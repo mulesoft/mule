@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
+import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.isNoPolicyOperation;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
@@ -73,13 +74,13 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -154,6 +155,18 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected ExecutionMediator executionMediator;
   protected ComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
+  /**
+   * MULE-18375: When a policy is applied to an operation that has defined a target, it's necessary to wait until the policy
+   * finishes to calculate the return value with {@link #returnDelegate}. But in this case, because of in order to execute the
+   * rest of the policy we need to transform the {@link Result} returned by the operation into a {@link CoreEvent}, we use
+   * {@link #valueReturnDelegate} as a helper class to do this transformation. It's used only when there is an operation that
+   * defines a target, and at the same time, there are operation policies applied to it. Finally, when the policy finishes, the
+   * proper {@link #returnDelegate} is executed.
+   * <p>
+   * It's an horrible solution, we only need a piece of code that transforms an {@link Object} into a {@link CoreEvent} and not a
+   * {@link ReturnDelegate} .
+   */
+  private ReturnDelegate valueReturnDelegate;
   protected PolicyManager policyManager;
 
   private String resolvedProcessorRepresentation;
@@ -198,13 +211,18 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           final Scheduler currentScheduler = ((InternalEvent) event).getInternalParameter(PROCESSOR_SCHEDULER_CONTEXT_KEY);
 
           OperationExecutionFunction operationExecutionFunction;
+          OperationPolicy operationPolicy = policyManager.createOperationPolicy(this, event, () -> resolutionResult);
+
+          boolean isTargetWithPolicies = !isNoPolicyOperation(operationPolicy) && !isBlank(target);
+
+          final ReturnDelegate processReturnDelegate = isTargetWithPolicies ? valueReturnDelegate : returnDelegate;
 
           if (shouldUsePrecalculatedContext(event)) {
             ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
 
             operationExecutionFunction = (parameters, operationEvent) -> {
               operationContext.setCurrentScheduler(currentScheduler != null ? currentScheduler : IMMEDIATE_SCHEDULER);
-              return doProcessWithErrorMapping(operationEvent, operationContext);
+              return doProcessWithErrorMapping(operationEvent, operationContext, processReturnDelegate);
             };
           } else {
             operationExecutionFunction = (parameters, operationEvent) -> {
@@ -215,16 +233,22 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               } catch (MuleException e) {
                 return error(e);
               }
-              return doProcessWithErrorMapping(operationEvent, operationContext);
+              return doProcessWithErrorMapping(operationEvent, operationContext, processReturnDelegate);
             };
           }
 
           if (getLocation() != null) {
             ((DefaultFlowCallStack) event.getFlowCallStack())
                 .setCurrentProcessorPath(resolvedProcessorRepresentation);
-            return Mono.from(policyManager
-                .createOperationPolicy(this, event, () -> resolutionResult)
-                .process(event, operationExecutionFunction, () -> resolutionResult, getLocation()));
+
+            return Mono.from(operationPolicy
+                .process(event, operationExecutionFunction, () -> resolutionResult, getLocation()))
+                .map(checkedFunction(result -> {
+                  if (!isTargetWithPolicies) {
+                    return result;
+                  }
+                  return returnDelegate.asReturnValue(result, createExecutionContext(event));
+                }));
           } else {
             // If this operation has no component location then it is internal. Don't apply policies on internal operations.
             return Mono.from(operationExecutionFunction.execute(resolutionResult, event));
@@ -282,8 +306,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    * with the addition of many additional flatMaps. It would be slightly clearer to create the MessagingException in
    * ReactorCompletionCallback where Mono.error is used but we don't have a reference to the processor there.
    */
-  private Publisher<CoreEvent> doProcessWithErrorMapping(CoreEvent operationEvent, ExecutionContextAdapter<T> operationContext) {
-    return doProcess(operationEvent, operationContext)
+  private Publisher<CoreEvent> doProcessWithErrorMapping(CoreEvent operationEvent, ExecutionContextAdapter<T> operationContext,
+                                                         ReturnDelegate delegate) {
+    return doProcess(operationEvent, operationContext, delegate)
         .onErrorMap(e -> !(e instanceof MessagingException),
                     e -> {
                       MessagingException ex = new MessagingException(operationEvent, e, this);
@@ -300,17 +325,21 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   protected Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<T> operationContext) {
+    return doProcess(event, operationContext, returnDelegate);
+  }
+
+  private Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<T> operationContext, ReturnDelegate delegate) {
     return executeOperation(operationContext)
-        .map(value -> asReturnValue(operationContext, value))
-        .switchIfEmpty(fromCallable(() -> asReturnValue(operationContext, null)))
+        .map(value -> asReturnValue(operationContext, value, delegate))
+        .switchIfEmpty(fromCallable(() -> asReturnValue(operationContext, null, delegate)))
         .onErrorMap(Exceptions::unwrap);
   }
 
-  private CoreEvent asReturnValue(ExecutionContextAdapter<T> operationContext, Object value) {
+  private CoreEvent asReturnValue(ExecutionContextAdapter<T> operationContext, Object value, ReturnDelegate delegate) {
     if (value instanceof CoreEvent) {
       return (CoreEvent) value;
     } else {
-      return returnDelegate.asReturnValue(value, operationContext);
+      return delegate.asReturnValue(value, operationContext);
     }
   }
 
@@ -332,6 +361,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected void doInitialise() throws InitialisationException {
     if (!initialised) {
       returnDelegate = createReturnDelegate();
+      valueReturnDelegate = getValueReturnDelegate();
       initialiseIfNeeded(resolverSet, muleContext);
       componentExecutor = createComponentExecutor();
       executionMediator = createExecutionMediator();

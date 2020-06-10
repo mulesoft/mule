@@ -76,6 +76,14 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation) -> operationExecutionFunction
           .execute(opParamProcessor.getOperationParameters(), operationEvent);
 
+  /**
+   * @param policy the {@link OperationPolicy} to evaluate
+   * @return {@code true} if the provided policy is a no-op, {@code false} if a policy is actually applied.
+   */
+  public static boolean isNoPolicyOperation(OperationPolicy policy) {
+    return NO_POLICY_OPERATION.equals(policy);
+  }
+
   private MuleContext muleContext;
 
   private Registry registry;
