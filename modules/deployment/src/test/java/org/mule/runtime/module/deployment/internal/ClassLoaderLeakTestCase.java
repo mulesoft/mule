@@ -7,18 +7,28 @@ package org.mule.runtime.module.deployment.internal;
  */
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-import java.lang.ref.PhantomReference;
-import java.lang.ref.ReferenceQueue;
-
-import org.junit.Test;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.Test;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase {
 
@@ -27,11 +37,11 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   private static final int PROBER_POLIING_TIMEOUT = 5000;
 
-  private String appName;
+  private final String appName;
 
-  private String xmlFile;
+  private final String xmlFile;
 
-  private boolean useEchoPluginInApp;
+  private final boolean useEchoPluginInApp;
 
   private TestDeploymentListener deploymentListener;
 
@@ -68,6 +78,47 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
     }));
   }
 
+  @Test
+  @Issue("MULE-18480")
+  @Description("When an artifact is redeployed, objects associated to the original deployment are released befroe deploying the new one.")
+  public void redeployPreviousAppEagerlyGCd() throws Exception {
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
+    deploymentService.addDeploymentListener(mockDeploymentListener);
+
+    ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder();
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+    assertThat(getDeploymentListener().isAppDeployed(), is(true));
+
+    final PhantomReference<Application> firstAppRef =
+        new PhantomReference<>(deploymentService.findApplication(appName), new ReferenceQueue<>());
+
+    AtomicReference<Throwable> redeploymentSuccessThrown = new AtomicReference<>();
+
+    doAnswer(invocation -> {
+      try {
+        new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+          System.gc();
+          assertThat(firstAppRef.isEnqueued(), is(true));
+          return true;
+        }));
+      } catch (Throwable t) {
+        redeploymentSuccessThrown.set(t);
+      }
+
+      return null;
+    }).when(mockDeploymentListener).onRedeploymentSuccess(appName);
+
+    deploymentService.redeploy(appName);
+
+    // Application was redeployed
+    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(appName);
+      return true;
+    }));
+    assertThat(redeploymentSuccessThrown.get(), is(nullValue()));
+  }
+
   private ApplicationFileBuilder getApplicationFileBuilder() throws Exception {
     if (useEchoPluginInApp) {
       return createExtensionApplicationWithServices(xmlFile + ".xml",
@@ -99,9 +150,9 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     private boolean appUndeployed;
 
-    private String appName;
+    private final String appName;
 
-    private ClassLoaderLeakTestCase deploymentTestCase;
+    private final ClassLoaderLeakTestCase deploymentTestCase;
 
     protected MuleDeploymentService deploymentService;
 
@@ -116,7 +167,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
     public void onDeploymentSuccess(String artifactName) {
       Application app = deploymentTestCase.findApp(appName, 1);
       appDeployed = true;
-      phantomReference = new PhantomReference<ArtifactClassLoader>(app.getArtifactClassLoader(), new ReferenceQueue<>());
+      phantomReference = new PhantomReference<>(app.getArtifactClassLoader(), new ReferenceQueue<>());
     };
 
     @Override

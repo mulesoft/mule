@@ -68,7 +68,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   private final ArtifactDeploymentTemplate deploymentTemplate;
   private AbstractDeployableArtifactFactory<T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
-  private MuleContextListenerFactory muleContextListenerFactory;
+  private final MuleContextListenerFactory muleContextListenerFactory;
 
 
   public DefaultArchiveDeployer(final ArtifactDeployer deployer,
@@ -220,6 +220,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       if (isRedeploy) {
         deploymentListener.onRedeploymentStart(artifactName);
         deploymentTemplate.preRedeploy(artifact);
+        artifact = null;
         undeployArtifact(artifactName, false);
       }
 
