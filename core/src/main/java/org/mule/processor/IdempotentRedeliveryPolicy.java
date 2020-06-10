@@ -22,7 +22,6 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.Message;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.util.lock.LockFactory;
