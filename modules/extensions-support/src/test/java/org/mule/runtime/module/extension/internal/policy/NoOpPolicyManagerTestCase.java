@@ -1,0 +1,30 @@
+package org.mule.runtime.module.extension.internal.policy;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
+
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
+import org.mule.runtime.core.internal.policy.OperationPolicy;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+public class NoOpPolicyManagerTestCase extends AbstractMuleTestCase {
+
+  private NoOpPolicyManager noOpPolicyManager = new NoOpPolicyManager();
+
+  @Test
+  public void noOpPolicyManagerCreatesNoPolicyOperation() {
+    Component operation = mock(Component.class);
+    CoreEvent operationEvent = mock(CoreEvent.class);
+    OperationParametersProcessor operationParameters = mock(OperationParametersProcessor.class);
+
+    OperationPolicy policy = noOpPolicyManager.createOperationPolicy(operation, operationEvent, operationParameters);
+
+    assertThat(policy, is(noPolicyOperation()));
+  }
+}
