@@ -755,18 +755,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     final Scheduler currentScheduler = (Scheduler) ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
         .orElse(IMMEDIATE_SCHEDULER);
 
-    ExecutionContextAdapter<T> operationContext;
-    if (shouldUsePrecalculatedContext(event)) {
-      operationContext = getPrecalculatedContext(oep.getOperationEvent());
-      operationContext.setCurrentScheduler(currentScheduler);
-      ((InternalEvent) operationContext.getEvent()).setSdkInternalContext(((InternalEvent) event).getSdkInternalContext());
-    } else {
-      operationContext = createExecutionContext(oep.getConfiguration(),
-                                                oep.getParameters(),
-                                                oep.getOperationEvent(),
-                                                currentScheduler);
-    }
-
+    ExecutionContextAdapter<T> operationContext = oep.getExecutionContextAdapter();
 
     executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext,
                                               isTargetWithPolicies(event) ? valueReturnDelegate : returnDelegate));
