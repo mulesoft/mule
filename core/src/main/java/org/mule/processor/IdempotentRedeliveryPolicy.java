@@ -8,8 +8,10 @@ package org.mule.processor;
 
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
+import com.google.common.primitives.Bytes;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -20,6 +22,7 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.Message;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.util.lock.LockFactory;
@@ -283,8 +286,10 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     {
         if (useSecureHash)
         {
-            Object payload = event.getMessage().getPayload();
-            byte[] bytes = (byte[]) objectToByteArray.transform(payload);
+            MuleMessage message = event.getMessage();
+            Object payload = message.getPayload();
+            byte[] payloadBytes = (byte[]) objectToByteArray.transform(payload);
+            byte[] bytes = Bytes.concat(payloadBytes, message.getUniqueId().getBytes());
             if (payload instanceof InputStream)
             {
                 // We've consumed the stream.

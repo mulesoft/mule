@@ -124,6 +124,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
     public void testMessageRedeliveryUsingMemory() throws Exception
     {
         when(message.getPayload()).thenReturn(STRING_MESSAGE);
+        when(message.getUniqueId()).thenReturn(STRING_MESSAGE);
         irp.initialise();
         processUntilFailure();
         verify(mockDlqMessageProcessor, VerificationModeFactory.times(1)).process(event);
@@ -133,6 +134,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
     public void testMessageRedeliveryUsingSerializationStore() throws Exception
     {
         when(message.getPayload()).thenReturn(STRING_MESSAGE);
+        when(message.getUniqueId()).thenReturn(STRING_MESSAGE);
         reset(mockObjectStoreManager);
         final ObjectStore serializationObjectStore = new SerializationObjectStore();
         when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt())).thenAnswer(new Answer<ObjectStore>()
@@ -152,6 +154,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
     public void testThreadSafeObjectStoreUsage() throws Exception
     {
         when(message.getPayload()).thenReturn(STRING_MESSAGE);
+        when(message.getUniqueId()).thenReturn(STRING_MESSAGE);
         irp.setListener(mockWaitingMessageProcessor);
         irp.initialise();
         ExecuteIrpThread firstIrpExecutionThread = new ExecuteIrpThread();
