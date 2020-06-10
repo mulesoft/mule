@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
@@ -42,7 +43,6 @@ import java.util.Properties;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   private final ArtifactDeploymentTemplate deploymentTemplate;
   private AbstractDeployableArtifactFactory<T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
-  private MuleContextListenerFactory muleContextListenerFactory;
+  private final MuleContextListenerFactory muleContextListenerFactory;
 
 
   public DefaultArchiveDeployer(final ArtifactDeployer deployer,
@@ -489,6 +489,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       if (isRedeploy) {
         deploymentListener.onRedeploymentStart(artifactName);
         deploymentTemplate.preRedeploy(artifact);
+        artifact = null;
         undeployArtifact(artifactName, false);
       }
 
