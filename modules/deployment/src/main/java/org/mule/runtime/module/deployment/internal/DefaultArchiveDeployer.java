@@ -23,6 +23,7 @@ import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -393,28 +394,33 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   @Override
-  public void redeploy(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException {
-    log(miniSplash(format("Redeploying artifact '%s'", artifact.getArtifactName())));
+  public void redeploy(String artifactName, Optional<Properties> deploymentProperties) throws DeploymentException {
+    log(miniSplash(format("Redeploying artifact '%s'", artifactName)));
 
-    deploymentListener.onRedeploymentStart(artifact.getArtifactName());
+    T artifact = findArtifact(artifactName);
+    final File artifactLocation = artifact.getLocation();
+    final DeployableArtifactDescriptor artifactDescriptor = artifact.getDescriptor();
+
+    deploymentListener.onRedeploymentStart(artifactName);
 
     deploymentTemplate.preRedeploy(artifact);
 
-    if (!artifactZombieMap.containsKey(artifact.getArtifactName())) {
-      deploymentListener.onUndeploymentStart(artifact.getArtifactName());
+    if (!artifactZombieMap.containsKey(artifactName)) {
+      deploymentListener.onUndeploymentStart(artifactName);
       try {
         deployer.undeploy(artifact);
-        deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
+        artifact = null;
+        deploymentListener.onUndeploymentSuccess(artifactName);
       } catch (Throwable e) {
-        deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
-        deploymentListener.onRedeploymentFailure(artifact.getArtifactName(), e);
+        deploymentListener.onUndeploymentFailure(artifactName, e);
+        deploymentListener.onRedeploymentFailure(artifactName, e);
       }
     }
 
-    deploymentListener.onDeploymentStart(artifact.getArtifactName());
+    deploymentListener.onDeploymentStart(artifactName);
     try {
-      artifact = createArtifact(artifact.getLocation(),
-                                ofNullable(resolveDeploymentProperties(artifact.getDescriptor().getDataFolderName(),
+      artifact = createArtifact(artifactLocation,
+                                ofNullable(resolveDeploymentProperties(artifactDescriptor.getDataFolderName(),
                                                                        deploymentProperties)));
       trackArtifact(artifact);
 

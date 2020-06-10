@@ -12,8 +12,8 @@ import static java.util.Optional.empty;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.find;
-import static org.apache.commons.collections.CollectionUtils.select;
 import static org.apache.commons.collections.CollectionUtils.subtract;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
@@ -23,6 +23,7 @@ import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -445,7 +446,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   private String[] removeDuplicateAppNames(String[] apps) {
-    List<String> appNames = new LinkedList<String>();
+    List<String> appNames = new LinkedList<>();
 
     for (String appName : apps) {
       if (!appNames.contains(appName)) {
@@ -457,30 +458,32 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   private void redeployModifiedDomains() {
-    Collection redeployableDomains = getArtifactsToRedeploy(domains);
-    redeployModifiedArtifacts(redeployableDomains, domainTimestampListener, domainArchiveDeployer);
+    Collection<String> redeployableDomains = getArtifactsToRedeploy(domains, domainTimestampListener);
+    redeployModifiedArtifacts(redeployableDomains, domainArchiveDeployer);
   }
 
   private void redeployModifiedApplications() {
-    Collection redeployableApplications = getArtifactsToRedeploy(applications);
-    redeployModifiedArtifacts(redeployableApplications, applicationTimestampListener, applicationArchiveDeployer);
+    Collection<String> redeployableApplications = getArtifactsToRedeploy(applications, applicationTimestampListener);
+    redeployModifiedArtifacts(redeployableApplications, applicationArchiveDeployer);
   }
 
-  private <T extends DeployableArtifact> Collection getArtifactsToRedeploy(Collection<T> collection) {
-    return select(collection, object -> ((DeployableArtifact) object).getDescriptor().isRedeploymentEnabled());
+  private <T extends DeployableArtifact> Collection<String> getArtifactsToRedeploy(Collection<T> collection,
+                                                                                   ArtifactTimestampListener<T> artifactTimestampListener) {
+    return collection.stream()
+        .filter(artifact -> artifact.getDescriptor().isRedeploymentEnabled())
+        .filter(artifactTimestampListener::isArtifactResourceUpdated)
+        .map(artifact -> artifact.getArtifactName())
+        .collect(toList());
   }
 
-  private <T extends Artifact> void redeployModifiedArtifacts(Collection<T> artifacts,
-                                                              ArtifactTimestampListener<T> artifactTimestampListener,
+  private <T extends Artifact> void redeployModifiedArtifacts(Collection<String> artifactNames,
                                                               ArchiveDeployer<T> artifactArchiveDeployer) {
-    for (T artifact : artifacts) {
-      if (artifactTimestampListener.isArtifactResourceUpdated(artifact)) {
-        try {
-          artifactArchiveDeployer.redeploy(artifact, empty());
-        } catch (DeploymentException e) {
-          if (logger.isDebugEnabled()) {
-            logger.debug("Error redeploying artifact {}", artifact.getArtifactName(), e);
-          }
+    for (String artifactName : artifactNames) {
+      try {
+        artifactArchiveDeployer.redeploy(artifactName, empty());
+      } catch (DeploymentException e) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Error redeploying artifact {}", artifactName, e);
         }
       }
     }
@@ -499,7 +502,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   private static class ArtifactTimestampListener<T extends Artifact> implements PropertyChangeListener {
 
-    private Map<String, ArtifactResourcesTimestamp<T>> artifactConfigResourcesTimestaps = new HashMap<>();
+    private final Map<String, ArtifactResourcesTimestamp<T>> artifactConfigResourcesTimestaps = new HashMap<>();
 
     public ArtifactTimestampListener(ObservableList<T> artifacts) {
       artifacts.addPropertyChangeListener(this);
