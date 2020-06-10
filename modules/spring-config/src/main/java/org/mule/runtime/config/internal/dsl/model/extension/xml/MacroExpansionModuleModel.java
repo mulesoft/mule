@@ -272,8 +272,9 @@ public class MacroExpansionModuleModel {
                                            ComponentAst comp, ConfigurationModel configurationModel) {
     Map<String, String> propertiesMap = comp.getParameters()
         .stream()
+        .filter(paramAst -> paramAst.getValue().isRight())
         .collect(toMap(paramAst -> paramAst.getModel().getName(),
-                       paramAst -> paramAst.getValue().reduce(v -> v.toString(), v -> v.toString())));
+                       paramAst -> paramAst.getValue().getRight().toString()));
     Map<String, String> connectionPropertiesMap =
         extractConnectionProperties(comp, configurationModel);
     propertiesMap.putAll(connectionPropertiesMap);
