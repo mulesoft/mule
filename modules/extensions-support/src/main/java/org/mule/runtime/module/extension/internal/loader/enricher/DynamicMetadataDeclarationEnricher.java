@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isASTMode;
 
@@ -238,11 +239,10 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       enrichResolversInformation(declaration, new MetadataScopeAdapter() {
 
         private OutputTypeResolver outputResolver = resolverFactory.getOutputResolver();
-        private MetadataScopeAdapter delegate = new DefaultMetadataScopeAdapter(extensionType, method, declaration);
 
         @Override
         public boolean hasInputResolvers() {
-          return delegate.hasInputResolvers();
+          return false;
         }
 
         @Override
@@ -252,17 +252,17 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
 
         @Override
         public boolean hasAttributesResolver() {
-          return delegate.hasAttributesResolver();
+          return false;
         }
 
         @Override
         public Supplier<? extends TypeKeysResolver> getKeysResolver() {
-          return delegate.getKeysResolver();
+          return () -> nullMetadataResolver;
         }
 
         @Override
         public Map<String, Supplier<? extends InputTypeResolver>> getInputResolvers() {
-          return delegate.getInputResolvers();
+          return emptyMap();
         }
 
         @Override
@@ -272,7 +272,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
 
         @Override
         public Supplier<? extends AttributesTypeResolver> getAttributesResolver() {
-          return delegate.getAttributesResolver();
+          return () -> nullMetadataResolver;
         }
       });
     }
