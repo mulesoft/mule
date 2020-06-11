@@ -227,16 +227,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected ExecutionMediator executionMediator;
   protected CompletableComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
-  /**
+  /*
    * TODO: MULE-18483 When a policy is applied to an operation that has defined a target, it's necessary to wait until the policy
    * finishes to calculate the return value with {@link #returnDelegate}. But in this case, because of in order to execute the
-   * rest of the policy we need to transform the {@link Result} returned by the operation into a {@link CoreEvent}, we use
-   * {@link #valueReturnDelegate} as a helper class to do this transformation. It's used only when there is an operation that
-   * defines a target, and at the same time, there are operation policies applied to it. Finally, when the policy finishes, the
-   * proper {@link #returnDelegate} is executed.
-   * <p>
-   * It's an horrible solution, we only need a piece of code that transforms an {@link Object} into a {@link CoreEvent} and not a
-   * {@link ReturnDelegate} .
+   * rest of the policy we need to transform the {@link Result} returned by the operation into a {@link CoreEvent}, we use {@link
+   * #valueReturnDelegate} as a helper class to do this transformation. It's used only when there is an operation that defines a
+   * target, and at the same time, there are operation policies applied to it. Finally, when the policy finishes, the proper
+   * {@link #returnDelegate} is executed. It'd be ideal to improve this by extracting from {@link ReturnDelegate} the logic
+   * that transforms an {@link Object} into a {@link CoreEvent}.
    */
   private ReturnDelegate valueReturnDelegate;
   protected PolicyManager policyManager;
