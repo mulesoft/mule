@@ -83,6 +83,6 @@ public class SdkInternalContextTestCase extends AbstractMuleTestCase {
       public void error(Throwable e) {
         throw new MuleRuntimeException(e);
       }
-    });
+    }, null);
   }
 }

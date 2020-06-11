@@ -20,6 +20,7 @@ import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 import java.util.Map;
 import java.util.Optional;
@@ -79,10 +80,11 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
 
   public void setOperationExecutionParams(ComponentLocation location, String eventId,
                                           Optional<ConfigurationInstance> configuration,
-                                          Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback) {
+                                          Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback,
+                                          ExecutionContextAdapter executionContextAdapter) {
     locationSpecificContext.get(new Pair<>(location, eventId)).setOperationExecutionParams(configuration, parameters,
                                                                                            operationEvent,
-                                                                                           callback);
+                                                                                           callback, executionContextAdapter);
   }
 
   public OperationExecutionParams getOperationExecutionParams(ComponentLocation location, String eventId) {
@@ -140,8 +142,10 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     }
 
     public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
-                                            CoreEvent operationEvent, ExecutorCallback callback) {
-      this.operationExecutionParams = new OperationExecutionParams(configuration, parameters, operationEvent, callback);
+                                            CoreEvent operationEvent, ExecutorCallback callback,
+                                            ExecutionContextAdapter executionContextAdapter) {
+      this.operationExecutionParams =
+          new OperationExecutionParams(configuration, parameters, operationEvent, callback, executionContextAdapter);
     }
 
     public Optional<ConfigurationInstance> getConfiguration() {
@@ -175,13 +179,16 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     private final Map<String, Object> parameters;
     private final CoreEvent operationEvent;
     private final ExecutorCallback callback;
+    private final ExecutionContextAdapter executionContextAdapter;
 
     public OperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
-                                    CoreEvent operationEvent, ExecutorCallback callback) {
+                                    CoreEvent operationEvent, ExecutorCallback callback,
+                                    ExecutionContextAdapter executionContextAdapter) {
       this.configuration = configuration;
       this.parameters = parameters;
       this.operationEvent = operationEvent;
       this.callback = callback;
+      this.executionContextAdapter = executionContextAdapter;
     }
 
     public Optional<ConfigurationInstance> getConfiguration() {
@@ -198,6 +205,10 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
 
     public ExecutorCallback getCallback() {
       return callback;
+    }
+
+    public ExecutionContextAdapter getExecutionContextAdapter() {
+      return executionContextAdapter;
     }
   }
 }

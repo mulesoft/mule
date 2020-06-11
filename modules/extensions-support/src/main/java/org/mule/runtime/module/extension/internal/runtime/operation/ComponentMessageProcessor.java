@@ -105,6 +105,7 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -226,6 +227,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected ExecutionMediator executionMediator;
   protected CompletableComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
+  /*
+   * TODO: MULE-18483 When a policy is applied to an operation that has defined a target, it's necessary to wait until the policy
+   * finishes to calculate the return value with {@link #returnDelegate}. But in this case, because of in order to execute the
+   * rest of the policy we need to transform the {@link Result} returned by the operation into a {@link CoreEvent}, we use {@link
+   * #valueReturnDelegate} as a helper class to do this transformation. It's used only when there is an operation that defines a
+   * target, and at the same time, there are operation policies applied to it. Finally, when the policy finishes, the proper
+   * {@link #returnDelegate} is executed. It'd be ideal to improve this by extracting from {@link ReturnDelegate} the logic
+   * that transforms an {@link Object} into a {@link CoreEvent}.
+   */
+  private ReturnDelegate valueReturnDelegate;
   protected PolicyManager policyManager;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
@@ -357,7 +368,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               if (!async && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
                 onEventSynchronous(event, executorCallback, ctx);
               } else {
-                onEvent(event, executorCallback);
+                onEvent(event, executorCallback, ctx);
               }
             })
             .map(e -> Either.empty());
@@ -393,7 +404,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private void onEvent(CoreEvent event, ExecutorCallback executorCallback) {
+  private void onEvent(CoreEvent event, ExecutorCallback executorCallback, Context ctx) {
     try {
       SdkInternalContext sdkInternalContext = from(event);
       final ComponentLocation location = getLocation();
@@ -403,7 +414,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult(location, eventId);
 
       OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
-        sdkInternalContext.setOperationExecutionParams(location, eventId, configuration, parameters, operationEvent, callback);
+        setOperationExecutionParams(location, event, configuration, parameters, operationEvent, callback, ctx);
 
         fluxSupplier.get().next(operationEvent);
       };
@@ -411,8 +422,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       if (location != null) {
         ((DefaultFlowCallStack) event.getFlowCallStack())
             .pushCurrentProcessorPath(resolvedProcessorRepresentation);
-        sdkInternalContext.getPolicyToApply(location, eventId)
-            .process(event, operationExecutionFunction, () -> resolutionResult, location, executorCallback);
+
+        ExecutorCallback effectiveCallback =
+            isTargetWithPolicies(event) ? getExecutionCallbackForPolicyAndOperationWithTarget(event, executorCallback)
+                : executorCallback;
+
+        sdkInternalContext.getPolicyToApply(location, eventId).process(event, operationExecutionFunction, () -> resolutionResult,
+                                                                       location, effectiveCallback);
       } else {
         // If this operation has no component location then it is internal. Don't apply policies on internal operations.
         operationExecutionFunction.execute(resolutionResult, event, executorCallback);
@@ -432,23 +448,70 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult(location, eventId);
 
       OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
-        sdkInternalContext.setOperationExecutionParams(location, eventId, configuration, parameters, operationEvent, callback);
+        setOperationExecutionParams(location, event, configuration, parameters, operationEvent, callback, ctx);
 
         prepareAndExecuteOperation(event, () -> callback, ctx);
       };
 
-      operationExecutionFunction.execute(resolutionResult, event, executorCallback);
+      ExecutorCallback effectiveCallback =
+          isTargetWithPolicies(event) ? getExecutionCallbackForPolicyAndOperationWithTarget(event, executorCallback)
+              : executorCallback;
+
+      operationExecutionFunction.execute(resolutionResult, event, effectiveCallback);
     } catch (Throwable t) {
       executorCallback.error(unwrap(t));
     }
   }
 
-  private ExecutorCallback mapped(ExecutorCallback callback, ExecutionContextAdapter<T> operationContext) {
+  /**
+   * Only used in case the operation defines a target and there are operation policies applied to it.
+   *
+   * @param event
+   * @param delegateCallback
+   * @return
+   * @see {@link #valueReturnDelegate}
+   */
+  private ExecutorCallback getExecutionCallbackForPolicyAndOperationWithTarget(CoreEvent event,
+                                                                               ExecutorCallback delegateCallback) {
+    return new ExecutorCallback() {
+
+      @Override
+      public void complete(Object o) {
+        ExecutionContextAdapter operationContext = null;
+        try {
+          OperationExecutionParams operationExecutionParams =
+              from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
+
+          if (operationExecutionParams != null) {
+            operationContext = operationExecutionParams.getExecutionContextAdapter();
+            operationContext.changeEvent(event);
+          } else {
+            // there was an error propagated before <execute-next> and the operation execution parameters don't exists yet.
+            operationContext = createExecutionContext(event);
+          }
+
+          delegateCallback.complete(returnDelegate.asReturnValue(o, operationContext));
+        } catch (MuleException e) {
+          delegateCallback.error(e);
+        } catch (Throwable t) {
+          delegateCallback.error(unwrap(t));
+        }
+      }
+
+      @Override
+      public void error(Throwable t) {
+        delegateCallback.error(unwrap(t));
+      }
+    };
+  }
+
+  private ExecutorCallback mapped(ExecutorCallback callback, ExecutionContextAdapter<T> operationContext,
+                                  ReturnDelegate delegate) {
     return new ExecutorCallback() {
 
       @Override
       public void complete(Object value) {
-        callback.complete(returnDelegate.asReturnValue(value, operationContext));
+        callback.complete(delegate.asReturnValue(value, operationContext));
       }
 
       @Override
@@ -456,6 +519,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         callback.error(unwrap(t));
       }
     };
+  }
+
+  // TODO MULE-18482: decouple policies and operation logic
+  private boolean isTargetWithPolicies(CoreEvent event) {
+    return !from(event).isNoPolicyOperation(getLocation(), event.getContext().getId()) && !isBlank(target);
   }
 
   private Optional<ConfigurationInstance> resolveConfiguration(CoreEvent event) {
@@ -502,6 +570,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         throw new InitialisationException(createStaticMessage("Could not resolve transactional configuration"), e, this);
       }
       returnDelegate = createReturnDelegate();
+      valueReturnDelegate = getValueReturnDelegate();
       initialiseIfNeeded(resolverSet, muleContext);
       componentExecutor = createComponentExecutor();
       executionMediator = createExecutionMediator();
@@ -602,7 +671,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
                 from(event)
                     .getOperationExecutionParams(getLocation(), event.getContext().getId())
-                    .getCallback().error(((EventProcessingException) t).getCause());
+                    .getCallback().error(t.getCause());
               })));
     },
                                                 getRuntime().availableProcessors());
@@ -645,25 +714,43 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return event;
   }
 
-  private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
-    OperationExecutionParams oep = from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
+  private void setOperationExecutionParams(ComponentLocation location, CoreEvent event,
+                                           Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
+                                           CoreEvent operationEvent, ExecutorCallback callback, Context ctx) {
+
+    SdkInternalContext sdkInternalContext = SdkInternalContext.from(event);
 
     final Scheduler currentScheduler = (Scheduler) ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
         .orElse(IMMEDIATE_SCHEDULER);
 
     ExecutionContextAdapter<T> operationContext;
     if (shouldUsePrecalculatedContext(event)) {
-      operationContext = getPrecalculatedContext(oep.getOperationEvent());
+      operationContext = getPrecalculatedContext(operationEvent);
       operationContext.setCurrentScheduler(currentScheduler);
       ((InternalEvent) operationContext.getEvent()).setSdkInternalContext(((InternalEvent) event).getSdkInternalContext());
     } else {
-      operationContext = createExecutionContext(oep.getConfiguration(),
-                                                oep.getParameters(),
-                                                oep.getOperationEvent(),
+      operationContext = createExecutionContext(configuration,
+                                                parameters,
+                                                operationEvent,
                                                 currentScheduler);
     }
 
-    executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext));
+    sdkInternalContext.setOperationExecutionParams(location, event.getContext().getId(), configuration, parameters,
+                                                   operationEvent, callback, operationContext);
+
+  }
+
+
+  private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
+    OperationExecutionParams oep = from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
+
+    final Scheduler currentScheduler = (Scheduler) ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
+        .orElse(IMMEDIATE_SCHEDULER);
+
+    ExecutionContextAdapter<T> operationContext = oep.getExecutionContextAdapter();
+
+    executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext,
+                                              isTargetWithPolicies(event) ? valueReturnDelegate : returnDelegate));
   }
 
   private void initRetryPolicyResolver() {
