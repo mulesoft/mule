@@ -79,6 +79,8 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   /**
    * @param policy the {@link OperationPolicy} to evaluate
    * @return {@code true} if the provided policy is a no-op, {@code false} if a policy is actually applied.
+   *
+   * @since 4.2.3
    */
   public static boolean isNoPolicyOperation(OperationPolicy policy) {
     return NO_POLICY_OPERATION.equals(policy);
