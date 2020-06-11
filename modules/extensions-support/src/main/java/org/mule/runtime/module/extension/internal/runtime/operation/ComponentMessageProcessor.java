@@ -228,7 +228,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected CompletableComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
   /**
-   * MULE-18375: When a policy is applied to an operation that has defined a target, it's necessary to wait until the policy
+   * TODO: MULE-18483 When a policy is applied to an operation that has defined a target, it's necessary to wait until the policy
    * finishes to calculate the return value with {@link #returnDelegate}. But in this case, because of in order to execute the
    * rest of the policy we need to transform the {@link Result} returned by the operation into a {@link CoreEvent}, we use
    * {@link #valueReturnDelegate} as a helper class to do this transformation. It's used only when there is an operation that
@@ -480,15 +480,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       @Override
       public void complete(Object o) {
         ExecutionContextAdapter operationContext = null;
-        CoreEvent originalEvent = null;
         try {
           OperationExecutionParams operationExecutionParams =
               from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
 
           if (operationExecutionParams != null) {
-            operationContext =
-                operationExecutionParams.getExecutionContextAdapter();
-            originalEvent = operationContext.getEvent();
+            operationContext = operationExecutionParams.getExecutionContextAdapter();
             operationContext.changeEvent(event);
           } else {
             // there was an error propagated before <execute-next> and the operation execution parameters don't exists yet.
@@ -500,10 +497,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           delegateCallback.error(e);
         } catch (Throwable t) {
           delegateCallback.error(unwrap(t));
-        } finally {
-          if (operationContext != null && originalEvent != null) {
-            operationContext.changeEvent(originalEvent);
-          }
         }
       }
 
@@ -530,6 +523,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     };
   }
 
+  // TODO MULE-18482: decouple policies and operation logic
   private boolean isTargetWithPolicies(CoreEvent event) {
     return !from(event).isNoPolicyOperation(getLocation(), event.getContext().getId()) && !isBlank(target);
   }
