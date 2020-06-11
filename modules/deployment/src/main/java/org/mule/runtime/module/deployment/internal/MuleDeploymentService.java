@@ -234,15 +234,6 @@ public class MuleDeploymentService implements DeploymentService {
     redeploy(artifactName, ofNullable(appProperties));
   }
 
-  @Override
-  public void redeploy(URI archiveUri, Properties appProperties) throws IOException {
-    deployTemplateMethod(archiveUri, ofNullable(appProperties), getAppsFolder(), applicationDeployer);
-  }
-
-  @Override
-  public void redeploy(URI archiveUri) throws IOException {
-    redeploy(archiveUri, null);
-  }
 
   @Override
   public void undeployDomain(String domainName) {
