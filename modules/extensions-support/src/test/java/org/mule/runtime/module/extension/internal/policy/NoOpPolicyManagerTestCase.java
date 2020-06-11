@@ -17,6 +17,7 @@ import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
 public class NoOpPolicyManagerTestCase extends AbstractMuleTestCase {
@@ -24,6 +25,7 @@ public class NoOpPolicyManagerTestCase extends AbstractMuleTestCase {
   private NoOpPolicyManager noOpPolicyManager = new NoOpPolicyManager();
 
   @Test
+  @Issue("MULE-18442")
   public void noOpPolicyManagerCreatesNoPolicyOperation() {
     Component operation = mock(Component.class);
     CoreEvent operationEvent = mock(CoreEvent.class);
