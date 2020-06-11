@@ -38,7 +38,6 @@ import org.mule.test.metadata.extension.model.shops.Order;
 import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
 import org.mule.test.metadata.extension.query.MetadataExtensionQueryTranslator;
 import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
-import org.mule.test.metadata.extension.query.QueryExtraResolver;
 import org.mule.test.metadata.extension.resolver.AnyJsonTypeStaticResolver;
 import org.mule.test.metadata.extension.resolver.TestAttributesResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestBooleanMetadataResolver;
@@ -47,7 +46,6 @@ import org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithK
 import org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam;
 import org.mule.test.metadata.extension.resolver.TestInputResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestInputResolverWithoutKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputAttributesResolverWithKeyResolver;
@@ -275,15 +273,6 @@ public class MetadataOperations {
       nativeOutputResolver = NativeQueryOutputResolver.class)
   @MediaType(TEXT_PLAIN)
   public String returnQuery(@MetadataKeyId String query) {
-    return query;
-  }
-
-  @Query(translator = MetadataExtensionQueryTranslator.class,
-      entityResolver = MetadataExtensionEntityResolver.class,
-      nativeOutputResolver = NativeQueryOutputResolver.class)
-  @MediaType(TEXT_PLAIN)
-  public String queryWithOtherMetadata(@MetadataKeyId(QueryExtraResolver.class) String query,
-                                       @TypeResolver(QueryExtraResolver.class) Object input) {
     return query;
   }
 
