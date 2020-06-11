@@ -265,7 +265,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   public void typeResolversInformationSetForDsql() throws Exception {
     OperationDeclaration query = getDeclaration(declaration.getOperations(), "queryWithOtherMetadata");
     Optional<TypeResolversInformationModelProperty> info = query
-            .getModelProperty(TypeResolversInformationModelProperty.class);
+        .getModelProperty(TypeResolversInformationModelProperty.class);
 
     assertThat(info.isPresent(), is(true));
     assertThat(info.get().getCategoryName(), is("QueryResolverCategory"));

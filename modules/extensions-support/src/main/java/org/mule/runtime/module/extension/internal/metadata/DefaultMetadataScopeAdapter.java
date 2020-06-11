@@ -33,10 +33,8 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
-import org.mule.runtime.extension.api.annotation.param.Query;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
-import org.mule.runtime.extension.api.metadata.NullQueryMetadataResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithDeclaringClass;
@@ -68,7 +66,6 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
   public DefaultMetadataScopeAdapter(Type extensionElement, MethodElement operation, OperationDeclaration declaration) {
     operation.getValueFromAnnotation(OutputResolver.class);
     Optional<OutputResolver> outputResolverDeclaration = operation.getAnnotation(OutputResolver.class);
-    Optional<Query> queryResolverDeclaration = operation.getAnnotation(Query.class);
     Optional<Pair<MetadataKeyId, MetadataType>> keyId = locateMetadataKeyId(declaration);
 
     inputResolvers = getInputResolvers(declaration);
@@ -85,9 +82,6 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
       keyId.ifPresent(pair -> keysResolver = getKeysResolver(pair.getRight(), pair.getLeft(),
                                                              () -> getCategoryName(outputResolver, attributesResolver,
                                                                                    inputResolvers)));
-    } else if (queryResolverDeclaration.isPresent()
-        && !(queryResolverDeclaration.get().nativeOutputResolver().equals(NullQueryMetadataResolver.class))) {
-      outputResolver = ResolverSupplier.of(queryResolverDeclaration.get().nativeOutputResolver());
     } else {
       initializeFromClass(extensionElement, operation, declaration);
     }
