@@ -34,7 +34,7 @@ public class RollbackExceptionStrategyRedeliveryCountTestCase extends Functional
     @Test
     public void testRollbackExceptionStrategyNumberOfRetries() throws Exception
     {
-        final CountDownLatch latch = new CountDownLatch(4);
+        final CountDownLatch latch = new CountDownLatch(8);
         LocalMuleClient client = muleContext.getClient();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
         {
@@ -45,6 +45,8 @@ public class RollbackExceptionStrategyRedeliveryCountTestCase extends Functional
             }
         });
         client.dispatch("vm://in8", "test", null);
+        client.dispatch("vm://in8", "test", null);
+
         if (!latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
         {
             fail("message should have been delivered at least 5 times");
@@ -52,7 +54,8 @@ public class RollbackExceptionStrategyRedeliveryCountTestCase extends Functional
         MuleMessage response = client.request("vm://dlqCounter", 20000);
         assertThat(response, IsNull.notNullValue());
         AtomicInteger counter = muleContext.getRegistry().lookupObject("counter");
-        assertThat(counter.get(), Is.is(4));
+        assertThat(counter.get(), Is.is(8));
     }
+
 
 }
