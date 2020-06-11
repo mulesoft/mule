@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.ComponentLocationProvider.resolveProcessorRepresentation;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -247,7 +248,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                   if (!isTargetWithPolicies) {
                     return result;
                   }
-                  return returnDelegate.asReturnValue(result, createExecutionContext(event));
+                  try {
+                    return returnDelegate.asReturnValue(result, createExecutionContext(event));
+                  } catch (Exception e) {
+                    throw new MessagingException(createStaticMessage(e.getMessage()), event, e);
+                  }
                 }));
           } else {
             // If this operation has no component location then it is internal. Don't apply policies on internal operations.
