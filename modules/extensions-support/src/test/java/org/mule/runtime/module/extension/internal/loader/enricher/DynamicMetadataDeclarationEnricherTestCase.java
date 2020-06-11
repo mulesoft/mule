@@ -257,8 +257,21 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
         .getModelProperty(TypeResolversInformationModelProperty.class);
 
     assertThat(info.isPresent(), is(true));
-    assertThat(info.get().getCategoryName(), is("MetadataExtensionEntityResolver"));
-    assertThat(info.get().getOutputResolver().get().getResolverName(), is(OUTPUT_PAYLOAD.name()));
+    assertThat(info.get().getCategoryName(), is("QueryResolverCategory"));
+    assertThat(info.get().getOutputResolver().get().getResolverName(), is(OUTPUT_PAYLOAD.name() + "-NativeQueryResolver"));
+  }
+
+  @Test
+  public void typeResolversInformationSetForDsql() throws Exception {
+    OperationDeclaration query = getDeclaration(declaration.getOperations(), "queryWithOtherMetadata");
+    Optional<TypeResolversInformationModelProperty> info = query
+            .getModelProperty(TypeResolversInformationModelProperty.class);
+
+    assertThat(info.isPresent(), is(true));
+    assertThat(info.get().getCategoryName(), is("QueryResolverCategory"));
+    assertThat(info.get().getKeysResolver().get().getResolverName(), is("QueryExtraMetadataResolver"));
+    assertThat(info.get().getParameterResolver("input").get().getResolverName(), is("QueryExtraMetadataResolver"));
+    assertThat(info.get().getOutputResolver().get().getResolverName(), is(OUTPUT_PAYLOAD.name() + "-NativeQueryResolver"));
   }
 
   private void assertParameterIsMetadataKeyPart(ParameterDeclaration param) {

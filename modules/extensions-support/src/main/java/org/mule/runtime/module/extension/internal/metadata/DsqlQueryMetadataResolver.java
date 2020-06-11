@@ -15,6 +15,7 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.resolving.MetadataComponent;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
@@ -40,6 +41,11 @@ final class DsqlQueryMetadataResolver implements OutputTypeResolver {
                             OutputTypeResolver nativeOutputResolver) {
     this.entityResolver = entityResolver;
     this.nativeOutputResolver = nativeOutputResolver;
+  }
+
+  @Override
+  public String getResolverName() {
+    return MetadataComponent.OUTPUT_PAYLOAD.name() + "-" + nativeOutputResolver.getResolverName();
   }
 
   /**
