@@ -7,8 +7,8 @@
 package org.mule.processor;
 
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static com.google.common.primitives.Bytes.concat;
 
-import com.google.common.primitives.Bytes;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -288,7 +288,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             MuleMessage message = event.getMessage();
             Object payload = message.getPayload();
             byte[] payloadBytes = (byte[]) objectToByteArray.transform(payload);
-            byte[] bytes = Bytes.concat(payloadBytes, message.getUniqueId().getBytes());
+            byte[] bytes = concat(payloadBytes, message.getUniqueId().getBytes());
             if (payload instanceof InputStream)
             {
                 // We've consumed the stream.
