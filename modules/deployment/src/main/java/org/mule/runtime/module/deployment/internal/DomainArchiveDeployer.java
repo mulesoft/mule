@@ -114,12 +114,12 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   }
 
   @Override
-  public void redeploy(Domain artifact, Optional<Properties> deploymentProperties) throws DeploymentException {
+  public void redeploy(String artifactName, Optional<Properties> deploymentProperties) throws DeploymentException {
     try {
-      domainDeployer.redeploy(artifact, deploymentProperties);
+      domainDeployer.redeploy(artifactName, deploymentProperties);
     } catch (DeploymentException e) {
       logger.warn(String.format("Failure during redeployment of domain %s, domain applications deployment will be skipped",
-                                artifact.getArtifactName()));
+                                artifactName));
       throw e;
     }
   }
