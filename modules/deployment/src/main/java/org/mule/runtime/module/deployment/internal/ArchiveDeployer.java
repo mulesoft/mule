@@ -42,7 +42,7 @@ public interface ArchiveDeployer<T extends Artifact> {
 
   void setDeploymentListener(DeploymentListener deploymentListener);
 
-  void redeploy(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException;
+  void redeploy(String artifactName, Optional<Properties> deploymentProperties) throws DeploymentException;
 
   Map<String, Map<URI, Long>> getArtifactsZombieMap();
 
