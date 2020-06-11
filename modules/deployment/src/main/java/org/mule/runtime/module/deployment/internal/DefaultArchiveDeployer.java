@@ -422,6 +422,18 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       artifact = createArtifact(artifactLocation,
                                 ofNullable(resolveDeploymentProperties(artifactDescriptor.getDataFolderName(),
                                                                        deploymentProperties)));
+    } catch (IOException t) {
+      try {
+        logDeploymentFailure(t, artifactName);
+        String msg = "Failed to deploy artifact: " + artifact.getArtifactName();
+        throw new DeploymentException(createStaticMessage(msg), t);
+      } finally {
+        deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
+        deploymentListener.onRedeploymentFailure(artifact.getArtifactName(), t);
+      }
+    }
+
+    try {
       trackArtifact(artifact);
 
       deployer.deploy(artifact);

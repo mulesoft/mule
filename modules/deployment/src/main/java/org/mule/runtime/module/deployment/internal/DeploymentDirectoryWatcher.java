@@ -472,7 +472,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     return collection.stream()
         .filter(artifact -> artifact.getDescriptor().isRedeploymentEnabled())
         .filter(artifactTimestampListener::isArtifactResourceUpdated)
-        .map(artifact -> artifact.getArtifactName())
+        .map(DeployableArtifact::getArtifactName)
         .collect(toList());
   }
 
