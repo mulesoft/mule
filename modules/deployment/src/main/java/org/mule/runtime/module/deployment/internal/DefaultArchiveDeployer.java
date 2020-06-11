@@ -425,11 +425,11 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     } catch (IOException t) {
       try {
         logDeploymentFailure(t, artifactName);
-        String msg = "Failed to deploy artifact: " + artifact.getArtifactName();
+        String msg = "Failed to deploy artifact: " + artifactName;
         throw new DeploymentException(createStaticMessage(msg), t);
       } finally {
-        deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
-        deploymentListener.onRedeploymentFailure(artifact.getArtifactName(), t);
+        deploymentListener.onDeploymentFailure(artifactName, t);
+        deploymentListener.onRedeploymentFailure(artifactName, t);
       }
     }
 
