@@ -264,7 +264,7 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   private void redeployDomain(String domainName, Optional<Properties> deploymentProperties) {
-    executeSynchronized(() -> domainDeployer.redeploy(findDomain(domainName), deploymentProperties));
+    executeSynchronized(() -> domainDeployer.redeploy(domainName, deploymentProperties));
   }
 
   @Override
@@ -392,7 +392,7 @@ public class MuleDeploymentService implements DeploymentService {
   private void redeploy(final String artifactName, final Optional<Properties> deploymentProperties) {
     executeSynchronized(() -> {
       try {
-        applicationDeployer.redeploy(findApplication(artifactName), deploymentProperties);
+        applicationDeployer.redeploy(artifactName, deploymentProperties);
       } catch (DeploymentException e) {
         if (logger.isDebugEnabled()) {
           logger.debug("Failure while redeploying application: " + artifactName, e);
