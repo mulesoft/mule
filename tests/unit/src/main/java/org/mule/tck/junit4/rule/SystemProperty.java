@@ -17,11 +17,18 @@ public class SystemProperty extends ExternalResource {
 
   /**
    * Utility method to execute a callable with a system property and restoring the property's value afterwards.
+   *
+   * @return the return value of the callable, or null if an exception was found during its execution.
    */
   public static <V> V runWithProperty(String name, String value, Callable<V> runnable) throws Throwable {
+    V callableValue;
     SystemProperty property = new SystemProperty(name, value);
     property.before();
-    V callableValue = runnable.call();
+    try {
+      callableValue = runnable.call();
+    } catch (Exception e) {
+      callableValue = null;
+    }
     property.after();
     return callableValue;
   }

@@ -156,7 +156,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
   @Test
   public void generate() throws Exception {
     if (extensionUnderTest == null) {
-      fail();
+      fail("There was a problem setting up the extension model for the test case.");
     }
     final String json = generator.serialize(extensionUnderTest).trim();
     try {
@@ -176,7 +176,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
   @Test
   public void load() {
     if (extensionUnderTest == null) {
-      fail();
+      fail("There was a problem setting up the extension model for the test case.");
     }
     ExtensionModel result = generator.deserialize(expectedJson);
     assertThat(result, is(extensionUnderTest));
