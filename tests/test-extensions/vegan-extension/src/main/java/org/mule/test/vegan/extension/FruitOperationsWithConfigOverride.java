@@ -7,6 +7,7 @@
 package org.mule.test.vegan.extension;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -18,6 +19,11 @@ public class FruitOperationsWithConfigOverride {
 
   public Integer getTimeToPeel(@Config EasyToEatConfig config,
                                @ConfigOverride Integer timeToPeel) {
+    return timeToPeel;
+  }
+
+  public long getTimeToPeelLong(@Config EasyToEatConfig config,
+                                @ConfigOverride long timeToPeel) {
     return timeToPeel;
   }
 
