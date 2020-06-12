@@ -12,6 +12,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
@@ -89,17 +90,10 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
   private ExtensionModelJsonSerializer generator;
   private String expectedJson;
 
-
   @Parameterized.Parameters(name = "{1}")
   public static Collection<Object[]> data() {
-    final ClassLoader classLoader = ExtensionModelJsonGeneratorTestCase.class.getClassLoader();
-    final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
-    when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
-        .thenReturn(asList(new JavaXmlDeclarationEnricher()));
-
     List<ExtensionJsonGeneratorTestUnit> extensions;
-    extensions = asList(
-                        newTestUnit(javaLoader, VeganExtension.class, "vegan.json"),
+    extensions = asList(newTestUnit(javaLoader, VeganExtension.class, "vegan.json"),
                         newTestUnit(javaLoader, PetStoreConnector.class, "petstore.json"),
                         newTestUnit(javaLoader, MetadataExtension.class, "metadata.json"),
                         newTestUnit(javaLoader, HeisenbergExtension.class, "heisenberg.json"),
@@ -115,6 +109,15 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
                         newTestUnit(javaLoader, ImplicitConfigExtension.class, "implicit-config.json"),
                         newTestUnit(javaLoader, NonImplicitConfigExtension.class, "non-implicit-config.json"),
                         newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.json"));
+
+    return createExtensionModels(extensions);
+  }
+
+  protected static Collection<Object[]> createExtensionModels(List<ExtensionJsonGeneratorTestUnit> extensions) {
+    final ClassLoader classLoader = ExtensionModelJsonGeneratorTestCase.class.getClassLoader();
+    final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
+    when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
+        .thenReturn(asList(new JavaXmlDeclarationEnricher()));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);
@@ -152,6 +155,9 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void generate() throws Exception {
+    if (extensionUnderTest == null) {
+      fail();
+    }
     final String json = generator.serialize(extensionUnderTest).trim();
     try {
       JSONAssert.assertEquals(expectedJson, json, true);
@@ -169,6 +175,9 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void load() {
+    if (extensionUnderTest == null) {
+      fail();
+    }
     ExtensionModel result = generator.deserialize(expectedJson);
     assertThat(result, is(extensionUnderTest));
   }
