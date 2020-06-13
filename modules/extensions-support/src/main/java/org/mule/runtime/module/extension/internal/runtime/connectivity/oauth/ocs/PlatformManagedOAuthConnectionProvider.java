@@ -35,7 +35,6 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
@@ -57,7 +56,6 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils;
@@ -204,7 +202,8 @@ public class PlatformManagedOAuthConnectionProvider<C>
                                              muleContext,
                                              false,
                                              new ReflectionCache(),
-                                             expressionManager);
+                                             expressionManager,
+                                             this.toString());
     Class<? extends ConnectionProvider> connectionProviderDelegateClass =
         getImplementingType(oauthConfig.getDelegateConnectionProviderModel())
             .orElseThrow(() -> new IllegalStateException("Delegate connection provider must have an implementing type."));

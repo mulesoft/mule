@@ -6,24 +6,32 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.resolver;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
+import static com.google.common.collect.ImmutableList.of;
+import static java.lang.String.format;
+import static java.time.Instant.ofEpochMilli;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.locateParsingDelegate;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.module.extension.internal.config.dsl.object.*;
+import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultValueResolverParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.MediaTypeValueResolverParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.ParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.resolver.BasicTypesValueResolverFactoryTypeVisitor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -35,14 +43,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static com.google.common.collect.ImmutableList.of;
-import static java.lang.String.format;
-import static java.time.Instant.ofEpochMilli;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.locateParsingDelegate;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * A {@link MetadataTypeVisitor} implementation that creates a {@link ValueResolver} instances
@@ -50,55 +52,32 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
  *
  * @since 4.2
  */
-public class ValueResolverFactoryTypeVisitor extends BasicTypeMetadataVisitor {
+public class ValueResolverFactoryTypeVisitor extends BasicTypesValueResolverFactoryTypeVisitor {
 
-  private final ConversionService conversionService = new DefaultConversionService();
   private final List<ValueResolverParsingDelegate> valueResolverParsingDelegates =
       of(new CharsetValueResolverParsingDelegate(), new MediaTypeValueResolverParsingDelegate());
   private final ValueResolverParsingDelegate defaultValueResolverParsingDelegate = new DefaultValueResolverParsingDelegate();
 
-  private final Reference<ValueResolver> resolverValueHolder = new Reference<>();
-  private DslSyntaxResolver dslSyntaxResolver;
-  private final String parameterName;
-  private final MetadataType expected;
-  private final Object value;
+  private final DslSyntaxResolver dslSyntaxResolver;
   private final Object defaultValue;
   private final boolean acceptsReferences;
-  private final Class<?> expectedClass;
 
-
-  public ValueResolverFactoryTypeVisitor(DslSyntaxResolver dslSyntaxResolver, String parameterName, MetadataType expected,
+  public ValueResolverFactoryTypeVisitor(DslSyntaxResolver dslSyntaxResolver, String parameterName,
                                          Object value, Object defaultValue, boolean acceptsReferences, Class<?> expectedClass) {
+    super(parameterName, value, expectedClass);
     this.dslSyntaxResolver = dslSyntaxResolver;
-    this.parameterName = parameterName;
-    this.expected = expected;
-    this.value = value;
     this.defaultValue = defaultValue;
     this.acceptsReferences = acceptsReferences;
-    this.expectedClass = expectedClass;
-  }
-
-  public ValueResolver getResolver() {
-    return resolverValueHolder.get();
-  }
-
-  @Override
-  protected void visitBasicType(MetadataType metadataType) {
-    if (conversionService.canConvert(value.getClass(), expectedClass)) {
-      resolverValueHolder.set(new StaticValueResolver<>(convertSimpleValue(value, expectedClass, parameterName)));
-    } else {
-      defaultVisit(metadataType);
-    }
   }
 
   @Override
   public void visitDateTime(DateTimeType dateTimeType) {
-    resolverValueHolder.set(parseDate(value, dateTimeType, defaultValue));
+    setResolver(parseDate(getValue(), dateTimeType, defaultValue));
   }
 
   @Override
   public void visitDate(DateType dateType) {
-    resolverValueHolder.set(parseDate(value, dateType, defaultValue));
+    setResolver(parseDate(getValue(), dateType, defaultValue));
   }
 
   @Override
@@ -113,25 +92,25 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeMetadataVisitor {
     Optional<DslElementSyntax> typeDsl = dslSyntaxResolver.resolve(objectType);
 
     if (delegate.isPresent() && typeDsl.isPresent()) {
-      valueResolver = (ValueResolver) delegate.get().parse(value.toString(), objectType, typeDsl.get());
+      valueResolver = (ValueResolver) delegate.get().parse(getValue().toString(), objectType, typeDsl.get());
     } else {
       valueResolver = acceptsReferences
-          ? defaultValueResolverParsingDelegate.parse(value.toString(), objectType, null)
-          : new StaticValueResolver<>(value);
+          ? defaultValueResolverParsingDelegate.parse(getValue().toString(), objectType, null)
+          : new StaticValueResolver<>(getValue());
     }
 
-    resolverValueHolder.set(valueResolver);
+    setResolver(valueResolver);
   }
 
   @Override
   protected void defaultVisit(MetadataType metadataType) {
     ValueResolver delegateResolver = locateParsingDelegate(valueResolverParsingDelegates, metadataType)
-        .map(delegate -> delegate.parse(value.toString(), metadataType, null))
+        .map(delegate -> delegate.parse(getValue().toString(), metadataType, null))
         .orElseGet(() -> acceptsReferences
-            ? defaultValueResolverParsingDelegate.parse(value.toString(), metadataType, null)
-            : new TypeSafeValueResolverWrapper(new StaticValueResolver<>(value), expectedClass));
+            ? defaultValueResolverParsingDelegate.parse(getValue().toString(), metadataType, null)
+            : new TypeSafeValueResolverWrapper(new StaticValueResolver<>(getValue()), getExpectedClass()));
 
-    resolverValueHolder.set(delegateResolver);
+    setResolver(delegateResolver);
   }
 
   private ValueResolver parseDate(Object value, MetadataType dateType, Object defaultValue) {
@@ -149,15 +128,6 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeMetadataVisitor {
     }
 
     return doParseDate(value, type);
-  }
-
-  private Object convertSimpleValue(Object value, Class<?> expectedClass, String parameterName) {
-    try {
-      return conversionService.convert(value, expectedClass);
-    } catch (Exception e) {
-      throw new IllegalArgumentException(format("Could not transform simple value '%s' to type '%s' in parameter '%s'", value,
-                                                expectedClass.getSimpleName(), parameterName));
-    }
   }
 
   private ValueResolver doParseDate(Object value, Class<?> type) {

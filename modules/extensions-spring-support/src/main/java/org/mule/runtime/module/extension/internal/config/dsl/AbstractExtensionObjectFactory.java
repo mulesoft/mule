@@ -92,7 +92,8 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
   }
 
   private ParametersResolver parametersResolverFromValues(MuleContext muleContext) {
-    return ParametersResolver.fromValues(parameters, muleContext, isLazyInitMode(properties), reflectionCache, expressionManager);
+    return ParametersResolver.fromValues(parameters, muleContext, isLazyInitMode(properties), reflectionCache, expressionManager,
+                                         this.getRepresentation());
   }
 
   public Map<String, Object> getParameters() {

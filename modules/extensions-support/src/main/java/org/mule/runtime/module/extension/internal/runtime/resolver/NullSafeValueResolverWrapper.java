@@ -155,7 +155,8 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
             if (field.getAnnotation(ConfigOverride.class) != null) {
               ValueResolver<?> fieldDelegate = fieldResolver != null ? fieldResolver : new StaticValueResolver<>(null);
-              fieldResolver = ConfigOverrideValueResolverWrapper.of(fieldDelegate, field.getName(), reflectionCache, muleContext);
+              fieldResolver = ConfigOverrideValueResolverWrapper.of(fieldDelegate, field.getName(), field.getType(),
+                                                                    reflectionCache, muleContext, clazz.getName());
             }
           }
 

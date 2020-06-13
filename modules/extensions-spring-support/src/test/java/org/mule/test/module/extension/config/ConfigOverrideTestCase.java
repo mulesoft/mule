@@ -50,6 +50,10 @@ public class ConfigOverrideTestCase extends AbstractExtensionFunctionalTestCase 
   @Test
   @Issue("MULE-18489")
   public void timeToPeelOverrideOperationWithDefaultsDifferentType() throws Exception {
+    flowRunner("timeToPeelOverrideOperationWithDefaultsDifferentType")
+        .run().getMessage().getPayload();
+    flowRunner("timeToPeelOverrideOperationWithDefaultsDifferentType")
+        .run().getMessage().getPayload();
     TypedValue<Integer> result = flowRunner("timeToPeelOverrideOperationWithDefaultsDifferentType")
         .run().getMessage().getPayload();
     assertThat(result.getValue(), is(10L));
