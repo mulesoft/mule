@@ -35,6 +35,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.ATTRIBUTES;
@@ -56,6 +57,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
@@ -107,15 +109,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+import org.hamcrest.BaseMatcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_DW)
@@ -126,9 +132,9 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Rule
   public ExpectedException expectedEx = none();
 
-  private ExpressionLanguage genericExpressionLanguage = spy(ExpressionLanguage.class);
+  private final ExpressionLanguage genericExpressionLanguage = spy(ExpressionLanguage.class);
   private DefaultExpressionLanguageFactoryService genericExpressionLanguageService;
-  private BindingContext bindingContext = NULL_BINDING_CONTEXT;
+  private final BindingContext bindingContext = NULL_BINDING_CONTEXT;
 
   @Before
   public void before() {
@@ -618,6 +624,27 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
     assertThat(session.evaluate("payload").getValue(), is("test"));
     assertThat(session.evaluate("flow.name").getValue(), is("test"));
+  }
+
+  @Test
+  @Issue("MULE-18490")
+  public void compiledWithBindingContextAndLocation() throws MuleException {
+    final ExpressionLanguage el = mock(ExpressionLanguage.class);
+
+    compile("flow.name", el);
+
+    verify(el).compile(eq("flow.name"), argThat(new BaseMatcher<BindingContext>() {
+
+      @Override
+      public boolean matches(Object item) {
+        return item instanceof BindingContext && ((BindingContext) item).lookup("flow").isPresent();
+      }
+
+      @Override
+      public void describeTo(org.hamcrest.Description description) {
+        description.appendText("A bindingContext containing a 'flow' binding");
+      }
+    }));
   }
 
   @Test
