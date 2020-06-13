@@ -61,7 +61,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   private PolicyNotificationHelper notificationHelper;
   private PolicyEventMapper policyEventMapper;
-  private PolicyTraceLogger policyTraceLogger = new PolicyTraceLogger();
+  private final PolicyTraceLogger policyTraceLogger = new PolicyTraceLogger();
 
   private OnExecuteNextErrorConsumer onExecuteNextErrorConsumer;
 
@@ -107,8 +107,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
       return new OnExecuteNextErrorConsumer(me -> {
         final CoreEvent event = me.getEvent();
 
-        // for backpressure errors, the MessagingException does not have the failingComponent set
-        if (me.getFailingComponent() == null ||
+        if (me.getFailingComponent() != null &&
             isWithinSourcePolicy(me.getFailingComponent().getLocation())) {
           return policyEventMapper.fromPolicyNext(event);
         } else {
