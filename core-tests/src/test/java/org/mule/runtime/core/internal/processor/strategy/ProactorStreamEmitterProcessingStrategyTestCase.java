@@ -256,8 +256,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Description("When the ProactorProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void tx() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     getInstance().bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
 
@@ -307,8 +306,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                         .getConfiguration()
                                                                                                         .getShutdownTimeout()))
         .build();
-    flow.initialise();
-    flow.start();
+    startFlow();
     rejectingSchedulerSpy.reset();
 
     processFlow(testEvent());
@@ -349,8 +347,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                         .getConfiguration()
                                                                                                         .getShutdownTimeout()))
         .build();
-    flow.initialise();
-    flow.start();
+    startFlow();
     rejectingSchedulerSpy.reset();
 
     processFlow(testEvent());
@@ -522,8 +519,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                         .getShutdownTimeout()))
         .processors(blockingProcessor)
         .build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     processFlow(testEvent());
     assertThat(threads, hasSize(equalTo(1)));
@@ -558,8 +554,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
         .processors(cpuLightProcessor, latchedProcessor)
         .maxConcurrency(6)
         .build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     List<Future> futures = new ArrayList<>();
 
@@ -600,8 +595,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     flow = flowBuilder.get()
         .source(triggerableMessageSource)
         .processors(cpuLightProcessor, latchedProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     List<Future> futures = new ArrayList<>();
 
@@ -644,8 +638,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
         .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, 1))
         .build();
 
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     List<Future> futures = new ArrayList<>();
 
@@ -686,8 +679,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
         .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, 1))
         .build();
 
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     List<Future> futures = new ArrayList<>();
 
@@ -761,8 +753,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                         .getShutdownTimeout()))
         .source(triggerableMessageSource)
         .processors(cpuLightProcessor, cpuIntensiveProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(FlowBackPressureRequiredSchedulerBusyException.class));
@@ -779,8 +770,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     spySchedulers();
 
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 
@@ -803,8 +793,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     spySchedulers();
 
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 
@@ -824,8 +813,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     spySchedulers();
 
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 

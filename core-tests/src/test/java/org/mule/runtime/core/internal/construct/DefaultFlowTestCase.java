@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.construct;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -29,17 +30,20 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -160,6 +164,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
   @Test
   public void testProcessStopped() throws Exception {
+    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     flow.initialise();
 
     try {
@@ -179,8 +184,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .processingStrategyFactory(new BlockingProcessingStrategyFactory())
         .build();
 
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     flow.stop();
     flow.start();
@@ -207,6 +211,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
         .source(mockMessageSource)
         .processors(processors).build();
+    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
 
     flow.initialise();
     try {
@@ -224,8 +229,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
   @Test
   public void defaultMaxConcurrency() throws Exception {
-    flow.initialise();
-    flow.start();
+    startFlow();
     assertThat(flow.getMaxConcurrency(), equalTo(DEFAULT_MAX_CONCURRENCY));
     // When max concurrency is default Integer.MAX_VALUE then the Scheduler is created with no withMaxConcurrentTasks
     // configuration.
@@ -242,6 +246,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .maxConcurrency(customMaxConcurrency)
         .build();
     try {
+      customFlow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
       customFlow.initialise();
       customFlow.start();
       assertThat(customFlow.getMaxConcurrency(), equalTo(customMaxConcurrency));
@@ -278,8 +283,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .processingStrategyFactory((muleContext, s) -> processingStrategy)
         .build();
 
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     InOrder inOrder = inOrder(sink, processor, processingStrategy);
 
@@ -312,8 +316,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .messagingExceptionHandler(errorHandler)
         .build();
 
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     InOrder inOrder = inOrder(sink, processor, errorHandler, processingStrategy);
 
@@ -344,6 +347,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .processingStrategyFactory((muleContext, s) -> processingStrategy)
         .build();
 
+    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     flow.initialise();
 
     InOrder inOrder = inOrder(sink, processor, processingStrategy);
@@ -371,6 +375,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .processingStrategyFactory((muleContext, s) -> processingStrategy)
         .messagingExceptionHandler(errorHandler)
         .build();
+    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
 
     flow.initialise();
 
@@ -408,8 +413,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .processingStrategyFactory((muleContext, s) -> processingStrategy)
         .build();
 
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     InOrder inOrder = inOrder(sink, processor, processingStrategy);
 
@@ -492,12 +496,17 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .processors(singletonList(new ErrorProcessor()))
         .processingStrategyFactory(new BlockingProcessingStrategyFactory())
         .build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     CoreEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
     assertThat(response, nullValue());
     assertThat(nonExpectedError.get(), is(false));
+  }
+
+  private void startFlow() throws InitialisationException, MuleException {
+    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.initialise();
+    flow.start();
   }
 
   public static class ErrorProcessor implements Processor {

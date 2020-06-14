@@ -100,8 +100,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
       + "is active, but rather executes these events synchronously in the caller thread transparently.")
   public void tx() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     getInstance()
         .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
@@ -114,4 +113,5 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
+
 }

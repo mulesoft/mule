@@ -356,6 +356,17 @@ public interface AllureConstants {
 
   }
 
+  interface ExecutionEngineFeature {
+
+    String EXECUTION_ENGINE = "Execution Engine";
+
+    interface ExecutionEngineStory {
+
+      String BACKPRESSURE = "Backpressure";
+    }
+
+  }
+
   interface SchedulerFeature {
 
     String SCHEDULER = "Scheduler";
