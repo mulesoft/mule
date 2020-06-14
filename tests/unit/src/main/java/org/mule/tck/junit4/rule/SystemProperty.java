@@ -16,7 +16,7 @@ import org.junit.rules.ExternalResource;
 public class SystemProperty extends ExternalResource {
 
   /**
-   * Utility method to execute a callable with a system property and restoring the property's value afterwards.
+   * Utility method to execute a callable with a system property and restoring the property's original value afterwards.
    *
    * @return the return value of the callable, or null if an exception was found during its execution.
    */
