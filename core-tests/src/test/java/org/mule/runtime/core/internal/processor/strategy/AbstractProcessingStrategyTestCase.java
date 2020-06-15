@@ -573,7 +573,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   private Function<FlowBackPressureException, Throwable> backPressureExceptionMapper() {
     return backpressureException -> {
       try {
-        return new MessagingException(newEvent(), backpressureException);
+        return new MessagingException(newEvent(), backpressureException, backpressureException.getFlow());
       } catch (MuleException e) {
         throw propagate(e);
       }
@@ -658,7 +658,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
                         backPressureExceptionMapper())
             .transform(triggerableMessageSource.getListener())
             .doOnNext(event -> processed.getAndIncrement())
-            .doOnError(e -> rejected.getAndIncrement())
+            .doOnError(MessagingException.class, e -> {
+              assertThat(e.getFailingComponent(), is(flow));
+              rejected.getAndIncrement();
+            })
             .subscribe());
         if (i == STREAM_ITERATIONS / 2) {
           latch.release();
