@@ -318,8 +318,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     usingObjectStoreJarFile = new ExtensionCompiler()
         .compiling(getResourceFile("/org/foo/os/UsingObjectStoreExtension.java"))
-        .including(getResourceFile("/org/foo/os/registry-bootstrap.properties"),
-                   "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
         .compile("mule-module-using-object-store-1.0.0.jar", "1.0.0");
 
     goodbyeExtensionV1JarFile = new ExtensionCompiler()

@@ -107,14 +107,6 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     final Map<String, ArtifactPlugin> ownArtifactPlugins = new HashMap<>();
 
     ownResolvedPluginDescriptors.stream()
-        // .map(artifactPluginDescriptor -> new DefaultArtifactPlugin(getArtifactPluginId(ownPolicyClassLoader.getArtifactId(),
-        // artifactPluginDescriptor.getName()),
-        // artifactPluginDescriptor, ownPolicyClassLoader
-        // .getArtifactPluginClassLoaders().stream()
-        // .filter(artifactClassLoader -> artifactClassLoader
-        // .getArtifactId()
-        // .endsWith(artifactPluginDescriptor.getName()))
-        // .findFirst().get()))
         .map(artifactPluginDescriptor -> new DefaultArtifactPlugin(getArtifactPluginId(ownPolicyClassLoader.getArtifactId(),
                                                                                        artifactPluginDescriptor.getName()),
                                                                    artifactPluginDescriptor, ownPolicyClassLoader
