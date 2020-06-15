@@ -598,6 +598,28 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  public void policyWithExtensionUsingObjectStore() throws Exception {
+    policyManager.registerPolicyTemplate(policyWithPluginUsingObjectStore().getArtifactFile());
+
+    ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG,
+                                                                                           simpleExtensionPlugin);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyWithPluginUsingObjectStore().getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/policy-using-object-store.xml"),
+                                                      emptyList()));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
   public void redeployPolicyWithSecurityManagerDefined() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
@@ -667,6 +689,18 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
         .build())
         .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
         .dependingOn(helloExtensionV1Plugin);
+  }
+
+  private PolicyFileBuilder policyWithPluginUsingObjectStore() {
+    MulePolicyModel.MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModel.MulePolicyModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
+        .setRequiredProduct(Product.MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
+    return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
+        .build())
+        .dependingOn(usingObjectStorePlugin);
   }
 
   private PolicyFileBuilder createInjectedPolicy() throws URISyntaxException {

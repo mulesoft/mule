@@ -83,6 +83,12 @@ public interface AllureConstants {
     }
   }
 
+  interface ClassloadingIsolationFeature {
+
+    String CLASSLOADING_ISOLATION = "Classloading Isolation";
+
+  }
+
   interface DeploymentConfiguration {
 
     String DEPLOYMENT_CONFIGURATION = "Deployment Configuration";
