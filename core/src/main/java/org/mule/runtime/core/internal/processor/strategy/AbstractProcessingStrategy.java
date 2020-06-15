@@ -24,8 +24,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -61,10 +61,8 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategyAd
   protected Consumer<CoreEvent> createDefaultOnEventConsumer() {
     return event -> {
       if (isTransactionActive()) {
-        final MessagingException throwable = new MessagingException(event,
-                                                                    new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE)));
-        throw Exceptions.propagateWrappingFatal(throwable);
-        // ((BaseEventContext) event.getContext()).error(throwable);
+        ((BaseEventContext) event.getContext()).error(new MessagingException(event,
+                                                                             new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE))));
       }
     };
   }
