@@ -18,7 +18,7 @@ import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREF
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX_LENGTH;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
@@ -35,7 +35,7 @@ public final class ExpressionLanguageUtils {
 
   private static final BindingContext COMPILATION_BINDING_CONTEXT =
       // just add the flow binding so that scripts referencing it are compiled fine
-      addFlowNameBindingsToBuilder(from("(null)"),
+      addFlowNameBindingsToBuilder(fromSingleComponent("(null)"),
                                    addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT))
                                        .build();
 
