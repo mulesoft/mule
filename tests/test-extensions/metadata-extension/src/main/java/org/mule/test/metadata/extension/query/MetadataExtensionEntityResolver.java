@@ -9,6 +9,7 @@ package org.mule.test.metadata.extension.query;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
+import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.QUERY_RESOLVER_CATEGORY;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -50,6 +51,6 @@ public class MetadataExtensionEntityResolver implements QueryEntityResolver {
 
   @Override
   public String getCategoryName() {
-    return "MetadataExtensionEntityResolver";
+    return QUERY_RESOLVER_CATEGORY;
   }
 }

@@ -236,7 +236,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       declareDynamicType(declaration.getOutput());
       declareMetadataKeyId(declaration, null);
       enrichMetadataKeyParameters(declaration, nullMetadataResolver);
-      enrichResolversInformation(declaration, new MetadataScopeAdapter() {
+      final MetadataScopeAdapter metadataScope = new MetadataScopeAdapter() {
 
         private OutputTypeResolver outputResolver = resolverFactory.getOutputResolver();
 
@@ -274,7 +274,8 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
         public Supplier<? extends AttributesTypeResolver> getAttributesResolver() {
           return () -> nullMetadataResolver;
         }
-      });
+      };
+      declareResolversInformation(declaration, metadataScope, getCategoryName(metadataScope));
     }
 
 
