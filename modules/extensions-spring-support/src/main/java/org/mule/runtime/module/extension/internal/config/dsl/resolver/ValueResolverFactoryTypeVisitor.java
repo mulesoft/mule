@@ -27,7 +27,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultValue
 import org.mule.runtime.module.extension.internal.config.dsl.object.MediaTypeValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
-import org.mule.runtime.module.extension.internal.config.resolver.BasicTypesValueResolverFactoryTypeVisitor;
+import org.mule.runtime.module.extension.internal.config.resolver.BasicTypeValueResolverFactoryTypeVisitor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
@@ -52,7 +52,7 @@ import org.joda.time.format.ISODateTimeFormat;
  *
  * @since 4.2
  */
-public class ValueResolverFactoryTypeVisitor extends BasicTypesValueResolverFactoryTypeVisitor {
+public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFactoryTypeVisitor {
 
   private final List<ValueResolverParsingDelegate> valueResolverParsingDelegates =
       of(new CharsetValueResolverParsingDelegate(), new MediaTypeValueResolverParsingDelegate());
