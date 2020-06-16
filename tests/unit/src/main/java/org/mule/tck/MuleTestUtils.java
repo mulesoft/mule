@@ -94,15 +94,15 @@ public final class MuleTestUtils {
    */
   public static Flow createFlowWithSource(MuleContext context, String flowName,
                                           Optional<ProcessingStrategyFactory> processingStrategyFactory, MessageSource source)
-          throws MuleException {
+      throws MuleException {
     FlowExceptionHandler defaultErrorHandler = context.getDefaultErrorHandler(empty());
     initialiseIfNeeded(defaultErrorHandler, context);
     startIfNeeded(defaultErrorHandler);
     final Flow.Builder flowBuilder = builder(flowName, context)
-            .processingStrategyFactory(processingStrategyFactory
-                    .orElse((muleContext, schedulersNamePrefix) -> withContextClassLoader(MuleTestUtils.class.getClassLoader(),
-                            () -> spy(new TestDirectProcessingStrategy()))))
-            .messagingExceptionHandler(defaultErrorHandler);
+        .processingStrategyFactory(processingStrategyFactory
+            .orElse((muleContext, schedulersNamePrefix) -> withContextClassLoader(MuleTestUtils.class.getClassLoader(),
+                                                                                  () -> spy(new TestDirectProcessingStrategy()))))
+        .messagingExceptionHandler(defaultErrorHandler);
     if (source != null) {
       flowBuilder.source(source);
     }
@@ -123,7 +123,7 @@ public final class MuleTestUtils {
    */
   public static Flow createFlow(MuleContext context, String flowName,
                                 Optional<ProcessingStrategyFactory> processingStrategyFactory)
-          throws MuleException {
+      throws MuleException {
     return createFlowWithSource(context, flowName, processingStrategyFactory, null);
   }
 
@@ -141,7 +141,7 @@ public final class MuleTestUtils {
    */
   public static Flow createAndRegisterFlow(MuleContext context, String flowName,
                                            ConfigurationComponentLocator mockComponentLocator)
-          throws MuleException {
+      throws MuleException {
     return createAndRegisterFlow(context, flowName, mockComponentLocator, null);
   }
 
@@ -154,7 +154,7 @@ public final class MuleTestUtils {
   public static Flow createAndRegisterFlow(MuleContext context, String flowName,
                                            ConfigurationComponentLocator mockComponentLocator,
                                            ProcessingStrategyFactory processingStrategyFactory)
-          throws MuleException {
+      throws MuleException {
     Flow flow = createFlow(context, flowName, ofNullable(processingStrategyFactory));
     MuleRegistry registry = ((MuleContextWithRegistry) context).getRegistry();
     if (registry != null) {
