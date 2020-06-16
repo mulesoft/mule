@@ -253,6 +253,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private static File defaultFooServiceJarFile;
 
   protected static File helloExtensionV1JarFile;
+  protected static File usingObjectStoreJarFile;
 
   private static File helloExtensionV2JarFile;
 
@@ -315,6 +316,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                    "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
         .compile("mule-module-hello-1.0.0.jar", "1.0.0");
 
+    usingObjectStoreJarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/os/UsingObjectStoreExtension.java"))
+        .compile("mule-module-using-object-store-1.0.0.jar", "1.0.0");
+
     helloExtensionV2JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
                                                                 getResourceFile("/org/foo/hello/HelloOperation.java"))
         .compile("mule-module-hello-2.0.0.jar", "2.0.0");
@@ -351,6 +356,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected final ArtifactPluginFileBuilder byeXmlExtensionPlugin = createByeXmlPluginFileBuilder();
   protected final ArtifactPluginFileBuilder moduleUsingByeXmlExtensionPlugin = createModuleUsingByeXmlPluginFileBuilder();
+  protected final ArtifactPluginFileBuilder usingObjectStorePlugin = createUsingObjectStorePluginFileBuilder();
 
   // Application file builders
   protected final ApplicationFileBuilder emptyAppFileBuilder =
@@ -1482,6 +1488,21 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .addProperty("version", "1.0.0");
     return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0.0")
         .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
+        .describedBy((mulePluginModelBuilder.build()));
+  }
+
+  private ArtifactPluginFileBuilder createUsingObjectStorePluginFileBuilder() {
+    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("usingObjectStorePlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("usingObjectStorePlugin", MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.os.UsingObjectStoreExtension")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("usingObjectStorePlugin-1.0.0")
+        .dependingOn(new JarFileBuilder("usingObjectStore", usingObjectStoreJarFile))
         .describedBy((mulePluginModelBuilder.build()));
   }
 
