@@ -19398,6 +19398,14 @@
             "type": "String"
           },
           "parameterName": "query"
+        },
+        "typeResolversInformation": {
+          "category": "QueryResolverCategory",
+          "outputResolver": {
+            "resolverName": "QUERY_OUTPUT_RESOLVER-ENTITY-NativeQueryResolver",
+            "requiresConnection": false,
+            "requiresConfiguration": false
+          }
         }
       },
       "kind": "operation"
@@ -24988,6 +24996,14 @@
             "type": "String"
           },
           "parameterName": "query"
+        },
+        "typeResolversInformation": {
+          "category": "QueryResolverCategory",
+          "outputResolver": {
+            "resolverName": "QUERY_OUTPUT_RESOLVER-ENTITY-NativeQueryResolver",
+            "requiresConnection": false,
+            "requiresConfiguration": false
+          }
         }
       },
       "kind": "operation"
@@ -28990,6 +29006,17 @@
         {
           "key": {
             "name": "categoryName"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "resolverName"
           },
           "model": {
             "type": "String"

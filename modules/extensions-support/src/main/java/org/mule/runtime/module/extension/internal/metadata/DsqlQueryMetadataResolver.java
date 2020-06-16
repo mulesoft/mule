@@ -33,13 +33,22 @@ import java.util.List;
  */
 final class DsqlQueryMetadataResolver implements OutputTypeResolver {
 
+  private static final String QUERY_OUTPUT_RESOLVER = "QUERY_OUTPUT_RESOLVER";
+
   private final QueryEntityResolver entityResolver;
   private final OutputTypeResolver nativeOutputResolver;
+  private final String name;
 
   DsqlQueryMetadataResolver(QueryEntityResolver entityResolver,
                             OutputTypeResolver nativeOutputResolver) {
     this.entityResolver = entityResolver;
     this.nativeOutputResolver = nativeOutputResolver;
+    this.name = QUERY_OUTPUT_RESOLVER + "-" + entityResolver.getResolverName() + "-" + nativeOutputResolver.getResolverName();
+  }
+
+  @Override
+  public String getResolverName() {
+    return this.name;
   }
 
   /**
