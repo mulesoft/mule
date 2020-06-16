@@ -16,10 +16,16 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 public class NativeQueryOutputResolver implements OutputTypeResolver<String> {
 
   public static final String NATIVE_QUERY = "SELECT FIELDS: field-id FROM TYPE: Circle DO WHERE field-diameter < 18";
+  public static final String QUERY_RESOLVER_CATEGORY = "QueryResolverCategory";
+
+  @Override
+  public String getResolverName() {
+    return "NativeQueryResolver";
+  }
 
   @Override
   public String getCategoryName() {
-    return "MetadataExtensionEntityResolver";
+    return QUERY_RESOLVER_CATEGORY;
   }
 
   @Override

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isASTMode;
 
@@ -21,7 +22,10 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclarat
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.TypedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOutputDeclaration;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.util.collection.Collectors;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
@@ -57,6 +61,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * {@link DeclarationEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for components
@@ -219,18 +224,58 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       declareInputResolvers(sourceCallbackDeclaration, metadataScope);
     }
 
-    private void enrichWithDsql(OperationDeclaration declaration, MethodElement method) {
+    private void enrichWithDsql(OperationDeclaration declaration,
+                                MethodElement method) {
       Query query = method.getAnnotation(Query.class).get();
-      declaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> new QueryMetadataResolverFactory(
-                                                                                                                   query
-                                                                                                                       .nativeOutputResolver(),
-                                                                                                                   query
-                                                                                                                       .entityResolver())));
+      final MetadataResolverFactory resolverFactory = new QueryMetadataResolverFactory(
+                                                                                       query.nativeOutputResolver(),
+                                                                                       query.entityResolver());
+      declaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> resolverFactory));
 
       addQueryModelProperties(declaration, query);
       declareDynamicType(declaration.getOutput());
       declareMetadataKeyId(declaration, null);
       enrichMetadataKeyParameters(declaration, nullMetadataResolver);
+      final MetadataScopeAdapter metadataScope = new MetadataScopeAdapter() {
+
+        private OutputTypeResolver outputResolver = resolverFactory.getOutputResolver();
+
+        @Override
+        public boolean hasInputResolvers() {
+          return false;
+        }
+
+        @Override
+        public boolean hasOutputResolver() {
+          return true;
+        }
+
+        @Override
+        public boolean hasAttributesResolver() {
+          return false;
+        }
+
+        @Override
+        public Supplier<? extends TypeKeysResolver> getKeysResolver() {
+          return () -> nullMetadataResolver;
+        }
+
+        @Override
+        public Map<String, Supplier<? extends InputTypeResolver>> getInputResolvers() {
+          return emptyMap();
+        }
+
+        @Override
+        public Supplier<? extends OutputTypeResolver> getOutputResolver() {
+          return () -> outputResolver;
+        }
+
+        @Override
+        public Supplier<? extends AttributesTypeResolver> getAttributesResolver() {
+          return () -> nullMetadataResolver;
+        }
+      };
+      declareResolversInformation(declaration, metadataScope, getCategoryName(metadataScope));
     }
 
 

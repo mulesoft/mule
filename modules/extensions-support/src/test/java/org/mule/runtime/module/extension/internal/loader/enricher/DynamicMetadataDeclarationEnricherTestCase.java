@@ -249,13 +249,14 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   }
 
   @Test
-  public void typeResolverInformationSkippedForDsql() throws Exception {
+  public void outputTypeResolverInformationSetForDsql() throws Exception {
     OperationDeclaration query = getDeclaration(declaration.getOperations(), "doQuery");
     Optional<TypeResolversInformationModelProperty> info = query
         .getModelProperty(TypeResolversInformationModelProperty.class);
 
-    assertThat("Query resolvers information should not be declared in the model",
-               info.isPresent(), is(false));
+    assertThat(info.isPresent(), is(true));
+    assertThat(info.get().getCategoryName(), is("QueryResolverCategory"));
+    assertThat(info.get().getOutputResolver().get().getResolverName(), is("QUERY_OUTPUT_RESOLVER-ENTITY-NativeQueryResolver"));
   }
 
   private void assertParameterIsMetadataKeyPart(ParameterDeclaration param) {
