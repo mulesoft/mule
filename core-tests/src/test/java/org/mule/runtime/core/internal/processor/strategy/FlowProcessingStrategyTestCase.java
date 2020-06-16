@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -14,7 +15,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
@@ -126,5 +129,6 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
     }
 
     flow = flowBuilder.build();
+    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
   }
 }

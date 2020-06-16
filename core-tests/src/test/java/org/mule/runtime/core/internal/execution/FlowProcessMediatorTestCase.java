@@ -48,7 +48,6 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.SourceRemoteConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
@@ -73,6 +72,7 @@ import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -167,6 +167,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     startIfNeeded(flowProcessMediator);
 
     flow = mock(AbstractPipeline.class, withSettings().extraInterfaces(Component.class));
+    when(flow.getLocation()).thenReturn(DefaultComponentLocation.from("flow"));
     FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
 
     // Call routeError failure callback for success response sending error test cases
@@ -438,7 +439,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   public void backpressureCheckFailure() throws MuleException {
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(coreEvent -> emptyMap());
     final ArgumentCaptor<CoreEvent> eventCaptor = ArgumentCaptor.forClass(CoreEvent.class);
-    doThrow(propagate(new FlowBackPressureMaxConcurrencyExceededException("flow", MAX_CONCURRENCY_EXCEEDED))).when(flow)
+    doThrow(propagate(new FlowBackPressureMaxConcurrencyExceededException(flow, MAX_CONCURRENCY_EXCEEDED))).when(flow)
         .checkBackpressure(eventCaptor.capture());
 
     flowProcessMediator.process(template, context);

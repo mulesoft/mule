@@ -51,7 +51,7 @@ class BackPressureStrategySelector {
           sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         } catch (InterruptedException e) {
           currentThread().interrupt();
-          createAndThrowIfNeeded(abstractPipeline.getName(), ree.getReason(), ree);
+          createAndThrowIfNeeded(abstractPipeline, ree.getReason(), ree);
         }
       }
     }

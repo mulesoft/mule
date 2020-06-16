@@ -283,7 +283,7 @@ public class FlowProcessMediator implements Initialisable {
     // Since the decision whether the event is handled by the source onError or onBackPressure callback is made in
     // SourceAdapter by checking the ErrorType, the exception is wrapped
     SourcePolicyFailureResult result =
-        new SourcePolicyFailureResult(new MessagingException(errorEvent, exception),
+        new SourcePolicyFailureResult(new MessagingException(errorEvent, exception, exception.getFlow()),
                                       () -> template.getFailedExecutionResponseParametersFunction().apply(errorEvent));
 
     return left(result);

@@ -19,10 +19,12 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
@@ -169,6 +171,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   public void processWithBlockingProcessingStrategy() throws Exception {
     flow.dispose();
     flow = builder("flow", muleContext).processingStrategyFactory(new BlockingProcessingStrategyFactory()).build();
+    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     flow.initialise();
     flow.start();
 
@@ -179,6 +182,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   public void processWithDirectProcessingStrategy() throws Exception {
     flow.dispose();
     flow = builder("flow", muleContext).processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
+    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     flow.initialise();
     flow.start();
 
