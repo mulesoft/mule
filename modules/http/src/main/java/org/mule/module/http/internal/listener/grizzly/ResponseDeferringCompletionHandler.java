@@ -45,6 +45,7 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
   private final Semaphore sending = new Semaphore(1);
 
   private volatile boolean isDone;
+  private volatile boolean isCompleted;
 
   public ResponseDeferringCompletionHandler(final FilterChainContext ctx,
                                             final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
@@ -98,9 +99,12 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
 
   private void doComplete()
   {
-    responseStatusCallback.responseSendSuccessfully();
-    ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
-    resume();
+    if(!isCompleted) {
+      isCompleted = true;
+      responseStatusCallback.responseSendSuccessfully();
+      ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
+      resume();
+    }
   }
 
   /**
