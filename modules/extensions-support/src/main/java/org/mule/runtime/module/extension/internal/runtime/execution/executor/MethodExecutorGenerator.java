@@ -21,6 +21,7 @@ import static net.bytebuddy.matcher.ElementMatchers.isConstructor;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
@@ -38,6 +39,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.field.FieldDescription;
@@ -63,6 +66,8 @@ import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
  * @since 4.3.0
  */
 public class MethodExecutorGenerator {
+
+  private static final Logger LOGGER = getLogger(MethodExecutorGenerator.class);
 
   private static final String TARGET_INSTANCE_FIELD_NAME = "__targetInstance";
   private final Map<String, Class<MethodExecutor>> executorClasses = new ConcurrentHashMap<>();
@@ -106,7 +111,14 @@ public class MethodExecutorGenerator {
     Class<MethodExecutor> generatedClass = getExecutorClass(method, generatedByteCodeFile);
     List<Object> args = new ArrayList<>();
     args.add(targetInstance);
-    args.addAll(asList(argumentResolverDelegate.getArgumentResolvers()));
+    final List<ArgumentResolver<?>> argumentResolvers = asList(argumentResolverDelegate.getArgumentResolvers());
+    args.addAll(argumentResolvers);
+
+    if (LOGGER.isTraceEnabled()) {
+      for (ArgumentResolver<?> argumentResolver : argumentResolvers) {
+        LOGGER.debug("Argument resolver for {}: {}", generatedClass.getName(), argumentResolver);
+      }
+    }
 
     try {
       return (MethodExecutor) generatedClass.getConstructors()[0].newInstance(args.toArray(new Object[args.size()]));
@@ -209,23 +221,25 @@ public class MethodExecutorGenerator {
 
         ).make();
 
+    if (generatedByteCodeFile == null && LOGGER.isTraceEnabled()) {
+      generatedByteCodeFile = new File(executorName + ".class");
+    }
     if (generatedByteCodeFile != null) {
       try (FileOutputStream os = new FileOutputStream(generatedByteCodeFile)) {
         os.write(byteBuddyMadeWrapper.getBytes());
       } catch (IOException e) {
-        throw new MuleRuntimeException(createStaticMessage(format(
-                                                                  "Could not store bytecode while generating a dynamic %s for method %s",
+        throw new MuleRuntimeException(createStaticMessage(format("Could not store bytecode while generating a dynamic %s for method %s",
                                                                   MethodExecutor.class, method.toString())),
                                        e);
       }
+      LOGGER.trace("Generated class '{}' saved at '{}'", executorName, generatedByteCodeFile.getAbsoluteFile());
     }
 
     try {
       return (Class<MethodExecutor>) byteBuddyMadeWrapper.load(executorClassLoader, INJECTION).getLoaded();
     } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage(
-                                                         "Could not generate MethodExecutor class for method "
-                                                             + method.toString()),
+      throw new MuleRuntimeException(createStaticMessage("Could not generate MethodExecutor class for method "
+          + method.toString()),
                                      e);
     }
   }

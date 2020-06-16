@@ -89,19 +89,22 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   private final Map<String, ?> parameters;
   private final ReflectionCache reflectionCache;
   private final ExpressionManager expressionManager;
+  private final String parameterOwner;
 
   private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters, boolean lazyInitEnabled,
-                             ReflectionCache reflectionCache, ExpressionManager expressionManager) {
+                             ReflectionCache reflectionCache, ExpressionManager expressionManager, String parameterOwner) {
     this.muleContext = muleContext;
     this.parameters = parameters;
     this.lazyInitEnabled = lazyInitEnabled;
     this.reflectionCache = reflectionCache;
     this.expressionManager = expressionManager;
+    this.parameterOwner = parameterOwner;
   }
 
   public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext, boolean lazyInitEnabled,
-                                              ReflectionCache reflectionCache, ExpressionManager expressionManager) {
-    return new ParametersResolver(muleContext, parameters, lazyInitEnabled, reflectionCache, expressionManager);
+                                              ReflectionCache reflectionCache, ExpressionManager expressionManager,
+                                              String parameterOwner) {
+    return new ParametersResolver(muleContext, parameters, lazyInitEnabled, reflectionCache, expressionManager, parameterOwner);
   }
 
   public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel, MuleContext muleContext,
@@ -112,7 +115,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       parameterValues.put(model.getName(), model.getDefaultValue());
     }
 
-    return new ParametersResolver(muleContext, parameterValues, false, reflectionCache, expressionManager);
+    return new ParametersResolver(muleContext, parameterValues, false, reflectionCache, expressionManager,
+                                  parameterizedModel.getName());
   }
 
   /**
@@ -255,7 +259,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
 
     if (parameter.isOverrideFromConfig()) {
       resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
-                                                       parameterName, reflectionCache, this.muleContext);
+                                                       parameterName, parameter.getType(),
+                                                       reflectionCache, this.muleContext, parameterOwner);
     }
     return (ValueResolver<Object>) resolver;
   }
@@ -336,7 +341,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       if (field.getAnnotation(ConfigOverrideTypeAnnotation.class).isPresent()) {
         valueResolver =
             ConfigOverrideValueResolverWrapper.of(valueResolver != null ? valueResolver : new StaticValueResolver<>(null),
-                                                  key, reflectionCache, muleContext);
+                                                  key, objectField.getType(), reflectionCache, muleContext,
+                                                  objectClass.getName());
       }
 
       if (valueResolver != null) {

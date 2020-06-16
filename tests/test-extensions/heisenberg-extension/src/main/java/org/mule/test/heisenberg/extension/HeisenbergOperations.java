@@ -272,6 +272,12 @@ public class HeisenbergOperations implements Disposable {
         .mediaType(dt.getMediaType()).attributes(new IntegerAttributes(index)).build();
   }
 
+  @MediaType(TEXT_PLAIN)
+  public Result<String, IntegerAttributes> getEnemyLong(@Config HeisenbergExtension config,
+                                                        @Optional(defaultValue = "0") long index) {
+    return getEnemy(config, (int) index);
+  }
+
   public List<Result<String, IntegerAttributes>> getAllEnemies(@Config HeisenbergExtension config) {
     List<Result<String, IntegerAttributes>> enemies = new ArrayList<>(config.getEnemies().size());
     for (int i = 0; i < config.getEnemies().size(); i++) {

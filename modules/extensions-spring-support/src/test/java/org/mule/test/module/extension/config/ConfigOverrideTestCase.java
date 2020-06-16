@@ -26,6 +26,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import io.qameta.allure.Issue;
+
 public class ConfigOverrideTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
@@ -43,6 +45,18 @@ public class ConfigOverrideTestCase extends AbstractExtensionFunctionalTestCase 
     TypedValue<Integer> result = flowRunner("timeToPeelOverrideOperationWithDefaults")
         .run().getMessage().getPayload();
     assertThat(result.getValue(), is(10));
+  }
+
+  @Test
+  @Issue("MULE-18489")
+  public void timeToPeelOverrideOperationWithDefaultsDifferentType() throws Exception {
+    flowRunner("timeToPeelOverrideOperationWithDefaultsDifferentType")
+        .run().getMessage().getPayload();
+    flowRunner("timeToPeelOverrideOperationWithDefaultsDifferentType")
+        .run().getMessage().getPayload();
+    TypedValue<Integer> result = flowRunner("timeToPeelOverrideOperationWithDefaultsDifferentType")
+        .run().getMessage().getPayload();
+    assertThat(result.getValue(), is(10L));
   }
 
   @Test

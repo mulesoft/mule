@@ -6,21 +6,29 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.module.extension.internal.config.resolver.BasicTypeValueResolverFactoryTypeVisitor;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
@@ -29,6 +37,10 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.function.Function;
+
+import org.slf4j.Logger;
+
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
  * A {@link ValueResolver} wrapper which defaults to obtaining the value from the current {@link ConfigurationInstance}
@@ -39,11 +51,20 @@ import java.util.function.Function;
  */
 public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolver<T>, Initialisable {
 
+  private static final Logger LOGGER = getLogger(ConfigOverrideValueResolverWrapper.class);
+
   private final ValueResolver<T> delegate;
   private final String parameterName;
+  private final Either<Class<?>, MetadataType> parameterType;
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
+  private final String paramOwner;
   private Function<Object, Object> defaultValueResolver;
+
+  private final LoadingCache<String, String> paramCoercionWarnsLog = newBuilder().build(message -> {
+    LOGGER.warn(message);
+    return message;
+  });
 
   /**
    * Creates a new instance
@@ -54,20 +75,43 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
    * @param <T> the generic type of the produced values.
    * @return a new instance of {@link ConfigOverrideValueResolverWrapper}
    */
-  public static <T> ValueResolver<T> of(ValueResolver<T> delegate, String parameterName, ReflectionCache reflectionCache,
-                                        MuleContext muleContext) {
+  public static <T> ValueResolver<T> of(ValueResolver<T> delegate, String parameterName, Class<?> parameterType,
+                                        ReflectionCache reflectionCache,
+                                        MuleContext muleContext, String paramOwner) {
     checkArgument(delegate != null, "A ValueResolver is required in order to delegate the value resolution.");
     checkArgument(!isBlank(parameterName), "A parameter name is required in order to use the config as a fallback.");
-    return new ConfigOverrideValueResolverWrapper<>(delegate, parameterName, reflectionCache, muleContext);
+    return new ConfigOverrideValueResolverWrapper<>(delegate, parameterName, left(parameterType), reflectionCache, muleContext,
+                                                    paramOwner);
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @param delegate the {@link ValueResolver delegate} used to obtain a value in the first place. Only if this {@code delegate}
+   *        returns a {@code null} value will the resolution using a {@link ConfigurationInstance config} will be attempted.
+   * @param reflectionCache the cache for expensive reflection lookups
+   * @param <T> the generic type of the produced values.
+   * @return a new instance of {@link ConfigOverrideValueResolverWrapper}
+   */
+  public static <T> ValueResolver<T> of(ValueResolver<T> delegate, String parameterName, MetadataType parameterType,
+                                        ReflectionCache reflectionCache,
+                                        MuleContext muleContext, String paramOwner) {
+    checkArgument(delegate != null, "A ValueResolver is required in order to delegate the value resolution.");
+    checkArgument(!isBlank(parameterName), "A parameter name is required in order to use the config as a fallback.");
+    return new ConfigOverrideValueResolverWrapper<>(delegate, parameterName, right(parameterType), reflectionCache, muleContext,
+                                                    paramOwner);
   }
 
   private ConfigOverrideValueResolverWrapper(ValueResolver<T> delegate, String parameterName,
-                                             ReflectionCache reflectionCache, MuleContext muleContext) {
+                                             Either<Class<?>, MetadataType> parameterType,
+                                             ReflectionCache reflectionCache, MuleContext muleContext, String paramOwner) {
     this.muleContext = muleContext;
     checkArgument(delegate != null, "A ConfigOverride value resolver requires a non-null delegate");
     this.delegate = delegate;
     this.parameterName = parameterName;
+    this.parameterType = parameterType;
     this.reflectionCache = reflectionCache;
+    this.paramOwner = paramOwner;
   }
 
   @Override
@@ -82,7 +126,51 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
           + parameterName + "]. No configuration was available in the current resolution context."));
     }
 
-    return resolveConfigOverrideParameter(context.getConfig().get());
+    // do this instead of using apply to avoid code bloat to rethrow the MuleException thrown by
+    // visitor.getResolver().resolve(context)
+    if (parameterType.isLeft()) {
+      final T configOverrideValue = resolveConfigOverrideParameter(context.getConfig().get());
+      if (configOverrideValue == null) {
+        return null;
+      }
+
+      final Class<?> expectedClass = parameterType.getLeft();
+      if (expectedClass.isAssignableFrom(configOverrideValue.getClass())) {
+        return configOverrideValue;
+      }
+
+      paramCoercionWarnsLog
+          .get("Parameter '" + parameterName + "' from '" + paramOwner + "' is of type '" + expectedClass.getName()
+              + "' but overrides a config value of type '" + configOverrideValue.getClass().getName() + "'");
+
+      final BasicTypeValueResolverFactoryTypeVisitor visitor =
+          new BasicTypeValueResolverFactoryTypeVisitor(parameterName, configOverrideValue, expectedClass);
+      return (T) visitor.basicTypeResolver().resolve(context);
+    } else if (parameterType.isRight()) {
+      final MetadataType metadataType = parameterType.getRight();
+
+      final T configOverrideValue = resolveConfigOverrideParameter(context.getConfig().get());
+      if (configOverrideValue == null) {
+        return null;
+      }
+
+      final Class<?> expectedClass = getType(metadataType).orElse(Object.class);
+      if (expectedClass.isAssignableFrom(configOverrideValue.getClass())) {
+        return configOverrideValue;
+      }
+
+      paramCoercionWarnsLog
+          .get("Parameter '" + parameterName + "' from '" + paramOwner + "' is of type '" + expectedClass.getName()
+              + "' but overrides a config value of type '" + configOverrideValue.getClass().getName() + "'");
+
+      final BasicTypeValueResolverFactoryTypeVisitor visitor =
+          new BasicTypeValueResolverFactoryTypeVisitor(parameterName, configOverrideValue, expectedClass);
+      metadataType.accept(visitor);
+      return (T) visitor.getResolver().resolve(context);
+    } else {
+      return null;
+    }
+
   }
 
   public T resolveWithoutConfig(ValueResolvingContext context) throws MuleException {
