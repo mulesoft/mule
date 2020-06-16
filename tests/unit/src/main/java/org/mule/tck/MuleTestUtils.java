@@ -7,7 +7,9 @@
 package org.mule.tck;
 
 import static java.util.Collections.singletonMap;
-import static java.util.Optional.*;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
