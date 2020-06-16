@@ -15,7 +15,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -279,14 +278,14 @@ class UntilSuccessfulRouter {
       // Prevent any MuleException from replacing the retry exhausted error message or error type
       // (see MessagingExceptionResolver#findRoot)
       Throwable retryPolicyExhaustionCause =
-          suppressIfPresent(getMessagingExceptionCause(throwable), MuleException.class);
+          suppressIfPresent(throwable, MuleException.class);
       RetryPolicyExhaustedException retryPolicyExhaustedException =
           new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG),
                                             retryPolicyExhaustionCause,
                                             owner);
-      // Info about the cause is added. Note that if a MuleException has been suppressed, it will later overwrite this
+      // Info about the cause is added. Note that if a MuleException has been suppressed, it will later overwrite this value
       // (see ExceptionHelper#getRootMuleException)
-      retryPolicyExhaustedException.addInfo(MuleExceptionInfo.INFO_CAUSED_BY_KEY, retryPolicyExhaustionCause.getMessage());
+      retryPolicyExhaustedException.addInfo(MuleExceptionInfo.INFO_CAUSED_BY_KEY, retryPolicyExhaustionCause);
       if (throwable instanceof MessagingException) {
         exceptionEvent = ((MessagingException) throwable).getEvent();
       }
