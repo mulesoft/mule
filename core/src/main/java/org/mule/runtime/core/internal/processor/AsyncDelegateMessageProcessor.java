@@ -344,6 +344,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
               asyncQueue.remove(queuedEvent);
             } else {
               synchronized (asyncQueue) {
+                if (asyncQueue.size() == 0) {
+                  return;
+                }
                 asyncQueue.wait();
               }
             }
@@ -365,4 +368,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
       asyncQueue.clear();
     }
   }
+
+  public void setSchedulerService(SchedulerService schedulerService) throws InitialisationException {
+    this.schedulerService = schedulerService;
+    initialise();
+  }
+
 }
