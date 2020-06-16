@@ -12,6 +12,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.BACKPRESSURE;
+
 import org.mule.runtime.api.notification.ExtensionNotification;
 import org.mule.runtime.api.notification.ExtensionNotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
@@ -34,6 +36,8 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 import org.junit.Test;
+
+import io.qameta.allure.Story;
 
 public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -155,6 +159,7 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
+  @Story(BACKPRESSURE)
   public void sourceFiresNotificationsOnBackPressure() throws Exception {
     Latch failed = new Latch();
     final Reference<ExtensionNotification> batchFailed = new Reference<>();
@@ -231,8 +236,8 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
   private class TestExtensionNotificationListener implements ExtensionNotificationListener {
 
-    private Consumer<ExtensionNotification> onNotification;
-    private MultiMap<String, ExtensionNotification> notifications = new MultiMap<>();
+    private final Consumer<ExtensionNotification> onNotification;
+    private final MultiMap<String, ExtensionNotification> notifications = new MultiMap<>();
     private Map<String, Integer> correlationCount;
 
     public TestExtensionNotificationListener(Consumer<ExtensionNotification> onNotification, boolean correlationOn) {

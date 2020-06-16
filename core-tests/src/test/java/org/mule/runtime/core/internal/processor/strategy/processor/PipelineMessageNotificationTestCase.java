@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.strategy.processor;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
@@ -27,6 +29,7 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -116,6 +119,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   public void createTestPipeline(List<Processor> processors, ErrorHandler errorHandler) {
     pipeline = new TestPipeline(pipelineName, muleContext, null, processors, errorHandler);
+    pipeline.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     context = create(pipeline, TEST_CONNECTOR_LOCATION);
   }
 

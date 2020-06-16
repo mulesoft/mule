@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedSet;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -22,6 +23,7 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.api.construct.Flow.builder;
@@ -38,6 +40,7 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
@@ -51,6 +54,7 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
@@ -264,8 +268,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   public void singleCpuLight() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor).build();
 
-    flow.initialise();
-    flow.start();
+    startFlow();
     processFlow(testEvent());
 
     assertThat(schedulers.toString(), schedulers, cpuLightSchedulerMatcher());
@@ -293,8 +296,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     List<Processor> processors = new ArrayList<>(asList(processorsBeforeLatch));
     processors.add(latchedProcessor);
     flow = flowBuilder.processors(processors).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     for (int i = 0; i < invocations; i++) {
       asyncExecutor.submit(() -> processFlow(newEvent()));
@@ -325,8 +327,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void multipleCpuLight() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuLightProcessor, cpuLightProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     processFlow(testEvent());
   }
@@ -334,8 +335,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void singleBlocking() throws Exception {
     flow = flowBuilder.get().processors(blockingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     processFlow(testEvent());
 
@@ -349,8 +349,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void multipleBlocking() throws Exception {
     flow = flowBuilder.get().processors(blockingProcessor, blockingProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     processFlow(testEvent());
   }
@@ -358,8 +357,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void singleCpuIntensive() throws Exception {
     flow = flowBuilder.get().processors(cpuIntensiveProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     processFlow(testEvent());
 
@@ -374,8 +372,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   public void multipleCpuIntensive() throws Exception {
     flow =
         flowBuilder.get().processors(cpuIntensiveProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     processFlow(testEvent());
   }
@@ -383,8 +380,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void mix() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     processFlow(testEvent());
   }
@@ -394,8 +390,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuLightProcessor, blockingProcessor, blockingProcessor,
                                         cpuLightProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor, cpuLightProcessor)
         .build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     processFlow(testEvent());
   }
@@ -403,8 +398,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void asyncCpuLight() throws Exception {
     flow = flowBuilder.get().processors(asyncProcessor, cpuLightProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     processFlow(testEvent());
   }
@@ -417,8 +411,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void stream() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     CountDownLatch latch = new CountDownLatch(STREAM_ITERATIONS);
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
@@ -430,8 +423,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void streamAfterRestart() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     CountDownLatch latch = new CountDownLatch(STREAM_ITERATIONS);
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
@@ -460,8 +452,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void concurrentStream() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     CountDownLatch latch = new CountDownLatch(STREAM_ITERATIONS);
     for (int i = 0; i < CONCURRENT_TEST_CONCURRENCY; i++) {
@@ -481,8 +472,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void errorsStream() throws Exception {
     flow = flowBuilder.get().processors(failingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     CountDownLatch latch = new CountDownLatch(STREAM_ITERATIONS);
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
@@ -494,8 +484,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void errorSuccessStream() throws Exception {
     flow = flowBuilder.get().processors(errorSuccessProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     CountDownLatch sucessLatch = new CountDownLatch(STREAM_ITERATIONS / 2);
     CountDownLatch errorLatch = new CountDownLatch(STREAM_ITERATIONS / 2);
@@ -518,8 +507,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow = flowBuilder.get()
         .source(triggerableMessageSource)
         .processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     getInstance()
         .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
@@ -538,8 +526,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow = flowBuilder.get()
         .source(triggerableMessageSource)
         .processors(asyncProcessor, cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     getInstance()
         .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
@@ -557,8 +544,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       throws Exception {
     flow = flowBuilder.get().processors(ioRWProcessor).build();
 
-    flow.initialise();
-    flow.start();
+    startFlow();
     processFlow(eventSupplier.call());
     assertThat(schedulers.toString(), schedulers, schedulerNameMatcher);
   }
@@ -587,7 +573,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   private Function<FlowBackPressureException, Throwable> backPressureExceptionMapper() {
     return backpressureException -> {
       try {
-        return new MessagingException(newEvent(), backpressureException);
+        return new MessagingException(newEvent(), backpressureException, backpressureException.getFlow());
       } catch (MuleException e) {
         throw propagate(e);
       }
@@ -626,8 +612,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       }
     });
     flow = flowBuilder.get().processors(annotatedAsyncProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
     processFlow(testEvent());
   }
 
@@ -660,8 +645,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
               }))
               .maxConcurrency(2)
               .build();
-      flow.initialise();
-      flow.start();
+      startFlow();
 
       AtomicInteger rejected = new AtomicInteger();
       AtomicInteger processed = new AtomicInteger();
@@ -674,7 +658,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
                         backPressureExceptionMapper())
             .transform(triggerableMessageSource.getListener())
             .doOnNext(event -> processed.getAndIncrement())
-            .doOnError(e -> rejected.getAndIncrement())
+            .doOnError(MessagingException.class, e -> {
+              assertThat(e.getFailingComponent(), is(flow));
+              rejected.getAndIncrement();
+            })
             .subscribe());
         if (i == STREAM_ITERATIONS / 2) {
           latch.release();
@@ -692,6 +679,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
             return true;
           }));
     }
+  }
+
+  protected void startFlow() throws InitialisationException, MuleException {
+    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.initialise();
+    flow.start();
   }
 
   class MultipleInvocationLatchedProcessor extends AbstractComponent implements Processor {

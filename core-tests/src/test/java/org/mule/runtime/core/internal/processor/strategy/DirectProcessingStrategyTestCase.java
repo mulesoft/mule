@@ -14,8 +14,8 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.collection.IsEmptyIterable.emptyIterable;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DIRECT;
 
@@ -135,8 +135,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
       + "synchronously in a caller thread.")
   public void tx() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
+    startFlow();
 
     getInstance()
         .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));

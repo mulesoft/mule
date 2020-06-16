@@ -216,13 +216,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     final Map<BackPressureReason, FlowBackPressureException> backPressureExceptions = new HashMap<>();
 
     backPressureExceptions.put(EVENTS_ACCUMULATED,
-                               new FlowBackPressureEventsAccumulatedException(getName(), EVENTS_ACCUMULATED));
+                               new FlowBackPressureEventsAccumulatedException(this, EVENTS_ACCUMULATED));
     backPressureExceptions.put(MAX_CONCURRENCY_EXCEEDED,
-                               new FlowBackPressureMaxConcurrencyExceededException(getName(), EVENTS_ACCUMULATED));
+                               new FlowBackPressureMaxConcurrencyExceededException(this, EVENTS_ACCUMULATED));
     backPressureExceptions.put(REQUIRED_SCHEDULER_BUSY,
-                               new FlowBackPressureRequiredSchedulerBusyException(getName(), EVENTS_ACCUMULATED));
+                               new FlowBackPressureRequiredSchedulerBusyException(this, EVENTS_ACCUMULATED));
     backPressureExceptions.put(REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER,
-                               new FlowBackPressureRequiredSchedulerBusyWithFullBufferException(getName(), EVENTS_ACCUMULATED));
+                               new FlowBackPressureRequiredSchedulerBusyWithFullBufferException(this, EVENTS_ACCUMULATED));
 
     this.backPressureExceptions = unmodifiableMap(backPressureExceptions);
 

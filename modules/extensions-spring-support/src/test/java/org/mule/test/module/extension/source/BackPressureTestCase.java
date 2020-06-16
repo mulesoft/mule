@@ -14,7 +14,9 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.DROP;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.FAIL;
 import static org.mule.tck.probe.PollingProber.check;
+import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.BACKPRESSURE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -28,6 +30,9 @@ import java.util.List;
 
 import org.junit.Test;
 
+import io.qameta.allure.Story;
+
+@Story(BACKPRESSURE)
 public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static List<CoreEvent> EVENTS;
