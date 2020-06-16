@@ -94,14 +94,12 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
 
     return new DefaultPolicyTemplate(policyClassLoader.getArtifactId(), descriptor, policyClassLoader,
                                      artifactPlugins,
-                                     resolveOwnArtifactPlugins(application, descriptor, policyClassLoader, artifactPlugins,
-                                                               ownResolvedPluginDescriptors, ownPolicyClassLoader));
+                                     resolveOwnArtifactPlugins(artifactPlugins, ownResolvedPluginDescriptors,
+                                                               ownPolicyClassLoader));
   }
 
   // Need all the plugins that the policy itself depends on, while keeping a relationship with the appropriate classloader.
-  private List<ArtifactPlugin> resolveOwnArtifactPlugins(Application application, PolicyTemplateDescriptor descriptor,
-                                                         MuleDeployableArtifactClassLoader policyClassLoader,
-                                                         List<ArtifactPlugin> artifactPlugins,
+  private List<ArtifactPlugin> resolveOwnArtifactPlugins(List<ArtifactPlugin> artifactPlugins,
                                                          List<ArtifactPluginDescriptor> ownResolvedPluginDescriptors,
                                                          MuleDeployableArtifactClassLoader ownPolicyClassLoader) {
     final Map<String, ArtifactPlugin> ownArtifactPlugins = new HashMap<>();
