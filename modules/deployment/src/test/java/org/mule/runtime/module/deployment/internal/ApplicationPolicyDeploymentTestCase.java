@@ -33,6 +33,7 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -74,6 +75,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 
 /**
@@ -313,6 +315,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
 
   @Test
+  @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyUsingAppPlugin() throws Exception {
     policyManager.registerPolicyTemplate(policyUsingAppPluginFileBuilder.getArtifactFile());
 
@@ -331,6 +334,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyUsingPluginOnlyInPolicy() throws Exception {
     policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
 
@@ -350,6 +354,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyIncludingPlugin() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
@@ -371,6 +376,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyDuplicatingExtensionPlugin() throws Exception {
     policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
 
@@ -389,6 +395,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyUsingModuleThatUsesPlugin() throws Exception {
     PolicyFileBuilder policyIncludingByePlugin = createPolicyIncludingByePlugin();
     policyManager.registerPolicyTemplate(policyIncludingByePlugin.getArtifactFile());
@@ -409,6 +416,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyUsingModuleThatUsesPluginDuplicatedInTheApplication() throws Exception {
     PolicyFileBuilder policyIncludingByePlugin = createPolicyIncludingByePlugin();
     policyManager.registerPolicyTemplate(policyIncludingByePlugin.getArtifactFile());
@@ -429,6 +437,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyDuplicatingPlugin() throws Exception {
 
     policyManager.registerPolicyTemplate(exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactFile());
@@ -454,6 +463,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyDuplicatingPluginOnDomain() throws Exception {
 
     addPackedDomainFromBuilder(exceptionThrowingPluginImportingDomain);
@@ -479,8 +489,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     }
   }
 
-  @Ignore("MULE-15842: fix once we support declaring share objects plugins in policies")
   @Test
+  @Ignore("MULE-15842: fix once we support declaring share objects plugins in policies")
   public void failsToApplyApplicationPolicyWithPluginVersionMismatch() throws Exception {
     policyManager.registerPolicyTemplate(policyIncludingHelloPluginV2FileBuilder.getArtifactFile());
 
@@ -527,6 +537,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Feature(CLASSLOADING_ISOLATION)
   public void appliesPolicyThatUsesPolicyClassOnExpression() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
@@ -601,6 +612,28 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Feature(CLASSLOADING_ISOLATION)
+  public void policyWithExtensionUsingObjectStore() throws Exception {
+    policyManager.registerPolicyTemplate(policyWithPluginUsingObjectStore().getArtifactFile());
+
+    ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG,
+                                                                                           simpleExtensionPlugin);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyWithPluginUsingObjectStore().getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/policy-using-object-store.xml"),
+                                                      emptyList()));
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
   public void redeployPolicyWithSecurityManagerDefined() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
@@ -670,6 +703,18 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
         .build())
         .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
         .dependingOn(helloExtensionV1Plugin);
+  }
+
+  private PolicyFileBuilder policyWithPluginUsingObjectStore() {
+    MulePolicyModel.MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModel.MulePolicyModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
+        .setRequiredProduct(Product.MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
+    return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
+        .build())
+        .dependingOn(usingObjectStorePlugin);
   }
 
   private PolicyFileBuilder createInjectedPolicy() throws URISyntaxException {
