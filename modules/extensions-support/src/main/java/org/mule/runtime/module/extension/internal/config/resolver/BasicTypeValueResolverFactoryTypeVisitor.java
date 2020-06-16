@@ -25,7 +25,7 @@ import org.springframework.core.convert.support.DefaultConversionService;
  *
  * @since 4.4, 4.3.1
  */
-public class BasicTypesValueResolverFactoryTypeVisitor extends BasicTypeMetadataVisitor {
+public class BasicTypeValueResolverFactoryTypeVisitor extends BasicTypeMetadataVisitor {
 
   private final ConversionService conversionService = new DefaultConversionService();
 
@@ -35,7 +35,7 @@ public class BasicTypesValueResolverFactoryTypeVisitor extends BasicTypeMetadata
   private final Class<?> expectedClass;
 
 
-  public BasicTypesValueResolverFactoryTypeVisitor(String parameterName, Object value, Class<?> expectedClass) {
+  public BasicTypeValueResolverFactoryTypeVisitor(String parameterName, Object value, Class<?> expectedClass) {
     this.parameterName = parameterName;
     this.value = value;
     this.expectedClass = expectedClass;

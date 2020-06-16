@@ -232,7 +232,7 @@ public class MethodExecutorGenerator {
                                                                   MethodExecutor.class, method.toString())),
                                        e);
       }
-      LOGGER.debug("Generated class '{}' saved at '{}'", executorName, generatedByteCodeFile.getAbsoluteFile());
+      LOGGER.trace("Generated class '{}' saved at '{}'", executorName, generatedByteCodeFile.getAbsoluteFile());
     }
 
     try {

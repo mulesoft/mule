@@ -28,7 +28,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.module.extension.internal.config.resolver.BasicTypesValueResolverFactoryTypeVisitor;
+import org.mule.runtime.module.extension.internal.config.resolver.BasicTypeValueResolverFactoryTypeVisitor;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
@@ -143,8 +143,8 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
           .get("Parameter '" + parameterName + "' from '" + paramOwner + "' is of type '" + expectedClass.getName()
               + "' but overrides a config value of type '" + configOverrideValue.getClass().getName() + "'");
 
-      final BasicTypesValueResolverFactoryTypeVisitor visitor =
-          new BasicTypesValueResolverFactoryTypeVisitor(parameterName, configOverrideValue, expectedClass);
+      final BasicTypeValueResolverFactoryTypeVisitor visitor =
+          new BasicTypeValueResolverFactoryTypeVisitor(parameterName, configOverrideValue, expectedClass);
       return (T) visitor.basicTypeResolver().resolve(context);
     } else if (parameterType.isRight()) {
       final MetadataType metadataType = parameterType.getRight();
@@ -163,8 +163,8 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
           .get("Parameter '" + parameterName + "' from '" + paramOwner + "' is of type '" + expectedClass.getName()
               + "' but overrides a config value of type '" + configOverrideValue.getClass().getName() + "'");
 
-      final BasicTypesValueResolverFactoryTypeVisitor visitor =
-          new BasicTypesValueResolverFactoryTypeVisitor(parameterName, configOverrideValue, expectedClass);
+      final BasicTypeValueResolverFactoryTypeVisitor visitor =
+          new BasicTypeValueResolverFactoryTypeVisitor(parameterName, configOverrideValue, expectedClass);
       metadataType.accept(visitor);
       return (T) visitor.getResolver().resolve(context);
     } else {
