@@ -373,6 +373,11 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     protected Object decorate(Object value) {
       return value != null ? value : defaultValue;
     }
+
+    @Override
+    public String toString() {
+      return super.toString() + "; defaultValue: " + defaultValue + " (" + defaultValue.getClass().getName() + ")";
+    }
   }
 
   private class TypedValueCursorArgumentResolverDecorator extends ArgumentResolverDecorator {
@@ -413,5 +418,10 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     }
 
     protected abstract Object decorate(Object value);
+
+    @Override
+    public String toString() {
+      return this.getClass().getSimpleName() + "(" + decoratee.toString() + ")";
+    }
   }
 }

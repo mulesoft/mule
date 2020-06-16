@@ -65,6 +65,10 @@
         <heisenberg:get-enemy config-ref="heisenberg"/>
     </flow>
     
+    <flow name="getDefaultEnemyLong">
+        <heisenberg:get-enemy-long config-ref="heisenberg"/>
+    </flow>
+    
     <flow name="getAllEnemies">
         <heisenberg:get-all-enemies config-ref="heisenberg"/>
     </flow>

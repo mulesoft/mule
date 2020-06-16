@@ -32,4 +32,9 @@ public class ByParameterNameArgumentResolver<T> implements ArgumentResolver<T> {
   public T resolve(ExecutionContext executionContext) {
     return (T) executionContext.getParameters().get(parameterName);
   }
+
+  @Override
+  public String toString() {
+    return "ByParameterNameArgumentResolver(" + parameterName + ")";
+  }
 }

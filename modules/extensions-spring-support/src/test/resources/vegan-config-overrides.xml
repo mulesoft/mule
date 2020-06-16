@@ -33,6 +33,10 @@
         <vegan:get-time-to-peel config-ref="apple"/>
     </flow>
 
+    <flow name="timeToPeelOverrideOperationWithDefaultsDifferentType">
+        <vegan:get-time-to-peel-long config-ref="apple"/>
+    </flow>
+
     <flow name="timeToPeelOverrideOperationWithCustom">
         <vegan:get-time-to-peel config-ref="appleCustom"/>
     </flow>

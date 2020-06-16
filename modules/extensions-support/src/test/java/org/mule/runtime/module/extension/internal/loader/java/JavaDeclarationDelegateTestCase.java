@@ -123,11 +123,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import com.google.common.reflect.TypeToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import com.google.common.reflect.TypeToken;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -471,10 +472,11 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(extensionDeclaration.getOperations(), hasSize(57));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(22));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(23));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, NAME_AS_STREAM, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
+    assertOperation(withOperationsDeclaration, "getEnemyLong", "");
     assertOperation(withOperationsDeclaration, GET_ALL_ENEMIES_OPERATION, "");
     assertOperation(extensionDeclaration, KILL_OPERATION, "");
     assertOperation(extensionDeclaration, KILL_CUSTOM_OPERATION, "");

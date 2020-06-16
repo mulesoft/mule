@@ -32,6 +32,7 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
+
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -177,6 +178,11 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   @Test
   public void operationWithDefaulValueParameter() throws Exception {
     assertThat(GUSTAVO_FRING, equalTo(runFlow("getDefaultEnemy").getMessage().getPayload().getValue()));
+  }
+
+  @Test
+  public void operationWithDefaulValueParameterLong() throws Exception {
+    assertThat(GUSTAVO_FRING, equalTo(runFlow("getDefaultEnemyLong").getMessage().getPayload().getValue()));
   }
 
   @Test
