@@ -154,7 +154,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   /**
-   * This provides an optimization to avoid going to DW for evaluationg just the payload, which is there at hand already.
+   * This provides an optimization to avoid going to DW for evaluating just the payload, which is there at hand already.
    */
   protected static TypedValue resolvePayload(CoreEvent event, BindingContext context) {
     return event != null ? event.getMessage().getPayload()
@@ -232,8 +232,9 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public ExpressionLanguageSessionAdaptor openSession(ComponentLocation location, CoreEvent event, BindingContext context) {
-    ExpressionLanguageSession session = expressionExecutor.openSession(bindingContextFor(location, event, context));
+  public ExpressionLanguageSessionAdaptor openSession(ComponentLocation location, CoreEvent event, BindingContext baseContext) {
+    final BindingContext context = bindingContextFor(location, event, baseContext);
+    ExpressionLanguageSession session = expressionExecutor.openSession(context);
     return new ExpressionLanguageSessionAdaptor() {
 
       @Override

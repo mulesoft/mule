@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
+import static org.mule.runtime.api.el.BindingContextUtils.addFlowNameBindingsToBuilder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
@@ -17,6 +18,7 @@ import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREF
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX_LENGTH;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
@@ -32,7 +34,10 @@ import org.mule.runtime.api.event.Event;
 public final class ExpressionLanguageUtils {
 
   private static final BindingContext COMPILATION_BINDING_CONTEXT =
-      addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build();
+      // just add the flow binding so that scripts referencing it are compiled fine
+      addFlowNameBindingsToBuilder(from("(null)"),
+                                   addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT))
+                                       .build();
 
   private ExpressionLanguageUtils() {}
 
