@@ -121,8 +121,7 @@ public class ModuleExceptionHandler {
           ? suppressIfPresent(throwable.getCause(), MessagingException.class)
           : new MuleRuntimeException(createStaticMessage(throwable.getMessage()));
     } else {
-      return throwable;
+      return suppressIfPresent(throwable, MessagingException.class);
     }
   }
-
 }
