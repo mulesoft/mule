@@ -51,6 +51,7 @@ public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractA
     async = createAsyncDelegateMessageProcessor(target, flow);
     service = new FixingBackPressureSchedulerService(strategy);
     async.setSchedulerService(service);
+    async.initialise();
     async.start();
   }
 

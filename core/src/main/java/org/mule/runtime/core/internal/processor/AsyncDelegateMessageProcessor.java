@@ -380,9 +380,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
   }
 
-  public void setSchedulerService(SchedulerService schedulerService) throws InitialisationException {
+  void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
-    initialise();
   }
 
 }
