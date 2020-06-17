@@ -62,6 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,7 +76,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
 
-  static final Map<String, ExtensionModel> extensionModels = new HashMap<>();
+  static Map<String, ExtensionModel> extensionModels = new HashMap<>();
 
   private static ExtensionModelLoader javaLoader = new DefaultJavaExtensionModelLoader();
   private static ExtensionModelLoader soapLoader = new SoapExtensionModelLoader();
@@ -109,6 +110,15 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
                         newTestUnit(javaLoader, NonImplicitConfigExtension.class, "non-implicit-config.json"),
                         newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.json"));
 
+    return createExtensionModels(extensions);
+  }
+
+  protected static Collection<Object[]> createExtensionModels(List<ExtensionJsonGeneratorTestUnit> extensions) {
+    final ClassLoader classLoader = ExtensionModelJsonGeneratorTestCase.class.getClassLoader();
+    final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
+    when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
+        .thenReturn(asList(new JavaXmlDeclarationEnricher()));
+
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);
 
@@ -119,16 +129,6 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
 
       return model;
     };
-
-    return createExtensionModels(extensions, createExtensionModel);
-  }
-
-  protected static Collection<Object[]> createExtensionModels(List<ExtensionJsonGeneratorTestUnit> extensions,
-                                                              BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel) {
-    final ClassLoader classLoader = ExtensionModelJsonGeneratorTestCase.class.getClassLoader();
-    final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
-    when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
-        .thenReturn(asList(new JavaXmlDeclarationEnricher()));
 
     return extensions.stream()
         .map(e -> e.toTestParams(createExtensionModel))
@@ -174,6 +174,11 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
   public void load() {
     ExtensionModel result = generator.deserialize(expectedJson);
     assertThat(result, is(extensionUnderTest));
+  }
+
+  @AfterClass
+  public static void cleanUp() {
+    extensionModels = new HashMap<>();
   }
 
   private void updateExpectedJson(String json) throws URISyntaxException, IOException {
