@@ -19,7 +19,6 @@ import static org.mule.test.allure.AllureConstants.ArtifactAst.ParameterAst.PARA
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Before;
 import org.junit.Test;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.NamedObject;
@@ -42,9 +41,6 @@ public class ComponentModelTestCase extends AbstractMuleTestCase {
   private static final String PARAMETER_B = "b";
   private static final String PARAMETER_C = "c";
   private ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-
-  @Before
-  public void before() {}
 
   private org.mule.runtime.api.meta.model.ComponentModel createParameterizedModel() {
     org.mule.runtime.api.meta.model.ComponentModel parameterizedModel =
