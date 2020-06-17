@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -73,7 +74,7 @@ public class AbstractBenchmark {
 
   protected Flow createFlow(MuleContext muleContext) {
     final Flow flow = builder(FLOW_NAME, muleContext).build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     return flow;
   }
 
