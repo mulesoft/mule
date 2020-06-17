@@ -340,16 +340,16 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
               eventDispatcher.accept(queuedEvent);
               asyncQueue.remove(queuedEvent);
             } else {
-              synchronized (asyncQueue) {
-                asyncQueue.wait();
+              synchronized (executing) {
+                if (asyncQueue.size() == 0) {
+                  executing.set(null);
+                  return;
+                }
               }
             }
           } catch (FromFlowRejectedExecutionException free) {
             // Nothing to do, let next iteration catch it.
             yield();
-          } catch (InterruptedException e) {
-            currentThread().interrupt();
-            return;
           }
         }
       });
@@ -358,12 +358,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     public void handleBackpressure(CoreEvent event) {
       asyncQueue.offer(event);
 
-      synchronized (asyncQueue) {
-        asyncQueue.notify();
-      }
-
       synchronized (executing) {
-        if (executing.get() == null || executing.get().isDone()) {
+        if (executing.get() == null) {
           executing.set(dispatchTask());
         }
       }
