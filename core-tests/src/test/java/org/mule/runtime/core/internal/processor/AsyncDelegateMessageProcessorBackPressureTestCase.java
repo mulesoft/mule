@@ -14,8 +14,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.AsyncStory.ASYNC;
 
 import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -34,7 +36,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
-@Issue("MULE-18431")
+@Story(ASYNC)
 public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractAsyncDelegateMessageProcessorTestCase {
 
   private FixingBackPressureSchedulerService service;
@@ -56,6 +58,7 @@ public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractA
   }
 
   @Test
+  @Issue("MULE-18431")
   public void processManyWithBackPressure() throws Exception {
     latch = new CountDownLatch(2);
 
