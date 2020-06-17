@@ -10,6 +10,7 @@ import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
@@ -28,6 +29,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -100,6 +102,40 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractAsyncDelegate
     flow.start();
 
     process();
+  }
+
+  @Test
+  public void process() throws Exception {
+    CoreEvent request = testEvent();
+
+    CoreEvent result = process(async, request);
+
+    // Complete parent context so we can assert event context completion based on async completion.
+    ((BaseEventContext) request.getContext()).success(result);
+
+    assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(false));
+
+    // Permit async processing now we have already asserted that response alone is not enough to complete event context.
+    asyncEntryLatch.countDown();
+
+    assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
+
+    // Block until async completes, not just target processor.
+    while (!((BaseEventContext) target.sensedEvent.getContext()).isTerminated()) {
+      park100ns();
+    }
+    assertThat(target.sensedEvent, notNullValue());
+
+    // Block to ensure async fully completes before testing state
+    while (!((BaseEventContext) request.getContext()).isTerminated()) {
+      park100ns();
+    }
+
+    assertThat(((BaseEventContext) target.sensedEvent.getContext()).isTerminated(), is(true));
+    assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(true));
+
+    assertTargetEvent(request);
+    assertResponse(result);
   }
 
 }

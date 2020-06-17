@@ -66,7 +66,9 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBui
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -315,6 +317,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     private final Consumer<CoreEvent> eventDispatcher;
 
     private final LazyValue<Scheduler> queueDispatcherScheduler;
+    private final AtomicReference<Future> executing = new AtomicReference<>();
 
     public QueueBackpressureHandler(SchedulerService schedulerService, Supplier<SchedulerConfig> schedulerConfigSupplier,
                                     Consumer<CoreEvent> eventDispatcher, String location) {
@@ -328,14 +331,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
       });
     }
 
-    public void handleBackpressure(CoreEvent event) {
-      asyncQueue.offer(event);
-
-      synchronized (asyncQueue) {
-        asyncQueue.notify();
-      }
-
-      queueDispatcherScheduler.get().execute(() -> {
+    private Future dispatchTask() {
+      return queueDispatcherScheduler.get().submit(() -> {
         while (!currentThread().isInterrupted()) {
           try {
             final CoreEvent queuedEvent = asyncQueue.peek();
@@ -344,9 +341,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
               asyncQueue.remove(queuedEvent);
             } else {
               synchronized (asyncQueue) {
-                if (asyncQueue.size() == 0) {
-                  return;
-                }
                 asyncQueue.wait();
               }
             }
@@ -359,6 +353,23 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
           }
         }
       });
+    }
+
+    public void handleBackpressure(CoreEvent event) {
+      asyncQueue.offer(event);
+
+      synchronized (asyncQueue) {
+        asyncQueue.notify();
+      }
+
+      synchronized (executing) {
+        if (executing.get() != null) {
+          if (!executing.get().isDone()) {
+            return;
+          }
+        }
+        executing.set(dispatchTask());
+      }
     }
 
     @Override
