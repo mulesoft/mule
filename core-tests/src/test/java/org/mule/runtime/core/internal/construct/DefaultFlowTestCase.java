@@ -36,7 +36,7 @@ import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -164,7 +164,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
   @Test
   public void testProcessStopped() throws Exception {
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     flow.initialise();
 
     try {
@@ -211,7 +211,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
         .source(mockMessageSource)
         .processors(processors).build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
 
     flow.initialise();
     try {
@@ -246,7 +246,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .maxConcurrency(customMaxConcurrency)
         .build();
     try {
-      customFlow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+      customFlow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
       customFlow.initialise();
       customFlow.start();
       assertThat(customFlow.getMaxConcurrency(), equalTo(customMaxConcurrency));
@@ -347,7 +347,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .processingStrategyFactory((muleContext, s) -> processingStrategy)
         .build();
 
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     flow.initialise();
 
     InOrder inOrder = inOrder(sink, processor, processingStrategy);
@@ -375,7 +375,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .processingStrategyFactory((muleContext, s) -> processingStrategy)
         .messagingExceptionHandler(errorHandler)
         .build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
 
     flow.initialise();
 
@@ -504,7 +504,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   }
 
   private void startFlow() throws InitialisationException, MuleException {
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     flow.initialise();
     flow.start();
   }

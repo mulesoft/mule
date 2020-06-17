@@ -44,7 +44,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
@@ -169,7 +169,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
 
     flow = builder("flow", muleContext).processingStrategyFactory(processingStrategyFactory).build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     flow.initialise();
     flow.start();
   }

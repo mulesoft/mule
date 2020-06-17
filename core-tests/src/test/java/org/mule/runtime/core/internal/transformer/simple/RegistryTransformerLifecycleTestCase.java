@@ -10,7 +10,7 @@ import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -47,7 +47,7 @@ public class RegistryTransformerLifecycleTestCase extends AbstractMuleContextTes
     TransformerLifecycleTracker transformer = new TransformerLifecycleTracker();
     transformer.setProperty("foo");
     Flow flow = builder("flow", muleContext).processors(transformer).build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(flow);
 
     muleContext.dispose();

@@ -29,7 +29,7 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -119,7 +119,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   public void createTestPipeline(List<Processor> processors, ErrorHandler errorHandler) {
     pipeline = new TestPipeline(pipelineName, muleContext, null, processors, errorHandler);
-    pipeline.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    pipeline.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     context = create(pipeline, TEST_CONNECTOR_LOCATION);
   }
 

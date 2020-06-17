@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
@@ -129,6 +129,6 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
     }
 
     flow = flowBuilder.build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
   }
 }

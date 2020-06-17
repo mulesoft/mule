@@ -167,7 +167,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     startIfNeeded(flowProcessMediator);
 
     flow = mock(AbstractPipeline.class, withSettings().extraInterfaces(Component.class));
-    when(flow.getLocation()).thenReturn(DefaultComponentLocation.from("flow"));
+    when(flow.getLocation()).thenReturn(DefaultComponentLocation.fromSingleComponent("flow"));
     FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
 
     // Call routeError failure callback for success response sending error test cases

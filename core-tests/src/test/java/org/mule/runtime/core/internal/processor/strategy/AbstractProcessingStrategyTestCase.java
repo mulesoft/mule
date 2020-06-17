@@ -40,7 +40,7 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
@@ -682,7 +682,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   }
 
   protected void startFlow() throws InitialisationException, MuleException {
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     flow.initialise();
     flow.start();
   }

@@ -37,7 +37,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -824,7 +824,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   private Processor createFlow(ReactiveProcessor processor) throws MuleException {
     flow = Flow.builder("test", muleContext).processors(new ReactiveProcessorToProcessorAdaptor(processor)).build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     flow.initialise();
     flow.start();
     return flow;

@@ -14,7 +14,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -83,7 +83,7 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
       // expected
     }
 
-    getFlowConstruct().setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    getFlowConstruct().setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     getFlowConstruct().initialise();
     getFlowConstruct().start();
 
@@ -108,7 +108,7 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
       // expected
     }
 
-    getFlowConstruct().setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    getFlowConstruct().setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     getFlowConstruct().initialise();
     assertFalse(getFlowConstruct().isStarted());
 
@@ -154,7 +154,7 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
   @Test
   public void testRegisterUnregister() throws MuleException, Exception {
     FlowConstruct construct = getFlowConstruct();
-    construct.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    construct.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(construct);
     assertNotNull(((MuleContextWithRegistry) muleContext).getRegistry().lookupFlowConstruct(construct.getName()));
   }
@@ -162,7 +162,7 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
   @Test
   public void testInitialStateStopped() throws Exception {
     AbstractFlowConstruct flow = getStoppedFlowConstruct();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
 
     assertFalse(flow.isStarted());
     assertFalse(flow.isStopped());
