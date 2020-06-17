@@ -66,7 +66,9 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBui
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -315,6 +317,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     private final Consumer<CoreEvent> eventDispatcher;
 
     private final LazyValue<Scheduler> queueDispatcherScheduler;
+    private final AtomicReference<Future> executing = new AtomicReference<>();
 
     public QueueBackpressureHandler(SchedulerService schedulerService, Supplier<SchedulerConfig> schedulerConfigSupplier,
                                     Consumer<CoreEvent> eventDispatcher, String location) {
@@ -328,14 +331,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
       });
     }
 
-    public void handleBackpressure(CoreEvent event) {
-      asyncQueue.offer(event);
-
-      synchronized (asyncQueue) {
-        asyncQueue.notify();
-      }
-
-      queueDispatcherScheduler.get().execute(() -> {
+    private Future dispatchTask() {
+      return queueDispatcherScheduler.get().submit(() -> {
         while (!currentThread().isInterrupted()) {
           try {
             final CoreEvent queuedEvent = asyncQueue.peek();
@@ -343,19 +340,29 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
               eventDispatcher.accept(queuedEvent);
               asyncQueue.remove(queuedEvent);
             } else {
-              synchronized (asyncQueue) {
-                asyncQueue.wait();
+              synchronized (executing) {
+                if (asyncQueue.size() == 0) {
+                  executing.set(null);
+                  return;
+                }
               }
             }
           } catch (FromFlowRejectedExecutionException free) {
             // Nothing to do, let next iteration catch it.
             yield();
-          } catch (InterruptedException e) {
-            currentThread().interrupt();
-            return;
           }
         }
       });
+    }
+
+    public void handleBackpressure(CoreEvent event) {
+      asyncQueue.offer(event);
+
+      synchronized (executing) {
+        if (executing.get() == null) {
+          executing.set(dispatchTask());
+        }
+      }
     }
 
     @Override
@@ -365,4 +372,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
       asyncQueue.clear();
     }
   }
+
+  void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
+  }
+
 }
