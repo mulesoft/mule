@@ -6,7 +6,9 @@
  */
 package org.mule;
 
+import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -71,7 +73,9 @@ public class AbstractBenchmark {
   }
 
   protected Flow createFlow(MuleContext muleContext) {
-    return builder(FLOW_NAME, muleContext).build();
+    final Flow flow = builder(FLOW_NAME, muleContext).build();
+    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    return flow;
   }
 
   public CoreEvent createEvent(Flow flow) {
