@@ -53,7 +53,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -84,7 +83,8 @@ public class ComponentModel implements ComponentAst {
   private ComponentIdentifier identifier;
   private String componentId;
   private final Map<String, String> parameters = new HashMap<>();
-  private Map<String, ComponentParameterAst> parameterAsts = new HashMap<>();
+  private final Map<String, ComponentParameterAst> parameterAstsByName = new HashMap<>();
+  private List<ComponentParameterAst> parameterAsts;
   private final AtomicBoolean parameterAstsPopulated = new AtomicBoolean(false);
   private final Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
@@ -204,7 +204,7 @@ public class ComponentModel implements ComponentAst {
     parameterAstsPopulated.set(false);
 
     this.parameters.put(parameterModel.getName(), value.getRawValue());
-    this.parameterAsts.put(parameterModel.getName(), value);
+    this.parameterAstsByName.put(parameterModel.getName(), value);
   }
 
   /**
@@ -214,16 +214,13 @@ public class ComponentModel implements ComponentAst {
   @Override
   public ComponentParameterAst getParameter(String paramName) {
     populateParameterAsts();
-    return parameterAsts.get(paramName);
+    return parameterAstsByName.get(paramName);
   }
 
   @Override
   public Collection<ComponentParameterAst> getParameters() {
     populateParameterAsts();
-    return parameterAsts.values()
-        .stream()
-        .filter(param -> param.getValue().getValue().isPresent())
-        .collect(toList());
+    return parameterAsts;
   }
 
   private void populateParameterAsts() {
@@ -238,24 +235,8 @@ public class ComponentModel implements ComponentAst {
 
     getModel(ParameterizedModel.class)
         .ifPresent(parameterizedModel -> {
-          // Keep parameter order defined on parameterized model
-          final Map<String, ComponentParameterAst> initialParameterAsts = new TreeMap<>(new Comparator<String>() {
-
-            final List<String> params = parameterizedModel.getAllParameterModels()
-                .stream()
-                .map(NamedObject::getName)
-                .collect(toList());
-
-            @Override
-            public int compare(String c1, String c2) {
-              return Integer.compare(params.indexOf(c1), params.indexOf(c2));
-            }
-          });
-
-          initialParameterAsts.putAll(parameterAsts);
-
           parameterizedModel.getAllParameterModels().forEach(paramModel -> {
-            final ComponentParameterAst computedParam = initialParameterAsts.computeIfAbsent(paramModel
+            final ComponentParameterAst computedParam = parameterAstsByName.computeIfAbsent(paramModel
                 .getName(), paramNameKey -> findParameterModel(paramNameKey)
                     .map(foundParamModel -> getRawParameterValue(paramNameKey)
                         .map(rawParamValue -> new DefaultComponentParameterAst(rawParamValue, () -> foundParamModel))
@@ -282,7 +263,21 @@ public class ComponentModel implements ComponentAst {
               componentId = (String) computedParam.getValue().getRight();
             }
           });
-          this.parameterAsts = initialParameterAsts;
+
+          // Keep parameter order defined on parameterized model
+          this.parameterAsts = this.parameterAstsByName.values().stream().filter(param -> param.getValue().getValue().isPresent())
+              .sorted(new Comparator<ComponentParameterAst>() {
+
+                final List<String> params = parameterizedModel.getAllParameterModels()
+                    .stream()
+                    .map(NamedObject::getName)
+                    .collect(toList());
+
+                @Override
+                public int compare(ComponentParameterAst o1, ComponentParameterAst o2) {
+                  return Integer.compare(params.indexOf(o1), params.indexOf(o2));
+                }
+              }).collect(toList());
         });
   }
 
