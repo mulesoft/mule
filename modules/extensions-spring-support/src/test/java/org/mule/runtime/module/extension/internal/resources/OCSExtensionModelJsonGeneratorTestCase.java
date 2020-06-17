@@ -30,8 +30,8 @@ public class OCSExtensionModelJsonGeneratorTestCase extends ExtensionModelJsonGe
         Collections.singletonList(newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth-ocs.json"));
     try {
       return callWithProperty(OCS_ENABLED, "true", () -> createExtensionModels(extensions));
-    } catch (Throwable throwable) {
-      throw new RuntimeException("Failed to create the extension models for the test.");
+    } catch (Throwable t) {
+      throw new RuntimeException("Failed to create the extension models for the test.", t);
     }
   }
 }
