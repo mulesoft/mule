@@ -6,21 +6,13 @@
  */
 package org.mule.runtime.core.internal.processor;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.locks.LockSupport.parkNanos;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
@@ -30,106 +22,29 @@ import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import java.beans.ExceptionListener;
-import java.util.Map;
-
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProcessorTestCase implements ExceptionListener {
-
-  private AsyncDelegateMessageProcessor async;
-  protected TestListener target = new TestListener();
-  private Exception exceptionThrown;
-  protected Latch latch = new Latch();
-  private final Latch asyncEntryLatch = new Latch();
-  private Flow flow;
-
-  @Rule
-  public ExpectedException expected;
+public class AsyncDelegateMessageProcessorTestCase extends AbstractAsyncDelegateMessageProcessorTestCase {
 
   public AsyncDelegateMessageProcessorTestCase(Mode mode) {
     super(mode);
-    setStartContext(true);
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(REGISTRY_KEY, componentLocator);
   }
 
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
     flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
-
     async = createAsyncDelegateMessageProcessor(target, flow);
     async.start();
-  }
-
-  @Override
-  protected void doTearDown() throws Exception {
-    async.stop();
-    async.dispose();
-
-    flow.dispose();
-    super.doTearDown();
-  }
-
-  @Test
-  public void process() throws Exception {
-    CoreEvent request = testEvent();
-
-    CoreEvent result = process(async, request);
-
-    // Complete parent context so we can assert event context completion based on async completion.
-    ((BaseEventContext) request.getContext()).success(result);
-
-    assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(false));
-
-    // Permit async processing now we have already asserted that response alone is not enough to complete event context.
-    asyncEntryLatch.countDown();
-
-    assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
-
-    // Block until async completes, not just target processor.
-    while (!((BaseEventContext) target.sensedEvent.getContext()).isTerminated()) {
-      park100ns();
-    }
-    assertThat(target.sensedEvent, notNullValue());
-
-    // Block to ensure async fully completes before testing state
-    while (!((BaseEventContext) request.getContext()).isTerminated()) {
-      park100ns();
-    }
-
-    assertThat(((BaseEventContext) target.sensedEvent.getContext()).isTerminated(), is(true));
-    assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(true));
-
-    assertTargetEvent(request);
-    assertResponse(result);
-  }
-
-  private void park100ns() {
-    parkNanos(100);
   }
 
   @Test
@@ -189,55 +104,38 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     process();
   }
 
-  private void assertTargetEvent(CoreEvent request) {
-    // Assert that event is processed in async thread
-    assertNotNull(target.sensedEvent);
-    assertThat(request, not(sameInstance(target.sensedEvent)));
-    assertThat(request.getCorrelationId(), equalTo(target.sensedEvent.getCorrelationId()));
-    assertThat(request.getMessage(), sameInstance(target.sensedEvent.getMessage()));
-    assertThat(target.thread, not(sameInstance(currentThread())));
-  }
+  @Test
+  public void process() throws Exception {
+    CoreEvent request = testEvent();
 
-  private void assertResponse(CoreEvent result) throws MuleException {
-    // Assert that response is echoed by async and no exception is thrown in flow
-    assertThat(testEvent(), sameInstance(result));
-    assertThat(exceptionThrown, nullValue());
-  }
+    CoreEvent result = process(async, request);
 
-  private AsyncDelegateMessageProcessor createAsyncDelegateMessageProcessor(Processor listener, FlowConstruct flowConstruct)
-      throws Exception {
-    DefaultMessageProcessorChainBuilder delegateBuilder = new DefaultMessageProcessorChainBuilder();
-    delegateBuilder.setProcessingStrategy(flowConstruct.getProcessingStrategy());
-    delegateBuilder.chain(listener);
+    // Complete parent context so we can assert event context completion based on async completion.
+    ((BaseEventContext) request.getContext()).success(result);
 
-    AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(delegateBuilder, "thread");
-    mp.setAnnotations(getAppleFlowComponentLocationAnnotations());
-    initialiseIfNeeded(mp, true, muleContext);
-    return mp;
-  }
+    assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(false));
 
-  class TestListener implements Processor {
+    // Permit async processing now we have already asserted that response alone is not enough to complete event context.
+    asyncEntryLatch.countDown();
 
-    CoreEvent sensedEvent;
-    Thread thread;
+    assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
 
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-      try {
-        asyncEntryLatch.await();
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-      sensedEvent = event;
-      thread = currentThread();
-      latch.countDown();
-      return event;
+    // Block until async completes, not just target processor.
+    while (!((BaseEventContext) target.sensedEvent.getContext()).isTerminated()) {
+      park100ns();
     }
-  }
+    assertThat(target.sensedEvent, notNullValue());
 
-  @Override
-  public void exceptionThrown(Exception e) {
-    exceptionThrown = e;
+    // Block to ensure async fully completes before testing state
+    while (!((BaseEventContext) request.getContext()).isTerminated()) {
+      park100ns();
+    }
+
+    assertThat(((BaseEventContext) target.sensedEvent.getContext()).isTerminated(), is(true));
+    assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(true));
+
+    assertTargetEvent(request);
+    assertResponse(result);
   }
 
 }

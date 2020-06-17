@@ -9,6 +9,7 @@ package org.mule.tck;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -36,6 +37,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -47,6 +49,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.mockito.Mockito;
 
@@ -88,14 +91,16 @@ public final class MuleTestUtils {
   /**
    * Creates an empty flow with the provided name and source, if it's not null.
    */
-  public static Flow createFlowWithSource(MuleContext context, String flowName, MessageSource source)
+  public static Flow createFlowWithSource(MuleContext context, String flowName,
+                                          Optional<ProcessingStrategyFactory> processingStrategyFactory, MessageSource source)
       throws MuleException {
     FlowExceptionHandler defaultErrorHandler = context.getDefaultErrorHandler(empty());
     initialiseIfNeeded(defaultErrorHandler, context);
     startIfNeeded(defaultErrorHandler);
     final Flow.Builder flowBuilder = builder(flowName, context)
-        .processingStrategyFactory((muleContext, schedulersNamePrefix) -> withContextClassLoader(MuleTestUtils.class
-            .getClassLoader(), () -> spy(new TestDirectProcessingStrategy())))
+        .processingStrategyFactory(processingStrategyFactory
+            .orElse((muleContext, schedulersNamePrefix) -> withContextClassLoader(MuleTestUtils.class.getClassLoader(),
+                                                                                  () -> spy(new TestDirectProcessingStrategy()))))
         .messagingExceptionHandler(defaultErrorHandler);
     if (source != null) {
       flowBuilder.source(source);
@@ -106,10 +111,26 @@ public final class MuleTestUtils {
   }
 
   /**
+   * Creates an empty flow with the provided name and source, if it's not null.
+   */
+  public static Flow createFlowWithSource(MuleContext context, String flowName, MessageSource source) throws MuleException {
+    return createFlowWithSource(context, flowName, empty(), source);
+  }
+
+  /**
+   * Creates an empty flow with the provided name.
+   */
+  public static Flow createFlow(MuleContext context, String flowName,
+                                Optional<ProcessingStrategyFactory> processingStrategyFactory)
+      throws MuleException {
+    return createFlowWithSource(context, flowName, processingStrategyFactory, null);
+  }
+
+  /**
    * Creates an empty flow with the provided name.
    */
   public static Flow createFlow(MuleContext context, String flowName) throws MuleException {
-    return createFlowWithSource(context, flowName, null);
+    return createFlowWithSource(context, flowName, empty(), null);
   }
 
   /**
@@ -120,7 +141,20 @@ public final class MuleTestUtils {
   public static Flow createAndRegisterFlow(MuleContext context, String flowName,
                                            ConfigurationComponentLocator mockComponentLocator)
       throws MuleException {
-    Flow flow = createFlow(context, flowName);
+    return createAndRegisterFlow(context, flowName, mockComponentLocator, null);
+  }
+
+  /**
+   * Creates a new flow and registers it in the given {@code mockComponentLocator}
+   *
+   * @param mockComponentLocator a {@link Mockito#mock(Class)} {@link ConfigurationComponentLocator}
+   * @param processingStrategyFactory a {@link ProcessingStrategyFactory} to be used by the flow
+   */
+  public static Flow createAndRegisterFlow(MuleContext context, String flowName,
+                                           ConfigurationComponentLocator mockComponentLocator,
+                                           ProcessingStrategyFactory processingStrategyFactory)
+      throws MuleException {
+    Flow flow = createFlow(context, flowName, ofNullable(processingStrategyFactory));
     MuleRegistry registry = ((MuleContextWithRegistry) context).getRegistry();
     if (registry != null) {
       registry.registerFlowConstruct(flow);
@@ -202,6 +236,7 @@ public final class MuleTestUtils {
       return new StreamPerEventSink(pipeline, event -> {
       });
     }
+
   }
 
 
