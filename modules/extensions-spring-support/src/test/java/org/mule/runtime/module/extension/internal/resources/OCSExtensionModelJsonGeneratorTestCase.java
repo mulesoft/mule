@@ -8,10 +8,10 @@ package org.mule.runtime.module.extension.internal.resources;
 
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ENABLED;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionModelJsonGeneratorTestCase.ExtensionJsonGeneratorTestUnit.newTestUnit;
+import static org.mule.tck.junit4.rule.SystemProperty.callWithProperty;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth.TestOAuthExtension;
 
 import java.util.Collection;
@@ -29,9 +29,9 @@ public class OCSExtensionModelJsonGeneratorTestCase extends ExtensionModelJsonGe
     List<ExtensionJsonGeneratorTestUnit> extensions =
         Collections.singletonList(newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth-ocs.json"));
     try {
-      return SystemProperty.runWithProperty(OCS_ENABLED, "true", () -> createExtensionModels(extensions));
+      return callWithProperty(OCS_ENABLED, "true", () -> createExtensionModels(extensions));
     } catch (Throwable throwable) {
-      return null;
+      throw new RuntimeException("Failed to create the extension models for the test.");
     }
   }
 }
