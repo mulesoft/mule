@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.model;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -85,7 +84,7 @@ public class ComponentModel implements ComponentAst {
   private ComponentIdentifier identifier;
   private String componentId;
   private final Map<String, String> parameters = new HashMap<>();
-  private Map<String, ComponentParameterAst> parameterAsts = emptyMap();
+  private Map<String, ComponentParameterAst> parameterAsts = new HashMap<>();
   private final AtomicBoolean parameterAstsPopulated = new AtomicBoolean(false);
   private final Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
