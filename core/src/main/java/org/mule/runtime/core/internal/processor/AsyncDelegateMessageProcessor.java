@@ -363,12 +363,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
       }
 
       synchronized (executing) {
-        if (executing.get() != null) {
-          if (!executing.get().isDone()) {
-            return;
-          }
+        if (executing.get() == null || executing.get().isDone()) {
+          executing.set(dispatchTask());
         }
-        executing.set(dispatchTask());
       }
     }
 
