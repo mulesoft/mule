@@ -23,7 +23,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 
-public class CxfProxyServiceHttp10NPETestCase extends FunctionalTestCase {
+public class Mule18493TestCase extends FunctionalTestCase {
 
     private static final int DEFAULT_TIMEOUT = 1000;
 
