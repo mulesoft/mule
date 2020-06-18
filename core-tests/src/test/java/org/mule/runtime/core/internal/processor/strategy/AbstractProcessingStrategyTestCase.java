@@ -217,7 +217,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected Scheduler custom;
   protected TestScheduler ringBuffer;
   protected TestScheduler asyncExecutor;
-  protected ExecutorService cachedThreadPool = newFixedThreadPool(4, new NamedThreadFactory("cachedThreadPool"));
+  protected ExecutorService cachedThreadPool = newFixedThreadPool(CORES, new NamedThreadFactory("cachedThreadPool"));
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -744,7 +744,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
               assertThat(e.getFailingComponent(), is(flow));
               rejected.getAndIncrement();
             })
-            .subscribe());
+            .subscribe(event -> {
+            }, t -> {
+              if (!(t instanceof MessagingException)) {
+                t.printStackTrace();
+              }
+            }));
         if (i == STREAM_ITERATIONS / 2) {
           latch.release();
         }
