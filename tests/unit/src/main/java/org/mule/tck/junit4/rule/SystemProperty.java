@@ -6,12 +6,31 @@
  */
 package org.mule.tck.junit4.rule;
 
+import java.util.concurrent.Callable;
+
 import org.junit.rules.ExternalResource;
 
 /**
  * Sets up a system property before a test and guarantees to tear it down afterward.
  */
 public class SystemProperty extends ExternalResource {
+
+  /**
+   * Utility method to execute a callable with a system property and restoring the property's original value afterwards.
+   *
+   * @return the return value of the callable.
+   */
+  public static <V> V callWithProperty(String name, String value, Callable<V> callable) throws Throwable {
+    SystemProperty property = new SystemProperty(name, value);
+    property.before();
+    try {
+      return callable.call();
+    } catch (Exception e) {
+      throw new Exception("Callable threw an exception during its execution.", e);
+    } finally {
+      property.after();
+    }
+  }
 
   protected boolean initialized;
   protected String value;
