@@ -10,6 +10,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Comparator.comparing;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
@@ -122,6 +123,7 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
 
       final List<ParameterModel> tempParameterModels = adaptedType.getFields().stream()
           .map(ObjectFieldTypeAsParameterModelAdapter::new)
+          .sorted(comparing(ObjectFieldTypeAsParameterModelAdapter::getName))
           .collect(toList());
 
       this.parameterModelsByName = tempParameterModels
