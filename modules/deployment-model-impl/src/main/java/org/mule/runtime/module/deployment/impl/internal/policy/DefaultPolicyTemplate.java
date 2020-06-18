@@ -13,6 +13,8 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 
 import java.io.File;
 import java.util.List;
@@ -75,7 +77,15 @@ public class DefaultPolicyTemplate implements PolicyTemplate {
 
   @Override
   public void dispose() {
-    policyClassLoader.dispose();
+    if (isRegionClassLoaderMember((ClassLoader) policyClassLoader)) {
+      ((DisposableClassLoader) ((ClassLoader) policyClassLoader).getParent()).dispose();
+    } else if (policyClassLoader instanceof DisposableClassLoader) {
+      ((DisposableClassLoader) policyClassLoader).dispose();
+    }
+  }
+
+  private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
+    return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
   }
 
   public List<ArtifactPlugin> getArtifactPlugins() {
