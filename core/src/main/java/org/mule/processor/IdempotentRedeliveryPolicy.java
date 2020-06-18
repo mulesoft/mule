@@ -6,6 +6,7 @@
  */
 package org.mule.processor;
 
+import static org.mule.api.config.MuleProperties.MULE_FORCE_REDELIVERY;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static com.google.common.primitives.Bytes.concat;
 
@@ -288,7 +289,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             byte[] bytes;
             MuleMessage message = event.getMessage();
             Object payload = message.getPayload();
-            if(Boolean.parseBoolean(System.getProperty("RollBackExceptionStrategy","false")))
+            if(Boolean.parseBoolean(System.getProperty(MULE_FORCE_REDELIVERY,"false")))
             {
                 byte[] payloadBytes = (byte[]) objectToByteArray.transform(payload);
                 bytes = concat(payloadBytes, message.getUniqueId().getBytes());

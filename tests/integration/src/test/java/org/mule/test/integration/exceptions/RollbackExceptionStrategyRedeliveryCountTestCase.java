@@ -8,6 +8,7 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.api.config.MuleProperties.MULE_FORCE_REDELIVERY;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -34,7 +35,7 @@ public class RollbackExceptionStrategyRedeliveryCountTestCase extends Functional
     @Test
     public void testRollbackExceptionStrategyNumberOfRetries() throws Exception
     {
-        System.setProperty("RollBackExceptionStrategy", "true");
+        System.setProperty(MULE_FORCE_REDELIVERY, "true");
         final CountDownLatch latch = new CountDownLatch(8);
         LocalMuleClient client = muleContext.getClient();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
