@@ -25,6 +25,7 @@ import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.util.LazyValue;
@@ -102,7 +103,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
   }
 
 
-  static class StreamEmitterProcessingStrategy extends AbstractReactorStreamProcessingStrategy {
+  static class StreamEmitterProcessingStrategy extends AbstractReactorStreamProcessingStrategy implements Stoppable {
 
     private static final Logger LOGGER = getLogger(StreamEmitterProcessingStrategy.class);
     private static final String NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR = "No subscriptions active for processor.";
@@ -141,6 +142,14 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     }
 
     @Override
+    public void stop() {
+      // Stop the schedulers as early as possible
+      if (allSchedulersStopped()) {
+        stopSchedulersIfNeeded();
+      }
+    }
+
+    @Override
     public void dispose() {
       final long startMillis = currentTimeMillis();
       final long shutdownTimeout = shutdownTimeoutSupplier.get();
@@ -162,6 +171,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         }
       }
 
+      // force the schedulers to be stopped.
+      activeSinksCount.set(0);
       super.dispose();
     }
 
@@ -174,7 +185,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       // While there are active fluxes, the schedulers cannot be stopped because they are still being used.
       // Moreover, the `complete` of the flux done during shutdown will require those schedulers active to correctly propagate it
       // downstream
-      boolean shouldStop = activeSinksCount.updateAndGet(operand -> operand == 0 ? 0 : operand - 1) == 0;
+      boolean shouldStop = decrementActiveSinks();
 
       if (shouldStop) {
         try {
@@ -185,6 +196,10 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       }
 
       return shouldStop;
+    }
+
+    private boolean decrementActiveSinks() {
+      return activeSinksCount.updateAndGet(operand -> operand == 0 ? 0 : operand - 1) == 0;
     }
 
     @Override
@@ -239,7 +254,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     @Override
     public Publisher<CoreEvent> configureInternalPublisher(Publisher<CoreEvent> flux) {
       return from(flux)
-          .doAfterTerminate(() -> stopSchedulersIfNeeded())
+          .doAfterTerminate(() -> decrementActiveSinks())
           .doOnSubscribe(s -> activeSinksCount.incrementAndGet());
     }
 
