@@ -7,9 +7,11 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.Boolean.valueOf;
+import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
+
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 
@@ -22,6 +24,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
+  @Override
   public void deploy(T artifact, boolean startArtifact) {
     try {
       artifact.install();
@@ -36,8 +39,8 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
         throw ((DeploymentException) t);
       }
 
-      final String msg = String.format("Failed to deploy artifact [%s]", artifact.getArtifactName());
-      throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
+      final String msg = format("Failed to deploy artifact [%s]", artifact.getArtifactName());
+      throw new DeploymentException(createStaticMessage(msg), t);
     }
   }
 
@@ -45,7 +48,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
    * Initializes the artifact by taking into account deployment properties
    * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_DEPLOYMENT_PROPERTY}
    * and {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY}.
-   * 
+   *
    * @param artifact the T artifact to be initialized
    */
   private void doInit(T artifact) {
@@ -54,9 +57,9 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     if (artifact.getDescriptor().getDeploymentProperties().isPresent()) {
       Properties deploymentProperties = artifact.getDescriptor().getDeploymentProperties().get();
       lazyInit = valueOf((String) deploymentProperties.getOrDefault(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "false"));
-      enableXmlValidations = valueOf((String) deploymentProperties.getOrDefault(
-                                                                                MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY,
-                                                                                "false"));
+      enableXmlValidations =
+          valueOf((String) deploymentProperties.getOrDefault(MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY,
+                                                             "false"));
     }
 
     if (lazyInit) {
@@ -66,6 +69,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     }
   }
 
+  @Override
   public void undeploy(T artifact) {
     try {
       tryToStopArtifact(artifact);
@@ -75,8 +79,8 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
         throw ((DeploymentException) t);
       }
 
-      final String msg = String.format("Failed to undeployArtifact artifact [%s]", artifact.getArtifactName());
-      throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
+      final String msg = format("Failed to undeployArtifact artifact [%s]", artifact.getArtifactName());
+      throw new DeploymentException(createStaticMessage(msg), t);
     }
   }
 
@@ -84,9 +88,8 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     try {
       artifact.dispose();
     } catch (Throwable t) {
-      logger.error(String.format(
-                                 "Unable to cleanly dispose artifact '%s'. Restart Mule if you get errors redeploying this artifact",
-                                 artifact.getArtifactName()),
+      logger.error(format("Unable to cleanly dispose artifact '%s'. Restart Mule if you get errors redeploying this artifact",
+                          artifact.getArtifactName()),
                    t);
     }
   }
@@ -96,8 +99,8 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     try {
       artifact.stop();
     } catch (Throwable t) {
-      logger.error(String.format("Unable to cleanly stop artifact '%s'. Restart Mule if you get errors redeploying this artifact",
-                                 artifact.getArtifactName()),
+      logger.error(format("Unable to cleanly stop artifact '%s'. Restart Mule if you get errors redeploying this artifact",
+                          artifact.getArtifactName()),
                    t);
     }
   }
