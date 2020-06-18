@@ -11,6 +11,7 @@ import static java.util.function.Function.identity;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.construct.BackPressureReason.EVENTS_ACCUMULATED;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
@@ -25,7 +26,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -61,8 +61,8 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategyAd
   protected Consumer<CoreEvent> createDefaultOnEventConsumer() {
     return event -> {
       if (isTransactionActive()) {
-        ((BaseEventContext) event.getContext()).error(new MessagingException(event,
-                                                                             new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE))));
+        throw propagateWrappingFatal(new MessagingException(event,
+                                                            new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE))));
       }
     };
   }

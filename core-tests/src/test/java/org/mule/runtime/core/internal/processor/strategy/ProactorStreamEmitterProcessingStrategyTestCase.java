@@ -62,7 +62,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
 import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -102,29 +101,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
   public ProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
     super(mode);
-  }
-
-  @Override
-  protected ProcessingStrategyFactory createProcessingStrategyFactory() {
-    return new AsyncProcessingStrategyFactory() {
-
-      private int maxConcurrency = MAX_VALUE;
-
-      @Override
-      public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-        return createProcessingStrategy(muleContext, schedulersNamePrefix, maxConcurrency);
-      }
-
-      @Override
-      public void setMaxConcurrencyEagerCheck(boolean maxConcurrencyEagerCheck) {
-        // Nothing to do
-      }
-
-      @Override
-      public void setMaxConcurrency(int maxConcurrency) {
-        this.maxConcurrency = maxConcurrency;
-      }
-    };
   }
 
   @Override
@@ -187,6 +163,17 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Description("With the ProactorProcessingStrategy, a BLOCKING message processor is scheduled on a IO thread.")
   public void singleBlocking() throws Exception {
     super.singleBlocking();
+    assertThat(threads, hasSize(equalTo(1)));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("With the ProactorProcessingStrategy, a BLOCKING message processor is scheduled on a IO thread.")
+  public void singleBlockingInnerPublisher() throws Exception {
+    super.singleBlockingInnerPublisher();
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
@@ -554,6 +541,25 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     triggerableMessageSource = new TriggerableMessageSource(FAIL);
 
     flow = flowBuilder.get()
+        .processingStrategyFactory(new AsyncProcessingStrategyFactory() {
+
+          private int maxConcurrency = MAX_VALUE;
+
+          @Override
+          public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+            return createProcessingStrategy(muleContext, schedulersNamePrefix, maxConcurrency);
+          }
+
+          @Override
+          public void setMaxConcurrencyEagerCheck(boolean maxConcurrencyEagerCheck) {
+            // Nothing to do
+          }
+
+          @Override
+          public void setMaxConcurrency(int maxConcurrency) {
+            this.maxConcurrency = maxConcurrency;
+          }
+        })
         .source(triggerableMessageSource)
         .processors(cpuLightProcessor, latchedProcessor)
         .maxConcurrency(6)
