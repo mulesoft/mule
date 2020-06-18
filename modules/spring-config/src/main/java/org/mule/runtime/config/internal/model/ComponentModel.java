@@ -275,7 +275,7 @@ public class ComponentModel implements ComponentAst {
 
                 @Override
                 public int compare(ComponentParameterAst o1, ComponentParameterAst o2) {
-                  return Integer.compare(params.indexOf(o1), params.indexOf(o2));
+                  return Integer.compare(params.indexOf(o1.getModel().getName()), params.indexOf(o2.getModel().getName()));
                 }
               }).collect(toList());
         });

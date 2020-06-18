@@ -8,9 +8,12 @@ package org.mule.runtime.config.model;
 
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,15 +22,20 @@ import static org.mule.test.allure.AllureConstants.ArtifactAst.ParameterAst.PARA
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.model.DefaultComponentParameterAst;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.yaml.snakeyaml.parser.ParserException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +49,9 @@ public class ComponentModelTestCase extends AbstractMuleTestCase {
   private static final String PARAMETER_B = "b";
   private static final String PARAMETER_C = "c";
   private ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   private org.mule.runtime.api.meta.model.ComponentModel createParameterizedModel() {
     org.mule.runtime.api.meta.model.ComponentModel parameterizedModel =
@@ -77,6 +88,17 @@ public class ComponentModelTestCase extends AbstractMuleTestCase {
         parameterizedModel.getAllParameterModels().stream().map(NamedObject::getName).collect(toList());
     List<String> parametersName = parameters.stream().map(p -> p.getModel().getName()).collect(toList());
     assertThat(parametersName, is(expectedParametersName));
+  }
 
+  @Test
+  public void getParametersShouldFailIfParameterizedModelIsNotPresent() {
+    expectedException.expectMessage(containsString("is not parameterizable"));
+    expectedException.expect(IllegalStateException.class);
+    ComponentModel componentModel = baseComponentModelBuilder().build();
+    componentModel.getParameters();
+  }
+
+  private ComponentModel.Builder baseComponentModelBuilder() {
+    return new ComponentModel.Builder().setIdentifier(mock(ComponentIdentifier.class));
   }
 }
