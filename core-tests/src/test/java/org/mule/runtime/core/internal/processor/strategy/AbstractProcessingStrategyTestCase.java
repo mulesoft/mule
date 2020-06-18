@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -54,6 +55,7 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
@@ -169,6 +171,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       return CPU_LITE_ASYNC;
     }
   };
+  protected Processor cpuLightInnerPublisherProcessor;
+  protected Processor cpuIntensiveInnerPublisherProcessor;
+  protected Processor blockingInnerPublisherProcessor;
+  protected Processor asyncInnerPublisherProcessor;
   protected Processor annotatedAsyncProcessor = new AnnotatedAsyncProcessor();
 
   protected Processor failingProcessor = new ThreadTrackingProcessor() {
@@ -201,13 +207,17 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     }
   };
 
-  protected Scheduler cpuLight;
-  protected Scheduler blocking;
-  protected Scheduler cpuIntensive;
+  protected ProcessingStrategy ps;
+  protected CountDownLatch innerPublisherLatch;
+
+  protected TestScheduler cpuLight;
+  protected TestScheduler blocking;
+  protected TestScheduler cpuIntensive;
+  protected TestScheduler customWrapped;
   protected Scheduler custom;
-  protected Scheduler ringBuffer;
-  protected Scheduler asyncExecutor;
-  protected ExecutorService cachedThreadPool = newFixedThreadPool(4, new NamedThreadFactory("cachedThreadPool"));
+  protected TestScheduler ringBuffer;
+  protected TestScheduler asyncExecutor;
+  protected ExecutorService cachedThreadPool = newFixedThreadPool(CORES, new NamedThreadFactory("cachedThreadPool"));
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -223,10 +233,43 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Before
   public void before() throws RegistrationException {
+    ps = createProcessingStrategy(muleContext, "test");
+    innerPublisherLatch = new CountDownLatch(1);
+
+    cpuLightInnerPublisherProcessor = new WithInnerPublisherProcessor(ps, innerPublisherLatch) {
+
+      @Override
+      public ProcessingType getProcessingType() {
+        return CPU_LITE;
+      }
+    };
+    cpuIntensiveInnerPublisherProcessor = new WithInnerPublisherProcessor(ps, innerPublisherLatch) {
+
+      @Override
+      public ProcessingType getProcessingType() {
+        return ProcessingType.CPU_INTENSIVE;
+      }
+    };
+    blockingInnerPublisherProcessor = new WithInnerPublisherProcessor(ps, innerPublisherLatch) {
+
+      @Override
+      public ProcessingType getProcessingType() {
+        return BLOCKING;
+      }
+    };
+    asyncInnerPublisherProcessor = new WithInnerPublisherProcessor(ps, innerPublisherLatch) {
+
+      @Override
+      public ProcessingType getProcessingType() {
+        return CPU_LITE_ASYNC;
+      }
+    };
+
     cpuLight = new TestScheduler(2, CPU_LIGHT, false);
     blocking = new TestScheduler(4, IO, true);
     cpuIntensive = new TestScheduler(2, CPU_INTENSIVE, true);
-    custom = new RetrySchedulerWrapper(new TestScheduler(4, CUSTOM, true), 5, () -> {
+    customWrapped = new TestScheduler(4, CUSTOM, true);
+    custom = new RetrySchedulerWrapper(customWrapped, 5, () -> {
     });
     ringBuffer = new TestScheduler(1, RING_BUFFER, true);
     asyncExecutor = new TestScheduler(CORES, EXECUTOR, false);
@@ -244,7 +287,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   }
 
   protected ProcessingStrategyFactory createProcessingStrategyFactory() {
-    return (muleContext, prefix) -> createProcessingStrategy(muleContext, prefix);
+    return (muleContext, prefix) -> ps;
   }
 
   protected abstract ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix);
@@ -261,6 +304,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     cpuIntensive.stop();
     custom.stop();
     asyncExecutor.stop();
+
+    ringBuffer.assertNoFailures();
+    cpuLight.assertNoFailures();
+    blocking.assertNoFailures();
+    cpuIntensive.assertNoFailures();
+    customWrapped.assertNoFailures();
+    asyncExecutor.assertNoFailures();
+
     cachedThreadPool.shutdownNow();
   }
 
@@ -340,6 +391,31 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     processFlow(testEvent());
 
     assertThat(schedulers.toString(), schedulers, ioSchedulerMatcher());
+  }
+
+  @Test
+  public void singleBlockingInnerPublisher() throws Exception {
+    flow = flowBuilder.get().processors(blockingInnerPublisherProcessor).build();
+    startFlow();
+
+    cpuLight.execute(() -> {
+      try {
+        processFlow(testEvent());
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
+    });
+
+    // Wait for the flow to be processing
+    Thread.sleep(100);
+
+    // simulate an inner publisher still processing events when the flow is stopped.
+    flow.stop();
+    innerPublisherLatch.countDown();
+
+    assertThat(schedulers.toString(), schedulers, ioSchedulerMatcher());
+    flow.dispose();
+    flow = null;
   }
 
   protected Matcher<Iterable<? extends String>> ioSchedulerMatcher() {
@@ -436,6 +512,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     blocking.stop();
     cpuIntensive.stop();
     ringBuffer.stop();
+
+    cpuLight.assertNoFailures();
+    blocking.assertNoFailures();
+    cpuIntensive.assertNoFailures();
+    ringBuffer.assertNoFailures();
+
     cpuLight = new TestScheduler(2, CPU_LIGHT, false);
     blocking = new TestScheduler(4, IO, true);
     cpuIntensive = new TestScheduler(2, CPU_INTENSIVE, true);
@@ -662,7 +744,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
               assertThat(e.getFailingComponent(), is(flow));
               rejected.getAndIncrement();
             })
-            .subscribe());
+            .subscribe(event -> {
+            }, t -> {
+              if (!(t instanceof MessagingException)) {
+                t.printStackTrace();
+              }
+            }));
         if (i == STREAM_ITERATIONS / 2) {
           latch.release();
         }
@@ -739,6 +826,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   static class TestScheduler extends ScheduledThreadPoolExecutor implements Scheduler {
 
+    private final List<AssertionError> failures = new ArrayList<>();
+
     private final String threadNamePrefix;
     private final ExecutorService executor;
 
@@ -762,6 +851,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     @Override
     public void stop() {
+      if (currentThread().getName().startsWith(threadNamePrefix)) {
+        failures.add(new AssertionError("A scheduler must not be stopped from within itself"));
+      }
+
       shutdown();
       executor.shutdown();
     }
@@ -783,6 +876,17 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       return threadNamePrefix;
     }
 
+    public void assertNoFailures() {
+      if (!failures.isEmpty()) {
+        throw failures.iterator().next();
+      }
+    }
+
+    public void assertStopped() {
+      if (!isShutdown()) {
+        fail("Scheduler not stopped");
+      }
+    }
   }
 
   /**
@@ -854,6 +958,37 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       } else {
         return Processor.super.apply(schedulerTrackingPublisher);
       }
+    }
+
+  }
+
+  class WithInnerPublisherProcessor extends ThreadTrackingProcessor {
+
+    private final ProcessingStrategy ps;
+    private final CountDownLatch latch;
+
+    public WithInnerPublisherProcessor(ProcessingStrategy ps, CountDownLatch latch) {
+      this.ps = ps;
+      this.latch = latch;
+    }
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      try {
+        return super.process(event);
+      } finally {
+        try {
+          latch.await();
+        } catch (InterruptedException e) {
+          currentThread().interrupt();
+          throw new MuleRuntimeException(e);
+        }
+      }
+    }
+
+    @Override
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+      return ps.configureInternalPublisher(super.apply(publisher));
     }
 
   }

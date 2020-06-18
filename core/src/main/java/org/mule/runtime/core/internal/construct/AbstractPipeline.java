@@ -392,7 +392,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             .build())
         .build();
     // Notify error in event context
-    ((BaseEventContext) event.getContext()).error(new MessagingException(errorEvent, wrappedException));
+    ((BaseEventContext) event.getContext()).error(new MessagingException(errorEvent, wrappedException, this));
   }
 
   protected ReactiveProcessor processFlowFunction() {

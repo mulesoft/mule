@@ -225,9 +225,6 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
                                                         .stream()
                                                         .filter(p -> parameterNamesRequiredForMetadata
                                                             .contains((p.getModel()).getName()))
-                                                        // TODO MULE-18328 Force parameters order to be consistent
-                                                        .sorted((o1, o2) -> o1.getModel().getName()
-                                                            .compareTo(o2.getModel().getName()))
                                                         .map(p -> resolveKeyFromSimpleValue(elementModel, p)))
                                                     .orElse(Stream.empty()))
         .collect(toList());
@@ -257,8 +254,6 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
       List<MetadataCacheId> keyParts = elementModel.getParameters()
           .stream()
           .filter(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
-          // TODO MULE-18328 Force parameters order to be consistent
-          .sorted((o1, o2) -> o1.getModel().getName().compareTo(o2.getModel().getName()))
           .map(p -> resolveKeyFromSimpleValue(elementModel, p))
           .collect(toList());
       return keyParts.isEmpty() ? empty() : of(new MetadataCacheId(keyParts, "metadataKey"));
