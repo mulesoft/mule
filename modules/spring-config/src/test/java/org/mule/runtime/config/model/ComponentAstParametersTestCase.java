@@ -8,7 +8,6 @@ package org.mule.runtime.config.model;
 
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -30,12 +29,10 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.model.DefaultComponentParameterAst;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.yaml.snakeyaml.parser.ParserException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +40,7 @@ import java.util.List;
 
 @Feature(ARTIFACT_AST)
 @Story(PARAMETER_AST)
-public class ComponentModelTestCase extends AbstractMuleTestCase {
+public class ComponentAstParametersTestCase extends AbstractMuleTestCase {
 
   private static final String PARAMETER_A = "a";
   private static final String PARAMETER_B = "b";
@@ -73,7 +70,7 @@ public class ComponentModelTestCase extends AbstractMuleTestCase {
 
   @Test
   public void retrieveParametersAsDefinedAtExtensionModel() {
-    ComponentModel componentModel = new ComponentModel();
+    ComponentModel componentModel = baseComponentModelBuilder().build();
     org.mule.runtime.api.meta.model.ComponentModel parameterizedModel = createParameterizedModel();
     parameterizedModel.getAllParameterModels().forEach(p -> componentModel.setParameter(p,
                                                                                         new DefaultComponentParameterAst("value-"
