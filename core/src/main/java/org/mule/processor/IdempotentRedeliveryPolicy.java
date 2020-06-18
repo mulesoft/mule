@@ -285,10 +285,16 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     {
         if (useSecureHash)
         {
+            byte[] bytes;
             MuleMessage message = event.getMessage();
             Object payload = message.getPayload();
-            byte[] payloadBytes = (byte[]) objectToByteArray.transform(payload);
-            byte[] bytes = concat(payloadBytes, message.getUniqueId().getBytes());
+            if(Boolean.parseBoolean(System.getProperty("RollBackExceptionStrategy","false")))
+            {
+                byte[] payloadBytes = (byte[]) objectToByteArray.transform(payload);
+                bytes = concat(payloadBytes, message.getUniqueId().getBytes());
+            } else {
+                bytes = (byte[]) objectToByteArray.transform(payload);
+            }
             if (payload instanceof InputStream)
             {
                 // We've consumed the stream.

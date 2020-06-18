@@ -34,6 +34,7 @@ public class RollbackExceptionStrategyRedeliveryCountTestCase extends Functional
     @Test
     public void testRollbackExceptionStrategyNumberOfRetries() throws Exception
     {
+        System.setProperty("RollBackExceptionStrategy", "true");
         final CountDownLatch latch = new CountDownLatch(8);
         LocalMuleClient client = muleContext.getClient();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
