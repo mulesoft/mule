@@ -446,7 +446,7 @@ public final class XmlExtensionLoaderDelegate {
     }
 
     moduleModel.recursiveStream()
-        .forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel, extensionModelHelper, true));
+        .forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel, extensionModelHelper));
     recursiveStreamWithHierarchy(moduleModel).forEach(new ComponentLocationVisitor());
 
     final String name = moduleModel.getRawParameterValue(MODULE_NAME).orElse(null);
