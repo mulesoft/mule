@@ -107,7 +107,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
                   .onErrorMap(MessagingException.class,
                               error -> createMessagingException(doAfter(interceptor, (Component) component, of(error.getCause()))
                                   .apply((InternalEvent) error.getEvent()),
-                                                                error.getCause(), (Component) component, of(error)))
+                                                                error.getCause(), error.getFailingComponent(), of(error)))
                   .cast(InternalEvent.class)
                   .map(doAfter(interceptor, (Component) component, empty()))
                   .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
@@ -142,7 +142,11 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
 
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(new MessagingException(interceptionEvent.resolve(), e, component));
+        if (e.getCause() instanceof MessagingException) {
+          throw propagate(e.getCause());
+        } else {
+          throw propagate(new MessagingException(interceptionEvent.resolve(), e, component));
+        }
       }
     };
   }
