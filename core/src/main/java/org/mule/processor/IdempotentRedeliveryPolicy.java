@@ -50,6 +50,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
 {
     private final ObjectToByteArray objectToByteArray = new ObjectToByteArray();
     private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
+    private static final boolean FORCE_REDELIVERY = getBoolean(MULE_FORCE_REDELIVERY);
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -59,7 +60,6 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     private ObjectStore<AtomicInteger> store;
     private LockFactory lockFactory;
     private String idrId;
-    private boolean forceRedelivery;
 
     @Override
     public void initialise() throws InitialisationException
@@ -109,7 +109,6 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         String flowName = flowConstruct.getName();
         idrId = String.format("%s-%s-%s",appName,flowName,"idr");
         lockFactory = muleContext.getLockFactory();
-        forceRedelivery = getBoolean(MULE_FORCE_REDELIVERY);
         if (store == null)
         {
             store = new ProvidedObjectStoreWrapper<>(null, internalObjectStoreFactory());
@@ -292,7 +291,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             byte[] bytes;
             MuleMessage message = event.getMessage();
             Object payload = message.getPayload();
-            if(forceRedelivery)
+            if(FORCE_REDELIVERY)
             {
                 byte[] payloadBytes = (byte[]) objectToByteArray.transform(payload);
                 bytes = concat(payloadBytes, message.getUniqueId().getBytes());
