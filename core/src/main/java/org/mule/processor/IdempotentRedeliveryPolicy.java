@@ -6,6 +6,8 @@
  */
 package org.mule.processor;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.api.config.MuleProperties.MULE_FORCE_REDELIVERY;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static com.google.common.primitives.Bytes.concat;
 
@@ -48,6 +50,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
 {
     private final ObjectToByteArray objectToByteArray = new ObjectToByteArray();
     private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
+    private static final boolean FORCE_REDELIVERY = getBoolean(MULE_FORCE_REDELIVERY);
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -285,10 +288,18 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     {
         if (useSecureHash)
         {
+            byte[] bytes;
             MuleMessage message = event.getMessage();
             Object payload = message.getPayload();
-            byte[] payloadBytes = (byte[]) objectToByteArray.transform(payload);
-            byte[] bytes = concat(payloadBytes, message.getUniqueId().getBytes());
+            if(FORCE_REDELIVERY)
+            {
+                byte[] payloadBytes = (byte[]) objectToByteArray.transform(payload);
+                bytes = concat(payloadBytes, message.getUniqueId().getBytes());
+            }
+            else
+            {
+                bytes = (byte[]) objectToByteArray.transform(payload);
+            }
             if (payload instanceof InputStream)
             {
                 // We've consumed the stream.

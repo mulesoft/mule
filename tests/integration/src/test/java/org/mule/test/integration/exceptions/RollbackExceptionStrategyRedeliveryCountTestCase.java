@@ -8,7 +8,9 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.api.config.MuleProperties.MULE_FORCE_REDELIVERY;
 
+import org.junit.After;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
@@ -28,7 +30,14 @@ public class RollbackExceptionStrategyRedeliveryCountTestCase extends Functional
     @Override
     protected String getConfigFile()
     {
+        System.setProperty(MULE_FORCE_REDELIVERY, "true");
         return "org/mule/test/integration/exceptions/rollback-exception-strategy-redelivery-count.xml";
+    }
+
+    @After
+    public void after()
+    {
+        System.setProperty(MULE_FORCE_REDELIVERY, "false");
     }
 
     @Test
@@ -49,7 +58,7 @@ public class RollbackExceptionStrategyRedeliveryCountTestCase extends Functional
 
         if (!latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
         {
-            fail("message should have been delivered at least 5 times");
+            fail("message should have been delivered at least 8 times");
         }
         MuleMessage response = client.request("vm://dlqCounter", 20000);
         assertThat(response, IsNull.notNullValue());
