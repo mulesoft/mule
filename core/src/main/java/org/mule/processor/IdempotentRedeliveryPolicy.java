@@ -59,7 +59,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     private ObjectStore<AtomicInteger> store;
     private LockFactory lockFactory;
     private String idrId;
-    private boolean redelivery;
+    private boolean forceRedelivery;
 
     @Override
     public void initialise() throws InitialisationException
@@ -109,7 +109,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         String flowName = flowConstruct.getName();
         idrId = String.format("%s-%s-%s",appName,flowName,"idr");
         lockFactory = muleContext.getLockFactory();
-        redelivery = parseBoolean(System.getProperty(MULE_FORCE_REDELIVERY,"false"));
+        forceRedelivery = parseBoolean(System.getProperty(MULE_FORCE_REDELIVERY,"false"));
         if (store == null)
         {
             store = new ProvidedObjectStoreWrapper<>(null, internalObjectStoreFactory());
@@ -292,7 +292,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             byte[] bytes;
             MuleMessage message = event.getMessage();
             Object payload = message.getPayload();
-            if(redelivery)
+            if(forceRedelivery)
             {
                 byte[] payloadBytes = (byte[]) objectToByteArray.transform(payload);
                 bytes = concat(payloadBytes, message.getUniqueId().getBytes());
