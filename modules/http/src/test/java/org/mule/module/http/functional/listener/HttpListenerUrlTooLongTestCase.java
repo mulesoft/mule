@@ -7,14 +7,15 @@
 
 package org.mule.module.http.functional.listener;
 
-import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.repeat;
+import static org.apache.http.client.fluent.Request.Get;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.REQUEST_URI_TOO_LONG;
@@ -35,7 +36,7 @@ public class HttpListenerUrlTooLongTestCase extends FunctionalTestCase
     @Test
     public void returnsRequestUriTooLong() throws Exception
     {
-        final Response response = Request.Get(getListenerUrl(repeat("path", 3000)))
+        final Response response = Get(getListenerUrl(repeat("path", 3000)))
             .execute();
 
         assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(REQUEST_URI_TOO_LONG.getStatusCode()));
@@ -44,6 +45,6 @@ public class HttpListenerUrlTooLongTestCase extends FunctionalTestCase
 
     private String getListenerUrl(String path)
     {
-        return String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
+        return format("http://localhost:%s/%s", listenPort.getNumber(), path);
     }
 }
