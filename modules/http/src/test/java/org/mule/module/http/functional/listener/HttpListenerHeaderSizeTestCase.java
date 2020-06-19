@@ -9,7 +9,7 @@ package org.mule.module.http.functional.listener;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.REQUEST_URI_TOO_LONG;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -41,8 +41,8 @@ public class HttpListenerHeaderSizeTestCase extends FunctionalTestCase
     public void maxHeaderSizeExceeded() throws Exception
     {
         MuleMessage response = sendRequestWithQueryParam(Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) + SIZE_DELTA);
-        assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(BAD_REQUEST.getStatusCode()));
-        assertThat(response.<String>getInboundProperty(HTTP_REASON_PROPERTY), is(BAD_REQUEST.getReasonPhrase()));
+        assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(REQUEST_URI_TOO_LONG.getStatusCode()));
+        assertThat(response.<String>getInboundProperty(HTTP_REASON_PROPERTY), is(REQUEST_URI_TOO_LONG.getReasonPhrase()));
     }
 
     @Test
