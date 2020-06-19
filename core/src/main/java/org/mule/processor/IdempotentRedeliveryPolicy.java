@@ -6,7 +6,7 @@
  */
 package org.mule.processor;
 
-import static java.lang.Boolean.parseBoolean;
+import static java.lang.Boolean.getBoolean;
 import static org.mule.api.config.MuleProperties.MULE_FORCE_REDELIVERY;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static com.google.common.primitives.Bytes.concat;
@@ -109,7 +109,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         String flowName = flowConstruct.getName();
         idrId = String.format("%s-%s-%s",appName,flowName,"idr");
         lockFactory = muleContext.getLockFactory();
-        forceRedelivery = parseBoolean(System.getProperty(MULE_FORCE_REDELIVERY,"false"));
+        forceRedelivery = getBoolean(MULE_FORCE_REDELIVERY);
         if (store == null)
         {
             store = new ProvidedObjectStoreWrapper<>(null, internalObjectStoreFactory());
