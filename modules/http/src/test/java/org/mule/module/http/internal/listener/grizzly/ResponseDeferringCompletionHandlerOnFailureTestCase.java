@@ -7,6 +7,8 @@
 package org.mule.module.http.internal.listener.grizzly;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.Protocol.HTTP_1_1;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
@@ -20,6 +22,7 @@ import static org.mule.module.http.internal.listener.grizzly.ResponseDeferringCo
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -31,10 +34,11 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.memory.HeapMemoryManager;
 import org.glassfish.grizzly.memory.MemoryManager;
-import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.module.http.internal.domain.OutputHandlerHttpEntity;
 import org.mule.module.http.internal.domain.response.DefaultHttpResponse;
@@ -68,12 +72,25 @@ public class ResponseDeferringCompletionHandlerOnFailureTestCase extends Abstrac
 
     private OutputStream outputStream;
 
+    private ExecutorService executor;
+
 
     @Before
     public void setUp() throws Exception
     {
         mockHttpRequestAndResponse();
         responseDeferringCompletionHandler = new ResponseDeferringCompletionHandler(ctx, request, response, mock(ResponseStatusCallback.class));
+        executor = newSingleThreadExecutor();
+    }
+
+    @After
+    public void tearDown() throws MuleException, InterruptedException
+    {
+        if (executor != null)
+        {
+            executor.awaitTermination(1000, MILLISECONDS);
+            executor.shutdownNow();
+        }
     }
 
     @Test
@@ -86,7 +103,7 @@ public class ResponseDeferringCompletionHandlerOnFailureTestCase extends Abstrac
         // It fails
         responseDeferringCompletionHandler.failed(new IOException("Broken pipe"));
 
-        // Step sync is released so that the response attempts to flush a chunl again.
+        // Step sync is released so that the response attempts to flush a chunk again.
         stepSync.release();
 
         waitUntilContentSynchronizer(contentWritten);
@@ -100,9 +117,9 @@ public class ResponseDeferringCompletionHandlerOnFailureTestCase extends Abstrac
     public void write(MuleEvent event, final OutputStream out) throws IOException
     {
         outputStream = out;
-
-        new Thread("Thread that flushes")
+        executor.submit(new Runnable()
         {
+
             @Override
             public void run()
             {
@@ -122,8 +139,9 @@ public class ResponseDeferringCompletionHandlerOnFailureTestCase extends Abstrac
                     exceptionOnFlush = e;
                 }
                 contentWritten.set(true);
+
             }
-        }.start();
+        });
     }
 
     private void waitUntilContentSynchronizer(final AtomicBoolean synchronizer)
