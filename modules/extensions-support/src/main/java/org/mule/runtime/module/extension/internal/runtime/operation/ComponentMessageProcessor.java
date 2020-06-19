@@ -208,8 +208,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           final Scheduler currentScheduler = ((InternalEvent) event).getInternalParameter(PROCESSOR_SCHEDULER_CONTEXT_KEY);
 
           OperationExecutionFunction operationExecutionFunction;
-          OperationPolicy operationPolicy = policyManager.createOperationPolicy(this, event, () -> resolutionResult);
+          OperationPolicy operationPolicy = null;
 
+          if (shouldApplyPolicies()) {
+            operationPolicy = policyManager.createOperationPolicy(this, event, () -> resolutionResult);
+          }
           boolean isTargetWithPolicies = !isNoPolicyOperation(operationPolicy) && !isBlank(target);
 
           final ReturnDelegate processReturnDelegate = isTargetWithPolicies ? valueReturnDelegate : returnDelegate;
@@ -235,7 +238,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             };
           }
 
-          if (getLocation() != null) {
+          if (shouldApplyPolicies()) {
             ((DefaultFlowCallStack) event.getFlowCallStack())
                 .setCurrentProcessorPath(resolvedProcessorRepresentation);
 
@@ -252,10 +255,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                   }
                 }));
           } else {
-            // If this operation has no component location then it is internal. Don't apply policies on internal operations.
             return Mono.from(operationExecutionFunction.execute(resolutionResult, event));
           }
         }));
+  }
+
+  // If this operation has no component location then it is internal. Don't apply policies on internal operations.
+  private boolean shouldApplyPolicies() {
+    return getLocation() != null;
   }
 
   private CoreEvent addContextToEvent(CoreEvent event, Context ctx) {
