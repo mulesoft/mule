@@ -18,6 +18,8 @@ import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
@@ -72,4 +74,18 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
     resolveAndLogException(exception);
   }
 
+  @Override
+  public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
+                                    Consumer<CoreEvent> continueCallback,
+                                    Consumer<Throwable> propagateCallback) {
+    return error -> {
+      logException(error);
+      propagateCallback.accept(error);
+    };
+  }
+
+  @Override
+  public String toString() {
+    return "OnCriticalErrorHandler";
+  }
 }
