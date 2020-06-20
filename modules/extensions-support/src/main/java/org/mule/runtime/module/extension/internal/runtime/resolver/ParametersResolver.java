@@ -31,10 +31,12 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
 
+import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.SimpleType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -267,8 +269,18 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       parameter.getType().accept(new MetadataTypeVisitor() {
 
         @Override
-        public void visitSimpleType(SimpleType simpleType) {
-          simpleTypeClass.set(ExtensionMetadataTypeUtils.getType(simpleType).orElse(null));
+        public void visitString(StringType stringType) {
+          simpleTypeClass.set(String.class);
+        }
+
+        @Override
+        public void visitBoolean(BooleanType booleanType) {
+          simpleTypeClass.set(Boolean.class);
+        }
+
+        @Override
+        public void visitNumber(NumberType numberType) {
+          simpleTypeClass.set(ExtensionMetadataTypeUtils.<Number>getType(numberType).orElse(Number.class));
         }
 
       });
