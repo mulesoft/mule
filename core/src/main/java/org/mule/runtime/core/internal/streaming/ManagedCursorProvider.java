@@ -21,17 +21,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see CursorManager
  * @since 4.0
  */
-public abstract class ManagedCursorProvider<T extends Cursor> extends CursorProviderDecorator<T>
-    implements IdentifiableCursorProvider<T> {
+public abstract class ManagedCursorProvider<T extends Cursor> implements CursorProvider<T> {
 
+  private final CursorProvider<T> delegate;
   private final Set<Cursor> cursors = newSetFromMap(new ConcurrentHashMap<>());
   private final MutableStreamingStatistics statistics;
   private final CursorProviderJanitor janitor;
-  private final int id;
 
-  protected ManagedCursorProvider(IdentifiableCursorProvider<T> delegate, MutableStreamingStatistics statistics) {
-    super(delegate);
-    id = delegate.getId();
+  protected ManagedCursorProvider(CursorProvider<T> delegate, MutableStreamingStatistics statistics) {
+    this.delegate = delegate;
     this.janitor = new CursorProviderJanitor(delegate, cursors, statistics);
     this.statistics = statistics;
     statistics.incrementOpenProviders();
@@ -52,6 +50,10 @@ public abstract class ManagedCursorProvider<T extends Cursor> extends CursorProv
 
     statistics.incrementOpenCursors();
     return managedCursor;
+  }
+
+  public CursorProvider<T> getDelegate() {
+    return delegate;
   }
 
   public final void onClose(Cursor cursor) {
@@ -77,11 +79,6 @@ public abstract class ManagedCursorProvider<T extends Cursor> extends CursorProv
     janitor.releaseResources();
   }
 
-  @Override
-  public int getId() {
-    return id;
-  }
-
   public CursorProviderJanitor getJanitor() {
     return janitor;
   }
@@ -89,5 +86,10 @@ public abstract class ManagedCursorProvider<T extends Cursor> extends CursorProv
   @Override
   public void close() {
     janitor.close();
+  }
+
+  @Override
+  public boolean isClosed() {
+    return delegate.isClosed();
   }
 }
