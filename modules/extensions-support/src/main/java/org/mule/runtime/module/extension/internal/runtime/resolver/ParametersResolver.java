@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static com.google.common.primitives.Primitives.wrap;
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
@@ -33,6 +34,8 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.SimpleType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -72,6 +75,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -258,9 +262,27 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     }
 
     if (parameter.isOverrideFromConfig()) {
-      resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
-                                                       parameterName, parameter.getType(),
-                                                       reflectionCache, this.muleContext, parameterOwner);
+      AtomicReference<Class<?>> simpleTypeClass = new AtomicReference<>();
+
+      parameter.getType().accept(new MetadataTypeVisitor() {
+
+        @Override
+        public void visitSimpleType(SimpleType simpleType) {
+          simpleTypeClass.set(ExtensionMetadataTypeUtils.getType(simpleType).orElse(null));
+        }
+
+      });
+
+      if (simpleTypeClass.get() != null) {
+        resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
+                                                         parameterName, wrap(simpleTypeClass.get()),
+                                                         reflectionCache, this.muleContext, parameterOwner);
+      } else {
+        resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
+                                                         parameterName, parameter.getType(),
+                                                         reflectionCache, this.muleContext, parameterOwner);
+      }
+
     }
     return (ValueResolver<Object>) resolver;
   }
