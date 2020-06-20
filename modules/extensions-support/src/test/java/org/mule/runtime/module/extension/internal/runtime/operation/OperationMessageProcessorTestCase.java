@@ -38,7 +38,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
-import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
@@ -66,7 +65,6 @@ import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -480,10 +478,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(operationExecutor.execute(any())).thenReturn(just(inputStream));
 
     messageProcessor.process(event);
-    ArgumentCaptor<CursorProvider> providerCaptor = ArgumentCaptor.forClass(CursorProvider.class);
-    verify(streamingManager).manage(providerCaptor.capture(), any(EventContext.class));
-
-    assertThat(unwrap(providerCaptor.getValue()), is(sameInstance(provider)));
+    verify(streamingManager).manage(same(provider), any(EventContext.class));
   }
 
   private void assertProcessingType(ExecutionType executionType, ProcessingType expectedProcessingType) {
