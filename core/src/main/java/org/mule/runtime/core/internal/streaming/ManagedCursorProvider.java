@@ -52,16 +52,16 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
     return managedCursor;
   }
 
-  public CursorProvider<T> getDelegate() {
-    return delegate;
-  }
-
   public final void onClose(Cursor cursor) {
     if (cursors.remove(cursor)) {
       if (isClosed() && cursors.isEmpty()) {
         releaseResources();
       }
     }
+  }
+
+  public CursorProvider<T> getDelegate() {
+    return delegate;
   }
 
   /**
