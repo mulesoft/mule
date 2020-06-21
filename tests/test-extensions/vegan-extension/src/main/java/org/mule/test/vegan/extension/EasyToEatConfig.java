@@ -15,9 +15,17 @@ import java.util.List;
 
 public abstract class EasyToEatConfig {
 
+  public enum Time {
+    SHORT, AVERAGE, LONG;
+  }
+
   @Parameter
   @Optional(defaultValue = "10")
   private Integer timeToPeel;
+
+  @Parameter
+  @Optional(defaultValue = "AVERAGE")
+  private Time timeToPeelEnum;
 
   @Parameter
   @NullSafe
