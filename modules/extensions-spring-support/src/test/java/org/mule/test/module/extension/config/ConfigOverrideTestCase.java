@@ -19,6 +19,7 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.vegan.extension.AppleConfig;
+import org.mule.test.vegan.extension.EasyToEatConfig.Time;
 import org.mule.test.vegan.extension.HealthyFood;
 
 import java.util.List;
@@ -57,6 +58,18 @@ public class ConfigOverrideTestCase extends AbstractExtensionFunctionalTestCase 
     TypedValue<Integer> result = flowRunner("timeToPeelOverrideOperationWithDefaultsDifferentType")
         .run().getMessage().getPayload();
     assertThat(result.getValue(), is(10L));
+  }
+
+  @Test
+  @Issue("MULE-18489")
+  public void timeToPeelOverrideOperationWithDefaultEnum() throws Exception {
+    flowRunner("timeToPeelOverrideOperationWithDefaultEnum")
+        .run().getMessage().getPayload();
+    flowRunner("timeToPeelOverrideOperationWithDefaultEnum")
+        .run().getMessage().getPayload();
+    TypedValue<Integer> result = flowRunner("timeToPeelOverrideOperationWithDefaultEnum")
+        .run().getMessage().getPayload();
+    assertThat(result.getValue(), is(Time.AVERAGE));
   }
 
   @Test
