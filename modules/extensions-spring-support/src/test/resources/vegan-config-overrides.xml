@@ -37,6 +37,10 @@
         <vegan:get-time-to-peel-long config-ref="apple"/>
     </flow>
 
+    <flow name="timeToPeelOverrideOperationWithDefaultEnum">
+        <vegan:get-time-to-peel-enum config-ref="apple"/>
+    </flow>
+
     <flow name="timeToPeelOverrideOperationWithCustom">
         <vegan:get-time-to-peel config-ref="appleCustom"/>
     </flow>

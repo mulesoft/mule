@@ -12,6 +12,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.test.vegan.extension.EasyToEatConfig.Time;
 
 import java.util.List;
 
@@ -25,6 +26,11 @@ public class FruitOperationsWithConfigOverride {
   public long getTimeToPeelLong(@Config EasyToEatConfig config,
                                 @ConfigOverride long timeToPeel) {
     return timeToPeel;
+  }
+
+  public Time getTimeToPeelEnum(@Config EasyToEatConfig config,
+                                @ConfigOverride Time timeToPeelEnum) {
+    return timeToPeelEnum;
   }
 
   public List<String> getProducers(@Config EasyToEatConfig config,

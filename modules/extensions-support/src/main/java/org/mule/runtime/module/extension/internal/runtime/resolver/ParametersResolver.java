@@ -270,7 +270,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
 
         @Override
         public void visitString(StringType stringType) {
-          simpleTypeClass.set(String.class);
+          // enum values are represented as strings
+          simpleTypeClass.set(ExtensionMetadataTypeUtils.<String>getType(stringType).orElse(String.class));
         }
 
         @Override
