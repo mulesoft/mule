@@ -19,6 +19,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 
+import org.junit.Ignore;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.Ricin;
@@ -29,6 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@Ignore
 public class ParameterResolverOperationExecutionTestCase extends AbstractParameterResolverTestCase {
 
   @Rule

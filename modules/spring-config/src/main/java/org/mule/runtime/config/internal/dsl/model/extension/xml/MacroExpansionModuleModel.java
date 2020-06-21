@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
+import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsNamespace;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
@@ -458,9 +459,8 @@ public class MacroExpansionModuleModel {
         .ifPresent(configParameter -> {
           // look for the global element which "name" attribute maps to "configParameter" value
           // or a nested element to a config that was added by the macroexpansion of another module before
-          ComponentAst configRefComponentModel = applicationModel.recursiveStream()
-              .filter(componentModel -> componentModel.getIdentifier().getNamespace()
-                  .equals(extensionModel.getXmlDslModel().getPrefix()))
+          ComponentAst configRefComponentModel = applicationModel
+              .filteredComponents(equalsNamespace(extensionModel.getXmlDslModel().getPrefix()))
               .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent()
                   && configParameter.equals(componentModel.getComponentId().orElse(null)))
               .findFirst()
