@@ -7,6 +7,8 @@
 package org.mule.module.http.internal.listener.grizzly;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.System.clearProperty;
+import static java.lang.System.setProperty;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.Protocol.HTTP_1_1;
@@ -19,6 +21,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.module.http.internal.listener.grizzly.ResponseDeferringCompletionHandler.FAILURE_WHILE_PROCESSING_HTTP_RESPONSE_BODY;
+import static org.mule.module.http.internal.listener.grizzly.ResponseDeferringCompletionHandler.HTTP_RESPONSE_DEFERRING_COMPLETION_TIMEOUT_PROPERTY;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,6 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.collections.MultiHashMap;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.Transport;
+import org.glassfish.grizzly.WriteResult;
 import org.glassfish.grizzly.filterchain.FilterChain;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpRequestPacket;
@@ -36,6 +40,7 @@ import org.glassfish.grizzly.memory.HeapMemoryManager;
 import org.glassfish.grizzly.memory.MemoryManager;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -45,6 +50,7 @@ import org.mule.module.http.internal.domain.response.DefaultHttpResponse;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.domain.response.ResponseStatus;
 import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.module.http.internal.listener.grizzly.ResponseDeferringCompletionHandler.CompletionOutputStream;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -52,6 +58,7 @@ import org.mule.tck.probe.Probe;
 public class ResponseDeferringCompletionHandlerOnFailureTestCase extends AbstractMuleTestCase implements OutputHandler
 {
 
+    private static final String TEST_RESPONSE_DEFERRRING_TIMEOUT = "2000";
     private static final int POOLING_FREQUENCY_MILLIS = 1000;
     private static final int POOLING_TIMEOUT_MILLIS = 20000;
 
@@ -73,6 +80,7 @@ public class ResponseDeferringCompletionHandlerOnFailureTestCase extends Abstrac
     private OutputStream outputStream;
 
     private ExecutorService executor;
+
 
 
     @Before
@@ -103,7 +111,25 @@ public class ResponseDeferringCompletionHandlerOnFailureTestCase extends Abstrac
         // It fails
         responseDeferringCompletionHandler.failed(new IOException("Broken pipe"));
 
+        releaseStepSyncAndAssert();
+    }
+    
+    @Test
+    public void testNotHangInCaseNoCompletionIsPerformed() throws IOException, InterruptedException
+    {
+        setProperty(HTTP_RESPONSE_DEFERRING_COMPLETION_TIMEOUT_PROPERTY, TEST_RESPONSE_DEFERRRING_TIMEOUT);
+        ResponseDeferringCompletionHandler responseDeferringCompletionHandler    = new NeverCompleteResponseDeferringCompletionHandler(ctx, request, response, mock(ResponseStatusCallback.class));
+        responseDeferringCompletionHandler.start();
+
+        waitUntilContentSynchronizer(firstChunkWritten);
+
         // Step sync is released so that the response attempts to flush a chunk again.
+        releaseStepSyncAndAssert();
+        clearProperty(HTTP_RESPONSE_DEFERRING_COMPLETION_TIMEOUT_PROPERTY);
+    }
+
+    private void releaseStepSyncAndAssert()
+    {
         stepSync.release();
 
         waitUntilContentSynchronizer(contentWritten);
@@ -127,6 +153,7 @@ public class ResponseDeferringCompletionHandlerOnFailureTestCase extends Abstrac
                 {
                     outputStream.write("This is a test string".getBytes());
                     firstChunkWritten.set(true);
+                    outputStream.flush();
 
                     stepSync.acquire();
 
@@ -172,5 +199,21 @@ public class ResponseDeferringCompletionHandlerOnFailureTestCase extends Abstrac
         when(ctx.getFilterChain()).thenReturn(filterChain);
         when(connection.getTransport()).thenReturn(transport);
         when(transport.getMemoryManager()).thenReturn(memoryManager);
+    }
+
+    private static class NeverCompleteResponseDeferringCompletionHandler extends ResponseDeferringCompletionHandler
+    {
+
+        public NeverCompleteResponseDeferringCompletionHandler(FilterChainContext ctx, HttpRequestPacket request, HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
+        {
+            super(ctx, request, httpResponse, responseStatusCallback);
+        }
+
+        @Override
+        public void completed(WriteResult result)
+        {
+            // never complete the write
+        }
+
     }
 }
