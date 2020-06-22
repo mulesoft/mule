@@ -24,7 +24,6 @@ import org.junit.Test;
 
 @Feature(ERROR_HANDLING)
 @Story(ERROR_MAPPINGS)
-@Ignore
 public class ModuleUsingErrorMappingTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   private static final String CONNECT_ERROR_MESSAGE = "Could not connect.";
