@@ -41,7 +41,7 @@ public class GZIPCompressorInputStream extends DeflaterInputStream {
   private boolean trailerWritten = false;
 
   // Internal buffer for GZIP header and trailer.
-  private final Buffer buffer;
+  private Buffer buffer;
 
   /**
    * Helper inner class containing the length and position of the internal buffer.
@@ -82,7 +82,6 @@ public class GZIPCompressorInputStream extends DeflaterInputStream {
     buffer = new Buffer();
   }
 
-  @Override
   public int read(byte b[], int off, int len) throws IOException {
     // Check if there are bytes left to be read from the internal buffer. This is used to provide the header
     // or trailer, and always takes precedence.
@@ -158,12 +157,5 @@ public class GZIPCompressorInputStream extends DeflaterInputStream {
     buf[offset] = (byte) (s & 0xff);
     buf[offset + 1] = (byte) ((s >> 8) & 0xff);
     return 2;
-  }
-
-  @Override
-  public void close() throws IOException {
-    super.close();
-    // Since the deflater is not the default one, it must be closed explicitly
-    def.end();
   }
 }
