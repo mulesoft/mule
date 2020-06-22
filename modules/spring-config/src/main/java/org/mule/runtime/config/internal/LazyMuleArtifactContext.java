@@ -27,7 +27,6 @@ import static org.mule.runtime.api.metadata.MetadataService.NON_LAZY_METADATA_SE
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
-import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.notNullLocation;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
@@ -366,7 +365,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       Set<String> requestedLocations = locationOptional.map(location -> (Set<String>) newHashSet(location.toString()))
           .orElseGet(() -> getApplicationModel()
               .filteredComponents(basePredicate)
-              .filter(notNullLocation())
               .map(comp -> comp.getLocation().getLocation())
               .collect(toSet()));
 

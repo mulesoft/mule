@@ -65,18 +65,15 @@ public final class ExpressionLanguageUtils {
    * @return the sanitized expression
    */
   public static String sanitize(String expression) {
-    String trimmedExpression = expression.trim();
     String sanitizedExpression;
-    if (trimmedExpression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
-      if (!trimmedExpression.endsWith(DEFAULT_EXPRESSION_POSTFIX)) {
-        throw new ExpressionExecutionException(createStaticMessage(format("Unbalanced brackets in expression '%s'",
-                                                                          trimmedExpression)));
+    if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
+      if (!expression.endsWith(DEFAULT_EXPRESSION_POSTFIX)) {
+        throw new ExpressionExecutionException(createStaticMessage(format("Unbalanced brackets in expression '%s'", expression)));
       }
       sanitizedExpression =
-          trimmedExpression.substring(DEFAULT_EXPRESSION_PREFIX.length(),
-                                      trimmedExpression.length() - DEFAULT_EXPRESSION_POSTFIX.length());
+          expression.substring(DEFAULT_EXPRESSION_PREFIX.length(), expression.length() - DEFAULT_EXPRESSION_POSTFIX.length());
     } else {
-      sanitizedExpression = trimmedExpression;
+      sanitizedExpression = expression;
     }
 
     if (sanitizedExpression.startsWith(DW_PREFIX + PREFIX_EXPR_SEPARATOR)
