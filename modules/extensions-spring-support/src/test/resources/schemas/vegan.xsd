@@ -133,6 +133,7 @@
             </xs:element>
           </xs:sequence>
           <xs:attribute type="mule:expressionInt" use="optional" default="10" name="timeToPeel"></xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/vegan" type="org.mule.test.vegan.extension.EasyToEatConfig.TimeEnumType" use="optional" default="AVERAGE" name="timeToPeelEnum"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
@@ -445,6 +446,30 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetTimeToPeelEnumType" substitutionGroup="mule:abstract-operator" name="get-time-to-peel-enum"></xs:element>
+  <xs:complexType name="GetTimeToPeelEnumType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/vegan" type="org.mule.test.vegan.extension.EasyToEatConfig.TimeEnumType" use="optional" name="timeToPeelEnum"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetTimeToPeelLongType" substitutionGroup="mule:abstract-operator" name="get-time-to-peel-long"></xs:element>
   <xs:complexType name="GetTimeToPeelLongType">
     <xs:complexContent>
@@ -528,6 +553,7 @@
             </xs:element>
           </xs:sequence>
           <xs:attribute type="mule:expressionInt" use="optional" default="10" name="timeToPeel"></xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/vegan" type="org.mule.test.vegan.extension.EasyToEatConfig.TimeEnumType" use="optional" default="AVERAGE" name="timeToPeelEnum"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
@@ -1153,4 +1179,18 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:simpleType name="org.mule.test.vegan.extension.EasyToEatConfig.TimeEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="SHORT"></xs:enumeration>
+          <xs:enumeration value="AVERAGE"></xs:enumeration>
+          <xs:enumeration value="LONG"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
 </xs:schema>

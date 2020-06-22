@@ -7,9 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static com.google.common.primitives.Primitives.wrap;
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections.CollectionUtils.intersection;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
@@ -30,9 +32,13 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
 
+import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -72,7 +78,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import com.google.common.base.Joiner;
@@ -204,40 +210,42 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                      List<ParameterModel> parameterModels, ResolverSet resolverSet)
       throws ConfigurationException {
     Map<String, String> aliasedParameterNames = forSize(parameterModels.size());
-    parameterModels.forEach(p -> {
-      if (!p.isComponentId()
-          // This model property exists only for non synthetic parameters, in which case the value resolver has to be created,
-          // regardless of the parameter being the componentId
-          || p.getModelProperty(ExtensionParameterDescriptorModelProperty.class).isPresent()) {
-        final String parameterName = getMemberName(p, p.getName());
-        if (!parameterName.equals(p.getName())) {
-          aliasedParameterNames.put(parameterName, p.getName());
-        }
-        ValueResolver<?> resolver = getParameterValueResolver(p);
-        if (resolver != null) {
-          resolverSet.add(parameterName, resolver);
-        } else if (p.isRequired() && !lazyInitEnabled) {
-          throw new RequiredParameterNotSetException(p);
-        }
-      }
-    });
+    parameterModels
+        .stream()
+        .filter(p -> !p.isComponentId()
+            // This model property exists only for non synthetic parameters, in which case the value resolver has to be created,
+            // regardless of the parameter being the componentId
+            || p.getModelProperty(ExtensionParameterDescriptorModelProperty.class).isPresent())
+        .forEach(p -> {
+          final String parameterName = getMemberName(p, p.getName());
+          if (!parameterName.equals(p.getName())) {
+            aliasedParameterNames.put(parameterName, p.getName());
+          }
+          ValueResolver<?> resolver = getParameterValueResolver(p);
+          if (resolver != null) {
+            resolverSet.add(parameterName, resolver);
+          } else if (p.isRequired() && !lazyInitEnabled) {
+            throw new RequiredParameterNotSetException(p);
+          }
+        });
 
     checkParameterGroupExclusiveness(model, groups,
-                                     parameters.entrySet().stream().flatMap(entry -> {
-                                       if (entry.getValue() instanceof ParameterValueResolver) {
-                                         try {
-                                           return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
-                                               .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
-                                         } catch (ValueResolvingException e) {
-                                           throw new MuleRuntimeException(e);
-                                         }
-                                       } else {
-                                         String key = entry.getKey();
-                                         aliasedParameterNames.getOrDefault(key, key);
-                                         return Stream.of(key);
-                                       }
-                                     })
-                                         .collect(Collectors.toSet()));
+                                     parameters.entrySet().stream()
+                                         .flatMap(entry -> {
+                                           if (entry.getValue() instanceof ParameterValueResolver) {
+                                             try {
+                                               return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
+                                                   .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
+                                             } catch (ValueResolvingException e) {
+                                               throw new MuleRuntimeException(e);
+                                             }
+                                           } else {
+                                             String key = entry.getKey();
+                                             aliasedParameterNames.getOrDefault(key, key);
+                                             return Stream.of(key);
+                                           }
+                                         })
+                                         .collect(toSet()));
     return resolverSet;
   }
 
@@ -253,14 +261,47 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
 
     if (isNullSafe(parameter)) {
       ValueResolver<?> delegate = resolver != null ? resolver : new StaticValueResolver<>(null);
-      MetadataType type = parameter.getModelProperty(NullSafeModelProperty.class).get().defaultType();
-      resolver = NullSafeValueResolverWrapper.of(delegate, type, reflectionCache, expressionManager, this.muleContext, this);
+      Optional<MetadataType> type =
+          parameter.getModelProperty(NullSafeModelProperty.class).map(NullSafeModelProperty::defaultType);
+      if (type.isPresent()) {
+        resolver =
+            NullSafeValueResolverWrapper.of(delegate, type.get(), reflectionCache, expressionManager, this.muleContext, this);
+      }
     }
 
     if (parameter.isOverrideFromConfig()) {
-      resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
-                                                       parameterName, parameter.getType(),
-                                                       reflectionCache, this.muleContext, parameterOwner);
+      AtomicReference<Class<?>> simpleTypeClass = new AtomicReference<>();
+
+      parameter.getType().accept(new MetadataTypeVisitor() {
+
+        @Override
+        public void visitString(StringType stringType) {
+          // enum values are represented as strings
+          simpleTypeClass.set(ExtensionMetadataTypeUtils.<String>getType(stringType).orElse(String.class));
+        }
+
+        @Override
+        public void visitBoolean(BooleanType booleanType) {
+          simpleTypeClass.set(Boolean.class);
+        }
+
+        @Override
+        public void visitNumber(NumberType numberType) {
+          simpleTypeClass.set(ExtensionMetadataTypeUtils.<Number>getType(numberType).orElse(Number.class));
+        }
+
+      });
+
+      if (simpleTypeClass.get() != null) {
+        resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
+                                                         parameterName, wrap(simpleTypeClass.get()),
+                                                         reflectionCache, this.muleContext, parameterOwner);
+      } else {
+        resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
+                                                         parameterName, parameter.getType(),
+                                                         reflectionCache, this.muleContext, parameterOwner);
+      }
+
     }
     return (ValueResolver<Object>) resolver;
   }
@@ -369,30 +410,30 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                                List<ParameterGroupModel> groups,
                                                Set<String> resolverKeys)
       throws ConfigurationException {
-    if (!lazyInitEnabled) {
-      for (ParameterGroupModel group : groups) {
-        for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
-          Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), resolverKeys);
-          if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
-            throw new ConfigurationException((createStaticMessage(format(
-                                                                         "Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing. "
-                                                                             + "One of the following should be set: [%s]",
-                                                                         group.getName(),
-                                                                         Joiner.on(", ")
-                                                                             .join(exclusiveModel
-                                                                                 .getExclusiveParameterNames())))));
-          } else if (definedExclusiveParameters.size() > 1) {
-            if (model.isPresent()) {
-              throw new ConfigurationException(
-                                               createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
-                                                                          getComponentModelTypeName(model.get()),
-                                                                          getModelName(model.get()),
-                                                                          Joiner.on(", ").join(definedExclusiveParameters))));
-            } else {
-              throw new ConfigurationException(
-                                               createStaticMessage(format("The following parameters cannot be set at the same time: [%s]",
-                                                                          Joiner.on(", ").join(definedExclusiveParameters))));
-            }
+    if (lazyInitEnabled) {
+      return;
+    }
+
+    for (ParameterGroupModel group : groups) {
+      for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
+        Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), resolverKeys);
+        if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
+          throw new ConfigurationException((createStaticMessage(format(
+                                                                       "Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing. "
+                                                                           + "One of the following should be set: [%s]",
+                                                                       group.getName(),
+                                                                       Joiner.on(", ")
+                                                                           .join(exclusiveModel
+                                                                               .getExclusiveParameterNames())))));
+        } else if (definedExclusiveParameters.size() > 1) {
+          if (model.isPresent()) {
+            throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
+                                                                        getComponentModelTypeName(model.get()),
+                                                                        getModelName(model.get()),
+                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
+          } else {
+            throw new ConfigurationException(createStaticMessage(format("The following parameters cannot be set at the same time: [%s]",
+                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
           }
         }
       }

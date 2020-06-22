@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.streaming.CursorManager;
-import org.mule.runtime.core.internal.streaming.IdentifiableCursorProviderDecorator;
 
 import java.io.InputStream;
 
@@ -57,7 +56,7 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
 
     Object value = resolve(inputStream, eventContext);
     if (value instanceof CursorStreamProvider) {
-      value = streamingManager.manage(IdentifiableCursorProviderDecorator.of((CursorStreamProvider) value), eventContext);
+      value = streamingManager.manage((CursorStreamProvider) value, eventContext);
     }
 
     return value;
