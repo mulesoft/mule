@@ -60,6 +60,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -235,6 +236,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   }
 
   @Test
+  @Ignore("Flaky, see MULE-18517")
   public void configurationInstanceIsRemovedFromLifecycleTrackingAfterExpired() throws Exception {
     HeisenbergExtension instance = (HeisenbergExtension) provider.get(event).getValue();
 
