@@ -334,11 +334,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return ((InternalEvent) event).getInternalParameter(INTERCEPTION_RESOLVED_CONTEXT);
   }
 
-  protected Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<T> operationContext) {
-    return doProcess(event, operationContext, returnDelegate);
-  }
-
-  private Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<T> operationContext, ReturnDelegate delegate) {
+  protected Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<T> operationContext, ReturnDelegate delegate) {
     return executeOperation(operationContext)
         .map(value -> asReturnValue(operationContext, value, delegate))
         .switchIfEmpty(fromCallable(() -> asReturnValue(operationContext, null, delegate)))
