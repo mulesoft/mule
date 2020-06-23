@@ -363,9 +363,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       }
 
       Set<String> requestedLocations = locationOptional.map(location -> (Set<String>) newHashSet(location.toString()))
-          .orElseGet(() -> getApplicationModel().recursiveStream()
-              .filter(basePredicate)
-              .filter(comp -> comp.getLocation() != null)
+          .orElseGet(() -> getApplicationModel()
+              .filteredComponents(basePredicate)
               .map(comp -> comp.getLocation().getLocation())
               .collect(toSet()));
 
@@ -637,8 +636,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    */
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
-    getApplicationModel().recursiveStream()
-        .filter(cm -> !isIgnored(cm))
+    getApplicationModel()
+        .filteredComponents(cm -> !isIgnored(cm))
         .forEach(cm -> componentLocator.addComponentLocation(cm.getLocation()));
   }
 
