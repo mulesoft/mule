@@ -34,6 +34,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
@@ -197,15 +198,15 @@ public class MacroExpansionModuleModel {
           return new ComponentAst() {
 
             @Override
-            public Stream<ComponentAst> recursiveStream() {
+            public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
               return Stream.concat(Stream.of(this),
                                    mappedGlobalElements.stream()
-                                       .flatMap(g -> g.recursiveStream()));
+                                       .flatMap(g -> g.recursiveStream(direction)));
             }
 
             @Override
-            public Spliterator<ComponentAst> recursiveSpliterator() {
-              return recursiveStream().spliterator();
+            public Spliterator<ComponentAst> recursiveSpliterator(AstTraversalDirection direction) {
+              return recursiveStream(direction).spliterator();
             }
 
             @Override

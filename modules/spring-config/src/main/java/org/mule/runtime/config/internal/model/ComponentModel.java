@@ -20,6 +20,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDE
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
+import static org.mule.runtime.config.internal.factories.ComponentAstSpliteratorStrategyFactory.traversalStrategy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
@@ -37,6 +38,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
@@ -320,67 +322,13 @@ public class ComponentModel implements ComponentAst {
   }
 
   @Override
-  public Stream<ComponentAst> recursiveStream() {
-    return StreamSupport.stream(recursiveSpliterator(), false);
+  public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
+    return StreamSupport.stream(recursiveSpliterator(direction), false);
   }
 
   @Override
-  public Spliterator<ComponentAst> recursiveSpliterator() {
-    return new Spliterator<ComponentAst>() {
-
-      private boolean rootProcessed = false;
-
-      private Spliterator<ComponentAst> currentChildSpliterator;
-
-      private Spliterator<ComponentAst> innerSpliterator;
-
-      @Override
-      public boolean tryAdvance(Consumer<? super ComponentAst> action) {
-        if (!rootProcessed) {
-          rootProcessed = true;
-          action.accept(ComponentModel.this);
-          return true;
-        }
-
-        trySplit();
-
-        if (currentChildSpliterator != null) {
-          if (currentChildSpliterator.tryAdvance(action)) {
-            return true;
-          } else {
-            currentChildSpliterator = null;
-            return tryAdvance(action);
-          }
-        } else {
-          if (innerSpliterator.tryAdvance(cm -> currentChildSpliterator = cm.recursiveSpliterator())) {
-            return tryAdvance(action);
-          } else {
-            return false;
-          }
-        }
-      }
-
-      @Override
-      public Spliterator<ComponentAst> trySplit() {
-        if (innerSpliterator == null) {
-          innerSpliterator = directChildrenStream().spliterator();
-        }
-        return null;
-      }
-
-      @Override
-      public long estimateSize() {
-        return 1 + directChildrenStream()
-            .mapToLong(inner -> inner.recursiveSpliterator().estimateSize())
-            .sum();
-      }
-
-      @Override
-      public int characteristics() {
-        return ORDERED | DISTINCT | SIZED | NONNULL | IMMUTABLE | SUBSIZED;
-      }
-
-    };
+  public Spliterator<ComponentAst> recursiveSpliterator(AstTraversalDirection direction) {
+    return traversalStrategy(this, direction);
   }
 
   @Override
