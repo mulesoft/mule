@@ -225,7 +225,7 @@ public class ApplicationModel implements ArtifactAst {
                           ResourceProvider externalResourceProvider)
       throws Exception {
     this(artifactConfig, artifactDeclaration, emptySet(), emptyMap(), empty(), of(new ComponentBuildingDefinitionRegistry()),
-         externalResourceProvider, true);
+         externalResourceProvider);
   }
 
   /**
@@ -249,22 +249,7 @@ public class ApplicationModel implements ArtifactAst {
                           Map<String, String> deploymentProperties,
                           Optional<ConfigurationProperties> parentConfigurationProperties,
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
-                          ResourceProvider externalResourceProvider)
-      throws Exception {
-    this(artifactConfig, artifactDeclaration, extensionModels, deploymentProperties, parentConfigurationProperties,
-         componentBuildingDefinitionRegistry,
-         externalResourceProvider, true);
-  }
-
-  // TODO: MULE-9638 remove this optional
-  public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
-                          Set<ExtensionModel> extensionModels,
-                          Map<String, String> deploymentProperties,
-                          Optional<ConfigurationProperties> parentConfigurationProperties,
-                          Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
-                          ResourceProvider externalResourceProvider,
-                          boolean runtimeMode) {
-
+                          ResourceProvider externalResourceProvider) {
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.externalResourceProvider = externalResourceProvider;
     createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
@@ -299,7 +284,7 @@ public class ApplicationModel implements ArtifactAst {
     this.ast = originalAst;
     ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
     ast.recursiveStream().forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel,
-                                                                                    extensionModelHelper, runtimeMode));
+                                                                                    extensionModelHelper));
     // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
     // and crafted declared extension models)
     resolveMissingComponentTypes(ast.recursiveStream());

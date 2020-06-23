@@ -94,11 +94,15 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
               return literalsParameters.getOrDefault(expr, expr);
             })
             .mapRight(v -> {
-              if (moduleGlobalElementsNames.contains(v)) {
-                return v.toString().concat("-").concat(defaultGlobalElementSuffix);
-              } else {
-                return literalsParameters.getOrDefault(v, (String) v);
+              if (v instanceof String) {
+                String stringValue = (String) v;
+                if (moduleGlobalElementsNames.contains(stringValue)) {
+                  return stringValue.concat("-").concat(defaultGlobalElementSuffix);
+                } else {
+                  return literalsParameters.getOrDefault(stringValue, stringValue);
+                }
               }
+              return null;
             });
       }
 
