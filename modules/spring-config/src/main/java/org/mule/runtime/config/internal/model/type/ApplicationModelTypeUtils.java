@@ -557,44 +557,32 @@ public final class ApplicationModelTypeUtils {
       private Optional<DslElementSyntax> recursiveAwareContainedElement(Map<String, Optional<DslElementSyntax>> typesDslMap,
                                                                         DslElementSyntax subTypeDsl,
                                                                         ParameterModel nestedParameter) {
-        final Optional<DslElementSyntax> containedElement =
-            subTypeDsl.getContainedElement(nestedParameter.getName())
-                .map(innerElement -> {
-                  final Optional<DslElementSyntax> referencedDslElement =
-                      typesDslMap.get(nestedParameter.getType().toString());
+        return subTypeDsl.getContainedElement(nestedParameter.getName())
+            .map(innerElement -> getTypeId(nestedParameter.getType())
+                .flatMap(typeId -> typesDslMap.containsKey(typeId) ? typesDslMap.get(typeId) : empty())
+                .map(referencedDslElement -> {
+                  final DslElementSyntaxBuilder baseReferenced = DslElementSyntaxBuilder.create()
+                      .withAttributeName(innerElement.getAttributeName())
+                      .withElementName(innerElement.getElementName())
+                      .withNamespace(innerElement.getPrefix(), innerElement.getNamespace())
+                      .requiresConfig(innerElement.requiresConfig())
+                      .supportsAttributeDeclaration(innerElement.supportsAttributeDeclaration())
+                      .supportsChildDeclaration(innerElement.supportsChildDeclaration())
+                      .supportsTopLevelDeclaration(innerElement.supportsTopLevelDeclaration())
+                      .asWrappedElement(innerElement.isWrapped());
 
-                  if (referencedDslElement != null && referencedDslElement.isPresent()) {
-                    final DslElementSyntaxBuilder baseReferenced = DslElementSyntaxBuilder.create()
-                        .withAttributeName(innerElement.getAttributeName())
-                        .withElementName(innerElement.getElementName())
-                        .withNamespace(innerElement.getPrefix(), innerElement.getNamespace())
-                        .requiresConfig(innerElement.requiresConfig())
-                        .supportsAttributeDeclaration(innerElement.supportsAttributeDeclaration())
-                        .supportsChildDeclaration(innerElement.supportsChildDeclaration())
-                        .supportsTopLevelDeclaration(innerElement.supportsTopLevelDeclaration())
-                        .asWrappedElement(innerElement.isWrapped());
+                  // Handle recursive types by getting the element structure from the referenced type
+                  referencedDslElement.getContainedElementsByName().entrySet()
+                      .forEach(containedEntry -> baseReferenced.containing(containedEntry.getKey(), containedEntry.getValue()));
+                  referencedDslElement.getGenerics().entrySet()
+                      .forEach(genericEntry -> baseReferenced.withGeneric(genericEntry.getKey(), genericEntry.getValue()));
 
-                    // Handle recursive types by getting the element structure from the referenced type
-                    referencedDslElement.get().getContainedElementsByName().entrySet()
-                        .forEach(containedEntry -> {
-                          baseReferenced.containing(containedEntry.getKey(), containedEntry.getValue());
-                        });
-
-                    referencedDslElement.get().getGenerics().entrySet()
-                        .forEach(genericEntry -> {
-                          baseReferenced.withGeneric(genericEntry.getKey(), genericEntry.getValue());
-                        });
-
-                    return baseReferenced.build();
-                  } else {
-                    return innerElement;
-                  }
-                });
-        return containedElement;
+                  return baseReferenced.build();
+                })
+                .orElse(innerElement));
       }
     };
   }
-
 
   private static Optional<ComponentIdentifier> getIdentifier(DslElementSyntax dsl) {
     if (isNotBlank(dsl.getElementName()) && isNotBlank(dsl.getPrefix())) {
