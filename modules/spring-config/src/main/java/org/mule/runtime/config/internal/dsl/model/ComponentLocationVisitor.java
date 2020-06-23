@@ -19,7 +19,6 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_IDENTIFIER;
@@ -47,6 +46,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
@@ -257,7 +257,9 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
   }
 
   private boolean isModuleOperation(ComponentAst componentModel) {
-    return componentModel.getModel(OperationModel.class).isPresent();
+    return componentModel.getModel(OperationModel.class)
+        .flatMap(om -> om.getModelProperty(OperationComponentModelModelProperty.class))
+        .isPresent();
   }
 
   private boolean parentComponentIsRouter(ComponentAst componentModel, List<ComponentAst> hierarchy) {
