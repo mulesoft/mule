@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -468,12 +467,9 @@ public class MessageProcessors {
                     .transform(processor)
                     .doOnNext(completeSuccessIfNeeded())
                     .map(event -> right(MessagingException.class, event))
-
                     // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
                     // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
-                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete())
-                    .mergeWith(create(errorSwitchSinkSinkRef))
-
+                    .mergeWith(Flux.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef))
                     .map(childContextResponseMapper())
                     .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
                     .map(MessageProcessors::toParentContext);
