@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
@@ -30,9 +29,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -161,69 +158,53 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
     }
 
     getModel(ParameterizedModel.class)
-        .ifPresent(parameterizedModel -> parameterizedModel.getAllParameterModels().forEach(paramModel -> {
-          final ComponentParameterAst computedParam = parameterAsts.computeIfAbsent(paramModel
-              .getName(), paramNameKey -> findParameterModel(paramNameKey)
-                  .map(foundParamModel -> getRawParameterValue(paramNameKey)
-                      .map(rawParamValue -> new DefaultComponentParameterAst(rawParamValue, () -> foundParamModel))
-                      .orElseGet(() -> new DefaultComponentParameterAst(null, () -> foundParamModel)))
-                  .orElseThrow(() -> {
-                    // Try to provide as much troubleshooting information as possible
-                    final String msgPrefix = format("Wanted paramName '%s' from object '%s'.", paramNameKey,
-                                                    getModel(NamedObject.class).map(n -> n.getName()).orElse("(null)"));
+        .ifPresent(parameterizedModel -> {
+          getModel(SourceModel.class)
+              // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
+              // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
+              // previous implementations.
+              .map(sourceModel -> Stream
+                  .concat(parameterizedModel.getParameterGroupModels().stream(),
+                          Stream.concat(sourceModel.getSuccessCallback().map(cb -> cb.getParameterGroupModels().stream())
+                              .orElse(Stream.empty()),
+                                        sourceModel.getErrorCallback().map(cb -> cb.getParameterGroupModels().stream())
+                                            .orElse(Stream.empty()))))
+              .orElse(parameterizedModel.getParameterGroupModels().stream())
+              .forEach(pg -> {
+                if (pg.isShowInDsl()) {
+                  final Optional<ComponentAst> paramGroupComp = directChildrenStream()
+                      .filter(comp -> pg.getName().equals(toCamelCase(comp.getIdentifier().getName(), "-")))
+                      .findAny();
 
-                    if (!getModel(ParameterizedModel.class).isPresent()) {
-                      return new NoSuchElementException(msgPrefix + " The model is not parameterizable.");
-                    } else {
-                      final List<String> availableParams = getModel(ParameterizedModel.class).get().getAllParameterModels()
-                          .stream()
-                          .map(pm -> pm.getName()).collect(toList());
-                      return new NoSuchElementException(msgPrefix + " Available: " + availableParams);
+                  if (paramGroupComp.isPresent()) {
+                    pg.getParameterModels()
+                        .forEach(paramModel -> populateParameterAst(paramGroupComp.get()
+                            .getRawParameterValue(paramModel.getName()), paramModel));
+                  } else {
+                    pg.getParameterModels()
+                        .forEach(paramModel -> populateParameterAst(empty(), paramModel));
+                  }
+                } else {
+                  pg.getParameterModels().forEach(paramModel -> {
+                    final ComponentParameterAst computedParam =
+                        populateParameterAst(this.getRawParameterValue(paramModel.getName()), paramModel);
+                    if (paramModel.isComponentId()) {
+                      componentId = (String) computedParam.getValue().getRight();
                     }
-                  }));
+                  });
+                }
 
-          if (paramModel.isComponentId()) {
-            componentId = (String) computedParam.getValue().getRight();
-          }
-        }));
+              });
+        });
   }
 
-  private Optional<ParameterModel> findParameterModel(String paramName) {
-    // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
-    // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in previous
-    // implementations.
-    Optional<ParameterModel> parameterModel = getModel(SourceModel.class)
-        .flatMap(sourceModel -> {
-          if (sourceModel.getErrorCallback().isPresent()) {
-            final Optional<ParameterModel> findFirst = sourceModel.getErrorCallback().get().getAllParameterModels()
-                .stream()
-                .filter(pm -> pm.getName().equals(paramName))
-                .findFirst();
-
-            if (findFirst.isPresent()) {
-              return findFirst;
-            }
-          }
-
-          if (sourceModel.getSuccessCallback().isPresent()) {
-            return sourceModel.getSuccessCallback().get().getAllParameterModels()
-                .stream()
-                .filter(pm -> pm.getName().equals(paramName))
-                .findFirst();
-          }
-
-          return empty();
-        });
-
-    if (!parameterModel.isPresent()) {
-      parameterModel = getModel(ParameterizedModel.class)
-          .flatMap(parameterizedModel -> parameterizedModel.getAllParameterModels()
-              .stream()
-              .filter(pm -> pm.getName().equals(paramName))
-              .findFirst());
-    }
-
-    return parameterModel;
+  private ComponentParameterAst populateParameterAst(Optional<String> rawValue, ParameterModel paramModel) {
+    return parameterAsts.computeIfAbsent(paramModel.getName(),
+                                         paramNameKey -> rawValue
+                                             .map(rawParamValue -> new DefaultComponentParameterAst(rawParamValue,
+                                                                                                    () -> paramModel))
+                                             .orElseGet(() -> new DefaultComponentParameterAst(null,
+                                                                                               () -> paramModel)));
   }
 
   @Override
