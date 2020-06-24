@@ -66,6 +66,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InOrder;
 
@@ -480,6 +481,7 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   }
 
   @Test
+  @Ignore("MULE-18522")
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
     assumeThat(mode, is(SOURCE));
 
