@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="http-listener-config" host="localhost" port="${port}" protocol="HTTP"  usePersistentConnections="true"/>
+
+    <flow name="cxfOutputHandlerFlow">
+        <http:listener config-ref="http-listener-config" path="/cxfOutputHandlerFlow" parseRequest="false" responseStreamingMode="ALWAYS" />
+        <cxf:proxy-service port="ListsSoap"
+                           service="Lists"
+                           namespace="http://schemas.microsoft.com/sharepoint/soap/"
+                           wsdlLocation="src/test/resources/ListsOriginal.wsdl"
+        />
+    </flow>
+</mule>
