@@ -6,27 +6,25 @@
  */
 package org.mule.runtime.config.model;
 
-import static java.util.Optional.empty;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ARTIFACT_AST;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ParameterAst.PARAMETER_AST;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -38,6 +36,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
 @Feature(ARTIFACT_AST)
 @Story(PARAMETER_AST)
 public class ComponentAstParametersTestCase extends AbstractMuleTestCase {
@@ -45,7 +51,7 @@ public class ComponentAstParametersTestCase extends AbstractMuleTestCase {
   private static final String PARAMETER_A = "a";
   private static final String PARAMETER_B = "b";
   private static final String PARAMETER_C = "c";
-  private ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   @Rule
   public ExpectedException expectedException = none();
@@ -78,8 +84,7 @@ public class ComponentAstParametersTestCase extends AbstractMuleTestCase {
     componentModel.setComponentModel(parameterizedModel);
 
     Collection<ComponentParameterAst> parameters = componentModel.getParameters();
-    assertThat(parameters, not(empty()));
-    assertThat(parameters.size(), is(3));
+    assertThat(parameters, hasSize(3));
 
     List<String> expectedParametersName =
         parameterizedModel.getAllParameterModels().stream().map(NamedObject::getName).collect(toList());
@@ -93,6 +98,50 @@ public class ComponentAstParametersTestCase extends AbstractMuleTestCase {
     expectedException.expect(IllegalStateException.class);
     ComponentModel componentModel = baseComponentModelBuilder().build();
     componentModel.getParameters();
+  }
+
+  @Test
+  @Issue("MULE-18513")
+  public void paramsInShowDslGroupProperlyProcessed() {
+    org.mule.runtime.api.meta.model.ComponentModel parameterizedModel =
+        mock(org.mule.runtime.api.meta.model.ComponentModel.class);
+
+    final ParameterModel paramA = createParameterModel(PARAMETER_A);
+    final ParameterModel paramB = createParameterModel(PARAMETER_B);
+    final ParameterModel paramC = createParameterModel(PARAMETER_C);
+
+    when(parameterizedModel.getAllParameterModels()).thenReturn(asList(paramA, paramB, paramC));
+
+    final ParameterGroupModel paramGroupA = mock(ParameterGroupModel.class);
+    when(paramGroupA.getName()).thenReturn(DEFAULT_GROUP_NAME);
+    when(paramGroupA.getParameterModels()).thenReturn(singletonList(paramA));
+    when(paramGroupA.isShowInDsl()).thenReturn(false);
+    final ParameterGroupModel paramGroupB = mock(ParameterGroupModel.class);
+    when(paramGroupB.getName()).thenReturn("groupB");
+    when(paramGroupB.getParameterModels()).thenReturn(singletonList(paramB));
+    when(paramGroupB.isShowInDsl()).thenReturn(false);
+    final ParameterGroupModel paramGroupC = mock(ParameterGroupModel.class);
+    when(paramGroupC.getName()).thenReturn("groupC");
+    when(paramGroupC.getParameterModels()).thenReturn(singletonList(paramC));
+    when(paramGroupC.isShowInDsl()).thenReturn(true);
+
+    when(parameterizedModel.getParameterGroupModels()).thenReturn(asList(paramGroupA, paramGroupB, paramGroupC));
+
+    ComponentModel componentModel = baseComponentModelBuilder()
+        .addParameter(PARAMETER_A, "a", false)
+        .addParameter(PARAMETER_B, "b", false)
+        .addChildComponentModel(baseComponentModelBuilder()
+            .setIdentifier(buildFromStringRepresentation("test:group-c"))
+            .addParameter(PARAMETER_C, "c", false)
+            .build())
+        .build();
+    componentModel.setComponentModel(parameterizedModel);
+
+    Collection<ComponentParameterAst> parameters = componentModel.getParameters();
+
+    assertThat(parameters, hasSize(3));
+    assertThat(parameters.stream().map(p -> p.getValue().getRight()).collect(toList()),
+               is(asList("a", "b", "c")));
   }
 
   private ComponentModel.Builder baseComponentModelBuilder() {
