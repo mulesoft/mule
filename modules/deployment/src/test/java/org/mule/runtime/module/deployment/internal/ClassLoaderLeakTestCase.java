@@ -48,6 +48,7 @@ import java.lang.ref.ReferenceQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -164,7 +165,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   @Test
   @Issue("MULE-18480")
-  @Description("When an artifact is redeployed by changing it in the filesystem, objects associated to the original deployment are released befroe deploying the new one.")
+  @Description("When an artifact is redeployed by changing it in the filesystem, objects associated to the original deployment are released before deploying the new one.")
   public void redeployByConfigChangePreviousAppEagerlyGCd() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     AtomicReference<Throwable> redeploymentSuccessThrown = new AtomicReference<>();
@@ -182,7 +183,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   @Test
   @Issue("MULE-18480")
-  @Description("When an artifact is redeployed through the deployment service by uri, objects associated to the original deployment are released befroe deploying the new one.")
+  @Description("When an artifact is redeployed through the deployment service by uri, objects associated to the original deployment are released before deploying the new one.")
   public void redeployPreviousAppEagerlyGCd() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     AtomicReference<Throwable> redeploymentSuccessThrown = new AtomicReference<>();
@@ -198,7 +199,8 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   @Test
   @Issue("MULE-18480")
-  @Description("When an artifact is redeployed through the deployment service by name, objects associated to the original deployment are released befroe deploying the new one.")
+  @Ignore("MULE-18520")
+  @Description("When an artifact is redeployed through the deployment service by name, objects associated to the original deployment are released before deploying the new one.")
   public void redeployByNamePreviousAppEagerlyGCd() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     AtomicReference<Throwable> redeploymentSuccessThrown = new AtomicReference<>();

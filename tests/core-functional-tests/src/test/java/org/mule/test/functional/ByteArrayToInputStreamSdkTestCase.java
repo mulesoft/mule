@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTestCase {
@@ -31,6 +32,7 @@ public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTes
   }
 
   @Test
+  @Ignore("MULE-18519")
   public void byteArrayToInputStreamTransformationIsSuccessful() {
     check(POLL_TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> EventRecorder.countCapturedEvents() == EXPECTED_EVENT_COUNT);
   }
