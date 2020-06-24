@@ -57,6 +57,7 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
   private final Integer httpResponseDeferringCompletionTimeout = getInteger(HTTP_RESPONSE_DEFERRING_COMPLETION_TIMEOUT_PROPERTY, -1);
 
   private volatile boolean isDone;
+  private volatile AtomicBoolean isCompleted = new AtomicBoolean(false);
 
   public ResponseDeferringCompletionHandler(final FilterChainContext ctx,
                                             final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
@@ -110,9 +111,12 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
 
   private void doComplete()
   {
-    responseStatusCallback.responseSendSuccessfully();
-    ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
-    resume();
+    //If its not completed, then complete it
+    if(isCompleted.compareAndSet(false, true)) {
+      responseStatusCallback.responseSendSuccessfully();
+      ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
+      resume();
+    }
   }
 
   /**
