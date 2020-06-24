@@ -26327,6 +26327,333 @@
       "description": "",
       "modelProperties": {},
       "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "xml",
+          "type": "@ref:#root:shiporder"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": true,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "XML_OUTPUT_SCHEMA_WITH_IMPORT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Union",
+                "annotations": {
+                  "typeId": "ByteStreamingStrategy"
+                },
+                "of": [
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "repeatable-in-memory-stream"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "initialBufferSize"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "512"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "This is the amount of memory that will be allocated in order to consume the stream and provide random access to it. If the stream contains more data than can be fit into this buffer, then it will be expanded by according to the bufferSizeIncrement attribute, with an upper limit of maxInMemorySize."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "bufferSizeIncrement"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "512"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "This is by how much will be buffer size by expanded if it exceeds its initial size. Setting a value of zero or lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised when the buffer gets full."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "maxBufferSize"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "1024"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "bufferUnit"
+                        },
+                        "model": {
+                          "type": "String",
+                          "annotations": {
+                            "enum": {
+                              "type": "[Ljava.lang.String;",
+                              "values": [
+                                "BYTE",
+                                "KB",
+                                "MB",
+                                "GB"
+                              ]
+                            },
+                            "default": "KB"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The unit in which all these attributes are expressed"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "repeatable-file-store-stream"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "inMemorySize"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "512"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Defines the maximum memory that the stream should use to keep data in memory. If more than that is consumed then it will start to buffer the content on disk."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "bufferUnit"
+                        },
+                        "model": {
+                          "type": "String",
+                          "annotations": {
+                            "enum": {
+                              "type": "[Ljava.lang.String;",
+                              "values": [
+                                "BYTE",
+                                "KB",
+                                "MB",
+                                "GB"
+                              ]
+                            },
+                            "default": "KB"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The unit in which maxInMemorySize is expressed"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "non-repeatable-stream",
+                      "description": {
+                        "value": "This configuration allows the input stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
+                      }
+                    },
+                    "fields": []
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "streamingStrategy",
+              "description": "Configure if repeatable streams should be used and their behaviour",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "abstract-byte-streaming-strategy",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 2
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 0
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "xmlOutputSchemaWithImport",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
     }
   ],
   "functions": [],
@@ -27851,7 +28178,6 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "#root:shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -27865,7 +28191,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "#root:shiporder"
       },
       "fields": [
         {
@@ -28016,7 +28343,6 @@
       "format": "csv",
       "type": "Object",
       "annotations": {
-        "typeId": "csv-object",
         "classInformation": {
           "classname": "java.lang.Integer",
           "hasDefaultConstructor": false,
@@ -28030,7 +28356,8 @@
           "parent": "java.lang.Number",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "csv-object"
       },
       "fields": []
     },
@@ -28038,7 +28365,6 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "custom-java",
         "classInformation": {
           "classname": "java.lang.Object",
           "hasDefaultConstructor": true,
@@ -28050,7 +28376,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "custom-java"
       },
       "fields": []
     },
@@ -28058,8 +28385,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "http://example.com/example.json",
-        "label": "Person",
         "classInformation": {
           "classname": "void",
           "hasDefaultConstructor": false,
@@ -28071,7 +28396,9 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "label": "Person",
+        "typeId": "http://example.com/example.json"
       },
       "open": {
         "type": "Any"
@@ -28115,7 +28442,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "json-object",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -28129,7 +28455,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "json-object"
       },
       "fields": [
         {
