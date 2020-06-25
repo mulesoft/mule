@@ -20,7 +20,6 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDE
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
-import static org.mule.runtime.config.internal.factories.ComponentAstSpliteratorStrategyFactory.traversalStrategy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
@@ -328,7 +327,7 @@ public class ComponentModel implements ComponentAst {
 
   @Override
   public Spliterator<ComponentAst> recursiveSpliterator(AstTraversalDirection direction) {
-    return traversalStrategy(this, direction);
+    return direction.recursiveSpliterator(this);
   }
 
   @Override
