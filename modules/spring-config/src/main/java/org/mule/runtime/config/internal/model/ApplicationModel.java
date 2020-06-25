@@ -60,6 +60,7 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
@@ -260,14 +261,14 @@ public class ApplicationModel implements ArtifactAst {
     this.originalAst = new ArtifactAst() {
 
       @Override
-      public Stream<ComponentAst> recursiveStream() {
+      public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
         return topLevelComponentsStream()
-            .flatMap(cm -> cm.recursiveStream());
+            .flatMap(cm -> cm.recursiveStream(direction));
       }
 
       @Override
-      public Spliterator<ComponentAst> recursiveSpliterator() {
-        return recursiveStream().spliterator();
+      public Spliterator<ComponentAst> recursiveSpliterator(AstTraversalDirection direction) {
+        return recursiveStream(direction).spliterator();
       }
 
       @Override
@@ -976,13 +977,13 @@ public class ApplicationModel implements ArtifactAst {
   }
 
   @Override
-  public Stream<ComponentAst> recursiveStream() {
-    return ast.recursiveStream();
+  public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
+    return ast.recursiveStream(direction);
   }
 
   @Override
-  public Spliterator<ComponentAst> recursiveSpliterator() {
-    return ast.recursiveSpliterator();
+  public Spliterator<ComponentAst> recursiveSpliterator(AstTraversalDirection direction) {
+    return ast.recursiveSpliterator(direction);
   }
 
   @Override

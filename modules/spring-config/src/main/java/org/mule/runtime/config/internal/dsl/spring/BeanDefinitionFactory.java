@@ -150,34 +150,20 @@ public class BeanDefinitionFactory {
   }
 
   /**
-   * Creates a {@code BeanDefinition} by traversing the {@code ComponentModel} and its children.
+   * Creates a {@code BeanDefinition} for the {@code ComponentModel}.
    *
+   * @param springComponentModels a {@link Map} created {@link ComponentAst} and {@link SpringComponentModel}
    * @param parentComponentModel        the container of the component model from which we want to create the bean definition.
    * @param componentModel              the component model from which we want to create the bean definition.
    * @param registry                    the bean registry since it may be required to get other bean definitions to create this one or to register
    *                                    the bean definition.
-   * @param componentModelPostProcessor a function to post process the bean definition.
-   * @param oldParsingMechanism         a function to execute the old parsing mechanism if required by children {@code ComponentModel}s
    * @param componentLocator            where the locations of any {@link Component}'s locations must be registered
-   * @return the {@code BeanDefinition} of the component model.
    */
-  public void resolveComponentRecursively(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                          ComponentAst parentComponentModel,
-                                          ComponentAst componentModel,
-                                          BeanDefinitionRegistry registry,
-                                          SpringConfigurationComponentLocator componentLocator) {
-    // TODO MULE-18374 avoid this double recursion
-    componentModel.directChildrenStream()
-        .forEach(innerComponent -> resolveComponentRecursively(springComponentModels, componentModel, innerComponent, registry,
-                                                               componentLocator));
-    resolveComponent(springComponentModels, parentComponentModel, componentModel, registry, componentLocator);
-  }
-
-  private void resolveComponent(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                ComponentAst parentComponentModel,
-                                ComponentAst componentModel,
-                                BeanDefinitionRegistry registry,
-                                SpringConfigurationComponentLocator componentLocator) {
+  public void resolveComponent(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                               ComponentAst parentComponentModel,
+                               ComponentAst componentModel,
+                               BeanDefinitionRegistry registry,
+                               SpringConfigurationComponentLocator componentLocator) {
     if (isComponentIgnored(componentModel.getIdentifier())) {
       return;
     }
