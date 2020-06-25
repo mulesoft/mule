@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
@@ -545,7 +546,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
             .orElse(false))
         .peek(cm -> cm.getComponentId().ifPresent(alwaysEnabledTopLevelComponents::add))
         .filter(cm -> !cm.getComponentId().isPresent())
-        .map(cm -> cm.getIdentifier())
+        .map(ComponentAst::getIdentifier)
         .collect(toSet());
     Set<String> alwaysEnabledGeneratedTopLevelComponentsName = new HashSet<>();
 
@@ -553,8 +554,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     final Set<ComponentAst> rootComponents = resolveRootComponents(applicationModel);
 
-    recursiveStreamWithHierarchy(applicationModel)
-        .filter(cm -> !mustBeRoot || rootComponents.contains(cm.getFirst()))
+    recursiveStreamWithHierarchy(applicationModel, BOTTOM_UP)
+        // Create component if must not be root is mandatory or component is a root component or component is child of a root component
+        .filter(cm -> !mustBeRoot || rootComponents.contains(cm.getFirst())
+            || cm.getSecond().stream().anyMatch(rootComponents::contains))
         .filter(cm -> !isIgnored(cm.getFirst()))
         .forEach(cm -> {
           if (rootComponents.contains(cm.getFirst())) {
@@ -562,12 +565,13 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                 .ifPresent(componentName -> createdComponentModels.add(new Pair<>(componentName, cm.getFirst())));
           }
 
-          beanDefinitionFactory.resolveComponentRecursively(springComponentModels,
-                                                            cm.getSecond().isEmpty() ? null
-                                                                : cm.getSecond().get(cm.getSecond().size() - 1),
-                                                            cm.getFirst(), beanFactory, componentLocator);
+          beanDefinitionFactory.resolveComponent(springComponentModels,
+                                                 cm.getSecond().isEmpty() ? null : cm.getSecond().get(cm.getSecond().size() - 1),
+                                                 cm.getFirst(), beanFactory, componentLocator);
 
-          componentLocator.addComponentLocation(cm.getFirst().getLocation());
+          if (rootComponents.contains(cm.getFirst())) {
+            componentLocator.addComponentLocation(cm.getFirst().getLocation());
+          }
         });
 
 
