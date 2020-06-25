@@ -310,22 +310,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return new ApplicationModel(artifactConfig, artifactDeclaration, getExtensions(),
                                   artifactProperties, parentConfigurationProperties,
                                   of(componentBuildingDefinitionRegistry),
-                                  externalResourceProvider, isRuntimeMode());
+                                  externalResourceProvider);
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
-  }
-
-  /**
-   * Defines if the context should be created for Runtime (execution) o not. This has impact on how the AST
-   * will be populated and created.
-   *
-   * @since 4.3
-   */
-  protected boolean isRuntimeMode() {
-    return true;
   }
 
   public void initialize() {

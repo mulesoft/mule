@@ -302,7 +302,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
 
           @Override
           public void visitArrayType(ArrayType arrayType) {
-            if (paramModel.getDslConfiguration().allowsReferences()) {
+            if (paramModel.getDslConfiguration().allowsReferences() && v instanceof String) {
               getHashedGlobal(v.toString()).ifPresent(reference::set);
             }
           }
