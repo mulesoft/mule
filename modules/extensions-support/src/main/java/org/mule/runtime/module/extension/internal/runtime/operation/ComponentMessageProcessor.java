@@ -105,7 +105,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -724,10 +723,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         .orElse(IMMEDIATE_SCHEDULER);
 
     ExecutionContextAdapter<T> operationContext;
-    if (shouldUsePrecalculatedContext(event)) {
+    if (shouldUsePrecalculatedContext(operationEvent)) {
       operationContext = getPrecalculatedContext(operationEvent);
       operationContext.setCurrentScheduler(currentScheduler);
-      ((InternalEvent) operationContext.getEvent()).setSdkInternalContext(((InternalEvent) event).getSdkInternalContext());
+      // copy the context to the operationEvent
+      ((InternalEvent) operationContext.getEvent()).setSdkInternalContext(sdkInternalContext);
     } else {
       operationContext = createExecutionContext(configuration,
                                                 parameters,
