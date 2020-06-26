@@ -48,6 +48,7 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
