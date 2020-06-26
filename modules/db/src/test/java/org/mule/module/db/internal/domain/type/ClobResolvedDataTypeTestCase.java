@@ -56,24 +56,45 @@ public class ClobResolvedDataTypeTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void convertsStringToClob() throws Exception {
+  public void convertsStringToClobWhenDriverSupportsSetClob() throws Exception {
+    String value = "foo";
+
+    dataType.setParameterValue(statement, PARAM_INDEX, value);
+
+    verify(connection).createClob();
+  }
+
+  @Test
+  public void convertsInputStreamToClobWhenDriverSupportsSetClob() throws Exception {
+    String streamContent = "bar";
+    InputStream value = new StringInputStream(streamContent);
+
+    dataType.setParameterValue(statement, PARAM_INDEX, value);
+
+    verify(connection).createClob();
+  }
+
+  @Test
+  public void convertsStringToClobWhenDriverDoesNotSupportSetClob() throws Exception {
+    when(connection.createClob()).thenThrow(new RuntimeException());
+
     String value = "foo";
 
     dataType.setParameterValue(statement, PARAM_INDEX, value);
 
     verify(statement).setCharacterStream(eq(PARAM_INDEX), any(StringReader.class), eq(value.length()));
-    verify(statement, never()).setObject(PARAM_INDEX, clob, CLOB);
   }
 
   @Test
-  public void convertsInputStreamToClob() throws Exception {
+  public void convertsInputStreamToClobWhenDriverDoesNotSupportSetClob() throws Exception {
+    when(connection.createClob()).thenThrow(new RuntimeException());
+
     String streamContent = "bar";
     InputStream value = new StringInputStream(streamContent);
 
     dataType.setParameterValue(statement, PARAM_INDEX, value);
 
     verify(statement).setCharacterStream(eq(PARAM_INDEX), any(StringReader.class), eq(streamContent.length()));
-    verify(statement, never()).setObject(PARAM_INDEX, clob, CLOB);
   }
 
   @Test
