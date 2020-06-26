@@ -24,7 +24,6 @@ import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
@@ -283,9 +282,6 @@ class UntilSuccessfulRouter {
           new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG),
                                             retryPolicyExhaustionCause,
                                             owner);
-      // Info about the cause is added. Note that if a MuleException has been suppressed, it will later overwrite this value
-      // (see ExceptionHelper#getRootMuleException)
-      retryPolicyExhaustedException.addInfo(MuleExceptionInfo.INFO_CAUSED_BY_KEY, retryPolicyExhaustionCause);
       if (throwable instanceof MessagingException) {
         exceptionEvent = ((MessagingException) throwable).getEvent();
       }

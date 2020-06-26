@@ -168,7 +168,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
     Throwable exception = handler.processException(moduleException);
 
     assertThat(exception.getCause(), is(instanceOf(SuppressedMuleException.class)));
-    assertThat(((SuppressedMuleException) exception.getCause()).getSuppressedMuleException(),
+    assertThat(((SuppressedMuleException) exception.getCause()).getSuppressedException(),
                is(instanceOf(MessagingException.class)));
   }
 
