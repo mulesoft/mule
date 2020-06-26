@@ -42,14 +42,13 @@ public class ClobResolvedDataTypeTestCase extends AbstractMuleTestCase {
   private ClobResolvedDataType dataType;
   private PreparedStatement statement;
   private Connection connection;
-  private Clob clob;
 
   @Before
   public void setUp() throws Exception {
     dataType = new ClobResolvedDataType(CLOB, null);
     statement = mock(PreparedStatement.class);
     connection = mock(Connection.class);
-    clob = mock(Clob.class);
+    Clob clob = mock(Clob.class);
 
     when(statement.getConnection()).thenReturn(connection);
     when(connection.createClob()).thenReturn(clob);
