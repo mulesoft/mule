@@ -6,19 +6,18 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static java.lang.Integer.getInteger;
+import static java.lang.Integer.valueOf;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.HttpServerFilter.RESPONSE_COMPLETE_EVENT;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.transport.OutputHandler;
-import org.mule.module.http.internal.domain.OutputHandlerHttpEntity;
-import org.mule.module.http.internal.domain.response.HttpResponse;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
-
-import com.google.common.base.Preconditions;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.CompletionHandler;
@@ -28,6 +27,13 @@ import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.glassfish.grizzly.memory.MemoryManager;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.transport.OutputHandler;
+import org.mule.module.http.internal.domain.OutputHandlerHttpEntity;
+import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
+
+import com.google.common.base.Preconditions;
 
 /**
  * {@link org.glassfish.grizzly.CompletionHandler}, responsible for asynchronous http response transferring
@@ -37,12 +43,18 @@ import org.glassfish.grizzly.memory.MemoryManager;
  */
 public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHandler
 {
+  
+  public static final String HTTP_RESPONSE_DEFERRING_COMPLETION_TIMEOUT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.response.deferring.completion.timeout";  
+  public static final String FAILURE_WHILE_PROCESSING_HTTP_RESPONSE_BODY = "Failure while processing HTTP response body.";
+
   private final MemoryManager memoryManager;
   private final HttpResponsePacket httpResponsePacket;
   private final OutputHandler outputHandler;
   private final ResponseStatusCallback responseStatusCallback;
   private final CompletionOutputStream outputStream;
   private final Semaphore sending = new Semaphore(1);
+  private final AtomicBoolean failed = new AtomicBoolean(false);
+  private final Integer httpResponseDeferringCompletionTimeout = getInteger(HTTP_RESPONSE_DEFERRING_COMPLETION_TIMEOUT_PROPERTY, -1);
 
   private volatile boolean isDone;
 
@@ -124,6 +136,8 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
   {
     super.failed(throwable);
     resume();
+    failed.set(true);
+    sending.release();
   }
 
   /**
@@ -161,7 +175,7 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
     }
 
     @Override
-    public void write(byte[] b, int off, int len)
+    public void write(byte[] b, int off, int len) throws IOException
     {
       flushIfNecessary(len);
       buffer.put(b, off, len);
@@ -185,7 +199,8 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
         }
         try
         {
-          sending.acquire();
+          acquireSendingSemaphore();
+          
           isDone = true;
           ctx.write(content, completionHandler);
           written = true;
@@ -205,6 +220,22 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
       }
     }
 
+    private void acquireSendingSemaphore() throws InterruptedException, IOException
+    {
+        if (httpResponseDeferringCompletionTimeout != -1)
+        {
+            boolean acquired = sending.tryAcquire(httpResponseDeferringCompletionTimeout, MILLISECONDS);
+            if (!acquired)
+            {
+                throw new IOException(FAILURE_WHILE_PROCESSING_HTTP_RESPONSE_BODY);
+            }
+        }
+        else
+        {
+            sending.acquire();
+        }
+    }
+
     public boolean isWritten()
     {
       return written;
@@ -214,8 +245,10 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
      * Checks whether there's enough space for the data, flushing and renewing the current buffer if not.
      *
      * @param writeLength the amount of data intended for the current buffer
+     * 
+     * @throws IOException exception in case the response handler already failed
      */
-    private void flushIfNecessary(int writeLength)
+    private void flushIfNecessary(int writeLength) throws IOException
     {
       if (buffer.remaining() < writeLength)
       {
@@ -228,14 +261,20 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
      * Sends all pending data (if any) and renews the current buffer.
      *
      * @param bufferSize size to renew the buffer after flushing
+     * 
+     * @throws IOException exception in case the response handler already failed 
      */
-    public void flush(int bufferSize)
+    public void flush(int bufferSize) throws IOException
     {
       if (hasPendingData())
       {
         try
         {
-          sending.acquire();
+          acquireSendingSemaphore();
+          if (failed.get())
+          {
+            throw new IOException(FAILURE_WHILE_PROCESSING_HTTP_RESPONSE_BODY);
+          }
           ctx.write(getBufferAsContent(), completionHandler);
           written = true;
         }
@@ -273,4 +312,5 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
       return memoryManager.allocate(bufferSize);
     }
   }
+  
 }
