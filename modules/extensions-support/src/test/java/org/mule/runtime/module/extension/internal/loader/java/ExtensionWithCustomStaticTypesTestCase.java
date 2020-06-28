@@ -304,21 +304,18 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
     Object[] typeFields = ((DefaultObjectType) type).getFields().toArray();
     DefaultObjectFieldType fieldOrder = (DefaultObjectFieldType) typeFields[0];
     DefaultObjectType order = (DefaultObjectType) fieldOrder.getValue();
-    Object[] orderFields = order.getFields().toArray();
-    MatcherAssert.assertThat(orderFields.length, is(3));
+    MatcherAssert.assertThat(order.getFields().toArray().length, is(3));
 
-    DefaultObjectFieldType fieldPerson = (DefaultObjectFieldType) orderFields[0];
+    DefaultObjectFieldType fieldPerson = (DefaultObjectFieldType) order.getFieldByName("orderperson").get();
     assertThat(fieldPerson.getValue(), instanceOf(DefaultStringType.class));
 
-    DefaultObjectFieldType fieldShipTo = (DefaultObjectFieldType) orderFields[1];
+    DefaultObjectFieldType fieldShipTo = (DefaultObjectFieldType) order.getFieldByName("shipto").get();
     DefaultObjectType shipTo = (DefaultObjectType) fieldShipTo.getValue();
-    Object[] shipToFields = shipTo.getFields().toArray();
-    MatcherAssert.assertThat(shipToFields.length, is(4));
+    MatcherAssert.assertThat(shipTo.getFields().toArray().length, is(4));
 
-    DefaultObjectFieldType fieldItems = (DefaultObjectFieldType) orderFields[2];
-    DefaultObjectType items = (DefaultObjectType) fieldItems.getValue();
-    Object[] itemFields = items.getFields().toArray();
-    MatcherAssert.assertThat(itemFields.length, is(4));
+    DefaultObjectFieldType fieldItem = (DefaultObjectFieldType) order.getFieldByName("item").get();
+    DefaultObjectType item = (DefaultObjectType) fieldItem.getValue();
+    MatcherAssert.assertThat(item.getFields().toArray().length, is(4));
   }
 
   private void assertJsonPerson(Typed typed) {
