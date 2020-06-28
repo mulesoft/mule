@@ -221,11 +221,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   @Override
-  protected boolean isRuntimeMode() {
-    return false;
-  }
-
-  @Override
   protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     super.prepareBeanFactory(beanFactory);
     trackingPostProcessor = new TrackingPostProcessor();

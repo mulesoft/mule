@@ -2939,7 +2939,12 @@
                     "query": false,
                     "order": 12
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "FLOW",
+                      "namespace": "MULE"
+                    }
+                  ],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -2966,7 +2971,12 @@
                     "query": false,
                     "order": 13
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "FLOW",
+                      "namespace": "MULE"
+                    }
+                  ],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -3781,7 +3791,12 @@
                     "query": false,
                     "order": 12
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "FLOW",
+                      "namespace": "MULE"
+                    }
+                  ],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -3808,7 +3823,12 @@
                     "query": false,
                     "order": 13
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "FLOW",
+                      "namespace": "MULE"
+                    }
+                  ],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -10269,7 +10289,12 @@
                     "query": false,
                     "order": 12
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "FLOW",
+                      "namespace": "MULE"
+                    }
+                  ],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -10296,7 +10321,12 @@
                     "query": false,
                     "order": 13
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "FLOW",
+                      "namespace": "MULE"
+                    }
+                  ],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -13477,7 +13507,12 @@
                     "query": false,
                     "order": 13
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "FLOW",
+                      "namespace": "MULE"
+                    }
+                  ],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -13504,7 +13539,12 @@
                     "query": false,
                     "order": 14
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "FLOW",
+                      "namespace": "MULE"
+                    }
+                  ],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
