@@ -1,26 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module name="module-invalid-test-connection"
         xmlns="http://www.mulesoft.org/schema/mule/module"
-        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
-           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+           http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
     <property name="someUserConfig" type="string" defaultValue="some-username"/>
     <property name="somePassConfig" type="string" defaultValue="some-password"/>
     <property name="port" type="string"/>
 
-    <http:request-config name="http-requester-config" basePath="/basic-auth/" xmlns:connection="true">
-        <http:request-connection host="localhost" protocol="HTTP" port="#[vars.port]">
-            <!-- ... -->
-        </http:request-connection>
-    </http:request-config>
+    <petstore:config name="http-requester-config" cashierName="cashierName" xmlns:connection="true">
+        <petstore:connection username="#[vars.someUserConfig]" password="#[vars.somePassConfig]"/>
+        <petstore:pets>
+            <petstore:pet value="#[vars.port]"/>
+        </petstore:pets>
+    </petstore:config>
 
-    <http:request-config name="second-http-requester-config" basePath="/basic-auth/">
-        <http:request-connection host="localhost" protocol="HTTP" port="#[vars.port]">
-            <!-- ... -->
-        </http:request-connection>
-    </http:request-config>
+    <petstore:config name="second-http-requester-config" cashierName="cashierName">
+        <petstore:connection username="#[vars.someUserConfig]" password="#[vars.somePassConfig]"/>
+        <petstore:pets>
+            <petstore:pet value="#[vars.port]"/>
+        </petstore:pets>
+    </petstore:config>
 
 </module>

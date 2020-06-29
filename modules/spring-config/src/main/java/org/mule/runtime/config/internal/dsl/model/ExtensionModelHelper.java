@@ -388,7 +388,11 @@ public class ExtensionModelHelper {
             protected void onNestable(NestableElementModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onNestableElement(model);
-                stop();
+
+                if (!(model instanceof NestedComponentModel)
+                    || ((NestedComponentModel) model).getAllowedStereotypes().isEmpty()) {
+                  stop();
+                }
               }
             }
 

@@ -7,6 +7,7 @@
 package org.mule.runtime.extension.internal.loader;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.String.join;
@@ -94,6 +95,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.extension.XmlSdk1ExtensionModelProvider;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
@@ -132,7 +134,6 @@ import org.jgrapht.graph.DefaultEdge;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -192,7 +193,7 @@ public final class XmlExtensionLoaderDelegate {
    *
    * @see {@link XmlExtensionLoaderDelegate#loadOperationsFrom(HasOperationDeclarer, ComponentModel, DirectedGraph, XmlDslModel, XmlExtensionLoaderDelegate.OperationVisibility)}
    */
-  private enum OperationVisibility {
+  public enum OperationVisibility {
     PRIVATE, PUBLIC
   }
 
@@ -230,6 +231,9 @@ public final class XmlExtensionLoaderDelegate {
   public static final String XSD_SUFFIX = ".xsd";
   private static final String XML_SUFFIX = ".xml";
   private static final String TYPES_XML_SUFFIX = "-catalog" + XML_SUFFIX;
+
+  final Set<ComponentIdentifier> NOT_GLOBAL_ELEMENT_IDENTIFIERS =
+      newHashSet(OPERATION_PROPERTY_IDENTIFIER, CONNECTION_PROPERTIES_IDENTIFIER, OPERATION_IDENTIFIER);
 
   private final String modulePath;
   private final boolean validateXml;
@@ -269,8 +273,12 @@ public final class XmlExtensionLoaderDelegate {
                                          e);
     }
     loadDeclaration();
+
+    final Set<ExtensionModel> loaderExtensions = new HashSet<>(context.getDslResolvingContext().getExtensions());
+    loaderExtensions.add(XmlSdk1ExtensionModelProvider.getExtensionModel());
+
     final ExtensionModelHelper extensionModelHelper =
-        new ExtensionModelHelper(context.getDslResolvingContext().getExtensions(), context.getDslResolvingContext());
+        new ExtensionModelHelper(loaderExtensions, context.getDslResolvingContext());
 
     final Set<ExtensionModel> extensions = new HashSet<>(extensionModelHelper.getExtensionsModels());
     try {
@@ -467,7 +475,7 @@ public final class XmlExtensionLoaderDelegate {
     resourcesPaths.stream().forEach(declarer::withResource);
 
     fillDeclarer(declarer, name, version, category, vendor, xmlDslModel, description);
-    declarer.withModelProperty(getXmlExtensionModelProperty((ComponentModel) moduleModel, xmlDslModel));
+    declarer.withModelProperty(getXmlExtensionModelProperty(moduleDocument, xmlDslModel));
 
     Graph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     // loading public operations
@@ -475,15 +483,16 @@ public final class XmlExtensionLoaderDelegate {
     addGlobalElementModelProperty(declarer, globalElementsComponentModel);
     final Optional<ConfigurationDeclarer> configurationDeclarer =
         loadPropertiesFrom(declarer, moduleModel, globalElementsComponentModel, extensionModelHelper);
-    final HasOperationDeclarer hasOperationDeclarer = configurationDeclarer.isPresent() ? configurationDeclarer.get() : declarer;
+    final HasOperationDeclarer hasOperationDeclarer = configurationDeclarer.map(d -> (HasOperationDeclarer) d).orElse(declarer);
 
     ExtensionDeclarer temporalPublicOpsDeclarer = new ExtensionDeclarer();
     fillDeclarer(temporalPublicOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
-    loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel, OperationVisibility.PUBLIC);
+    loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
+                       OperationVisibility.PUBLIC);
     loadOperationsFrom(temporalPublicOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                        OperationVisibility.PUBLIC);
     try {
-      enrichModuleModel(moduleModel, createExtensionModel(temporalPublicOpsDeclarer), extensionModelHelper);
+      moduleModel = enrichModuleModel(moduleModel, createExtensionModel(temporalPublicOpsDeclarer), extensionModelHelper);
     } catch (IllegalModelDefinitionException e) {
       // Nothing to do, this failure will be thrown again when the actual declarer, hasOperationDeclarer, is used to build the
       // extension model.
@@ -504,7 +513,7 @@ public final class XmlExtensionLoaderDelegate {
       final PrivateOperationsModelProperty privateOperations = new PrivateOperationsModelProperty(result.getOperationModels());
       declarer.withModelProperty(privateOperations);
 
-      enrichModuleModel(moduleModel, result, extensionModelHelper);
+      moduleModel = enrichModuleModel(moduleModel, result, extensionModelHelper);
     }
 
     final CycleDetector<String, DefaultEdge> cycleDetector = new CycleDetector<>(directedGraph);
@@ -546,13 +555,17 @@ public final class XmlExtensionLoaderDelegate {
     });
   }
 
-  private void enrichModuleModel(final ComponentAst moduleModel, ExtensionModel result,
-                                 ExtensionModelHelper extensionModelHelper) {
-    // TODO MULE-17419 (AST) Set all models, not just for operations (routers/scopes are missing here for sure)
+  private ComponentAst enrichModuleModel(final ComponentAst moduleModel, ExtensionModel result,
+                                         ExtensionModelHelper extensionModelHelper) {
+    // // TODO MULE-17419 (AST) Set all models, not just for operations (routers/scopes are missing here for sure)
     moduleModel.recursiveStream()
         .filter(comp -> TNS_PREFIX.equals(comp.getIdentifier().getNamespace()))
         .forEach(comp -> result.getOperationModel(comp.getIdentifier().getName())
-            .ifPresent(model -> ((ComponentModel) comp).setComponentModel(model)));
+            .ifPresent(model -> {
+              System.out.println("lala");
+              ((ComponentModel) comp).setComponentModel(model);
+            }));
+    return moduleModel;
   }
 
   private ExtensionModel createExtensionModel(ExtensionDeclarer declarer) {
@@ -581,7 +594,7 @@ public final class XmlExtensionLoaderDelegate {
    * that must be macro expanded and others which might not, but that job is left for the
    * {@link MacroExpansionModulesModel#getDirectExpandableNamespaceDependencies(ComponentModel, Set)}
    */
-  private XmlExtensionModelProperty getXmlExtensionModelProperty(ComponentModel moduleModel,
+  private XmlExtensionModelProperty getXmlExtensionModelProperty(Document moduleModel,
                                                                  XmlDslModel xmlDslModel) {
     final Set<String> namespaceDependencies = getUsedNamespaces(moduleModel).stream()
         .filter(namespace -> !xmlDslModel.getNamespace().equals(namespace))
@@ -626,8 +639,6 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private List<ComponentAst> extractGlobalElementsFrom(ComponentAst moduleModel) {
-    final Set<ComponentIdentifier> NOT_GLOBAL_ELEMENT_IDENTIFIERS = Sets
-        .newHashSet(OPERATION_PROPERTY_IDENTIFIER, CONNECTION_PROPERTIES_IDENTIFIER, OPERATION_IDENTIFIER);
     return moduleModel.directChildrenStream()
         .filter(child -> !NOT_GLOBAL_ELEMENT_IDENTIFIERS.contains(child.getIdentifier()))
         .collect(toList());
@@ -778,8 +789,8 @@ public final class XmlExtensionLoaderDelegate {
    * heavily relies on the {@link DslSyntaxResolver}, as many elements in the XML do not match to the names of the model.
    *
    * @param globalElementsComponentModel global elements of the smart connector
-   * @param extensionModelHelper         with the set of extensions used to generate the current {@link ExtensionModel}
-   * @return a {@link ComponentModel} of the global element to do test connection, empty otherwise.
+   * @param extensionModelHelper with the set of extensions used to generate the current {@link ExtensionModel}
+   * @return a {@link ComponentAst} of the global element to do test connection, empty otherwise.
    */
   private Optional<ComponentAst> findTestConnectionGlobalElementFrom(List<ComponentAst> globalElementsComponentModel,
                                                                      ExtensionModelHelper extensionModelHelper) {
@@ -818,6 +829,7 @@ public final class XmlExtensionLoaderDelegate {
 
   private void extractOperationExtension(HasOperationDeclarer declarer, ComponentAst operationModel,
                                          Graph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel) {
+    // String operationName = operationModel.getComponentId().map(id -> NameUtils.toCamelCase(id, "-")).orElse(null);
     String operationName = operationModel.getComponentId().orElse(null);
     OperationDeclarer operationDeclarer = declarer.withOperation(operationName);
     ComponentAst bodyComponentModel = operationModel.directChildrenStream()

@@ -17,10 +17,10 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.Component
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.internal.model.ApplicationModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +36,9 @@ import org.jgrapht.traverse.GraphIterator;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  * A {@link MacroExpansionModulesModel} goes over all the parametrized {@link ExtensionModel} by filtering them if they have the
@@ -197,10 +200,19 @@ public class MacroExpansionModulesModel {
    * @param rootComponentModel element to look for the attributes.
    * @return a collection of used namespaces.
    */
-  public static Set<String> getUsedNamespaces(ComponentModel rootComponentModel) {
-    return rootComponentModel.getRawParameters().entrySet().stream()
-        .filter(parameter -> parameter.getKey().startsWith(XMLNS_ATTRIBUTE + ":"))
-        .map(Map.Entry::getValue)
-        .collect(toSet());
+  public static Set<String> getUsedNamespaces(Document moduleDocument) {
+    Set<String> namespaces = new HashSet<>();
+
+    final NamedNodeMap rootAttributes = moduleDocument.getFirstChild().getAttributes();
+    for (int i = 0; i < rootAttributes.getLength(); i++) {
+      Node node = rootAttributes.item(i);
+      String name = node.getNodeName();
+
+      if (name.startsWith(XMLNS_ATTRIBUTE + ":")) {
+        namespaces.add(node.getNodeValue());
+      }
+    }
+
+    return namespaces;
   }
 }

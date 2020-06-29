@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module name="module-not-defined-test-connection"
         xmlns="http://www.mulesoft.org/schema/mule/module"
-        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
         xmlns:file="http://www.mulesoft.org/schema/mule/file"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
-           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd
            http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
 
     <property name="someUserConfig" type="string" defaultValue="some-username"/>
     <property name="somePassConfig" type="string" defaultValue="some-password"/>
     <property name="port" type="string"/>
 
-
-    <http:request-config name="http-global-element" basePath="/basic-auth/">
-        <http:request-connection host="localhost" protocol="HTTP" port="#[vars.port]">
-            <!-- ... -->
-        </http:request-connection>
-    </http:request-config>
+    <petstore:config name="http-global-element" cashierName="cashierName">
+        <petstore:connection username="#[vars.someUserConfig]" password="#[vars.somePassConfig]"/>
+        <petstore:pets>
+            <petstore:pet value="#[vars.port]"/>
+        </petstore:pets>
+    </petstore:config>
 
     <file:config name="file-global-element">
         <file:connection workingDir="#[vars.workingDir]"/>
