@@ -9,6 +9,7 @@ package org.mule.module.db.internal.domain.type;
 
 import static java.lang.String.format;
 
+import org.mule.util.CharSetUtils;
 import org.mule.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +37,13 @@ public class ClobResolvedDataType extends ResolvedDbType
     {
         if (value != null && !(value instanceof Clob)) {
             String valueString;
+            boolean isInputStream = false;
 
             if (value instanceof String) {
                 valueString = (String) value;
             } else if (value instanceof InputStream) {
                 valueString = IOUtils.toString((InputStream) value);
+                isInputStream = true;
             } else {
                 throw new IllegalArgumentException(createUnsupportedTypeErrorMessage(value));
             }
@@ -48,7 +51,13 @@ public class ClobResolvedDataType extends ResolvedDbType
             try {
                 LOGGER.debug("Creating CLOB object");
                 Clob clob = statement.getConnection().createClob();
-                clob.setString(1, valueString);
+
+                if (isInputStream) {
+                    IOUtils.copy((InputStream) value, clob.setCharacterStream(1), CharSetUtils.defaultCharsetName());
+                } else {
+                    clob.setString(1, valueString);
+                }
+
                 super.setParameterValue(statement, index, clob);
             } catch (Throwable t) {
                 // createClob method has been add to JDBC API in version 3.0. Since we have to support any driver that works
