@@ -264,7 +264,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   private ApplicationModel createApplicationModel() {
     try {
-      LOGGER.error("dev prop provider CAMBIADOO");
       DefaultConfigurationPropertiesResolver propertyResolver =
           new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
 
