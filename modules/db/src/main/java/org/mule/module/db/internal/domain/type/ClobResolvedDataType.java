@@ -59,10 +59,10 @@ public class ClobResolvedDataType extends ResolvedDbType
                 }
 
                 super.setParameterValue(statement, index, clob);
-            } catch (Throwable t) {
+            } catch (Exception e) {
                 // createClob method has been add to JDBC API in version 3.0. Since we have to support any driver that works
                 // with JDK 1.8 we try an alternative way to set CLOB objects.
-                LOGGER.debug("Error creating CLOB object. Using alternative way to set CLOB object", t);
+                LOGGER.debug("Error creating CLOB object. Using alternative way to set CLOB object", e);
                 statement.setCharacterStream(index, new StringReader(valueString), valueString.length());
             }
         } else {
