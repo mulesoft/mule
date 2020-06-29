@@ -1872,6 +1872,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <injectAllReactorProjects>true</injectAllReactorProjects>
+                </configuration>
             </plugin>
         </plugins>
     </build>
