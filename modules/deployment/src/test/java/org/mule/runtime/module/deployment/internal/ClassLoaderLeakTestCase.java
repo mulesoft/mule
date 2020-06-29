@@ -48,6 +48,7 @@ import java.lang.ref.ReferenceQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -199,6 +200,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   @Test
   @Issue("MULE-18480")
   @Description("When an artifact is redeployed through the deployment service by name, objects associated to the original deployment are released befroe deploying the new one.")
+  @Ignore("MULE-18520")
   public void redeployByNamePreviousAppEagerlyGCd() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     AtomicReference<Throwable> redeploymentSuccessThrown = new AtomicReference<>();
