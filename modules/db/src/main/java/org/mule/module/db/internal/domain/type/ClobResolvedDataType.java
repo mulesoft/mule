@@ -14,6 +14,7 @@ import org.mule.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.Clob;
@@ -36,33 +37,25 @@ public class ClobResolvedDataType extends ResolvedDbType
     public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException
     {
         if (value != null && !(value instanceof Clob)) {
-            String valueString;
-            boolean isInputStream = false;
-
-            if (value instanceof String) {
-                valueString = (String) value;
-            } else if (value instanceof InputStream) {
-                valueString = IOUtils.toString((InputStream) value);
-                isInputStream = true;
-            } else {
-                throw new IllegalArgumentException(createUnsupportedTypeErrorMessage(value));
-            }
-
             try {
                 LOGGER.debug("Creating CLOB object");
                 Clob clob = statement.getConnection().createClob();
 
-                if (isInputStream) {
+                if (value instanceof String) {
+                    clob.setString(1, (String)value);
+                } else if (value instanceof InputStream) {
                     IOUtils.copy((InputStream) value, clob.setCharacterStream(1), CharSetUtils.defaultCharsetName());
                 } else {
-                    clob.setString(1, valueString);
+                    throw new IllegalArgumentException(createUnsupportedTypeErrorMessage(value));
                 }
 
                 super.setParameterValue(statement, index, clob);
-            } catch (Exception e) {
+            } catch (SQLException | IOException e) {
                 // createClob method has been add to JDBC API in version 3.0. Since we have to support any driver that works
                 // with JDK 1.8 we try an alternative way to set CLOB objects.
                 LOGGER.debug("Error creating CLOB object. Using alternative way to set CLOB object", e);
+
+                String valueString  = (value instanceof String) ? (String) value : IOUtils.toString((InputStream) value);
                 statement.setCharacterStream(index, new StringReader(valueString), valueString.length());
             }
         } else {
@@ -74,3 +67,6 @@ public class ClobResolvedDataType extends ResolvedDbType
         return format("Cannot create a Clob from a value of type '%s'", value.getClass());
     }
 }
+
+
+
