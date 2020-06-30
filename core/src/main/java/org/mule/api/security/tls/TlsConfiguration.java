@@ -324,15 +324,16 @@ public final class TlsConfiguration
     {
         KeyStore tempKeyStore = KeyStore.getInstance(keystoreType);
 
-        InputStream is = IOUtils.getResourceAsStream(keyStoreName, getClass());
-        if (null == is)
-        {
-            throw new FileNotFoundException(
-                    cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
-        }
+        try (InputStream is = IOUtils.getResourceAsStream(keyStoreName, getClass())) {
+	        if (null == is)
+	        {
+	            throw new FileNotFoundException(
+	                    cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
+	        }
 
-        tempKeyStore.load(is, keyStorePassword.toCharArray());
-        return tempKeyStore;
+	        tempKeyStore.load(is, keyStorePassword.toCharArray());
+	        return tempKeyStore;
+        }
     }
 
     protected void checkKeyStoreContainsAlias(KeyStore keyStore) throws KeyStoreException
@@ -515,7 +516,7 @@ public final class TlsConfiguration
         context.init(keyManagers, trustManagers, null);
         return context;
     }
-    
+
     public SSLContext getSslContext(TrustManager[] trustManagers) throws NoSuchAlgorithmException, KeyManagementException
     {
         return getSslContext(trustManagers, getSslType());
