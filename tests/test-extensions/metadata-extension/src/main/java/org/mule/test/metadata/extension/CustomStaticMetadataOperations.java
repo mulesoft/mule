@@ -44,6 +44,11 @@ public class CustomStaticMetadataOperations {
     return cl.getResourceAsStream("order.xml");
   }
 
+  @OutputXmlType(schema = "orderWithImport.xsd", qname = "shiporder")
+  public InputStream xmlOutputSchemaWithImport() {
+    return cl.getResourceAsStream("order.xml");
+  }
+
   @OutputXmlType(schema = "order.xsd", qname = "shiporder")
   public List<InputStream> xmlOutputList() {
     ArrayList xmlList = new ArrayList();

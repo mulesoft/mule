@@ -23,6 +23,9 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.impl.DefaultBinaryType;
+import org.mule.metadata.api.model.impl.DefaultObjectFieldType;
+import org.mule.metadata.api.model.impl.DefaultObjectType;
+import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -33,6 +36,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.metadata.extension.MetadataExtension;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase {
@@ -52,6 +56,12 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
   @Test
   public void withOutputXmlStaticType() throws Exception {
     OperationModel o = getOperation("xmlOutput");
+    assertXmlOrder(o.getOutput());
+  }
+
+  @Test
+  public void withOutputXmlStaticTypeSchemaWithImport() throws Exception {
+    OperationModel o = getOperation("xmlOutputSchemaWithImport");
     assertXmlOrder(o.getOutput());
   }
 
@@ -290,6 +300,22 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
     assertThat(typed.hasDynamicType(), is(false));
     assertThat(type.getMetadataFormat(), is(XML));
     assertThat(type.toString(), is("#root:shiporder"));
+
+    Object[] typeFields = ((DefaultObjectType) type).getFields().toArray();
+    DefaultObjectFieldType fieldOrder = (DefaultObjectFieldType) typeFields[0];
+    DefaultObjectType order = (DefaultObjectType) fieldOrder.getValue();
+    MatcherAssert.assertThat(order.getFields().toArray().length, is(3));
+
+    DefaultObjectFieldType fieldPerson = (DefaultObjectFieldType) order.getFieldByName("orderperson").get();
+    assertThat(fieldPerson.getValue(), instanceOf(DefaultStringType.class));
+
+    DefaultObjectFieldType fieldShipTo = (DefaultObjectFieldType) order.getFieldByName("shipto").get();
+    DefaultObjectType shipTo = (DefaultObjectType) fieldShipTo.getValue();
+    MatcherAssert.assertThat(shipTo.getFields().toArray().length, is(4));
+
+    DefaultObjectFieldType fieldItem = (DefaultObjectFieldType) order.getFieldByName("item").get();
+    DefaultObjectType item = (DefaultObjectType) fieldItem.getValue();
+    MatcherAssert.assertThat(item.getFields().toArray().length, is(4));
   }
 
   private void assertJsonPerson(Typed typed) {

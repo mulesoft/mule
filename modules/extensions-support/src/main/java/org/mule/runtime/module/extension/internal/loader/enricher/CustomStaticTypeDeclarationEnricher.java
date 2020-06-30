@@ -59,6 +59,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.AnnotatedElement;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -224,7 +225,8 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
       }
       Optional<MetadataType> type;
       try (InputStream is = getSchemaContent(schema)) {
-        type = new XmlTypeLoader(getInstance().addSchema(schema, is)).load(qname);
+        URL schemaURL = currentThread().getContextClassLoader().getResource(schema);
+        type = new XmlTypeLoader(getInstance().addSchema(schemaURL.toString(), is)).load(qname);
       } catch (IOException e) {
         throw new MuleRuntimeException(e);
       }
