@@ -19,7 +19,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Driver;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -286,9 +289,9 @@ public class JdbcResourceReleaser implements ResourceReleaser {
             thread.interrupt();
           } catch (Throwable e) {
             logger
-                .debug("An error occurred trying to close the '" + thread.getName() + "' Thread. This might cause memory leaks.", e);
+                .debug("An error occurred trying to close the '" + thread.getName() + "' Thread. This might cause memory leaks.",
+                       e);
           }
-
         }
       }
     } catch (Exception e) {

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
+import static java.lang.Thread.sleep;
+import static java.lang.Thread.enumerate;
 import static java.lang.Thread.currentThread;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
@@ -38,7 +40,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.sql.Driver;
-import java.util.*;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.ResourceBundle;
+import java.util.MissingResourceException;
 
 import org.junit.Test;
 
@@ -179,6 +185,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
 
     Timer timerThread = new Timer();
     TimerTask task = new TimerTask() {
+
       @Override
       public void run() {
         System.out.println("Timer");
@@ -187,10 +194,10 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     timerThread.schedule(task, 10, 1000);
     killOracleThreadsMethod.invoke(resourceReleaser);
 
-    Thread.sleep(1000);
+    sleep(1000);
 
     Thread[] threads = new Thread[Thread.activeCount()];
-    Thread.enumerate(threads);
+    enumerate(threads);
     for (Thread thread : threads) {
       assertThat(thread.getName(), not(containsString("Timer-")));
     }
