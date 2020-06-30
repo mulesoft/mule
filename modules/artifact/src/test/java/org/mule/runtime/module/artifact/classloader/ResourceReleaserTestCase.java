@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.hamcrest.core.StringContains.containsString;
 
 import org.mule.module.artifact.classloader.JdbcResourceReleaser;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -37,9 +38,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.sql.Driver;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import org.junit.Test;
 
@@ -168,6 +167,32 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
       ResourceReleaser secondInstance = testArtifactClassLoader.createResourceReleaserInstance();
 
       assertThat(firstInstance, sameInstance(secondInstance));
+    }
+  }
+
+  @Test
+  public void stopOracleDriverLeakyThreads() throws Exception {
+    JdbcResourceReleaser resourceReleaser = new JdbcResourceReleaser();
+
+    Method killOracleThreadsMethod = resourceReleaser.getClass().getDeclaredMethod("disposeOracleDriverThreads");
+    killOracleThreadsMethod.setAccessible(true);
+
+    Timer timerThread = new Timer();
+    TimerTask task = new TimerTask() {
+      @Override
+      public void run() {
+        System.out.println("Timer");
+      }
+    };
+    timerThread.schedule(task, 10, 1000);
+    killOracleThreadsMethod.invoke(resourceReleaser);
+
+    Thread.sleep(1000);
+
+    Thread[] threads = new Thread[Thread.activeCount()];
+    Thread.enumerate(threads);
+    for (Thread thread : threads) {
+      assertThat(thread.getName(), not(containsString("Timer-")));
     }
   }
 
