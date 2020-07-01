@@ -871,6 +871,40 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     validate();
   }
 
+  @Test
+  public void contentParametersWithSameNameAndDifferentTypeId() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Pojo.class);
+    when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
+    ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, AnotherPojo.class);
+    when(secondParam.getRole()).thenReturn(CONTENT);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
+    validate();
+  }
+
+  @Test
+  public void contentParametersWithSameNameAndSameTypeId() {
+    ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Pojo.class);
+    when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
+    ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Pojo.class);
+    when(secondParam.getRole()).thenReturn(CONTENT);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
+    validate();
+  }
+
+  @Test
+  public void contentParametersWithSameNameNoTypeIdButSameType() {
+    ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, String.class);
+    when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
+    ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, String.class);
+    when(secondParam.getRole()).thenReturn(CONTENT);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
+    validate();
+  }
+
   private void mockParameterGroup(ParameterizedModel model, List<ParameterModel> parameters) {
     ParameterGroupModel group = mock(ParameterGroupModel.class);
 
@@ -1001,6 +1035,22 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     String argument3;
     @Parameter
     String argument4;
+  }
+
+  public static class Pojo {
+
+    @Parameter
+    String parameterName;
+    @Parameter
+    String parameterName2;
+  }
+
+  public static class AnotherPojo {
+
+    @Parameter
+    String anotherParameterName;
+    @Parameter
+    String anotherParameterName2;
   }
 
 }
