@@ -48,7 +48,7 @@ import org.reactivestreams.Publisher;
  */
 public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable {
 
-  private static final String SOURCE_POLICY_PART_IDENTIFIER = "source";
+  static final String SOURCE_POLICY_PART_IDENTIFIER = "source";
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
   public static final String POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS = "policy.isPropagateMessageTransformations";
@@ -123,9 +123,10 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   }
 
   private Boolean isWithinSourcePolicy(final ComponentLocation loc) {
-    return loc.getParts().get(1).getPartIdentifier()
-        .map(tci -> tci.getIdentifier().getName().equals(SOURCE_POLICY_PART_IDENTIFIER))
-        .orElse(false);
+    return loc.getParts().size() >= 2
+        && loc.getParts().get(1).getPartIdentifier()
+            .map(tci -> tci.getIdentifier().getName().equals(SOURCE_POLICY_PART_IDENTIFIER))
+            .orElse(false);
   }
 
   @Override
