@@ -858,7 +858,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
       @Override
       public String describeFailure() {
-        return "Properties were not overriden by the deployment properties";
+        return "Condition on registry not met";
       }
     });
   }
