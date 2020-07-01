@@ -53,7 +53,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
 
   protected static final Message MESSAGE = Message.builder().value(PAYLOAD).attributesValue(new StringAttributes()).build();
 
-  private final MuleContext muleContext = mockContextWithServices();
+  protected final MuleContext muleContext = mockContextWithServices();
   protected Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
   protected Processor flowProcessor = mock(Processor.class);
   protected CoreEvent initialEvent;
@@ -62,7 +62,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   protected ArgumentCaptor<Publisher> eventCaptor = ArgumentCaptor.forClass(Publisher.class);
   private final FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
   private SourcePolicyContext sourcePolicyContext;
-  private OperationPolicyContext operationPolicyContext;
+  protected OperationPolicyContext operationPolicyContext;
 
   @Before
   public void before() {
