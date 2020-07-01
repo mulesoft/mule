@@ -8,6 +8,10 @@ package org.mule.module.artifact.classloader;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static java.lang.Thread.activeCount;
+import static java.lang.Thread.enumerate;
+
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
@@ -20,9 +24,9 @@ import java.lang.reflect.Method;
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -44,8 +48,11 @@ import org.slf4j.LoggerFactory;
  */
 public class JdbcResourceReleaser implements ResourceReleaser {
 
+  private static final String avoidThreadDisposal = getProperty("avoid.dispose.oracle.threads");
+
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
-  public static final String ORACLE_DRIVER_TIMER_THREAD_NAME = "Timer";
+  public static final String ORACLE_DRIVER_TIMER_THREAD_NAME = "Timer-";
+  public static final String ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
   private final transient Logger logger = LoggerFactory.getLogger(getClass());
   private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
       Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
@@ -268,14 +275,13 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
   private void disposeOracleDriverThreads() {
     try {
-      String avoidThreadDisposal = System.getProperty("avoid.dispose.oracle.threads");
       if (Boolean.valueOf(avoidThreadDisposal)) {
         return;
       }
 
-      Thread[] threads = new Thread[Thread.activeCount()];
+      Thread[] threads = new Thread[activeCount()];
       try {
-        Thread.enumerate(threads);
+        enumerate(threads);
       } catch (Throwable t) {
         logger
             .debug("An error occurred trying to obtain available Threads. Thread cleanup will be skipped.", t);
@@ -283,7 +289,8 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       }
 
       for (Thread thread : threads) {
-        if (thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)) {
+        if (thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
+            && thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)) {
           try {
             thread.stop();
             thread.interrupt();

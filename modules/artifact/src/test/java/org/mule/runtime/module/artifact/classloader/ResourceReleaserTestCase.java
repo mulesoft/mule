@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
-import static java.lang.Thread.sleep;
+import static java.lang.Thread.State.TERMINATED;
+import static java.lang.Thread.activeCount;
 import static java.lang.Thread.enumerate;
 import static java.lang.Thread.currentThread;
 import static java.sql.DriverManager.deregisterDriver;
@@ -23,8 +24,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.hamcrest.core.StringContains.containsString;
 
 import org.mule.module.artifact.classloader.JdbcResourceReleaser;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -51,6 +52,7 @@ import org.junit.Test;
 @SmallTest
 public class ResourceReleaserTestCase extends AbstractMuleTestCase {
 
+  public static final String ORACLE_DRIVER_TIMER_THREAD_NAME = "Timer-";
   public static final String TEST_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/runtime/module/artifact/classloader/TestResourceReleaser.class";
 
@@ -191,15 +193,18 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
         System.out.println("Timer");
       }
     };
-    timerThread.schedule(task, 10, 1000);
+
+    timerThread.schedule(task, 10, 100000);
+
+    Thread[] threads = new Thread[activeCount()];
+    enumerate(threads);
+
     killOracleThreadsMethod.invoke(resourceReleaser);
 
-    sleep(1000);
-
-    Thread[] threads = new Thread[Thread.activeCount()];
-    enumerate(threads);
     for (Thread thread : threads) {
-      assertThat(thread.getName(), not(containsString("Timer-")));
+      if (thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)) {
+        check(15000, 100, () -> TERMINATED.equals(thread.getState()));
+      }
     }
   }
 
