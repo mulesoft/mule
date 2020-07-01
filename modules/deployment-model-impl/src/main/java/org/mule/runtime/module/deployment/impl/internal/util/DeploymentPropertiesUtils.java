@@ -28,7 +28,7 @@ public class DeploymentPropertiesUtils {
 
   private static final String DEPLOYMENT_PROPERTIES_FILE_NAME = "deployment.properties";
 
-  private static final String DEPLOYTMENT_PROPERTIES_DIRECTORY = "deployment-properties";
+  private static final String DEPLOYMENT_PROPERTIES_DIRECTORY = "deployment-properties";
 
   /**
    * This method resolves the deploymentProperties for a new deploy/redeploy considering the new deployment properties passed by
@@ -46,7 +46,7 @@ public class DeploymentPropertiesUtils {
       throws IOException {
     File file = new File(getExecutionFolder(), artifactName);
     String workingDirectory = file.getAbsolutePath();
-    String deploymentPropertiesPath = workingDirectory + separator + DEPLOYTMENT_PROPERTIES_DIRECTORY;
+    String deploymentPropertiesPath = workingDirectory + separator + DEPLOYMENT_PROPERTIES_DIRECTORY;
 
     if (!deploymentProperties.isPresent()) {
       return getDeploymentProperties(deploymentPropertiesPath);

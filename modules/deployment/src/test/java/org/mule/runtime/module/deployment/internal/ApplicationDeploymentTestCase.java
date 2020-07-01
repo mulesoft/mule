@@ -59,6 +59,7 @@ import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExten
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.junit.Rule;
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -117,6 +118,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Rule
   public SystemProperty systemProperty = new SystemProperty(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_SYSTEM_VALUE);
+
+  @Rule
+  public SystemProperty otherSystemProperty = new SystemProperty("oneProperty", "someValue");
 
   public ApplicationDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -268,6 +272,34 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     redeployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getId(), deploymentProperties,
                                         (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
                                             .equals(FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY));
+  }
+
+  @Issue("MULE-16688")
+  @Test
+  public void deployAppWithDeploymentPropertiesInImportTag() throws Exception {
+    Properties deploymentProperties = new Properties();
+    deploymentProperties.put("environment", "dev");
+    startDeployment();
+    ApplicationFileBuilder applicationFileBuilder = appFileBuilder("app-import-file")
+        .definedBy("app-import-file.xml").usingResource("config-dev.xml", "config-dev.xml");
+    deployAndVerifyPropertyInRegistry(applicationFileBuilder.getArtifactFile().toURI(),
+                                      deploymentProperties,
+                                      (registry) -> registry.lookupByName("environment").get()
+                                          .equals("dev"));
+  }
+
+  @Issue("MULE-16688")
+  @Test
+  public void deployAppWithOverwrittenDeploymentPropertiesInImportTag() throws Exception {
+    Properties deploymentProperties = new Properties();
+    deploymentProperties.put("oneProperty", "dev");
+    startDeployment();
+    ApplicationFileBuilder applicationFileBuilder = appFileBuilder("app-import-file-overwritten")
+        .definedBy("app-import-file-overwritten.xml").usingResource("config-dev.xml", "config-dev.xml");
+    deployAndVerifyPropertyInRegistry(applicationFileBuilder.getArtifactFile().toURI(),
+                                      deploymentProperties,
+                                      (registry) -> registry.lookupByName("oneProperty").get()
+                                          .equals("dev"));
   }
 
   @Test

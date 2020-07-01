@@ -41,6 +41,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor.processXmlConfiguration;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -59,6 +60,8 @@ import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
@@ -272,8 +275,43 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private void createApplicationModel() {
     try {
       DefaultConfigurationPropertiesResolver propertyResolver =
-          new DefaultConfigurationPropertiesResolver(empty(), new EnvironmentPropertiesConfigurationProvider());
-      List<ConfigFile> configFiles = new XmlConfigurationProcessor().processXmlConfiguration(new XmlParsingConfiguration() {
+          new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
+
+            ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
+
+            @Override
+            public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+              final String propertyValue = artifactProperties.get(configurationAttributeKey);
+
+              if (propertyValue == null) {
+                return parentProvider.getConfigurationProperty(configurationAttributeKey);
+              }
+              return of(new ConfigurationProperty() {
+
+                @Override
+                public Object getSource() {
+                  return this;
+                }
+
+                @Override
+                public Object getRawValue() {
+                  return propertyValue;
+                }
+
+                @Override
+                public String getKey() {
+                  return configurationAttributeKey;
+                }
+              });
+            }
+
+            @Override
+            public String getDescription() {
+              return "Deployment properties";
+            }
+          });
+
+      List<ConfigFile> configFiles = processXmlConfiguration(new XmlParsingConfiguration() {
 
         @Override
         public ParsingPropertyResolver getParsingPropertyResolver() {
@@ -307,8 +345,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
         @Override
         public List<XmlNamespaceInfoProvider> getXmlNamespaceInfoProvider() {
-          return XmlNamespaceInfoProviderSupplier.createFromExtensionModels(getExtensions(), Optional.of(cl -> serviceRegistry
-              .lookupProviders(XmlNamespaceInfoProvider.class, cl).stream().collect(Collectors.toList())));
+          return XmlNamespaceInfoProviderSupplier.createFromExtensionModels(getExtensions(), of(cl -> serviceRegistry
+              .lookupProviders(XmlNamespaceInfoProvider.class, cl).stream().collect(toList())));
         }
       });
 
