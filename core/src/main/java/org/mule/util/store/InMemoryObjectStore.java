@@ -183,6 +183,11 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     }
 
     @Override
+    protected boolean shouldExpire() {
+        return true;
+    }
+
+    @Override
     public void expire()
     {
         int expiredEntries = doTrimAndExpire();
