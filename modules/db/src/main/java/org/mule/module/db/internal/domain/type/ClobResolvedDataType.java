@@ -8,8 +8,13 @@
 package org.mule.module.db.internal.domain.type;
 
 import static java.lang.String.format;
-import org.mule.util.IOUtils;
 
+import org.mule.util.CharSetUtils;
+import org.mule.util.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.Clob;
@@ -21,6 +26,8 @@ import java.sql.SQLException;
  */
 public class ClobResolvedDataType extends ResolvedDbType
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClobResolvedDataType.class);
+
     public ClobResolvedDataType(int id, String name)
     {
         super(id, name);
@@ -29,29 +36,36 @@ public class ClobResolvedDataType extends ResolvedDbType
     @Override
     public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException
     {
-        if (value != null && !(value instanceof Clob))
-        {
-            if (value instanceof String)
-            {
-                statement.setCharacterStream(index, new StringReader((String) value), ((String) value).length());
-            }
-            else if (value instanceof InputStream)
-            {
-                String stringValue = IOUtils.toString((InputStream) value);
-                statement.setCharacterStream(index, new StringReader(stringValue), stringValue.length());
-            }
-            else
-            {
-                throw new IllegalArgumentException(createUnsupportedTypeErrorMessage(value));
-            }
+        if (value != null && !(value instanceof Clob)) {
+            try {
+                LOGGER.debug("Creating CLOB object");
+                Clob clob = statement.getConnection().createClob();
 
-            return;
+                if (value instanceof String) {
+                    clob.setString(1, (String)value);
+                } else if (value instanceof InputStream) {
+                    IOUtils.copy((InputStream) value, clob.setCharacterStream(1), CharSetUtils.defaultCharsetName());
+                } else {
+                    throw new IllegalArgumentException(createUnsupportedTypeErrorMessage(value));
+                }
+
+                super.setParameterValue(statement, index, clob);
+            } catch (SQLException | IOException e) {
+                // createClob method has been add to JDBC API in version 3.0. Since we have to support any driver that works
+                // with JDK 1.8 we try an alternative way to set CLOB objects.
+                LOGGER.debug("Error creating CLOB object. Using alternative way to set CLOB object", e);
+
+                String valueString  = (value instanceof String) ? (String) value : IOUtils.toString((InputStream) value);
+                statement.setCharacterStream(index, new StringReader(valueString), valueString.length());
+            }
+        } else {
+            super.setParameterValue(statement, index, value);
         }
-
-        super.setParameterValue(statement, index, value);
     }
 
     protected static String createUnsupportedTypeErrorMessage(Object value) {
         return format("Cannot create a Clob from a value of type '%s'", value.getClass());
     }
 }
+
+
