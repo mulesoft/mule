@@ -1,0 +1,25 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test-components"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd">
+
+    <test:queue-config name="queueConfig">
+        <test:connection />
+    </test:queue-config>
+
+    <flow name="enqueueFlow">
+        <test:skeleton-source-mod />
+
+        <logger level="WARN" />
+
+        <set-payload value="The payload" />
+
+        <test:queue-push config-ref="queueConfig"/>
+
+        <test:queue-push config-ref="queueConfig">
+            <test:content>The content</test:content>
+        </test:queue-push>
+    </flow>
+
+</mule>
