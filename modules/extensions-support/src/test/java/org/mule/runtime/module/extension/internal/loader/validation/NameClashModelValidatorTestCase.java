@@ -50,6 +50,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
+import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.internal.loader.validator.NameClashModelValidator;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
@@ -205,6 +206,9 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(sourceModel.getModelProperty(any())).thenReturn(empty());
     when(sourceModel.getErrorCallback()).thenReturn(empty());
     when(sourceModel.getSuccessCallback()).thenReturn(empty());
+
+    when(extensionModel.getModelProperty(ClassLoaderModelProperty.class))
+        .thenReturn(of(new ClassLoaderModelProperty(Thread.currentThread().getContextClassLoader())));
 
     visitableMock(operationModel);
   }
@@ -872,11 +876,23 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void contentParametersWithSameNameAndDifferentTypeId() {
+  public void contentParametersWithSameNameAndAreNotAssignable() {
     exception.expect(IllegalModelDefinitionException.class);
     ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Pojo.class);
     when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
     ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, AnotherPojo.class);
+    when(secondParam.getRole()).thenReturn(CONTENT);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
+    validate();
+  }
+
+  @Test
+  public void contentParametersWithSameNameAreAssignableButDifferentTypeId() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Pojo.class);
+    when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
+    ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, ChildPojo.class);
     when(secondParam.getRole()).thenReturn(CONTENT);
     when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
     when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
@@ -1043,6 +1059,12 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     String parameterName;
     @Parameter
     String parameterName2;
+  }
+
+  public static class ChildPojo extends Pojo {
+
+    @Parameter
+    String parameterChild;
   }
 
   public static class AnotherPojo {
