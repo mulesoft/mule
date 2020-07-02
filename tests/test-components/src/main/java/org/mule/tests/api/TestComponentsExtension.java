@@ -6,7 +6,7 @@ import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.tests.internal.QueueConfiguration;
-import org.mule.tests.internal.SkeletonSourceMod;
+import org.mule.tests.internal.SkeletonSource;
 
 
 /**
@@ -15,7 +15,7 @@ import org.mule.tests.internal.SkeletonSourceMod;
  */
 @Xml(prefix = "test-components")
 @Extension(name = "Test Components")
-@Sources(SkeletonSourceMod.class)
+@Sources(SkeletonSource.class)
 @Configurations(QueueConfiguration.class)
 @Export(classes = TestQueueManager.class)
 public class TestComponentsExtension {

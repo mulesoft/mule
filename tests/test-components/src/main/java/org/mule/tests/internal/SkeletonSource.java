@@ -24,7 +24,7 @@ import javax.inject.Inject;
  * Mock message source that provides access to the Processor set by the owner Flow.
  */
 @MediaType(value = ANY, strict = false)
-public class SkeletonSourceMod extends Source<InputStream, InputStream> {
+public class SkeletonSource extends Source<InputStream, InputStream> {
 
     @Inject
     private ConfigurationComponentLocator locator;

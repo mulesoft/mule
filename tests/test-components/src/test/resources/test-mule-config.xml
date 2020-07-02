@@ -9,7 +9,7 @@
     </test:queue-config>
 
     <flow name="enqueueFlow">
-        <test:skeleton-source-mod />
+        <test:skeleton-source />
 
         <logger level="WARN" />
 
