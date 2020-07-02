@@ -6,6 +6,7 @@
  */
 package org.mule.util.store;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -17,6 +18,8 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class InMemoryStoreTestCase extends AbstractMuleTestCase
 {
@@ -33,6 +36,28 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
     {
         int entryTTL = 3000;
         createTimedObjectStore(entryTTL);
+
+        // store entries in quick succession
+        storeObjects("1", "2", "3");
+
+        // they should still be alive at this point
+        assertObjectsInStore("1", "2", "3");
+
+        // wait until the entry TTL has been exceeded
+        Thread.sleep(entryTTL + 1000);
+
+        // make sure all values are gone
+        assertObjectsExpired("1", "2", "3");
+    }
+
+    @Test
+    public void testSimpleTimedExpiryInSecondaryNode() throws Exception
+    {
+        int entryTTL = 3000;
+        createTimedObjectStore(entryTTL);
+        MuleContext context = mock(MuleContext.class);
+        when(context.isPrimaryPollingInstance()).thenReturn(false);
+        store.setMuleContext(context);
 
         // store entries in quick succession
         storeObjects("1", "2", "3");
