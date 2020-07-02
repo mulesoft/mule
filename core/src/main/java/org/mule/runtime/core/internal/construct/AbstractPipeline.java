@@ -325,27 +325,19 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
 
-    final ReactiveProcessor processor = pub -> from(propagateCompletion(pub,
-                                                                        sinkRecorder.flux(),
-                                                                        innerEventPub -> routeThroughProcessingStrategyTransformerInnerFlux(sinkRecorder,
-                                                                                                                                            innerEventPub),
-                                                                        () -> sinkRecorder.complete(), t -> sinkRecorder.error(t),
-                                                                        muleContext.getConfiguration().getShutdownTimeout(),
-                                                                        completionCallbackScheduler))
-                                                                            .map(result -> {
-                                                                              result.applyLeft(t -> {
-                                                                                throw propagate(t);
-                                                                              });
-                                                                              return result.getRight();
-                                                                            });
-
-    final FlowProcessor flowProcessor = new FlowProcessor(processor, this);
-    ReactiveProcessor interceptorWrapperProcessorFunction = flowProcessor;
-    // Take processor publisher function itself and transform it by applying interceptor transformations onto it.
-    for (ReactiveInterceptor interceptor : flowInterceptors) {
-      interceptorWrapperProcessorFunction = interceptor.apply(flowProcessor, interceptorWrapperProcessorFunction);
-    }
-    return interceptorWrapperProcessorFunction;
+    return pub -> from(propagateCompletion(pub,
+                                           sinkRecorder.flux(),
+                                           innerEventPub -> routeThroughProcessingStrategyTransformerInnerFlux(sinkRecorder,
+                                                                                                               innerEventPub),
+                                           () -> sinkRecorder.complete(), t -> sinkRecorder.error(t),
+                                           muleContext.getConfiguration().getShutdownTimeout(),
+                                           completionCallbackScheduler))
+                                               .map(result -> {
+                                                 result.applyLeft(t -> {
+                                                   throw propagate(t);
+                                                 });
+                                                 return result.getRight();
+                                               });
   }
 
   private Flux<Either<Throwable, CoreEvent>> routeThroughProcessingStrategyTransformerInnerFlux(FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder,
@@ -395,10 +387,24 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     ((BaseEventContext) event.getContext()).error(new MessagingException(errorEvent, wrappedException, this));
   }
 
-  protected ReactiveProcessor processFlowFunction() {
+  private ReactiveProcessor processFlowFunction() {
+    ReactiveProcessor interceptedPipeline;
+    if (flowInterceptors.isEmpty()) {
+      interceptedPipeline = pipeline;
+    } else {
+      final FlowProcessor flowProcessor = new FlowProcessor(pipeline, this);
+      ReactiveProcessor interceptorWrapperProcessorFunction = flowProcessor;
+      // Take processor publisher function itself and transform it by applying interceptor transformations onto it.
+      for (ReactiveInterceptor interceptor : flowInterceptors) {
+        interceptorWrapperProcessorFunction = interceptor.apply(flowProcessor, interceptorWrapperProcessorFunction);
+      }
+
+      interceptedPipeline = interceptorWrapperProcessorFunction;
+    }
+
     return stream -> from(stream)
         .doOnNext(beforeProcessors())
-        .transform(processingStrategy.onPipeline(pipeline))
+        .transform(processingStrategy.onPipeline(interceptedPipeline))
         .doOnNext(afterProcessors())
         .onErrorContinue(MessagingException.class,
                          (me, e) -> ((BaseEventContext) (((MessagingException) me).getEvent().getContext())).error(me));

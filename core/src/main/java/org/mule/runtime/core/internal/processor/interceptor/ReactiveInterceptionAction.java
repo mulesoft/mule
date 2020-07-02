@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorFromFailingProcessor;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.just;
 
@@ -68,6 +69,8 @@ class ReactiveInterceptionAction implements InterceptionAction {
         .cast(InternalEvent.class)
         .map(interceptionEvent::reset)
         .cast(InterceptionEvent.class)
+        // This is needed for all cases because the invoked component may use fluxes
+        .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
         .subscriberContext(ctx)
         .toFuture();
   }
