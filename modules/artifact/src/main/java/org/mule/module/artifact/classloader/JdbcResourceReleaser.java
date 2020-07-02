@@ -51,7 +51,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
   private static final String AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME = "avoid.dispose.oracle.threads";
   private static final boolean JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_ORACLE_THREADS =
-      getBoolean(getProperty(AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME));
+      getBoolean(AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME);
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
   public static final String ORACLE_DRIVER_TIMER_THREAD_NAME = "Timer-";
@@ -291,6 +291,12 @@ public class JdbcResourceReleaser implements ResourceReleaser {
         return;
       }
 
+      /* IMPORTANT: this is done to avoid metaspace OOM caused by oracle driver
+      thread leak. This is only meant to stop TimerThread threads spawned
+      by oracle driver's HAManger class. This timer cannot be fetched
+      by reflection because, in order to do so, other oracle dependencies
+      would be required.
+      * */
       for (Thread thread : threads) {
         if (isThreadApplicationTimerThread(thread)) {
           try {
