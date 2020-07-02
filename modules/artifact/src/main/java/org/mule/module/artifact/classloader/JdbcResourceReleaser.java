@@ -23,10 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Driver;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -290,7 +287,8 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
       for (Thread thread : threads) {
         if (thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
-            && thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)) {
+            && thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)
+            && isThreadLoadedByThisClassLoader(thread.getContextClassLoader())) {
           try {
             thread.stop();
             thread.interrupt();
@@ -306,4 +304,27 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     }
   }
 
+  private boolean isThreadLoadedByThisClassLoader(ClassLoader threadBaseClassLoader) {
+    ClassLoader threadClassLoader = threadBaseClassLoader;
+    ClassLoader lastClassLoader = null;
+    ClassLoader resourceReleaserClassLoader = this.getClass().getClassLoader();
+
+    while (threadClassLoader != null) {
+      lastClassLoader = threadClassLoader;
+      // It has to be the same reference not equals to
+      if (threadClassLoader == resourceReleaserClassLoader) {
+        return true;
+      }
+      threadClassLoader = threadClassLoader.getParent();
+    }
+
+    while (resourceReleaserClassLoader != null) {
+      if (lastClassLoader == resourceReleaserClassLoader) {
+        return true;
+      }
+      resourceReleaserClassLoader = resourceReleaserClassLoader.getParent();
+    }
+
+    return false;
+  }
 }
