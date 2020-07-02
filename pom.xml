@@ -1811,12 +1811,18 @@
                         <!-- List dependencies in the MANIFEST.MF -->
                         <manifest>
                             <!-- Note that we do not generate a classpath into the manifest, since doing so
-                                 significnatly slows down compilations that use the jar -->
+                                 significantly slows down compilations that use the jar -->
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                         <!-- Custom Entries -->
                         <manifestEntries>
+                            <!-- include repository revision from buildnumber plugin -->
+                            <Build-Revision>${buildNumber}</Build-Revision>
+                            <Build-Date>${timestamp}</Build-Date>
+                            <Dev-List-Email>${dev.list}</Dev-List-Email>
+                            <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
+                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
                             <More-Info>For more information go to ${productUrl}</More-Info>
                             <Support>Get commercial support: ${project.organization.url}/support</Support>
                             <Description>Mule Runtime and Integration Platform</Description>
@@ -1824,12 +1830,12 @@
                             <Vendor-Url>${project.organization.url}</Vendor-Url>
                             <Product-Url>${productUrl}</Product-Url>
                             <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
-                            <!-- include repository revision from buildnumber plugin -->
-                            <Build-Revision>${buildNumber}</Build-Revision>
-                            <Build-Date>${timestamp}</Build-Date>
-                            <Dev-List-Email>${dev.list}</Dev-List-Email>
-                            <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
-                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
+                            <Git-tags>${git.tags}</Git-tags>
+                            <Git-branch>${git.branch}</Git-branch>
+                            <Git-remote-origin-url>${git.remote.origin.url}</Git-remote-origin-url>
+                            <Git-commit-id>${git.commit.id}</Git-commit-id>
+                            <Git-commit-id-describe>${git.commit.id.describe}</Git-commit-id-describe>
+                            <Git-commit-time>${git.commit.time}</Git-commit-time>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -1839,7 +1845,7 @@
                 <artifactId>allure-maven</artifactId>
             </plugin>
             <plugin>
-                <!-- Aggregate sources artifact must be explicitely required from the maven command -->
+                <!-- Aggregate sources artifact must be explicitly required from the maven command -->
                 <!-- Attempting to generate it automatically by configuring the execution here will cause issues when adding new modules -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -1853,6 +1859,22 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>4.0.0</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <injectAllReactorProjects>true</injectAllReactorProjects>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -30,3 +30,6 @@ testdir/
 hostkey.ser
 *.h2.db
 *.factorypath
+
+# Manifest
+src/main/resources/META-INF/MANIFEST.MF
