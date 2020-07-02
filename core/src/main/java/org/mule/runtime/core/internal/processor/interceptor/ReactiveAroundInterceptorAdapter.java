@@ -69,8 +69,7 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
           .flatMapMany(ctx -> from(publisher)
               .cast(InternalEvent.class)
               .flatMap(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next, ctx))
-                  .onErrorMap(CompletionException.class,
-                              completionException -> completionException.getCause())));
+                  .onErrorMap(CompletionException.class, CompletionException::getCause)));
     } else {
       return next;
     }
