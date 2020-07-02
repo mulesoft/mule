@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:test-components="http://www.mulesoft.org/schema/mule/test-components"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-                          http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+                          http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd
                           http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
     <heisenberg:config name="heisenberg"
@@ -27,6 +27,10 @@
             <heisenberg:known-address value="one address"/>
         </heisenberg:known-addresses>
     </heisenberg:config>
+
+    <test-components:queue-config name="out">
+        <test-components:connection />
+    </test-components:queue-config>
 
     <flow name="source" initialState="stopped">
         <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
@@ -100,7 +104,7 @@
         <error-handler>
             <on-error-propagate type="SOURCE_RESPONSE_GENERATE">
                 <set-payload value="Expected."/>
-                <test:queue name="out"/>
+                <test-components:queue-push config-ref="out"/>
             </on-error-propagate>
         </error-handler>
     </flow>
@@ -156,10 +160,10 @@
         <error-handler>
             <on-error-propagate type="SOURCE_RESPONSE_SEND">
                 <set-payload value="Expected."/>
-                <test:queue name="out"/>
+                <test-components:queue-push config-ref="out"/>
             </on-error-propagate>
             <on-error-propagate type="SOURCE_RESPONSE">
-                <test:queue name="out"/>
+                <test-components:queue-push config-ref="out"/>
             </on-error-propagate>
         </error-handler>
     </flow>

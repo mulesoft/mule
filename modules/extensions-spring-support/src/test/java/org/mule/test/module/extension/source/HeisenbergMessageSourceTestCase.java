@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.source;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -36,7 +37,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.resetHeisenber
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 
-import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
@@ -47,10 +47,13 @@ import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.tests.api.TestQueueManager;
 
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 import org.hamcrest.Matcher;
 import org.junit.Rule;
@@ -64,6 +67,9 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public static final int TIME_WAIT_MILLIS = 3000;
 
   private static final String OUT = "out";
+
+  @Inject
+  private TestQueueManager queueManager;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -183,8 +189,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(HeisenbergSource.terminateStatus, is(ERROR_INVOKE));
     assertThat(HeisenbergSource.error, not(empty()));
 
-    TestConnectorQueueHandler queueHandler = new TestConnectorQueueHandler(registry);
-    assertThat(queueHandler.read(OUT, RECEIVE_TIMEOUT).getMessage(), hasPayload(equalTo("Expected.")));
+    assertThat(queueManager.read(OUT, RECEIVE_TIMEOUT, MILLISECONDS).getMessage(), hasPayload(equalTo("Expected.")));
   }
 
   @Test
@@ -197,8 +202,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(HeisenbergSource.terminateStatus, is(ERROR_BODY));
     assertThat(HeisenbergSource.error, not(empty()));
 
-    TestConnectorQueueHandler queueHandler = new TestConnectorQueueHandler(registry);
-    assertThat(queueHandler.read(OUT, RECEIVE_TIMEOUT).getMessage(), hasPayload(equalTo("Expected.")));
+    assertThat(queueManager.read(OUT, RECEIVE_TIMEOUT, MILLISECONDS).getMessage(), hasPayload(equalTo("Expected.")));
   }
 
   @Test
