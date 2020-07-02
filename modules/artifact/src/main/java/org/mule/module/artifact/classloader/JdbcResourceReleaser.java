@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.activeCount;
 import static java.lang.Thread.enumerate;
+import static java.lang.Boolean.getBoolean;
 
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
@@ -48,7 +49,9 @@ import org.slf4j.LoggerFactory;
  */
 public class JdbcResourceReleaser implements ResourceReleaser {
 
-  private static final String avoidThreadDisposal = getProperty("avoid.dispose.oracle.threads");
+  private static final String AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME = "avoid.dispose.oracle.threads";
+  private static final boolean JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_ORACLE_THREADS =
+      getBoolean(getProperty(AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME));
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
   public static final String ORACLE_DRIVER_TIMER_THREAD_NAME = "Timer-";
@@ -275,7 +278,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
   private void disposeOracleDriverThreads() {
     try {
-      if (Boolean.valueOf(avoidThreadDisposal)) {
+      if (JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_ORACLE_THREADS) {
         return;
       }
 
@@ -289,9 +292,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       }
 
       for (Thread thread : threads) {
-        if (thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
-            && thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)
-            && isThreadLoadedByThisClassLoader(thread.getContextClassLoader())) {
+        if (isThreadApplicationTimerThread(thread)) {
           try {
             thread.stop();
             thread.interrupt();
@@ -305,6 +306,12 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     } catch (Exception e) {
       logger.debug(e.getMessage());
     }
+  }
+
+  private boolean isThreadApplicationTimerThread(Thread thread) {
+    return thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
+        && thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)
+        && isThreadLoadedByThisClassLoader(thread.getContextClassLoader());
   }
 
   private boolean isThreadLoadedByThisClassLoader(ClassLoader threadBaseClassLoader) {
