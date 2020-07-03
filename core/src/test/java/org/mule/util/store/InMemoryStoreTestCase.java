@@ -6,17 +6,23 @@
  */
 package org.mule.util.store;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Test;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class InMemoryStoreTestCase extends AbstractMuleTestCase
 {
@@ -45,6 +51,43 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
 
         // make sure all values are gone
         assertObjectsExpired("1", "2", "3");
+    }
+
+    @Test
+    public void testSimpleTimedExpiryInSecondaryNode() throws Exception
+    {
+        int entryTTL = 3000;
+        createTimedObjectStore(entryTTL);
+        MuleContext context = mock(MuleContext.class);
+        when(context.isPrimaryPollingInstance()).thenReturn(false);
+        store.setMuleContext(context);
+
+        // store entries in quick succession
+        storeObjects("1");
+
+        // they should still be alive at this point
+        assertObjectsInStore("1");
+
+        // wait until the entry TTL has been exceeded
+        PollingProber prober = new PollingProber(entryTTL + 1000, 500);
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                try {
+                    return store.contains("1");
+                } catch (ObjectStoreException e) {
+                    return false;
+                }
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Expected entry to have expired";
+            }
+        });
     }
 
     @Test
