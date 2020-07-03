@@ -20,6 +20,7 @@ import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJEC
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -131,6 +132,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     expireDelayLatch.countDown();
   }
 
+  @Issue("MULE-18548")
   @Test
   public void expireInMemoryInSecondaryNode() throws InitialisationException {
     when(muleContext.isPrimaryPollingInstance()).thenReturn(false);
