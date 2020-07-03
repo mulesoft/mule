@@ -23,6 +23,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -34,7 +35,6 @@ import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newPar
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -52,6 +52,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
+import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
@@ -68,6 +69,8 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,8 +85,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.slf4j.Logger;
-
-import com.google.common.collect.ImmutableSet;
 
 public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractMuleTestCase {
 
@@ -103,6 +104,7 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
   protected static final String PROVIDED_PARAMETER_DEFAULT_VALUE = "providedParameter";
   protected static final String EXTENSION_NAME = "extension";
   protected static final String OPERATION_NAME = "mockOperation";
+  protected static final String OTHER_OPERATION_NAME = "mockOtherOperation";
   protected static final String SOURCE_NAME = "source";
   protected static final String CONFIGURATION_NAME = "configuration";
   protected static final String OTHER_CONFIGURATION_NAME = "otherConfiguration";
@@ -114,6 +116,7 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
   private static final String MY_CONNECTION = MY_CONFIG + "/connection"; // Not a valid location, hack to reuse helper function.
   private static final String SOURCE_LOCATION = MY_FLOW + "/source";
   private static final String OPERATION_LOCATION = MY_FLOW + "/processors/0";
+  private static final String OTHER_OPERATION_LOCATION = MY_FLOW + "/processors/1";
 
   @Mock(lenient = true)
   protected ExtensionModel mockExtension;
@@ -126,6 +129,9 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
 
   @Mock(lenient = true)
   protected OperationModel operation;
+
+  @Mock(lenient = true)
+  protected OperationModel otherOperation;
 
   @Mock(lenient = true)
   protected ConnectionProviderModel connectionProvider;
@@ -278,10 +284,16 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
     when(source.getSuccessCallback()).thenReturn(empty());
     when(source.getErrorCallback()).thenReturn(empty());
+
     when(operation.getName()).thenReturn(OPERATION_NAME);
     when(operation.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
 
     visitableMock(operation, source);
+
+    when(otherOperation.getName()).thenReturn(OTHER_OPERATION_NAME);
+    when(otherOperation.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
+
+    visitableMock(otherOperation, source);
 
     when(dslContext.getExtension(any())).thenReturn(of(mockExtension));
     when(dslContext.getExtensions()).thenReturn(singleton(mockExtension));
@@ -290,7 +302,7 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
     allParameterModels.addAll(defaultGroupParameterModels);
     allParameterModels.addAll(customParameterGroupModels);
 
-    Stream.of(configuration, otherConfiguration, operation, connectionProvider, source)
+    Stream.of(configuration, otherConfiguration, operation, otherOperation, connectionProvider, source)
         .forEach(model -> when(model.getAllParameterModels()).thenReturn(allParameterModels));
 
     extensions = ImmutableSet.<ExtensionModel>builder()
@@ -329,8 +341,9 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
       }
       return empty();
     });
-    when(extension.getOperationModels()).thenReturn(asList(operation));
-    when(extension.getOperationModel(anyString())).thenReturn(of(operation));
+    when(extension.getOperationModels()).thenReturn(asList(operation, otherOperation));
+    when(extension.getOperationModel(eq(OPERATION_NAME))).thenReturn(of(operation));
+    when(extension.getOperationModel(eq(OTHER_OPERATION_NAME))).thenReturn(of(otherOperation));
 
     when(extension.getSourceModels()).thenReturn(asList(source));
     when(extension.getSourceModel(anyString())).thenReturn(of(source));
@@ -413,17 +426,21 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
                                    .withParameter(PARAMETER_IN_GROUP_NAME, PARAMETER_IN_GROUP_DEFAULT_VALUE)
                                    .getDeclaration())
                                .getDeclaration())
-            .withComponent(
-                           declarer.newOperation(OPERATION_NAME)
-                               .withConfig(MY_CONFIG)
-                               .withParameterGroup(newParameterGroup()
-                                   .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
-                                   .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
-                                   .getDeclaration())
-                               .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
-                                   .withParameter(PARAMETER_IN_GROUP_NAME, PARAMETER_IN_GROUP_DEFAULT_VALUE)
-                                   .getDeclaration())
-                               .getDeclaration())
+            .withComponent(declareOperation(OPERATION_NAME))
+            .withComponent(declareOperation(OTHER_OPERATION_NAME))
+            .getDeclaration())
+        .getDeclaration();
+  }
+
+  private OperationElementDeclaration declareOperation(String operationName) {
+    return declarer.newOperation(operationName)
+        .withConfig(MY_CONFIG)
+        .withParameterGroup(newParameterGroup()
+            .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
+            .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
+            .getDeclaration())
+        .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
+            .withParameter(PARAMETER_IN_GROUP_NAME, PARAMETER_IN_GROUP_DEFAULT_VALUE)
             .getDeclaration())
         .getDeclaration();
   }
@@ -762,7 +779,7 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
   }
 
   @Test
-  public void differentConfigsWithSameParametersGetDifferentHashs() throws Exception {
+  public void differentConfigsWithSameParameterGetDifferentHash() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
     app.addGlobalElement(declareOtherConfig(config.getConnection().get(), "newName",
@@ -786,6 +803,13 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
     checkIdsAreDifferent(opId1, opId2);
   }
 
+  @Test
+  public void differentOperationsWithSameParametersGetsDifferentHash() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OTHER_OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    checkIdsAreDifferent(opId1, opId2);
+  }
 
   private static class Locator implements ComponentLocator<ComponentAst> {
 
