@@ -8,12 +8,15 @@ package org.mule.util.store;
 
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Test;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -60,16 +63,31 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
         store.setMuleContext(context);
 
         // store entries in quick succession
-        storeObjects("1", "2", "3");
+        storeObjects("1");
 
         // they should still be alive at this point
-        assertObjectsInStore("1", "2", "3");
+        assertObjectsInStore("1");
 
         // wait until the entry TTL has been exceeded
-        Thread.sleep(entryTTL + 1000);
+        PollingProber prober = new PollingProber(entryTTL + 1000, 500);
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                try {
+                    return store.contains("1");
+                } catch (ObjectStoreException e) {
+                    return false;
+                }
+            }
 
-        // make sure all values are gone
-        assertObjectsExpired("1", "2", "3");
+            @Override
+            public String describeFailure()
+            {
+                return "Expected entry to have expired";
+            }
+        });
     }
 
     @Test
