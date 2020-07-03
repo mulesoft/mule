@@ -80,9 +80,13 @@ public abstract class AbstractMonitoredObjectStore<T extends Serializable>
         }
     }
 
+    protected boolean shouldExpire() {
+        return context == null || context.isPrimaryPollingInstance();
+    }
+
     public final void run()
     {
-        if (context == null || context.isPrimaryPollingInstance())
+        if (shouldExpire())
         {
             expire();
         }
