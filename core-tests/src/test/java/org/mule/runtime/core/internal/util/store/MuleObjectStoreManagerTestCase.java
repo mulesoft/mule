@@ -131,6 +131,34 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     expireDelayLatch.countDown();
   }
 
+  @Test
+  public void expireInMemoryInSecondaryNode() throws InitialisationException {
+    when(muleContext.isPrimaryPollingInstance()).thenReturn(false);
+    expireDelayLatch = new CountDownLatch(1);
+
+    addJavaSerializerToMockMuleContext(muleContext);
+    storeManager.initialise();
+
+    storeManager.createObjectStore(TEST_PARTITION_NAME + "_1", ObjectStoreSettings.builder()
+        .persistent(true)
+        .entryTtl(10L)
+        .expirationInterval(10L)
+        .build());
+
+    storeManager.createObjectStore(TEST_PARTITION_NAME + "_2", ObjectStoreSettings.builder()
+        .persistent(false)
+        .entryTtl(10L)
+        .expirationInterval(10L)
+        .build());
+
+    new PollingProber(POLLING_TIMEOUT, POLLING_DELAY).check(new JUnitLambdaProbe(() -> {
+      assertThat(expires.get(), is(1));
+      return true;
+    }));
+
+    expireDelayLatch.countDown();
+  }
+
   private void ensurePartitionIsCleared(boolean isPersistent) throws ObjectStoreException, InitialisationException {
     try {
       ObjectStorePartition<Serializable> store = createStorePartition(TEST_PARTITION_NAME, isPersistent);
