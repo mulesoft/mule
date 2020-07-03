@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -58,12 +62,13 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
         parseRepeatableAnnotation(type, SubTypeMapping.class, c -> ((SubTypesMapping) c).value());
 
     if (!typeMappings.isEmpty()) {
-      declareSubTypesMapping(declarer, typeMappings, extensionDeclaration.getName());
+      declareSubTypesMapping(declarer, typeMappings, extensionLoadingContext.getDslResolvingContext(),
+                             extensionDeclaration.getName());
     }
   }
 
   private void declareSubTypesMapping(ExtensionDeclarer declarer, List<AnnotationValueFetcher<SubTypeMapping>> typeMappings,
-                                      String name) {
+                                      DslResolvingContext dslResolvingContext, String name) {
     if (typeMappings.stream().map(valueFetcher -> valueFetcher.getClassValue(SubTypeMapping::baseType)).distinct()
         .count() != typeMappings.size()) {
       throw new IllegalModelDefinitionException(String
@@ -71,10 +76,34 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
               + " Duplicated base types are not allowed", name));
     }
 
-    typeMappings.forEach(mapping -> declarer.withSubTypes(mapping.getClassValue(SubTypeMapping::baseType).asMetadataType(),
-                                                          mapping.getClassArrayValue(SubTypeMapping::subTypes).stream()
-                                                              .map(Type::asMetadataType)
-                                                              .collect(toImmutableList())));
+    typeMappings.forEach(mapping -> {
+      final MetadataType baseType = mapping.getClassValue(SubTypeMapping::baseType).asMetadataType();
+      final List<MetadataType> subTypes = mapping.getClassArrayValue(SubTypeMapping::subTypes)
+          .stream()
+          .map(Type::asMetadataType)
+          .collect(toImmutableList());
+      declarer.withSubTypes(baseType, subTypes);
+
+      // For subtypes that reference types from other artifacts, auto-import them.
+      final Optional<String> baseTypeId = getTypeId(baseType);
+      baseTypeId.flatMap(dslResolvingContext::getExtensionForType).ifPresent(importedDeclaringExtension -> {
+        declarer.withImportedType(new ImportedTypeModel(baseTypeId
+            .flatMap(importedTypeId -> dslResolvingContext.getTypeCatalog()
+                .getType(importedTypeId))
+            .orElse((ObjectType) baseType)));
+
+      });
+      subTypes.forEach(subType -> {
+        final Optional<String> subTypeId = getTypeId(subType);
+        subTypeId.flatMap(dslResolvingContext::getExtensionForType).ifPresent(importedDeclaringExtension -> {
+          declarer.withImportedType(new ImportedTypeModel(subTypeId
+              .flatMap(importedTypeId -> dslResolvingContext.getTypeCatalog()
+                  .getType(importedTypeId))
+              .orElse((ObjectType) subType)));
+        });
+      });
+
+    });
   }
 
 }

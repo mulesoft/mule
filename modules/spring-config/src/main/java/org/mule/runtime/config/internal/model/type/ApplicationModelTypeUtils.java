@@ -65,6 +65,9 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -75,6 +78,8 @@ import com.google.common.collect.Multimap;
  * @since 4.4
  */
 public final class ApplicationModelTypeUtils {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationModelTypeUtils.class);
 
   private static final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
@@ -511,12 +516,15 @@ public final class ApplicationModelTypeUtils {
               Map<String, Optional<DslElementSyntax>> typesDslMap = new HashMap<>();
               Map<ComponentIdentifier, String> itemIdentifiers = new HashMap<>();
 
+              LOGGER.debug("getArrayItemTypeVisitor.visitObject: visiting itemType '{}'.", itemType.toString());
+
               extensionModelHelper.resolveSubTypes(itemType).entrySet()
-                  .forEach(entrySet -> getTypeId(entrySet.getKey())
+                  .stream()
+                  .forEach(entry -> getTypeId(entry.getKey())
                       .ifPresent(subTypeTypeId -> {
-                        typesDslMap.put(subTypeTypeId, entrySet.getValue());
-                        objectTypeByTypeId.put(subTypeTypeId, entrySet.getKey());
-                        entrySet.getValue().ifPresent(dslElementSyntax -> getIdentifier(dslElementSyntax)
+                        typesDslMap.put(subTypeTypeId, entry.getValue());
+                        objectTypeByTypeId.put(subTypeTypeId, entry.getKey());
+                        entry.getValue().ifPresent(dslElementSyntax -> getIdentifier(dslElementSyntax)
                             .ifPresent(subTypeIdentifier -> itemIdentifiers.put(subTypeIdentifier, subTypeTypeId)));
                       }));
 
@@ -527,24 +535,27 @@ public final class ApplicationModelTypeUtils {
                 itemIdentifiers.put(itemIdentifier, itemTypeId);
               });
 
+              LOGGER.debug("getArrayItemTypeVisitor.visitObject: itemIdentifiers: '{}'.", itemIdentifiers.toString());
+
               List<ComponentAst> componentModels = paramComponent.getInnerComponents().stream()
-                  .filter(c -> itemIdentifiers.keySet().contains(c.getIdentifier()))
+                  .filter(c -> itemIdentifiers.containsKey(c.getIdentifier()))
                   .map(c -> (ComponentAst) c)
                   .collect(toList());
 
               componentModel.setParameter(paramModel, new DefaultComponentParameterAst(componentModels,
                                                                                        () -> paramModel,
                                                                                        paramComponent.getMetadata()));
-              paramComponent.getInnerComponents().stream().forEach(itemComponent -> {
+              componentModels.stream().forEach(itemComponent -> {
                 String typeId = itemIdentifiers.get(itemComponent.getIdentifier());
                 typesDslMap.get(typeId).ifPresent(subTypeDsl -> {
                   MetadataTypeModelAdapter parameterizedModel =
                       createParameterizedTypeModelAdapter(objectTypeByTypeId.get(typeId), extensionModelHelper);
-                  itemComponent.setMetadataTypeModelAdapter(parameterizedModel);
+                  ((ComponentModel) itemComponent).setMetadataTypeModelAdapter(parameterizedModel);
 
-                  final Multimap<ComponentIdentifier, ComponentModel> nestedComponents = getNestedComponents(itemComponent);
+                  final Multimap<ComponentIdentifier, ComponentModel> nestedComponents =
+                      getNestedComponents((ComponentModel) itemComponent);
                   parameterizedModel.getAllParameterModels().stream()
-                      .forEach(nestedParameter -> enrichComponentModels(itemComponent, nestedComponents,
+                      .forEach(nestedParameter -> enrichComponentModels((ComponentModel) itemComponent, nestedComponents,
                                                                         recursiveAwareContainedElement(typesDslMap, subTypeDsl,
                                                                                                        nestedParameter),
                                                                         nestedParameter, extensionModelHelper));
@@ -559,8 +570,19 @@ public final class ApplicationModelTypeUtils {
                                                                         ParameterModel nestedParameter) {
         return subTypeDsl.getContainedElement(nestedParameter.getName())
             .map(innerElement -> getTypeId(nestedParameter.getType())
-                .flatMap(typeId -> typesDslMap.containsKey(typeId) ? typesDslMap.get(typeId) : empty())
+                .flatMap(typeId -> {
+                  if (typesDslMap.containsKey(typeId)) {
+                    LOGGER
+                        .warn("getArrayItemTypeVisitor.recursiveAwareContainedElement: No entry for '{}' in typesDslMap, ignoring.",
+                              typeId);
+                    return typesDslMap.get(typeId);
+                  } else {
+                    return empty();
+                  }
+                })
                 .map(referencedDslElement -> {
+                  LOGGER.warn("getArrayItemTypeVisitor.recursiveAwareContainedElement: processing typeId {}",
+                              referencedDslElement.toString());
                   final DslElementSyntaxBuilder baseReferenced = DslElementSyntaxBuilder.create()
                       .withAttributeName(innerElement.getAttributeName())
                       .withElementName(innerElement.getElementName())
