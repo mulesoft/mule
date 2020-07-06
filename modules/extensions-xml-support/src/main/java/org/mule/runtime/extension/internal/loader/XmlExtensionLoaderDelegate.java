@@ -46,6 +46,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
@@ -61,6 +62,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -100,6 +102,7 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.extension.XmlSdk1ExtensionModelProvider;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
+import org.mule.runtime.extension.api.model.operation.ImmutableOperationModel;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator;
 import org.mule.runtime.extension.internal.loader.validator.property.InvalidTestConnectionMarkerModelProperty;
@@ -490,7 +493,7 @@ public final class XmlExtensionLoaderDelegate {
     ExtensionDeclarer temporalPublicOpsDeclarer = new ExtensionDeclarer();
     fillDeclarer(temporalPublicOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
     loadOperationsFrom(temporalPublicOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
-                       OperationVisibility.PUBLIC);
+                       OperationVisibility.PUBLIC, empty());
     try {
       moduleModel = enrichModuleModel(moduleModel, createExtensionModel(temporalPublicOpsDeclarer), extensionModelHelper, false);
     } catch (IllegalModelDefinitionException e) {
@@ -502,28 +505,39 @@ public final class XmlExtensionLoaderDelegate {
     if (comesFromTNS) {
       // when parsing for the TNS, we need the <operation/>s to be part of the extension model to validate the XML properly
       loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
-                         OperationVisibility.PRIVATE);
+                         OperationVisibility.PRIVATE, empty());
     } else {
       // when parsing for the macro expansion, the <operation/>s will be left in the PrivateOperationsModelProperty model property
       ExtensionDeclarer temporalPrivateOpsDeclarer = new ExtensionDeclarer();
       fillDeclarer(temporalPrivateOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
       loadOperationsFrom(temporalPrivateOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
-                         OperationVisibility.PRIVATE);
-      final ExtensionModel result = createExtensionModel(temporalPrivateOpsDeclarer);
-      moduleModel = enrichModuleModel(moduleModel, result, extensionModelHelper, false);
+                         OperationVisibility.PRIVATE, empty());
+      final ExtensionModel privateTnsExtensionModel = createExtensionModel(temporalPrivateOpsDeclarer);
+      moduleModel = enrichModuleModel(moduleModel, privateTnsExtensionModel, extensionModelHelper, false);
 
-      final PrivateOperationsModelProperty privateOperations = new PrivateOperationsModelProperty(result.getOperationModels());
+      final PrivateOperationsModelProperty privateOperations =
+          new PrivateOperationsModelProperty(privateTnsExtensionModel.getOperationModels());
       declarer.withModelProperty(privateOperations);
     }
-
-    loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
-                       OperationVisibility.PUBLIC);
 
     final CycleDetector<String, DefaultEdge> cycleDetector = new CycleDetector<>(directedGraph);
     final Set<String> cycles = cycleDetector.findCycles();
     if (!cycles.isEmpty()) {
       throw new MuleRuntimeException(createStaticMessage(format(CYCLIC_OPERATIONS_ERROR, new TreeSet<>(cycles))));
     }
+
+    // make all operations added to hasOperationDeclarer be properly enriched with the referenced operations, hwether they are
+    // public or private.
+    ExtensionDeclarer temporalAllOpsDeclarer = new ExtensionDeclarer();
+    fillDeclarer(temporalAllOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
+    loadOperationsFrom(temporalAllOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
+                       OperationVisibility.PRIVATE, empty());
+    loadOperationsFrom(temporalAllOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
+                       OperationVisibility.PUBLIC, empty());
+    final ExtensionModel allTnsExtensionModel = createExtensionModel(temporalAllOpsDeclarer);
+
+    loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
+                       OperationVisibility.PUBLIC, of(allTnsExtensionModel));
   }
 
   public Stream<Pair<ComponentAst, List<ComponentAst>>> recursiveStreamWithHierarchy(ComponentAst moduleModel) {
@@ -559,14 +573,14 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private ComponentAst enrichModuleModel(/* URL resource, Document moduleDocument, */
-                                         final ComponentAst moduleModel, ExtensionModel result,
+                                         final ComponentAst moduleModel, ExtensionModel tnsExtensionModel,
                                          ExtensionModelHelper extensionModelHelper, boolean oldMode) {
     // // // TODO MULE-17419 (AST) Set all models, not just for operations (routers/scopes are missing here for sure)
 
     // This sets the model into the same instance that is in the op model property...
     moduleModel.recursiveStream()
         .filter(comp -> TNS_PREFIX.equals(comp.getIdentifier().getNamespace()))
-        .forEach(comp -> result.getOperationModel(comp.getIdentifier().getName())
+        .forEach(comp -> tnsExtensionModel.getOperationModel(comp.getIdentifier().getName())
             .ifPresent(model -> {
               if (oldMode) {
                 System.out.println("lala");
@@ -575,25 +589,7 @@ public final class XmlExtensionLoaderDelegate {
             }));
     // return moduleModel;
 
-    final ComponentAst mmm = MuleArtifactAstCopyUtils.copyComponentTreeRecursively(moduleModel, comp -> {
-      if (TNS_PREFIX.equals(comp.getIdentifier().getNamespace())) {
-        return new BaseComponentAstDecorator(comp) {
-
-          @Override
-          public <M> Optional<M> getModel(Class<M> modelClass) {
-            final Optional<M> filter = (Optional<M>) result.getOperationModel(comp.getIdentifier().getName())
-                .filter(model -> modelClass.isAssignableFrom(model.getClass()));
-
-            return filter.isPresent() ? filter : comp.getModel(modelClass);
-            // .map(model -> (M) model)
-            // .orElseGet(() -> (Optional<M>) comp.getModel(modelClass))
-          }
-
-        };
-      } else {
-        return comp;
-      }
-    });
+    final ComponentAst mmm = enrichRecursively(moduleModel, tnsExtensionModel);
 
     // // ... but this creates a new one, so the comps in the model property are left unenriched...
     // final ComponentAst mmm = getModuleComponentModel(resource, moduleDocument, extensionsWithTns);
@@ -611,6 +607,68 @@ public final class XmlExtensionLoaderDelegate {
       return moduleModel;
     } else {
       return mmm;
+    }
+  }
+
+  private ComponentAst enrichRecursively(final ComponentAst moduleModel, ExtensionModel result) {
+    return MuleArtifactAstCopyUtils.copyComponentTreeRecursively(moduleModel, comp -> {
+      if (TNS_PREFIX.equals(comp.getIdentifier().getNamespace())) {
+        final Optional<OperationModel> enrichedOperationModel = result.getOperationModel(comp.getIdentifier().getName())
+            .filter(model -> OperationModel.class.isAssignableFrom(model.getClass()))
+            .map(model -> enrichOperationModel(model, result));
+
+        return new BaseComponentAstDecorator(comp) {
+
+          @Override
+          public <M> Optional<M> getModel(Class<M> modelClass) {
+            return enrichedOperationModel.isPresent() && OperationModel.class.isAssignableFrom(modelClass)
+                ? (Optional<M>) enrichedOperationModel
+                : comp.getModel(modelClass);
+          }
+        };
+      } else {
+        return comp;
+      }
+    });
+  }
+
+  private OperationModel enrichOperationModel(OperationModel model, ExtensionModel result) {
+
+    final Set<ModelProperty> enrichedModelProperties = model.getModelProperties()
+        .stream()
+        .map(mp -> {
+          if (mp instanceof OperationComponentModelModelProperty) {
+            final OperationComponentModelModelProperty ocm = (OperationComponentModelModelProperty) mp;
+            // TODO
+            return new OperationComponentModelModelProperty(enrichRecursively(ocm.getOperationComponentModel(), result),
+                                                            enrichRecursively(ocm.getBodyComponentModel(), result));
+          } else {
+            return mp;
+          }
+        })
+        .collect(toSet());
+
+    if (model instanceof OperationModel) {
+      OperationModel opModel = model;
+      return new ImmutableOperationModel(opModel.getName(),
+                                         opModel.getDescription(),
+                                         opModel.getParameterGroupModels(),
+                                         opModel.getNestedComponents(),
+                                         opModel.getOutput(),
+                                         opModel.getOutputAttributes(),
+                                         opModel.isBlocking(),
+                                         opModel.getExecutionType(),
+                                         opModel.requiresConnection(),
+                                         opModel.isTransactional(),
+                                         opModel.supportsStreaming(),
+                                         opModel.getDisplayModel().orElse(null),
+                                         opModel.getErrorModels(),
+                                         opModel.getStereotype(),
+                                         enrichedModelProperties,
+                                         opModel.getNotificationModels(),
+                                         opModel.getDeprecationModel().orElse(null));
+    } else {
+      return model;
     }
   }
 
@@ -864,17 +922,19 @@ public final class XmlExtensionLoaderDelegate {
 
   private void loadOperationsFrom(HasOperationDeclarer declarer, ComponentAst moduleModel,
                                   Graph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel,
-                                  final OperationVisibility visibility) {
+                                  final OperationVisibility visibility, Optional<ExtensionModel> tnsExtensionModel) {
 
     moduleModel.directChildrenStream()
         .filter(child -> child.getIdentifier().equals(OPERATION_IDENTIFIER))
         .filter(operationModel -> operationModel.getRawParameterValue(ATTRIBUTE_VISIBILITY).map(OperationVisibility::valueOf)
             .orElse(null) == visibility)
-        .forEach(operationModel -> extractOperationExtension(declarer, operationModel, directedGraph, xmlDslModel));
+        .forEach(operationModel -> extractOperationExtension(declarer, operationModel, directedGraph, xmlDslModel,
+                                                             tnsExtensionModel));
   }
 
   private void extractOperationExtension(HasOperationDeclarer declarer, ComponentAst operationModel,
-                                         Graph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel) {
+                                         Graph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel,
+                                         Optional<ExtensionModel> tnsExtensionModel) {
     // String operationName = operationModel.getComponentId().map(id -> NameUtils.toCamelCase(id, "-")).orElse(null);
     String operationName = operationModel.getComponentId().orElse(null);
     OperationDeclarer operationDeclarer = declarer.withOperation(operationName);
@@ -886,7 +946,15 @@ public final class XmlExtensionLoaderDelegate {
     directedGraph.addVertex(operationName);
     fillGraphWithTnsReferences(directedGraph, operationName, bodyComponentModel.directChildrenStream());
 
-    operationDeclarer.withModelProperty(new OperationComponentModelModelProperty(operationModel, bodyComponentModel));
+    if (tnsExtensionModel.isPresent()) {
+      operationDeclarer.withModelProperty(new OperationComponentModelModelProperty(enrichRecursively(operationModel,
+                                                                                                     tnsExtensionModel.get()),
+                                                                                   enrichRecursively(bodyComponentModel,
+                                                                                                     tnsExtensionModel.get())));
+    } else {
+      operationDeclarer.withModelProperty(new OperationComponentModelModelProperty(operationModel, bodyComponentModel));
+    }
+
     operationDeclarer.describedAs(getDescription(operationModel));
     operationDeclarer.getDeclaration().setDisplayModel(getDisplayModel(operationModel));
     extractOperationParameters(operationDeclarer, operationModel);
