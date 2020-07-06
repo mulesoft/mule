@@ -13,7 +13,9 @@ import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.junit.MockitoJUnit.*;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArtifact;
@@ -24,32 +26,30 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.get
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.CONFIGURATION_COMPONENT_LOCATOR;
-import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.ComponentLifeCycle;
+import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.ComponentLifeCycle.*;
 
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.config.api.LazyComponentInitializer.ComponentLocationFilter;
 import org.mule.runtime.config.dsl.model.AbstractDslModelTestCase;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
@@ -57,8 +57,8 @@ import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorC
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.ConfigResource;
 
+import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -66,16 +66,16 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
-@RunWith(MockitoJUnitRunner.class)
 @Feature(CONFIGURATION_COMPONENT_LOCATOR)
-@Story(ComponentLifeCycle.COMPONENT_LIFE_CYCLE)
+@Story(COMPONENT_LIFE_CYCLE)
 public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTestCase {
+
+  @Rule
+  public MockitoRule mockitoRule = rule().silent();
 
   private LazyMuleArtifactContext lazyMuleArtifactContext;
 
   private static final String MY_FLOW = "myFlow";
-
-  private ElementDeclarer declarer;
 
   @Mock
   private ExtensionManager extensionManager;
@@ -100,7 +100,6 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
   public void setup() throws Exception {
     initializations = new AtomicInteger(0);
 
-    declarer = forExtension(EXTENSION_NAME);
     muleContext = mockContextWithServices();
     extensions = ImmutableSet.<ExtensionModel>builder()
         .add(getExtensionModel())
@@ -108,16 +107,16 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
         .build();
 
     MessageProcessorChainBuilder messageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder().chain(targetProcessor);
-    DefaultListableBeanFactory beanFactory = new ObjectProviderAwareBeanFactory(null);
     MuleRegistry mockedRegistry = muleContext.getRegistry();
 
     when(extensionManager.getExtensions()).thenReturn(extensions);
     when(muleContext.getExecutionClassLoader()).thenReturn(currentThread().getContextClassLoader());
     when(muleContext.getExtensionManager()).thenReturn(extensionManager);
+    when(muleContext.getCustomizationService()).thenReturn(mock(CustomServiceRegistry.class));
     when(mockedRegistry.lookupObject(MY_FLOW)).thenReturn(messageProcessorChainBuilder);
     when(mockedRegistry.get(OBJECT_REGISTRY)).thenReturn(new DefaultRegistry(muleContext));
 
-    lazyMuleArtifactContext = createLazyMuleArtifactContextStub(beanFactory);
+    lazyMuleArtifactContext = createLazyMuleArtifactContextStub();
 
     doAnswer(a -> {
       initializations.incrementAndGet();
@@ -125,9 +124,8 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
     }).when((Initialisable) targetProcessor).initialise();
   }
 
-
   @Test
-  @Issue("MULE-18316")
+  @Issue("MULE-17400")
   public void shouldNotCreateBeansForSameLocationRequest() {
     Location location = builderFromStringRepresentation(MY_FLOW).build();
 
@@ -139,8 +137,8 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
   }
 
   @Test
-  @Issue("MULE-18316")
-  public void shouldCreateBeansForSameLocationRequestIfDifferentPhaseApplied() throws InitialisationException {
+  @Issue("MULE-17400")
+  public void shouldCreateBeansForSameLocationRequestIfDifferentPhaseApplied() {
     Location location = builderFromStringRepresentation(MY_FLOW).build();
 
     lazyMuleArtifactContext.initializeComponent(location, false);
@@ -150,7 +148,7 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
   }
 
   @Test
-  @Issue("MULE-18316")
+  @Issue("MULE-17400")
   public void shouldNotCreateBeansForSameLocationFilterRequest() {
     ComponentLocationFilter filter = loc -> loc.getLocation().equals(MY_FLOW);
 
@@ -161,7 +159,7 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
   }
 
   @Test
-  @Issue("MULE-18316")
+  @Issue("MULE-17400")
   public void shouldCreateBeansForSameLocationFilterRequestIfDifferentPhaseApplied() {
     ComponentLocationFilter filter = loc -> loc.getLocation().equals(MY_FLOW);
 
@@ -185,51 +183,17 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
         .getDeclaration();
   }
 
-  private LazyMuleArtifactContext createLazyMuleArtifactContextStub(DefaultListableBeanFactory beanFactory) {
+  private LazyMuleArtifactContext createLazyMuleArtifactContextStub() {
     LazyMuleArtifactContext muleArtifactContext =
         new LazyMuleArtifactContext(muleContext, new ConfigResource[0], getSimpleApp(),
                                     optionalObjectsController, new HashMap<>(), APP,
                                     emptyList(), empty(), empty(), true, lockFactory) {
 
           @Override
-          protected DefaultListableBeanFactory createBeanFactory() {
-            return beanFactory;
-          }
-
-          @Override
-          protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
-            // Bean factory is mocked, so no bean registering here
-          }
-
-          @Override
-          protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-            // Bean factory is mocked, so no bean registering here
-          }
-
-          @Override
-          protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-            // Bean factory is mocked, so no bean registering here
-          }
-
-          @Override
-          protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-            // Bean factory is mocked, so no bean invocation here
-          }
-
-          @Override
-          protected void registerListeners() {
-            // Bean factory is mocked, so no bean registering here
-          }
-
-          @Override
           protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
             // Bean factory is mocked, so no bean registering here
           }
 
-          @Override
-          protected void finishRefresh() {
-            // Bean factory is mocked, so no nothing to do here
-          }
         };
 
     muleArtifactContext.refresh();
