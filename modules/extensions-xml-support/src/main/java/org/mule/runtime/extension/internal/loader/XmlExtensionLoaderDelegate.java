@@ -494,6 +494,13 @@ public final class XmlExtensionLoaderDelegate {
     fillDeclarer(temporalPublicOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
     loadOperationsFrom(temporalPublicOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                        OperationVisibility.PUBLIC, empty());
+
+    CycleDetector<String, DefaultEdge> cycleDetector = new CycleDetector<>(directedGraph);
+    Set<String> cycles = cycleDetector.findCycles();
+    if (!cycles.isEmpty()) {
+      throw new MuleRuntimeException(createStaticMessage(format(CYCLIC_OPERATIONS_ERROR, new TreeSet<>(cycles))));
+    }
+
     try {
       moduleModel = enrichModuleModel(moduleModel, createExtensionModel(temporalPublicOpsDeclarer), extensionModelHelper, false);
     } catch (IllegalModelDefinitionException e) {
@@ -520,8 +527,8 @@ public final class XmlExtensionLoaderDelegate {
       declarer.withModelProperty(privateOperations);
     }
 
-    final CycleDetector<String, DefaultEdge> cycleDetector = new CycleDetector<>(directedGraph);
-    final Set<String> cycles = cycleDetector.findCycles();
+    cycleDetector = new CycleDetector<>(directedGraph);
+    cycles = cycleDetector.findCycles();
     if (!cycles.isEmpty()) {
       throw new MuleRuntimeException(createStaticMessage(format(CYCLIC_OPERATIONS_ERROR, new TreeSet<>(cycles))));
     }
