@@ -489,8 +489,6 @@ public final class XmlExtensionLoaderDelegate {
 
     ExtensionDeclarer temporalPublicOpsDeclarer = new ExtensionDeclarer();
     fillDeclarer(temporalPublicOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
-    loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
-                       OperationVisibility.PUBLIC);
     loadOperationsFrom(temporalPublicOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                        OperationVisibility.PUBLIC);
     try {
@@ -512,11 +510,14 @@ public final class XmlExtensionLoaderDelegate {
       loadOperationsFrom(temporalPrivateOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                          OperationVisibility.PRIVATE);
       final ExtensionModel result = createExtensionModel(temporalPrivateOpsDeclarer);
+      moduleModel = enrichModuleModel(moduleModel, result, extensionModelHelper, false);
+
       final PrivateOperationsModelProperty privateOperations = new PrivateOperationsModelProperty(result.getOperationModels());
       declarer.withModelProperty(privateOperations);
-
-      moduleModel = enrichModuleModel(moduleModel, result, extensionModelHelper, false);
     }
+
+    loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
+                       OperationVisibility.PUBLIC);
 
     final CycleDetector<String, DefaultEdge> cycleDetector = new CycleDetector<>(directedGraph);
     final Set<String> cycles = cycleDetector.findCycles();
