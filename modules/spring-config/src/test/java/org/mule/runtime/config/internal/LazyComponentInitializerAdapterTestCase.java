@@ -12,7 +12,11 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.*;
@@ -58,13 +62,13 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBui
 import org.mule.runtime.dsl.api.ConfigResource;
 
 import org.mockito.junit.MockitoRule;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.google.common.collect.ImmutableSet;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 @Feature(CONFIGURATION_COMPONENT_LOCATOR)
 @Story(COMPONENT_LIFE_CYCLE)
@@ -76,6 +80,9 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
   private LazyMuleArtifactContext lazyMuleArtifactContext;
 
   private static final String MY_FLOW = "myFlow";
+
+  @Mock
+  private ObjectProviderAwareBeanFactory beanFactory;
 
   @Mock
   private ExtensionManager extensionManager;
@@ -92,8 +99,6 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
   @SuppressWarnings("deprecation")
   private MuleContextWithRegistry muleContext;
 
-  private Set<ExtensionModel> extensions;
-
   private AtomicInteger initializations;
 
   @Before
@@ -101,10 +106,10 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
     initializations = new AtomicInteger(0);
 
     muleContext = mockContextWithServices();
-    extensions = ImmutableSet.<ExtensionModel>builder()
-        .add(getExtensionModel())
-        .add(mockExtension)
-        .build();
+    Set<ExtensionModel> extensions = ImmutableSet.<ExtensionModel>builder()
+            .add(getExtensionModel())
+            .add(mockExtension)
+            .build();
 
     MessageProcessorChainBuilder messageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder().chain(targetProcessor);
     MuleRegistry mockedRegistry = muleContext.getRegistry();
@@ -116,7 +121,11 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
     when(mockedRegistry.lookupObject(MY_FLOW)).thenReturn(messageProcessorChainBuilder);
     when(mockedRegistry.get(OBJECT_REGISTRY)).thenReturn(new DefaultRegistry(muleContext));
 
-    lazyMuleArtifactContext = createLazyMuleArtifactContextStub();
+    when(beanFactory.getSingletonMutex()).thenReturn("mutex");
+    doReturn(new String[0]).when(beanFactory).getBeanNamesForType(any(Class.class), anyBoolean(), anyBoolean());
+    doNothing().when(beanFactory).setSerializationId(any(String.class));
+
+    lazyMuleArtifactContext = createLazyMuleArtifactContextStub(beanFactory);
 
     doAnswer(a -> {
       initializations.incrementAndGet();
@@ -183,17 +192,16 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
         .getDeclaration();
   }
 
-  private LazyMuleArtifactContext createLazyMuleArtifactContextStub() {
+  private LazyMuleArtifactContext createLazyMuleArtifactContextStub(ObjectProviderAwareBeanFactory beanFactory) {
     LazyMuleArtifactContext muleArtifactContext =
         new LazyMuleArtifactContext(muleContext, new ConfigResource[0], getSimpleApp(),
                                     optionalObjectsController, new HashMap<>(), APP,
                                     emptyList(), empty(), empty(), true, lockFactory) {
 
           @Override
-          protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
-            // Bean factory is mocked, so no bean registering here
+          protected DefaultListableBeanFactory createBeanFactory() {
+            return beanFactory;
           }
-
         };
 
     muleArtifactContext.refresh();
