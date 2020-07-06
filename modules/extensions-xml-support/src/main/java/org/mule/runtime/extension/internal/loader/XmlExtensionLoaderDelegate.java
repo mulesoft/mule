@@ -64,6 +64,8 @@ import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
+import org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
@@ -492,7 +494,7 @@ public final class XmlExtensionLoaderDelegate {
     loadOperationsFrom(temporalPublicOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                        OperationVisibility.PUBLIC);
     try {
-      moduleModel = enrichModuleModel(moduleModel, createExtensionModel(temporalPublicOpsDeclarer), extensionModelHelper);
+      moduleModel = enrichModuleModel(moduleModel, createExtensionModel(temporalPublicOpsDeclarer), extensionModelHelper, false);
     } catch (IllegalModelDefinitionException e) {
       // Nothing to do, this failure will be thrown again when the actual declarer, hasOperationDeclarer, is used to build the
       // extension model.
@@ -513,7 +515,7 @@ public final class XmlExtensionLoaderDelegate {
       final PrivateOperationsModelProperty privateOperations = new PrivateOperationsModelProperty(result.getOperationModels());
       declarer.withModelProperty(privateOperations);
 
-      moduleModel = enrichModuleModel(moduleModel, result, extensionModelHelper);
+      moduleModel = enrichModuleModel(moduleModel, result, extensionModelHelper, false);
     }
 
     final CycleDetector<String, DefaultEdge> cycleDetector = new CycleDetector<>(directedGraph);
@@ -555,17 +557,60 @@ public final class XmlExtensionLoaderDelegate {
     });
   }
 
-  private ComponentAst enrichModuleModel(final ComponentAst moduleModel, ExtensionModel result,
-                                         ExtensionModelHelper extensionModelHelper) {
-    // // TODO MULE-17419 (AST) Set all models, not just for operations (routers/scopes are missing here for sure)
+  private ComponentAst enrichModuleModel(/* URL resource, Document moduleDocument, */
+                                         final ComponentAst moduleModel, ExtensionModel result,
+                                         ExtensionModelHelper extensionModelHelper, boolean oldMode) {
+    // // // TODO MULE-17419 (AST) Set all models, not just for operations (routers/scopes are missing here for sure)
+
+    // This sets the model into the same instance that is in the op model property...
     moduleModel.recursiveStream()
         .filter(comp -> TNS_PREFIX.equals(comp.getIdentifier().getNamespace()))
         .forEach(comp -> result.getOperationModel(comp.getIdentifier().getName())
             .ifPresent(model -> {
-              System.out.println("lala");
-              ((ComponentModel) comp).setComponentModel(model);
+              if (oldMode) {
+                System.out.println("lala");
+                ((ComponentModel) comp).setComponentModel(model);
+              }
             }));
-    return moduleModel;
+    // return moduleModel;
+
+    final ComponentAst mmm = MuleArtifactAstCopyUtils.copyComponentTreeRecursively(moduleModel, comp -> {
+      if (TNS_PREFIX.equals(comp.getIdentifier().getNamespace())) {
+        return new BaseComponentAstDecorator(comp) {
+
+          @Override
+          public <M> Optional<M> getModel(Class<M> modelClass) {
+            final Optional<M> filter = (Optional<M>) result.getOperationModel(comp.getIdentifier().getName())
+                .filter(model -> modelClass.isAssignableFrom(model.getClass()));
+
+            return filter.isPresent() ? filter : comp.getModel(modelClass);
+            // .map(model -> (M) model)
+            // .orElseGet(() -> (Optional<M>) comp.getModel(modelClass))
+          }
+
+        };
+      } else {
+        return comp;
+      }
+    });
+
+    // // ... but this creates a new one, so the comps in the model property are left unenriched...
+    // final ComponentAst mmm = getModuleComponentModel(resource, moduleDocument, extensionsWithTns);
+    // mmm.recursiveStream()
+    // .forEach(componentModel -> {
+    // resolveTypedComponentIdentifier((ComponentModel) componentModel,
+    // new ExtensionModelHelper(extensionsWithTns));
+    // });
+    // recursiveStreamWithHierarchy(mmm).forEach(new ComponentLocationVisitor());
+
+    // what are the differences between mmm and moduleModel?
+
+    // return mmm;
+    if (oldMode) {
+      return moduleModel;
+    } else {
+      return mmm;
+    }
   }
 
   private ExtensionModel createExtensionModel(ExtensionDeclarer declarer) {
