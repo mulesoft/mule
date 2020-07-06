@@ -20,6 +20,7 @@ import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJEC
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -125,6 +126,35 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
 
     new PollingProber(POLLING_TIMEOUT, POLLING_DELAY).check(new JUnitLambdaProbe(() -> {
       assertThat(expires.get(), is(2));
+      return true;
+    }));
+
+    expireDelayLatch.countDown();
+  }
+
+  @Issue("MULE-18548")
+  @Test
+  public void expireInMemoryInSecondaryNode() throws InitialisationException {
+    when(muleContext.isPrimaryPollingInstance()).thenReturn(false);
+    expireDelayLatch = new CountDownLatch(1);
+
+    addJavaSerializerToMockMuleContext(muleContext);
+    storeManager.initialise();
+
+    storeManager.createObjectStore(TEST_PARTITION_NAME + "_1", ObjectStoreSettings.builder()
+        .persistent(true)
+        .entryTtl(10L)
+        .expirationInterval(10L)
+        .build());
+
+    storeManager.createObjectStore(TEST_PARTITION_NAME + "_2", ObjectStoreSettings.builder()
+        .persistent(false)
+        .entryTtl(10L)
+        .expirationInterval(10L)
+        .build());
+
+    new PollingProber(POLLING_TIMEOUT, POLLING_DELAY).check(new JUnitLambdaProbe(() -> {
+      assertThat(expires.get(), is(1));
       return true;
     }));
 
