@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.core.internal.store.AbstractPartitionableObjectStore;
 import org.slf4j.Logger;
 
 public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable, Disposable {
@@ -284,7 +285,9 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
 
     @Override
     public void run() {
-      if (muleContext.isPrimaryPollingInstance()) {
+      boolean expireRegardlessPollingInstance =
+          (store instanceof AbstractPartitionableObjectStore) && ((AbstractPartitionableObjectStore) store).shouldAlwaysExpire();
+      if (expireRegardlessPollingInstance || muleContext.isPrimaryPollingInstance()) {
         try {
           store.expire(entryTTL, maxEntries, partitionName);
         } catch (Exception e) {
