@@ -495,11 +495,7 @@ public final class XmlExtensionLoaderDelegate {
     loadOperationsFrom(temporalPublicOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                        OperationVisibility.PUBLIC, empty());
 
-    CycleDetector<String, DefaultEdge> cycleDetector = new CycleDetector<>(directedGraph);
-    Set<String> cycles = cycleDetector.findCycles();
-    if (!cycles.isEmpty()) {
-      throw new MuleRuntimeException(createStaticMessage(format(CYCLIC_OPERATIONS_ERROR, new TreeSet<>(cycles))));
-    }
+    validateNoCycles(directedGraph);
 
     try {
       moduleModel = enrichRecursively(moduleModel, createExtensionModel(temporalPublicOpsDeclarer));
@@ -527,11 +523,7 @@ public final class XmlExtensionLoaderDelegate {
       declarer.withModelProperty(privateOperations);
     }
 
-    cycleDetector = new CycleDetector<>(directedGraph);
-    cycles = cycleDetector.findCycles();
-    if (!cycles.isEmpty()) {
-      throw new MuleRuntimeException(createStaticMessage(format(CYCLIC_OPERATIONS_ERROR, new TreeSet<>(cycles))));
-    }
+    validateNoCycles(directedGraph);
 
     // make all operations added to hasOperationDeclarer be properly enriched with the referenced operations, hwether they are
     // public or private.
@@ -552,6 +544,16 @@ public final class XmlExtensionLoaderDelegate {
 
     loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
                        OperationVisibility.PUBLIC, allTnsExtensionModel);
+  }
+
+  private void validateNoCycles(Graph<String, DefaultEdge> directedGraph) {
+    CycleDetector<String, DefaultEdge> cycleDetector;
+    Set<String> cycles;
+    cycleDetector = new CycleDetector<>(directedGraph);
+    cycles = cycleDetector.findCycles();
+    if (!cycles.isEmpty()) {
+      throw new MuleRuntimeException(createStaticMessage(format(CYCLIC_OPERATIONS_ERROR, new TreeSet<>(cycles))));
+    }
   }
 
   public Stream<Pair<ComponentAst, List<ComponentAst>>> recursiveStreamWithHierarchy(ComponentAst moduleModel) {
@@ -911,7 +913,6 @@ public final class XmlExtensionLoaderDelegate {
   private void extractOperationExtension(HasOperationDeclarer declarer, ComponentAst operationModel,
                                          Graph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel,
                                          Optional<ExtensionModel> tnsExtensionModel) {
-    // String operationName = operationModel.getComponentId().map(id -> NameUtils.toCamelCase(id, "-")).orElse(null);
     String operationName = operationModel.getComponentId().orElse(null);
     OperationDeclarer operationDeclarer = declarer.withOperation(operationName);
     ComponentAst bodyComponentModel = operationModel.directChildrenStream()
