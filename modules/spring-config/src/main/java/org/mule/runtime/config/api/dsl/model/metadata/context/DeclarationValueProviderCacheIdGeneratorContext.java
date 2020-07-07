@@ -6,13 +6,18 @@
  */
 package org.mule.runtime.config.api.dsl.model.metadata.context;
 
+import static java.util.Objects.hash;
 import static java.util.stream.Collectors.toMap;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterValue;
+import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
+import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
+import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
+import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 
 import java.util.Map;
 import java.util.Objects;
@@ -40,7 +45,7 @@ public class DeclarationValueProviderCacheIdGeneratorContext implements ValuePro
         .collect(toMap(ElementDeclaration::getName, p -> new DefaultParameterInfo<>(
                                                                                     p.getName(),
                                                                                     p.getValue(),
-                                                                                    Objects::hash)));
+                                                                                    HashingParameterValueVisitor::computeHashFor)));
     this.configContext = configContext;
     this.connectionContext = connectionContext;
   }
@@ -68,6 +73,36 @@ public class DeclarationValueProviderCacheIdGeneratorContext implements ValuePro
   @Override
   public Optional<ValueProviderCacheIdGeneratorContext<ParameterValue>> getConnectionContext() {
     return connectionContext.get();
+  }
+
+  private static class HashingParameterValueVisitor implements ParameterValueVisitor {
+
+    private static int computeHashFor(ParameterValue parameterValue) {
+      final HashingParameterValueVisitor visitor = new HashingParameterValueVisitor();
+      parameterValue.accept(visitor);
+      return visitor.hash;
+    }
+
+    private int hash = 0;
+
+    @Override
+    public void visitSimpleValue(ParameterSimpleValue text) {
+      hash += hash(text.getValue());
+    }
+
+    @Override
+    public void visitListValue(ParameterListValue list) {
+      list.getValues().forEach(v -> v.accept(this));
+    }
+
+    @Override
+    public void visitObjectValue(ParameterObjectValue objectValue) {
+      objectValue.getParameters().forEach((k, v) -> {
+        hash += hash(k);
+        v.accept(this);
+      });
+    }
+
   }
 
 }

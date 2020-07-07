@@ -19,7 +19,7 @@
 
         <!-- Mule classes -->
         <AsyncLogger name="org.mule" level="WARN"/>
-        <AsyncLogger name="org.mule.runtime.config" level="WARN"/>
+        <AsyncLogger name="org.mule.runtime.config" level="DEBUG"/>
 
         <AsyncLogger name="com.mulesoft" level="WARN"/>
 
