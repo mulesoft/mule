@@ -28,6 +28,7 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_T
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
@@ -67,7 +68,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
-import org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
@@ -502,7 +502,7 @@ public final class XmlExtensionLoaderDelegate {
     }
 
     try {
-      moduleModel = enrichModuleModel(moduleModel, createExtensionModel(temporalPublicOpsDeclarer), extensionModelHelper, false);
+      moduleModel = enrichRecursively(moduleModel, createExtensionModel(temporalPublicOpsDeclarer));
     } catch (IllegalModelDefinitionException e) {
       // Nothing to do, this failure will be thrown again when the actual declarer, hasOperationDeclarer, is used to build the
       // extension model.
@@ -520,7 +520,7 @@ public final class XmlExtensionLoaderDelegate {
       loadOperationsFrom(temporalPrivateOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                          OperationVisibility.PRIVATE, empty());
       final ExtensionModel privateTnsExtensionModel = createExtensionModel(temporalPrivateOpsDeclarer);
-      moduleModel = enrichModuleModel(moduleModel, privateTnsExtensionModel, extensionModelHelper, false);
+      moduleModel = enrichRecursively(moduleModel, privateTnsExtensionModel);
 
       final PrivateOperationsModelProperty privateOperations =
           new PrivateOperationsModelProperty(privateTnsExtensionModel.getOperationModels());
@@ -541,10 +541,17 @@ public final class XmlExtensionLoaderDelegate {
                        OperationVisibility.PRIVATE, empty());
     loadOperationsFrom(temporalAllOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                        OperationVisibility.PUBLIC, empty());
-    final ExtensionModel allTnsExtensionModel = createExtensionModel(temporalAllOpsDeclarer);
+
+    Optional<ExtensionModel> allTnsExtensionModel = empty();
+    try {
+      allTnsExtensionModel = of(createExtensionModel(temporalAllOpsDeclarer));
+    } catch (IllegalModelDefinitionException e) {
+      // Nothing to do, this failure will be thrown again when the actual declarer, hasOperationDeclarer, is used to build the
+      // extension model.
+    }
 
     loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
-                       OperationVisibility.PUBLIC, of(allTnsExtensionModel));
+                       OperationVisibility.PUBLIC, allTnsExtensionModel);
   }
 
   public Stream<Pair<ComponentAst, List<ComponentAst>>> recursiveStreamWithHierarchy(ComponentAst moduleModel) {
@@ -579,47 +586,10 @@ public final class XmlExtensionLoaderDelegate {
     });
   }
 
-  private ComponentAst enrichModuleModel(/* URL resource, Document moduleDocument, */
-                                         final ComponentAst moduleModel, ExtensionModel tnsExtensionModel,
-                                         ExtensionModelHelper extensionModelHelper, boolean oldMode) {
-    // // // TODO MULE-17419 (AST) Set all models, not just for operations (routers/scopes are missing here for sure)
-
-    // This sets the model into the same instance that is in the op model property...
-    moduleModel.recursiveStream()
-        .filter(comp -> TNS_PREFIX.equals(comp.getIdentifier().getNamespace()))
-        .forEach(comp -> tnsExtensionModel.getOperationModel(comp.getIdentifier().getName())
-            .ifPresent(model -> {
-              if (oldMode) {
-                System.out.println("lala");
-                ((ComponentModel) comp).setComponentModel(model);
-              }
-            }));
-    // return moduleModel;
-
-    final ComponentAst mmm = enrichRecursively(moduleModel, tnsExtensionModel);
-
-    // // ... but this creates a new one, so the comps in the model property are left unenriched...
-    // final ComponentAst mmm = getModuleComponentModel(resource, moduleDocument, extensionsWithTns);
-    // mmm.recursiveStream()
-    // .forEach(componentModel -> {
-    // resolveTypedComponentIdentifier((ComponentModel) componentModel,
-    // new ExtensionModelHelper(extensionsWithTns));
-    // });
-    // recursiveStreamWithHierarchy(mmm).forEach(new ComponentLocationVisitor());
-
-    // what are the differences between mmm and moduleModel?
-
-    // return mmm;
-    if (oldMode) {
-      return moduleModel;
-    } else {
-      return mmm;
-    }
-  }
-
   private ComponentAst enrichRecursively(final ComponentAst moduleModel, ExtensionModel result) {
-    return MuleArtifactAstCopyUtils.copyComponentTreeRecursively(moduleModel, comp -> {
+    return copyComponentTreeRecursively(moduleModel, comp -> {
       if (TNS_PREFIX.equals(comp.getIdentifier().getNamespace())) {
+        // TODO MULE-17419 (AST) Set all models, not just for operations (routers/scopes are missing here for sure)
         final Optional<OperationModel> enrichedOperationModel = result.getOperationModel(comp.getIdentifier().getName())
             .filter(model -> OperationModel.class.isAssignableFrom(model.getClass()))
             .map(model -> enrichOperationModel(model, result));
@@ -646,7 +616,6 @@ public final class XmlExtensionLoaderDelegate {
         .map(mp -> {
           if (mp instanceof OperationComponentModelModelProperty) {
             final OperationComponentModelModelProperty ocm = (OperationComponentModelModelProperty) mp;
-            // TODO
             return new OperationComponentModelModelProperty(enrichRecursively(ocm.getOperationComponentModel(), result),
                                                             enrichRecursively(ocm.getBodyComponentModel(), result));
           } else {
