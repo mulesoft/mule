@@ -10,7 +10,7 @@
     
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <muleOAuthClienVersion>1.0.0-SNAPSHOT</muleOAuthClienVersion>
+        <muleOAuthClientVersion>1.0.0-SNAPSHOT</muleOAuthClientVersion>
     </properties>
 
     <dependencies>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-oauth-client</artifactId>
-            <version>${muleOAuthClienVersion}</version>
+            <version>${muleOAuthClientVersion}</version>
         </dependency>
     </dependencies>
 </project>
