@@ -53,7 +53,7 @@ public class DeclarationContextValueProviderCacheIdGeneratorTestCase extends Abs
     Optional<ParameterizedModel> elementModel = component.getModel(ParameterizedModel.class);
 
     if (!elementDeclaration.isPresent() || !elementModel.isPresent()) {
-      fail(format("missing declaration or model for:", location));
+      fail(format("missing declaration or model for: %s", location));
     }
 
     Optional<ComponentAst> configAst = resolveConfigName(component)

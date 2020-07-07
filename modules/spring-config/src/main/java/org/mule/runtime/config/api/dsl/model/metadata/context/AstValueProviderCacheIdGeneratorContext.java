@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl.model.metadata.context;
 
+import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -18,8 +19,8 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class AstValueProviderCacheIdGeneratorContext implements ValueProviderCacheIdGeneratorContext<ComponentParameterAst> {
 
@@ -41,7 +42,7 @@ public class AstValueProviderCacheIdGeneratorContext implements ValueProviderCac
         .collect(toMap(p -> p.getModel().getName(),
                        p -> new DefaultParameterInfo<>(p.getModel().getName(),
                                                        p,
-                                                       v -> v.getValue().reduce(Objects::hash, Objects::hash))));
+                                                       ParameterVisitorFunctions::computeHashFor)));
     this.configContext = empty();
     this.connectionContext = NULL_LAZY_VALUE;
   }
@@ -82,5 +83,35 @@ public class AstValueProviderCacheIdGeneratorContext implements ValueProviderCac
     return connectionContext.get();
   }
 
+  private static class ParameterVisitorFunctions {
+
+    private static int computeHashFor(ComponentParameterAst parameter) {
+      return new ParameterVisitorFunctions(parameter).hash;
+    }
+
+    private int hash = 0;
+    private final Function<String, Void> leftFunction = this::hashForLeft;
+    private final Function<Object, Void> rightFunction = this::hashForRight;
+
+    private ParameterVisitorFunctions(ComponentParameterAst startingParameter) {
+      startingParameter.getValue().reduce(leftFunction, rightFunction);
+    }
+
+    private Void hashForLeft(String s) {
+      hash += hash(s);
+      return null;
+    }
+
+    private Void hashForRight(Object o) {
+      if (o instanceof ComponentAst) {
+        final ComponentAst c = (ComponentAst) o;
+        c.getParameters().forEach(p -> p.getValue().reduce(leftFunction, rightFunction));
+      } else {
+        hash += hash(o);
+      }
+      return null;
+    }
+
+  }
 
 }
