@@ -87,7 +87,7 @@ public class MessagingException extends EventProcessingException {
     super(original.getI18nMessage(), event, original.getCause());
     this.failingComponent = original.getFailingComponent();
     this.handled = original.handled();
-    original.getInfo().forEach(this::addInfo);
+    addAllInfo(original.getInfo());
     extractMuleMessage(event);
     setMessage(original.getMessage());
   }
@@ -97,6 +97,9 @@ public class MessagingException extends EventProcessingException {
     extractMuleMessage(event);
     this.failingComponent = failingComponent;
     setMessage(generateMessage(getI18nMessage(), null));
+    if (cause instanceof MuleException) {
+      addAllInfo(((MuleException) cause).getInfo());
+    }
   }
 
   protected String generateMessage(I18nMessage message, MuleContext muleContext) {

@@ -15,14 +15,15 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
@@ -35,7 +36,6 @@ import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,8 +66,8 @@ class UntilSuccessfulRouter {
   private static final Logger LOGGER = getLogger(UntilSuccessfulRouter.class);
 
   static final String RETRY_CTX_INTERNAL_PARAM_KEY = "untilSuccessful.router.retryContext";
-  private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
-      "'until-successful' retries exhausted. Last exception message was: %s";
+  private static final String UNTIL_SUCCESSFUL_MSG =
+      "'until-successful' retries exhausted";
   private final EventInternalContextResolver<Map<String, RetryContext>> retryContextResolver;
 
   private final Component owner;
@@ -273,16 +273,19 @@ class UntilSuccessfulRouter {
 
   private Function<Throwable, Throwable> getThrowableFunction(CoreEvent event) {
     return throwable -> {
-      Throwable cause = getMessagingExceptionCause(throwable);
       CoreEvent exceptionEvent = event;
+      // Prevent any MuleException from replacing the retry exhausted error message or error type
+      // (see MessagingExceptionResolver#findRoot)
+      Throwable retryPolicyExhaustionCause =
+          suppressIfPresent(throwable, MuleException.class);
+      RetryPolicyExhaustedException retryPolicyExhaustedException =
+          new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG),
+                                            retryPolicyExhaustionCause,
+                                            owner);
       if (throwable instanceof MessagingException) {
         exceptionEvent = ((MessagingException) throwable).getEvent();
       }
-      return new MessagingException(exceptionEvent,
-                                    new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
-                                                                                          cause.getMessage()),
-                                                                      new SuppressedMuleException(cause), owner),
-                                    owner);
+      return new MessagingException(exceptionEvent, retryPolicyExhaustedException, owner);
     };
   }
 
