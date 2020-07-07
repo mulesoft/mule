@@ -19,7 +19,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.junit.MockitoJUnit.*;
+import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArtifact;
@@ -107,9 +107,9 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
 
     muleContext = mockContextWithServices();
     Set<ExtensionModel> extensions = ImmutableSet.<ExtensionModel>builder()
-            .add(getExtensionModel())
-            .add(mockExtension)
-            .build();
+        .add(getExtensionModel())
+        .add(mockExtension)
+        .build();
 
     MessageProcessorChainBuilder messageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder().chain(targetProcessor);
     MuleRegistry mockedRegistry = muleContext.getRegistry();
