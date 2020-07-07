@@ -26,8 +26,6 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
-import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
-import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
