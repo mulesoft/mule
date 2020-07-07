@@ -33,6 +33,12 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
  */
 public class XmlSdk1ExtensionModelDeclarer {
 
+  private static final String XMLSDK1_STEREOTYPE_NAMESPACE = "XML_SDK_1";
+
+  private static final StereotypeModel PARAMS_STEREOTYPE = newStereotype("PARAMETERS", XMLSDK1_STEREOTYPE_NAMESPACE).build();
+  private static final StereotypeModel PARAM_STEREOTYPE = newStereotype("PARAMETER", XMLSDK1_STEREOTYPE_NAMESPACE).build();
+  private static final StereotypeModel OUTPUT_STEREOTYPE = newStereotype("OUTPUT", XMLSDK1_STEREOTYPE_NAMESPACE).build();
+
   public ExtensionDeclarer createExtensionModel() {
     final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault()
         .createTypeLoader(XmlSdk1ExtensionModelDeclarer.class
@@ -86,18 +92,16 @@ public class XmlSdk1ExtensionModelDeclarer {
             .enumOf(PRIVATE.name(), PUBLIC.name())
             .build());
 
-    final StereotypeModel paramsStereotype = newStereotype("PARAMETERS", "XML_SDK_1").build();
-    final StereotypeModel paramStereotype = newStereotype("PARAMETER", "XML_SDK_1").build();
     operationDeclaration.withOptionalComponent("parameters")
-        .withAllowedStereotypes(paramsStereotype);
+        .withAllowedStereotypes(PARAMS_STEREOTYPE);
 
     extensionDeclarer.withConstruct("parameters")
-        .withStereotype(paramsStereotype)
+        .withStereotype(PARAMS_STEREOTYPE)
         .withComponent("parameter")
-        .withAllowedStereotypes(paramStereotype);
+        .withAllowedStereotypes(PARAM_STEREOTYPE);
 
     final ParameterGroupDeclarer parameterDefaultParamGroup = extensionDeclarer.withConstruct("parameter")
-        .withStereotype(paramStereotype)
+        .withStereotype(PARAM_STEREOTYPE)
         .onDefaultParameterGroup();
 
     parameterDefaultParamGroup
@@ -123,12 +127,11 @@ public class XmlSdk1ExtensionModelDeclarer {
         .withStereotype(CHAIN)
         .withChain();
 
-    final StereotypeModel outputStereotype = newStereotype("OUTPUT", "XML_SDK_1").build();
     operationDeclaration.withOptionalComponent("output")
-        .withAllowedStereotypes(outputStereotype);
+        .withAllowedStereotypes(OUTPUT_STEREOTYPE);
 
     extensionDeclarer.withConstruct("output")
-        .withStereotype(outputStereotype)
+        .withStereotype(OUTPUT_STEREOTYPE)
         .onDefaultParameterGroup()
         .withRequiredParameter("type")
         .ofType(typeBuilder.stringType()
