@@ -80,18 +80,18 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void handleThrowingOfNotDeclaredErrorType() {
     typeRepository.addErrorType(buildFromStringRepresentation(ERROR_NAMESPACE + ":" + CONNECTIVITY_ERROR_IDENTIFIER),
-                                typeRepository.getAnyErrorType());
+            typeRepository.getAnyErrorType());
     when(operationModel.getErrorModels())
-        .thenReturn(singleton(newError(TRANSFORMATION_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
+            .thenReturn(singleton(newError(TRANSFORMATION_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     ModuleException moduleException =
-        new ModuleException(CONNECTIVITY, new RuntimeException());
+            new ModuleException(CONNECTIVITY, new RuntimeException());
 
     assertThatThrownBy(() -> handler.processException(moduleException))
-        .isInstanceOf(MuleRuntimeException.class)
-        .hasMessage("The component 'testOperation' from the connector 'Test Extension' attempted to throw 'TEST-EXTENSION:CONNECTIVITY', "
-            +
-            "but only [TEST-EXTENSION:TRANSFORMATION] errors are allowed.");
+            .isInstanceOf(MuleRuntimeException.class)
+            .hasMessage("The component 'testOperation' from the connector 'Test Extension' attempted to throw 'TEST-EXTENSION:CONNECTIVITY', "
+                    +
+                    "but only [TEST-EXTENSION:TRANSFORMATION] errors are allowed.");
   }
 
   @Test
@@ -120,13 +120,33 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     ModuleException moduleException =
-        new ModuleException(CONNECTIVITY, new RuntimeException());
+            new ModuleException(CONNECTIVITY, new RuntimeException());
 
     assertThatThrownBy(() -> handler.processException(moduleException))
-        .isInstanceOf(MuleRuntimeException.class)
-        .hasMessage("The component 'testOperation' from the connector 'Test Extension' attempted to throw 'TEST-EXTENSION:CONNECTIVITY',"
-            +
-            " but it was not registered in the Error Repository");
+            .isInstanceOf(MuleRuntimeException.class)
+            .hasMessage("The component 'testOperation' from the connector 'Test Extension' attempted to throw 'TEST-EXTENSION:CONNECTIVITY',"
+                    +
+                    " but it was not registered in the Error Repository");
+  }
+
+  @Test
+  public void handleTypedException() {
+    when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    typeRepository.addErrorType(builder()
+                    .name(CONNECTIVITY_ERROR_IDENTIFIER)
+                    .namespace(ERROR_NAMESPACE)
+                    .build(),
+            typeRepository.getAnyErrorType());
+
+    ModuleException moduleException =
+            new ModuleException(CONNECTIVITY, new RuntimeException());
+    Throwable exception = handler.processException(moduleException);
+
+    assertThat(exception, is(instanceOf(TypedException.class)));
+    ErrorType errorType = ((TypedException) exception).getErrorType();
+    assertThat(errorType.getIdentifier(), is(CONNECTIVITY_ERROR_IDENTIFIER));
+    assertThat(errorType.getNamespace(), is(ERROR_NAMESPACE));
   }
 
   @Test
@@ -138,40 +158,20 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     typeRepository.addErrorType(builder()
-        .name(CONNECTIVITY_ERROR_IDENTIFIER)
-        .namespace(ERROR_NAMESPACE)
-        .build(),
-                                typeRepository.getAnyErrorType());
+                    .name(CONNECTIVITY_ERROR_IDENTIFIER)
+                    .namespace(ERROR_NAMESPACE)
+                    .build(),
+            typeRepository.getAnyErrorType());
 
     ModuleException moduleException =
-        new ModuleException(CONNECTIVITY, new RuntimeException(new MessagingException(
-                                                                                      createStaticMessage("Suppressed exception"),
-                                                                                      event)));
+            new ModuleException(CONNECTIVITY, new RuntimeException(new MessagingException(
+                    createStaticMessage("Suppressed exception"),
+                    event)));
     Throwable exception = handler.processException(moduleException);
 
     assertThat(exception.getCause(), is(instanceOf(SuppressedMuleException.class)));
     assertThat(((SuppressedMuleException) exception.getCause()).getSuppressedException(),
-               is(instanceOf(MessagingException.class)));
-  }
-
-  @Test
-  public void handleTypedException() {
-    when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
-    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
-    typeRepository.addErrorType(builder()
-        .name(CONNECTIVITY_ERROR_IDENTIFIER)
-        .namespace(ERROR_NAMESPACE)
-        .build(),
-                                typeRepository.getAnyErrorType());
-
-    ModuleException moduleException =
-        new ModuleException(CONNECTIVITY, new RuntimeException());
-    Throwable exception = handler.processException(moduleException);
-
-    assertThat(exception, is(instanceOf(TypedException.class)));
-    ErrorType errorType = ((TypedException) exception).getErrorType();
-    assertThat(errorType.getIdentifier(), is(CONNECTIVITY_ERROR_IDENTIFIER));
-    assertThat(errorType.getNamespace(), is(ERROR_NAMESPACE));
+            is(instanceOf(MessagingException.class)));
   }
 
   private ComponentIdentifier getIdentifier(ErrorModel parent) {
