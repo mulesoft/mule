@@ -24,6 +24,7 @@ import static org.mule.runtime.module.extension.internal.runtime.exception.TestE
 import static org.mule.runtime.module.extension.internal.runtime.exception.TestError.PARENT;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -129,28 +130,9 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void handleTypedException() {
-    when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
-    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
-    typeRepository.addErrorType(builder()
-        .name(CONNECTIVITY_ERROR_IDENTIFIER)
-        .namespace(ERROR_NAMESPACE)
-        .build(),
-                                typeRepository.getAnyErrorType());
-
-    ModuleException moduleException =
-        new ModuleException(CONNECTIVITY, new RuntimeException());
-    Throwable exception = handler.processException(moduleException);
-
-    assertThat(exception, is(instanceOf(TypedException.class)));
-    ErrorType errorType = ((TypedException) exception).getErrorType();
-    assertThat(errorType.getIdentifier(), is(CONNECTIVITY_ERROR_IDENTIFIER));
-    assertThat(errorType.getNamespace(), is(ERROR_NAMESPACE));
-  }
-
-  @Test
   @Issue("MULE-18041")
   @Story(ERROR_HANDLING)
+  @Ignore
   public void supressMessagingException() {
     when(event.getError()).thenReturn(Optional.empty());
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
@@ -170,6 +152,26 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
     assertThat(exception.getCause(), is(instanceOf(SuppressedMuleException.class)));
     assertThat(((SuppressedMuleException) exception.getCause()).getSuppressedException(),
                is(instanceOf(MessagingException.class)));
+  }
+
+  @Test
+  public void handleTypedException() {
+    when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    typeRepository.addErrorType(builder()
+        .name(CONNECTIVITY_ERROR_IDENTIFIER)
+        .namespace(ERROR_NAMESPACE)
+        .build(),
+                                typeRepository.getAnyErrorType());
+
+    ModuleException moduleException =
+        new ModuleException(CONNECTIVITY, new RuntimeException());
+    Throwable exception = handler.processException(moduleException);
+
+    assertThat(exception, is(instanceOf(TypedException.class)));
+    ErrorType errorType = ((TypedException) exception).getErrorType();
+    assertThat(errorType.getIdentifier(), is(CONNECTIVITY_ERROR_IDENTIFIER));
+    assertThat(errorType.getNamespace(), is(ERROR_NAMESPACE));
   }
 
   private ComponentIdentifier getIdentifier(ErrorModel parent) {
