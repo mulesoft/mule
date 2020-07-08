@@ -151,6 +151,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("MULE-18041")
+  @Issue("MULE-18562")
   @Story(ERROR_HANDLING)
   @Ignore
   public void supressMessagingException() {
