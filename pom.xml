@@ -231,7 +231,7 @@
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.2.0-20200708</muleDslApiVersion>
-        <muleExtensionsApiVersion>1.2.1-20200708</muleExtensionsApiVersion>
+        <muleExtensionsApiVersion>1.2.1-20200709</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.2.0-20200708</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.4.0-20200708</muleMavenClientApi>
         <muleMavenClientImpl>1.4.0-20200708</muleMavenClientImpl>
