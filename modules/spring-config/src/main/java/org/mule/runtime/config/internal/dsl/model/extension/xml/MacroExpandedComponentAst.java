@@ -129,6 +129,11 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
       public Optional<ComponentMetadataAst> getMetadata() {
         return originalParameter.getMetadata();
       }
+
+      @Override
+      public boolean isDefault() {
+        return originalParameter.isDefault();
+      }
     };
   }
 
