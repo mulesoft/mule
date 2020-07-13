@@ -54,6 +54,10 @@
         {
           "format": "java",
           "type": "@ref:org.mule.test.subtypes.extension.Revolver"
+        },
+        {
+          "format": "java",
+          "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
         }
       ]
     }
@@ -576,7 +580,11 @@
               "allowedStereotypeModels": [
                 {
                   "type": "RICIN",
-                  "namespace": "HEISENBERG"
+                  "namespace": "HEISENBERG",
+                  "parent": {
+                    "type": "WEAPON",
+                    "namespace": "HEISENBERG"
+                  }
                 }
               ],
               "name": "ricin",
