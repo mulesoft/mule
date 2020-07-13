@@ -44,6 +44,8 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -439,7 +441,18 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
 
   private boolean acceptsErrorType(CoreEvent event) {
-    return errorTypeMatcher == null || errorTypeMatcher.match(event.getError().get().getErrorType());
+    Error error = event.getError().get();
+    return errorTypeMatcher == null || errorTypeMatcher.match(error.getErrorType())
+        || acceptsSuppressedErrorType(error.getSuppressedErrors());
+  }
+
+  private boolean acceptsSuppressedErrorType(List<Error> suppressedErrors) {
+    for (Error suppressedError : suppressedErrors) {
+      if (errorTypeMatcher.match(suppressedError.getErrorType())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private boolean acceptsExpression(CoreEvent event) {

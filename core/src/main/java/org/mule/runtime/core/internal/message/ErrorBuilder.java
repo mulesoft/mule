@@ -20,6 +20,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.util.List;
 
@@ -37,6 +38,7 @@ public final class ErrorBuilder {
   private ErrorType errorType;
   private Message errorMessage;
   private List<Error> errors = emptyList();
+  private List<Error> suppressedErrors = emptyList();
 
   public static ErrorBuilder builder() {
     return new ErrorBuilder();
@@ -74,6 +76,11 @@ public final class ErrorBuilder {
     MuleException muleRoot = getRootMuleException(this.exception);
     if (muleRoot != null && muleRoot.getMessage() != null) {
       this.description = muleRoot.getMessage();
+      for (MuleException suppressedException : muleRoot.getExceptionInfo().getSuppressedCauses()) {
+        if (suppressedException instanceof MessagingException) {
+          ((MessagingException) suppressedException).getEvent().getError().ifPresent(error -> suppressedErrors.add(error));
+        }
+      }
     }
   }
 
@@ -195,7 +202,7 @@ public final class ErrorBuilder {
     checkState(detailedDescription != null, "detailed description exception cannot be null");
     checkState(errorType != null, "errorType exception cannot be null");
     return new ErrorImplementation(exception, description, detailedDescription, failingComponent, errorType, errorMessage,
-                                   errors);
+                                   errors, suppressedErrors);
   }
 
   /**
@@ -212,10 +219,11 @@ public final class ErrorBuilder {
     private final ErrorType errorType;
     private final Message muleMessage;
     private final List<Error> errors;
+    private final List<Error> suppressedErrors;
 
     private ErrorImplementation(Throwable exception, String description, String detailedDescription,
                                 Component failingComponent, ErrorType errorType,
-                                Message errorMessage, List<Error> errors) {
+                                Message errorMessage, List<Error> errors, List<Error> suppressedErrors) {
       this.exception = exception;
       this.description = description;
       this.detailedDescription = detailedDescription;
@@ -223,6 +231,7 @@ public final class ErrorBuilder {
       this.errorType = errorType;
       this.muleMessage = errorMessage;
       this.errors = unmodifiableList(errors);
+      this.suppressedErrors = suppressedErrors;
     }
 
     /**
@@ -276,6 +285,11 @@ public final class ErrorBuilder {
     }
 
     @Override
+    public List<Error> getSuppressedErrors() {
+      return suppressedErrors;
+    }
+
+    @Override
     public String toString() {
       StringBuilder buf = new StringBuilder(120);
 
@@ -296,6 +310,8 @@ public final class ErrorBuilder {
       buf.append("  errorMessage=").append(defaultIfNull(muleMessage, "-"));
       buf.append(lineSeparator());
       buf.append("  childErrors=").append(errors);
+      buf.append(lineSeparator());
+      buf.append("  suppressedErrors=").append(errors);
       buf.append(lineSeparator());
       buf.append('}');
       return buf.toString();
