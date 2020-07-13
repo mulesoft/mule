@@ -61,6 +61,11 @@ public interface AllureConstants {
       String MUNIT_COMPONENT_LOCATION = "MUnit component location";
 
     }
+
+    interface ComponentLifeCycle {
+
+      String COMPONENT_LIFE_CYCLE = "Component life cycle";
+    }
   }
 
   interface DeploymentTypeFeature {
