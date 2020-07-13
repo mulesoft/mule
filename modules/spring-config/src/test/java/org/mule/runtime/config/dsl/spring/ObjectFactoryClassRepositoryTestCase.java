@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.config.dsl.spring;
 
-import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -83,7 +83,7 @@ public class ObjectFactoryClassRepositoryTestCase {
     ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
     return objectFactoryClassRepository.getObjectFactoryClass(componentBuildingDefinition,
                                                               factoryType,
-                                                              FakeObject.class, () -> false, empty());
+                                                              FakeObject.class, () -> false);
   }
 
 

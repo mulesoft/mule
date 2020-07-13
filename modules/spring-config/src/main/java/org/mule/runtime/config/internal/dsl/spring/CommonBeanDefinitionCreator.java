@@ -6,18 +6,13 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
 import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
@@ -27,7 +22,6 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -46,10 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.ServiceConfigurationError;
-import java.util.Set;
-import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
@@ -57,8 +48,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Processor in the chain of responsibility that knows how to handle a generic {@code ComponentBuildingDefinition}.
@@ -68,11 +57,6 @@ import com.google.common.collect.ImmutableSet;
  *        TODO MULE-9638 set visibility to package
  */
 public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
-
-  private static Set<ComponentIdentifier> genericPropertiesCustomProcessingIdentifiers =
-      ImmutableSet.<ComponentIdentifier>builder()
-          .add(CUSTOM_TRANSFORMER_IDENTIFIER)
-          .build();
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
   private final BeanDefinitionPostProcessor beanDefinitionPostProcessor;
@@ -186,40 +170,9 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
 
-    Optional<Consumer<Object>> instanceCustomizationFunctionOptional;
-
-    Map<String, Object> customProperties = getTransformerCustomProperties(componentModel.getComponent());
-    if (customProperties.isEmpty()) {
-      instanceCustomizationFunctionOptional = empty();
-    } else {
-      instanceCustomizationFunctionOptional = of(object -> injectSpringProperties(customProperties, object));
-    }
-
     return rootBeanDefinition(objectFactoryClassRepository
         .getObjectFactoryClass(componentBuildingDefinition, objectFactoryType, objectTypeVisitor.getType(),
-                               new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit()),
-                               instanceCustomizationFunctionOptional));
-  }
-
-  private void injectSpringProperties(Map<String, Object> customProperties, Object createdInstance) {
-    try {
-      for (String propertyName : customProperties.keySet()) {
-        copyProperty(createdInstance, propertyName, customProperties.get(propertyName));
-      }
-    } catch (Exception e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
-  private Map<String, Object> getTransformerCustomProperties(ComponentAst componentModel) {
-    ComponentIdentifier identifier = componentModel.getIdentifier();
-    if (!identifier.equals(CUSTOM_TRANSFORMER_IDENTIFIER)) {
-      return emptyMap();
-    }
-    return componentModel.directChildrenStream()
-        .filter(innerComponent -> innerComponent.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
-        .map(PropertyComponentUtils::getPropertyValueFromPropertyComponent)
-        .collect(toMap(propValue -> propValue.getFirst(), propValue -> propValue.getSecond()));
+                               new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
   }
 
   private void processComponentDefinitionModel(Map<ComponentAst, SpringComponentModel> springComponentModels,
@@ -245,9 +198,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   static void processMuleProperties(ComponentAst componentModel, BeanDefinitionBuilder beanDefinitionBuilder,
                                     BeanDefinitionPostProcessor beanDefinitionPostProcessor) {
     // for now we skip custom-transformer since requires injection by the object factory.
-    if (genericPropertiesCustomProcessingIdentifiers.contains(componentModel.getIdentifier())
-        || (beanDefinitionPostProcessor != null && beanDefinitionPostProcessor.getGenericPropertiesCustomProcessingIdentifiers()
-            .contains(componentModel.getIdentifier()))) {
+    if (beanDefinitionPostProcessor != null && beanDefinitionPostProcessor.getGenericPropertiesCustomProcessingIdentifiers()
+        .contains(componentModel.getIdentifier())) {
       return;
     }
     componentModel.directChildrenStream()

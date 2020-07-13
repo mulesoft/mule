@@ -81,38 +81,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="auto-transformer" type="abstractTransformerType" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that uses the transform discovery mechanism to convert the message payload. This transformer works much better when transforming custom object types rather than Java types, because there is less chance for ambiguity.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="custom-transformer" type="customTransformerType" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A user-implemented transformer.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customTransformerType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractTransformerType">
-                <xsd:sequence>
-                    <xsd:group ref="propertiesGroup"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            An implementation of the Transformer interface.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="byte-array-to-object-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer">
         <xsd:annotation>
