@@ -142,7 +142,6 @@ public class ApplicationModel implements ArtifactAst {
   public static final String REFERENCE_ATTRIBUTE = "ref";
   public static final String VALUE_ATTRIBUTE = "value";
   public static final String TRANSFORMER_REFERENCE_ELEMENT = "transformer";
-  public static final String CUSTOM_TRANSFORMER = "custom-transformer";
   public static final String DESCRIPTION_ELEMENT = "description";
   public static final String PROPERTIES_ELEMENT = "properties";
 
@@ -167,8 +166,6 @@ public class ApplicationModel implements ArtifactAst {
       builder().namespace(CORE_PREFIX).name(ANNOTATIONS_PROPERTY_NAME).build();
   public static final ComponentIdentifier TRANSFORMER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(TRANSFORMER_REFERENCE_ELEMENT).build();
-  public static final ComponentIdentifier CUSTOM_TRANSFORMER_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(CUSTOM_TRANSFORMER).build();
   public static final ComponentIdentifier DOC_DESCRIPTION_IDENTIFIER =
       builder().namespace(DOC_NAMESPACE).name(DESCRIPTION_ELEMENT).build();
   public static final ComponentIdentifier DESCRIPTION_IDENTIFIER =

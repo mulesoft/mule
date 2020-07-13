@@ -12,7 +12,6 @@ import static java.lang.System.getProperty;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getTransformerBaseBuilder;
@@ -147,8 +146,6 @@ import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.internal.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
-import org.mule.runtime.core.internal.transformer.encryption.AbstractEncryptionTransformer;
-import org.mule.runtime.core.internal.transformer.simple.AutoTransformer;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
@@ -749,21 +746,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("targetValue", fromSimpleParameter("targetValue").build())
         .build());
     transformerComponentBuildingDefinitions.add(getCoreMuleMessageTransformerBaseBuilder()
-        .withIdentifier("content").withTypeDefinition(fromType(String.class)).build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(AutoTransformer.class)
-        .withIdentifier("auto-transformer")
+        .withIdentifier("content").withTypeDefinition(fromType(String.class))
         .build());
-    transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(getCustomTransformerConfigurationFactory(),
-                                                                          Transformer.class,
-                                                                          newBuilder()
-                                                                              .withKey("class")
-                                                                              .withAttributeDefinition(fromSimpleParameter("class")
-                                                                                  .build())
-                                                                              .build())
-                                                                                  .withTypeDefinition(fromConfigurationAttribute("class"))
-                                                                                  .withIdentifier("custom-transformer")
-                                                                                  .withNamespace(CORE_PREFIX)
-                                                                                  .build());
 
     return transformerComponentBuildingDefinitions;
   }
@@ -775,23 +759,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
       transformer.setIdentifier((String) parameters.get("identifier"));
       transformer.setValue((String) parameters.get("value"));
       return transformer;
-    };
-  }
-
-  private ConfigurableInstanceFactory getEncryptionTransformerConfigurationFactory(Class<? extends AbstractEncryptionTransformer> abstractEncryptionTransformerType) {
-    return parameters -> {
-      AbstractEncryptionTransformer encryptionTransformer =
-          (AbstractEncryptionTransformer) createNewInstance(abstractEncryptionTransformerType);
-      encryptionTransformer.setStrategy((EncryptionStrategy) parameters.get("strategy"));
-      return encryptionTransformer;
-    };
-  }
-
-  private ConfigurableInstanceFactory getCustomTransformerConfigurationFactory() {
-    return parameters -> {
-      String className = (String) parameters.get("class");
-      checkState(className != null, "custom-transformer class attribute cannot be null");
-      return createNewInstance(className);
     };
   }
 

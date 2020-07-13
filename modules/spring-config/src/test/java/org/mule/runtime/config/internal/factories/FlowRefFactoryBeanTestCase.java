@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.factories;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -320,7 +319,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         .get();
     BeanDefinition subFlowBeanDefinition = genericBeanDefinition(new ObjectFactoryClassRepository()
         .getObjectFactoryClass(subFlowComponentBuildingDefinition, SubflowMessageProcessorChainFactoryBean.class, Object.class,
-                               () -> true, empty()))
+                               () -> true))
                                    .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
                                    .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
                                    .setScope(BeanDefinition.SCOPE_PROTOTYPE)

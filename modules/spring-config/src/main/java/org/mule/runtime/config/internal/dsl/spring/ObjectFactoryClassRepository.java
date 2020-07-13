@@ -8,21 +8,22 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
+
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
 
-import com.github.benmanes.caffeine.cache.LoadingCache;
-
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import org.springframework.beans.factory.SmartFactoryBean;
+
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
-import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
  * Repository for storing the dynamic class generated to mimic {@link org.springframework.beans.factory.FactoryBean} from an
@@ -63,17 +64,14 @@ public class ObjectFactoryClassRepository {
   public Class<ObjectFactory> getObjectFactoryClass(ComponentBuildingDefinition componentBuildingDefinition,
                                                     Class objectFactoryType,
                                                     Class createdObjectType,
-                                                    Supplier<Boolean> isLazyInitFunction,
-                                                    Optional<Consumer<Object>> instancePostCreationFunctionOptional) {
-    return getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, createdObjectType, isLazyInitFunction,
-                                        instancePostCreationFunctionOptional);
+                                                    Supplier<Boolean> isLazyInitFunction) {
+    return getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, createdObjectType, isLazyInitFunction);
   }
 
   private Class<ObjectFactory> getObjectFactoryDynamicClass(final ComponentBuildingDefinition componentBuildingDefinition,
                                                             final Class objectFactoryType,
                                                             final Class createdObjectType,
-                                                            final Supplier<Boolean> isLazyInitFunction,
-                                                            final Optional<Consumer<Object>> instancePostCreationFunction) {
+                                                            final Supplier<Boolean> isLazyInitFunction) {
     /*
      * We need this to allow spring create the object using a FactoryBean but using the object factory setters and getters so we
      * create as FactoryBean a dynamic class that will have the same attributes and methods as the ObjectFactory that the user
@@ -95,7 +93,7 @@ public class ObjectFactoryClassRepository {
     // from the compatibility module.
     // Setting this to false will generate an excessive amount of different proxy classes loaded by the container CL
     // that will end up in Metaspace OOM.
-    enhancer.setUseCache(!instancePostCreationFunction.isPresent());
+    enhancer.setUseCache(true);
 
     // MG says: this is super important. Generating this variable here prevents the lambda below from
     // keeping a reference to the componentBuildingDefinition, which in turn references a classloader and has
@@ -114,9 +112,7 @@ public class ObjectFactoryClassRepository {
             return createdObjectType;
           }
           if (method.getName().equals("getObject")) {
-            Object createdInstance = proxy.invokeSuper(obj, args);
-            instancePostCreationFunction.ifPresent(consumer -> consumer.accept(createdInstance));
-            return createdInstance;
+            return proxy.invokeSuper(obj, args);
           }
           if (method.getName().equals("isPrototype")) {
             return prototype;
