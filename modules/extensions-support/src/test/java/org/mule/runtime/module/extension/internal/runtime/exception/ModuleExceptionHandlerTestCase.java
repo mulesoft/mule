@@ -24,6 +24,7 @@ import static org.mule.runtime.module.extension.internal.runtime.exception.TestE
 import static org.mule.runtime.module.extension.internal.runtime.exception.TestError.PARENT;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -151,6 +152,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("MULE-18041")
   @Story(ERROR_HANDLING)
+  @Ignore("MULE-18562")
   public void supressMessagingException() {
     when(event.getError()).thenReturn(Optional.empty());
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
