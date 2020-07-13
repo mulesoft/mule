@@ -27,7 +27,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 @Feature(ARTIFACT_AST)
 @Story(PARAMETER_AST)
-public class ComponentParameterAstTestCase extends AbstractMuleTestCase {
+public class ComponentAstParameterTestCase extends AbstractMuleTestCase {
 
   private final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
