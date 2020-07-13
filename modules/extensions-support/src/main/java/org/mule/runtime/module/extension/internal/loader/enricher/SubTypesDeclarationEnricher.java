@@ -85,24 +85,20 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
       declarer.withSubTypes(baseType, subTypes);
 
       // For subtypes that reference types from other artifacts, auto-import them.
-      final Optional<String> baseTypeId = getTypeId(baseType);
-      baseTypeId.flatMap(dslResolvingContext::getExtensionForType).ifPresent(importedDeclaringExtension -> {
-        declarer.withImportedType(new ImportedTypeModel(baseTypeId
-            .flatMap(importedTypeId -> dslResolvingContext.getTypeCatalog()
-                .getType(importedTypeId))
-            .orElse((ObjectType) baseType)));
+      autoImportReferencedTypes(declarer, dslResolvingContext, baseType);
+      subTypes.forEach(subType -> autoImportReferencedTypes(declarer, dslResolvingContext, subType));
 
-      });
-      subTypes.forEach(subType -> {
-        final Optional<String> subTypeId = getTypeId(subType);
-        subTypeId.flatMap(dslResolvingContext::getExtensionForType).ifPresent(importedDeclaringExtension -> {
-          declarer.withImportedType(new ImportedTypeModel(subTypeId
-              .flatMap(importedTypeId -> dslResolvingContext.getTypeCatalog()
-                  .getType(importedTypeId))
-              .orElse((ObjectType) subType)));
-        });
-      });
+    });
+  }
 
+  private void autoImportReferencedTypes(ExtensionDeclarer declarer, DslResolvingContext dslResolvingContext,
+                                         MetadataType subType) {
+    final Optional<String> subTypeId = getTypeId(subType);
+    subTypeId.flatMap(dslResolvingContext::getExtensionForType).ifPresent(importedDeclaringExtension -> {
+      declarer.withImportedType(new ImportedTypeModel(subTypeId
+          .flatMap(importedTypeId -> dslResolvingContext.getTypeCatalog()
+              .getType(importedTypeId))
+          .orElse((ObjectType) subType)));
     });
   }
 
