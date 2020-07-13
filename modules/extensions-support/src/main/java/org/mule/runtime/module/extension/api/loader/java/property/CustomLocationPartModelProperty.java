@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.privileged.loader.java.property;
+package org.mule.runtime.module.extension.api.loader.java.property;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -53,7 +53,7 @@ public class CustomLocationPartModelProperty implements ModelProperty {
 
   @Override
   public boolean isPublic() {
-    return false;
+    return true;
   }
 
 }

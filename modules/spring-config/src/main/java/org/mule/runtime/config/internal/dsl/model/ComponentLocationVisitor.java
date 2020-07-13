@@ -35,7 +35,7 @@ import org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
-import org.mule.runtime.module.extension.privileged.loader.java.property.CustomLocationPartModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.CustomLocationPartModelProperty;
 
 import java.util.List;
 import java.util.Optional;
