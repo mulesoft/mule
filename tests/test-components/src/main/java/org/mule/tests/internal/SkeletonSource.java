@@ -7,18 +7,12 @@
 package org.mule.tests.internal;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import java.io.InputStream;
-import java.lang.reflect.Field;
-
-import javax.inject.Inject;
 
 /**
  * Mock message source that provides access to the Processor set by the owner Flow.
@@ -26,32 +20,15 @@ import javax.inject.Inject;
 @MediaType(value = ANY, strict = false)
 public class SkeletonSource extends Source<InputStream, InputStream> {
 
-    @Inject
-    private ConfigurationComponentLocator locator;
-
     private volatile boolean started = false;
-    private Processor listener;
 
     @Override
     public synchronized void onStart(SourceCallback sourceCallback) throws MuleException {
-
-        try {
-            Field field = sourceCallback.getClass().getDeclaredField("listener");
-            field.setAccessible(true);
-            listener = (Processor) field.get(sourceCallback);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            throw new MuleRuntimeException(e);
-        } finally {
-            started = true;
-        }
+        started = true;
     }
 
     public synchronized boolean isStarted() {
         return started;
-    }
-
-    public Processor getListener() {
-        return listener;
     }
 
     @Override
