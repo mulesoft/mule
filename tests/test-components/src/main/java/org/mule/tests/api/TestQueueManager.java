@@ -6,6 +6,7 @@
  */
 package org.mule.tests.api;
 
+import static java.lang.Thread.currentThread;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tests.internal.TestQueue;
 
@@ -29,6 +30,7 @@ public class TestQueueManager {
         try {
             return get(configName).pop(timeout, timeUnit);
         } catch (InterruptedException e) {
+            currentThread().interrupt();
             return null;
         }
     }
@@ -37,7 +39,7 @@ public class TestQueueManager {
         try {
             get(configName).push(event);
         } catch (InterruptedException e) {
-            // ignore
+            currentThread().interrupt();
         }
     }
 

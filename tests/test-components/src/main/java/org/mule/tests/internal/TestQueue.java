@@ -1,16 +1,11 @@
 package org.mule.tests.internal;
 
-import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-
 public final class TestQueue {
-
-  private static final Logger LOGGER = getLogger(TestQueue.class);
 
   private final String name;
   private LinkedBlockingQueue<CoreEvent> blockingQueue;

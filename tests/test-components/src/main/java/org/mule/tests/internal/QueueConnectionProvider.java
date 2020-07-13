@@ -8,12 +8,7 @@ import org.mule.tests.api.TestQueueManager;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class QueueConnectionProvider implements CachedConnectionProvider<TestQueue> {
-
-  private final Logger LOGGER = LoggerFactory.getLogger(QueueConnectionProvider.class);
 
   @Inject
   private TestQueueManager queueManager;
