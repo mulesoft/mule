@@ -15,7 +15,6 @@ import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocat
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PRIVATE;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.OperationVisibility.PUBLIC;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -24,7 +23,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 
 /**
  * An {@link ExtensionDeclarer} for Mule's XML SDK v1
@@ -40,9 +38,6 @@ public class XmlSdk1ExtensionModelDeclarer {
   private static final StereotypeModel OUTPUT_STEREOTYPE = newStereotype("OUTPUT", XMLSDK1_STEREOTYPE_NAMESPACE).build();
 
   public ExtensionDeclarer createExtensionModel() {
-    final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault()
-        .createTypeLoader(XmlSdk1ExtensionModelDeclarer.class
-            .getClassLoader());
     final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JavaTypeLoader.JAVA);
 
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
