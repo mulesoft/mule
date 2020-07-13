@@ -573,7 +573,7 @@ public final class ApplicationModelTypeUtils {
                 .flatMap(typeId -> {
                   if (typesDslMap.containsKey(typeId)) {
                     LOGGER
-                        .warn("getArrayItemTypeVisitor.recursiveAwareContainedElement: No entry for '{}' in typesDslMap, ignoring.",
+                        .debug("getArrayItemTypeVisitor.recursiveAwareContainedElement: No entry for '{}' in typesDslMap, ignoring.",
                               typeId);
                     return typesDslMap.get(typeId);
                   } else {
@@ -581,7 +581,7 @@ public final class ApplicationModelTypeUtils {
                   }
                 })
                 .map(referencedDslElement -> {
-                  LOGGER.warn("getArrayItemTypeVisitor.recursiveAwareContainedElement: processing typeId {}",
+                  LOGGER.debug("getArrayItemTypeVisitor.recursiveAwareContainedElement: processing typeId {}",
                               referencedDslElement.toString());
                   final DslElementSyntaxBuilder baseReferenced = DslElementSyntaxBuilder.create()
                       .withAttributeName(innerElement.getAttributeName())
