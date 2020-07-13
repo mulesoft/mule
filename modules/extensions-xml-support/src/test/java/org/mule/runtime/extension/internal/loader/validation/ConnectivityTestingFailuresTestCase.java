@@ -17,11 +17,14 @@ import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.MODULE_CONNECTION_MARKER_ATTRIBUTE;
 import static org.mule.runtime.extension.internal.loader.validator.TestConnectionValidator.TEST_CONNECTION_SELECTED_ELEMENT_INVALID;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
@@ -57,7 +60,8 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
   @Test
   public void multipleGlobalElementsWithXmlnsConnectionAttribute() {
     setExpectedMessage("first-config", "second-config");
-    getExtensionModelFrom("validation/testconnection/module-multiple-global-element-xmlns-connection-true.xml");
+    getExtensionModelFrom("validation/testconnection/module-multiple-global-element-xmlns-connection-true.xml",
+                          new HashSet<>(Arrays.asList(getPetstoreExtension(true))));
   }
 
   @Test
@@ -65,14 +69,14 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
     setExpectedMessage("first-config-not-defined-to-which-one-do-test-connection",
                        "second-config-not-defined-to-which-one-do-test-connection");
     getExtensionModelFrom("validation/testconnection/module-not-defined-test-connection.xml",
-                          new HashSet<>(Arrays.asList(getHttpExtension(true))));
+                          new HashSet<>(Arrays.asList(getPetstoreExtension(true))));
   }
 
   @Test
   public void multipleGlobalElementsWithTestConnectionAndNotEvenOneDefinedHttpAndFile() {
     setExpectedMessage("file-global-element", "http-global-element");
     getExtensionModelFrom("validation/testconnection/module-not-defined-test-connection-http-file.xml",
-                          new HashSet<>(Arrays.asList(getHttpExtension(true), getFileExtension())));
+                          new HashSet<>(Arrays.asList(getPetstoreExtension(true), getFileExtension())));
   }
 
   @Test
@@ -90,7 +94,7 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
   @Test
   public void invalidTestConnectionElement() {
     ExtensionModel loaded = getExtensionModelFrom("validation/testconnection/module-invalid-test-connection.xml",
-                                                  new HashSet<>(Arrays.asList(getHttpExtension(false))));
+                                                  new HashSet<>(Arrays.asList(getPetstoreExtension(false))));
     ProblemsReporter problemsReporter = new ProblemsReporter(loaded);
     new TestConnectionValidator().validate(loaded, problemsReporter);
 
@@ -98,7 +102,7 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
     assertThat(problemsReporter.getWarnings().get(0).getMessage(), is(format(TEST_CONNECTION_SELECTED_ELEMENT_INVALID,
                                                                              "http-requester-config",
                                                                              MODULE_CONNECTION_MARKER_ATTRIBUTE,
-                                                                             "http:request-config")));
+                                                                             "petstore:config")));
     assertThat(problemsReporter.getWarnings().get(0).getComponent(), is(loaded.getConfigurationModels().get(0)));
 
   }
@@ -107,8 +111,8 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
     return mockedExtension("file", "config", "connection", true);
   }
 
-  private ExtensionModel getHttpExtension(boolean supportsConnectivityTesting) {
-    return mockedExtension("http", "request-config", "request-connection", supportsConnectivityTesting);
+  private ExtensionModel getPetstoreExtension(boolean supportsConnectivityTesting) {
+    return mockedExtension("petstore", "config", "connection", supportsConnectivityTesting);
   }
 
   private void setExpectedMessage(String... conflictingGlobalElements) {
@@ -118,15 +122,23 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
 
   private ExtensionModel mockedExtension(final String name, final String config, final String connectionProvider,
                                          boolean supportsConnectivityTesting) {
+    final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault()
+        .createTypeLoader(ConnectivityTestingFailuresTestCase.class.getClassLoader());
+
     final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
-    extensionDeclarer.named(name)
+    final ConfigurationDeclarer configDeclarer = extensionDeclarer.named(name)
         .onVersion("4.0.0")
         .fromVendor("MuleSoft testcase")
         .withCategory(Category.COMMUNITY)
-        .withConfig(config)
+        .withConfig(config);
+    configDeclarer
         .withConnectionProvider(connectionProvider)
         .supportsConnectivityTesting(supportsConnectivityTesting)
-        .withConnectionManagementType(ConnectionManagementType.NONE);
+        .withConnectionManagementType(ConnectionManagementType.NONE)
+        .onDefaultParameterGroup()
+        .withRequiredParameter("name")
+        .ofType(typeLoader.load(String.class))
+        .asComponentId();
 
     return new ExtensionModelFactory()
         .create(new DefaultExtensionLoadingContext(extensionDeclarer, currentThread().getContextClassLoader(),
