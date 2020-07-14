@@ -39,7 +39,7 @@ public class ComponentAstParameterTestCase extends AbstractMuleTestCase {
   public void componentParameterWithRawValueIsNonADefaultParameter() {
     ParameterModel model = mock(ParameterModel.class);
     ComponentParameterAst parameterAst = new DefaultComponentParameterAst(RAW_VALUE, () -> model);
-    assertThat(parameterAst.isDefault(), is(false));
+    assertThat(parameterAst.isDefaultValue(), is(false));
   }
 
   @Description("A component parameter without a raw-value is a default parameter")
@@ -47,7 +47,7 @@ public class ComponentAstParameterTestCase extends AbstractMuleTestCase {
   public void componentParameterWithoutRawValueIsADefaultParameter() {
     ParameterModel model = mock(ParameterModel.class);
     ComponentParameterAst parameterAst = new DefaultComponentParameterAst(null, () -> model);
-    assertThat(parameterAst.isDefault(), is(true));
+    assertThat(parameterAst.isDefaultValue(), is(true));
   }
 
   @Description("A component parameter wit same raw-value as a default model parameter is a default parameter")
@@ -57,7 +57,7 @@ public class ComponentAstParameterTestCase extends AbstractMuleTestCase {
     when(model.getDefaultValue()).thenReturn(RAW_VALUE);
     when(model.getType()).thenReturn(TYPE_LOADER.load(String.class));
     ComponentParameterAst parameterAst = new DefaultComponentParameterAst(RAW_VALUE, () -> model);
-    assertThat(parameterAst.isDefault(), is(true));
+    assertThat(parameterAst.isDefaultValue(), is(true));
   }
 
   @Description("A component parameter wit same raw-value expression as a default model parameter is a default parameter")
@@ -67,7 +67,7 @@ public class ComponentAstParameterTestCase extends AbstractMuleTestCase {
     when(model.getDefaultValue()).thenReturn(RAW_VALUE_EXPRESSION);
     when(model.getType()).thenReturn(TYPE_LOADER.load(String.class));
     ComponentParameterAst parameterAst = new DefaultComponentParameterAst(RAW_VALUE_EXPRESSION, () -> model);
-    assertThat(parameterAst.isDefault(), is(true));
+    assertThat(parameterAst.isDefaultValue(), is(true));
     assertThat(parameterAst.getValue().getLeft(), is(extractExpression(RAW_VALUE_EXPRESSION).get()));
   }
 
@@ -77,6 +77,6 @@ public class ComponentAstParameterTestCase extends AbstractMuleTestCase {
     ParameterModel model = mock(ParameterModel.class);
     ParameterModel child = mock(ParameterModel.class);
     ComponentParameterAst parameterAst = new DefaultComponentParameterAst(child, () -> model, null);
-    assertThat(parameterAst.isDefault(), is(true));
+    assertThat(parameterAst.isDefaultValue(), is(true));
   }
 }

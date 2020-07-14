@@ -174,7 +174,7 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
   }
 
   @Override
-  public boolean isDefault() {
+  public boolean isDefaultValue() {
     return ofNullable(getRawValue()).map(v -> {
       if (getModel() != null && getModel().getDefaultValue() != null) {
         return v.equals(getModel().getDefaultValue());

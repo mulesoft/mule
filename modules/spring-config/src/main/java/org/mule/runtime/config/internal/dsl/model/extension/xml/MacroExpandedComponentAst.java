@@ -131,8 +131,8 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
       }
 
       @Override
-      public boolean isDefault() {
-        return originalParameter.isDefault();
+      public boolean isDefaultValue() {
+        return originalParameter.isDefaultValue();
       }
     };
   }
