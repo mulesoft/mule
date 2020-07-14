@@ -19,7 +19,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -32,14 +31,18 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHan
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestTransaction;
@@ -71,8 +74,15 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
   private OnErrorContinueHandler onErrorContinueHandler;
 
+  private ErrorType anyErrorType = ErrorTypeBuilder.builder().namespace("MULE").identifier("ANY").build();
+
   public OnErrorContinueHandlerTestCase(VerboseExceptions verbose) {
     super(verbose);
+  }
+
+  @Override
+  protected TemplateOnErrorHandler getErrorHandler() {
+    return onErrorContinueHandler;
   }
 
   @Override
@@ -133,9 +143,9 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
   @Test
   public void handleExceptionWithMessageProcessorsChangingEvent() throws Exception {
-    CoreEvent lastEventCreated = InternalEvent.builder(context).message(of("")).build();
+    CoreEvent lastEventCreated = InternalEvent.builder(context).message(Message.of("")).build();
     onErrorContinueHandler
-        .setMessageProcessors(asList(createChagingEventMessageProcessor(InternalEvent.builder(context).message(of(""))
+        .setMessageProcessors(asList(createChagingEventMessageProcessor(InternalEvent.builder(context).message(Message.of(""))
             .build()),
                                      createChagingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
@@ -156,7 +166,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
    */
   @Test
   public void messageToStringNotCalledOnFailure() throws Exception {
-    muleEvent = builder(muleEvent).message(spy(of(""))).build();
+    muleEvent = builder(muleEvent).message(spy(Message.of(""))).build();
     muleEvent = spy(muleEvent);
     when(mockException.getStackTrace()).thenReturn(new StackTraceElement[0]);
     when(mockException.getEvent()).thenReturn(muleEvent);

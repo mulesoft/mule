@@ -7,21 +7,35 @@
 package org.mule.runtime.core.internal.exception;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
+import org.junit.Test;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleExceptionInfo;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
@@ -54,6 +68,8 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
 
   protected CoreEvent muleEvent;
 
+  protected abstract AbstractExceptionListener getErrorHandler();
+
   @Before
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
@@ -68,5 +84,52 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
   @After
   public void after() {
     flow.dispose();
+  }
+
+  @Test
+  public void testUnsuppressedErrorMustBeAccepted() throws InitialisationException {
+    if (getErrorHandler() instanceof TemplateOnErrorHandler) {
+      TemplateOnErrorHandler onErrorHandler = (TemplateOnErrorHandler) getErrorHandler();
+      CoreEvent event = getCoreEventWithSuppressedError(onErrorHandler.getMuleContext());
+      onErrorHandler.setErrorType("MULE:UNSUPPRESSED");
+      initialiseIfNeeded(onErrorHandler, onErrorHandler.getMuleContext());
+      assertThat(onErrorHandler.accept(event), is(true));
+    }
+  }
+
+  @Test
+  public void testSuppressedErrorMustBeAccepted() throws InitialisationException {
+    if (getErrorHandler() instanceof TemplateOnErrorHandler) {
+      TemplateOnErrorHandler onErrorHandler = (TemplateOnErrorHandler) getErrorHandler();
+      CoreEvent event = getCoreEventWithSuppressedError(onErrorHandler.getMuleContext());
+      onErrorHandler.setErrorType("MULE:SUPPRESSED");
+      initialiseIfNeeded(onErrorHandler, onErrorHandler.getMuleContext());
+      assertThat(onErrorHandler.accept(event), is(true));
+    }
+  }
+
+  private CoreEvent getCoreEventWithSuppressedError(MuleContext muleContext) {
+    ErrorType anyErrorType = ErrorTypeBuilder.builder().namespace("MULE").identifier("ANY").build();
+    ErrorType suppressedErrorType =
+        ErrorTypeBuilder.builder().namespace("MULE").identifier("SUPPRESSED").parentErrorType(anyErrorType).build();
+    ErrorType unsuppressedErrorType =
+        ErrorTypeBuilder.builder().namespace("MULE").identifier("UNSUPPRESSED").parentErrorType(anyErrorType).build();
+    ErrorType sourceResponseErrorType =
+        ErrorTypeBuilder.builder().namespace("MULE").identifier("SOURCE_RESPONSE").parentErrorType(anyErrorType).build();
+    Error errorWithSuppression = mock(Error.class);
+    Error suppressedError = mock(Error.class);
+    CoreEvent event = mock(CoreEvent.class);
+    when(errorWithSuppression.getSuppressedErrors()).thenReturn(Collections.singletonList(suppressedError));
+    when(errorWithSuppression.getErrorType()).thenReturn(unsuppressedErrorType);
+    when(suppressedError.getErrorType()).thenReturn(suppressedErrorType);
+    when(event.getError()).thenReturn(Optional.of(errorWithSuppression));
+    when(muleContext.getErrorTypeRepository()
+        .lookupErrorType(ComponentIdentifier.buildFromStringRepresentation("MULE:SUPPRESSED")))
+            .thenReturn(Optional.of(suppressedErrorType));
+    when(muleContext.getErrorTypeRepository()
+        .lookupErrorType(ComponentIdentifier.buildFromStringRepresentation("MULE:UNSUPPRESSED")))
+            .thenReturn(Optional.of(unsuppressedErrorType));
+    when(muleContext.getErrorTypeRepository().getSourceResponseErrorType()).thenReturn(sourceResponseErrorType);
+    return event;
   }
 }

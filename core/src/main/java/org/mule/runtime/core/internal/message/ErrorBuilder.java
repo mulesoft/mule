@@ -244,7 +244,7 @@ public final class ErrorBuilder {
       this.errorType = errorType;
       this.muleMessage = errorMessage;
       this.errors = unmodifiableList(errors);
-      this.suppressedErrors = suppressedErrors;
+      this.suppressedErrors = unmodifiableList(suppressedErrors);
     }
 
     /**
@@ -322,9 +322,9 @@ public final class ErrorBuilder {
       buf.append(lineSeparator());
       buf.append("  errorMessage=").append(defaultIfNull(muleMessage, "-"));
       buf.append(lineSeparator());
-      buf.append("  childErrors=").append(errors);
+      buf.append("  suppressedErrors=").append(suppressedErrors);
       buf.append(lineSeparator());
-      buf.append("  suppressedErrors=").append(errors);
+      buf.append("  childErrors=").append(errors);
       buf.append(lineSeparator());
       buf.append('}');
       return buf.toString();

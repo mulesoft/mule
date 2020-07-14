@@ -438,7 +438,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return acceptsAll() || (acceptsErrorType(event) && acceptsExpression(event));
   }
 
-
   private boolean acceptsErrorType(CoreEvent event) {
     Error error = event.getError().get();
     return errorTypeMatcher == null || errorTypeMatcher.match(error.getErrorType())

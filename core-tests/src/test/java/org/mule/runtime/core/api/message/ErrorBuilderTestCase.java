@@ -7,14 +7,16 @@
 package org.mule.runtime.core.api.message;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.of;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 
@@ -26,6 +28,8 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -34,13 +38,12 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class ErrorBuilderTestCase extends AbstractMuleTestCase {
 
   private static final String EXCEPTION_MESSAGE = "message";
-  private final ErrorType mockErrorType = Mockito.mock(ErrorType.class);
+  private final ErrorType mockErrorType = mock(ErrorType.class);
 
   @Test
   public void buildErrorFromException() {
@@ -69,7 +72,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     String detailedDescription = "detailed description";
     String description = "description";
     ErrorType errorType = mockErrorType;
-    Message errorMessage = of(null);
+    Message errorMessage = Message.of(null);
     IllegalArgumentException exception = new IllegalArgumentException("some message");
     Error error = builder()
         .errorType(errorType)
@@ -107,7 +110,14 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   public void givesStringRepresentation() {
     ErrorType anyError = ErrorTypeBuilder.builder().namespace("MULE").identifier("ANY").build();
     ErrorType testError = ErrorTypeBuilder.builder().namespace("MULE").identifier("TEST").parentErrorType(anyError).build();
-    Error error = builder(new ComposedErrorMessageAwareException(createStaticMessage(EXCEPTION_MESSAGE), testError))
+    CoreEvent suppressedErrorEvent = mock(CoreEvent.class);
+    MuleException suppressedMessagingException = new MessagingException(createStaticMessage("Test"), suppressedErrorEvent);
+    Error suppressedError = builder(suppressedMessagingException).errorType(testError).build();
+    when(suppressedErrorEvent.getError()).thenReturn(of(suppressedError));
+    MuleException composedMessageAwareException =
+        new ComposedErrorMessageAwareException(createStaticMessage(EXCEPTION_MESSAGE), testError);
+    composedMessageAwareException.getExceptionInfo().addSuppressedCause(suppressedMessagingException);
+    Error error = builder(composedMessageAwareException)
         .errorType(testError)
         .build();
 
@@ -126,6 +136,17 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
                    + "  attributes=<not set>\n"
                    + "  attributesMediaType=*/*\n"
                    + "}\n"
+                   + "  suppressedErrors=[\n"
+                   + "org.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
+                   + "{\n"
+                   + "  description=Test\n"
+                   + "  detailedDescription=Test\n"
+                   + "  errorType=MULE:TEST\n"
+                   + "  cause=org.mule.runtime.core.internal.exception.MessagingException\n"
+                   + "  errorMessage=-\n"
+                   + "  suppressedErrors=[]\n"
+                   + "  childErrors=[]\n"
+                   + "}]"
                    + "  childErrors=[\n"
                    + "org.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
                    + "{\n"
@@ -134,6 +155,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
                    + "  errorType=MULE:TEST\n"
                    + "  cause=java.lang.RuntimeException\n"
                    + "  errorMessage=-\n"
+                   + "  suppressedErrors=[]\n"
                    + "  childErrors=[]\n"
                    + "}, \n"
                    + "org.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
@@ -143,6 +165,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
                    + "  errorType=MULE:TEST\n"
                    + "  cause=java.io.IOException\n"
                    + "  errorMessage=-\n"
+                   + "  suppressedErrors=[]\n"
                    + "  childErrors=[]\n"
                    + "}]\n"
                    + "}")));
@@ -151,7 +174,9 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   private class ComposedErrorMessageAwareException extends MuleException implements ErrorMessageAwareException,
       ComposedErrorException {
 
-    private ErrorType errorType;
+    private static final long serialVersionUID = -5454799054976232938L;
+
+    private final ErrorType errorType;
 
     public ComposedErrorMessageAwareException(I18nMessage message) {
       this(message, mockErrorType);
