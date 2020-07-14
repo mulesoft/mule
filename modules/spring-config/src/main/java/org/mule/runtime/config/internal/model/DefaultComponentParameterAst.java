@@ -173,4 +173,14 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
     return ofNullable(metadata);
   }
 
+  @Override
+  public boolean isDefaultValue() {
+    return ofNullable(getRawValue()).map(v -> {
+      if (getModel() != null && getModel().getDefaultValue() != null) {
+        return v.equals(getModel().getDefaultValue());
+      } else {
+        return false;
+      }
+    }).orElse(true);
+  }
 }
