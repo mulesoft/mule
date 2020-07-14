@@ -11,11 +11,14 @@ import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.runtime.core.internal.util.TestFileUtils.isFileOpen;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_KEYSTORE;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SSL_TYPE;
@@ -38,6 +41,8 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
 public class TlsConfigurationTestCase extends AbstractMuleTestCase {
@@ -70,6 +75,58 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase {
     } catch (Exception e) {
       assertNotNull("expected", e);
     }
+  }
+
+  @Test
+  public void testTlsConfigurationDoesNotLeakKeyStoreFile() throws Exception {
+    TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
+    configuration.setKeyPassword("mulepassword");
+    configuration.setKeyStorePassword("mulepassword");
+    configuration.setKeyStore("clientKeystore");
+    configuration.initialise(false, JSSE_NAMESPACE);
+
+    File keyStoreFile = newFile(configuration.getKeyStore());
+    assertThat(keyStoreFile.exists(), is(true));
+    assertThat(isFileOpen(keyStoreFile), is(false));
+  }
+
+  @Test
+  public void testTlsConfigurationDoesNotLeakTrustStoreFile() throws Exception {
+    TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
+    configuration.setKeyPassword("mulepassword");
+    configuration.setKeyStorePassword("mulepassword");
+    configuration.setKeyStore("clientKeystore");
+    configuration.setTrustStorePassword("mulepassword");
+    configuration.setTrustStore("trustStore");
+    configuration.initialise(false, JSSE_NAMESPACE);
+
+    File trustStoreFile = newFile(configuration.getTrustStore());
+    assertThat(trustStoreFile.exists(), is(true));
+    assertThat(isFileOpen(trustStoreFile), is(false));
+  }
+
+  @Test
+  @Issue("MULE-18569")
+  @Description("When store file doesn't exist, the absolute path is null")
+  public void setNotExistentPathLetsNullValue() throws IOException {
+    TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
+    configuration.setKeyStore("notExistent");
+    configuration.setTrustStore("notExistent");
+
+    assertThat(configuration.getKeyStore(), is(nullValue()));
+    assertThat(configuration.getTrustStore(), is(nullValue()));
+  }
+
+  @Test
+  @Issue("MULE-18569")
+  @Description("The TLS Configuration path setters were prepending a slash to the absolute path in Windows")
+  public void tlsConfigurationDoesNotBreakPaths() throws IOException {
+    TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
+    configuration.setKeyStore("clientKeystore");
+    configuration.setTrustStore("trustStore");
+
+    assertThat(newFile(configuration.getKeyStore()).exists(), is(true));
+    assertThat(newFile(configuration.getTrustStore()).exists(), is(true));
   }
 
   @Test
