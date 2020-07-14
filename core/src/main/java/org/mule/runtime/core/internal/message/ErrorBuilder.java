@@ -21,7 +21,9 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.internal.exception.SuppressedMuleException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,19 +71,30 @@ public final class ErrorBuilder {
     if (e instanceof ComposedErrorException) {
       this.errors = ((ComposedErrorException) e).getErrors();
     }
+    if (e instanceof SuppressedMuleException) {
+      this.suppressedErrors = getSuppressedMessagingErrors((SuppressedMuleException) e);
+    }
     this.exception = e;
     String exceptionDescription = e.getMessage() != null ? e.getMessage() : "unknown description";
     this.description = exceptionDescription;
     this.detailedDescription = exceptionDescription;
     MuleException muleRoot = getRootMuleException(this.exception);
-    if (muleRoot != null && muleRoot.getMessage() != null) {
-      this.description = muleRoot.getMessage();
-      for (MuleException suppressedException : muleRoot.getExceptionInfo().getSuppressedCauses()) {
-        if (suppressedException instanceof MessagingException) {
-          ((MessagingException) suppressedException).getEvent().getError().ifPresent(error -> suppressedErrors.add(error));
-        }
+    if (muleRoot != null) {
+      this.suppressedErrors = getSuppressedMessagingErrors(muleRoot);
+      if (muleRoot.getMessage() != null) {
+        this.description = muleRoot.getMessage();
       }
     }
+  }
+
+  private List<Error> getSuppressedMessagingErrors(MuleException muleException) {
+    List<Error> suppressedMessagingErrors = new ArrayList<>(4);
+    for (MuleException suppressedException : muleException.getExceptionInfo().getSuppressedCauses()) {
+      if (suppressedException instanceof MessagingException) {
+        ((MessagingException) suppressedException).getEvent().getError().ifPresent(suppressedMessagingErrors::add);
+      }
+    }
+    return suppressedMessagingErrors;
   }
 
   /**

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -18,6 +19,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
@@ -116,10 +118,10 @@ public class ModuleExceptionHandler {
     // For subclasses of ModuleException, we use it as it already contains additional information
     if (throwable.getClass().equals(ModuleException.class)) {
       return throwable.getCause() != null
-          ? throwable.getCause()
+          ? suppressIfPresent(throwable.getCause(), MessagingException.class)
           : new MuleRuntimeException(createStaticMessage(throwable.getMessage()));
     } else {
-      return throwable;
+      return suppressIfPresent(throwable, MessagingException.class);
     }
   }
 }
