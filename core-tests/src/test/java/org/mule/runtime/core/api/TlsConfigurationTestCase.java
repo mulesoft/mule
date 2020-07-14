@@ -78,34 +78,6 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testTlsConfigurationDoesNotLeakKeyStoreFile() throws Exception {
-    TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
-    configuration.setKeyPassword("mulepassword");
-    configuration.setKeyStorePassword("mulepassword");
-    configuration.setKeyStore("clientKeystore");
-    configuration.initialise(false, JSSE_NAMESPACE);
-
-    File keyStoreFile = newFile(configuration.getKeyStore());
-    assertThat(keyStoreFile.exists(), is(true));
-    assertThat(isFileOpen(keyStoreFile), is(false));
-  }
-
-  @Test
-  public void testTlsConfigurationDoesNotLeakTrustStoreFile() throws Exception {
-    TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
-    configuration.setKeyPassword("mulepassword");
-    configuration.setKeyStorePassword("mulepassword");
-    configuration.setKeyStore("clientKeystore");
-    configuration.setTrustStorePassword("mulepassword");
-    configuration.setTrustStore("trustStore");
-    configuration.initialise(false, JSSE_NAMESPACE);
-
-    File trustStoreFile = newFile(configuration.getTrustStore());
-    assertThat(trustStoreFile.exists(), is(true));
-    assertThat(isFileOpen(trustStoreFile), is(false));
-  }
-
-  @Test
   @Issue("MULE-18569")
   @Description("When store file doesn't exist, the absolute path is null")
   public void setNotExistentPathLetsNullValue() throws IOException {
