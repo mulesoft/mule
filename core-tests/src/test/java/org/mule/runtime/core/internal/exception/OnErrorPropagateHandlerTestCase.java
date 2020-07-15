@@ -43,7 +43,6 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
-import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.processor.ContextPropagationChecker;
@@ -68,7 +67,6 @@ import reactor.core.publisher.Flux;
 public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCase {
 
   protected MuleContext muleContext = mockContextWithServices();
-
   private static final String DEFAULT_LOG_MESSAGE = "LOG";
 
   @Rule

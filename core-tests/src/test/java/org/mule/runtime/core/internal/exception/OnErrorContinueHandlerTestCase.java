@@ -41,7 +41,6 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
-import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestTransaction;
