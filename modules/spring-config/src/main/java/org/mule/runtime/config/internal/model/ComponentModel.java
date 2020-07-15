@@ -454,7 +454,8 @@ public abstract class ComponentModel {
             })
             .filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
             .ifPresent(paramModel -> {
-              if (paramModel.getExpressionSupport() == NOT_SUPPORTED) {
+              if (paramModel.getExpressionSupport() == NOT_SUPPORTED
+                  || childComp.directChildrenStream().findFirst().isPresent()) {
                 setParameter(paramModel, new DefaultComponentParameterAst(childComp,
                                                                           () -> paramModel, childComp.getMetadata()));
 
