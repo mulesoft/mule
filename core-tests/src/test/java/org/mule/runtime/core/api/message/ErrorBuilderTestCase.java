@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.message;
 
 import static java.util.Arrays.asList;
-import static java.util.Optional.of;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
@@ -18,10 +17,14 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
@@ -38,10 +41,12 @@ import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 
 @SmallTest
+@Feature(ERROR_HANDLING)
 public class ErrorBuilderTestCase extends AbstractMuleTestCase {
 
   private static final String EXCEPTION_MESSAGE = "message";
@@ -76,6 +81,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("MULE-18562")
   public void buildErrorWithSuppressedError() {
     MessagingException messagingException = getMessagingException();
     Throwable exception =
@@ -84,6 +90,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("MULE-18562")
   public void buildErrorWithNestedSuppressedError() {
     MessagingException messagingException = getMessagingException();
     Throwable exception =
@@ -96,7 +103,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     String detailedDescription = "detailed description";
     String description = "description";
     ErrorType errorType = mockErrorType;
-    Message errorMessage = Message.of(null);
+    Message errorMessage = of(null);
     IllegalArgumentException exception = new IllegalArgumentException("some message");
     Error error = builder()
         .errorType(errorType)
@@ -204,7 +211,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     CoreEvent suppressedErrorEvent = mock(CoreEvent.class);
     MessagingException suppressedMessagingException = new MessagingException(createStaticMessage("Test"), suppressedErrorEvent);
     Error suppressedError = builder(suppressedMessagingException).errorType(testError).build();
-    when(suppressedErrorEvent.getError()).thenReturn(of(suppressedError));
+    when(suppressedErrorEvent.getError()).thenReturn(Optional.of(suppressedError));
     return suppressedMessagingException;
   }
 
@@ -232,7 +239,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
 
     @Override
     public Message getErrorMessage() {
-      return Message.of(TEST_PAYLOAD);
+      return of(TEST_PAYLOAD);
     }
 
   }

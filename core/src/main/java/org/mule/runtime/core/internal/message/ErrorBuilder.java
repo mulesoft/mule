@@ -87,6 +87,12 @@ public final class ErrorBuilder {
     }
   }
 
+  /**
+   * Returns all the {@link Error} instances that the given {@link MuleException} inform as suppressed.
+   * @param muleException Given {@link MuleException}.
+   * @return {@link List<Error>} containing all the {@link Error} instances that the given {@link MuleException} inform as suppressed.
+   * @see SuppressedMuleException
+   */
   private List<Error> getSuppressedMessagingErrors(MuleException muleException) {
     List<Error> suppressedMessagingErrors = new ArrayList<>(4);
     for (MuleException suppressedException : muleException.getExceptionInfo().getSuppressedCauses()) {

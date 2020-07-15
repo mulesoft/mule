@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
@@ -16,6 +17,7 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.EventContext;
@@ -34,7 +36,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.After;
@@ -87,6 +88,7 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
   }
 
   @Test
+  @Issue("MULE-18562")
   public void testUnsuppressedErrorMustBeAccepted() throws InitialisationException {
     if (getErrorHandler() instanceof TemplateOnErrorHandler) {
       TemplateOnErrorHandler onErrorHandler = (TemplateOnErrorHandler) getErrorHandler();
@@ -98,6 +100,7 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
   }
 
   @Test
+  @Issue("MULE-18562")
   public void testSuppressedErrorMustBeAccepted() throws InitialisationException {
     if (getErrorHandler() instanceof TemplateOnErrorHandler) {
       TemplateOnErrorHandler onErrorHandler = (TemplateOnErrorHandler) getErrorHandler();
@@ -119,7 +122,7 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
     Error errorWithSuppression = mock(Error.class);
     Error suppressedError = mock(Error.class);
     CoreEvent event = mock(CoreEvent.class);
-    when(errorWithSuppression.getSuppressedErrors()).thenReturn(Collections.singletonList(suppressedError));
+    when(errorWithSuppression.getSuppressedErrors()).thenReturn(singletonList(suppressedError));
     when(errorWithSuppression.getErrorType()).thenReturn(unsuppressedErrorType);
     when(suppressedError.getErrorType()).thenReturn(suppressedErrorType);
     when(event.getError()).thenReturn(Optional.of(errorWithSuppression));
