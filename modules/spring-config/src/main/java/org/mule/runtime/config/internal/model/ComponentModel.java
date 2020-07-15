@@ -22,7 +22,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -34,6 +34,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.operation.ErrorMappings;
+import org.mule.runtime.api.meta.model.operation.ErrorMappings.ErrorMapping;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -41,7 +42,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
-import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
@@ -272,19 +272,17 @@ public class ComponentModel implements ComponentAst {
                     if ("errorMappings".equals(paramModel.getName())) {
                       final List<ErrorMappings.ErrorMapping> errorMappings = directChildrenStream()
                           .filter(child -> ERROR_MAPPING_IDENTIFIER.equals(child.getIdentifier()))
-                          .map(child -> new ErrorMappings.ErrorMapping() {
+                          .map(child -> new ErrorMapping() {
 
                             @Override
-                            public ComponentIdentifier getTarget() {
+                            public String getTarget() {
                               return child.getRawParameterValue(SOURCE_TYPE)
-                                  .map(ComponentIdentifier::buildFromStringRepresentation)
-                                  .orElse(ANY);
+                                  .orElse(ANY_IDENTIFIER);
                             }
 
                             @Override
-                            public ComponentIdentifier getSource() {
+                            public String getSource() {
                               return child.getRawParameterValue(TARGET_TYPE)
-                                  .map(BeanDefinitionFactory::parserErrorType)
                                   .orElse(null);
                             }
                           })

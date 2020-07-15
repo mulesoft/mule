@@ -19,6 +19,7 @@ import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObj
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -39,10 +40,7 @@ import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import java.util.Optional;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
 public class DeclarationElementModelFactoryTestCase extends AbstractDslModelTestCase {
 
   @Test

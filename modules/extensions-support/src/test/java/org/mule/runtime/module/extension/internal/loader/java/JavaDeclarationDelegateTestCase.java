@@ -123,15 +123,18 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import com.google.common.reflect.TypeToken;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclarationTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   private static final String GET_GRAMS_IN_STORAGE = "getGramsInStorage";
   private static final String EXTENDED_CONFIG_NAME = "extended-config";

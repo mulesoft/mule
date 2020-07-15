@@ -7,19 +7,21 @@
 package org.mule.runtime.extension.internal.loader.validator;
 
 import static java.lang.String.format;
+import static java.util.Optional.of;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
+import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.doForErrorMappings;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.operation.ErrorMappings.ErrorMapping;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.api.dsl.CoreDslConstants;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
@@ -28,7 +30,6 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -79,13 +80,8 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
       validateRaiseError(namespace, operationModel, componentModel, problemsReporter);
     }
 
-    componentModel.getModel(OperationModel.class).ifPresent(pm -> {
-      final ComponentParameterAst errorMappings = componentModel.getParameter("errorMappings");
-      errorMappings.getValue().applyRight(errorMappingsValue -> {
-        List<ComponentAst> mappings = (List<ComponentAst>) errorMappingsValue;
-        mappings.forEach(m -> validateErrorMapping(namespace, operationModel, m, problemsReporter));
-      });
-    });
+    doForErrorMappings(componentModel, mappings -> mappings
+        .forEach(mapping -> validateErrorMapping(namespace, operationModel, mapping, problemsReporter)));
 
     componentModel.directChildrenStream()
         .forEach(childComponentModel -> searchAndValidate(namespace, operationModel, childComponentModel, problemsReporter));
@@ -98,16 +94,22 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
   }
 
   private void validateErrorMapping(String moduleNamespace, OperationModel operationModel,
-                                    ComponentAst errorMappingComponentModel,
+                                    ErrorMapping errorMappingComponentModel,
                                     ProblemsReporter problemsReporter) {
-    genericValidation(moduleNamespace, operationModel, errorMappingComponentModel, problemsReporter, TARGET_TYPE,
-                      ERROR_MAPPING_IDENTIFIER);
+    genericValidation(moduleNamespace, operationModel, problemsReporter, TARGET_TYPE, ERROR_MAPPING_IDENTIFIER,
+                      of(errorMappingComponentModel.getSource()));
   }
 
   private void genericValidation(String moduleNamespace, OperationModel operationModel, ComponentAst elementComponentModel,
                                  ProblemsReporter problemsReporter, String attributeToValidate,
                                  ComponentIdentifier workingIdentifier) {
-    final Optional<String> stringRepresentation = elementComponentModel.getRawParameterValue(attributeToValidate);
+    genericValidation(moduleNamespace, operationModel, problemsReporter, attributeToValidate, workingIdentifier,
+                      elementComponentModel.getRawParameterValue(attributeToValidate));
+  }
+
+  private void genericValidation(String moduleNamespace, OperationModel operationModel, ProblemsReporter problemsReporter,
+                                 String attributeToValidate, ComponentIdentifier workingIdentifier,
+                                 final Optional<String> stringRepresentation) {
     if (!stringRepresentation.isPresent()) {
       problemsReporter.addError(new Problem(operationModel, format(
                                                                    EMPTY_TYPE_FORMAT_MESSAGE,

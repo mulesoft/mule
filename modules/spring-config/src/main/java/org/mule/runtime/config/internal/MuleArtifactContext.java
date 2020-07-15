@@ -16,6 +16,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
@@ -24,9 +25,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDE
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
-import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
-import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.parserErrorType;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
@@ -38,13 +37,13 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor.processXmlConfiguration;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
+import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.doForErrorMappings;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -61,14 +60,12 @@ import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
@@ -484,35 +481,21 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private void registerErrorMappings(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {
-    componentModel.getModel(ParameterizedModel.class).ifPresent(pm -> {
-      final ComponentParameterAst errorMappings = componentModel.getParameter("errorMappings");
-      // TODO make null check not needed
-      if (errorMappings != null) {
-        errorMappings.getValue().applyRight(errorMappingsValue -> {
-          List<ComponentAst> mappings = (List<ComponentAst>) errorMappingsValue;
-          mappings.forEach(m -> {
-            // TODO MULE-17709 error-mapping should have an extension model declaration
-            ComponentIdentifier source = m.getRawParameterValue(SOURCE_TYPE)
-                .map(ComponentIdentifier::buildFromStringRepresentation)
-                .orElse(ANY);
+    doForErrorMappings(componentModel, mappings -> mappings
+        .forEach(mapping -> {
+          ComponentIdentifier source = buildFromStringRepresentation(mapping.getSource());
 
-            if (!muleContext.getErrorTypeRepository().lookupErrorType(source).isPresent()) {
-              throw new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source));
-            }
+          if (!muleContext.getErrorTypeRepository().lookupErrorType(source).isPresent()) {
+            throw new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source));
+          }
 
-            // TODO MULE-17709 error-mapping should have an extension model declaration
-            resolveErrorType(m.getRawParameterValue(TARGET_TYPE).orElse(null), syntheticErrorNamespaces,
-                             !disableXmlValidations);
-          });
-        });
-      }
-    });
+          resolveErrorType(mapping.getTarget(), syntheticErrorNamespaces, !disableXmlValidations);
+        }));
   }
 
   private void processRaiseError(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {
     if (componentModel.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
-      // TODO MULE-18373 properly declare raise-error parameters in extension model
-      String representation = componentModel.getRawParameterValue("type").orElse(null);
+      String representation = (String) componentModel.getParameter("type").getValue().getRight();
       if (isEmpty(representation) && disableXmlValidations) {
         // We can just ignore this as we should allow an empty value here
         return;
