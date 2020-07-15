@@ -42,9 +42,11 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
@@ -203,30 +205,32 @@ public class BeanDefinitionFactory {
                                 springComponentModel);
 
                   // add any error mappings if present
-                  List<ComponentAst> errorMappingComponents = componentModel.directChildrenStream()
-                      .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER
-                          .equals(innerComponent.getIdentifier()))
-                      .collect(toList());
-                  if (!errorMappingComponents.isEmpty()) {
-                    addAnnotation(ANNOTATION_ERROR_MAPPINGS,
-                                  errorMappingComponents.stream().map(innerComponent -> {
-                                    ComponentIdentifier source =
-                                        innerComponent.getRawParameterValue(SOURCE_TYPE)
-                                            .map(ComponentIdentifier::buildFromStringRepresentation)
-                                            .orElse(ANY);
+                  componentModel.getModel(OperationModel.class).ifPresent(pm -> {
+                    final ComponentParameterAst errorMappings = componentModel.getParameter("errorMappings");
+                    errorMappings.getValue().applyRight(errorMappingsValue -> {
+                      List<ComponentAst> mappings = (List<ComponentAst>) errorMappingsValue;
+                      if (!mappings.isEmpty()) {
+                        addAnnotation(ANNOTATION_ERROR_MAPPINGS,
+                                      mappings.stream().map(innerComponent -> {
+                                        ComponentIdentifier source =
+                                            innerComponent.getRawParameterValue(SOURCE_TYPE)
+                                                .map(ComponentIdentifier::buildFromStringRepresentation)
+                                                .orElse(ANY);
 
-                                    ErrorType errorType = errorTypeRepository
-                                        .lookupErrorType(source)
-                                        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.",
-                                                                                                        source)));
+                                        ErrorType errorType = errorTypeRepository
+                                            .lookupErrorType(source)
+                                            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.",
+                                                                                                            source)));
 
-                                    ErrorTypeMatcher errorTypeMatcher =
-                                        new SingleErrorTypeMatcher(errorType);
-                                    ErrorType targetValue = resolveErrorType(innerComponent
-                                        .getRawParameterValue(TARGET_TYPE).orElse(null));
-                                    return new ErrorMapping(errorTypeMatcher, targetValue);
-                                  }).collect(toList()), springComponentModel);
-                  }
+                                        ErrorTypeMatcher errorTypeMatcher =
+                                            new SingleErrorTypeMatcher(errorType);
+                                        ErrorType targetValue = resolveErrorType(innerComponent
+                                            .getRawParameterValue(TARGET_TYPE).orElse(null));
+                                        return new ErrorMapping(errorTypeMatcher, targetValue);
+                                      }).collect(toList()), springComponentModel);
+                      }
+                    });
+                  });
 
                   componentLocator.addComponentLocation(componentModel.getLocation());
                   addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel, springComponentModel);

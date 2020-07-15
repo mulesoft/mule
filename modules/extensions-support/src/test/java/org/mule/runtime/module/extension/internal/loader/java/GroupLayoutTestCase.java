@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.vegan.extension.SpreadVeganismOperation.ARGUMENTS_TAB;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
@@ -31,7 +32,7 @@ public class GroupLayoutTestCase extends AbstractJavaExtensionDeclarationTestCas
   @Test
   public void groupLayout() {
     OperationDeclaration operation = getOperation(extensionDeclaration, "convinceAnimalKiller");
-    assertThat(operation.getParameterGroups(), hasSize(2));
+    assertThat(operation.getParameterGroups(), hasSize(3));
     ParameterGroupDeclaration group = operation.getParameterGroups().get(0);
     assertThat(group.getLayoutModel().getTabName().get(), is(ARGUMENTS_TAB));
   }

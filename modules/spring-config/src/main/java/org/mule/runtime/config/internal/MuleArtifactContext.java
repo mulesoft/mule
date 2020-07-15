@@ -28,7 +28,6 @@ import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.parserErrorType;
-import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getExtensionModelsComponentBuildingDefinitions;
@@ -62,12 +61,14 @@ import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
@@ -483,24 +484,29 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private void registerErrorMappings(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {
-    List<ComponentAst> errorMappingComponents = componentModel.directChildrenStream()
-        .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
-    if (!errorMappingComponents.isEmpty()) {
-      errorMappingComponents.stream().forEach(innerComponent -> {
-        // TODO MULE-17709 error-mapping should have an extension model declaration
-        ComponentIdentifier source = innerComponent.getRawParameterValue(SOURCE_TYPE)
-            .map(ComponentIdentifier::buildFromStringRepresentation)
-            .orElse(ANY);
+    componentModel.getModel(ParameterizedModel.class).ifPresent(pm -> {
+      final ComponentParameterAst errorMappings = componentModel.getParameter("errorMappings");
+      // TODO make null check not needed
+      if (errorMappings != null) {
+        errorMappings.getValue().applyRight(errorMappingsValue -> {
+          List<ComponentAst> mappings = (List<ComponentAst>) errorMappingsValue;
+          mappings.forEach(m -> {
+            // TODO MULE-17709 error-mapping should have an extension model declaration
+            ComponentIdentifier source = m.getRawParameterValue(SOURCE_TYPE)
+                .map(ComponentIdentifier::buildFromStringRepresentation)
+                .orElse(ANY);
 
-        if (!muleContext.getErrorTypeRepository().lookupErrorType(source).isPresent()) {
-          throw new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source));
-        }
+            if (!muleContext.getErrorTypeRepository().lookupErrorType(source).isPresent()) {
+              throw new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source));
+            }
 
-        // TODO MULE-17709 error-mapping should have an extension model declaration
-        resolveErrorType(innerComponent.getRawParameterValue(TARGET_TYPE).orElse(null), syntheticErrorNamespaces,
-                         !disableXmlValidations);
-      });
-    }
+            // TODO MULE-17709 error-mapping should have an extension model declaration
+            resolveErrorType(m.getRawParameterValue(TARGET_TYPE).orElse(null), syntheticErrorNamespaces,
+                             !disableXmlValidations);
+          });
+        });
+      }
+    });
   }
 
   private void processRaiseError(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {

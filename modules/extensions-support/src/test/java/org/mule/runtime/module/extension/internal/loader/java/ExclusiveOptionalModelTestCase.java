@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ExclusiveParametersDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
@@ -33,7 +34,7 @@ public class ExclusiveOptionalModelTestCase extends AbstractJavaExtensionDeclara
   @Test
   public void exclusiveOptionals() {
     OperationDeclaration operation = getOperation(extensionDeclaration, "convinceAnimalKiller");
-    assertThat(operation.getParameterGroups(), hasSize(2));
+    assertThat(operation.getParameterGroups(), hasSize(3));
 
     ParameterGroupDeclaration group = operation.getParameterGroups().get(0);
     assertThat(group.getName(), equalTo("arguments"));

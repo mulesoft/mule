@@ -19,6 +19,7 @@ import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.api.dsl.CoreDslConstants;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
@@ -27,6 +28,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -75,9 +77,16 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
                                  ProblemsReporter problemsReporter) {
     if (componentModel.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
       validateRaiseError(namespace, operationModel, componentModel, problemsReporter);
-    } else if (componentModel.getIdentifier().equals(ERROR_MAPPING_IDENTIFIER)) {
-      validateErrorMapping(namespace, operationModel, componentModel, problemsReporter);
     }
+
+    componentModel.getModel(OperationModel.class).ifPresent(pm -> {
+      final ComponentParameterAst errorMappings = componentModel.getParameter("errorMappings");
+      errorMappings.getValue().applyRight(errorMappingsValue -> {
+        List<ComponentAst> mappings = (List<ComponentAst>) errorMappingsValue;
+        mappings.forEach(m -> validateErrorMapping(namespace, operationModel, m, problemsReporter));
+      });
+    });
+
     componentModel.directChildrenStream()
         .forEach(childComponentModel -> searchAndValidate(namespace, operationModel, childComponentModel, problemsReporter));
   }

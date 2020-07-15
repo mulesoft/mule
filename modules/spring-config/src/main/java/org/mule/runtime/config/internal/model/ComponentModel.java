@@ -20,7 +20,9 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDE
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -31,6 +33,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
+import org.mule.runtime.api.meta.model.operation.ErrorMappings;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -38,6 +41,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
+import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
@@ -79,6 +83,9 @@ import javax.xml.namespace.QName;
 public class ComponentModel implements ComponentAst {
 
   public static String COMPONENT_MODEL_KEY = "ComponentModel";
+
+  public static final String SOURCE_TYPE = "sourceType";
+  public static final String TARGET_TYPE = "targetType";
 
   private ComponentIdentifier identifier;
   private String componentId;
@@ -262,10 +269,34 @@ public class ComponentModel implements ComponentAst {
                   }
                 } else {
                   pg.getParameterModels().forEach(paramModel -> {
-                    final ComponentParameterAst computedParam =
-                        populateParameterAst(this.getRawParameterValue(paramModel.getName()), paramModel);
-                    if (paramModel.isComponentId()) {
-                      componentId = (String) computedParam.getValue().getRight();
+                    if ("errorMappings".equals(paramModel.getName())) {
+                      final List<ErrorMappings.ErrorMapping> errorMappings = directChildrenStream()
+                          .filter(child -> ERROR_MAPPING_IDENTIFIER.equals(child.getIdentifier()))
+                          .map(child -> new ErrorMappings.ErrorMapping() {
+
+                            @Override
+                            public ComponentIdentifier getTarget() {
+                              return child.getRawParameterValue(SOURCE_TYPE)
+                                  .map(ComponentIdentifier::buildFromStringRepresentation)
+                                  .orElse(ANY);
+                            }
+
+                            @Override
+                            public ComponentIdentifier getSource() {
+                              return child.getRawParameterValue(TARGET_TYPE)
+                                  .map(BeanDefinitionFactory::parserErrorType)
+                                  .orElse(null);
+                            }
+                          })
+                          .collect(toList());
+                      parameterAstsByName.put(paramModel.getName(),
+                                              new DefaultComponentParameterAst(errorMappings, () -> paramModel, null));
+                    } else {
+                      final ComponentParameterAst computedParam =
+                          populateParameterAst(this.getRawParameterValue(paramModel.getName()), paramModel);
+                      if (paramModel.isComponentId()) {
+                        componentId = (String) computedParam.getValue().getRight();
+                      }
                     }
                   });
                 }

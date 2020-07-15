@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -16,6 +17,8 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRouter;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isScope;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
@@ -25,6 +28,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
@@ -55,6 +59,8 @@ import java.util.Optional;
 final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private static final String OPERATION = "Operation";
+  private static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault()
+      .createTypeLoader(OperationModelLoaderDelegate.class.getClassLoader());
   private static final AnyType ANY_TYPE = BaseTypeBuilder.create(JAVA).anyType().build();
 
   private final Map<MethodElement, OperationDeclarer> operationDeclarers = new HashMap<>();
@@ -150,6 +156,15 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                                                                        operationDeclarer.getDeclaration());
       processMimeType(operationDeclarer, operationMethod);
       declareParameters(operationDeclarer, operationMethod.getParameters(), fieldParameters, declarationContext);
+
+      operationDeclarer
+          .onParameterGroup("errorMappings")
+          .withDslInlineRepresentation(false)
+          .withOptionalParameter("errorMappings")
+          .ofType(BaseTypeBuilder.create(JAVA).arrayType()
+              .of(TYPE_LOADER.load(org.mule.runtime.api.meta.model.operation.ErrorMappings.ErrorMapping.class)).build())
+          .defaultingTo(emptyList());
+
       operationDeclarers.put(operationMethod, operationDeclarer);
     }
   }

@@ -52,6 +52,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -60,6 +61,7 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
@@ -840,29 +842,35 @@ public class ApplicationModel implements ArtifactAst {
 
   private void validateErrorMappings() {
     recursiveStream().forEach(componentModel -> {
-      List<ComponentAst> errorMappings = componentModel.directChildrenStream()
-          .filter(c -> c.getIdentifier().equals(ERROR_MAPPING_IDENTIFIER))
-          .collect(toList());
-      if (!errorMappings.isEmpty()) {
-        List<ComponentAst> anyMappings = errorMappings.stream()
-            .filter(this::isErrorMappingWithSourceAny)
-            .collect(toList());
-        if (anyMappings.size() > 1) {
-          throw new MuleRuntimeException(createStaticMessage("Only one mapping for 'ANY' or an empty source type is allowed."));
-        } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(errorMappings.get(errorMappings.size() - 1))) {
-          throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have 'ANY' or an empty source type."));
-        }
-        List<String> sources = errorMappings.stream()
-            .map(model -> model.getRawParameterValue(SOURCE_TYPE).orElse(ANY_IDENTIFIER))
-            .collect(toList());
-        List<String> distinctSources = sources.stream()
-            .distinct()
-            .collect(toList());
-        if (sources.size() != distinctSources.size()) {
-          throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are '%s'.",
-                                                                    on("', '").join(disjunction(sources, distinctSources)))));
-        }
-      }
+
+      componentModel.getModel(OperationModel.class).ifPresent(pm -> {
+        final ComponentParameterAst errorMappings = componentModel.getParameter("errorMappings");
+        errorMappings.getValue().applyRight(errorMappingsValue -> {
+          List<ComponentAst> mappings = (List<ComponentAst>) errorMappingsValue;
+
+          if (!mappings.isEmpty()) {
+            List<ComponentAst> anyMappings = mappings.stream()
+                .filter(this::isErrorMappingWithSourceAny)
+                .collect(toList());
+            if (anyMappings.size() > 1) {
+              throw new MuleRuntimeException(createStaticMessage("Only one mapping for 'ANY' or an empty source type is allowed."));
+            } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(mappings.get(mappings.size() - 1))) {
+              throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have 'ANY' or an empty source type."));
+            }
+            List<String> sources = mappings.stream()
+                .map(model -> model.getRawParameterValue(SOURCE_TYPE).orElse(ANY_IDENTIFIER))
+                .collect(toList());
+            List<String> distinctSources = sources.stream()
+                .distinct()
+                .collect(toList());
+            if (sources.size() != distinctSources.size()) {
+              throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are '%s'.",
+                                                                        on("', '")
+                                                                            .join(disjunction(sources, distinctSources)))));
+            }
+          }
+        });
+      });
     });
   }
 
