@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.message;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
+import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 
 import org.mule.runtime.api.exception.ComposedErrorException;
@@ -44,6 +46,10 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
 
   private static final String EXCEPTION_MESSAGE = "message";
   private final ErrorType mockErrorType = mock(ErrorType.class);
+  private final ErrorType anyError = ErrorTypeBuilder.builder().namespace("MULE").identifier("ANY").build();
+  private final ErrorType testError =
+      ErrorTypeBuilder.builder().namespace("MULE").identifier("TEST").parentErrorType(anyError).build();
+
 
   @Test
   public void buildErrorFromException() {
@@ -53,6 +59,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     assertThat(error.getDescription(), is(EXCEPTION_MESSAGE));
     assertThat(error.getDetailedDescription(), is(EXCEPTION_MESSAGE));
     assertThat(error.getErrorType(), is(mockErrorType));
+    assertThat(error.getSuppressedErrors(), is(empty()));
     assertThat(error.getChildErrors(), is(empty()));
   }
 
@@ -64,7 +71,24 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     assertThat(error.getDescription(), containsString(EXCEPTION_MESSAGE));
     assertThat(error.getDetailedDescription(), containsString(EXCEPTION_MESSAGE));
     assertThat(error.getErrorType(), is(mockErrorType));
+    assertThat(error.getSuppressedErrors(), is(empty()));
     assertThat(error.getChildErrors(), is(empty()));
+  }
+
+  @Test
+  public void buildErrorWithSuppressedError() {
+    MessagingException messagingException = getMessagingException();
+    Throwable exception =
+        suppressIfPresent(new DefaultMuleException(EXCEPTION_MESSAGE, messagingException), MessagingException.class);
+    buildErrorAndAssertSuppression(exception, messagingException);
+  }
+
+  @Test
+  public void buildErrorWithNestedSuppressedError() {
+    MessagingException messagingException = getMessagingException();
+    Throwable exception =
+        new DefaultMuleException(EXCEPTION_MESSAGE, suppressIfPresent(messagingException, MessagingException.class));
+    buildErrorAndAssertSuppression(exception, messagingException);
   }
 
   @Test
@@ -100,6 +124,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     assertThat(error.getCause(), is(instanceOf(ComposedErrorMessageAwareException.class)));
     assertThat(error.getErrorType(), is(mockErrorType));
     assertThat(error.getErrorMessage().getPayload().getValue(), is(TEST_PAYLOAD));
+    assertThat(error.getSuppressedErrors(), is(empty()));
     List<Error> childErrors = error.getChildErrors();
     assertThat(childErrors, hasSize(2));
     assertThat(childErrors.get(0).getCause(), is(instanceOf(RuntimeException.class)));
@@ -108,15 +133,9 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void givesStringRepresentation() {
-    ErrorType anyError = ErrorTypeBuilder.builder().namespace("MULE").identifier("ANY").build();
-    ErrorType testError = ErrorTypeBuilder.builder().namespace("MULE").identifier("TEST").parentErrorType(anyError).build();
-    CoreEvent suppressedErrorEvent = mock(CoreEvent.class);
-    MuleException suppressedMessagingException = new MessagingException(createStaticMessage("Test"), suppressedErrorEvent);
-    Error suppressedError = builder(suppressedMessagingException).errorType(testError).build();
-    when(suppressedErrorEvent.getError()).thenReturn(of(suppressedError));
     MuleException composedMessageAwareException =
         new ComposedErrorMessageAwareException(createStaticMessage(EXCEPTION_MESSAGE), testError);
-    composedMessageAwareException.getExceptionInfo().addSuppressedCause(suppressedMessagingException);
+    composedMessageAwareException.getExceptionInfo().addSuppressedCause(getMessagingException());
     Error error = builder(composedMessageAwareException)
         .errorType(testError)
         .build();
@@ -169,6 +188,24 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
                    + "  childErrors=[]\n"
                    + "}]\n"
                    + "}")));
+  }
+
+  private void buildErrorAndAssertSuppression(Throwable exception, MessagingException suppressedCause) {
+    Error error = builder(exception).errorType(mockErrorType).build();
+    assertThat(error.getCause(), is(exception));
+    assertThat(error.getDescription(), containsString(EXCEPTION_MESSAGE));
+    assertThat(error.getDetailedDescription(), containsString(EXCEPTION_MESSAGE));
+    assertThat(error.getErrorType(), is(mockErrorType));
+    assertThat(error.getSuppressedErrors(), contains(suppressedCause.getEvent().getError().get()));
+    assertThat(error.getChildErrors(), is(empty()));
+  }
+
+  private MessagingException getMessagingException() {
+    CoreEvent suppressedErrorEvent = mock(CoreEvent.class);
+    MessagingException suppressedMessagingException = new MessagingException(createStaticMessage("Test"), suppressedErrorEvent);
+    Error suppressedError = builder(suppressedMessagingException).errorType(testError).build();
+    when(suppressedErrorEvent.getError()).thenReturn(of(suppressedError));
+    return suppressedMessagingException;
   }
 
   private class ComposedErrorMessageAwareException extends MuleException implements ErrorMessageAwareException,
