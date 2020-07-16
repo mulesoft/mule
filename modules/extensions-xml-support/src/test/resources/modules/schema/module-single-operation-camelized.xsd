@@ -8,7 +8,9 @@
     <xs:complexType name="AnotherCamelizedOperationButStartsWithCapitalLetterType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -26,7 +28,9 @@
     <xs:complexType name="SomeCamelizedOperationType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

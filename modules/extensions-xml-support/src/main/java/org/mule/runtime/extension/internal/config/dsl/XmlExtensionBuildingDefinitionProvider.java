@@ -31,6 +31,7 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -158,6 +159,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
         .withSetterParameterDefinition("extensionModel", fromFixedValue(extensionModel).build())
         .withSetterParameterDefinition("operationModel", fromFixedValue(operationModel).build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+        .withSetterParameterDefinition("errorMappings", fromChildCollectionConfiguration(EnrichedErrorMapping.class).build())
         .asPrototype().build());
   }
 

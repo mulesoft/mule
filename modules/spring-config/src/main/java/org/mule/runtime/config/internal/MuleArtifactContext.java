@@ -495,7 +495,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   private void processRaiseError(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {
     if (componentModel.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
-      String representation = (String) componentModel.getParameter("type").getValue().getRight();
+      String representation = componentModel.getRawParameterValue("type").orElse(null);
       if (isEmpty(representation) && disableXmlValidations) {
         // We can just ignore this as we should allow an empty value here
         return;

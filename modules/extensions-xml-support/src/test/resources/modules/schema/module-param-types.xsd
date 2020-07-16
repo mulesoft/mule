@@ -8,7 +8,9 @@
     <xs:complexType name="Boolean-param-operationType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:expressionBoolean" use="required" name="booleanParam"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -27,7 +29,9 @@
     <xs:complexType name="Date-param-operationType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:expressionDateTime" use="required" name="dateParam"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -46,7 +50,9 @@
     <xs:complexType name="Datetime-param-operationType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:expressionDateTime" use="required" name="datetimeParam"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -65,7 +71,9 @@
     <xs:complexType name="Integer-param-operationType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:expressionDecimal" use="required" name="integerParam"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -84,7 +92,9 @@
     <xs:complexType name="String-param-operationType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:expressionString" use="required" name="stringParam"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -103,7 +113,9 @@
     <xs:complexType name="Time-param-operationType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="xs:string" use="required" name="timeParam"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>

@@ -7,7 +7,6 @@
 package org.mule.runtime.extension.internal.processor;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -21,7 +20,6 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
-import static org.mule.runtime.core.internal.exception.EnrichedErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
@@ -76,7 +74,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
 
@@ -120,17 +117,19 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private final boolean returnsVoid;
   private final Optional<String> target;
   private final String targetValue;
+  private final List<EnrichedErrorMapping> errorMappings;
   private CompiledExpression targetValueExpression;
-  private List<EnrichedErrorMapping> errorMappings = emptyList();
 
   public ModuleOperationMessageProcessor(Map<String, String> properties,
                                          Map<String, String> parameters,
+                                         List<EnrichedErrorMapping> errorMappings,
                                          ExtensionModel extensionModel, OperationModel operationModel) {
     this.properties = parseParameters(properties, getAllProperties(extensionModel));
     this.parameters = parseParameters(parameters, operationModel.getAllParameterModels());
     this.returnsVoid = MetadataTypeUtils.isVoid(operationModel.getOutput().getType());
     this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of(parameters.remove(TARGET_PARAMETER_NAME)) : empty();
     this.targetValue = parameters.remove(TARGET_VALUE_PARAMETER_NAME);
+    this.errorMappings = errorMappings;
   }
 
   /**
@@ -411,13 +410,5 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   @Override
   public List<EnrichedErrorMapping> getErrorMappings() {
     return errorMappings;
-  }
-
-  @Override
-  public void setAnnotations(Map<QName, Object> newAnnotations) {
-    super.setAnnotations(newAnnotations);
-
-    List<EnrichedErrorMapping> list = (List<EnrichedErrorMapping>) getAnnotation(ANNOTATION_ERROR_MAPPINGS);
-    this.errorMappings = list != null ? list : emptyList();
   }
 }
