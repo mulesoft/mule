@@ -450,7 +450,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       ErrorType suppressedErrorType = suppressedError.getErrorType();
       if (errorTypeMatcher.match(suppressedErrorType)) {
         logger
-            .warn("{} Error handler has matched the following suppressed error: {}. Consider a configuration change in order to match the unsuppressed error: {}",
+            .warn("{} error handler has matched the following suppressed error: {}. Consider a configuration change in order to match the unsuppressed error: {}",
                   this, suppressedErrorType, coreEvent.getError().get().getErrorType());
         return true;
       }
