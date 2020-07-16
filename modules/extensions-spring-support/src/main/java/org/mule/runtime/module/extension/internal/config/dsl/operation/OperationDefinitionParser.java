@@ -39,4 +39,13 @@ public class OperationDefinitionParser extends AbstractComponentDefinitionParser
   protected Class<OperationMessageProcessorObjectFactory> getMessageProcessorFactoryType() {
     return OperationMessageProcessorObjectFactory.class;
   }
+
+  // @Override
+  // protected void parseParameters(List<ParameterModel> parameters) {
+  // super.parseParameters(parameters
+  // .stream()
+  // .filter(parameter -> !parameter.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
+  // .collect(toList()));
+  // }
+
 }

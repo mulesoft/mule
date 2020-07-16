@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
+
 import org.mule.runtime.api.meta.model.operation.ErrorMappings.ErrorMapping;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -26,7 +28,7 @@ public final class ErrorMappingUtils {
 
   public static void doForErrorMappings(ComponentAst operation, Consumer<List<ErrorMapping>> action) {
     if (operation.getModel(OperationModel.class).isPresent()) {
-      final ComponentParameterAst errorMappingsParam = operation.getParameter("errorMappings");
+      final ComponentParameterAst errorMappingsParam = operation.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
       if (errorMappingsParam != null) {
         errorMappingsParam.<List<ErrorMapping>>getValue().applyRight(action);
       }

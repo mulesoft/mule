@@ -34,7 +34,7 @@ public class ExclusiveOptionalModelTestCase extends AbstractJavaExtensionDeclara
   @Test
   public void exclusiveOptionals() {
     OperationDeclaration operation = getOperation(extensionDeclaration, "convinceAnimalKiller");
-    assertThat(operation.getParameterGroups(), hasSize(3));
+    assertThat(operation.getParameterGroups(), hasSize(2));
 
     ParameterGroupDeclaration group = operation.getParameterGroups().get(0);
     assertThat(group.getName(), equalTo("arguments"));

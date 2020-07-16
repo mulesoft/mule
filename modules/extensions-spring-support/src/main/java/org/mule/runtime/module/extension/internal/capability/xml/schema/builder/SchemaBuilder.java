@@ -21,6 +21,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.EE_SCHEMA_LOCATION;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MAX_ONE;
@@ -36,6 +37,7 @@ import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEW
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.STRING;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.TLS_CONTEXT_TYPE;
+import static org.mule.runtime.config.internal.dsl.SchemaConstants.UNBOUNDED;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_OPTIONAL;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_REQUIRED;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.XML_NAMESPACE;
@@ -45,12 +47,10 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.componentHasAnImplicitConfiguration;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
-import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
 
@@ -109,8 +109,8 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -118,6 +118,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
@@ -578,7 +579,7 @@ public final class SchemaBuilder {
                                                              ParameterDslConfiguration dslModel) {
     return new MetadataTypeVisitor() {
 
-      private boolean forceOptional = paramDsl.supportsChildDeclaration() || !required;
+      private final boolean forceOptional = paramDsl.supportsChildDeclaration() || !required;
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
@@ -658,10 +659,14 @@ public final class SchemaBuilder {
   }
 
   TopLevelElement createRefElement(QName elementRef, boolean isRequired) {
+    return createRefElement(elementRef, isRequired, MAX_ONE);
+  }
+
+  private TopLevelElement createRefElement(QName elementRef, boolean isRequired, final String maxOccurs) {
     TopLevelElement element = new TopLevelElement();
     element.setRef(elementRef);
     element.setMinOccurs(isRequired ? ONE : ZERO);
-    element.setMaxOccurs(MAX_ONE);
+    element.setMaxOccurs(maxOccurs);
     return element;
   }
 
@@ -758,8 +763,11 @@ public final class SchemaBuilder {
               !parameter.getDslConfiguration().allowsReferences() &&
               !parameter.getDslConfiguration().allowTopLevelDefinition();
           parameter.getModelProperty(QNameModelProperty.class)
-              .map(QNameModelProperty::getValue)
-              .ifPresent(qName -> addParameterToSequence(asList(createRefElement(qName, isParameterRequired)), sequence));
+              .ifPresent(qName -> addParameterToSequence(asList(createRefElement(qName.getValue(), isParameterRequired,
+                                                                                 qName.isUnboundedMaxOccurs()
+                                                                                     ? UNBOUNDED
+                                                                                     : MAX_ONE)),
+                                                         sequence));
 
           if (parameter.getName().equals(TLS_PARAMETER_NAME)) {
             addTlsSupport(extensionType);

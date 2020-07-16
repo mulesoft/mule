@@ -21,9 +21,11 @@ import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -230,7 +232,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
           return Optional.empty();
         });
 
-    when(errorMappingsParameter.getName()).thenReturn("errorMappings");
+    when(errorMappingsParameter.getName()).thenReturn(ERROR_MAPPINGS_PARAMETER_NAME);
     when(errorMappingsParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
     when(errorMappingsParameter.getModelProperty(any())).thenReturn(empty());
     when(errorMappingsParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
@@ -239,10 +241,10 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(errorMappingsParameter.getType()).thenReturn(BaseTypeBuilder.create(JAVA).arrayType()
         .of(TYPE_LOADER.load(org.mule.runtime.api.meta.model.operation.ErrorMappings.ErrorMapping.class)).build());
 
-    when(errorMappingsParameterGroup.getName()).thenReturn("errorMappings");
+    when(errorMappingsParameterGroup.getName()).thenReturn(ERROR_MAPPINGS);
     when(errorMappingsParameterGroup.isShowInDsl()).thenReturn(false);
     when(errorMappingsParameterGroup.getParameterModels()).thenReturn(asList(errorMappingsParameter));
-    when(errorMappingsParameterGroup.getParameter("errorMappings")).thenReturn(of(errorMappingsParameter));
+    when(errorMappingsParameterGroup.getParameter(ERROR_MAPPINGS_PARAMETER_NAME)).thenReturn(of(errorMappingsParameter));
 
     List<String> parameters = new ArrayList<>();
     parameters.add(BEHAVIOUR_NAME);

@@ -516,11 +516,11 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), hasSize(1));
+    assertThat(operation.getAllParameters(), hasSize(0));
 
     operation = getOperation(withOperationsDeclaration, GET_ENEMY_OPERATION);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), hasSize(2));
+    assertThat(operation.getAllParameters(), hasSize(1));
     assertThat(operation.getOutput().getType(), equalTo(STRING_TYPE));
     assertThat(operation.getOutputAttributes().getType(), equalTo(toMetadataType(IntegerAttributes.class)));
     assertParameter(operation.getAllParameters(), "index", "", INT_TYPE, false, SUPPORTED, "0");
@@ -530,7 +530,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     operation = getOperation(withOperationsDeclaration, GET_ALL_ENEMIES_OPERATION);
     assertThat(operation, is(notNullValue()));
     assertFalse(operation.getDeprecation().isPresent());
-    assertThat(operation.getAllParameters(), hasSize(1));
+    assertThat(operation.getAllParameters(), hasSize(0));
     assertThat(operation.getOutput().getType(), is(instanceOf(ArrayType.class)));
     assertMessageType(((ArrayType) operation.getOutput().getType()).getType(), STRING_TYPE,
                       TYPE_LOADER.load(IntegerAttributes.class));
@@ -540,7 +540,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, KILL_OPERATION);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), hasSize(3));
+    assertThat(operation.getAllParameters(), hasSize(2));
     assertThat(operation.getOutput().getType(), equalTo(STRING_TYPE));
     assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
     assertParameter(operation.getAllParameters(), "victim", "", STRING_TYPE, false, SUPPORTED, "#[payload]");
@@ -550,7 +550,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, KILL_WITH_WEAPON);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), hasSize(4));
+    assertThat(operation.getAllParameters(), hasSize(3));
     assertParameter(operation.getAllParameters(), "weapon", "", WEAPON_TYPE, true, SUPPORTED, null);
     assertParameter(operation.getAllParameters(), "type", "", toMetadataType(WeaponType.class), true, SUPPORTED, null);
     assertParameter(operation.getAllParameters(), "attributesOfWeapon", "", toMetadataType(Weapon.WeaponAttributes.class), true,
@@ -560,7 +560,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, KILL_WITH_RICINS);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), hasSize(2));
+    assertThat(operation.getAllParameters(), hasSize(1));
     assertParameter(operation.getAllParameters(), "ricins", "", arrayOf(List.class, objectTypeBuilder(Ricin.class)), false,
                     SUPPORTED, "#[payload]");
     assertConnected(operation, false);
@@ -568,7 +568,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, KILL_WITH_MULTIPLES_WEAPONS);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), hasSize(2));
+    assertThat(operation.getAllParameters(), hasSize(1));
     assertParameter(operation.getAllParameters(), "weapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false,
                     SUPPORTED, "#[payload]");
     assertConnected(operation, false);
@@ -576,7 +576,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, KILL_WITH_MULTIPLE_WILDCARD_WEAPONS);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), hasSize(2));
+    assertThat(operation.getAllParameters(), hasSize(1));
     assertParameter(operation.getAllParameters(), "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)),
                     true, SUPPORTED, null);
     assertConnected(operation, false);
@@ -584,7 +584,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, KILL_CUSTOM_OPERATION);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), hasSize(3));
+    assertThat(operation.getAllParameters(), hasSize(2));
     assertParameter(operation.getAllParameters(), "victim", "", STRING_TYPE, false, SUPPORTED, "#[payload]");
     assertParameter(operation.getAllParameters(), "goodbyeMessage", "", STRING_TYPE, true, SUPPORTED, null);
     assertConnected(operation, false);
@@ -597,7 +597,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, INJECTED_EXTENSION_MANAGER);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), hasSize(1));
+    assertThat(operation.getAllParameters(), hasSize(0));
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
@@ -620,12 +620,12 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertTransactional(operation, false);
 
     operation = getOperation(withOperationsDeclaration, CALL_SAUL);
-    assertThat(operation.getAllParameters(), hasSize(1));
+    assertThat(operation.getAllParameters(), hasSize(0));
     assertConnected(operation, true);
     assertTransactional(operation, false);
 
     operation = getOperation(extensionDeclaration, CURE_CANCER);
-    assertThat(operation.getAllParameters(), hasSize(1));
+    assertThat(operation.getAllParameters(), hasSize(0));
     assertConnected(operation, false);
     assertTransactional(operation, false);
     java.util.Optional<ExceptionHandlerFactory> exceptionEnricherFactory = operation
@@ -716,14 +716,14 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, FAIL_TO_EXECUTE);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), hasSize(1));
+    assertThat(operation.getAllParameters(), hasSize(0));
     assertThat(operation.getOutput().getType(), is(instanceOf(VoidType.class)));
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
     operation = getOperation(extensionDeclaration, THROW_ERROR);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), hasSize(1));
+    assertThat(operation.getAllParameters(), hasSize(0));
     assertThat(operation.getOutput().getType(), is(instanceOf(VoidType.class)));
     assertConnected(operation, false);
     assertTransactional(operation, false);

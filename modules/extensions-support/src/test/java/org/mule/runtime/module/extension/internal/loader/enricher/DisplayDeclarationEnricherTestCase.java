@@ -154,7 +154,7 @@ public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
     ExtensionDeclaration declaration = marvelDeclarer.getDeclaration();
     OperationDeclaration findInstructionsOperation = getOperation(declaration, "findInstructions");
     List<ParameterDeclaration> params = findInstructionsOperation.getAllParameters();
-    assertThat(params, hasSize(3));
+    assertThat(params, hasSize(2));
 
     ParameterDeclaration pathParam = params.get(1);
     Optional<ClassValueModel> classValueModel = pathParam.getDisplayModel().getClassValueModel();
@@ -168,7 +168,7 @@ public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
     ExtensionDeclaration declaration = marvelDeclarer.getDeclaration();
     OperationDeclaration findInstructionsOperation = getOperation(declaration, "findInstructions");
     List<ParameterDeclaration> params = findInstructionsOperation.getAllParameters();
-    assertThat(params, hasSize(3));
+    assertThat(params, hasSize(2));
 
     ParameterDeclaration pathParam = params.get(0);
     Optional<PathModel> pathModel = pathParam.getDisplayModel().getPathModel();

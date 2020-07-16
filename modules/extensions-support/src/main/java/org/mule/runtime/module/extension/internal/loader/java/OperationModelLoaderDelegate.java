@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -156,15 +155,6 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                                                                        operationDeclarer.getDeclaration());
       processMimeType(operationDeclarer, operationMethod);
       declareParameters(operationDeclarer, operationMethod.getParameters(), fieldParameters, declarationContext);
-
-      operationDeclarer
-          .onParameterGroup("errorMappings")
-          .withDslInlineRepresentation(false)
-          .withOptionalParameter("errorMappings")
-          .ofType(BaseTypeBuilder.create(JAVA).arrayType()
-              .of(TYPE_LOADER.load(org.mule.runtime.api.meta.model.operation.ErrorMappings.ErrorMapping.class)).build())
-          .defaultingTo(emptyList());
-
       operationDeclarers.put(operationMethod, operationDeclarer);
     }
   }

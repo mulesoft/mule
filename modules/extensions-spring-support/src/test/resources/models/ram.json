@@ -220,7 +220,8 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "expiration-policy",
                     "prefix": "mule"
-                  }
+                  },
+                  "unboundedMaxOccurs": false
                 },
                 "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 4
@@ -515,7 +516,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 9
+                    "order": 10
                   },
                   "allowedStereotypeModels": [
                     {
@@ -933,6 +934,95 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "description": {
+                        "value": "Determines that an error thrown by this operation should be mapped to another"
+                      },
+                      "typeDsl": {
+                        "allowInlineDefinition": true,
+                        "allowTopLevelDefinition": false
+                      }
+                    },
+                    "item": {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "errorMapping"
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "source"
+                          },
+                          "model": {
+                            "type": "String"
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "target",
+                            "required": "true"
+                          },
+                          "model": {
+                            "type": "String"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 8,
+                    "tabName": "Error Mapping"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "errorMappings",
+                  "description": "Set of \u0027errorMapping\u0027s",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "error-mapping",
+                        "prefix": "mule"
+                      },
+                      "unboundedMaxOccurs": true
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 12
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
+              "showInDsl": false,
+              "name": "Error Mappings",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy"
@@ -1082,7 +1172,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 8,
+                    "order": 9,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1094,7 +1184,8 @@
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
-                      }
+                      },
+                      "unboundedMaxOccurs": false
                     },
                     "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
@@ -1107,7 +1198,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5
+                "order": 6
               },
               "showInDsl": false,
               "name": "Connection",
@@ -1579,7 +1670,8 @@
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "reconnection",
                         "prefix": "mule"
-                      }
+                      },
+                      "unboundedMaxOccurs": false
                     },
                     "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
@@ -1789,7 +1881,8 @@
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "pooling-profile",
                         "prefix": "mule"
-                      }
+                      },
+                      "unboundedMaxOccurs": false
                     },
                     "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 5

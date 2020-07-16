@@ -30,6 +30,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATE
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
+
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectType;
@@ -131,7 +132,7 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
     List<ParameterModel> parameterModels = operation.getAllParameterModels();
 
-    assertThat(parameterModels, hasSize(5));
+    assertThat(parameterModels, hasSize(6));
     assertConfigRefParam(parameterModels.get(0));
     assertStreamingStrategyParameter(parameterModels.get(1));
     ParameterModel path = parameterModels.get(2);
@@ -159,7 +160,7 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertThat(operation.getName(), is(STATIC_RESOURCE_OPERATION_NAME));
     assertType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
     final List<ParameterModel> parameters = operation.getAllParameterModels();
-    assertThat(parameters, hasSize(4));
+    assertThat(parameters, hasSize(5));
 
     assertStreamingStrategyParameter(parameters.get(0));
 

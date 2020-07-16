@@ -297,19 +297,17 @@
     </xsd:element>
     <xsd:complexType name="abstractOperatorType">
         <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
-                <xsd:sequence>
-                    <xsd:element name="error-mapping" type="errorMappingType" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Adds an error mapping.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-            </xsd:extension>
+            <xsd:extension base="abstractMessageProcessorType"/>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="error-mapping" type="errorMappingType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Adds an error mapping.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="errorMappingType">
         <xsd:annotation>
             <xsd:documentation>

@@ -56,6 +56,8 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DECLARED;
+import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_MATCHER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
@@ -464,7 +466,7 @@ class MuleExtensionModelDeclarer {
 
     raiseError.onDefaultParameterGroup()
         .withRequiredParameter("type")
-        .ofType(typeLoader.load(String.class))
+        .ofType(ERROR_TYPE_DECLARED)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The error type to raise.");
 
@@ -738,8 +740,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("The name of the error handler to reuse.");
 
     NestedRouteDeclarer onErrorContinue = errorHandler.withRoute("onErrorContinue")
-        .describedAs(
-                     "Error handler used to handle errors. It will commit any transaction as if the message was consumed successfully.");
+        .describedAs("Error handler used to handle errors. It will commit any transaction as if the message was consumed successfully.");
     declareOnErrorRoute(typeLoader, onErrorContinue);
 
     NestedRouteDeclarer onErrorPropagate = errorHandler.withRoute("onErrorPropagate")
@@ -774,10 +775,7 @@ class MuleExtensionModelDeclarer {
 
     onError.onDefaultParameterGroup()
         .withOptionalParameter("type")
-        .ofType(BaseTypeBuilder.create(JAVA).stringType()
-            .enumOf("ANY", "REDELIVERY_EXHAUSTED", "TRANSFORMATION", "EXPRESSION", "SECURITY", "CLIENT_SECURITY",
-                    "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED", "TIMEOUT")
-            .build())
+        .ofType(ERROR_TYPE_MATCHER)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The full name of the error type to match against or a comma separated list of full names, "
             + "to match against any of them.");

@@ -17,14 +17,14 @@ import javax.xml.namespace.QName;
  *
  * @since 4.0
  */
-public class ErrorMapping {
+public class EnrichedErrorMapping {
 
   public static QName ANNOTATION_ERROR_MAPPINGS = new QName("operator", "errorMappings");
 
   private final ErrorTypeMatcher sourceMatcher;
   private final ErrorType target;
 
-  public ErrorMapping(ErrorTypeMatcher sourceMatcher, ErrorType target) {
+  public EnrichedErrorMapping(ErrorTypeMatcher sourceMatcher, ErrorType target) {
     this.sourceMatcher = sourceMatcher;
     this.target = target;
   }

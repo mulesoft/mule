@@ -7,11 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.exception.EnrichedErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -27,6 +29,8 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
+import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
@@ -34,18 +38,25 @@ import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecu
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
+
 /**
  * An implementation of a {@link ComponentMessageProcessor} for {@link OperationModel operation models}
  *
  * @since 3.7.0
  */
 public class OperationMessageProcessor extends ComponentMessageProcessor<OperationModel>
-    implements EntityMetadataProvider {
+    implements EntityMetadataProvider, ErrorMappingsAware {
 
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
   private final EntityMetadataMediator entityMetadataMediator;
+
+  private List<EnrichedErrorMapping> errorMappings = emptyList();
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
@@ -140,5 +151,18 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
     }
 
     return super.isAsync();
+  }
+
+  @Override
+  public List<EnrichedErrorMapping> getErrorMappings() {
+    return errorMappings;
+  }
+
+  @Override
+  public void setAnnotations(Map<QName, Object> newAnnotations) {
+    super.setAnnotations(newAnnotations);
+
+    List<EnrichedErrorMapping> list = (List<EnrichedErrorMapping>) getAnnotation(ANNOTATION_ERROR_MAPPINGS);
+    this.errorMappings = list != null ? list : emptyList();
   }
 }

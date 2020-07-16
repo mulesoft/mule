@@ -23,6 +23,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGAT
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -34,7 +35,6 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.operation.ErrorMappings;
-import org.mule.runtime.api.meta.model.operation.ErrorMappings.ErrorMapping;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -43,6 +43,7 @@ import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter;
+import org.mule.runtime.core.internal.exception.DefaultErrorMapping;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 
@@ -269,23 +270,13 @@ public class ComponentModel implements ComponentAst {
                   }
                 } else {
                   pg.getParameterModels().forEach(paramModel -> {
-                    if ("errorMappings".equals(paramModel.getName())) {
+                    if (ERROR_MAPPINGS_PARAMETER_NAME.equals(paramModel.getName())) {
                       final List<ErrorMappings.ErrorMapping> errorMappings = directChildrenStream()
                           .filter(child -> ERROR_MAPPING_IDENTIFIER.equals(child.getIdentifier()))
-                          .map(child -> new ErrorMapping() {
-
-                            @Override
-                            public String getTarget() {
-                              return child.getRawParameterValue(SOURCE_TYPE)
-                                  .orElse(ANY_IDENTIFIER);
-                            }
-
-                            @Override
-                            public String getSource() {
-                              return child.getRawParameterValue(TARGET_TYPE)
-                                  .orElse(null);
-                            }
-                          })
+                          .map(child -> new DefaultErrorMapping(child.getRawParameterValue(SOURCE_TYPE)
+                              .orElse(ANY_IDENTIFIER),
+                                                                child.getRawParameterValue(TARGET_TYPE)
+                                                                    .orElse(null)))
                           .collect(toList());
                       parameterAstsByName.put(paramModel.getName(),
                                               new DefaultComponentParameterAst(errorMappings, () -> paramModel, null));

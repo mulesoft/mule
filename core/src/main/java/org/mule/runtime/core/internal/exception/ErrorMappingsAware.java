@@ -11,7 +11,7 @@ import org.mule.runtime.api.component.Component;
 import java.util.List;
 
 /**
- * Implementations support configuration for {@link ErrorMapping}s.
+ * Implementations support configuration for {@link EnrichedErrorMapping}s.
  *
  * @since 4.3
  */
@@ -20,5 +20,5 @@ public interface ErrorMappingsAware extends Component {
   /**
    * @return the type mappings for errors thrown by this component
    */
-  List<ErrorMapping> getErrorMappings();
+  List<EnrichedErrorMapping> getErrorMappings();
 }

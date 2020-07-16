@@ -37,7 +37,9 @@
   <xs:complexType name="TypedValueOnConfigType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
+        </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
@@ -60,7 +62,9 @@
   <xs:complexType name="TypedValueOperationStringParameterType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" default="This is a default string" name="stringValue"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
@@ -101,6 +105,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="complex-typed-value"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="complex-not-wrapped"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="map-of-complex-values"></xs:element>
@@ -138,6 +143,7 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="input-stream"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -158,6 +164,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="object-typed-value"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -178,6 +185,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="differed-door">
             <xs:complexType>
               <xs:complexContent>
@@ -205,6 +213,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="door-values">
             <xs:complexType>
               <xs:sequence>
@@ -232,6 +241,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="door-map-values">
             <xs:complexType>
               <xs:sequence>
@@ -267,6 +277,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="door-value">
             <xs:complexType>
               <xs:complexContent>
@@ -294,6 +305,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="param">
             <xs:complexType>
               <xs:complexContent>
@@ -326,6 +338,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="string-values">
             <xs:complexType>
               <xs:sequence>
@@ -362,6 +375,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="door-map-list-values">
             <xs:complexType>
               <xs:sequence>
@@ -401,6 +415,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="string-map-values">
             <xs:complexType>
               <xs:sequence>
@@ -433,6 +448,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="string-description"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">

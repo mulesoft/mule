@@ -29,11 +29,13 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -266,7 +268,7 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
       return empty();
     });
 
-    when(errorMappingsParameter.getName()).thenReturn("errorMappings");
+    when(errorMappingsParameter.getName()).thenReturn(ERROR_MAPPINGS_PARAMETER_NAME);
     when(errorMappingsParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
     when(errorMappingsParameter.getModelProperty(any())).thenReturn(empty());
     when(errorMappingsParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
@@ -275,10 +277,10 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
     when(errorMappingsParameter.getType()).thenReturn(BaseTypeBuilder.create(JAVA).arrayType()
         .of(TYPE_LOADER.load(org.mule.runtime.api.meta.model.operation.ErrorMappings.ErrorMapping.class)).build());
 
-    when(errorMappingsParameterGroup.getName()).thenReturn("errorMappings");
+    when(errorMappingsParameterGroup.getName()).thenReturn(ERROR_MAPPINGS);
     when(errorMappingsParameterGroup.isShowInDsl()).thenReturn(false);
     when(errorMappingsParameterGroup.getParameterModels()).thenReturn(asList(errorMappingsParameter));
-    when(errorMappingsParameterGroup.getParameter("errorMappings")).thenReturn(of(errorMappingsParameter));
+    when(errorMappingsParameterGroup.getParameter(ERROR_MAPPINGS_PARAMETER_NAME)).thenReturn(of(errorMappingsParameter));
 
     RequiredForMetadataModelProperty requiredForMetadataModelProperty =
         new RequiredForMetadataModelProperty(asList(PARAMETER_REQUIRED_FOR_METADATA_NAME));

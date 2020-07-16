@@ -33,7 +33,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
-import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+import static org.mule.runtime.core.internal.exception.EnrichedErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.doForErrorMappings;
 
@@ -53,7 +53,7 @@ import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.HashMap;
@@ -218,7 +218,7 @@ public class BeanDefinitionFactory {
                                           ErrorTypeMatcher errorTypeMatcher =
                                               new SingleErrorTypeMatcher(errorType);
                                           ErrorType targetValue = resolveErrorType(m.getTarget());
-                                          return new ErrorMapping(errorTypeMatcher, targetValue);
+                                          return new EnrichedErrorMapping(errorTypeMatcher, targetValue);
                                         })
                                         .collect(toList()),
                                     springComponentModel);

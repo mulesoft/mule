@@ -32,7 +32,7 @@ public class GroupLayoutTestCase extends AbstractJavaExtensionDeclarationTestCas
   @Test
   public void groupLayout() {
     OperationDeclaration operation = getOperation(extensionDeclaration, "convinceAnimalKiller");
-    assertThat(operation.getParameterGroups(), hasSize(3));
+    assertThat(operation.getParameterGroups(), hasSize(2));
     ParameterGroupDeclaration group = operation.getParameterGroups().get(0);
     assertThat(group.getLayoutModel().getTabName().get(), is(ARGUMENTS_TAB));
   }
