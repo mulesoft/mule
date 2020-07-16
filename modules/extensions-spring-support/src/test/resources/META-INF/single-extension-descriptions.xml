@@ -69,6 +69,9 @@
                 <parameter name="config-ref">
                     <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
                 </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of 'errorMapping's]]></description>
+                </parameter>
                 <parameter name="reconnectionStrategy">
                     <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
                 </parameter>
@@ -85,6 +88,9 @@
                 </parameter>
                 <parameter name="second">
                     <description><![CDATA[Second Description]]></description>
+                </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of 'errorMapping's]]></description>
                 </parameter>
             </parameters>
         </operation>

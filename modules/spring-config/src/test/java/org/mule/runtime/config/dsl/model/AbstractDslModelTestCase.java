@@ -39,6 +39,7 @@ import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.operation.ErrorMapping;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -239,7 +240,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(errorMappingsParameter.getLayoutModel()).thenReturn(empty());
     when(errorMappingsParameter.getRole()).thenReturn(BEHAVIOUR);
     when(errorMappingsParameter.getType()).thenReturn(BaseTypeBuilder.create(JAVA).arrayType()
-        .of(TYPE_LOADER.load(org.mule.runtime.api.meta.model.operation.ErrorMappings.ErrorMapping.class)).build());
+        .of(TYPE_LOADER.load(ErrorMapping.class)).build());
 
     when(errorMappingsParameterGroup.getName()).thenReturn(ERROR_MAPPINGS);
     when(errorMappingsParameterGroup.isShowInDsl()).thenReturn(false);

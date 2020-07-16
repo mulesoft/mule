@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.api.streaming.iterator.ListConsumer;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -28,6 +29,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.List;
+
 /**
  * Provides instances of {@link OperationMessageProcessor} for a given {@link OperationModel}
  *
@@ -36,8 +39,11 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 public final class OperationMessageProcessorBuilder
     extends ComponentMessageProcessorBuilder<OperationModel, OperationMessageProcessor> {
 
+  private final List<EnrichedErrorMapping> errorMappings;
+
   public OperationMessageProcessorBuilder(ExtensionModel extension,
                                           OperationModel operation,
+                                          List<EnrichedErrorMapping> errorMappings,
                                           PolicyManager policyManager,
                                           MuleContext muleContext,
                                           Registry registry) {
@@ -45,6 +51,7 @@ public final class OperationMessageProcessorBuilder
     super(extension, operation, policyManager, registry.lookupByType(ReflectionCache.class).get(),
           registry.lookupByType(ExpressionManager.class).get(), muleContext, registry);
 
+    this.errorMappings = errorMappings;
   }
 
   @Override
@@ -59,12 +66,13 @@ public final class OperationMessageProcessorBuilder
 
     if (supportsOAuth) {
       return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                                arguments, cursorProviderFactory, retryPolicyTemplate, extensionManager,
-                                                policyManager, reflectionCache, resultTransformer, terminationTimeout);
+                                                errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate,
+                                                extensionManager, policyManager, reflectionCache, resultTransformer,
+                                                terminationTimeout);
     } else {
       return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                           arguments, cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                           reflectionCache, resultTransformer, terminationTimeout);
+                                           errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate, extensionManager,
+                                           policyManager, reflectionCache, resultTransformer, terminationTimeout);
     }
   }
 

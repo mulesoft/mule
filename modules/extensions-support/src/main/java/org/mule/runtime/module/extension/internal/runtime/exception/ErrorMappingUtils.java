@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
-import org.mule.runtime.api.meta.model.operation.ErrorMappings.ErrorMapping;
+import org.mule.runtime.api.meta.model.operation.ErrorMapping;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;

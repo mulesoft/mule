@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
@@ -122,8 +123,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(operationModel.isBlocking()).thenReturn(false);
 
     OperationMessageProcessor operationMessageProcessor =
-        new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
-                                      cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
+        new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, emptyList(),
+                                      resolverSet, cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
                                       mockPolicyManager, reflectionCache, null,
                                       muleContext.getConfiguration().getShutdownTimeout());
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));

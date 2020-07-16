@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 
@@ -17,7 +18,7 @@ import javax.xml.namespace.QName;
  *
  * @since 4.0
  */
-public class EnrichedErrorMapping {
+public class EnrichedErrorMapping extends AbstractComponent {
 
   public static QName ANNOTATION_ERROR_MAPPINGS = new QName("operator", "errorMappings");
 

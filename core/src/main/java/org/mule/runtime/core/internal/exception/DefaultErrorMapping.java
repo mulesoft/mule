@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import org.mule.runtime.api.meta.model.operation.ErrorMappings.ErrorMapping;
+import org.mule.runtime.api.meta.model.operation.ErrorMapping;
 
 public final class DefaultErrorMapping implements ErrorMapping {
 

@@ -7,13 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.exception.EnrichedErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -39,9 +37,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 /**
  * An implementation of a {@link ComponentMessageProcessor} for {@link OperationModel operation models}
@@ -56,21 +51,22 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
 
   private final EntityMetadataMediator entityMetadataMediator;
 
-  private List<EnrichedErrorMapping> errorMappings = emptyList();
+  private final List<EnrichedErrorMapping> errorMappings;
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
                                    ConfigurationProvider configurationProvider,
                                    String target,
                                    String targetValue,
+                                   List<EnrichedErrorMapping> errorMappings,
                                    ResolverSet resolverSet,
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache) {
-    this(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-         retryPolicyTemplate, extensionManager, policyManager, reflectionCache, null, -1);
+    this(extensionModel, operationModel, configurationProvider, target, targetValue, errorMappings, resolverSet,
+         cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache, null, -1);
   }
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
@@ -78,6 +74,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    ConfigurationProvider configurationProvider,
                                    String target,
                                    String targetValue,
+                                   List<EnrichedErrorMapping> errorMappings,
                                    ResolverSet resolverSet,
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
@@ -90,6 +87,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
           cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache,
           resultTransformer, terminationTimeout);
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
+    this.errorMappings = errorMappings;
   }
 
   @Override
@@ -156,13 +154,5 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   @Override
   public List<EnrichedErrorMapping> getErrorMappings() {
     return errorMappings;
-  }
-
-  @Override
-  public void setAnnotations(Map<QName, Object> newAnnotations) {
-    super.setAnnotations(newAnnotations);
-
-    List<EnrichedErrorMapping> list = (List<EnrichedErrorMapping>) getAnnotation(ANNOTATION_ERROR_MAPPINGS);
-    this.errorMappings = list != null ? list : emptyList();
   }
 }

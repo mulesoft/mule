@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.client.strategy;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -79,7 +80,7 @@ public abstract class AbstractExtensionsClientProcessorsStrategy implements Exte
     Map<String, ValueResolver> resolvedParams = parameters;
     try {
       OperationMessageProcessor processor =
-          new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext, registry)
+          new OperationMessageProcessorBuilder(extension, operation, emptyList(), policyManager, muleContext, registry)
               .setConfigurationProvider(config)
               .setParameters(resolvedParams)
               .setTerminationTimeout(-1)
