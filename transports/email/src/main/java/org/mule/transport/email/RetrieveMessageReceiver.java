@@ -463,7 +463,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                             + " as folder is closed");
                     }
                     //stop if the total or current processed messages exceed the total amount
-                    done = (offset >= count) || (batchSize >= count);
+                    done = (offset-1 >= count) || (batchSize >= count);
                 }
                 catch (MessagingException e)
                 {

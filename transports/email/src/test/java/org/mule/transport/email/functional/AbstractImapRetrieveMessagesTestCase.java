@@ -54,11 +54,20 @@ public class AbstractImapRetrieveMessagesTestCase extends AbstractEmailFunctiona
 
     private FlowExecutionListener flowExecutionListener;
     public int initialReadMessages;
+    private int initialUnreadMessages;
+    
+    public AbstractImapRetrieveMessagesTestCase(ConfigVariant variant, String configResources, int initialReadMessages, int initialUnreadMessages)
+    {
+        super(variant, STRING_MESSAGE, "imap", configResources);
+        this.initialReadMessages = initialReadMessages;
+        this.initialUnreadMessages = initialUnreadMessages;
+    }
 
     public AbstractImapRetrieveMessagesTestCase(ConfigVariant variant, String configResources, int initialReadMessages)
     {
         super(variant, STRING_MESSAGE, "imap", configResources);
         this.initialReadMessages = initialReadMessages;
+        this.initialUnreadMessages = UNREAD_MESSAGES;
     }
 
     @Before
@@ -71,7 +80,7 @@ public class AbstractImapRetrieveMessagesTestCase extends AbstractEmailFunctiona
     @Test
     public void testRetrieveEmails() throws Exception
     {
-        assertThat(server.getReceivedMessages().length, is(equalTo(UNREAD_MESSAGES + initialReadMessages)));
+        assertThat(server.getReceivedMessages().length, is(equalTo(initialUnreadMessages + initialReadMessages)));
 
         flowExecutionListener.waitUntilFlowIsComplete();
 
@@ -81,17 +90,17 @@ public class AbstractImapRetrieveMessagesTestCase extends AbstractEmailFunctiona
             @Override
             public boolean isSatisfied()
             {
-                return (retrievedMessages.size() == UNREAD_MESSAGES);
+                return (retrievedMessages.size() == initialUnreadMessages);
             }
 
             @Override
             public String describeFailure()
             {
-                return "Expected email count was " + UNREAD_MESSAGES + " but actual one was " + retrievedMessages.size();
+                return "Expected email count was " + initialUnreadMessages + " but actual one was " + retrievedMessages.size();
             }
         });
 
-        for (int i = 0; i < UNREAD_MESSAGES; i++)
+        for (int i = 0; i < initialUnreadMessages; i++)
         {
             assertThat("Missing email " + i, retrievedMessages.contains(String.valueOf(i)), is(equalTo(true)));
         }
@@ -110,7 +119,7 @@ public class AbstractImapRetrieveMessagesTestCase extends AbstractEmailFunctiona
         }
 
         // Add unread messages.
-        generateAndStoreUnreadEmails(UNREAD_MESSAGES);
+        generateAndStoreUnreadEmails(initialUnreadMessages);
     }
 
     private void generateAndStoreUnreadEmails(int count) throws Exception
