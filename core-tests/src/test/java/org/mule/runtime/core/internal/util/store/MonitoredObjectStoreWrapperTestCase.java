@@ -193,6 +193,7 @@ public class MonitoredObjectStoreWrapperTestCase extends AbstractMuleTestCase {
     final PhantomReference<Serializable> phantomReference = new PhantomReference<>(innerValue, new ReferenceQueue<>());
 
     objectStore = new InMemoryObjectStore() {
+
       @Override
       public Serializable remove(String key) throws ObjectStoreException {
         super.remove(key);
@@ -201,7 +202,7 @@ public class MonitoredObjectStoreWrapperTestCase extends AbstractMuleTestCase {
           System.gc();
           assertThat(phantomReference.isEnqueued(), is(true));
           return true;
-        }, "A hard reference is being mantained to the bindingValue."));
+        }, "A hard reference is being mantained to the value of the OS entry."));
 
         return new MonitoredObjectStoreWrapper.StoredObject(new Serializable() {}, 0L, KEY);
       }
