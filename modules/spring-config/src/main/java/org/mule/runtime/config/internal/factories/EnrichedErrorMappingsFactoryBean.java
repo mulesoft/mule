@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.factories;
 import static java.lang.String.format;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -35,7 +36,7 @@ public class EnrichedErrorMappingsFactoryBean extends AbstractComponentFactory<E
 
   @Override
   public EnrichedErrorMapping doGetObject() throws Exception {
-    ComponentIdentifier sourceType = buildFromStringRepresentation(source);
+    ComponentIdentifier sourceType = source != null ? buildFromStringRepresentation(source) : ANY;
 
     ErrorType errorType = errorTypeRepository
         .lookupErrorType(sourceType)
