@@ -157,7 +157,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
 
   public void expire() {
     try {
-      LOGGER.debug("Starting expiry on {}...", getStore().toString());
+      LOGGER.debug("Starting expiry on {}...", getStore());
 
       final long now = currentTimeMillis();
       List<String> keys = allKeys();
@@ -166,8 +166,8 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
       PriorityQueue<Pair<String, Long>> sortedMaxEntries = null;
 
       if (excess > 0) {
-        LOGGER.trace("Will expire {} entries from {}", excess, getStore().toString());
-        sortedMaxEntries = new PriorityQueue<>(excess, comparing(paramT -> paramT.getSecond()));
+        LOGGER.trace("Will expire {} entries from {}", excess, getStore());
+        sortedMaxEntries = new PriorityQueue<>(excess, comparing(Pair::getSecond));
       }
 
       for (String key : keys) {
@@ -178,7 +178,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
         }
 
         if (entryTtl != null && now - obj.getTimestamp() >= entryTtl) {
-          LOGGER.trace("Expiring entry '{}' from {} due to TTL...", key, getStore().toString());
+          LOGGER.trace("Expiring entry '{}' from {} due to TTL...", key, getStore());
           expiryRemove(key);
         } else if (maxEntries != null && excess > 0) {
           sortedMaxEntries.offer(new Pair<>(obj.getKey(), obj.getTimestamp()));
@@ -188,7 +188,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
       if (sortedMaxEntries != null) {
         Pair<String, Long> obj = sortedMaxEntries.poll();
         while (obj != null && excess > 0) {
-          LOGGER.trace("Expiring entry '{}' from {} due to size excess...", obj.getFirst(), getStore().toString());
+          LOGGER.trace("Expiring entry '{}' from {} due to size excess...", obj.getFirst(), getStore());
           excess--;
           expiryRemove(obj.getFirst());
           obj = sortedMaxEntries.poll();
@@ -203,7 +203,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
     try {
       return getStore().retrieve(key);
     } catch (ObjectDoesNotExistException e) {
-      LOGGER.trace("Entry '{}' from {} already removed", key, getStore().toString());
+      LOGGER.trace("Entry '{}' from {} already removed", key, getStore());
       return null;
     }
   }
@@ -212,7 +212,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
     try {
       remove(key);
     } catch (ObjectDoesNotExistException e) {
-      LOGGER.trace("Entry '{}' from {} already removed", key, getStore().toString());
+      LOGGER.trace("Entry '{}' from {} already removed", key, getStore());
     }
   }
 
