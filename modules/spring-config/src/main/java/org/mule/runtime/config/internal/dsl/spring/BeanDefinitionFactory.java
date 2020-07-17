@@ -12,7 +12,6 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.SINGLE;
@@ -35,9 +34,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
@@ -85,7 +81,6 @@ public class BeanDefinitionFactory {
 
   private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
-          // .add(ERROR_MAPPING_IDENTIFIER)
           .add(DESCRIPTION_IDENTIFIER)
           .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
           .add(DOC_DESCRIPTION_IDENTIFIER)
@@ -110,20 +105,17 @@ public class BeanDefinitionFactory {
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
   private final BeanDefinitionCreator componentModelProcessor;
   private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
-  private final ErrorTypeRepository errorTypeRepository;
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
    *                                            artifact.
    * @param errorTypeRepository
    */
-  public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
-                               ErrorTypeRepository errorTypeRepository) {
+  public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
-    this.errorTypeRepository = errorTypeRepository;
 
     registerConfigurationPropertyProviders();
   }
@@ -194,29 +186,6 @@ public class BeanDefinitionFactory {
                                     .orElse(rawParams),
                                 springComponentModel);
 
-                  // // add any error mappings if present
-                  // doForErrorMappings(componentModel, mappings -> {
-                  // if (!mappings.isEmpty()) {
-                  // addAnnotation(ANNOTATION_ERROR_MAPPINGS,
-                  // mappings.stream()
-                  // .map(m -> {
-                  // ComponentIdentifier source = buildFromStringRepresentation(m.getSource());
-                  //
-                  // ErrorType errorType = errorTypeRepository
-                  // .lookupErrorType(source)
-                  // .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.",
-                  // source)));
-                  //
-                  // ErrorTypeMatcher errorTypeMatcher =
-                  // new SingleErrorTypeMatcher(errorType);
-                  // ErrorType targetValue = resolveErrorType(m.getTarget());
-                  // return new EnrichedErrorMapping(errorTypeMatcher, targetValue);
-                  // })
-                  // .collect(toList()),
-                  // springComponentModel);
-                  // }
-                  // });
-
                   componentLocator.addComponentLocation(componentModel.getLocation());
                   addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel, springComponentModel);
                 }
@@ -244,33 +213,6 @@ public class BeanDefinitionFactory {
     } else {
       return Optional.empty();
     }
-  }
-
-  private ErrorType resolveErrorType(String representation) {
-    ComponentIdentifier errorIdentifier = parserErrorType(representation);
-    if (CORE_ERROR_NS.equals(errorIdentifier.getNamespace())) {
-      return errorTypeRepository.lookupErrorType(errorIdentifier)
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
-                                                                                 errorIdentifier.getName()))));
-    }
-    return errorTypeRepository.lookupErrorType(errorIdentifier)
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find synthetic error '%s' in registry",
-                                                                        errorIdentifier)));
-  }
-
-  public static ComponentIdentifier parserErrorType(String representation) {
-    int separator = representation.indexOf(':');
-    String namespace;
-    String identifier;
-    if (separator > 0) {
-      namespace = representation.substring(0, separator).toUpperCase();
-      identifier = representation.substring(separator + 1).toUpperCase();
-    } else {
-      namespace = CORE_ERROR_NS;
-      identifier = representation.toUpperCase();
-    }
-
-    return ComponentIdentifier.builder().namespace(namespace).name(identifier).build();
   }
 
   /**

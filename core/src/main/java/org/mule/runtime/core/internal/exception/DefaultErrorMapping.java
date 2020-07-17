@@ -28,4 +28,8 @@ public final class DefaultErrorMapping implements ErrorMapping {
     return target;
   }
 
+  @Override
+  public String toString() {
+    return "DefaultErrorMapping: " + source + " -> " + target;
+  }
 }

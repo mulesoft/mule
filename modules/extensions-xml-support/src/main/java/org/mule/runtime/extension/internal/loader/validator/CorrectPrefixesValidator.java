@@ -7,7 +7,7 @@
 package org.mule.runtime.extension.internal.loader.validator;
 
 import static java.lang.String.format;
-import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
@@ -97,7 +97,7 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
                                     ErrorMapping errorMappingComponentModel,
                                     ProblemsReporter problemsReporter) {
     genericValidation(moduleNamespace, operationModel, problemsReporter, TARGET_TYPE, ERROR_MAPPING_IDENTIFIER,
-                      of(errorMappingComponentModel.getSource()));
+                      ofNullable(errorMappingComponentModel.getTarget()));
   }
 
   private void genericValidation(String moduleNamespace, OperationModel operationModel, ComponentAst elementComponentModel,

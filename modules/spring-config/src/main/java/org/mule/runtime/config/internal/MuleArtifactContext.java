@@ -26,7 +26,6 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENT
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
-import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.parserErrorType;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getExtensionModelsComponentBuildingDefinitions;
@@ -241,8 +240,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
 
     this.beanDefinitionFactory =
-        new BeanDefinitionFactory(muleContext.getConfiguration().getId(), componentBuildingDefinitionRegistry,
-                                  muleContext.getErrorTypeRepository());
+        new BeanDefinitionFactory(muleContext.getConfiguration().getId(), componentBuildingDefinitionRegistry);
 
     this.applicationModel = createApplicationModel();
   }
@@ -532,6 +530,21 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       logger.debug(format("Registering errorType '%s'", errorIdentifier));
     }
     return errorTypeRepository.addErrorType(errorIdentifier, errorTypeRepository.getAnyErrorType());
+  }
+
+  private ComponentIdentifier parserErrorType(String representation) {
+    int separator = representation.indexOf(':');
+    String namespace;
+    String identifier;
+    if (separator > 0) {
+      namespace = representation.substring(0, separator).toUpperCase();
+      identifier = representation.substring(separator + 1).toUpperCase();
+    } else {
+      namespace = CORE_ERROR_NS;
+      identifier = representation.toUpperCase();
+    }
+
+    return ComponentIdentifier.builder().namespace(namespace).name(identifier).build();
   }
 
   @Override
