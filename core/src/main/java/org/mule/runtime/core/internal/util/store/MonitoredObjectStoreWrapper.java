@@ -24,6 +24,7 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.store.TemplateObjectStore;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.UUID;
@@ -162,11 +163,11 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
       List<String> keys = allKeys();
       int excess = maxEntries != null ? (keys.size() - maxEntries) : 0;
 
-      PriorityQueue<StoredObject<T>> sortedMaxEntries = null;
+      PriorityQueue<Pair<String, Long>> sortedMaxEntries = null;
 
       if (excess > 0) {
         LOGGER.trace("Will expire {} entries from {}", excess, getStore().toString());
-        sortedMaxEntries = new PriorityQueue<>(excess, comparing(paramT -> paramT.timestamp));
+        sortedMaxEntries = new PriorityQueue<>(excess, comparing(paramT -> paramT.getSecond()));
       }
 
       for (String key : keys) {
@@ -180,16 +181,16 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
           LOGGER.trace("Expiring entry '{}' from {} due to TTL...", key, getStore().toString());
           expiryRemove(key);
         } else if (maxEntries != null && excess > 0) {
-          sortedMaxEntries.offer(obj);
+          sortedMaxEntries.offer(new Pair<>(obj.getKey(), obj.getTimestamp()));
         }
       }
 
       if (sortedMaxEntries != null) {
-        StoredObject<T> obj = sortedMaxEntries.poll();
+        Pair<String, Long> obj = sortedMaxEntries.poll();
         while (obj != null && excess > 0) {
-          LOGGER.trace("Expiring entry '{}' from {} due to size excess...", obj.getKey(), getStore().toString());
+          LOGGER.trace("Expiring entry '{}' from {} due to size excess...", obj.getFirst(), getStore().toString());
           excess--;
-          expiryRemove(obj.getKey());
+          expiryRemove(obj.getFirst());
           obj = sortedMaxEntries.poll();
         }
       }
