@@ -197,7 +197,7 @@ public class MonitoredObjectStoreWrapperTestCase extends AbstractMuleTestCase {
       public Serializable remove(String key) throws ObjectStoreException {
         super.remove(key);
 
-        new PollingProber(GC_POLLING_TIMEOUT * 100, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+        new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
           System.gc();
           assertThat(phantomReference.isEnqueued(), is(true));
           return true;
