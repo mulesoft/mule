@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
@@ -107,7 +108,10 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
                   .onErrorMap(MessagingException.class,
                               error -> createMessagingException(doAfter(interceptor, (Component) component, of(error.getCause()))
                                   .apply((InternalEvent) error.getEvent()),
-                                                                error.getCause(), error.getFailingComponent(), of(error)))
+                                                                error.getCause(),
+                                                                error.getFailingComponent() != null ? error.getFailingComponent()
+                                                                    : (Component) component,
+                                                                of(error)))
                   .cast(InternalEvent.class)
                   .map(doAfter(interceptor, (Component) component, empty()))
                   .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
