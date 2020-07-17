@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
+ * Utilities for dealing with {@code error-mapping} in operations.
  *
  * @since 4.4
  */
@@ -26,6 +27,12 @@ public final class ErrorMappingUtils {
     // Nothing to do
   }
 
+  /**
+   * For the given AST node representing an operation, execute the given {@code action} for each error mapping it has.
+   * 
+   * @param operation the operation from which to iterate the error mappings.
+   * @param action what is executed for every error mapping.
+   */
   public static void doForErrorMappings(ComponentAst operation, Consumer<List<ErrorMapping>> action) {
     if (operation.getModel(OperationModel.class).isPresent()) {
       final ComponentParameterAst errorMappingsParam = operation.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
