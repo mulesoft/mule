@@ -14,8 +14,9 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
@@ -37,6 +38,7 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
@@ -48,10 +50,12 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorTypeThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
+import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withFailingComponent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -77,6 +81,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -387,6 +392,30 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
+  }
+
+  @Test
+  @Issue("MULE-18549")
+  public void interceptorHandleMessagingExceptionWithFallingComponent() throws Exception {
+    Component mockedComponent = mock(Component.class);
+
+    startFlowWithInterceptors(interceptorThatFailsWith(mockedComponent));
+
+    expected.expect(MessagingException.class);
+    expected.expect(withFailingComponent(is(notNullValue(Component.class))));
+    expected.expect(withFailingComponent(is(sameInstance(mockedComponent))));
+    process(flow, eventBuilder(muleContext).message(Message.of("")).build());
+  }
+
+  @Test
+  @Issue("MULE-18549")
+  public void interceptorHandleMessagingExceptionWithoNullFallingComponent() throws Exception {
+    startFlowWithInterceptors(interceptorThatFailsWith(null));
+
+    expected.expect(MessagingException.class);
+    expected.expect(withFailingComponent(is(notNullValue(Component.class))));
+    expected.expect(withFailingComponent(is(sameInstance((Component) processor))));
+    process(flow, eventBuilder(muleContext).message(Message.of("")).build());
   }
 
   @Test
@@ -1776,6 +1805,22 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         });
       }
     }
+  }
+
+  private ProcessorInterceptor interceptorThatFailsWith(Component mockedComponent) {
+    return prepareInterceptor(new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
+                                                         InterceptionEvent event, InterceptionAction action) {
+        InternalEvent internalEvent = ((DefaultInterceptionEvent) event).resolve();
+        CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
+        completableFuture.completeExceptionally(new MessagingException(createStaticMessage("Some Error"), internalEvent,
+                                                                       new RuntimeException("Some Error"), mockedComponent));
+        return completableFuture;
+      }
+    });
   }
 
   private void verifyParametersResolvedAndDisposed(final VerificationMode times) {
