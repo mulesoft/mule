@@ -6,6 +6,8 @@
  */
 package org.mule.util;
 
+import static org.apache.commons.lang.SystemUtils.IS_OS_WINDOWS;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
 
@@ -994,6 +996,37 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         }
 
         return timeStamp;
+    }
+
+    public static boolean isFileOpen(File file)
+    {
+        if (IS_OS_WINDOWS)
+        {
+            // try to rename to the same name will fail on Windows
+            String fileName = file.getName();
+            File sameFileName = new File(fileName);
+            return !file.renameTo(sameFileName);
+        }
+        else
+        {
+            String filePath = file.getAbsolutePath();
+            File nullFile = new File("/dev/null");
+
+            // use lsof utility
+            ProcessBuilder builder = new ProcessBuilder("lsof", "-c", "java", "-a", "-T", "--", filePath).redirectError(nullFile).redirectOutput(nullFile);
+
+            try
+            {
+                Process process = builder.start();
+                int exitValue = process.waitFor();
+                return exitValue == 0;
+            }
+            catch (InterruptedException | IOException e)
+            {
+                // ignore the exceptions
+            }
+            return false;
+        }
     }
 
     public static Collection<File> findFiles(File folder, IOFileFilter filter, boolean recursive)
