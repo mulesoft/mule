@@ -23,6 +23,8 @@ import static org.mule.api.security.tls.TlsConfiguration.JSSE_NAMESPACE;
 import static org.mule.api.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
 import static org.mule.util.ClassUtils.getClassPathRoot;
 import static org.mule.util.FileUtils.deleteFile;
+import static org.mule.util.FileUtils.isFileOpen;
+import static org.mule.util.FileUtils.newFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +41,7 @@ import org.junit.Test;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.util.FileUtils;
 import org.mule.util.SecurityUtils;
 
 public class TlsConfigurationTestCase extends AbstractMuleTestCase
@@ -265,6 +268,34 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
             System.setProperty(MULE_SECURITY_SYSTEM_PROPERTY, previousSecurityModel);
             deleteFile(file);
         }
+    }
+    
+    @Test
+    public void testTlsConfigurationDoesNotLeakKeyStoreFile() throws Exception {
+      TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
+      configuration.setKeyPassword("mulepassword");
+      configuration.setKeyStorePassword("mulepassword");
+      configuration.setKeyStore("clientKeystore");
+      configuration.initialise(false, JSSE_NAMESPACE);
+
+      URL keystoreUrl = getClass().getClassLoader().getResource("clientKeystore");
+      File keyStoreFile = newFile(keystoreUrl.toURI());
+      assertThat(isFileOpen(keyStoreFile), is(false));
+    }
+
+    @Test
+    public void testTlsConfigurationDoesNotLeakTrustStoreFile() throws Exception {
+      TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
+      configuration.setKeyPassword("mulepassword");
+      configuration.setKeyStorePassword("mulepassword");
+      configuration.setKeyStore("clientKeystore");
+      configuration.setTrustStorePassword("mulepassword");
+      configuration.setTrustStore("trustStore");
+      configuration.initialise(false, JSSE_NAMESPACE);
+
+      URL keystoreUrl = getClass().getClassLoader().getResource("trustStore");
+      File trustStoreFile = newFile(keystoreUrl.toURI());
+      assertThat(isFileOpen(trustStoreFile), is(false));
     }
 
     private File getDefaultProtocolConfigFile() throws IOException
