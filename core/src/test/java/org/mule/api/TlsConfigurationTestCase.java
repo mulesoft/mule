@@ -6,8 +6,10 @@
  */
 package org.mule.api;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.api.config.MuleProperties;
@@ -16,6 +18,11 @@ import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.ClassUtils;
 import org.mule.util.SecurityUtils;
+
+import static org.mule.api.security.tls.TlsConfiguration.DEFAULT_KEYSTORE;
+import static org.mule.api.security.tls.TlsConfiguration.JSSE_NAMESPACE;
+import static org.mule.util.FileUtils.isFileOpen;
+import static org.mule.util.FileUtils.newFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +33,8 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TlsConfigurationTestCase extends AbstractMuleTestCase
@@ -168,6 +177,34 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
             System.setProperty(MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY, previousSecurityModel);
             file.delete();
         }
+    }
+    
+    @Test
+    public void testTlsConfigurationDoesNotLeakKeyStoreFile() throws Exception {
+      TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
+      configuration.setKeyPassword("mulepassword");
+      configuration.setKeyStorePassword("mulepassword");
+      configuration.setKeyStore("clientKeystore");
+      configuration.initialise(false, JSSE_NAMESPACE);
+
+      URL keystoreUrl = getClass().getClassLoader().getResource("clientKeystore");
+      File keyStoreFile = newFile(keystoreUrl.toURI());
+      assertThat(isFileOpen(keyStoreFile), is(false));
+    }
+
+    @Test
+    public void testTlsConfigurationDoesNotLeakTrustStoreFile() throws Exception {
+      TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
+      configuration.setKeyPassword("mulepassword");
+      configuration.setKeyStorePassword("mulepassword");
+      configuration.setKeyStore("clientKeystore");
+      configuration.setTrustStorePassword("mulepassword");
+      configuration.setTrustStore("trustStore");
+      configuration.initialise(false, JSSE_NAMESPACE);
+
+      URL keystoreUrl = getClass().getClassLoader().getResource("trustStore");
+      File trustStoreFile = newFile(keystoreUrl.toURI());
+      assertThat(isFileOpen(trustStoreFile), is(false));
     }
 
     private File createDefaultConfigFile() throws IOException
