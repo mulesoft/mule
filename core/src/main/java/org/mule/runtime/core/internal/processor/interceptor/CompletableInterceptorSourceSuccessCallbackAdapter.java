@@ -13,7 +13,7 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 
 /**
- * Hooks the {@link SourceInterceptor}s for a {@link MessageSource} failure callback into the {@code Reactor} response handling
+ * Hooks the {@link SourceInterceptor}s for a {@link MessageSource} successful callback into the {@code Reactor} response handling
  * pipeline.
  *
  * @since 4.3.0

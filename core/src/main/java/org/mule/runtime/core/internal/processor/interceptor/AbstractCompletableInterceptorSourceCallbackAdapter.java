@@ -132,6 +132,7 @@ public abstract class AbstractCompletableInterceptorSourceCallbackAdapter<T exte
           interceptor.afterCallback(component.getLocation(), interceptionEvent, thrown);
         } finally {
           setContextClassLoader(currentThread, ctxClassLoader, originalTCCL);
+          interceptor.afterTerminated(component.getLocation(), interceptionEvent, thrown);
         }
         return interceptionEvent.resolve();
       } catch (Exception e) {
