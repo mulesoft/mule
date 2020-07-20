@@ -32,6 +32,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -294,15 +295,16 @@ public final class TlsConfiguration
     {
         KeyStore tempKeyStore = KeyStore.getInstance(keystoreType);
 
-        InputStream is = IOUtils.getResourceAsStream(keyStoreName, getClass());
-        if (null == is)
+        try (InputStream is = IOUtils.getResourceAsStream(keyStoreName, getClass()))
         {
-            throw new FileNotFoundException(
-                cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
+            if (null == is)
+            {
+                throw new FileNotFoundException(
+                        cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
+            }
+            tempKeyStore.load(is, keyStorePassword.toCharArray());
+            return tempKeyStore;
         }
-
-        tempKeyStore.load(is, keyStorePassword.toCharArray());
-        return tempKeyStore;
     }
 
     protected void checkKeyStoreContainsAlias(KeyStore keyStore) throws KeyStoreException
@@ -390,13 +392,7 @@ public final class TlsConfiguration
         try
         {
             trustStore = KeyStore.getInstance(trustStoreType);
-            InputStream is = IOUtils.getResourceAsStream(trustStoreName, getClass());
-            if (null == is)
-            {
-                throw new FileNotFoundException(
-                        "Failed to load truststore from classpath or local file: " + trustStoreName);
-            }
-            trustStore.load(is, trustStorePassword.toCharArray());
+            loadTrustStore(trustStore);
         }
         catch (Exception e)
         {
@@ -405,6 +401,19 @@ public final class TlsConfiguration
         }
 
         return trustStore;
+    }
+
+    private void loadTrustStore(KeyStore trustStore) throws IOException, FileNotFoundException, NoSuchAlgorithmException, CertificateException
+    {
+        try (InputStream is = IOUtils.getResourceAsStream(trustStoreName, getClass()))
+        {
+            if (null == is)
+            {
+                throw new FileNotFoundException(
+                        "Failed to load truststore from classpath or local file: " + trustStoreName);
+            }
+            trustStore.load(is, trustStorePassword.toCharArray());
+        }
     }
 
     public static Set<TrustAnchor> getDefaultCaCerts() throws GeneralSecurityException
