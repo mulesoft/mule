@@ -400,4 +400,47 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>${maven.enforcer.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots-in-deps</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>No Snapshots Allowed in Deps!</message>
+                                            <excludes>
+                                                <exclude>org.mule.tests:test-components</exclude>
+                                            </excludes>
+                                        </requireReleaseDeps>
+                                        <requireReleaseVersion>
+                                            <message>No Snapshots Allowed in Project Version!</message>
+                                        </requireReleaseVersion>
+                                        <requirePluginVersions>
+                                            <message>Best Practice is to always define plugin versions!</message>
+                                            <unCheckedPluginList>
+                                                org.apache.maven.plugins:maven-clean-plugin
+                                            </unCheckedPluginList>
+                                        </requirePluginVersions>
+                                    </rules>
+                                    <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
