@@ -70,6 +70,7 @@ import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KillParameters;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
+import org.mule.test.heisenberg.extension.model.MyInterface;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.RecursiveChainA;
 import org.mule.test.heisenberg.extension.model.RecursiveChainB;
@@ -122,6 +123,21 @@ public class HeisenbergOperations implements Disposable {
   private ExtensionManager extensionManager;
 
   private final LazyValue<ExecutorService> executor = new LazyValue<>(() -> newSingleThreadExecutor());
+
+  @MediaType(ANY)
+  public String usingInterface(@Content MyInterface myInterface) {
+    return null;
+  }
+
+  @MediaType(ANY)
+  public String usingInterfaceB(@Content MyInterface myInterface) {
+    return null;
+  }
+
+  @MediaType(ANY)
+  public String usingInterfaceC(@Content MyInterface myInterface) {
+    return null;
+  }
 
   public List<Result<String, Object>> getSimpleBlacklist(@Config HeisenbergExtension config) {
     List<Result<String, Object>> blacklist = new LinkedList<>();
