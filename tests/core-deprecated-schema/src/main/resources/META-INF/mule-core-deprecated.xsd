@@ -144,49 +144,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="invoke" type="invokeType" substitutionGroup="top-level-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Invokes the method of a given object using method arguments expressed using mule expressions.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="invokeType">
-        <xsd:complexContent>
-            <xsd:extension base="topLevelProcessorType">
-                <xsd:attribute name="object-ref" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Reference to the object whose method will be invoked.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="method" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of the method to be invoked.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="methodArguments" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Comma-seperated list of mule expression that when evaluated are the arguments for the method invocation
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="methodArgumentTypes" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Comma-seperated list of mule expression that when evaluated are the arguments for the method invocation
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="processor" type="refMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>

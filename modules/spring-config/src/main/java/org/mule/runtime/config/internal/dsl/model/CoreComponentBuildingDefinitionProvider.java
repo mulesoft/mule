@@ -121,7 +121,6 @@ import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.internal.processor.IdempotentRedeliveryPolicy;
-import org.mule.runtime.core.internal.processor.InvokerMessageProcessor;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.processor.simple.AddFlowVariableProcessor;
@@ -622,16 +621,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("initialisationPolicy", fromSimpleParameter("initialisationPolicy",
                                                                                    PoolingProfile.POOL_INITIALISATION_POLICIES::get)
                                                                                        .build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("invoke")
-        .withTypeDefinition(fromType(InvokerMessageProcessor.class))
-        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("methodName", fromSimpleParameter("method").build())
-        .withSetterParameterDefinition("argumentExpressionsString",
-                                       fromSimpleParameter("methodArguments").build())
-        .withSetterParameterDefinition("object",
-                                       fromSimpleReferenceParameter("object-ref").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("expression-language")
