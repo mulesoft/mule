@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
 @SmallTest
@@ -79,6 +80,7 @@ public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase 
   }
 
   @Test
+  @Issue("MULE-18584")
   public void streamingStatisticsOnOpenAndClose() throws IOException {
     InputStream stream = new ByteArrayInputStream("Apple".getBytes());
     ManagedCursorStreamProvider streamProvider = (ManagedCursorStreamProvider) streamingHelper.resolveCursorProvider(stream);
