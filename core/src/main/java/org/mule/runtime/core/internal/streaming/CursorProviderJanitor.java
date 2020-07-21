@@ -73,7 +73,7 @@ public class CursorProviderJanitor {
     }
 
     try {
-      cursors.forEach(this::releaseCursor);
+      cursors.forEach(this::cleanUpCursor);
     } finally {
       provider.releaseResources();
       cursors.clear();
@@ -87,13 +87,17 @@ public class CursorProviderJanitor {
    * @param cursor a {@link Cursor}
    */
   public void releaseCursor(Cursor cursor) {
+    if (cursors.remove(cursor)) {
+      cleanUpCursor(cursor);
+    }
+  }
+
+  private void cleanUpCursor(Cursor cursor) {
     try {
-      if (cursors.remove(cursor)) {
-        statistics.decrementOpenCursors();
-        cursor.release();
-        if (provider.isClosed() && cursors.isEmpty()) {
-          releaseResources();
-        }
+      statistics.decrementOpenCursors();
+      cursor.release();
+      if (provider.isClosed() && cursors.isEmpty()) {
+        releaseResources();
       }
     } catch (Exception e) {
       LOGGER.warn("Exception was found trying to release cursor resources. Execution will continue", e);
