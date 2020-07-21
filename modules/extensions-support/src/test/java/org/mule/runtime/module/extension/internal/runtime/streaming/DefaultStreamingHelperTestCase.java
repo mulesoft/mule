@@ -16,6 +16,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -23,15 +24,19 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
+import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.factory.InMemoryCursorIteratorProviderFactory;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
 @SmallTest
@@ -72,6 +77,29 @@ public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase 
     });
 
     assertThat(cursor.hasNext(), is(false));
+  }
+
+  @Test
+  @Issue("MULE-18584")
+  public void streamingStatisticsOnOpenAndClose() throws IOException {
+    InputStream stream = new ByteArrayInputStream("Apple".getBytes());
+    ManagedCursorStreamProvider streamProvider = (ManagedCursorStreamProvider) streamingHelper.resolveCursorProvider(stream);
+
+    CursorStream cursorStream = streamProvider.openCursor();
+    assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), is(1));
+
+    cursorStream.close();
+    assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), is(0));
+
+    CursorStream cursorStream1 = streamProvider.openCursor();
+    CursorStream cursorStream2 = streamProvider.openCursor();
+    CursorStream cursorStream3 = streamProvider.openCursor();
+    assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), is(3));
+
+    cursorStream1.close();
+    cursorStream2.close();
+    cursorStream3.close();
+    assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), is(0));
   }
 
   @Test
