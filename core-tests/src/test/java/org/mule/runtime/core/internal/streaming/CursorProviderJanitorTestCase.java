@@ -42,4 +42,27 @@ public class CursorProviderJanitorTestCase extends AbstractMuleTestCase {
     verify(provider).releaseResources();
   }
 
+  @Test
+  public void multipleCursorsReleasedOnJanitorRelease() {
+    CursorProvider provider = mock(CursorProvider.class);
+    MutableStreamingStatistics statistics = mock(MutableStreamingStatistics.class);
+
+    Set<Cursor> cursors = new HashSet<Cursor>();
+    Cursor cursor1 = mock(Cursor.class);
+    Cursor cursor2 = mock(Cursor.class);
+    Cursor cursor3 = mock(Cursor.class);
+    cursors.add(cursor1);
+    cursors.add(cursor2);
+    cursors.add(cursor3);
+
+    CursorProviderJanitor janitor = new CursorProviderJanitor(provider, cursors, statistics);
+    janitor.releaseResources();
+
+    assertThat(janitor.provider, is(nullValue()));
+    assertThat(cursors, is(empty()));
+    verify(cursor1).release();
+    verify(cursor2).release();
+    verify(cursor3).release();
+    verify(provider).releaseResources();
+  }
 }
