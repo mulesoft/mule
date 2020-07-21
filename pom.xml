@@ -2015,6 +2015,9 @@
                                     <rules>
                                         <requireReleaseDeps>
                                             <message>No Snapshots Allowed in Deps!</message>
+                                            <excludes>
+                                                <exclude>org.mule.tests:test-components</exclude>
+                                            </excludes>
                                         </requireReleaseDeps>
                                         <requireReleaseVersion>
                                             <message>No Snapshots Allowed in Project Version!</message>
