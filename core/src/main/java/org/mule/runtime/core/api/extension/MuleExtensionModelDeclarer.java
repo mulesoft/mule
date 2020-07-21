@@ -56,7 +56,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
-import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DECLARED;
+import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_MATCHER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
@@ -98,6 +98,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
+import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
 import com.google.common.collect.ImmutableSet;
@@ -244,7 +245,8 @@ class MuleExtensionModelDeclarer {
         .withOperation("idempotentMessageValidator")
         .describedAs("Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. "
             + "Note that the ID used can be generated from the message using an expression defined in the 'idExpression' "
-            + "attribute. Otherwise, a 'DUPLICATE_MESSAGE' error is generated.");
+            + "attribute. Otherwise, a 'DUPLICATE_MESSAGE' error is generated.")
+        .withModelProperty(new NoErrorMappingModelProperty());
 
     validator.withOutput().ofType(typeLoader.load(void.class));
     validator.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -305,7 +307,8 @@ class MuleExtensionModelDeclarer {
         .describedAs("Allows a \u0027flow\u0027 to be referenced so that message processing will continue in the referenced flow "
             + "before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the "
             + "referenced flow and will therefore use its error handler etc.")
-        .withErrorModel(routingError);
+        .withErrorModel(routingError)
+        .withModelProperty(new NoErrorMappingModelProperty());
 
     flowRef.withOutput().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
     flowRef.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
@@ -323,7 +326,8 @@ class MuleExtensionModelDeclarer {
         .describedAs("Performs logging using an expression to determine the message to be logged. By default, if a message is not specified, the current Mule Message is logged "
             + "using the " + DEFAULT_LOG_LEVEL
             + " level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but "
-            + "the level and category can both be configured to suit your needs.");
+            + "the level and category can both be configured to suit your needs.")
+        .withModelProperty(new NoErrorMappingModelProperty());
 
     logger.withOutput().ofType(typeLoader.load(void.class));
     logger.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -352,7 +356,8 @@ class MuleExtensionModelDeclarer {
 
   private void declareSetPayload(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer setPayload = extensionDeclarer.withOperation("setPayload")
-        .describedAs("A processor that sets the payload with the provided value.");
+        .describedAs("A processor that sets the payload with the provided value.")
+        .withModelProperty(new NoErrorMappingModelProperty());
 
     setPayload.withOutput().ofType(typeLoader.load(void.class));
     setPayload.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -379,7 +384,8 @@ class MuleExtensionModelDeclarer {
 
   private void declareSetVariable(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer setVariable = extensionDeclarer.withOperation("setVariable")
-        .describedAs("A processor that adds variables.");
+        .describedAs("A processor that adds variables.")
+        .withModelProperty(new NoErrorMappingModelProperty());
 
     setVariable.withOutput().ofType(typeLoader.load(void.class));
     setVariable.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -411,7 +417,8 @@ class MuleExtensionModelDeclarer {
 
   private void declareParseTemplate(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer parseTemplate = extensionDeclarer.withOperation("parseTemplate")
-        .describedAs("Parses a template defined inline.");
+        .describedAs("Parses a template defined inline.")
+        .withModelProperty(new NoErrorMappingModelProperty());
 
     parseTemplate.withOutput().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
     parseTemplate.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -444,7 +451,8 @@ class MuleExtensionModelDeclarer {
 
   private void declareRemoveVariable(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer removeVariable = extensionDeclarer.withOperation("removeVariable")
-        .describedAs("A processor that removes variables by name or a wildcard expression.");
+        .describedAs("A processor that removes variables by name or a wildcard expression.")
+        .withModelProperty(new NoErrorMappingModelProperty());
 
     removeVariable.withOutput().ofType(typeLoader.load(void.class));
     removeVariable.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -459,14 +467,15 @@ class MuleExtensionModelDeclarer {
 
   private void declareRaiseError(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer raiseError = extensionDeclarer.withOperation("raiseError")
-        .describedAs("Throws an error with the specified type and description.");
+        .describedAs("Throws an error with the specified type and description.")
+        .withModelProperty(new NoErrorMappingModelProperty());
 
     raiseError.withOutput().ofType(typeLoader.load(void.class));
     raiseError.withOutputAttributes().ofType(typeLoader.load(void.class));
 
     raiseError.onDefaultParameterGroup()
         .withRequiredParameter("type")
-        .ofType(ERROR_TYPE_DECLARED)
+        .ofType(ERROR_TYPE_DEFINITION)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The error type to raise.");
 

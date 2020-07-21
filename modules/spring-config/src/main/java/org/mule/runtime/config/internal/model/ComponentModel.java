@@ -34,7 +34,6 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
-import org.mule.runtime.api.meta.model.operation.ErrorMapping;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -43,7 +42,7 @@ import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter;
-import org.mule.runtime.core.internal.exception.DefaultErrorMapping;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 
@@ -273,8 +272,8 @@ public class ComponentModel implements ComponentAst {
                     if (ERROR_MAPPINGS_PARAMETER_NAME.equals(paramModel.getName())) {
                       final List<ErrorMapping> errorMappings = directChildrenStream()
                           .filter(child -> ERROR_MAPPING_IDENTIFIER.equals(child.getIdentifier()))
-                          .map(child -> new DefaultErrorMapping(child.getRawParameterValue(SOURCE_TYPE).orElse(ANY_IDENTIFIER),
-                                                                child.getRawParameterValue(TARGET_TYPE).orElse(null)))
+                          .map(child -> new ErrorMapping(child.getRawParameterValue(SOURCE_TYPE).orElse(ANY_IDENTIFIER),
+                                                         child.getRawParameterValue(TARGET_TYPE).orElse(null)))
                           .collect(toList());
                       parameterAstsByName.put(paramModel.getName(),
                                               new DefaultComponentParameterAst(errorMappings, () -> paramModel, null));

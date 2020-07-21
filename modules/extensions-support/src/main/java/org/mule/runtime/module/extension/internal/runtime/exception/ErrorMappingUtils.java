@@ -8,10 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
-import org.mule.runtime.api.meta.model.operation.ErrorMapping;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -29,16 +30,18 @@ public final class ErrorMappingUtils {
 
   /**
    * For the given AST node representing an operation, execute the given {@code action} for each error mapping it has.
-   * 
+   *
    * @param operation the operation from which to iterate the error mappings.
    * @param action what is executed for every error mapping.
    */
-  public static void doForErrorMappings(ComponentAst operation, Consumer<List<ErrorMapping>> action) {
-    if (operation.getModel(OperationModel.class).isPresent()) {
-      final ComponentParameterAst errorMappingsParam = operation.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
-      if (errorMappingsParam != null) {
-        errorMappingsParam.<List<ErrorMapping>>getValue().applyRight(action);
+  public static void forEachErrorMappingDo(ComponentAst operation, Consumer<List<ErrorMapping>> action) {
+    operation.getModel(OperationModel.class).ifPresent(opModel -> {
+      if (!opModel.getModelProperty(NoErrorMappingModelProperty.class).isPresent()) {
+        final ComponentParameterAst errorMappingsParam = operation.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
+        if (errorMappingsParam != null) {
+          errorMappingsParam.<List<ErrorMapping>>getValue().applyRight(action);
+        }
       }
-    }
+    });
   }
 }

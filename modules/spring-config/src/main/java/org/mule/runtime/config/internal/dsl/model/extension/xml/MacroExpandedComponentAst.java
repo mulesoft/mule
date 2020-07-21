@@ -7,19 +7,19 @@
 package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
-import org.mule.runtime.api.meta.model.operation.ErrorMapping;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
-import org.mule.runtime.core.internal.exception.DefaultErrorMapping;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
 
 import java.util.Collection;
 import java.util.List;
@@ -88,6 +88,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
   }
 
   private ComponentParameterAst mapIdParam(final ComponentParameterAst originalParameter) {
+    requireNonNull(originalParameter);
     return new ComponentParameterAst() {
 
       @Override
@@ -115,9 +116,9 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
         return originalParameter.getValue()
             .mapRight(mappings -> ((List<ErrorMapping>) mappings)
                 .stream()
-                .map(mapping -> new DefaultErrorMapping(literalsParameters.getOrDefault(mapping.getSource(), mapping.getSource()),
-                                                        literalsParameters.getOrDefault(mapping.getTarget(),
-                                                                                        mapping.getTarget())))
+                .map(mapping -> new ErrorMapping(literalsParameters.getOrDefault(mapping.getSource(), mapping.getSource()),
+                                                 literalsParameters.getOrDefault(mapping.getTarget(),
+                                                                                 mapping.getTarget())))
                 .collect(toList()))
             .getRight();
       }

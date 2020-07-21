@@ -83,7 +83,7 @@
                     <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
                 </parameter>
                 <parameter name="errorMappings">
-                    <description><![CDATA[Set of 'errorMapping's]]></description>
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
                 <parameter name="reconnectionStrategy">
                     <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
@@ -100,7 +100,7 @@
                     <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
                 </parameter>
                 <parameter name="errorMappings">
-                    <description><![CDATA[Set of 'errorMapping's]]></description>
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
                 <parameter name="reconnectionStrategy">
                     <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
@@ -117,7 +117,7 @@
                     <description><![CDATA[Some other friend]]></description>
                 </parameter>
                 <parameter name="errorMappings">
-                    <description><![CDATA[Set of 'errorMapping's]]></description>
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
             </parameters>
         </operation>
@@ -128,7 +128,7 @@
                     <description><![CDATA[parameter documentation for an inherited operation.]]></description>
                 </parameter>
                 <parameter name="errorMappings">
-                    <description><![CDATA[Set of 'errorMapping's]]></description>
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
             </parameters>
         </operation>
@@ -148,7 +148,7 @@
                     <description><![CDATA[Param with alias]]></description>
                 </parameter>
                 <parameter name="errorMappings">
-                    <description><![CDATA[Set of 'errorMapping's]]></description>
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
             </parameters>
         </operation>
@@ -159,7 +159,7 @@
                     <description><![CDATA[some doc]]></description>
                 </parameter>
                 <parameter name="errorMappings">
-                    <description><![CDATA[Set of 'errorMapping's]]></description>
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
             </parameters>
         </operation>
@@ -170,7 +170,7 @@
                     <description><![CDATA[this is the String to be returned]]></description>
                 </parameter>
                 <parameter name="errorMappings">
-                    <description><![CDATA[Set of 'errorMapping's]]></description>
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
             </parameters>
         </operation>

@@ -6,30 +6,35 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import org.mule.runtime.api.meta.model.operation.ErrorMapping;
-
-public final class DefaultErrorMapping implements ErrorMapping {
+/**
+ * Determines that an error thrown by an operation should be mapped to another.
+ */
+public final class ErrorMapping {
 
   private final String source;
   private final String target;
 
-  public DefaultErrorMapping(String source, String target) {
+  public ErrorMapping(String source, String target) {
     this.source = source;
     this.target = target;
   }
 
-  @Override
+  /**
+   * @return the type of the error to be mapped from
+   */
   public String getSource() {
     return source;
   }
 
-  @Override
+  /**
+   * @return the type of the error to be mapped to
+   */
   public String getTarget() {
     return target;
   }
 
   @Override
   public String toString() {
-    return "DefaultErrorMapping: " + source + " -> " + target;
+    return "ErrorMapping: " + source + " -> " + target;
   }
 }

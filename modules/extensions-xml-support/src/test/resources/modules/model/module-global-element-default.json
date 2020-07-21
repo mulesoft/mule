@@ -164,7 +164,23 @@
                         },
                         "type": "String",
                         "annotations": {
-                          "typeId": "errorTypeMatcher"
+                          "typeId": "errorTypeMatcher",
+                          "enum": {
+                            "type": "[Ljava.lang.String;",
+                            "values": [
+                              "ANY",
+                              "REDELIVERY_EXHAUSTED",
+                              "TRANSFORMATION",
+                              "EXPRESSION",
+                              "SECURITY",
+                              "CLIENT_SECURITY",
+                              "SERVER_SECURITY",
+                              "ROUTING",
+                              "CONNECTIVITY",
+                              "RETRY_EXHAUSTED",
+                              "TIMEOUT"
+                            ]
+                          }
                         }
                       }
                     },
@@ -183,23 +199,7 @@
                         },
                         "type": "String",
                         "annotations": {
-                          "typeId": "errorTypeDeclared",
-                          "enum": {
-                            "type": "[Ljava.lang.String;",
-                            "values": [
-                              "ANY",
-                              "REDELIVERY_EXHAUSTED",
-                              "TRANSFORMATION",
-                              "EXPRESSION",
-                              "SECURITY",
-                              "CLIENT_SECURITY",
-                              "SERVER_SECURITY",
-                              "ROUTING",
-                              "CONNECTIVITY",
-                              "RETRY_EXHAUSTED",
-                              "TIMEOUT"
-                            ]
-                          }
+                          "typeId": "errorTypeDefinition"
                         }
                       }
                     }
@@ -225,7 +225,7 @@
               },
               "allowedStereotypeModels": [],
               "name": "errorMappings",
-              "description": "Set of \u0027errorMapping\u0027s",
+              "description": "Set of error mappings",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
@@ -234,6 +234,9 @@
                     "prefix": "mule"
                   },
                   "unboundedMaxOccurs": true
+                },
+                "sinceMuleVersion": {
+                  "version": "4.4.0"
                 },
                 "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 12
@@ -399,7 +402,23 @@
                         },
                         "type": "String",
                         "annotations": {
-                          "typeId": "errorTypeMatcher"
+                          "typeId": "errorTypeMatcher",
+                          "enum": {
+                            "type": "[Ljava.lang.String;",
+                            "values": [
+                              "ANY",
+                              "REDELIVERY_EXHAUSTED",
+                              "TRANSFORMATION",
+                              "EXPRESSION",
+                              "SECURITY",
+                              "CLIENT_SECURITY",
+                              "SERVER_SECURITY",
+                              "ROUTING",
+                              "CONNECTIVITY",
+                              "RETRY_EXHAUSTED",
+                              "TIMEOUT"
+                            ]
+                          }
                         }
                       }
                     },
@@ -418,23 +437,7 @@
                         },
                         "type": "String",
                         "annotations": {
-                          "typeId": "errorTypeDeclared",
-                          "enum": {
-                            "type": "[Ljava.lang.String;",
-                            "values": [
-                              "ANY",
-                              "REDELIVERY_EXHAUSTED",
-                              "TRANSFORMATION",
-                              "EXPRESSION",
-                              "SECURITY",
-                              "CLIENT_SECURITY",
-                              "SERVER_SECURITY",
-                              "ROUTING",
-                              "CONNECTIVITY",
-                              "RETRY_EXHAUSTED",
-                              "TIMEOUT"
-                            ]
-                          }
+                          "typeId": "errorTypeDefinition"
                         }
                       }
                     }
@@ -460,7 +463,7 @@
               },
               "allowedStereotypeModels": [],
               "name": "errorMappings",
-              "description": "Set of \u0027errorMapping\u0027s",
+              "description": "Set of error mappings",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
@@ -469,6 +472,9 @@
                     "prefix": "mule"
                   },
                   "unboundedMaxOccurs": true
+                },
+                "sinceMuleVersion": {
+                  "version": "4.4.0"
                 },
                 "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 12
@@ -671,7 +677,23 @@
                         },
                         "type": "String",
                         "annotations": {
-                          "typeId": "errorTypeMatcher"
+                          "typeId": "errorTypeMatcher",
+                          "enum": {
+                            "type": "[Ljava.lang.String;",
+                            "values": [
+                              "ANY",
+                              "REDELIVERY_EXHAUSTED",
+                              "TRANSFORMATION",
+                              "EXPRESSION",
+                              "SECURITY",
+                              "CLIENT_SECURITY",
+                              "SERVER_SECURITY",
+                              "ROUTING",
+                              "CONNECTIVITY",
+                              "RETRY_EXHAUSTED",
+                              "TIMEOUT"
+                            ]
+                          }
                         }
                       }
                     },
@@ -690,23 +712,7 @@
                         },
                         "type": "String",
                         "annotations": {
-                          "typeId": "errorTypeDeclared",
-                          "enum": {
-                            "type": "[Ljava.lang.String;",
-                            "values": [
-                              "ANY",
-                              "REDELIVERY_EXHAUSTED",
-                              "TRANSFORMATION",
-                              "EXPRESSION",
-                              "SECURITY",
-                              "CLIENT_SECURITY",
-                              "SERVER_SECURITY",
-                              "ROUTING",
-                              "CONNECTIVITY",
-                              "RETRY_EXHAUSTED",
-                              "TIMEOUT"
-                            ]
-                          }
+                          "typeId": "errorTypeDefinition"
                         }
                       }
                     }
@@ -732,7 +738,7 @@
               },
               "allowedStereotypeModels": [],
               "name": "errorMappings",
-              "description": "Set of \u0027errorMapping\u0027s",
+              "description": "Set of error mappings",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
@@ -741,6 +747,9 @@
                     "prefix": "mule"
                   },
                   "unboundedMaxOccurs": true
+                },
+                "sinceMuleVersion": {
+                  "version": "4.4.0"
                 },
                 "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 12

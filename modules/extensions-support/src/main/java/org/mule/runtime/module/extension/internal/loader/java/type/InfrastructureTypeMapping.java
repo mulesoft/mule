@@ -24,10 +24,10 @@ import static org.mule.runtime.internal.dsl.DslConstants.TLS_STANDARD_REVOCATION
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
-import org.mule.runtime.api.meta.model.operation.ErrorMapping;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tx.TransactionType;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;

@@ -42,7 +42,7 @@ import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor.processXmlConfiguration;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
-import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.doForErrorMappings;
+import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -479,7 +479,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private void registerErrorMappings(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {
-    doForErrorMappings(componentModel, mappings -> mappings
+    forEachErrorMappingDo(componentModel, mappings -> mappings
         .forEach(mapping -> {
           ComponentIdentifier source = buildFromStringRepresentation(mapping.getSource());
 
