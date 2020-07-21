@@ -16,6 +16,7 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <oracle.driver.version>12.2.0.1</oracle.driver.version>
     </properties>
 
     <dependencies>
@@ -197,6 +198,12 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>${oracle.driver.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
