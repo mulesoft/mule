@@ -4,17 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.tests.parsers.api;
+package org.mule.tests.api.pojos;
 
-import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-public class SimplePojo extends AbstractComponent {
+@TypeDsl(allowTopLevelDefinition = true)
+public class MyPojo {
 
+  @Parameter
+  @Optional(defaultValue = "jose")
   private String someParameter;
 
-  public SimplePojo() {}
+  public MyPojo() {}
 
-  public SimplePojo(String someParameter) {
+  public MyPojo(String someParameter) {
     this.someParameter = someParameter;
   }
 
@@ -31,11 +36,11 @@ public class SimplePojo extends AbstractComponent {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (!(o instanceof MyPojo)) {
       return false;
     }
 
-    SimplePojo that = (SimplePojo) o;
+    MyPojo that = (MyPojo) o;
 
     return someParameter != null ? someParameter.equals(that.someParameter) : that.someParameter == null;
 

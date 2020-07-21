@@ -1,0 +1,26 @@
+{
+  "extensionModelLoaderDescriptor": {
+    "id": "crafted",
+    "attributes": {
+      "type": "org.mule.tests.chains.api.extension.TestProcessorChainsExtensionLoadingDelegate"
+    }
+  },
+  "name": "Mule test processor chains plugin",
+  "minMuleVersion": "4.0.0",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [
+        "org.mule.tests.chains.api.config"
+      ],
+      "exportedResources": [
+        "/META-INF/mule-test-processor-chains.xsd",
+        "/META-INF/mule.schemas"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

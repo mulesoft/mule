@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.tests.parsers.api.config;
+package org.mule.tests.chains.api.config;
 
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
@@ -12,9 +12,9 @@ import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class TestParsersNamespaceInfoProvider implements XmlNamespaceInfoProvider {
+public class TestProcessorChainsNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
-  public static final String PARSERS_TEST_NAMESPACE = "parsers-test";
+  public static final String TEST_PROCESSOR_CHAINS_NAMESPACE = "test-processor-chains";
 
   @Override
   public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
@@ -22,12 +22,12 @@ public class TestParsersNamespaceInfoProvider implements XmlNamespaceInfoProvide
 
       @Override
       public String getNamespaceUriPrefix() {
-        return "http://www.mulesoft.org/schema/mule/parsers-test";
+        return "http://www.mulesoft.org/schema/mule/test-processor-chains";
       }
 
       @Override
       public String getNamespace() {
-        return PARSERS_TEST_NAMESPACE;
+        return TEST_PROCESSOR_CHAINS_NAMESPACE;
       }
     });
   }
