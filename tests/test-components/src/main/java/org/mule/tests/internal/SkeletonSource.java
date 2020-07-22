@@ -7,6 +7,7 @@
 package org.mule.tests.internal;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -20,19 +21,19 @@ import java.io.InputStream;
 @MediaType(value = ANY, strict = false)
 public class SkeletonSource extends Source<InputStream, InputStream> {
 
-    private volatile boolean started = false;
+  private volatile boolean started = false;
 
-    @Override
-    public synchronized void onStart(SourceCallback sourceCallback) throws MuleException {
-        started = true;
-    }
+  @Override
+  public synchronized void onStart(SourceCallback sourceCallback) throws MuleException {
+    started = true;
+  }
 
-    public synchronized boolean isStarted() {
-        return started;
-    }
+  public synchronized boolean isStarted() {
+    return started;
+  }
 
-    @Override
-    public synchronized void onStop() {
-        started = false;
-    }
+  @Override
+  public synchronized void onStop() {
+    started = false;
+  }
 }

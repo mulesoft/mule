@@ -7,6 +7,7 @@
 package org.mule.tests.api;
 
 import static java.lang.Thread.currentThread;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tests.internal.TestQueue;
 
@@ -16,34 +17,34 @@ import java.util.concurrent.TimeUnit;
 
 public class TestQueueManager {
 
-    private final Map<String, TestQueue> queuesMap = new ConcurrentHashMap<>();
+  private final Map<String, TestQueue> queuesMap = new ConcurrentHashMap<>();
 
-    public TestQueue get(String configName) {
-        return queuesMap.computeIfAbsent(configName, TestQueue::new);
-    }
+  public TestQueue get(String configName) {
+    return queuesMap.computeIfAbsent(configName, TestQueue::new);
+  }
 
-    public TestQueue remove(String configName) {
-        return queuesMap.remove(configName);
-    }
+  public TestQueue remove(String configName) {
+    return queuesMap.remove(configName);
+  }
 
-    public CoreEvent read(String configName, long timeout, TimeUnit timeUnit) {
-        try {
-            return get(configName).pop(timeout, timeUnit);
-        } catch (InterruptedException e) {
-            currentThread().interrupt();
-            return null;
-        }
+  public CoreEvent read(String configName, long timeout, TimeUnit timeUnit) {
+    try {
+      return get(configName).pop(timeout, timeUnit);
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
+      return null;
     }
+  }
 
-    public void write(String configName, CoreEvent event) {
-        try {
-            get(configName).push(event);
-        } catch (InterruptedException e) {
-            currentThread().interrupt();
-        }
+  public void write(String configName, CoreEvent event) {
+    try {
+      get(configName).push(event);
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
     }
+  }
 
-    public int countPendingEvents(String configName) {
-        return get(configName).countPendingEvents();
-    }
+  public int countPendingEvents(String configName) {
+    return get(configName).countPendingEvents();
+  }
 }

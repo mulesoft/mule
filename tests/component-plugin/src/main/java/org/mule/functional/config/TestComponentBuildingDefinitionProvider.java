@@ -18,7 +18,6 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfiguratio
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.functional.api.component.AssertionMessageProcessor;
-import org.mule.functional.api.component.DependencyInjectionObject;
 import org.mule.functional.api.component.EqualsLogChecker;
 import org.mule.functional.api.component.EventCallback;
 import org.mule.functional.api.component.FunctionalTestProcessor;
@@ -188,11 +187,6 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("shared-config")
         .withTypeDefinition(fromType(SharedConfig.class))
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition
-        .withIdentifier("dependency-injection-object")
-        .withTypeDefinition(fromType(DependencyInjectionObject.class))
         .build());
 
     componentBuildingDefinitions.add(baseDefinition
