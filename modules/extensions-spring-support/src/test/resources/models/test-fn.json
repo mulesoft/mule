@@ -536,8 +536,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"

@@ -239,9 +239,7 @@
   <xs:complexType name="CaptureCallbackPayloadsType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="request"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="state"></xs:attribute>
         <xs:attribute type="xs:string" use="required" name="config-ref">
@@ -258,7 +256,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
@@ -284,7 +281,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
@@ -311,7 +307,6 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionInt" use="optional" default="0" name="failAt"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
@@ -343,7 +338,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
@@ -361,9 +355,7 @@
   <xs:complexType name="UnauthorizeType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="resourceOwnerId">
           <xs:annotation>
             <xs:documentation>The id of the resource owner which access should be invalidated</xs:documentation>

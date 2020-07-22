@@ -297,7 +297,11 @@
     </xsd:element>
     <xsd:complexType name="abstractOperatorType">
         <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType"/>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" maxOccurs="unbounded" ref="error-mapping"/>
+                </xsd:sequence>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 

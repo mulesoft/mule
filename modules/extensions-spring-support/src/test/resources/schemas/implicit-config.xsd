@@ -76,9 +76,7 @@
   <xs:complexType name="GetConfigType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
@@ -103,7 +101,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
@@ -127,9 +124,7 @@
   <xs:complexType name="GetEnrichedNameType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="optionalWithDefault"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>

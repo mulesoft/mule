@@ -27,7 +27,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="payload"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">

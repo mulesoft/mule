@@ -414,8 +414,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "expiration-policy",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": false
+                  }
                 },
                 "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 4
@@ -727,8 +726,7 @@
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "error-mapping",
                         "prefix": "mule"
-                      },
-                      "unboundedMaxOccurs": true
+                      }
                     },
                     "sinceMuleVersion": {
                       "version": "4.4.0"
@@ -1080,8 +1078,7 @@
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "error-mapping",
                         "prefix": "mule"
-                      },
-                      "unboundedMaxOccurs": true
+                      }
                     },
                     "sinceMuleVersion": {
                       "version": "4.4.0"
@@ -1715,8 +1712,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -2043,8 +2039,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "abstract-byte-streaming-strategy",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": false
+                  }
                 },
                 "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 2
@@ -2246,8 +2241,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -2579,8 +2573,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -2887,8 +2880,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -3223,8 +3215,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -3559,8 +3550,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -3853,8 +3843,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -4219,8 +4208,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -4587,8 +4575,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -4965,8 +4952,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -5301,8 +5287,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -5602,8 +5587,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "error-mapping",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": true
+                  }
                 },
                 "sinceMuleVersion": {
                   "version": "4.4.0"
@@ -5924,8 +5908,7 @@
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "abstract-redelivery-policy",
                     "prefix": "mule"
-                  },
-                  "unboundedMaxOccurs": false
+                  }
                 },
                 "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 1

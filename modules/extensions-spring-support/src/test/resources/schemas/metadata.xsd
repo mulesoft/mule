@@ -235,7 +235,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="type"></xs:attribute>
@@ -263,7 +262,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
@@ -301,7 +299,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
@@ -339,7 +336,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
@@ -376,7 +372,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
@@ -414,7 +409,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
@@ -451,7 +445,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
@@ -469,7 +462,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
@@ -507,7 +499,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
@@ -525,7 +516,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/metadata" type="org.mule.test.metadata.extension.model.animals.AnimalCladeEnumType" use="required" name="type"></xs:attribute>
@@ -553,7 +543,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
@@ -591,7 +580,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
@@ -630,7 +618,6 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
@@ -657,7 +644,6 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
@@ -688,7 +674,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="type"></xs:attribute>
@@ -726,7 +711,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" default="CAR" name="type"></xs:attribute>
@@ -764,7 +748,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
@@ -801,7 +784,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="firstPerson"></xs:attribute>
@@ -840,7 +822,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
@@ -878,7 +859,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
@@ -915,7 +895,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
@@ -952,7 +931,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
@@ -990,7 +968,6 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="animal">
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
@@ -1026,7 +1003,6 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
@@ -1054,7 +1030,6 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
@@ -1081,7 +1056,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
@@ -1111,7 +1085,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
@@ -1149,7 +1122,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
@@ -1229,7 +1201,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="contents"></xs:element>
         </xs:sequence>
       </xs:extension>
@@ -1240,7 +1211,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="map-content"></xs:element>
         </xs:sequence>
       </xs:extension>
@@ -1251,7 +1221,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="animal-content"></xs:element>
         </xs:sequence>
       </xs:extension>
@@ -1261,9 +1230,7 @@
   <xs:complexType name="CustomAttributesOutputType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1281,9 +1248,7 @@
   <xs:complexType name="CustomInputAndOutputType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="required" name="type"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
@@ -1302,9 +1267,7 @@
   <xs:complexType name="CustomTypeInputType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="required" name="type"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
@@ -1323,9 +1286,7 @@
   <xs:complexType name="CustomTypeListOutputType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1343,9 +1304,7 @@
   <xs:complexType name="CustomTypeOutputType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1365,7 +1324,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
@@ -1385,7 +1343,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="query"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -1405,9 +1362,7 @@
   <xs:complexType name="DynamicListOfMessagesType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
@@ -1437,7 +1392,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="referable-elements">
             <xs:complexType>
               <xs:sequence>
@@ -1469,9 +1423,7 @@
   <xs:complexType name="InputHasExclusiveOptionalParameterGroupType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="cakeName"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="iceCreamName"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -1492,7 +1444,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="dessert-order">
             <xs:complexType>
               <xs:complexContent>
@@ -1528,9 +1479,7 @@
   <xs:complexType name="JsonArrayAttributesType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1548,9 +1497,7 @@
   <xs:complexType name="JsonArrayAttributesListType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1568,9 +1515,7 @@
   <xs:complexType name="JsonArrayOutputListType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
             <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
@@ -1593,9 +1538,7 @@
   <xs:complexType name="JsonAttributesType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1613,9 +1556,7 @@
   <xs:complexType name="JsonAttributesListType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1633,9 +1574,7 @@
   <xs:complexType name="JsonInputListType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionList" use="required" name="jsonList"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
@@ -1665,7 +1604,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="jsons">
             <xs:complexType>
               <xs:sequence>
@@ -1697,9 +1635,7 @@
   <xs:complexType name="JsonInputStreamType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="required" name="json"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
@@ -1720,7 +1656,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
@@ -1741,7 +1676,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
@@ -1760,9 +1694,7 @@
   <xs:complexType name="JsonOutputListType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
             <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
@@ -1785,9 +1717,7 @@
   <xs:complexType name="ListOfMessagesType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
             <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
@@ -1810,9 +1740,7 @@
   <xs:complexType name="MessageAttributesAnyTypeMetadataType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
             <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
@@ -1840,9 +1768,7 @@
   <xs:complexType name="MessageAttributesPersonTypeMetadataType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
@@ -1861,9 +1787,7 @@
   <xs:complexType name="ObjectListAsInputType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="objects"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -1883,9 +1807,7 @@
   <xs:complexType name="OutputAttributesWithDeclaredSubtypesMetadataType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1903,9 +1825,7 @@
   <xs:complexType name="OutputAttributesWithDynamicMetadataType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
@@ -1926,7 +1846,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="json-value"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -1947,7 +1866,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
@@ -1958,9 +1876,7 @@
   <xs:complexType name="ResolverOutputWithContextClassLoaderType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
@@ -1990,7 +1906,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="query"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -2011,7 +1926,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="plain-shape">
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
@@ -2057,9 +1971,7 @@
   <xs:complexType name="XmlAttributesType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -2077,9 +1989,7 @@
   <xs:complexType name="XmlInputType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="required" name="xml"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
@@ -2100,7 +2010,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
@@ -2119,9 +2028,7 @@
   <xs:complexType name="XmlOutputListType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
             <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
@@ -2149,9 +2056,7 @@
   <xs:complexType name="XmlOutputListWithEmptySchemaType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
-        </xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
             <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
@@ -2181,7 +2086,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="mule:error-mapping"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>

@@ -11,10 +11,10 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 
 /**
- * Represents a mapping between source and target {@link ErrorType}s, indicating that if
- * the first or a match for it is found then the other should be propagated instead.
+ * Represents a mapping between source and target {@link ErrorType}s, indicating that if the first or a match for it is found then
+ * the other should be propagated instead.
  *
- * @since 4.0
+ * @since 4.4
  */
 public class EnrichedErrorMapping extends AbstractComponent {
 

@@ -37,10 +37,10 @@ import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEW
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.STRING;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.TLS_CONTEXT_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.UNBOUNDED;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_OPTIONAL;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_REQUIRED;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.XML_NAMESPACE;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
@@ -659,14 +659,10 @@ public final class SchemaBuilder {
   }
 
   TopLevelElement createRefElement(QName elementRef, boolean isRequired) {
-    return createRefElement(elementRef, isRequired, MAX_ONE);
-  }
-
-  private TopLevelElement createRefElement(QName elementRef, boolean isRequired, final String maxOccurs) {
     TopLevelElement element = new TopLevelElement();
     element.setRef(elementRef);
     element.setMinOccurs(isRequired ? ONE : ZERO);
-    element.setMaxOccurs(maxOccurs);
+    element.setMaxOccurs(MAX_ONE);
     return element;
   }
 
@@ -756,18 +752,17 @@ public final class SchemaBuilder {
 
   void addInfrastructureParameters(ExtensionType extensionType, ParameterizedModel model, ExplicitGroup sequence) {
     model.getAllParameterModels().stream()
-        .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
+        .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class)
+            .map(infraParam -> !p.getName().equals(ERROR_MAPPINGS_PARAMETER_NAME))
+            .orElse(false))
         .sorted(comparing(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).get().getSequence()))
         .forEach(parameter -> {
           boolean isParameterRequired = parameter.isRequired() &&
               !parameter.getDslConfiguration().allowsReferences() &&
               !parameter.getDslConfiguration().allowTopLevelDefinition();
           parameter.getModelProperty(QNameModelProperty.class)
-              .ifPresent(qName -> addParameterToSequence(asList(createRefElement(qName.getValue(), isParameterRequired,
-                                                                                 qName.isUnboundedMaxOccurs()
-                                                                                     ? UNBOUNDED
-                                                                                     : MAX_ONE)),
-                                                         sequence));
+              .map(QNameModelProperty::getValue)
+              .ifPresent(qName -> addParameterToSequence(asList(createRefElement(qName, isParameterRequired)), sequence));
 
           if (parameter.getName().equals(TLS_PARAMETER_NAME)) {
             addTlsSupport(extensionType);
