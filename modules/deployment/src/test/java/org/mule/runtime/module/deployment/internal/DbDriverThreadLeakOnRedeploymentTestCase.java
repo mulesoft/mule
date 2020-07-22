@@ -31,12 +31,11 @@ public class DbDriverThreadLeakOnRedeploymentTestCase extends DbDriverThreadLeak
   public static List<Object[]> parameters() {
     return asList(new Object[][] {
         {true, "appWithExtensionPlugin-1.0.0-mule-application",
-            "oracle-db-app", true}
+            "oracle-db-app"}
     });
   }
 
-  public DbDriverThreadLeakOnRedeploymentTestCase(boolean parallellDeployment, String appName, String xmlFile,
-                                                  boolean useEchoPluginInApp) {
-    super(parallellDeployment, appName, xmlFile, useEchoPluginInApp);
+  public DbDriverThreadLeakOnRedeploymentTestCase(boolean parallellDeployment, String appName, String xmlFile) {
+    super(parallellDeployment, appName, xmlFile);
   }
 }

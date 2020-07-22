@@ -9,84 +9,45 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.deployment.meta.Product.MULE;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
-import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 
-import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
-import org.mule.runtime.api.deployment.meta.MulePluginModel;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.tck.report.HeapDumper;
-import org.mule.tck.util.CompilerUtils;
 
-import java.io.File;
-import java.lang.ref.PhantomReference;
-import java.lang.ref.ReferenceQueue;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
 
 public abstract class DbDriverThreadLeakTestCase extends AbstractDeploymentTestCase {
 
   @Rule
   public SystemProperty directoryWatcherChangeCheckInterval = new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "5");
 
-  private static File simpleExtensionJarFile;
-
-  private static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
-  private static final String POLICY_PROPERTY_KEY = "policyPropertyKey";
-  private static final String FOO_POLICY_NAME = "fooPolicy";
-
-  private static final int PROBER_POLLING_INTERVAL = 100;
-  private static final int PROBER_POLIING_TIMEOUT = 5000;
-
-  private final String appName;
+  private static final int PROBER_POLLING_INTERVAL = 500;
+  private static final int PROBER_POLLING_TIMEOUT = 8000;
+  public static final String ORACLE_DRIVER_TIMER_THREAD_NAME = "Timer-";
+  public static final String ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
 
   private final String xmlFile;
-
-  private final boolean useEchoPluginInApp;
-
-  @BeforeClass
-  public static void compileTestClasses() throws Exception {
-    simpleExtensionJarFile =
-        new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/simple/SimpleExtension.java"),
-                                                        getResourceFile("/org/foo/simple/SimpleOperation.java"))
-            .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0.0");
-  }
+  private final String appName;
 
   private TestDeploymentListener deploymentListener;
 
-  public DbDriverThreadLeakTestCase(boolean parallellDeployment, String appName, String xmlFile, boolean useEchoPluginInApp) {
+  public DbDriverThreadLeakTestCase(boolean parallellDeployment, String appName, String xmlFile) {
     super(parallellDeployment);
     this.appName = appName;
-    this.useEchoPluginInApp = useEchoPluginInApp;
     this.xmlFile = xmlFile;
   }
 
   @Test
-  public void undeploysApplicationDoesNotLeakClassloader() throws Exception {
-
+  public void oracleDriverTimerThreadsReleasedOnUndeploy() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder();
 
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -95,111 +56,36 @@ public abstract class DbDriverThreadLeakTestCase extends AbstractDeploymentTestC
 
     assertThat(getDeploymentListener().isAppDeployed(), is(true));
 
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      assertThat(countLiveThreadsWithName(ORACLE_DRIVER_TIMER_THREAD_NAME, ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME), is(1));
+      return true;
+    }));
+
     assertThat(removeAppAnchorFile(appName), is(true));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       assertThat(getDeploymentListener().isAppUndeployed(), is(true));
       return true;
     }));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      System.gc();
-      assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
-      return true;
-    }));
+    assertThat(countLiveThreadsWithName(ORACLE_DRIVER_TIMER_THREAD_NAME, ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME), is(0));
   }
 
-  @Test
-  @Issue("MULE-18480")
-  public void undeploysApplicationWithPoliciesDoesNotLeakClassloader() throws Exception {
-    ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder();
-
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-    startDeployment();
-
-    assertThat(getDeploymentListener().isAppDeployed(), is(true));
-
-    assertThat(removeAppAnchorFile(appName), is(true));
-
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(getDeploymentListener().isAppUndeployed(), is(true));
-      return true;
-    }));
-
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      System.gc();
-      assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
-      return true;
-    }));
-  }
-
-  private void prepareScenario(ApplicationFileBuilder applicationFileBuilder, DeploymentListener mockDeploymentListener,
-                               AtomicReference<Throwable> redeploymentSuccessThrown)
-      throws Exception, MuleException {
-    redeploymentSuccessThrown.set(new Exception("Leak check not done."));
-
-    deploymentService.addDeploymentListener(mockDeploymentListener);
-
-    addPackedAppFromBuilder(applicationFileBuilder);
-    startDeployment();
-    assertThat(getDeploymentListener().isAppDeployed(), is(true));
-
-    final PhantomReference<Application> firstAppRef =
-        new PhantomReference<>(deploymentService.findApplication(appName), new ReferenceQueue<>());
-
-    doAnswer(invocation -> {
-      try {
-        new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-          System.gc();
-          assertThat(firstAppRef.isEnqueued(), is(true));
-          return true;
-        }));
-        redeploymentSuccessThrown.set(null);
-      } catch (Throwable t) {
-        HeapDumper.main(new String[0]);
-        redeploymentSuccessThrown.set(t);
+  public int countLiveThreadsWithName(String threadName, String threadClassName) {
+    int count = 0;
+    Thread[] threads = new Thread[Thread.activeCount()];
+    Thread.enumerate(threads);
+    for (Thread thread : threads) {
+      if (thread.getName().startsWith(threadName) && thread.getClass().getName().contains(threadClassName)) {
+        count += 1;
       }
-
-      return null;
-    }).when(mockDeploymentListener).onRedeploymentSuccess(appName);
-  }
-
-  private void assertRededeployment(DeploymentListener mockDeploymentListener,
-                                    AtomicReference<Throwable> redeploymentSuccessThrown) {
-    new PollingProber(PROBER_POLIING_TIMEOUT + 1000, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      if (redeploymentSuccessThrown.get() != null) {
-        throw new MuleRuntimeException(redeploymentSuccessThrown.get());
-      }
-      return true;
-    }));
-
-    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(appName);
+    }
+    return count;
   }
 
   private ApplicationFileBuilder getApplicationFileBuilder() throws Exception {
-    if (useEchoPluginInApp) {
-      return createExtensionApplicationWithServices(xmlFile + ".xml",
-                                                    helloExtensionV1Plugin);
-    } else {
-      return new ApplicationFileBuilder(xmlFile)
-          .definedBy(xmlFile + ".xml");
-    }
-  }
-
-  private ArtifactPluginFileBuilder createSingleExtensionPlugin() {
-    MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("simpleExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("simpleExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
-        .build());
-    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.simple.SimpleExtension")
-        .addProperty("version", "1.0.0");
-    return new ArtifactPluginFileBuilder("simpleExtensionPlugin")
-        .dependingOn(new JarFileBuilder("simpleExtension", simpleExtensionJarFile))
-        .describedBy(mulePluginModelBuilder.build());
+    return createExtensionApplicationWithServices(xmlFile + ".xml",
+                                                  helloExtensionV1Plugin);
   }
 
   @Override

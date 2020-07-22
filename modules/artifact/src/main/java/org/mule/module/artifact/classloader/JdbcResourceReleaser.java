@@ -56,7 +56,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
   public static final String ORACLE_DRIVER_TIMER_THREAD_NAME = "Timer-";
   public static final String ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
-  private final transient Logger logger = LoggerFactory.getLogger(getClass());
+  private final static Logger logger = LoggerFactory.getLogger(JdbcResourceReleaser.class);
   private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
       Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
 
@@ -293,7 +293,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
       /* IMPORTANT: this is done to avoid metaspace OOM caused by oracle driver
       thread leak. This is only meant to stop TimerThread threads spawned
-      by oracle driver's HAManger class. This timer cannot be fetched
+      by oracle driver's HAManager class. This timer cannot be fetched
       by reflection because, in order to do so, other oracle dependencies
       would be required.
       * */
@@ -304,8 +304,8 @@ public class JdbcResourceReleaser implements ResourceReleaser {
             thread.interrupt();
           } catch (Throwable e) {
             logger
-                .debug("An error occurred trying to close the '" + thread.getName() + "' Thread. This might cause memory leaks.",
-                       e);
+                .warn("An error occurred trying to close the '" + thread.getName() + "' Thread. This might cause memory leaks.",
+                      e);
           }
         }
       }
