@@ -252,7 +252,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static File helloExtensionV1JarFile;
   protected static File usingObjectStoreJarFile;
-  protected static File oracleExtensionJarFile;
 
   protected static File goodbyeExtensionV1JarFile;
 
@@ -358,7 +357,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected final ArtifactPluginFileBuilder helloExtensionV1Plugin = createHelloExtensionV1PluginFileBuilder();
   protected final ArtifactPluginFileBuilder helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
   protected final ArtifactPluginFileBuilder goodbyeExtensionV1Plugin = createGoodbyeExtensionV1PluginFileBuilder();
-  protected final ArtifactPluginFileBuilder oracleExtensionPlugin = createOracleExtensionPluginFileBuilder();
 
   protected final ArtifactPluginFileBuilder exceptionThrowingPlugin = createExceptionThrowingPluginFileBuilder();
 
@@ -412,8 +410,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       createExceptionThrowingPluginImportingPolicyFileBuilder();
   protected final PolicyFileBuilder policyIncludingDependantPluginFileBuilder =
       createPolicyIncludingDependantPluginFileBuilder();
-  protected final PolicyFileBuilder policyIncludingOraclePluginFileBuilder =
-      createPolicyIncludingOraclePluginFileBuilder();
 
   protected final DomainFileBuilder exceptionThrowingPluginImportingDomain =
       new DomainFileBuilder("exception-throwing-plugin-importing-domain").definedBy("empty-domain-config.xml")
@@ -1525,37 +1521,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
         .addProperty("type", "org.foo.hello.HelloExtension")
         .addProperty("version", "1.0.0");
+    ArtifactPluginFileBuilder pluginFileBuilder = new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0.0")
+        .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
+        .describedBy((mulePluginModelBuilder.build()));
     try {
-      return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0.0")
-          .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
-          .dependingOnSharedLibrary(new JarFileBuilder("ojdbc", getResourceFile("/org/foo/oracle/ojdbc8-12.2.0.1.jar")))
-          .describedBy((mulePluginModelBuilder.build()));
+      return pluginFileBuilder
+          .dependingOnSharedLibrary(new JarFileBuilder("ojdbc", getResourceFile("/org/foo/oracle/ojdbc8-12.2.0.1.jar")));
     } catch (Exception e) {
-      return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0.0")
-          .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
-          .describedBy((mulePluginModelBuilder.build()));
-    }
-  }
-
-  private ArtifactPluginFileBuilder createOracleExtensionPluginFileBuilder() {
-    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
-        .build());
-    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.hello.HelloExtension")
-        .addProperty("version", "1.0.0");
-    try {
-      return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0.0")
-          .dependingOn(new JarFileBuilder("helloExtensionV1", oracleExtensionJarFile))
-          .dependingOnSharedLibrary(new JarFileBuilder("ojdbc", getResourceFile("/org/foo/oracle/ojdbc8-12.2.0.1.jar")))
-          .describedBy((mulePluginModelBuilder.build()));
-    } catch (Exception e) {
-      return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0.0")
-          .dependingOn(new JarFileBuilder("helloExtensionV1", oracleExtensionJarFile))
-          .describedBy((mulePluginModelBuilder.build()));
+      return pluginFileBuilder;
     }
   }
 
@@ -1575,17 +1548,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   private PolicyFileBuilder createPolicyIncludingPluginFileBuilder() {
-    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
-        .setRequiredProduct(Product.MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
-        .build()).dependingOn(helloExtensionV1Plugin);
-  }
-
-  private PolicyFileBuilder createPolicyIncludingOraclePluginFileBuilder() {
     MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
         .setRequiredProduct(Product.MULE)
