@@ -115,6 +115,11 @@ public class ValueProviderCacheId {
       return this;
     }
 
+    public ValueProviderCacheIdBuilder withHashValue(int hashValue) {
+      this.hashValue = Integer.toString(hashValue);
+      return this;
+    }
+
     public ValueProviderCacheIdBuilder containing(ValueProviderCacheId... parts) {
       return this.containing(asList(parts));
     }
