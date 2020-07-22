@@ -31,7 +31,7 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
       try {
         return createInternalService(getStartedApplication());
       } catch (ApplicationStartingException e) {
-        throw new MuleRuntimeException(e);
+        throw new MuleRuntimeException(e.getCause());
       }
     });
   }

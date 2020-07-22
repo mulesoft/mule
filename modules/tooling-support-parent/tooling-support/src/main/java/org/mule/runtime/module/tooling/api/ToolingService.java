@@ -39,6 +39,14 @@ public interface ToolingService extends Initialisable, Stoppable {
    */
   ConnectivityTestingServiceBuilder newConnectivityTestingServiceBuilder();
 
+  /**
+   * Provides a {@link DeclarationSessionBuilder} to create a {@link org.mule.runtime.module.tooling.api.artifact.DeclarationSession}
+   * by providing required configuration elements.
+   *
+   * @return a builder to create a {@link org.mule.runtime.module.tooling.api.artifact.DeclarationSession}
+   *
+   * @since 4.4.0
+   */
   DeclarationSessionBuilder newDeclarationSessionBuilder();
 
   /**
