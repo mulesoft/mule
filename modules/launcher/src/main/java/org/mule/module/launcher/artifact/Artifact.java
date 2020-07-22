@@ -79,4 +79,9 @@ public interface Artifact<D extends ArtifactDescriptor>
      * @param deploymentProperties deployment properties
      */
     void setDeploymentProperties(Properties deploymentProperties);
+
+    /**
+     * Notifies all retry policies associated to the artifact to stop retrying
+     */
+    void cancelStart();
 }

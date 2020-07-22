@@ -21,6 +21,7 @@ import org.mule.retry.notifiers.ConnectNotifier;
 
 import java.io.InterruptedIOException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,6 +37,8 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
     private Map<Object, Object> metaInfo;
 
     private MuleContext muleContext;
+
+    private AtomicBoolean cancelStart = new AtomicBoolean(false);
 
     private volatile boolean lastRetryInterrupted = false;
 
@@ -98,7 +101,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
                     }
                 }
             }
-            while (status.isOk());
+            while (status.isOk() && !cancelStart.get());
 
             context.setFailed(cause);
 
@@ -122,7 +125,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
             }
         }
     }
-    
+
     public RetryNotifier getNotifier()
     {
         return notifier;
@@ -153,5 +156,16 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
     public boolean isSynchronous()
     {
         return true;
+    }
+
+    protected AtomicBoolean getCancelStart()
+    {
+        return cancelStart;
+    }
+
+    @Override
+    public void cancelStart()
+    {
+        cancelStart.compareAndSet(false, true);
     }
 }

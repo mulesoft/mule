@@ -215,6 +215,7 @@ public class DeploymentDirectoryWatcher implements Runnable
     public void stop()
     {
         stopAppDirMonitorTimer();
+        cancelStart(applications);
 
         deploymentLock.lock();
         try
@@ -225,6 +226,22 @@ public class DeploymentDirectoryWatcher implements Runnable
         finally
         {
             deploymentLock.unlock();
+        }
+    }
+
+    private void cancelStart(List<? extends Artifact> artifacts) {
+        Collections.reverse(artifacts);
+
+        for (Artifact artifact : artifacts)
+        {
+            try
+            {
+                artifact.cancelStart();
+            }
+            catch (Throwable t)
+            {
+                logger.error(format("Error cancelling start for artifact '%s'", artifact), t);
+            }
         }
     }
 
