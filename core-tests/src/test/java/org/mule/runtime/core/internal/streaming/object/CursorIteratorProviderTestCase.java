@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.object;
 
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 import static java.lang.Math.toIntExact;
@@ -79,7 +80,7 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   }
 
   protected CursorIteratorProvider createStreamProvider(List<Object> data) {
-    return new InMemoryCursorIteratorProvider(toStreamingIterator(data), config);
+    return new InMemoryCursorIteratorProvider(toStreamingIterator(data), config, fromSingleComponent("log"), false);
   }
 
   @After
