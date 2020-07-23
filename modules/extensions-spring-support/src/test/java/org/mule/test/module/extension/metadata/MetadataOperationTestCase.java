@@ -34,7 +34,6 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.LA_PLATA;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
-
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -55,7 +54,6 @@ import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterTypeWrapper;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.message.StringAttributes;
-import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.AnimalClade;
 import org.mule.test.metadata.extension.model.animals.Bear;
@@ -73,7 +71,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
@@ -129,6 +126,18 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   @Test
   public void partialMultilevelKeys() throws Exception {
     location = Location.builder().globalName("partialMultiLevelKeyResolver").addProcessorsPart().addIndexPart(0).build();
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
+    assertSuccessResult(metadataKeysResult);
+    final Set<MetadataKey> continents = getKeysFromContainer(metadataKeysResult.get());
+    assertThat(continents, hasSize(1));
+
+    assertThat(continents, hasItem(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT)));
+    assertThat(continents, not(hasItem(metadataKeyWithId(EUROPE).withDisplayName(EUROPE).withPartName(CONTINENT))));
+  }
+
+  @Test
+  public void partialMultiLevelKeyShowInDslResolver() throws Exception {
+    location = Location.builder().globalName("partialMultiLevelKeyShowInDslResolver").addProcessorsPart().addIndexPart(0).build();
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
     assertSuccessResult(metadataKeysResult);
     final Set<MetadataKey> continents = getKeysFromContainer(metadataKeysResult.get());

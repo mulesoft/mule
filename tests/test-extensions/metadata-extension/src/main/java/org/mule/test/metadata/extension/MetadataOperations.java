@@ -12,7 +12,6 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -197,6 +196,13 @@ public class MetadataOperations {
                                                       name = "key") @MetadataKeyId(TestPartialMultiLevelKeyResolver.class) LocationKey locationKey,
                                                   @Content @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {
     return locationKey;
+  }
+
+  public LocationKey partialMultiLevelKeyShowInDslResolver(@Connection MetadataConnection connection,
+                                                           @ParameterGroup(name = "keyShowInDsl",
+                                                               showInDsl = true) @MetadataKeyId(TestPartialMultiLevelKeyResolver.class) LocationKey locationKeyShowInDslParam,
+                                                           @Content @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {
+    return locationKeyShowInDslParam;
   }
 
   public Order inputHasPojoWithExclusiveOptionalParameterGroup(Order dessertOrder) {

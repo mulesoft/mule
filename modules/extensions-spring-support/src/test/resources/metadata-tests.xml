@@ -156,6 +156,12 @@
         <metadata:partial-multi-level-key-resolver config-ref="config" continent="AMERICA"/>
     </flow>
 
+    <flow name="partialMultiLevelKeyShowInDslResolver">
+        <metadata:partial-multi-level-key-show-in-dsl-resolver config-ref="config">
+            <metadata:key-show-in-dsl continent="AMERICA"/>
+        </metadata:partial-multi-level-key-show-in-dsl-resolver>
+    </flow>
+
     <flow name="twoLevelPartialMultiLevelKeyResolver">
         <metadata:partial-multi-level-key-resolver config-ref="config" continent="AMERICA" country="ARGENTINA"/>
     </flow>
