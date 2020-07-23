@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
 
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
@@ -26,6 +27,7 @@ import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tx.TransactionType;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
@@ -56,6 +58,7 @@ public final class InfrastructureTypeMapping {
       .put(OperationTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 7))
       .put(TransactionType.class, new InfrastructureType(TRANSACTIONAL_TYPE_PARAMETER_NAME, 9))
       .put(SchedulingStrategy.class, new InfrastructureType(SCHEDULING_STRATEGY_PARAMETER_NAME, 10))
+      .put(ErrorMapping.class, new InfrastructureType(ERROR_MAPPINGS_PARAMETER_NAME, 11))
       .build();
 
   private static final Map<Type, InfrastructureType> TYPE_MAPPING = MAPPING.entrySet()
@@ -76,6 +79,8 @@ public final class InfrastructureTypeMapping {
   private static final Map<String, QNameModelProperty> QNAMES = ImmutableMap.<String, QNameModelProperty>builder()
       .put(SCHEDULING_STRATEGY_PARAMETER_NAME,
            new QNameModelProperty(new QName(CORE_NAMESPACE, SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER, CORE_PREFIX)))
+      .put(ERROR_MAPPINGS_PARAMETER_NAME,
+           new QNameModelProperty(new QName(CORE_NAMESPACE, ERROR_MAPPINGS_PARAMETER_NAME, CORE_PREFIX)))
       .put(TLS_PARAMETER_NAME,
            new QNameModelProperty(new QName(TLS_NAMESPACE_URI,
                                             TLS_CONTEXT_ELEMENT_IDENTIFIER,
@@ -115,6 +120,12 @@ public final class InfrastructureTypeMapping {
                    .allowTopLevelDefinition(false)
                    .allowsReferences(false)
                    .build())
+          .put(ERROR_MAPPINGS_PARAMETER_NAME,
+               ParameterDslConfiguration.builder()
+                   .allowsInlineDefinition(true)
+                   .allowTopLevelDefinition(false)
+                   .allowsReferences(false)
+                   .build())
           .put(TLS_PARAMETER_NAME,
                ParameterDslConfiguration.builder()
                    .allowsInlineDefinition(true)
@@ -136,8 +147,7 @@ public final class InfrastructureTypeMapping {
           .build();
 
   private static Map<String, String> nameMap =
-      MAPPING.entrySet().stream().collect(
-                                          toImmutableMap(e -> e.getKey().getName(), e -> e.getValue().getName()));
+      MAPPING.entrySet().stream().collect(toImmutableMap(e -> e.getKey().getName(), e -> e.getValue().getName()));
 
   public static Map<Class<?>, InfrastructureType> getMap() {
     return MAPPING;

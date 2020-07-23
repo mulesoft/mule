@@ -82,6 +82,9 @@
                 <parameter name="config-ref">
                     <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
                 </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
+                </parameter>
                 <parameter name="reconnectionStrategy">
                     <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
                 </parameter>
@@ -95,6 +98,9 @@
                 </parameter>
                 <parameter name="config-ref">
                     <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
                 <parameter name="reconnectionStrategy">
                     <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
@@ -110,6 +116,9 @@
                 <parameter name="otherFriend">
                     <description><![CDATA[Some other friend]]></description>
                 </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
+                </parameter>
             </parameters>
         </operation>
         <operation name="inheritedOperation">
@@ -117,6 +126,9 @@
             <parameters>
                 <parameter name="value">
                     <description><![CDATA[parameter documentation for an inherited operation.]]></description>
+                </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
             </parameters>
         </operation>
@@ -135,6 +147,9 @@
                 <parameter name="alias-param">
                     <description><![CDATA[Param with alias]]></description>
                 </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
+                </parameter>
             </parameters>
         </operation>
         <operation name="operation-with-alias">
@@ -143,6 +158,9 @@
                 <parameter name="value">
                     <description><![CDATA[some doc]]></description>
                 </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
+                </parameter>
             </parameters>
         </operation>
         <operation name="operationWithJavadocLinkReferences">
@@ -150,6 +168,9 @@
             <parameters>
                 <parameter name="value">
                     <description><![CDATA[this is the String to be returned]]></description>
+                </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
             </parameters>
         </operation>

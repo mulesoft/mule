@@ -17,11 +17,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -40,6 +44,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -57,7 +62,11 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoRule;
+
+import com.google.common.collect.ImmutableList;
 
 public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
 
@@ -79,6 +88,9 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   protected static final String ITEM_NAME = "list-name-item";
   protected static final String ANOTHER_OPERATION_NAME = "anotherMockOperation";
   protected static final String ANOTHER_CONTENT_NAME = "anotherMyCamelCaseName";
+
+  @Rule
+  public MockitoRule rule = rule().silent();
 
   @Mock(lenient = true)
   protected ExtensionModel mockExtension;
@@ -115,6 +127,12 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
 
   @Mock(lenient = true)
   protected ParameterGroupModel anotherParameterGroupModel;
+
+  @Mock(lenient = true)
+  protected ParameterModel errorMappingsParameter;
+
+  @Mock(lenient = true)
+  protected ParameterGroupModel errorMappingsParameterGroup;
 
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected SourceModel source;
@@ -215,6 +233,20 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
           return Optional.empty();
         });
 
+    when(errorMappingsParameter.getName()).thenReturn(ERROR_MAPPINGS_PARAMETER_NAME);
+    when(errorMappingsParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
+    when(errorMappingsParameter.getModelProperty(any())).thenReturn(empty());
+    when(errorMappingsParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
+    when(errorMappingsParameter.getLayoutModel()).thenReturn(empty());
+    when(errorMappingsParameter.getRole()).thenReturn(BEHAVIOUR);
+    when(errorMappingsParameter.getType()).thenReturn(BaseTypeBuilder.create(JAVA).arrayType()
+        .of(TYPE_LOADER.load(ErrorMapping.class)).build());
+
+    when(errorMappingsParameterGroup.getName()).thenReturn(ERROR_MAPPINGS);
+    when(errorMappingsParameterGroup.isShowInDsl()).thenReturn(false);
+    when(errorMappingsParameterGroup.getParameterModels()).thenReturn(asList(errorMappingsParameter));
+    when(errorMappingsParameterGroup.getParameter(ERROR_MAPPINGS_PARAMETER_NAME)).thenReturn(of(errorMappingsParameter));
+
     List<String> parameters = new ArrayList<>();
     parameters.add(BEHAVIOUR_NAME);
     RequiredForMetadataModelProperty requiredForMetadataModelProperty = new RequiredForMetadataModelProperty(parameters);
@@ -238,9 +270,9 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(source.getSuccessCallback()).thenReturn(empty());
     when(source.getErrorCallback()).thenReturn(empty());
     when(operation.getName()).thenReturn(OPERATION_NAME);
-    when(operation.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
+    when(operation.getParameterGroupModels()).thenReturn(asList(parameterGroupModel, errorMappingsParameterGroup));
     when(anotherOperation.getName()).thenReturn(ANOTHER_OPERATION_NAME);
-    when(anotherOperation.getParameterGroupModels()).thenReturn(asList(anotherParameterGroupModel));
+    when(anotherOperation.getParameterGroupModels()).thenReturn(asList(anotherParameterGroupModel, errorMappingsParameterGroup));
     visitableMock(operation, source, anotherOperation);
 
     Map<String, String> parameterResolversNames = new HashMap<>();
@@ -270,9 +302,16 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(dslContext.getExtensions()).thenReturn(singleton(mockExtension));
     when(dslContext.getTypeCatalog()).thenReturn(typeCatalog);
 
-    Stream.of(configuration, operation, connectionProvider, source)
+    Stream.of(configuration, connectionProvider, source)
         .forEach(model -> when(model.getAllParameterModels()).thenReturn(defaultGroupParameterModels));
-    when(anotherOperation.getAllParameterModels()).thenReturn(anotherDefaultGroupParameterModels);
+    when(operation.getAllParameterModels())
+        .thenReturn(ImmutableList.<ParameterModel>builder()
+            .addAll(defaultGroupParameterModels)
+            .add(errorMappingsParameter).build());
+    when(anotherOperation.getAllParameterModels())
+        .thenReturn(ImmutableList.<ParameterModel>builder()
+            .addAll(anotherDefaultGroupParameterModels)
+            .add(errorMappingsParameter).build());
   }
 
   protected void initializeExtensionMock(ExtensionModel extension) {

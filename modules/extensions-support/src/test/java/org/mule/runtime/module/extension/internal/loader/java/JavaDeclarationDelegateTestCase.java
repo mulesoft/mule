@@ -16,7 +16,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -124,15 +123,18 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import com.google.common.reflect.TypeToken;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclarationTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   private static final String GET_GRAMS_IN_STORAGE = "getGramsInStorage";
   private static final String EXTENDED_CONFIG_NAME = "extended-config";
@@ -514,7 +516,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters().isEmpty(), is(true));
+    assertThat(operation.getAllParameters(), hasSize(0));
 
     operation = getOperation(withOperationsDeclaration, GET_ENEMY_OPERATION);
     assertThat(operation, is(notNullValue()));
@@ -595,7 +597,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, INJECTED_EXTENSION_MANAGER);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters().isEmpty(), is(true));
+    assertThat(operation.getAllParameters(), hasSize(0));
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
@@ -618,12 +620,12 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertTransactional(operation, false);
 
     operation = getOperation(withOperationsDeclaration, CALL_SAUL);
-    assertThat(operation.getAllParameters(), is(empty()));
+    assertThat(operation.getAllParameters(), hasSize(0));
     assertConnected(operation, true);
     assertTransactional(operation, false);
 
     operation = getOperation(extensionDeclaration, CURE_CANCER);
-    assertThat(operation.getAllParameters(), is(empty()));
+    assertThat(operation.getAllParameters(), hasSize(0));
     assertConnected(operation, false);
     assertTransactional(operation, false);
     java.util.Optional<ExceptionHandlerFactory> exceptionEnricherFactory = operation
@@ -714,14 +716,14 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, FAIL_TO_EXECUTE);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), is(empty()));
+    assertThat(operation.getAllParameters(), hasSize(0));
     assertThat(operation.getOutput().getType(), is(instanceOf(VoidType.class)));
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
     operation = getOperation(extensionDeclaration, THROW_ERROR);
     assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters(), is(empty()));
+    assertThat(operation.getAllParameters(), hasSize(0));
     assertThat(operation.getOutput().getType(), is(instanceOf(VoidType.class)));
     assertConnected(operation, false);
     assertTransactional(operation, false);

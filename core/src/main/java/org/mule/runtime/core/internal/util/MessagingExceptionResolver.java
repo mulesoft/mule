@@ -30,7 +30,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.FlowExecutionException;
@@ -118,7 +118,7 @@ public class MessagingExceptionResolver {
             .stream()
             .filter(m -> m.match(rootErrorType))
             .findFirst()
-            .map(ErrorMapping::getTarget)
+            .map(EnrichedErrorMapping::getTarget)
             .orElse(rootErrorType);
       }
     }

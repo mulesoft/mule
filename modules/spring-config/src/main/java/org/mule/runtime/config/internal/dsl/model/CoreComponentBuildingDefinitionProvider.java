@@ -45,6 +45,7 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.ERROR_MAPPING_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECTION_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
@@ -72,6 +73,7 @@ import org.mule.runtime.config.internal.factories.AsyncMessageProcessorsFactoryB
 import org.mule.runtime.config.internal.factories.ChoiceRouterObjectFactory;
 import org.mule.runtime.config.internal.factories.DefaultFlowFactoryBean;
 import org.mule.runtime.config.internal.factories.DynamicConfigExpirationObjectFactory;
+import org.mule.runtime.config.internal.factories.EnrichedErrorMappingsFactoryBean;
 import org.mule.runtime.config.internal.factories.ErrorHandlerFactoryBean;
 import org.mule.runtime.config.internal.factories.ExpirationPolicyObjectFactory;
 import org.mule.runtime.config.internal.factories.FlowRefFactoryBean;
@@ -116,6 +118,7 @@ import org.mule.runtime.core.internal.el.mvel.configuration.AliasEntry;
 import org.mule.runtime.core.internal.el.mvel.configuration.ImportEntry;
 import org.mule.runtime.core.internal.el.mvel.configuration.MVELExpressionLanguageObjectFactory;
 import org.mule.runtime.core.internal.el.mvel.configuration.MVELGlobalFunctionsConfig;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
@@ -435,6 +438,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .add(baseDefinition.withIdentifier(OTHERWISE).withTypeDefinition(fromType(ProcessorRoute.class))
             .withObjectFactoryType(ProcessorRouteFactoryBean.class)
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+            .build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier(ERROR_MAPPING_ELEMENT_IDENTIFIER)
+            .withTypeDefinition(fromType(EnrichedErrorMapping.class))
+            .withObjectFactoryType(EnrichedErrorMappingsFactoryBean.class)
+            .withSetterParameterDefinition("source", fromSimpleParameter("sourceType").build())
+            .withSetterParameterDefinition("target", fromSimpleParameter("targetType").build())
             .build());
 
     componentBuildingDefinitions.add(baseDefinition

@@ -23,6 +23,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.drstrange.DrStrangeStereotypeDefinition.DR_STRANGE_STEREOTYPE_NAME;
 import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -101,7 +102,7 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractJavaExtensio
   @Test
   public void operationParameterWithFlowReferenceParameter() {
     OperationModel operation = configuration.getOperationModel("withFlowReference").get();
-    assertThat(operation.getAllParameterModels(), hasSize(3));
+    assertThat(operation.getAllParameterModels(), hasSize(4));
     ParameterModel param = operation.getAllParameterModels().get(0);
     List<StereotypeModel> stereotypes = param.getAllowedStereotypes();
     assertThat(stereotypes, hasSize(1));

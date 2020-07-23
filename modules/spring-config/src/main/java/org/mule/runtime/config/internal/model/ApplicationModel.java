@@ -30,7 +30,6 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDE
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_REF_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
-import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveTypedComponentIdentifier;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
@@ -40,6 +39,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONF
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
+import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
@@ -89,6 +89,7 @@ import org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
@@ -839,36 +840,31 @@ public class ApplicationModel implements ArtifactAst {
   }
 
   private void validateErrorMappings() {
-    recursiveStream().forEach(componentModel -> {
-      List<ComponentAst> errorMappings = componentModel.directChildrenStream()
-          .filter(c -> c.getIdentifier().equals(ERROR_MAPPING_IDENTIFIER))
+    recursiveStream().forEach(componentModel -> forEachErrorMappingDo(componentModel, mappings -> {
+      List<ErrorMapping> anyMappings = mappings.stream()
+          .filter(this::isErrorMappingWithSourceAny)
           .collect(toList());
-      if (!errorMappings.isEmpty()) {
-        List<ComponentAst> anyMappings = errorMappings.stream()
-            .filter(this::isErrorMappingWithSourceAny)
-            .collect(toList());
-        if (anyMappings.size() > 1) {
-          throw new MuleRuntimeException(createStaticMessage("Only one mapping for 'ANY' or an empty source type is allowed."));
-        } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(errorMappings.get(errorMappings.size() - 1))) {
-          throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have 'ANY' or an empty source type."));
-        }
-        List<String> sources = errorMappings.stream()
-            .map(model -> model.getRawParameterValue(SOURCE_TYPE).orElse(ANY_IDENTIFIER))
-            .collect(toList());
-        List<String> distinctSources = sources.stream()
-            .distinct()
-            .collect(toList());
-        if (sources.size() != distinctSources.size()) {
-          throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are '%s'.",
-                                                                    on("', '").join(disjunction(sources, distinctSources)))));
-        }
+      if (anyMappings.size() > 1) {
+        throw new MuleRuntimeException(createStaticMessage("Only one mapping for 'ANY' or an empty source type is allowed."));
+      } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(mappings.get(mappings.size() - 1))) {
+        throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have 'ANY' or an empty source type."));
       }
-    });
+      List<String> sources = mappings.stream()
+          .map(model -> model.getSource())
+          .collect(toList());
+      List<String> distinctSources = sources.stream()
+          .distinct()
+          .collect(toList());
+      if (sources.size() != distinctSources.size()) {
+        throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are '%s'.",
+                                                                  on("', '")
+                                                                      .join(disjunction(sources, distinctSources)))));
+      }
+    }));
   }
 
-  private boolean isErrorMappingWithSourceAny(ComponentAst model) {
-    return ANY_IDENTIFIER
-        .equals(model.getRawParameterValue(SOURCE_TYPE).orElse(ANY_IDENTIFIER));
+  private boolean isErrorMappingWithSourceAny(ErrorMapping model) {
+    return ANY_IDENTIFIER.equals(model.getSource());
   }
 
   private void validateErrorHandlerStructure() {

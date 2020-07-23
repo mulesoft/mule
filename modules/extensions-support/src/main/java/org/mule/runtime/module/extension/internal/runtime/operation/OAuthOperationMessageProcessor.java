@@ -14,6 +14,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -21,6 +22,8 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+
+import java.util.List;
 
 /**
  * A specialization of {@link OperationMessageProcessor} for operations which might be running
@@ -41,6 +44,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         ConfigurationProvider configurationProvider,
                                         String target,
                                         String targetValue,
+                                        List<EnrichedErrorMapping> errorMappings,
                                         ResolverSet resolverSet,
                                         CursorProviderFactory cursorProviderFactory,
                                         RetryPolicyTemplate retryPolicyTemplate,
@@ -49,8 +53,9 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         ReflectionCache reflectionCache,
                                         DefaultExecutionMediator.ResultTransformer resultTransformer,
                                         long outerFluxTerminationTimeout) {
-    super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, resultTransformer, outerFluxTerminationTimeout);
+    super(extensionModel, operationModel, configurationProvider, target, targetValue, errorMappings, resolverSet,
+          cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache, resultTransformer,
+          outerFluxTerminationTimeout);
   }
 
   @Override

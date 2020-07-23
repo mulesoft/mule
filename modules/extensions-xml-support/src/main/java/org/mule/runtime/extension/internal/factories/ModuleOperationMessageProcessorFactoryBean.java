@@ -17,6 +17,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.extension.internal.config.dsl.XmlSdkConfigurationProvider;
 import org.mule.runtime.extension.internal.processor.ModuleOperationMessageProcessor;
 
@@ -31,6 +32,8 @@ public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponen
     implements FactoryBean<ModuleOperationMessageProcessor> {
 
   private Map<String, String> parameters = emptyMap();
+
+  private List<EnrichedErrorMapping> errorMappings = emptyList();
 
   private List<Processor> processors;
 
@@ -54,7 +57,7 @@ public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponen
   @Override
   public ModuleOperationMessageProcessor getObject() throws Exception {
     final ModuleOperationMessageProcessor messageProcessorChain =
-        new ModuleOperationMessageProcessor(getProperties(), parameters, extensionModel,
+        new ModuleOperationMessageProcessor(getProperties(), parameters, errorMappings, extensionModel,
                                             operationModel);
 
     messageProcessorChain.setAnnotations(getAnnotations());
@@ -88,5 +91,9 @@ public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponen
 
   public void setMessageProcessors(List<Processor> processors) {
     this.processors = processors;
+  }
+
+  public void setErrorMappings(List<EnrichedErrorMapping> errorMappings) {
+    this.errorMappings = errorMappings;
   }
 }

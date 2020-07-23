@@ -15,7 +15,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
@@ -47,7 +47,7 @@ public final class InternalExceptionUtils {
                                            MessagingException me, ErrorTypeLocator locator) {
     Throwable cause = me.getCause() != null ? me.getCause() : me;
 
-    List<ErrorMapping> errorMappings = emptyList();
+    List<EnrichedErrorMapping> errorMappings = emptyList();
     if (obj instanceof ErrorMappingsAware) {
       errorMappings = ((ErrorMappingsAware) obj).getErrorMappings();
     }
@@ -95,7 +95,7 @@ public final class InternalExceptionUtils {
         : errorTypeLookedUp;
 
     if (processor instanceof ErrorMappingsAware) {
-      final List<ErrorMapping> errorMappings = ((ErrorMappingsAware) processor).getErrorMappings();
+      final List<EnrichedErrorMapping> errorMappings = ((ErrorMappingsAware) processor).getErrorMappings();
 
       if (errorMappings.isEmpty()) {
         return ErrorBuilder.builder(cause)
@@ -107,7 +107,7 @@ public final class InternalExceptionUtils {
                 .stream()
                 .filter(m -> m.match(resultError == null || isUnknownMuleError(resultError) ? errorType : currentError))
                 .findFirst()
-                .map(ErrorMapping::getTarget)
+                .map(EnrichedErrorMapping::getTarget)
                 .orElse(errorType))
             .build();
       }

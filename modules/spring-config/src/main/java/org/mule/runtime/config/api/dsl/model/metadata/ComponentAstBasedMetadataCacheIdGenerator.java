@@ -90,10 +90,11 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
   @Override
   public Optional<MetadataCacheId> getIdForComponentInputMetadata(ComponentAst component, String parameterName) {
     checkArgument(component.getModel(ParameterizedModel.class).isPresent(),
-                  "Cannot generate an Input Cache Key for a component with no parameters");
+                  () -> "Cannot generate an Input Cache Key for component '" + component.toString() + "' with no parameters");
     checkArgument(component.getModel(ParameterizedModel.class).get().getAllParameterModels().stream()
         .anyMatch(parameterModel -> parameterModel.getName().equals(parameterName)),
-                  "Cannot generate an Input Cache Key for the component since it does not have a parameter named "
+                  () -> "Cannot generate an Input Cache Key for component '" + component.toString()
+                      + "' since it does not have a parameter named "
                       + parameterName);
     return doResolveType(component, new InputMetadataResolutionTypeInformation(component, parameterName));
   }

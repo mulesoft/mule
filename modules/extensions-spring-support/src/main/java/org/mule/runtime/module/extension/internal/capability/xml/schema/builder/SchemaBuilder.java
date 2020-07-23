@@ -21,6 +21,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.EE_SCHEMA_LOCATION;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MAX_ONE;
@@ -39,18 +40,17 @@ import static org.mule.runtime.config.internal.dsl.SchemaConstants.TLS_CONTEXT_T
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_OPTIONAL;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_REQUIRED;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.XML_NAMESPACE;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.componentHasAnImplicitConfiguration;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
-import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
 
@@ -109,8 +109,8 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -118,6 +118,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
@@ -578,7 +579,7 @@ public final class SchemaBuilder {
                                                              ParameterDslConfiguration dslModel) {
     return new MetadataTypeVisitor() {
 
-      private boolean forceOptional = paramDsl.supportsChildDeclaration() || !required;
+      private final boolean forceOptional = paramDsl.supportsChildDeclaration() || !required;
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
@@ -751,7 +752,9 @@ public final class SchemaBuilder {
 
   void addInfrastructureParameters(ExtensionType extensionType, ParameterizedModel model, ExplicitGroup sequence) {
     model.getAllParameterModels().stream()
-        .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
+        .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class)
+            .map(infraParam -> !p.getName().equals(ERROR_MAPPINGS_PARAMETER_NAME))
+            .orElse(false))
         .sorted(comparing(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).get().getSequence()))
         .forEach(parameter -> {
           boolean isParameterRequired = parameter.isRequired() &&

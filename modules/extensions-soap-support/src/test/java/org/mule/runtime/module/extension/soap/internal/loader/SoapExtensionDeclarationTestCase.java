@@ -20,8 +20,8 @@ import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
-import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.BODY_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.HEADERS_PARAM;
@@ -32,6 +32,7 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_DESC;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_ID;
+
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -44,14 +45,14 @@ import org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors;
 import org.mule.runtime.soap.api.exception.error.SoapErrors;
 import org.mule.test.soap.extension.FootballSoapExtension;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDeclarationTestCase {
 
@@ -114,8 +115,9 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
         new ParameterProber(TRANSPORT_HEADERS_PARAM, null, ObjectType.class, false),
         new ParameterProber(ATTACHMENTS_PARAM, null, ObjectType.class, false),
     };
-    // the `3` is added because the sdk adds the config-ref, target, targetValue, and retryPolicy parameters automatically
-    assertThat(operation.getAllParameterModels(), hasSize(probers.length + 4));
+    // the `5` is added because the sdk adds the config-ref, target, targetValue, errorMappings, and retryPolicy parameters
+    // automatically
+    assertThat(operation.getAllParameterModels(), hasSize(probers.length + 5));
     assertParameters(operation.getAllParameterModels(), probers);
   }
 }

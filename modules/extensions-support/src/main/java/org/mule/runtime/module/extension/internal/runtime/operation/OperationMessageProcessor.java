@@ -27,6 +27,8 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
+import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
@@ -34,32 +36,37 @@ import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecu
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.List;
+
 /**
  * An implementation of a {@link ComponentMessageProcessor} for {@link OperationModel operation models}
  *
  * @since 3.7.0
  */
 public class OperationMessageProcessor extends ComponentMessageProcessor<OperationModel>
-    implements EntityMetadataProvider {
+    implements EntityMetadataProvider, ErrorMappingsAware {
 
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
   private final EntityMetadataMediator entityMetadataMediator;
 
+  private final List<EnrichedErrorMapping> errorMappings;
+
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
                                    ConfigurationProvider configurationProvider,
                                    String target,
                                    String targetValue,
+                                   List<EnrichedErrorMapping> errorMappings,
                                    ResolverSet resolverSet,
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache) {
-    this(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-         retryPolicyTemplate, extensionManager, policyManager, reflectionCache, null, -1);
+    this(extensionModel, operationModel, configurationProvider, target, targetValue, errorMappings, resolverSet,
+         cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache, null, -1);
   }
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
@@ -67,6 +74,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    ConfigurationProvider configurationProvider,
                                    String target,
                                    String targetValue,
+                                   List<EnrichedErrorMapping> errorMappings,
                                    ResolverSet resolverSet,
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
@@ -79,6 +87,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
           cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache,
           resultTransformer, terminationTimeout);
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
+    this.errorMappings = errorMappings;
   }
 
   @Override
@@ -140,5 +149,10 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
     }
 
     return super.isAsync();
+  }
+
+  @Override
+  public List<EnrichedErrorMapping> getErrorMappings() {
+    return errorMappings;
   }
 }

@@ -6,35 +6,35 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-
-import javax.xml.namespace.QName;
-
 /**
- * Represents a mapping between source and target {@link ErrorType}s, indicating that if
- * the first or a match for it is found then the other should be propagated instead.
- *
- * @since 4.0
+ * Determines that an error thrown by an operation should be mapped to another.
  */
-public class ErrorMapping {
+public final class ErrorMapping {
 
-  public static QName ANNOTATION_ERROR_MAPPINGS = new QName("operator", "errorMappings");
+  private final String source;
+  private final String target;
 
-  private final ErrorTypeMatcher sourceMatcher;
-  private final ErrorType target;
-
-  public ErrorMapping(ErrorTypeMatcher sourceMatcher, ErrorType target) {
-    this.sourceMatcher = sourceMatcher;
+  public ErrorMapping(String source, String target) {
+    this.source = source;
     this.target = target;
   }
 
-  public boolean match(ErrorType errorType) {
-    return sourceMatcher.match(errorType);
+  /**
+   * @return the type of the error to be mapped from
+   */
+  public String getSource() {
+    return source;
   }
 
-  public ErrorType getTarget() {
+  /**
+   * @return the type of the error to be mapped to
+   */
+  public String getTarget() {
     return target;
   }
 
+  @Override
+  public String toString() {
+    return "ErrorMapping: " + source + " -> " + target;
+  }
 }
