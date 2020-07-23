@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.streaming.object.factory;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
@@ -29,6 +32,7 @@ import java.util.Iterator;
 public abstract class AbstractCursorIteratorProviderFactory implements CursorIteratorProviderFactory {
 
   protected final StreamingManager streamingManager;
+  protected final static boolean trackCursorProviderClose = getBoolean(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY);
 
   public AbstractCursorIteratorProviderFactory(StreamingManager streamingManager) {
     this.streamingManager = streamingManager;

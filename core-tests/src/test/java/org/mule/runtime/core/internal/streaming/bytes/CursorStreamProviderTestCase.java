@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -93,7 +94,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
                                        new DataSize(bufferSize / 2, BYTE),
                                        new DataSize(maxBufferSize, BYTE));
 
-    return new InMemoryCursorStreamProvider(dataStream, config, bufferManager);
+    return new InMemoryCursorStreamProvider(dataStream, config, bufferManager, fromSingleComponent("log"), false);
   }
 
   @After
