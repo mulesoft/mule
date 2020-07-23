@@ -17,6 +17,7 @@ import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
 
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
 import java.lang.reflect.Field;
@@ -314,33 +315,16 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     }
   }
 
-  private boolean isThreadApplicationTimerThread(Thread thread) {
+  private boolean isThreadApplicationTimerThread(Thread thread) throws Exception {
     return thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
         && thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)
-        && isThreadLoadedByThisClassLoader(thread.getContextClassLoader());
+        && isThreadLoadedByDisposedApplication(thread.getContextClassLoader());
   }
 
-  private boolean isThreadLoadedByThisClassLoader(ClassLoader threadBaseClassLoader) {
-    ClassLoader threadClassLoader = threadBaseClassLoader;
-    ClassLoader lastClassLoader = null;
-    ClassLoader resourceReleaserClassLoader = this.getClass().getClassLoader();
+  private boolean isThreadLoadedByDisposedApplication(ClassLoader threadBaseClassLoader) throws Exception {
+    String threadArtifactId = ((MuleArtifactClassLoader)threadBaseClassLoader).getArtifactId();
+    String artifactId = ((MuleArtifactClassLoader)this.getClass().getClassLoader()).getArtifactId();
 
-    while (threadClassLoader != null) {
-      lastClassLoader = threadClassLoader;
-      // It has to be the same reference not equals to
-      if (threadClassLoader == resourceReleaserClassLoader) {
-        return true;
-      }
-      threadClassLoader = threadClassLoader.getParent();
-    }
-
-    while (resourceReleaserClassLoader != null) {
-      if (lastClassLoader == resourceReleaserClassLoader) {
-        return true;
-      }
-      resourceReleaserClassLoader = resourceReleaserClassLoader.getParent();
-    }
-
-    return false;
+    return threadArtifactId != null && threadArtifactId.equals(artifactId);
   }
 }
