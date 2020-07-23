@@ -3775,7 +3775,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         {
             return new TestDomainArchiveDeployer(
                     new DefaultArchiveDeployer<>(new DefaultArtifactDeployer<Domain>(), domainFactory, domains,
-                                                 new DomainDeploymentTemplate(applicationDeployer, this)),
+                                                 new DomainDeploymentTemplate(applicationDeployer, this), this),
                     applicationDeployer, this);
         }
     }
