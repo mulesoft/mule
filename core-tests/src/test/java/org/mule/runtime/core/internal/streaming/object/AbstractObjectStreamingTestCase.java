@@ -10,11 +10,6 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.api.streaming.object.CursorIterator;
-import org.mule.runtime.core.api.streaming.iterator.Consumer;
-import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
-import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +17,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.runtime.core.api.streaming.iterator.Consumer;
+import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
+import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public abstract class AbstractObjectStreamingTestCase extends AbstractMuleContextTestCase {
 
@@ -66,35 +67,36 @@ public abstract class AbstractObjectStreamingTestCase extends AbstractMuleContex
 
     return list;
   }
+}
 
-  private class TestConsumer<T> implements Consumer<T> {
 
-    private final Iterator<T> delegate;
-    private final int size;
+class TestConsumer<T> implements Consumer<T> {
 
-    private TestConsumer(Collection<T> collection) {
-      this.delegate = collection.iterator();
-      size = collection.size();
-    }
+  private final Iterator<T> delegate;
+  private final int size;
 
-    @Override
-    public T consume() throws NoSuchElementException {
-      return delegate.next();
-    }
+  TestConsumer(Collection<T> collection) {
+    this.delegate = collection.iterator();
+    size = collection.size();
+  }
 
-    @Override
-    public boolean isConsumed() {
-      return !delegate.hasNext();
-    }
+  @Override
+  public T consume() throws NoSuchElementException {
+    return delegate.next();
+  }
 
-    @Override
-    public void close() throws IOException {
+  @Override
+  public boolean isConsumed() {
+    return !delegate.hasNext();
+  }
 
-    }
+  @Override
+  public void close() throws IOException {
 
-    @Override
-    public int getSize() {
-      return size;
-    }
+  }
+
+  @Override
+  public int getSize() {
+    return size;
   }
 }

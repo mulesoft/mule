@@ -3,6 +3,51 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider::<init>(java.io.InputStream, org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig, org.mule.runtime.core.api.streaming.bytes.ByteBufferManager, org.mule.runtime.api.component.location.ComponentLocation, boolean)",
+          "package": "org.mule.runtime.core.api.streaming.bytes",
+          "classSimpleName": "InMemoryCursorStreamProvider",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "MULE-18595"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.streaming.bytes.AbstractCursorStreamProvider::<init>(java.io.InputStream, org.mule.runtime.api.component.location.ComponentLocation, boolean)",
+          "package": "org.mule.runtime.core.api.streaming.bytes",
+          "classSimpleName": "AbstractCursorStreamProvider",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "MULE-18595"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.Optional<org.mule.runtime.api.component.location.ComponentLocation> org.mule.runtime.core.api.streaming.bytes.AbstractCursorStreamProvider::getOriginatingLocation()",
+          "package": "org.mule.runtime.core.api.streaming.bytes",
+          "classSimpleName": "AbstractCursorStreamProvider",
+          "methodName": "getOriginatingLocation",
+          "elementKind": "method",
+          "justification": "MULE-18595"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider::<init>(java.io.InputStream, org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig, org.mule.runtime.core.api.streaming.bytes.ByteBufferManager, org.mule.runt component.location.ComponentLocation, boolean)",
+          "package": "org.mule.runtime.core.api.streaming.bytes",
+          "classSimpleName": "InMemoryCursorStreamProvider",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "MULE-18595"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.core.api.streaming.bytes.factory.AbstractCursorStreamProviderFactory.trackCursorProviderClose",
+          "package": "org.mule.runtime.core.api.streaming.bytes.factory",
+          "classSimpleName": "AbstractCursorStreamProviderFactory",
+          "fieldName": "trackCursorProviderClose",
+          "elementKind": "field",
+          "justification": "MULE-18595"
+        },
+        {
           "code": "java.method.defaultMethodAddedToInterface",
           "new": "method <T> java.util.concurrent.CompletableFuture<T> org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate::applyPolicy(java.util.function.Supplier<java.util.concurrent.CompletableFuture<T>>, java.util.function.Predicate<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
           "package": "org.mule.runtime.core.api.retry.policy",
