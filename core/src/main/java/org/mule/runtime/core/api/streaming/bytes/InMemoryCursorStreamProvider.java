@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.streaming.bytes;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.internal.streaming.bytes.BufferedCursorStream;
 import org.mule.runtime.core.internal.streaming.bytes.InMemoryStreamBuffer;
@@ -28,12 +29,36 @@ public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProv
    * @param wrappedStream the stream to buffer from
    * @param config        the config of the generated buffer
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
+   * @param originatingLocation indicates where the cursor was created
+   * @param trackCursorProviderClose if the provider should save the stack trace from where it was closed
+   *
+   * @since 4.3.0
    */
   public InMemoryCursorStreamProvider(InputStream wrappedStream,
                                       InMemoryCursorStreamConfig config,
-                                      ByteBufferManager bufferManager) {
-    super(wrappedStream);
+                                      ByteBufferManager bufferManager,
+                                      ComponentLocation originatingLocation,
+                                      boolean trackCursorProviderClose) {
+    super(wrappedStream, originatingLocation, trackCursorProviderClose);
     buffer = new InMemoryStreamBuffer(wrappedStream, config, bufferManager);
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @param wrappedStream the stream to buffer from
+   * @param config        the config of the generated buffer
+   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
+   * 
+   * @deprecated On 4.3.0, please use
+   *             {@link #InMemoryCursorStreamProvider(InputStream, InMemoryCursorStreamConfig, ByteBufferManager, ComponentLocation, boolean)}
+   *             instead.
+   */
+  @Deprecated
+  public InMemoryCursorStreamProvider(InputStream wrappedStream,
+                                      InMemoryCursorStreamConfig config,
+                                      ByteBufferManager bufferManager) {
+    this(wrappedStream, config, bufferManager, null, false);
   }
 
   /**
