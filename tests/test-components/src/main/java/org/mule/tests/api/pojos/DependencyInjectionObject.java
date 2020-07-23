@@ -4,9 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.functional.api.component;
+package org.mule.tests.api.pojos;
 
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
@@ -15,12 +14,14 @@ import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class DependencyInjectionObject extends AbstractComponent {
+@TypeDsl(allowTopLevelDefinition = true)
+public class DependencyInjectionObject {
 
   @Inject
   private ConfigurationComponentLocator configurationComponentLocator;

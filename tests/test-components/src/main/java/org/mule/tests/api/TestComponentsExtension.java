@@ -11,7 +11,9 @@ import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.tests.api.pojos.DependencyInjectionObject;
 import org.mule.tests.api.pojos.ElementWithAttributeAndChild;
+import org.mule.tests.api.pojos.MyPojo;
 import org.mule.tests.api.pojos.ParameterCollectionParser;
 import org.mule.tests.api.pojos.SameChildTypeContainer;
 import org.mule.tests.api.pojos.TextPojo;
@@ -26,7 +28,8 @@ import org.mule.tests.internal.SkeletonSource;
 @Extension(name = "Test Components")
 @Sources(SkeletonSource.class)
 @Configurations(QueueConfiguration.class)
-@Export(classes = {TestQueueManager.class, ParameterCollectionParser.class, ElementWithAttributeAndChild.class, TextPojo.class,
-    SameChildTypeContainer.class})
+@Export(classes = {TestQueueManager.class, ParameterCollectionParser.class, ElementWithAttributeAndChild.class,
+    TextPojo.class, MyPojo.class,
+    SameChildTypeContainer.class, DependencyInjectionObject.class})
 public class TestComponentsExtension {
 }
