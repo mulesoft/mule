@@ -212,6 +212,11 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     return System.nanoTime();
   }
 
+  @Override
+  public boolean shouldAlwaysExpire() {
+    return true;
+  }
+
   private static class ExpiryEntry {
 
     private final long time;

@@ -113,4 +113,8 @@ public abstract class AbstractPartitionableObjectStore<T extends Serializable> e
                                                                        partitionName)));
     }
   }
+
+  public boolean shouldAlwaysExpire() {
+    return false;
+  }
 }
