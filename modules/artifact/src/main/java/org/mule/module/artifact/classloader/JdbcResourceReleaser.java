@@ -310,7 +310,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
         }
       }
     } catch (Exception e) {
-      logger.debug(e.getMessage());
+      logger.error("An exception occurred while attempting to dispose of oracle timer threads: {}", e.getMessage());
     }
   }
 
