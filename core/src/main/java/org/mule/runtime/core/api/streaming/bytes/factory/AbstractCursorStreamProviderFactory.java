@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.api.streaming.bytes.factory;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.event.EventContext;
@@ -33,6 +36,7 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
 
   private final ByteBufferManager bufferManager;
   protected final StreamingManager streamingManager;
+  protected static final boolean trackCursorProviderClose = getBoolean(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY);
 
   /**
    * Creates a new instance
