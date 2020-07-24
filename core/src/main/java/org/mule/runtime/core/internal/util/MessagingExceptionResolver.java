@@ -82,7 +82,7 @@ public class MessagingExceptionResolver {
     Throwable root = rootCause.get().getFirst();
     Component failingComponent = getFailingProcessor(me, root);
 
-    CoreEvent event = resolveEvent(me, root, resolveErrorType(rootCause.get().getSecond()));
+    CoreEvent event = resolveEvent(me, root, failingComponent, resolveErrorType(rootCause.get().getSecond()));
     MessagingException result = resolveResultException(me, root, failingComponent, event);
 
     propagateAlreadyLogged(me, result);
@@ -103,8 +103,10 @@ public class MessagingExceptionResolver {
     return result;
   }
 
-  private CoreEvent resolveEvent(final MessagingException me, Throwable root, ErrorType errorType) {
-    return quickCopy(builder(getMessagingExceptionCause(root)).errorType(errorType)
+  private CoreEvent resolveEvent(final MessagingException me, Throwable root, Component failingComponent, ErrorType errorType) {
+    return quickCopy(builder(getMessagingExceptionCause(root))
+        .failingComponent(failingComponent)
+        .errorType(errorType)
         .build(), me.getEvent());
   }
 
