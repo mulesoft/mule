@@ -9,6 +9,15 @@
           "classSimpleName": "FlowProcessMediatorContext",
           "elementKind": "interface",
           "justification": "Context required to process the response"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.internal.message.ErrorBuilder org.mule.runtime.core.internal.message.ErrorBuilder::failingComponent(org.mule.runtime.api.component.Component)",
+          "package": "org.mule.runtime.core.internal.message",
+          "classSimpleName": "ErrorBuilder",
+          "methodName": "failingComponent",
+          "elementKind": "method",
+          "justification": "MULE-18535: Needed to properly fix a functional regression"
         }
       ]
     }
