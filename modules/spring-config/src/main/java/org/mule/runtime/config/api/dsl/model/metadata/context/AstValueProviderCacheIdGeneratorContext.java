@@ -17,6 +17,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper;
 
 import java.util.Map;
 import java.util.Optional;
@@ -42,7 +43,7 @@ public class AstValueProviderCacheIdGeneratorContext implements ValueProviderCac
         .collect(toMap(p -> p.getModel().getName(),
                        p -> new DefaultParameterInfo<>(p.getModel().getName(),
                                                        p,
-                                                       ParameterVisitorFunctions::computeHashFor)));
+                                                       ComponentBasedIdHelper::computeHashFor)));
     this.configContext = empty();
     this.connectionContext = NULL_LAZY_VALUE;
   }
@@ -81,37 +82,6 @@ public class AstValueProviderCacheIdGeneratorContext implements ValueProviderCac
   @Override
   public Optional<ValueProviderCacheIdGeneratorContext<ComponentParameterAst>> getConnectionContext() {
     return connectionContext.get();
-  }
-
-  private static class ParameterVisitorFunctions {
-
-    private static int computeHashFor(ComponentParameterAst parameter) {
-      return new ParameterVisitorFunctions(parameter).hash;
-    }
-
-    private int hash = 0;
-    private final Function<String, Void> leftFunction = this::hashForLeft;
-    private final Function<Object, Void> rightFunction = this::hashForRight;
-
-    private ParameterVisitorFunctions(ComponentParameterAst startingParameter) {
-      startingParameter.getValue().reduce(leftFunction, rightFunction);
-    }
-
-    private Void hashForLeft(String s) {
-      hash += hash(s);
-      return null;
-    }
-
-    private Void hashForRight(Object o) {
-      if (o instanceof ComponentAst) {
-        final ComponentAst c = (ComponentAst) o;
-        c.getParameters().forEach(p -> p.getValue().reduce(leftFunction, rightFunction));
-      } else {
-        hash += hash(o);
-      }
-      return null;
-    }
-
   }
 
 }

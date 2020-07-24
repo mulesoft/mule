@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.config.dsl.model;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static junit.framework.TestCase.fail;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -14,28 +17,97 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 
+import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
+import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedValueProviderCacheIdGenerator;
+import org.mule.runtime.config.api.dsl.model.metadata.ContextBasedValueProviderCacheIdGenerator;
+import org.mule.runtime.config.api.dsl.model.metadata.context.AstValueProviderCacheIdGeneratorContext;
+import org.mule.runtime.config.api.dsl.model.metadata.context.DeclarationValueProviderCacheIdGeneratorContextFactory;
+import org.mule.runtime.config.api.dsl.model.metadata.context.ValueProviderCacheIdGeneratorContext;
+import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
+import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import org.junit.Test;
 
-public abstract class AbstractValueProviderCacheIdGeneratorTestCase extends AbstractMockedValueProviderExtensionTestCase {
+public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValueProviderExtensionTestCase {
 
-  protected abstract Optional<ValueProviderCacheId> computeIdFor(ArtifactDeclaration appDeclaration,
+  private ValueProviderCacheIdGenerator<ValueProviderCacheIdGeneratorContext<?>> contextBasedValueProviderCacheIdGenerator =
+          new ContextBasedValueProviderCacheIdGenerator();
+  private DeclarationValueProviderCacheIdGeneratorContextFactory declarationContextFactory;
+
+  @Override
+  public void before() {
+    super.before();
+    declarationContextFactory =
+            new DeclarationValueProviderCacheIdGeneratorContextFactory(DslElementModelFactory.getDefault(dslContext));
+  }
+
+  private Optional<ValueProviderCacheId> computeIdFor(ArtifactDeclaration appDeclaration,
                                                                  String location,
                                                                  String parameterName)
-      throws Exception;
+      throws Exception {
+    ApplicationModel app = loadApplicationModel(appDeclaration);
+    Locator locator = new Locator(app);
+    ValueProviderCacheIdGenerator<ComponentAst> componentAstBasedValueProviderCacheIdGenerator = new ComponentAstBasedValueProviderCacheIdGenerator(locator);
+    ComponentAst component = getComponentAst(app, location);
 
-  protected Optional<String> resolveConfigName(ComponentAst elementModel) {
+    Optional<ComponentAst> configAst = resolveConfigName(component)
+            .flatMap(configName -> locator.get(Location.builderFromStringRepresentation(configName).build()));
+
+    ValueProviderCacheIdGeneratorContext astContext = configAst.map(
+            c -> new AstValueProviderCacheIdGeneratorContext(component,
+                                                             c))
+            .orElse(new AstValueProviderCacheIdGeneratorContext(component));
+
+
+    Optional<ParameterizedElementDeclaration> elementDeclaration = appDeclaration.findElement(builderFromStringRepresentation(location).build());
+    Optional<ParameterizedModel> elementModel = component.getModel(ParameterizedModel.class);
+
+    if (!elementDeclaration.isPresent() || !elementModel.isPresent()) {
+      fail(format("missing declaration or model for: %s", location));
+    }
+
+
+    ValueProviderCacheIdGeneratorContext declarationContext = configAst
+            .map(
+                    c -> {
+                      final Optional<ConfigurationElementDeclaration> configDeclaration =
+                              appDeclaration.findElement(builderFromStringRepresentation(c.getLocation().getLocation()).build());
+                      final Optional<ConfigurationModel> configModel = c.getModel(ConfigurationModel.class);
+                      if (!configDeclaration.isPresent() || !configModel.isPresent()) {
+                        fail(format("missing declaration or model for config: %s", c.getLocation().getLocation()));
+                      }
+                      return declarationContextFactory.createContext(elementDeclaration.get(), elementModel.get(),
+                                                                     configDeclaration.get(), configModel.get());
+                    })
+            .orElse(declarationContextFactory.createContext(elementDeclaration.get(), elementModel.get()));
+
+    Optional<ValueProviderCacheId> astContextId = contextBasedValueProviderCacheIdGenerator.getIdForResolvedValues(astContext, parameterName);
+    Optional<ValueProviderCacheId> componentBasedId = componentAstBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
+    Optional<ValueProviderCacheId> declarationContextId = contextBasedValueProviderCacheIdGenerator.getIdForResolvedValues(declarationContext, parameterName);
+
+    checkIdsAreEqual(astContextId, componentBasedId);
+    checkIdsAreEqual(componentBasedId, declarationContextId);
+
+    //Any should be fine
+    return declarationContextId;
+  }
+
+  private Optional<String> resolveConfigName(ComponentAst elementModel) {
     return elementModel.getRawParameterValue(CONFIG_ATTRIBUTE_NAME);
   }
 
@@ -66,7 +138,6 @@ public abstract class AbstractValueProviderCacheIdGeneratorTestCase extends Abst
                  .orElseThrow(() -> new RuntimeException("Could not find parameter to modify")))
         .orElseThrow(() -> new RuntimeException("Location not found"));
   }
-
 
   @Test
   public void idForParameterWithNoProviderInConfig() throws Exception {
@@ -347,4 +418,74 @@ public abstract class AbstractValueProviderCacheIdGeneratorTestCase extends Abst
     Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OTHER_OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     checkIdsAreDifferent(opId1, opId2);
   }
+
+  @Test
+  public void differentHashForComplexActingParameterValue() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    int intParam = 0;
+    String stringParam = "zero";
+    List<String> listParam = asList("one", "two", "three");
+    int innerIntParam = 0;
+    String innerStringParam = "zero";
+    List<String> innerListParm = asList("one", "two", "three");
+    Optional<ValueProviderCacheId> originalId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
+
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(1,
+                                                                                                                      stringParam,
+                                                                                                                      listParam,
+                                                                                                                      innerIntParam,
+                                                                                                                      innerStringParam,
+                                                                                                                      innerListParm)));
+    Optional<ValueProviderCacheId> changedIntId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
+
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(intParam,
+                                                                                                                      "one",
+                                                                                                                      listParam,
+                                                                                                                      innerIntParam,
+                                                                                                                      innerStringParam,
+                                                                                                                      innerListParm)));
+    Optional<ValueProviderCacheId> changedStringId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
+
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(intParam,
+                                                                                                                      stringParam,
+                                                                                                                      asList("one", "two", "four"),
+                                                                                                                      innerIntParam,
+                                                                                                                      innerStringParam,
+                                                                                                                      innerListParm)));
+    Optional<ValueProviderCacheId> changedListId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
+
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(intParam,
+                                                                                                                      stringParam,
+                                                                                                                      listParam,
+                                                                                                                      1,
+                                                                                                                      innerStringParam,
+                                                                                                                      innerListParm)));
+    Optional<ValueProviderCacheId> changedInnerIntId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
+
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(intParam,
+                                                                                                                      stringParam,
+                                                                                                                      listParam,
+                                                                                                                      innerIntParam,
+                                                                                                                      "one",
+                                                                                                                      innerListParm)));
+    Optional<ValueProviderCacheId> changedInnerStringId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
+
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(intParam,
+                                                                                                                      stringParam,
+                                                                                                                      listParam,
+                                                                                                                      innerIntParam,
+                                                                                                                      innerStringParam,
+                                                                                                                      asList("one", "two", "four"))));
+    Optional<ValueProviderCacheId> changedInnerListId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
+
+    List<Optional<ValueProviderCacheId>> allIds = asList(originalId, changedIntId, changedStringId, changedListId, changedInnerIntId, changedInnerStringId, changedInnerListId);
+    for(Optional<ValueProviderCacheId> idA : allIds) {
+      for(Optional<ValueProviderCacheId> idB : allIds) {
+        if(idA != idB) {
+          checkIdsAreDifferent(idA, idB);
+        }
+      }
+    }
+  }
+
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl.model.metadata.context;
 
+import static java.util.Comparator.comparing;
 import static java.util.Objects.hash;
 import static java.util.stream.Collectors.toMap;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -20,7 +21,6 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 public class DeclarationValueProviderCacheIdGeneratorContext implements ValueProviderCacheIdGeneratorContext<ParameterValue> {
@@ -80,14 +80,14 @@ public class DeclarationValueProviderCacheIdGeneratorContext implements ValuePro
     private static int computeHashFor(ParameterValue parameterValue) {
       final HashingParameterValueVisitor visitor = new HashingParameterValueVisitor();
       parameterValue.accept(visitor);
-      return visitor.hash;
+      return hash(visitor.hashBuilder.toString());
     }
 
-    private int hash = 0;
+    private StringBuilder hashBuilder = new StringBuilder();
 
     @Override
     public void visitSimpleValue(ParameterSimpleValue text) {
-      hash += hash(text.getValue());
+      hashBuilder.append(text.getValue());
     }
 
     @Override
@@ -97,9 +97,14 @@ public class DeclarationValueProviderCacheIdGeneratorContext implements ValuePro
 
     @Override
     public void visitObjectValue(ParameterObjectValue objectValue) {
-      objectValue.getParameters().forEach((k, v) -> {
-        hash += hash(k);
-        v.accept(this);
+      objectValue
+              .getParameters()
+              .entrySet()
+              .stream()
+              .sorted(comparing(Map.Entry::getKey))
+              .forEach(e -> {
+        hashBuilder.append(e.getKey());
+        e.getValue().accept(this);
       });
     }
 
