@@ -24,8 +24,8 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -334,6 +334,23 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * {@inheritDoc}
    */
   @Override
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataKey partialKey) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader,
+                                                                      () -> metadataMediator.getMetadataKeys(context,
+                                                                                                             partialKey,
+                                                                                                             reflectionCache)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onKeys());
+    }
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata() throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
@@ -354,6 +371,39 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getMetadata(context, key)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
+  }
+
+  @Override
+  public MetadataResult<MetadataType> getInputMetadata(MetadataKey key, String parameterName) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
+                                        .getInputMetadata(context, key, parameterName)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
+  }
+
+  @Override
+  public MetadataResult<MetadataType> getOutputMetadata(MetadataKey key) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader,
+                                                                      () -> metadataMediator.getOutputMetadata(context, key)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
+  }
+
+  @Override
+  public MetadataResult<MetadataType> getOutputAttributesMetadata(MetadataKey key) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
+                                        .getOutputAttributesMetadata(context, key)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }

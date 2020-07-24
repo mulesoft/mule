@@ -168,6 +168,10 @@
         <metadata:metadata-source-with-multilevel continent="AMERICA" country="ARGENTINA" city="BA"/>
     </flow>
 
+    <flow name="sourceMetadataWithPartialMultilevel">
+        <metadata:metadata-source-with-partial-multilevel/>
+    </flow>
+
     <flow name="typeWithDeclaredSubtypesMetadata">
         <metadata:type-with-declared-subtypes-metadata plainShape="#[mel:new org.mule.test.metadata.extension.model.shapes.Circle()]"
                                                        rectangleSubtype="#[mel:new org.mule.test.metadata.extension.model.shapes.Rectangle()]"

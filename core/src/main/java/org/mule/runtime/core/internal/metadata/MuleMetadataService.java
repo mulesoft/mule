@@ -13,7 +13,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_MET
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
-
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -68,6 +68,42 @@ public class MuleMetadataService implements MetadataService {
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(Location location) {
     return exceptionHandledMetadataFetch(() -> findMetadataKeyProvider(location).getMetadataKeys(),
                                          EXCEPTION_RESOLVING_METADATA_KEYS);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys(Location location, MetadataKey partialKey) {
+    return exceptionHandledMetadataFetch(() -> findMetadataKeyProvider(location).getMetadataKeys(partialKey),
+                                         EXCEPTION_RESOLVING_METADATA_KEYS);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<MetadataType> getInputMetadata(Location location, MetadataKey key, String parameterName) {
+    return exceptionHandledMetadataFetch(() -> findMetadataProvider(location).getInputMetadata(key, parameterName),
+                                         EXCEPTION_RESOLVING_COMPONENT_METADATA);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<MetadataType> getOutputMetadata(Location location, MetadataKey key) {
+    return exceptionHandledMetadataFetch(() -> findMetadataProvider(location).getOutputMetadata(key),
+                                         EXCEPTION_RESOLVING_COMPONENT_METADATA);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<MetadataType> getOutputAttributesMetadata(Location location, MetadataKey key) {
+    return exceptionHandledMetadataFetch(() -> findMetadataProvider(location).getOutputAttributesMetadata(key),
+                                         EXCEPTION_RESOLVING_COMPONENT_METADATA);
   }
 
   /**
