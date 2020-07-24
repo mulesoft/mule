@@ -10,7 +10,6 @@ package org.foo.oracle;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.service.test.api.FooService;
 
 import javax.inject.Inject;
 
@@ -22,13 +21,24 @@ import javax.inject.Inject;
 public class OracleExtension {
 
   @Parameter
-  private String message;
-  @Inject
-  private FooService fooService;
+  private String url;
+  @Parameter
+  private String user;
+  @Parameter
+  private String password;
+
 
   public OracleExtension() {}
 
-  public String getMessage() {
-    return this.fooService.doFoo(this.message);
+  public String getUrl() {
+    return this.url;
+  }
+
+  public String getUser() {
+    return this.user;
+  }
+
+  public String getPassword() {
+    return this.password;
   }
 }

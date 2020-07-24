@@ -18,31 +18,33 @@ import java.sql.Connection;
 import oracle.jdbc.driver.OracleDriver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 public class OracleOperation {
+
+  private static final String driverClassName = "oracle.jdbc.driver.OracleDriver";
 
   public OracleOperation() {}
 
   @MediaType(value = TEXT_PLAIN, strict = false)
   public String printMessage(@Config OracleExtension config) {
-    System.out.println("Test plugin extension says: " + config.getMessage());
-    return config.getMessage();
+    return "Test plugin extension says hello!";
   }
 
   @MediaType(value = TEXT_PLAIN, strict = false)
   public String connect(@Config OracleExtension config) {
     try {
-      Class.forName("oracle.jdbc.driver.OracleDriver");
+      Class.forName(this.driverClassName);
 
-      Connection con = getConnection("jdbc:oracle:thin:@//localhost:49161/xe","system","oracle");
+      Connection con = getConnection(config.getUrl(), config.getUser(), config.getPassword());
 
       con.close();
 
-      return config.getMessage();
+      return "Connection success!";
 
     } catch (Exception e) {
-      return "Exception ocurred: " + e.getMessage();
+      return "Exception ocurred while attempting to connect: " + e.getMessage();
     }
   }
 }

@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
       http://www.mulesoft.org/schema/mule/oracle http://www.mulesoft.org/schema/mule/oracle/current/mule-oracle.xsd">
 
-    <oracle:config name="default" message="Hello from app!!!"/>
+    <oracle:config name="default" url="jdbc:oracle:thin:@//localhost:49161/xe" user="system" password="oracle"/>
 
     <flow name="main">
         <scheduler>
