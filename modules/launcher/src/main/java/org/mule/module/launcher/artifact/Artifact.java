@@ -81,7 +81,7 @@ public interface Artifact<D extends ArtifactDescriptor>
     void setDeploymentProperties(Properties deploymentProperties);
 
     /**
-     * Notifies all retry policies associated to the artifact to stop retrying
+     * Cancels any ongoing process that prevents the startup fase from ending
      */
     void cancelStart();
 }
