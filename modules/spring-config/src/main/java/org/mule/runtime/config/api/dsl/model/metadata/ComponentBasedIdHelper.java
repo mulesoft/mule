@@ -119,9 +119,9 @@ public class ComponentBasedIdHelper {
         final ComponentAst c = (ComponentAst) o;
         c.getParameters().stream().sorted(comparing(p -> p.getModel().getName())).forEach(p -> {
           hashBuilder.append(p.getModel().getName());
-          if(p.getModel().getType() instanceof ArrayType) {
-            hashForList((Collection<ComponentAst>)p.getValue().getRight());
-          }else {
+          if (p.getModel().getType() instanceof ArrayType) {
+            hashForList((Collection<ComponentAst>) p.getValue().getRight());
+          } else {
             p.getValue().reduce(leftFunction, rightFunction);
           }
         });

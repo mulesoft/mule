@@ -310,12 +310,12 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     });
 
     RequiredForMetadataModelProperty requiredForMetadataModelProperty =
-            new RequiredForMetadataModelProperty(asList(PARAMETER_REQUIRED_FOR_METADATA_NAME));
+        new RequiredForMetadataModelProperty(asList(PARAMETER_REQUIRED_FOR_METADATA_NAME));
 
     when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
     when(connectionProvider.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
     when(connectionProvider.getModelProperty(RequiredForMetadataModelProperty.class))
-            .thenReturn(of(requiredForMetadataModelProperty));
+        .thenReturn(of(requiredForMetadataModelProperty));
 
     when(configuration.getName()).thenReturn(CONFIGURATION_NAME);
     when(configuration.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
@@ -331,7 +331,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(otherConfiguration.getSourceModels()).thenReturn(emptyList());
     when(otherConfiguration.getConnectionProviders()).thenReturn(asList(connectionProvider));
     when(otherConfiguration.getModelProperty(RequiredForMetadataModelProperty.class))
-            .thenReturn(of(requiredForMetadataModelProperty));
+        .thenReturn(of(requiredForMetadataModelProperty));
 
     when(source.getName()).thenReturn(SOURCE_NAME);
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
@@ -354,12 +354,12 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     allParameterModels.addAll(customParameterGroupModels);
 
     Stream.of(configuration, otherConfiguration, operation, otherOperation, connectionProvider, source)
-            .forEach(model -> when(model.getAllParameterModels()).thenReturn(allParameterModels));
+        .forEach(model -> when(model.getAllParameterModels()).thenReturn(allParameterModels));
 
     extensions = ImmutableSet.<ExtensionModel>builder()
-            .add(MuleExtensionModelProvider.getExtensionModel())
-            .add(mockExtension)
-            .build();
+        .add(MuleExtensionModelProvider.getExtensionModel())
+        .add(mockExtension)
+        .build();
 
     TypeCatalog typeCatalog = DslResolvingContext.getDefault(extensions).getTypeCatalog();
 
@@ -371,28 +371,27 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected void initializeExtensionMock(ExtensionModel extension) {
     when(extension.getName()).thenReturn(EXTENSION_NAME);
     when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
-                                                        .setXsdFileName("mule-mockns.xsd")
-                                                        .setPrefix(NAMESPACE)
-                                                        .setNamespace(NAMESPACE_URI)
-                                                        .setSchemaLocation(SCHEMA_LOCATION)
-                                                        .setSchemaVersion("4.0")
-                                                        .build());
+        .setXsdFileName("mule-mockns.xsd")
+        .setPrefix(NAMESPACE)
+        .setNamespace(NAMESPACE_URI)
+        .setSchemaLocation(SCHEMA_LOCATION)
+        .setSchemaVersion("4.0")
+        .build());
     when(extension.getSubTypes()).thenReturn(emptySet());
     when(extension.getImportedTypes()).thenReturn(emptySet());
     when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
-                                                        .setXsdFileName(EMPTY)
-                                                        .setPrefix(NAMESPACE)
-                                                        .setNamespace(NAMESPACE_URI)
-                                                        .setSchemaLocation(SCHEMA_LOCATION)
-                                                        .setSchemaVersion(EMPTY)
-                                                        .build());
+        .setXsdFileName(EMPTY)
+        .setPrefix(NAMESPACE)
+        .setNamespace(NAMESPACE_URI)
+        .setSchemaLocation(SCHEMA_LOCATION)
+        .setSchemaVersion(EMPTY)
+        .build());
 
     when(extension.getConfigurationModels()).thenReturn(asList(configuration, otherConfiguration));
     when(extension.getConfigurationModel(anyString())).then(invocation -> {
       if (configuration.getName().equals(invocation.getArgument(0))) {
         return of(configuration);
-      }
-      else if (otherConfiguration.getName().equals(invocation.getArgument(0))) {
+      } else if (otherConfiguration.getName().equals(invocation.getArgument(0))) {
         return of(otherConfiguration);
       }
       return empty();
@@ -411,128 +410,127 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
                                                           String parameterRequiredForMetadata, String actingParameter,
                                                           String providedParameter, String parameterInGroup) {
     return declarer.newConfiguration(CONFIGURATION_NAME)
-            .withRefName(name)
-            .withParameterGroup(newParameterGroup()
-                                        .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, parameterRequiredForMetadata)
-                                        .withParameter(ACTING_PARAMETER_NAME, actingParameter)
-                                        .withParameter(PROVIDED_PARAMETER_NAME, providedParameter)
-                                        .getDeclaration())
-            .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
-                                        .withParameter(PARAMETER_IN_GROUP_NAME, parameterInGroup)
-                                        .getDeclaration())
-            .withConnection(connectionDeclaration)
-            .getDeclaration();
+        .withRefName(name)
+        .withParameterGroup(newParameterGroup()
+            .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, parameterRequiredForMetadata)
+            .withParameter(ACTING_PARAMETER_NAME, actingParameter)
+            .withParameter(PROVIDED_PARAMETER_NAME, providedParameter)
+            .getDeclaration())
+        .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
+            .withParameter(PARAMETER_IN_GROUP_NAME, parameterInGroup)
+            .getDeclaration())
+        .withConnection(connectionDeclaration)
+        .getDeclaration();
   }
 
   protected ConfigurationElementDeclaration declareOtherConfig(ConnectionElementDeclaration connectionDeclaration, String name,
                                                                String parameterRequiredForMetadata, String actingParameter,
                                                                String providedParameter, String parameterInGroup) {
     return declarer.newConfiguration(OTHER_CONFIGURATION_NAME)
-            .withRefName(name)
-            .withParameterGroup(newParameterGroup()
-                                        .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, parameterRequiredForMetadata)
-                                        .withParameter(ACTING_PARAMETER_NAME, actingParameter)
-                                        .withParameter(PROVIDED_PARAMETER_NAME, providedParameter)
-                                        .getDeclaration())
-            .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
-                                        .withParameter(PARAMETER_IN_GROUP_NAME, parameterInGroup)
-                                        .getDeclaration())
-            .withConnection(connectionDeclaration)
-            .getDeclaration();
+        .withRefName(name)
+        .withParameterGroup(newParameterGroup()
+            .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, parameterRequiredForMetadata)
+            .withParameter(ACTING_PARAMETER_NAME, actingParameter)
+            .withParameter(PROVIDED_PARAMETER_NAME, providedParameter)
+            .getDeclaration())
+        .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
+            .withParameter(PARAMETER_IN_GROUP_NAME, parameterInGroup)
+            .getDeclaration())
+        .withConnection(connectionDeclaration)
+        .getDeclaration();
   }
 
   protected ConnectionElementDeclaration declareConnection(String parameterRequiredForMetadata, String actingParameter,
                                                            String providedParameter, String parameterInGroup) {
     return declarer.newConnection(CONNECTION_PROVIDER_NAME)
-            .withParameterGroup(newParameterGroup()
-                                        .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, parameterRequiredForMetadata)
-                                        .withParameter(ACTING_PARAMETER_NAME, actingParameter)
-                                        .withParameter(PROVIDED_PARAMETER_NAME, providedParameter)
-                                        .getDeclaration())
-            .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
-                                        .withParameter(PARAMETER_IN_GROUP_NAME, parameterInGroup)
-                                        .getDeclaration())
-            .getDeclaration();
+        .withParameterGroup(newParameterGroup()
+            .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, parameterRequiredForMetadata)
+            .withParameter(ACTING_PARAMETER_NAME, actingParameter)
+            .withParameter(PROVIDED_PARAMETER_NAME, providedParameter)
+            .getDeclaration())
+        .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
+            .withParameter(PARAMETER_IN_GROUP_NAME, parameterInGroup)
+            .getDeclaration())
+        .getDeclaration();
   }
 
   protected ParameterValue newComplexActingParameter(int intParam,
-                                                   String stringParam,
-                                                   List<String> listParam,
-                                                   int innerIntParam,
-                                                   String innerStringParam,
-                                                   List<String> innerListParam) {
+                                                     String stringParam,
+                                                     List<String> listParam,
+                                                     int innerIntParam,
+                                                     String innerStringParam,
+                                                     List<String> innerListParam) {
     ParameterListValue.Builder listValueBuilder = ParameterListValue.builder();
     listParam.forEach(listValueBuilder::withValue);
     ParameterListValue.Builder innerListValueBuilder = ParameterListValue.builder();
     innerListParam.forEach(innerListValueBuilder::withValue);
     return ParameterObjectValue.builder()
-            .withParameter("innerPojoParam",
-                           ParameterObjectValue.builder()
-                                   .withParameter("intParam", Integer.toString(innerIntParam))
-                                   .withParameter("stringParam", innerStringParam)
-                                   .withParameter("listParam", innerListValueBuilder.build())
-                                   .build())
-            .withParameter("intParam", Integer.toString(intParam))
-            .withParameter("stringParam", stringParam)
-            .withParameter("listParam", listValueBuilder.build())
-            .build();
+        .withParameter("innerPojoParam",
+                       ParameterObjectValue.builder()
+                           .withParameter("intParam", Integer.toString(innerIntParam))
+                           .withParameter("stringParam", innerStringParam)
+                           .withParameter("listParam", innerListValueBuilder.build())
+                           .build())
+        .withParameter("intParam", Integer.toString(intParam))
+        .withParameter("stringParam", stringParam)
+        .withParameter("listParam", listValueBuilder.build())
+        .build();
 
   }
 
   private OperationElementDeclaration declareOperation(String operationName) {
     return declarer.newOperation(operationName)
-            .withConfig(MY_CONFIG)
-            .withParameterGroup(newParameterGroup()
-                                        .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
-                                        .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
-                                        .withParameter(COMPLEX_ACTING_PARAMETER_NAME, newComplexActingParameter(
-                                                0,
-                                                "zero",
-                                                asList("one", "two", "three"),
-                                                0,
-                                                "zero",
-                                                asList("one", "two", "three")
-                                        ))
-                                        .withParameter(PROVIDED_FROM_COMPLEX_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
-                                        .getDeclaration())
+        .withConfig(MY_CONFIG)
+        .withParameterGroup(newParameterGroup()
+            .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
+            .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
+            .withParameter(COMPLEX_ACTING_PARAMETER_NAME, newComplexActingParameter(
+                                                                                    0,
+                                                                                    "zero",
+                                                                                    asList("one", "two", "three"),
+                                                                                    0,
+                                                                                    "zero",
+                                                                                    asList("one", "two", "three")))
+            .withParameter(PROVIDED_FROM_COMPLEX_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
+            .getDeclaration())
 
-            .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
-                                        .withParameter(PARAMETER_IN_GROUP_NAME, PARAMETER_IN_GROUP_DEFAULT_VALUE)
-                                        .getDeclaration())
-            .getDeclaration();
+        .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
+            .withParameter(PARAMETER_IN_GROUP_NAME, PARAMETER_IN_GROUP_DEFAULT_VALUE)
+            .getDeclaration())
+        .getDeclaration();
   }
 
 
   protected ArtifactDeclaration getBaseApp() {
     return ElementDeclarer.newArtifact()
-            .withGlobalElement(
-                    declareConfig(
-                            declareConnection(PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
-                                              ACTING_PARAMETER_DEFAULT_VALUE,
-                                              PROVIDED_PARAMETER_DEFAULT_VALUE,
-                                              PARAMETER_IN_GROUP_DEFAULT_VALUE),
-                            MY_CONFIG,
-                            PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
-                            ACTING_PARAMETER_DEFAULT_VALUE,
-                            PROVIDED_PARAMETER_DEFAULT_VALUE,
-                            PARAMETER_IN_GROUP_DEFAULT_VALUE))
-            .withGlobalElement(ElementDeclarer.forExtension(MULE_NAME)
-                                       .newConstruct(FLOW_ELEMENT_IDENTIFIER)
-                                       .withRefName(MY_FLOW)
-                                       .withComponent(
-                                               declarer.newSource(SOURCE_NAME).withConfig(MY_CONFIG)
-                                                       .withParameterGroup(newParameterGroup()
-                                                                                   .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
-                                                                                   .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
-                                                                                   .getDeclaration())
-                                                       .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
-                                                                                   .withParameter(PARAMETER_IN_GROUP_NAME, PARAMETER_IN_GROUP_DEFAULT_VALUE)
-                                                                                   .getDeclaration())
-                                                       .getDeclaration())
-                                       .withComponent(declareOperation(OPERATION_NAME))
-                                       .withComponent(declareOperation(OTHER_OPERATION_NAME))
-                                       .getDeclaration())
-            .getDeclaration();
+        .withGlobalElement(
+                           declareConfig(
+                                         declareConnection(PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
+                                                           ACTING_PARAMETER_DEFAULT_VALUE,
+                                                           PROVIDED_PARAMETER_DEFAULT_VALUE,
+                                                           PARAMETER_IN_GROUP_DEFAULT_VALUE),
+                                         MY_CONFIG,
+                                         PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
+                                         ACTING_PARAMETER_DEFAULT_VALUE,
+                                         PROVIDED_PARAMETER_DEFAULT_VALUE,
+                                         PARAMETER_IN_GROUP_DEFAULT_VALUE))
+        .withGlobalElement(ElementDeclarer.forExtension(MULE_NAME)
+            .newConstruct(FLOW_ELEMENT_IDENTIFIER)
+            .withRefName(MY_FLOW)
+            .withComponent(
+                           declarer.newSource(SOURCE_NAME).withConfig(MY_CONFIG)
+                               .withParameterGroup(newParameterGroup()
+                                   .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
+                                   .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
+                                   .getDeclaration())
+                               .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
+                                   .withParameter(PARAMETER_IN_GROUP_NAME, PARAMETER_IN_GROUP_DEFAULT_VALUE)
+                                   .getDeclaration())
+                               .getDeclaration())
+            .withComponent(declareOperation(OPERATION_NAME))
+            .withComponent(declareOperation(OTHER_OPERATION_NAME))
+            .getDeclaration())
+        .getDeclaration();
   }
 
 

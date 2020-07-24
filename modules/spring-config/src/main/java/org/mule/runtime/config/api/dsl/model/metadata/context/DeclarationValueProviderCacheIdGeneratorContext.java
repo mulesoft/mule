@@ -98,14 +98,14 @@ public class DeclarationValueProviderCacheIdGeneratorContext implements ValuePro
     @Override
     public void visitObjectValue(ParameterObjectValue objectValue) {
       objectValue
-              .getParameters()
-              .entrySet()
-              .stream()
-              .sorted(comparing(Map.Entry::getKey))
-              .forEach(e -> {
-        hashBuilder.append(e.getKey());
-        e.getValue().accept(this);
-      });
+          .getParameters()
+          .entrySet()
+          .stream()
+          .sorted(comparing(Map.Entry::getKey))
+          .forEach(e -> {
+            hashBuilder.append(e.getKey());
+            e.getValue().accept(this);
+          });
     }
 
   }
