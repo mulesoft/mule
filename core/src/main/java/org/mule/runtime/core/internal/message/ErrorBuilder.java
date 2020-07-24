@@ -13,6 +13,7 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.exception.MuleException;
@@ -32,6 +33,7 @@ public final class ErrorBuilder {
   private Throwable exception;
   private String description;
   private String detailedDescription;
+  private Component failingComponent;
   private ErrorType errorType;
   private Message errorMessage;
   private List<Error> errors = emptyList();
@@ -139,6 +141,19 @@ public final class ErrorBuilder {
   }
 
   /**
+   * Sets the component where this error was generated
+   *
+   * @param failingComponent
+   * @return {@code this} builder
+   *
+   * @since 4.3
+   */
+  public ErrorBuilder failingComponent(Component failingComponent) {
+    this.failingComponent = failingComponent;
+    return this;
+  }
+
+  /**
    * Sets the error message for the error.
    *
    * An error message is a {@link Message} with information related to the error. For instance, a response from an http:request
@@ -179,7 +194,8 @@ public final class ErrorBuilder {
     checkState(description != null, "description exception cannot be null");
     checkState(detailedDescription != null, "detailed description exception cannot be null");
     checkState(errorType != null, "errorType exception cannot be null");
-    return new ErrorImplementation(exception, description, detailedDescription, errorType, errorMessage, errors);
+    return new ErrorImplementation(exception, description, detailedDescription, failingComponent, errorType, errorMessage,
+                                   errors);
   }
 
   /**
@@ -192,15 +208,18 @@ public final class ErrorBuilder {
     private final Throwable exception;
     private final String description;
     private final String detailedDescription;
+    private final Component failingComponent;
     private final ErrorType errorType;
     private final Message muleMessage;
     private final List<Error> errors;
 
-    private ErrorImplementation(Throwable exception, String description, String detailedDescription, ErrorType errorType,
+    private ErrorImplementation(Throwable exception, String description, String detailedDescription,
+                                Component failingComponent, ErrorType errorType,
                                 Message errorMessage, List<Error> errors) {
       this.exception = exception;
       this.description = description;
       this.detailedDescription = detailedDescription;
+      this.failingComponent = failingComponent;
       this.errorType = errorType;
       this.muleMessage = errorMessage;
       this.errors = unmodifiableList(errors);
@@ -220,6 +239,11 @@ public final class ErrorBuilder {
     @Override
     public String getDetailedDescription() {
       return detailedDescription;
+    }
+
+    @Override
+    public String getFailingComponent() {
+      return failingComponent != null ? failingComponent.getRepresentation() : null;
     }
 
     /**
