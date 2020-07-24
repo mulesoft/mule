@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:hello="http://www.mulesoft.org/schema/mule/hello"
+      xmlns:oracle="http://www.mulesoft.org/schema/mule/oracle"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/hello http://www.mulesoft.org/schema/mule/hello/current/mule-hello.xsd">
+      http://www.mulesoft.org/schema/mule/oracle http://www.mulesoft.org/schema/mule/oracle/current/mule-oracle.xsd">
 
-    <hello:config name="default" message="Hello from app!!!"/>
+    <oracle:config name="default" message="Hello from app!!!"/>
 
     <flow name="main">
         <scheduler>
@@ -14,6 +14,6 @@
             </scheduling-strategy>
         </scheduler>
         <set-payload value=""/>
-        <hello:connect config-ref="default" />
+        <oracle:connect config-ref="default" />
     </flow>
 </mule>

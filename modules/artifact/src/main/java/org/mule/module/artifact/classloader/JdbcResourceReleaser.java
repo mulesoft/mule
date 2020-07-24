@@ -17,7 +17,9 @@ import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
 
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
 import java.lang.reflect.Field;
@@ -315,16 +317,53 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     }
   }
 
-  private boolean isThreadApplicationTimerThread(Thread thread) throws Exception {
+  private boolean isThreadApplicationTimerThread(Thread thread) {
     return thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
         && thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)
-        && isThreadLoadedByDisposedApplication(thread.getContextClassLoader());
+        && (isThreadLoadedByDisposedApplication(thread.getContextClassLoader())
+            || isThreadLoadedByDisposedDomain(thread.getContextClassLoader()));
   }
 
-  private boolean isThreadLoadedByDisposedApplication(ClassLoader threadBaseClassLoader) throws Exception {
-    String threadArtifactId = ((MuleArtifactClassLoader)threadBaseClassLoader).getArtifactId();
-    String artifactId = ((MuleArtifactClassLoader)this.getClass().getClassLoader()).getArtifactId();
+  private boolean isThreadLoadedByDisposedDomain(ClassLoader threadBaseClassLoader) {
+    /*try {
+      List<ClassLoader> threadDelegateClassLoaders = ((CompositeClassLoader) threadBaseClassLoader).getDelegates();
+      List<ClassLoader> delegateClassLoaders = ((CompositeClassLoader) this.getClass().getClassLoader()).getDelegates();
 
-    return threadArtifactId != null && threadArtifactId.equals(artifactId);
+      RegionClassLoader regionClassLoader, threadRegionClassLoader = null;
+      for (ClassLoader cl : threadDelegateClassLoaders) {
+        if (cl instanceof RegionClassLoader) {
+          threadRegionClassLoader = (RegionClassLoader) cl;
+        }
+      }
+
+      for (ClassLoader cl : delegateClassLoaders) {
+        if (cl instanceof RegionClassLoader) {
+          regionClassLoader = (RegionClassLoader) cl;
+          String artifactId = regionClassLoader.getArtifactId();
+          return artifactId != null && threadRegionClassLoader != null
+              && artifactId.equals(threadRegionClassLoader.getArtifactId());
+        }
+      }
+
+    } catch (Exception e) {
+      logger.warn("Exception occurred while attempting to compare {} and {} artifact id.", threadBaseClassLoader,
+                  this.getClass().getClassLoader());
+    }*/
+
+    return true;
+  }
+
+  private boolean isThreadLoadedByDisposedApplication(ClassLoader threadBaseClassLoader) {
+    try {
+      String threadArtifactId = ((MuleArtifactClassLoader) threadBaseClassLoader).getArtifactId();
+      String artifactId = ((MuleArtifactClassLoader) this.getClass().getClassLoader()).getArtifactId();
+
+      return threadArtifactId != null && threadArtifactId.equals(artifactId);
+    } catch (Exception e) {
+      logger.warn("Exception occurred while attempting to compare {} and {} artifact id.", threadBaseClassLoader,
+                  this.getClass().getClassLoader());
+    }
+
+    return false;
   }
 }

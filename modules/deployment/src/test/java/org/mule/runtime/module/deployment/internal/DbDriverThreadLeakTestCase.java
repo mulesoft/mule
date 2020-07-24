@@ -85,7 +85,7 @@ public abstract class DbDriverThreadLeakTestCase extends AbstractDeploymentTestC
 
   private ApplicationFileBuilder getApplicationFileBuilder() throws Exception {
     return createExtensionApplicationWithServices(xmlFile + ".xml",
-                                                  helloExtensionV1Plugin);
+                                                  oracleExtensionPlugin);
   }
 
   @Override
