@@ -36,6 +36,20 @@ public class ArtifactWrapperTestCase
         verify(artifact).cancelStart();
     }
 
+    @Test
+    public void testCancelStartWhenStopping() throws IOException
+    {
+        // Given an artifact wrapper
+        ArtifactSubtype artifact = mock(ArtifactSubtype.class);
+        ArtifactWrapper<ArtifactSubtype, ArtifactSubtypeDescriptor> artifactWrapper = new ArtifactWrapper<>(artifact);
+
+        // When cancelling start
+        artifactWrapper.stop();
+
+        // Then the delegate is told to cancel start
+        verify(artifact).cancelStart();
+    }
+
     private class ArtifactSubtype implements Artifact<ArtifactSubtypeDescriptor>
     {
         @Override

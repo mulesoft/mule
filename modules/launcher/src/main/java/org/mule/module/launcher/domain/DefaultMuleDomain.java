@@ -303,6 +303,7 @@ public class DefaultMuleDomain implements Domain
             }
             if (this.muleContext != null)
             {
+                this.cancelStart();
                 this.muleContext.stop();
             }
         }
@@ -411,7 +412,10 @@ public class DefaultMuleDomain implements Domain
         {
             for (Connector connector : muleContext.getRegistry().lookupObjects(Connector.class))
             {
-                connector.getRetryPolicyTemplate().cancelStart();
+                if(connector.getRetryPolicyTemplate() != null)
+                {
+                    connector.getRetryPolicyTemplate().cancelStart();
+                }
             }
         }
     }

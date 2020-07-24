@@ -53,6 +53,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
 
         try
         {
+            artifact.cancelStart();
             artifact.stop();
         }
         catch (Throwable t)

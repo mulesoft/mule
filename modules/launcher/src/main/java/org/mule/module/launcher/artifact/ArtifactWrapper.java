@@ -115,6 +115,7 @@ public class ArtifactWrapper<T extends Artifact<D>, D extends ArtifactDescriptor
             @Override
             public void execute()
             {
+                delegate.cancelStart();
                 delegate.stop();
             }
         });

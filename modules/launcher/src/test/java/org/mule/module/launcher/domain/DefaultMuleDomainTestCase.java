@@ -11,6 +11,8 @@ import org.junit.Test;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
+import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connector;
@@ -64,7 +66,7 @@ public class DefaultMuleDomainTestCase
     }
 
     @Test
-    public void testCancelStartOneConector()
+    public void testCancelStartOneConectorWithRetryPolicy()
     {
         // Given a default mule applicacion with 1 connector that has retryPolicy
         List<Connector> connectors = new ArrayList<>();
@@ -80,7 +82,7 @@ public class DefaultMuleDomainTestCase
     }
 
     @Test
-    public void testCancelStartFiveConectors()
+    public void testCancelStartFiveConectorsWithRetryPolicies()
     {
         // Given a default mule applicacion with 5 connectors that have retryPolicies
         List<Connector> connectors = new ArrayList<>();
@@ -97,6 +99,57 @@ public class DefaultMuleDomainTestCase
         defaultMuleDomain.cancelStart();
 
         // Then connector's retry policies start is also cancelled
+        verify(retryPolicyTemplate1, times(1)).cancelStart();
+        verify(retryPolicyTemplate2, times(1)).cancelStart();
+        verify(retryPolicyTemplate3, times(1)).cancelStart();
+        verify(retryPolicyTemplate4, times(1)).cancelStart();
+        verify(retryPolicyTemplate5, times(1)).cancelStart();
+    }
+
+    @Test
+    public void testCancelStartFiveConectorsWithNullRetryPolicies()
+    {
+        // Given a default mule applicacion with 5 connectors that have retryPolicies
+        List<Connector> connectors = new ArrayList<>();
+
+        Connector connector1 = mock(Connector.class);
+        connectors.add(connector1);
+        Connector connector2 = mock(Connector.class);
+        connectors.add(connector2);
+        Connector connector3 = mock(Connector.class);
+        connectors.add(connector3);
+        Connector connector4 = mock(Connector.class);
+        connectors.add(connector4);
+        Connector connector5 = mock(Connector.class);
+        connectors.add(connector5);
+
+        when(muleRegistry.lookupObjects(Connector.class)).thenReturn(connectors);
+
+        // When cancelling start
+        defaultMuleDomain.cancelStart();
+
+        // Then no error occurs
+
+    }
+
+    @Test
+    public void testStopCancelStartFiveConectors()
+    {
+        // Given a default mule applicacion with 5 connectors that have retryPolicies
+        List<Connector> connectors = new ArrayList<>();
+
+        RetryPolicyTemplate retryPolicyTemplate1 = addMockConnectorWithMockRetryPolicyToList(connectors);
+        RetryPolicyTemplate retryPolicyTemplate2 = addMockConnectorWithMockRetryPolicyToList(connectors);
+        RetryPolicyTemplate retryPolicyTemplate3 = addMockConnectorWithMockRetryPolicyToList(connectors);
+        RetryPolicyTemplate retryPolicyTemplate4 = addMockConnectorWithMockRetryPolicyToList(connectors);
+        RetryPolicyTemplate retryPolicyTemplate5 = addMockConnectorWithMockRetryPolicyToList(connectors);
+
+        when(muleRegistry.lookupObjects(Connector.class)).thenReturn(connectors);
+
+        // When stopping
+        defaultMuleDomain.stop();
+
+        // Then connector's retry policies start is cancelled
         verify(retryPolicyTemplate1, times(1)).cancelStart();
         verify(retryPolicyTemplate2, times(1)).cancelStart();
         verify(retryPolicyTemplate3, times(1)).cancelStart();

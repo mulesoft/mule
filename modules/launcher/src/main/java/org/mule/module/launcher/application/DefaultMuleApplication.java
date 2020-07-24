@@ -360,6 +360,8 @@ public class DefaultMuleApplication implements Application
     @Override
     public void stop()
     {
+        this.cancelStart();
+
         if (this.muleContext == null || !this.muleContext.getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME))
         {
             return;
@@ -457,9 +459,11 @@ public class DefaultMuleApplication implements Application
         {
             for(Connector connector: muleContext.getRegistry().lookupObjects(Connector.class))
             {
-                connector.getRetryPolicyTemplate().cancelStart();
+                if(connector.getRetryPolicyTemplate() != null)
+                {
+                    connector.getRetryPolicyTemplate().cancelStart();
+                }
             }
         }
     }
-
 }
