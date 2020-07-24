@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.util.MuleSystemProperties.*;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
@@ -31,6 +33,7 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
@@ -93,6 +96,8 @@ public class ArtifactContextBuilder {
   protected static final String CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL = "classLoaderRepository cannot be null";
   protected static final String CLASS_LOADER_REPOSITORY_WAS_NOT_SET = "classLoaderRepository was not set";
   protected static final String SERVICE_CONFIGURATOR_CANNOT_BE_NULL = "serviceConfigurator cannot be null";
+
+  private static final Boolean SHARE_ERROR_TYPE_REPOSITORY = getBoolean(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY);
 
   private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
   private ArtifactType artifactType = APP;
@@ -479,14 +484,7 @@ public class ArtifactContextBuilder {
           builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));
 
           withArtifactMuleContext(parentArtifact, parentContext -> muleContextBuilder
-              .setErrorTypeRepository(POLICY.equals(artifactType)
-                  // Since there is already a workaround to allow poliices to use http connector without declaring the dependency
-                  // and relying on it provided by the app, this case has to be accounted for here when handling error codes as
-                  // well.
-                  ? new FilteredCompositeErrorTypeRepository(createDefaultErrorTypeRepository(),
-                                                             parentContext.getErrorTypeRepository(),
-                                                             "HTTP")
-                  : createCompositeErrorTypeRepository(parentContext.getErrorTypeRepository())));
+              .setErrorTypeRepository(createErrorTypeRepository(parentContext)));
         } else {
           builders.add(new ConnectionManagerConfigurationBuilder());
         }
@@ -508,6 +506,23 @@ public class ArtifactContextBuilder {
       }
       throw e;
     }
+  }
+
+  private ErrorTypeRepository createErrorTypeRepository(MuleContext parentContext) {
+    if (POLICY.equals(artifactType)) {
+      if (SHARE_ERROR_TYPE_REPOSITORY) {
+        // Because MULE-18196 breaks backwards, we need this feature flag to allow legacy behavior
+        return createCompositeErrorTypeRepository(parentContext.getErrorTypeRepository());
+      } else {
+        // Since there is already a workaround to allow polices to use http connector without declaring the dependency
+        // and relying on it provided by the app, this case has to be accounted for here when handling error codes as
+        // well.
+        return new FilteredCompositeErrorTypeRepository(createDefaultErrorTypeRepository(),
+                                                        parentContext.getErrorTypeRepository(),
+                                                        "HTTP");
+      }
+    }
+    return createCompositeErrorTypeRepository(parentContext.getErrorTypeRepository());
   }
 
   protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties() {
