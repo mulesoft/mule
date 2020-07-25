@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test-policy="http://www.mulesoft.org/schema/mule/test-policy"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:simple="http://www.mulesoft.org/schema/mule/simple"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test-policy http://www.mulesoft.org/schema/mule/test-policy/current/mule-test-policy.xsd
+               http://www.mulesoft.org/schema/mule/simple http://www.mulesoft.org/schema/mule/simple/current/mule-simple.xsd">
+
+    <test-policy:proxy name="async-policy">
+        <test-policy:operation>
+            <try>
+                <simple:fail>
+                    <error-mapping sourceType="WITH-ERROR-DECLARATION:MY_DECLARED_ERROR"
+                                   targetType="MULE:ANY"/>
+                </simple:fail>
+                <error-handler>
+                    <on-error-continue type="MULE:ANY">
+                        <test-policy:execute-next/>
+                        <test-policy:custom-processor
+                                class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </test-policy:operation>
+    </test-policy:proxy>
+</mule>
