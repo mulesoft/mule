@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static java.lang.reflect.Modifier.FINAL;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -20,6 +21,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
@@ -35,12 +37,26 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.po
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 
+import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runners.Parameterized;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.PolicyNotification;
 import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.api.security.Authentication;
@@ -51,6 +67,7 @@ import org.mule.runtime.core.api.security.AbstractSecurityProvider;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
@@ -96,10 +113,18 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   private static File simpleExtensionJarFile;
   private static File withErrorDeclarationExtensionJarFile;
 
+  @Rule
+  public ExpectedException expectedEx = none();
+
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Boolean> params() {
     // Only run without parallel deployment since this configuration does not affect policy deployment at all
     return asList(false);
+  }
+
+  @Before
+  public void setup() throws NoSuchFieldException, IllegalAccessException {
+    setShareErrorTypeRepository(false);
   }
 
   // Policy artifact file builders
@@ -562,6 +587,45 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
   @Test
   @Issue("MULE-18196")
+  @Description("If the application doesn't have the ErrorType that is needed by the policy, but the policy already has it in its own ErrorType repository")
+  public void appliesPolicyWithoutSharingErrorTypeRepositoryWithSimpleApp() throws Exception {
+    setShareErrorTypeRepository(false);
+
+    configureSimpleAppAndPolicyWithErrorDeclarationExtensionAndErrorMapping();
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  @Issue("MULE-18196")
+  @Description("When policy and app share ErrorType repository, everything should work")
+  public void appliesPolicySharingErrorTypeRepositoryWithApp() throws Exception {
+    setShareErrorTypeRepository(true);
+
+    configureAppWithErrorDeclarationAndPolicyWithErrorMapping();
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+
+  @Test
+  @Issue("MULE-18196")
+  @Description("When policy ErrorType repository is isolated, the policy can't use any ErrorType that is not in its own repository")
+  public void appliesPolicyWithoutSharingErrorTypeRepositoryWithApp() throws Exception {
+    setShareErrorTypeRepository(false);
+
+    expectedEx.expect(PolicyRegistrationException.class);
+    expectedEx.expectMessage("Error occured registering policy 'barPolicy'");
+    expectedEx.expectCause(instanceOf(InitialisationException.class));
+
+    configureAppWithErrorDeclarationAndPolicyWithErrorMapping();
+
+  }
+
+  @Test
+  @Issue("MULE-18196")
   public void appliesPolicyAndAppWithCollidingErrorNamespace() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
@@ -798,6 +862,57 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
         .build()).dependingOn(moduleUsingByeXmlExtensionPlugin);
+  }
+
+  private void configureSimpleAppAndPolicyWithErrorDeclarationExtensionAndErrorMapping() throws Exception {
+    ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
+    ArtifactPluginFileBuilder withErrorDeclarationExtensionPlugin = createWithErrorDeclarationExtensionPlugin();
+
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.dependingOn(withErrorDeclarationExtensionPlugin)
+        .getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("app-with-simple-extension-config.xml",
+                                                                                           simpleExtensionPlugin);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/policy-with-error-mapping.xml"),
+                                                      emptyList()));
+  }
+
+  private void configureAppWithErrorDeclarationAndPolicyWithErrorMapping() throws Exception {
+    ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
+    ArtifactPluginFileBuilder withErrorDeclarationExtensionPlugin = createWithErrorDeclarationExtensionPlugin();
+
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.dependingOn(simpleExtensionPlugin).getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("app-with-simple-extension-config.xml",
+                                                                                           withErrorDeclarationExtensionPlugin,
+                                                                                           simpleExtensionPlugin);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/policy-with-error-mapping.xml"),
+                                                      emptyList()));
+  }
+
+  private void setShareErrorTypeRepository(boolean value) throws NoSuchFieldException, IllegalAccessException {
+    Field field = ArtifactContextBuilder.class.getDeclaredField("SHARE_ERROR_TYPE_REPOSITORY");
+    Field modifiersField = Field.class.getDeclaredField("modifiers");
+    modifiersField.setAccessible(true);
+    modifiersField.setInt(field, field.getModifiers() & ~FINAL);
+    field.setAccessible(true);
+    field.set(null, value);
   }
 
   public static class TestSecurityProvider extends AbstractSecurityProvider {
