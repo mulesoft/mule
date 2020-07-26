@@ -41,7 +41,7 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
   private final Map<String, String> showInDslParameters;
   private final ReflectionCache reflectionCache;
 
-  public OperationParameterValueResolver(ExecutionContext<T> executionContext,
+  OperationParameterValueResolver(ExecutionContext<T> executionContext,
                                          ResolverSet resolverSet,
                                          ReflectionCache reflectionCache,
                                          ExpressionManager expressionManager) {
