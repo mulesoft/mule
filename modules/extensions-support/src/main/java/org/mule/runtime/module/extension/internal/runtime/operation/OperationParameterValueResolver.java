@@ -42,9 +42,9 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
   private final ReflectionCache reflectionCache;
 
   OperationParameterValueResolver(ExecutionContext<T> executionContext,
-                                         ResolverSet resolverSet,
-                                         ReflectionCache reflectionCache,
-                                         ExpressionManager expressionManager) {
+                                  ResolverSet resolverSet,
+                                  ReflectionCache reflectionCache,
+                                  ExpressionManager expressionManager) {
     this.executionContext = executionContext;
     this.operationModel = executionContext.getComponentModel();
     this.resolverSet = resolverSet;
