@@ -74,12 +74,6 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     }
 
     @Override
-    public Domain deployExplodedArtifact(String artifactDir, Optional<Properties> properties) throws DeploymentException
-    {
-        return deployExplodedArtifact(artifactDir);
-    }
-
-    @Override
     public boolean isUpdatedZombieArtifact(String artifactName)
     {
         // Domains do not manage zombie artifacts

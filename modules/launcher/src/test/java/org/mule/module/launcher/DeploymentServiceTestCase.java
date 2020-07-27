@@ -3775,7 +3775,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         {
             return new TestDomainArchiveDeployer(
                     new DefaultArchiveDeployer<>(new DefaultArtifactDeployer<Domain>(), domainFactory, domains,
-                                                 new DomainDeploymentTemplate(applicationDeployer, this), this),
+                                                 new DomainDeploymentTemplate(applicationDeployer, this)),
                     applicationDeployer, this);
         }
     }
@@ -3844,29 +3844,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.redeployDomain(dummyDomainFileBuilder.getId());
 
         // Application was redeployed twice but it is not started
-        assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
-    }
-
-    @Test
-    public void stoppedApplicationsAreNotStartedWhenDomainIsRedeployedWithZip() throws Exception
-    {
-
-        DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
-        deploymentService.addDeploymentListener(mockDeploymentListener);
-
-        deployDomainAndApplication(dummyDomainFileBuilder, dummyDomainApp1FileBuilder);
-
-        //Stop application and check status
-        assertStatus(dummyDomainApp1FileBuilder.getId(), STARTED);
-        deploymentService.findApplication(dummyDomainApp1FileBuilder.getId()).stop();
-        assertStatus(dummyDomainApp1FileBuilder.getId(), STOPPED);
-
-        deploymentService.stop();
-        //Copy file to domain folder
-        addPackedDomainFromBuilder(dummyDomainFileBuilder);
-        deploymentService.start();
-
-        // Application was redeployed but it is not started
         assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
     }
 
