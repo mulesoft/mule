@@ -129,4 +129,13 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     assertThat(captured, hasSize(2));
     assertThat(captured.get(0), is(sameInstance(captured.get(1))));
   }
+
+  @Test
+  @Issue("")
+  public void manageSameCursorProviderTwice() {
+    CursorStreamProvider provider = mock(CursorStreamProvider.class);
+    CursorProvider managed = cursorManager.manage(provider, ctx);
+    CursorProvider managedSecond = cursorManager.manage(provider, ctx);
+    assertThat(managed, is(sameInstance(managedSecond)));
+  }
 }
