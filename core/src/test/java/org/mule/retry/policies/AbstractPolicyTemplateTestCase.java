@@ -62,7 +62,7 @@ public class AbstractPolicyTemplateTestCase
         assertThat(abstractPolicyTemplate.getCancelStart().get(), equalTo(false));
 
         // When cancelling start
-        abstractPolicyTemplate.cancelStart();
+        abstractPolicyTemplate.stopRetrying();
 
         // Then cancelStart is set to true
         assertThat(abstractPolicyTemplate.getCancelStart().get(), equalTo(true));
@@ -74,7 +74,7 @@ public class AbstractPolicyTemplateTestCase
         // Given a Policy based on the abstract policy template that should be executed forever but start is cancelled
         doThrow(new Exception()).when(retryCallback).doWork(any(RetryContext.class));
         when(retryPolicy.applyPolicy(any(Throwable.class))).thenReturn(PolicyStatus.policyOk());
-        abstractPolicyTemplate.cancelStart();
+        abstractPolicyTemplate.stopRetrying();
 
         // When executing
         abstractPolicyTemplate.execute(retryCallback, workManager);

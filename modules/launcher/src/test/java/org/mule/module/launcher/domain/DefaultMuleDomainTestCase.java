@@ -11,8 +11,6 @@ import org.junit.Test;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connector;
@@ -78,7 +76,7 @@ public class DefaultMuleDomainTestCase
         defaultMuleDomain.cancelStart();
 
         // Connectors's retry policy start is also cancelled
-        verify(retryPolicyTemplate).cancelStart();
+        verify(retryPolicyTemplate).stopRetrying();
     }
 
     @Test
@@ -99,11 +97,11 @@ public class DefaultMuleDomainTestCase
         defaultMuleDomain.cancelStart();
 
         // Then connector's retry policies start is also cancelled
-        verify(retryPolicyTemplate1, times(1)).cancelStart();
-        verify(retryPolicyTemplate2, times(1)).cancelStart();
-        verify(retryPolicyTemplate3, times(1)).cancelStart();
-        verify(retryPolicyTemplate4, times(1)).cancelStart();
-        verify(retryPolicyTemplate5, times(1)).cancelStart();
+        verify(retryPolicyTemplate1, times(1)).stopRetrying();
+        verify(retryPolicyTemplate2, times(1)).stopRetrying();
+        verify(retryPolicyTemplate3, times(1)).stopRetrying();
+        verify(retryPolicyTemplate4, times(1)).stopRetrying();
+        verify(retryPolicyTemplate5, times(1)).stopRetrying();
     }
 
     @Test
@@ -150,11 +148,11 @@ public class DefaultMuleDomainTestCase
         defaultMuleDomain.stop();
 
         // Then connector's retry policies start is cancelled
-        verify(retryPolicyTemplate1, times(1)).cancelStart();
-        verify(retryPolicyTemplate2, times(1)).cancelStart();
-        verify(retryPolicyTemplate3, times(1)).cancelStart();
-        verify(retryPolicyTemplate4, times(1)).cancelStart();
-        verify(retryPolicyTemplate5, times(1)).cancelStart();
+        verify(retryPolicyTemplate1, times(1)).stopRetrying();
+        verify(retryPolicyTemplate2, times(1)).stopRetrying();
+        verify(retryPolicyTemplate3, times(1)).stopRetrying();
+        verify(retryPolicyTemplate4, times(1)).stopRetrying();
+        verify(retryPolicyTemplate5, times(1)).stopRetrying();
     }
 
     private RetryPolicyTemplate addMockConnectorWithMockRetryPolicyToList(List<Connector> connectors)

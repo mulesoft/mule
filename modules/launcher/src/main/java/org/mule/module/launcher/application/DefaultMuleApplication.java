@@ -461,7 +461,7 @@ public class DefaultMuleApplication implements Application
             {
                 if(connector.getRetryPolicyTemplate() != null)
                 {
-                    connector.getRetryPolicyTemplate().cancelStart();
+                    connector.getRetryPolicyTemplate().stopRetrying();
                 }
             }
         }

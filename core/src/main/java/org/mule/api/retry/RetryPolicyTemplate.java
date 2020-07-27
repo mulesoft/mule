@@ -33,5 +33,5 @@ public interface RetryPolicyTemplate
 
     boolean isSynchronous();
 
-    void cancelStart();
+    void stopRetrying();
 }

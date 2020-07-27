@@ -98,7 +98,7 @@ public class AsynchronousRetryTemplate implements RetryPolicyTemplate
     }
 
     @Override
-    public void cancelStart() {
-        delegate.cancelStart();
+    public void stopRetrying() {
+        delegate.stopRetrying();
     }
 }

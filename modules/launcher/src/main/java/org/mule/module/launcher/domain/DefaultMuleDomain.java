@@ -414,7 +414,7 @@ public class DefaultMuleDomain implements Domain
             {
                 if(connector.getRetryPolicyTemplate() != null)
                 {
-                    connector.getRetryPolicyTemplate().cancelStart();
+                    connector.getRetryPolicyTemplate().stopRetrying();
                 }
             }
         }

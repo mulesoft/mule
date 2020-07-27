@@ -34,10 +34,10 @@ public class AsynchronousRetryTemplateTestCase
         // Given an asynchronous retry template with a delegate
 
         // When cancelling start
-        asynchronousRetryTemplate.cancelStart();
+        asynchronousRetryTemplate.stopRetrying();
 
         // Then
-        verify(delegate, times(1)).cancelStart();
+        verify(delegate, times(1)).stopRetrying();
     }
 
 }

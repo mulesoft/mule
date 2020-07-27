@@ -164,7 +164,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
     }
 
     @Override
-    public void cancelStart()
+    public void stopRetrying()
     {
         cancelStart.compareAndSet(false, true);
     }

@@ -62,7 +62,7 @@ public class DefaultMuleApplicationTestCase
         defaultMuleApplication.cancelStart();
 
         // Connectors's retry policy start is also cancelled
-        verify(retryPolicyTemplate).cancelStart();
+        verify(retryPolicyTemplate).stopRetrying();
     }
 
     @Test
@@ -83,11 +83,11 @@ public class DefaultMuleApplicationTestCase
         defaultMuleApplication.cancelStart();
 
         // Then connector's retry policies start is also cancelled
-        verify(retryPolicyTemplate1, times(1)).cancelStart();
-        verify(retryPolicyTemplate2, times(1)).cancelStart();
-        verify(retryPolicyTemplate3, times(1)).cancelStart();
-        verify(retryPolicyTemplate4, times(1)).cancelStart();
-        verify(retryPolicyTemplate5, times(1)).cancelStart();
+        verify(retryPolicyTemplate1, times(1)).stopRetrying();
+        verify(retryPolicyTemplate2, times(1)).stopRetrying();
+        verify(retryPolicyTemplate3, times(1)).stopRetrying();
+        verify(retryPolicyTemplate4, times(1)).stopRetrying();
+        verify(retryPolicyTemplate5, times(1)).stopRetrying();
     }
 
     @Test
@@ -112,11 +112,11 @@ public class DefaultMuleApplicationTestCase
         defaultMuleApplication.stop();
 
         // Then connector's retry policies start is cancelled
-        verify(retryPolicyTemplate1, times(1)).cancelStart();
-        verify(retryPolicyTemplate2, times(1)).cancelStart();
-        verify(retryPolicyTemplate3, times(1)).cancelStart();
-        verify(retryPolicyTemplate4, times(1)).cancelStart();
-        verify(retryPolicyTemplate5, times(1)).cancelStart();
+        verify(retryPolicyTemplate1, times(1)).stopRetrying();
+        verify(retryPolicyTemplate2, times(1)).stopRetrying();
+        verify(retryPolicyTemplate3, times(1)).stopRetrying();
+        verify(retryPolicyTemplate4, times(1)).stopRetrying();
+        verify(retryPolicyTemplate5, times(1)).stopRetrying();
     }
 
     @Test
