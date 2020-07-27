@@ -61,7 +61,7 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
     @Override
     public void postRedeploy(Artifact domain)
     {
-        postRedeploy(domain, emptyMap());
+        postRedeploy(domain, Collections.<Application, ApplicationStatus>emptyMap());
     }
 
     /**

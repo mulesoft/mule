@@ -37,7 +37,7 @@ public interface ArtifactDeploymentTemplate
         @Override
         public void postRedeploy(Artifact artifact)
         {
-            postRedeploy(artifact, emptyMap());
+            postRedeploy(artifact,  Collections.<Application, ApplicationStatus>emptyMap());
         }
 
         @Override
