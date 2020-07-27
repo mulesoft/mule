@@ -57,6 +57,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
   public static final String ORACLE_DRIVER_TIMER_THREAD_NAME = "Timer-";
   public static final String ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
+  public static final String COMPOSITE_CLASS_LOADER_CLASS_NAME = "CompositeClassLoader";
   private final static Logger logger = LoggerFactory.getLogger(JdbcResourceReleaser.class);
   private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
       Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
@@ -316,21 +317,23 @@ public class JdbcResourceReleaser implements ResourceReleaser {
   }
 
   private boolean isThreadApplicationTimerThread(Thread thread) {
+    String artifactId = ((ArtifactClassLoader) this.getClass().getClassLoader()).getArtifactId();
+
     return thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
         && thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)
-        && (isThreadLoadedByDisposedDomain(thread.getContextClassLoader())
-            || isThreadLoadedByDisposedApplication(thread.getContextClassLoader()));
+        && (isThreadLoadedByDisposedApplication(artifactId, thread.getContextClassLoader())
+            || isThreadLoadedByDisposedDomain(artifactId, thread.getContextClassLoader()));
   }
 
-  private boolean isThreadLoadedByDisposedDomain(ClassLoader threadBaseClassLoader) {
+  private boolean isThreadLoadedByDisposedDomain(String artifactId, ClassLoader threadContextClassLoader) {
     try {
-      Field delegateClassLoadersField = threadBaseClassLoader.getClass().getDeclaredField("delegates");
-      delegateClassLoadersField.setAccessible(true);
-      List<ClassLoader> classLoaderList = (List<ClassLoader>) delegateClassLoadersField.get(threadBaseClassLoader);
+      Class threadContextClassLoaderClass = threadContextClassLoader.getClass();
+      if (!threadContextClassLoaderClass.getSimpleName().equals(COMPOSITE_CLASS_LOADER_CLASS_NAME)) {
+        return false;
+      }
 
-      ClassLoader muleSharedDomainClassLoader = this.getClass().getClassLoader();
-      Method getArtifactIdMethod = muleSharedDomainClassLoader.getClass().getMethod("getArtifactId");
-      String artifactId = getArtifactIdMethod.invoke(muleSharedDomainClassLoader).toString();
+      Method getDelegateClassLoadersMethod = threadContextClassLoaderClass.getMethod("getDelegates");
+      List<ClassLoader> classLoaderList = (List<ClassLoader>) getDelegateClassLoadersMethod.invoke(threadContextClassLoader);
 
       for (ClassLoader classLoaderDelegate : classLoaderList) {
         ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoaderDelegate;
@@ -340,21 +343,19 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       }
 
     } catch (Exception e) {
-      logger.warn("Exception occurred while attempting to compare {} and {} artifactId.", threadBaseClassLoader,
+      logger.warn("Exception occurred while attempting to compare {} and {} artifactId.", threadContextClassLoader,
                   this.getClass().getClassLoader());
     }
 
     return false;
   }
 
-  private boolean isThreadLoadedByDisposedApplication(ClassLoader threadBaseClassLoader) {
+  private boolean isThreadLoadedByDisposedApplication(String artifactId, ClassLoader threadContextClassLoader) {
     try {
-      String threadArtifactId = ((MuleArtifactClassLoader) threadBaseClassLoader).getArtifactId();
-      String artifactId = ((MuleArtifactClassLoader) this.getClass().getClassLoader()).getArtifactId();
-
-      return threadArtifactId != null && threadArtifactId.equals(artifactId);
+      String threadClassLoaderArtifactId = ((MuleArtifactClassLoader) threadContextClassLoader).getArtifactId();
+      return threadClassLoaderArtifactId != null && threadClassLoaderArtifactId.equals(artifactId);
     } catch (Exception e) {
-      logger.warn("Exception occurred while attempting to compare {} and {} artifact id.", threadBaseClassLoader,
+      logger.warn("Exception occurred while attempting to compare {} and {} artifact id.", threadContextClassLoader,
                   this.getClass().getClassLoader());
     }
 
