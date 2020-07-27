@@ -182,7 +182,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     protected File appsDir;
     protected File domainsDir;
     protected TestMuleDeploymentService deploymentService;
-    protected static TestMuleDeploymentService staticDeploymentService;
     protected DeploymentListener applicationDeploymentListener;
     protected DeploymentListener domainDeploymentListener;
     protected TestDeploymentListener testDeploymentListener = new TestDeploymentListener();
@@ -3893,7 +3892,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.addDeploymentListener(mockDeploymentListener);
         addPackedAppFromBuilder(retryPolicyForeverAppFileBuilder);
 
-        ExecutorService service = Executors.newFixedThreadPool(3);
+        ExecutorService service = Executors.newFixedThreadPool(2);
         final CountDownLatch latch = new CountDownLatch(2);
 
         // Aquire the deployment lock and start the application
@@ -3906,7 +3905,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         // Check status
         assertStatus(retryPolicyForeverAppFileBuilder.getId(), STOPPED);
-        staticDeploymentService.stop();
+        deploymentService.stop();
         assertStatus(retryPolicyForeverAppFileBuilder.getId(), DESTROYED);
 
         service.awaitTermination(1000, TimeUnit.MILLISECONDS);
@@ -3918,11 +3917,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         @Override
         public boolean isSatisfied()
         {
-            return staticDeploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()) != null
-                    && staticDeploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext() != null
-                    && staticDeploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext().getRegistry() != null
-                    && !staticDeploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext().getRegistry().lookupObjects(Connector.class).isEmpty()
-                    && staticDeploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext().getRegistry().lookupObjects(Connector.class).iterator().next().getRetryPolicyTemplate() != null;
+            return deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()) != null
+                    && deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext() != null
+                    && deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext().getRegistry() != null
+                    && !deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext().getRegistry().lookupObjects(Connector.class).isEmpty()
+                    && deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext().getRegistry().lookupObjects(Connector.class).iterator().next().getRetryPolicyTemplate() != null;
         }
 
         @Override
@@ -3937,7 +3936,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         @Override
         public boolean isSatisfied()
         {
-            return STOPPED.equals(staticDeploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getStatus());
+            return STOPPED.equals(deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getStatus());
         }
 
         @Override
@@ -3959,7 +3958,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         @Override
         public void run()
         {
-            staticDeploymentService = deploymentService;
             deploymentService.start();
             latch.countDown();
         }
@@ -3981,8 +3979,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
             pollingProber.check(new ApplicationReconnectingProbe());
 
-            staticDeploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).cancelStart();
-            staticDeploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).stop();
+            deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).cancelStart();
+            deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).stop();
 
             pollingProber.check(new ApplicationStoppedProbe());
             latch.countDown();
