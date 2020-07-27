@@ -297,7 +297,7 @@ public final class ApplicationModelTypeUtils {
             return;
           }
 
-          handleWrappedElement(componentModel, paramComponent, innerComponents, paramModel, extensionModelHelper, paramDsl);
+          handleWrappedElement(componentModel, paramComponent, paramModel, extensionModelHelper);
         } else {
           paramModel.getType()
               .accept(getComponentChildVisitor(componentModel, paramModel, paramDsl, paramComponent, extensionModelHelper));
@@ -309,9 +309,7 @@ public final class ApplicationModelTypeUtils {
   }
 
   private static void handleWrappedElement(ComponentModel componentModel, ComponentModel wrappedComponent,
-                                           Multimap<ComponentIdentifier, ComponentModel> innerComponents,
-                                           ParameterModel paramModel, ExtensionModelHelper extensionModelHelper,
-                                           DslElementSyntax paramDsl) {
+                                           ParameterModel paramModel, ExtensionModelHelper extensionModelHelper) {
     Multimap<ComponentIdentifier, ComponentModel> nestedWrappedComponents = getNestedComponents(wrappedComponent);
 
     Map<ObjectType, Optional<DslElementSyntax>> objectTypeOptionalMap =
