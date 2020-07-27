@@ -40,7 +40,7 @@ public interface ArtifactDeploymentTemplate
         @Override
         public void postRedeploy(Artifact artifact, Map<Application, ApplicationStatus> appStatusPreRedeployment)
         {
-            // Nothing to do
+            postRedeploy(artifact);
         }
     };
 
