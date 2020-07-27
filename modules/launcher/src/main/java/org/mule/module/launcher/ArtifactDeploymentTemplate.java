@@ -10,8 +10,11 @@ import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.artifact.Artifact;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Collections.emptyMap;
 
 /**
  * Utility to hook callbacks just before and after an artifact is redeployed in Mule.
@@ -34,13 +37,13 @@ public interface ArtifactDeploymentTemplate
         @Override
         public void postRedeploy(Artifact artifact)
         {
-            // Nothing to do
+            postRedeploy(artifact, emptyMap());
         }
 
         @Override
         public void postRedeploy(Artifact artifact, Map<Application, ApplicationStatus> appStatusPreRedeployment)
         {
-            postRedeploy(artifact);
+            // Nothing to do
         }
     };
 
