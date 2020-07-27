@@ -11,7 +11,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -325,14 +324,6 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
         .build());
     when(extension.getSubTypes()).thenReturn(emptySet());
     when(extension.getImportedTypes()).thenReturn(emptySet());
-    when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
-        .setXsdFileName(EMPTY)
-        .setPrefix(NAMESPACE)
-        .setNamespace(NAMESPACE_URI)
-        .setSchemaLocation(SCHEMA_LOCATION)
-        .setSchemaVersion(EMPTY)
-        .build());
-
     when(extension.getConfigurationModels()).thenReturn(asList(configuration));
     when(extension.getConfigurationModel(anyString())).thenReturn(of(configuration));
     when(extension.getOperationModels()).thenReturn(asList(operation, anotherOperation));

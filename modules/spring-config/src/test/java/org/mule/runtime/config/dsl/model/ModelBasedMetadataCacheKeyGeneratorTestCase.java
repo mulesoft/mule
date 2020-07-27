@@ -13,6 +13,7 @@ import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEFAULTS;
@@ -87,6 +88,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+
+import io.qameta.allure.Issue;
 
 public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslModelTestCase {
 
@@ -270,6 +273,29 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
+
+  }
+
+  @Test
+  @Issue("MULE-18601")
+  public void configurationNestedParamsCountedTwiceForHash() throws Exception {
+
+    MetadataCacheId keyParts = getIdForComponent(getBaseApp());
+    LOGGER.debug(keyParts.toString());
+
+    assertThat(keyParts.getParts(), hasSize(3));
+    assertThat(keyParts.getParts().get(0).getParts(), hasSize(2));
+    assertThat(keyParts.getParts().get(0).getParts().get(0).getParts(), hasSize(0));
+
+    final MetadataCacheId configurationPart = keyParts.getParts().get(0).getParts().get(1);
+    assertThat(configurationPart.getSourceElementName().get(), is("configuration"));
+    assertThat(configurationPart.getParts(), hasSize(2));
+    assertThat(configurationPart.getParts().get(0).getParts(), hasSize(2));
+    assertThat(configurationPart.getParts().get(0).getParts().get(0).getParts(), hasSize(0));
+    assertThat(configurationPart.getParts().get(0).getParts().get(0).getParts(), hasSize(0));
+    assertThat(configurationPart.getParts().get(1).getParts(), hasSize(0));
+    assertThat(keyParts.getParts().get(1).getParts(), hasSize(0));
+    assertThat(keyParts.getParts().get(2).getParts(), hasSize(0));
 
   }
 
