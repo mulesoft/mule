@@ -65,25 +65,41 @@ public final class ErrorBuilder {
    * @param e the exception to use from which the error will be created.
    */
   private ErrorBuilder(Throwable e) {
-    if (e instanceof ErrorMessageAwareException) {
-      this.errorMessage = ((ErrorMessageAwareException) e).getErrorMessage();
-    }
-    if (e instanceof ComposedErrorException) {
-      this.errors = ((ComposedErrorException) e).getErrors();
-    }
-    if (e instanceof SuppressedMuleException) {
-      this.suppressedErrors = getSuppressedMessagingErrors((SuppressedMuleException) e);
-    }
-    this.exception = e;
+    Throwable cause = e;
     String exceptionDescription = e.getMessage() != null ? e.getMessage() : "unknown description";
     this.description = exceptionDescription;
     this.detailedDescription = exceptionDescription;
-    MuleException muleRoot = getRootMuleException(this.exception);
-    if (muleRoot != null) {
-      this.suppressedErrors = getSuppressedMessagingErrors(muleRoot);
-      if (muleRoot.getMessage() != null) {
-        this.description = muleRoot.getMessage();
+    if (cause instanceof SuppressedMuleException) {
+      // Setting a SuppressedMuleException would break backwards compatibility, so it must be unwrapped
+      cause = ((SuppressedMuleException) e).unwrap();
+      exception = cause;
+      addSuppressedErrors((SuppressedMuleException) e);
+      updateErrorDescription((MuleException) exception);
+    } else {
+      exception = cause;
+      MuleException muleRoot = getRootMuleException(exception);
+      if (muleRoot != null) {
+        addSuppressedErrors(muleRoot);
+        updateErrorDescription(muleRoot);
       }
+    }
+    if (cause instanceof ErrorMessageAwareException) {
+      this.errorMessage = ((ErrorMessageAwareException) cause).getErrorMessage();
+    }
+    if (cause instanceof ComposedErrorException) {
+      this.errors = ((ComposedErrorException) cause).getErrors();
+    }
+  }
+
+  private void updateErrorDescription(MuleException exception) {
+    MuleException muleRoot = exception;
+    // Returning the first suppression root message (if present) is equivalent to the behaviour prior to error suppression
+    if (!exception.getExceptionInfo().getSuppressedCauses().isEmpty()) {
+      List<MuleException> suppressedCauses = exception.getExceptionInfo().getSuppressedCauses();
+      muleRoot = getRootMuleException(suppressedCauses.get(suppressedCauses.size() - 1));
+    }
+    if (muleRoot.getMessage() != null) {
+      description = muleRoot.getMessage();
     }
   }
 
@@ -93,14 +109,18 @@ public final class ErrorBuilder {
    * @return {@link List<Error>} containing all the {@link Error} instances that the given {@link MuleException} inform as suppressed.
    * @see SuppressedMuleException
    */
-  private List<Error> getSuppressedMessagingErrors(MuleException muleException) {
-    List<Error> suppressedMessagingErrors = new ArrayList<>(4);
+  private void addSuppressedErrors(MuleException muleException) {
+    List<Error> suppressions = new ArrayList<>();
     for (MuleException suppressedException : muleException.getExceptionInfo().getSuppressedCauses()) {
       if (suppressedException instanceof MessagingException) {
-        ((MessagingException) suppressedException).getEvent().getError().ifPresent(suppressedMessagingErrors::add);
+        ((MessagingException) suppressedException).getEvent().getError().ifPresent(error -> {
+          suppressions.add(error);
+          // Exception must be updated with the suppressed error cause in order to avoid backwards compatibility issues
+          exception = error.getCause();
+        });
       }
     }
-    return suppressedMessagingErrors;
+    suppressedErrors = suppressions;
   }
 
   /**
@@ -115,6 +135,7 @@ public final class ErrorBuilder {
     this.errorType = e.getErrorType();
     this.errorMessage = e.getErrorMessage();
     this.errors = e.getChildErrors();
+    this.suppressedErrors = e.getSuppressedErrors();
   }
 
   /**

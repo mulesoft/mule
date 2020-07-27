@@ -36,6 +36,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
+import org.mule.runtime.internal.exception.SuppressedMuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -150,10 +151,10 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     assertThat(error.toString(),
                is(equalToIgnoringLineBreaks("\norg.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
                    + "{\n"
-                   + "  description=message\n"
+                   + "  description=Test\n"
                    + "  detailedDescription=message\n"
                    + "  errorType=MULE:TEST\n"
-                   + "  cause=org.mule.runtime.core.api.message.ErrorBuilderTestCase$ComposedErrorMessageAwareException\n"
+                   + "  cause=org.mule.runtime.core.internal.exception.MessagingException\n"
                    + "  errorMessage=\n"
                    + "org.mule.runtime.core.internal.message.DefaultMessageBuilder$MessageImplementation\n"
                    + "{\n"
@@ -172,7 +173,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
                    + "  errorMessage=-\n"
                    + "  suppressedErrors=[]\n"
                    + "  childErrors=[]\n"
-                   + "}]"
+                   + "}]\n"
                    + "  childErrors=[\n"
                    + "org.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
                    + "{\n"
@@ -199,10 +200,10 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
 
   private void buildErrorAndAssertSuppression(Throwable exception, MessagingException suppressedCause) {
     Error error = builder(exception).errorType(mockErrorType).build();
-    assertThat(error.getCause(), is(exception));
-    assertThat(error.getDescription(), containsString(EXCEPTION_MESSAGE));
+    assertThat(error.getDescription(), containsString(suppressedCause.getMessage()));
     assertThat(error.getDetailedDescription(), containsString(EXCEPTION_MESSAGE));
     assertThat(error.getErrorType(), is(mockErrorType));
+    assertThat(error.getCause(), is(suppressedCause));
     assertThat(error.getSuppressedErrors(), contains(suppressedCause.getEvent().getError().get()));
     assertThat(error.getChildErrors(), is(empty()));
   }
