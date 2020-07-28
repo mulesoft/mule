@@ -92,7 +92,7 @@ public class MuleDeploymentService implements DeploymentService
 
         ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<Application>();
 
-        this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications, NOP_ARTIFACT_DEPLOYMENT_TEMPLATE);
+        this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications, NOP_ARTIFACT_DEPLOYMENT_TEMPLATE, this);
         this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
         this.domainDeployer = createDomainArchiveDeployer(domainFactory, domains, applicationDeployer);
         this.domainDeployer.setDeploymentListener(domainDeploymentListener);
@@ -478,7 +478,7 @@ public class MuleDeploymentService implements DeploymentService
     {
         return new DomainArchiveDeployer(
                 new DefaultArchiveDeployer<>(new DefaultArtifactDeployer<Domain>(), domainFactory, domains,
-                                             new DomainDeploymentTemplate(applicationDeployer, this)),
+                                             new DomainDeploymentTemplate(applicationDeployer, this), this),
                 applicationDeployer, this);
 
     }
