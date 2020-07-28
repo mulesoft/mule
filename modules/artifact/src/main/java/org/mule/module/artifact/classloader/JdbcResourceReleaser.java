@@ -300,7 +300,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       would be required.
       * */
       for (Thread thread : threads) {
-        if (isThreadApplicationTimerThread(thread)) {
+        if (isThreadOracleTimerThread(thread)) {
           try {
             thread.stop();
             thread.interrupt();
@@ -316,7 +316,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     }
   }
 
-  private boolean isThreadApplicationTimerThread(Thread thread) {
+  private boolean isThreadOracleTimerThread(Thread thread) {
     String artifactId = ((ArtifactClassLoader) this.getClass().getClassLoader()).getArtifactId();
 
     return thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
@@ -325,7 +325,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
             || isThreadLoadedByDisposedDomain(artifactId, thread.getContextClassLoader()));
   }
 
-  private boolean isThreadLoadedByDisposedDomain(String artifactId, ClassLoader threadContextClassLoader) {
+  private boolean isThreadLoadedByDisposedDomain(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
     try {
       Class threadContextClassLoaderClass = threadContextClassLoader.getClass();
       if (!threadContextClassLoaderClass.getSimpleName().equals(COMPOSITE_CLASS_LOADER_CLASS_NAME)) {
@@ -337,7 +337,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
       for (ClassLoader classLoaderDelegate : classLoaderList) {
         ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoaderDelegate;
-        if (artifactClassLoader.getArtifactId().contains(artifactId)) {
+        if (artifactClassLoader.getArtifactId().contains(undeployedArtifactId)) {
           return true;
         }
       }
@@ -350,10 +350,10 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     return false;
   }
 
-  private boolean isThreadLoadedByDisposedApplication(String artifactId, ClassLoader threadContextClassLoader) {
+  private boolean isThreadLoadedByDisposedApplication(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
     try {
       String threadClassLoaderArtifactId = ((MuleArtifactClassLoader) threadContextClassLoader).getArtifactId();
-      return threadClassLoaderArtifactId != null && threadClassLoaderArtifactId.equals(artifactId);
+      return threadClassLoaderArtifactId != null && threadClassLoaderArtifactId.equals(undeployedArtifactId);
     } catch (Exception e) {
       logger.warn("Exception occurred while attempting to compare {} and {} artifact id.", threadContextClassLoader,
                   this.getClass().getClassLoader());
