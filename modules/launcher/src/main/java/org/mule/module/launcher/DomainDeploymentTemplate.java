@@ -77,7 +77,7 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
                 applicationDeployer.preTrackArtifact(domainApplication);
                 if (applicationDeployer.isUpdatedZombieArtifact(domainApplication.getArtifactName()))
                 {
-                    Optional<Properties> property = addShouldStartProperty(appStatusPreRedeployment.getOrDefault(domainApplication,STARTED));
+                    Optional<Properties> property = addShouldStartProperty(appStatusPreRedeployment.get(domainApplication));
                     applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(), property);
                 }
             }
@@ -88,7 +88,7 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
     private Optional<Properties> addShouldStartProperty(ApplicationStatus applicationStatus)
     {
         Properties newProperties = new Properties();
-        boolean startArtifact = applicationStatus.equals(STARTED) || applicationStatus.equals(DEPLOYMENT_FAILED);
+        boolean startArtifact = STARTED.equals(applicationStatus) || DEPLOYMENT_FAILED.equals(applicationStatus);
         newProperties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(startArtifact));
         return of(newProperties);
     }
