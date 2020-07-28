@@ -21,7 +21,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -97,7 +96,6 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
    */
   @Override
   public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
-
     MetadataKeysContainerBuilder keysBuilder = MetadataKeysContainerBuilder.getInstance();
     try {
       MetadataContext metadataContext = getMetadataContext();
@@ -108,6 +106,17 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
       return failure(newFailure(e).onKeys());
     }
     return success(keysBuilder.build());
+  }
+
+  /**
+   * Implementation for a configuration provider won't take into account the partialKey as it is defined
+   * only at the operation/source level the key.
+   *
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataKey partialKey) throws MetadataResolvingException {
+    return getMetadataKeys();
   }
 
   private void addComponentKeys(List<? extends ComponentModel> components, MetadataContext metadataContext,

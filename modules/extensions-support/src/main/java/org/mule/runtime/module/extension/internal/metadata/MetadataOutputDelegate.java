@@ -15,7 +15,6 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -39,13 +38,13 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.metadata.MetadataResolverUtils;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Metadata service delegate implementations that handles the resolution
@@ -122,7 +121,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return a {@link MetadataResult} with the {@link MetadataType} of the component's output
    */
-  private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final Object key) {
+  MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final Object key) {
     OutputModel output = ((HasOutputModel) model).getOutput();
     if (isVoid(output.getType()) || !output.hasDynamicType()) {
       return success(output.getType());
@@ -151,7 +150,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return a {@link MetadataResult} with the {@link MetadataType} of the components output {@link Message#getAttributes()}
    */
-  private MetadataResult<MetadataType> getOutputAttributesMetadata(final MetadataContext context, Object key) {
+  MetadataResult<MetadataType> getOutputAttributesMetadata(final MetadataContext context, Object key) {
     OutputModel attributes = ((HasOutputModel) model).getOutputAttributes();
     if (isVoid(attributes.getType()) || !attributes.hasDynamicType()) {
       return success(attributes.getType());

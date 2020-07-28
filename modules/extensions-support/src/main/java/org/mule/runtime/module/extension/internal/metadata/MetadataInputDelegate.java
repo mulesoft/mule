@@ -15,7 +15,6 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYP
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -97,8 +96,8 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * resolved using the {@link InputTypeResolver} if one is available to resolve its {@link MetadataType}, returning
    * {@link Optional#empty()} if no Content parameter is present Failure if the dynamic resolution fails for any reason.
    */
-  private MetadataResult<ParameterMetadataDescriptor> getParameterMetadataDescriptor(ParameterModel parameter,
-                                                                                     MetadataContext context, Object key) {
+  MetadataResult<ParameterMetadataDescriptor> getParameterMetadataDescriptor(ParameterModel parameter,
+                                                                             MetadataContext context, Object key) {
 
     ParameterMetadataDescriptorBuilder descriptorBuilder = ParameterMetadataDescriptor.builder(parameter.getName());
     if (!parameter.hasDynamicType()) {

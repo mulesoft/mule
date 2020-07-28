@@ -28,7 +28,6 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.DSL_RESOLUTION;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -98,8 +97,10 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
 
   protected static final String CONTENT_ONLY_CACHE_RESOLVER = "contentOnlyCacheResolver";
   protected static final String OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER = "outputAndMetadataKeyCacheResolver";
+  protected static final String EMPTY_PARTIAL_MULTILEVEL_KEYS = "emptyPartialMultilevelKeys";
   protected static final String SOURCE_METADATA = "sourceMetadata";
   protected static final String SOURCE_METADATA_WITH_MULTILEVEL = "sourceMetadataWithMultilevel";
+  protected static final String SOURCE_METADATA_WITH_PARTIAL_MULTILEVEL = "sourceMetadataWithPartialMultilevel";
   protected static final String SOURCE_METADATA_WITH_CALLBACK_PARAMETERS = "sourceMetadataWithCallbackParameters";
   protected static final String SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS = "shouldInheritOperationParentResolvers";
   protected static final String SIMPLE_MULTILEVEL_KEY_RESOLVER = "simpleMultiLevelKeyResolver";
@@ -270,6 +271,15 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
 
   protected void assertExpectedType(Typed type, Type expectedType) {
     assertThat(type.getType(), is(TYPE_LOADER.load(expectedType)));
+  }
+
+  protected void assertExpectedType(MetadataResult<MetadataType> metadataTypeMetadataResult, Type expectedType) {
+    assertExpectedType(metadataTypeMetadataResult, TYPE_LOADER.load(expectedType));
+  }
+
+  protected void assertExpectedType(MetadataResult<MetadataType> metadataTypeMetadataResult, MetadataType expectedType) {
+    assertThat(metadataTypeMetadataResult.isSuccess(), is(true));
+    assertThat(metadataTypeMetadataResult.get(), is(expectedType));
   }
 
   protected void assertExpectedType(Typed typedModel, MetadataType expectedType, boolean isDynamic) {

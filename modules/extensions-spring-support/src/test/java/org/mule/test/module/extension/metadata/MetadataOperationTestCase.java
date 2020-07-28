@@ -29,12 +29,12 @@ import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.BRAND;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.TIRES;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.ARGENTINA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.BUENOS_AIRES;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.EUROPE;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.LA_PLATA;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
-
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -48,6 +48,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -55,7 +56,6 @@ import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterTypeWrapper;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.message.StringAttributes;
-import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.AnimalClade;
 import org.mule.test.metadata.extension.model.animals.Bear;
@@ -73,7 +73,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
@@ -139,8 +138,21 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
+  public void partialMultilevelKeysExplicitResolution() throws Exception {
+    location = Location.builder().globalName(EMPTY_PARTIAL_MULTILEVEL_KEYS).addProcessorsPart().addIndexPart(0).build();
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult =
+        metadataService.getMetadataKeys(location, MetadataKeyBuilder.newKey(AMERICA).withPartName(CONTINENT).build());
+    assertSuccessResult(metadataKeysResult);
+    final Set<MetadataKey> continents = getKeysFromContainer(metadataKeysResult.get());
+    assertThat(continents, hasSize(1));
+
+    assertThat(continents, hasItem(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT)));
+    assertThat(continents, not(hasItem(metadataKeyWithId(EUROPE).withDisplayName(EUROPE).withPartName(CONTINENT))));
+  }
+
+  @Test
   public void emptyPartialMultilevelKeys() throws Exception {
-    location = Location.builder().globalName("emptyPartialMultilevelKeys").addProcessorsPart().addIndexPart(0).build();
+    location = Location.builder().globalName(EMPTY_PARTIAL_MULTILEVEL_KEYS).addProcessorsPart().addIndexPart(0).build();
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
     assertSuccessResult(metadataKeysResult);
     final Set<MetadataKey> continents = getKeysFromContainer(metadataKeysResult.get());
@@ -154,6 +166,30 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   public void twoLevelPartialMultilevelKeys() throws Exception {
     location = Location.builder().globalName("twoLevelPartialMultiLevelKeyResolver").addProcessorsPart().addIndexPart(0).build();
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
+    assertSuccessResult(metadataKeysResult);
+    final Set<MetadataKey> continents = getKeysFromContainer(metadataKeysResult.get());
+    assertThat(continents, hasSize(1));
+
+    Set<MetadataKey> countries = continents.iterator().next().getChilds();
+    assertThat(countries, hasSize(1));
+
+    Set<MetadataKey> cities = countries.iterator().next().getChilds();
+    assertThat(cities, hasSize(2));
+
+    assertThat(cities, hasItem(metadataKeyWithId(BUENOS_AIRES).withPartName(CITY)));
+    assertThat(cities, hasItem(metadataKeyWithId(LA_PLATA).withPartName(CITY)));
+  }
+
+  @Test
+  public void twoLevelPartialMultilevelKeysExplicitResolution() throws Exception {
+    location = Location.builder().globalName(EMPTY_PARTIAL_MULTILEVEL_KEYS).addProcessorsPart().addIndexPart(0).build();
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService
+        .getMetadataKeys(location, MetadataKeyBuilder
+            .newKey(AMERICA)
+            .withPartName(CONTINENT)
+            .withChild(MetadataKeyBuilder.newKey(ARGENTINA)
+                .withPartName(COUNTRY))
+            .build());
     assertSuccessResult(metadataKeysResult);
     final Set<MetadataKey> continents = getKeysFromContainer(metadataKeysResult.get());
     assertThat(continents, hasSize(1));
@@ -199,6 +235,19 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     assertExpectedType(getParameter(typedModel, "otherPerson"), personType, true);
   }
 
+  @Test
+  public void multipleInputWithKeyIdExplicitParameterResolution() throws Exception {
+    location = Location.builder().globalName(OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
+    assertExpectedType(metadataService.getInputMetadata(location, PERSON_METADATA_KEY, "type"), String.class);
+    assertExpectedType(metadataService.getInputMetadata(location, PERSON_METADATA_KEY, "firstPerson"), personType);
+    assertExpectedType(metadataService.getInputMetadata(location, PERSON_METADATA_KEY, "otherPerson"), personType);
+  }
+
+  @Test
+  public void outputMultipleInputWithKeyIdExplicitParameterResolution() throws Exception {
+    location = Location.builder().globalName(OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
+    assertExpectedType(metadataService.getOutputMetadata(location, CAR_KEY), carType);
+  }
 
   @Test
   public void dynamicOutputWithoutContentParam() throws Exception {
@@ -300,6 +349,19 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     OutputModel attributesOutputModel = typedModel.getOutputAttributes();
     assertThat(attributesOutputModel.hasDynamicType(), is(true));
     MetadataType type = typedModel.getOutputAttributes().getType();
+    assertThat(type, is(instanceOf(ObjectType.class)));
+    ObjectType dictionary = (ObjectType) type;
+    assertThat(dictionary.getOpenRestriction().get(), is(instanceOf(StringType.class)));
+  }
+
+  @Test
+  public void messageAttributesStringTypeMetadataExplicitResolution() throws Exception {
+    location = Location.builder().globalName(OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA).addProcessorsPart().addIndexPart(0).build();
+    MetadataResult<MetadataType> outputAttributesMetadata =
+        metadataService.getOutputAttributesMetadata(location, PERSON_METADATA_KEY);
+
+    assertThat(outputAttributesMetadata.isSuccess(), is(true));
+    MetadataType type = outputAttributesMetadata.get();
     assertThat(type, is(instanceOf(ObjectType.class)));
     ObjectType dictionary = (ObjectType) type;
     assertThat(dictionary.getOpenRestriction().get(), is(instanceOf(StringType.class)));
