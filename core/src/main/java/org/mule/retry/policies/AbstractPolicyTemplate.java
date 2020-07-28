@@ -38,7 +38,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
 
     private MuleContext muleContext;
 
-    private AtomicBoolean cancelStart = new AtomicBoolean(false);
+    private AtomicBoolean stopRetrying = new AtomicBoolean(false);
 
     private volatile boolean lastRetryInterrupted = false;
 
@@ -101,7 +101,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
                     }
                 }
             }
-            while (status.isOk() && !cancelStart.get());
+            while (status.isOk() && !stopRetrying.get());
 
             context.setFailed(cause);
 
@@ -158,14 +158,14 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
         return true;
     }
 
-    protected AtomicBoolean getCancelStart()
+    protected AtomicBoolean getStopRetrying()
     {
-        return cancelStart;
+        return stopRetrying;
     }
 
     @Override
     public void stopRetrying()
     {
-        cancelStart.compareAndSet(false, true);
+        stopRetrying.compareAndSet(false, true);
     }
 }

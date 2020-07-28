@@ -59,13 +59,13 @@ public class AbstractPolicyTemplateTestCase
     public void testCancelStart()
     {
         // Given a Policy based on the abstract policy template with a start that is not yet cancelled
-        assertThat(abstractPolicyTemplate.getCancelStart().get(), equalTo(false));
+        assertThat(abstractPolicyTemplate.getStopRetrying().get(), equalTo(false));
 
         // When cancelling start
         abstractPolicyTemplate.stopRetrying();
 
         // Then cancelStart is set to true
-        assertThat(abstractPolicyTemplate.getCancelStart().get(), equalTo(true));
+        assertThat(abstractPolicyTemplate.getStopRetrying().get(), equalTo(true));
     }
 
     @Test
