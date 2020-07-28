@@ -15,9 +15,11 @@ import static org.mule.util.SplashScreen.miniSplash;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.application.NullDeploymentListener;
 import org.mule.module.launcher.artifact.Artifact;
 import org.mule.module.launcher.artifact.ArtifactFactory;
+import org.mule.module.launcher.domain.Domain;
 import org.mule.module.launcher.util.ObservableList;
 import org.mule.util.CollectionUtils;
 
@@ -58,9 +60,10 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     private final ArtifactDeploymentTemplate deploymentTemplate;
     private ArtifactFactory<T> artifactFactory;
     private DeploymentListener deploymentListener = new NullDeploymentListener();
+    private final DeploymentService deploymentService;
 
     public DefaultArchiveDeployer(final ArtifactDeployer deployer, final ArtifactFactory artifactFactory, final ObservableList<T> artifacts,
-                                  ArtifactDeploymentTemplate deploymentTemplate)
+                                  ArtifactDeploymentTemplate deploymentTemplate, DeploymentService deploymentService)
     {
         this.deployer = deployer;
         this.artifactFactory = artifactFactory;
@@ -68,6 +71,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         this.deploymentTemplate = deploymentTemplate;
         this.artifactDir = artifactFactory.getArtifactDir();
         this.artifactArchiveInstaller = new ArtifactArchiveInstaller(artifactDir);
+        this.deploymentService = deploymentService;
     }
 
     @Override
@@ -99,8 +103,19 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         {
             return null;
         }
+        Optional<Properties> properties = absent();
+        return deployExplodedApp(artifactDir, properties);
+    }
 
-        return deployExplodedApp(artifactDir);
+    @Override
+    public T deployExplodedArtifact(String artifactDir, Optional<Properties> properties) throws DeploymentException
+    {
+        if (!isUpdatedZombieArtifact(artifactDir))
+        {
+            return null;
+        }
+
+        return deployExplodedApp(artifactDir, properties);
     }
 
     @Override
@@ -268,18 +283,32 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
 
         // check if this artifact is running first, undeployArtifact it then
         T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
+        Map<Application, ApplicationStatus> appStatusPreRedeployment = new HashMap<>();
         if (artifact != null)
         {
+            if (artifact instanceof Domain){
+                Collection<Application> domainApplications = findApplicationsAssociated((Domain) artifact);
+                for (Application domainApplication : domainApplications)
+                {
+                    appStatusPreRedeployment.put(domainApplication, domainApplication.getStatus());
+                }
+            }
             deploymentTemplate.preRedeploy(artifact);
             undeployArtifact(artifactName);
         }
 
         T deployedAtifact = deployPackagedArtifact(artifactUrl, deploymentProperties);
-        deploymentTemplate.postRedeploy(deployedAtifact);
+        deploymentTemplate.postRedeploy(deployedAtifact, appStatusPreRedeployment);
         return deployedAtifact;
     }
 
-    private T deployExplodedApp(String addedApp) throws DeploymentException
+
+    private Collection<Application> findApplicationsAssociated(Domain domain)
+    {
+        return deploymentService.findDomainApplications(domain.getArtifactName());
+    }
+
+    private T deployExplodedApp(String addedApp, Optional<Properties> properties) throws DeploymentException
     {
         if (logger.isInfoEnabled())
         {
@@ -317,7 +346,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
             }
         }
 
-        deployArtifact(artifact);
+        deployArtifact(artifact, properties);
         return artifact;
     }
 

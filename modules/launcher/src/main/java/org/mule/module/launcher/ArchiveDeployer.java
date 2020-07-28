@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher;
 
+import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.artifact.Artifact;
 import org.mule.module.launcher.artifact.ArtifactFactory;
 
@@ -28,6 +30,7 @@ public interface ArchiveDeployer<T extends Artifact>
     T deployPackagedArtifact(String zip) throws DeploymentException;
 
     T deployExplodedArtifact(String artifactDir) throws DeploymentException;
+    T deployExplodedArtifact(String artifactDir, Optional<Properties> properties) throws DeploymentException;
 
     /**
      * Indicates if a previously failed artifact (zombie) configuration was updated on the file system.
