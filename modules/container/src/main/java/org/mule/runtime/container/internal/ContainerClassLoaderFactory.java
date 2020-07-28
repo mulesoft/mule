@@ -179,7 +179,8 @@ public class ContainerClassLoaderFactory {
     final Map<String, LookupStrategy> result = new HashMap<>();
     for (MuleModule muleModule : modules) {
       for (String exportedPackage : muleModule.getExportedPackages()) {
-        result.put(exportedPackage, getSpecialLookupStrategy(exportedPackage).orElse(containerOnlyLookupStrategy));
+        LookupStrategy specialLookupStrategy = getSpecialLookupStrategy(exportedPackage);
+        result.put(exportedPackage, specialLookupStrategy == null ? containerOnlyLookupStrategy : specialLookupStrategy);
       }
     }
 
@@ -187,21 +188,21 @@ public class ContainerClassLoaderFactory {
   }
 
   /**
-   * Returns an {@link Optional} with the {@link LookupStrategy} if the one to use for the exportedPackage is other than
-   * a {@link ContainerOnlyLookupStrategy}
+   * Returns  the {@link LookupStrategy} if the one to use for the exportedPackage is other than
+   * a {@link ContainerOnlyLookupStrategy} or null.
    *
    * @param exportedPackage name of the package
    * @return
    */
-  private Optional<LookupStrategy> getSpecialLookupStrategy(String exportedPackage) {
+  private LookupStrategy getSpecialLookupStrategy(String exportedPackage) {
     if (exportedPackage.startsWith(MULE_SDK_API_PACKAGE)) {
-      return of(CHILD_FIRST);
+      return CHILD_FIRST;
     }
     // Let artifacts extend non "java." JRE packages
     if (ALLOW_JRE_EXTENSION && stream(JRE_EXTENDABLE_PACKAGES).anyMatch(exportedPackage::startsWith)) {
-      return of(PARENT_FIRST);
+      return PARENT_FIRST;
     }
-    return empty();
+    return null;
   }
 
   /**
