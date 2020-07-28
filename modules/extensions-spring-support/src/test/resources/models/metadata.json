@@ -8224,7 +8224,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.sdk.api.runtime.streaming.PagingProvider"
+                  ],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.test.metadata.extension.MetadataConnection",
@@ -8981,7 +8983,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.sdk.api.runtime.streaming.PagingProvider"
+                  ],
                   "parent": "",
                   "genericTypes": [],
                   "isMap": false
@@ -15123,7 +15127,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.sdk.api.runtime.streaming.PagingProvider"
+                  ],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.test.metadata.extension.MetadataConnection",
@@ -15837,7 +15843,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.sdk.api.runtime.streaming.PagingProvider"
+                  ],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.test.metadata.extension.MetadataConnection",
@@ -16629,7 +16637,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.sdk.api.runtime.streaming.PagingProvider"
+                  ],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.test.metadata.extension.MetadataConnection",
@@ -37275,6 +37285,7 @@
       "format": "json",
       "type": "Object",
       "annotations": {
+        "label": "Person",
         "typeId": "http://example.com/example.json",
         "classInformation": {
           "classname": "void",
@@ -37287,8 +37298,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "label": "Person"
+        }
       },
       "open": {
         "type": "Any"

@@ -803,7 +803,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.sdk.api.runtime.streaming.PagingProvider"
+                  ],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.extension.test.extension.reconnection.ReconnectableConnection",
@@ -1601,7 +1603,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.sdk.api.runtime.streaming.PagingProvider"
+                  ],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.extension.test.extension.reconnection.ReconnectableConnection",

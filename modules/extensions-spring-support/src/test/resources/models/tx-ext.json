@@ -722,7 +722,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.sdk.api.runtime.streaming.PagingProvider"
+                  ],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.test.transactional.connection.TestTransactionalConnection",
@@ -2672,7 +2674,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.sdk.api.runtime.streaming.PagingProvider"
+                  ],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.test.transactional.connection.TestTransactionalConnection",
@@ -3428,7 +3432,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.sdk.api.runtime.streaming.PagingProvider"
+                  ],
                   "parent": "",
                   "genericTypes": [
                     "org.mule.test.transactional.connection.TestTransactionalConnection",
