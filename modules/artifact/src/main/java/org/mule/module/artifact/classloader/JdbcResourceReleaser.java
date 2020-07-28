@@ -300,7 +300,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       would be required.
       * */
       for (Thread thread : threads) {
-        if (isThreadOracleTimerThread(thread)) {
+        if (isOracleTimerThread(thread)) {
           try {
             thread.stop();
             thread.interrupt();
@@ -316,7 +316,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     }
   }
 
-  private boolean isThreadOracleTimerThread(Thread thread) {
+  private boolean isOracleTimerThread(Thread thread) {
     String artifactId = ((ArtifactClassLoader) this.getClass().getClassLoader()).getArtifactId();
 
     return thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
