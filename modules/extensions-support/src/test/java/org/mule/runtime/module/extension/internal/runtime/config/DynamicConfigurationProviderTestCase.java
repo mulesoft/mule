@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
@@ -51,6 +53,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
@@ -119,7 +123,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(resolverSetResult.asMap()).thenReturn(new HashMap<>());
     visitableMock(operationModel);
 
-    expirationPolicy = new ImmutableExpirationPolicy(5, MINUTES, timeSupplier);
+    expirationPolicy = new ImmutableExpirationPolicy(5, SECONDS, timeSupplier);
 
     when(connectionProviderResolver.getResolverSet()).thenReturn(empty());
     when(connectionProviderResolver.resolve(any())).thenReturn(null);
@@ -222,12 +226,12 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     HeisenbergExtension instance2 = makeAlternateInstance();
 
     DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
-    timeSupplier.move(1, MINUTES);
+    timeSupplier.move(1, SECONDS);
 
     List<ConfigurationInstance> expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(true));
 
-    timeSupplier.move(10, MINUTES);
+    timeSupplier.move(10, SECONDS);
 
     expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(false));
@@ -237,12 +241,41 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   }
 
   @Test
+  public void cacheEvictionUnregistersConfigurations() throws Exception {
+    HeisenbergExtension instance1 = (HeisenbergExtension) provider.get(event).getValue();
+    HeisenbergExtension instance2 = makeAlternateInstance();
+
+    final DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
+
+    assertThat(provider.getConfigurationInstances().stream().map(ConfigurationInstance::getValue).collect(toImmutableList()),
+               containsInAnyOrder(instance1, instance2));
+
+    long evictionMillis = expirationPolicy.getTimeUnit().toMillis(expirationPolicy.getMaxIdleTime());
+    long probeMillis = evictionMillis + 1000;
+    new PollingProber(probeMillis, DEFAULT_POLLING_INTERVAL)
+        .check(new Probe() {
+
+          @Override
+          public boolean isSatisfied() {
+            provider.cleanUpCache();
+            return provider.getConfigurationInstances().isEmpty();
+          }
+
+          @Override
+          public String describeFailure() {
+            return format("Cache eviction didn't remove these configurations %s after %d ms",
+                          provider.getConfigurationInstances(), probeMillis);
+          }
+        });
+  }
+
+  @Test
   public void configurationInstanceIsRemovedFromLifecycleTrackingAfterExpired() throws Exception {
     HeisenbergExtension instance = (HeisenbergExtension) provider.get(event).getValue();
 
     DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
 
-    timeSupplier.move(10, MINUTES);
+    timeSupplier.move(10, SECONDS);
 
     assertThat(instance.getStop(), is(0));
     assertThat(instance.getDispose(), is(0));
@@ -266,7 +299,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
 
-    timeSupplier.move(1, MINUTES);
+    timeSupplier.move(1, SECONDS);
 
     List<ConfigurationInstance> expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(true));

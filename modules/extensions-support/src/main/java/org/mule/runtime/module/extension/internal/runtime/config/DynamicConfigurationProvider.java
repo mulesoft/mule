@@ -119,9 +119,12 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     this.extensionManager = muleContext.getExtensionManager();
 
     cache = Caffeine.newBuilder().expireAfterAccess(expirationPolicy.getMaxIdleTime(), expirationPolicy.getTimeUnit())
-        .removalListener((key, value, cause) -> extensionManager
-            .disposeConfiguration(((ResolverResultAndEvent) key).getResolverSetResult().toString(),
-                                  (ConfigurationInstance) value))
+        .removalListener((key, value, cause) -> {
+          extensionManager
+              .disposeConfiguration(((ResolverResultAndEvent) key).getResolverSetResult().toString(),
+                                    (ConfigurationInstance) value);
+          unRegisterConfiguration((ConfigurationInstance) value);
+        })
         .build(key -> createConfiguration(key.getResolverSetResult(), key.getEvent()));
   }
 
@@ -217,7 +220,6 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   public List<ConfigurationInstance> getExpired() {
     return cache.asMap().entrySet().stream().filter(entry -> isExpired(entry.getValue())).map(entry -> {
       cache.invalidate(entry.getKey());
-      unRegisterConfiguration(entry.getValue());
       return entry.getValue();
     }).collect(toImmutableList());
   }
@@ -299,6 +301,14 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     return this.connectionProviderResolver.getObjectBuilder()
         .filter(ob -> ob instanceof ConnectionProviderObjectBuilder)
         .map(ob -> ((ConnectionProviderObjectBuilder) ob).providerModel);
+  }
+
+  List<ConfigurationInstance> getConfigurationInstances() {
+    return configurationInstances;
+  }
+
+  void cleanUpCache() {
+    this.cache.cleanUp();
   }
 
   private static class ResolverResultAndEvent {

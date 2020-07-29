@@ -54,7 +54,7 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
   private final String name;
   private final ExtensionModel extensionModel;
   private final ConfigurationModel configurationModel;
-  private final List<ConfigurationInstance> configurationInstances = new LinkedList<>();
+  protected final List<ConfigurationInstance> configurationInstances = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
   protected final SimpleLifecycleManager lifecycleManager;
   protected final MuleContext muleContext;
