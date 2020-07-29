@@ -158,7 +158,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
         return true;
     }
 
-    protected AtomicBoolean getStopRetrying()
+    protected AtomicBoolean isStopRetrying()
     {
         return stopRetrying;
     }
