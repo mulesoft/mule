@@ -11,8 +11,6 @@ import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ALLOW_JRE_EXTENSION;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_JRE_EXTENSION_PACKAGES;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -38,7 +36,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
@@ -195,6 +192,8 @@ public class ContainerClassLoaderFactory {
    * @return
    */
   private LookupStrategy getSpecialLookupStrategy(String exportedPackage) {
+    // If an extension uses a class provided by the mule-sdk-api artifact, the container classloader should use
+    // the class with which the extension was compiled.
     if (exportedPackage.startsWith(MULE_SDK_API_PACKAGE)) {
       return CHILD_FIRST;
     }

@@ -6,13 +6,14 @@
  */
 package org.mule.test.classloading;
 
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class CLOperations {
@@ -21,7 +22,7 @@ public class CLOperations {
 
   public List<String> getMethods(String clazzName) {
     try {
-      return Arrays.stream(Thread.currentThread().getContextClassLoader().loadClass(clazzName).getMethods())
+      return stream(currentThread().getContextClassLoader().loadClass(clazzName).getMethods())
           .map(method -> method.getName()).collect(toList());
     } catch (ClassNotFoundException e) {
       throw new MuleRuntimeException(createStaticMessage("Class was not found!"), e);
