@@ -14,11 +14,13 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.probe.PollingProber.check;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -42,10 +44,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(CursorUtils.class)
 public class CursorManagerTestCase extends AbstractMuleTestCase {
 
   @Mock
@@ -131,11 +135,46 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Issue("")
+  @Issue("MULE-18506")
   public void manageSameCursorProviderTwice() {
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     CursorProvider managed = cursorManager.manage(provider, ctx);
     CursorProvider managedSecond = cursorManager.manage(provider, ctx);
+
+    ArgumentCaptor<ManagedCursorProvider> managedDecoratorCaptor = forClass(ManagedCursorProvider.class);
+    verify(ghostBuster, times(1)).track(managedDecoratorCaptor.capture());
+
+    List<ManagedCursorProvider> captured = managedDecoratorCaptor.getAllValues();
+    assertThat(captured, hasSize(1));
+    assertThat(captured.get(0), is(sameInstance(managed)));
     assertThat(managed, is(sameInstance(managedSecond)));
+  }
+
+  @Test
+  @Issue("MULE-18573")
+  public void manageTwoDifferentCursorProviderWithSameKey() {
+    mockStatic(CursorUtils.class);
+    given(CursorUtils.createKey(any())).willReturn(10);
+
+    CursorStreamProvider firstProvider = mock(CursorStreamProvider.class);
+    CursorProvider managed = cursorManager.manage(firstProvider, ctx);
+
+    CursorStreamProvider secondProvider = mock(CursorStreamProvider.class);
+    CursorProvider managedSecond = cursorManager.manage(secondProvider, ctx);
+
+    ArgumentCaptor<ManagedCursorProvider> managedDecoratorCaptor = forClass(ManagedCursorProvider.class);
+    verify(ghostBuster, times(2)).track(managedDecoratorCaptor.capture());
+
+    List<ManagedCursorProvider> captured = managedDecoratorCaptor.getAllValues();
+    assertThat(captured, hasSize(2));
+    assertThat(captured.get(0), is(sameInstance(managed)));
+    assertThat(captured.get(1), is(sameInstance(managedSecond)));
+  }
+
+  public void lalalal() {
+    mockStatic(CursorUtils.class);
+    given(CursorUtils.createKey(any())).willReturn(10);
+
+    when(ghostBuster.track(any())).thenReturn(new WeakReference<>(null));
   }
 }
