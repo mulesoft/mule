@@ -25,15 +25,19 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_MAPPINGS;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -60,6 +64,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -163,6 +168,12 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
   @Mock(lenient = true)
   protected ParameterGroupModel parameterGroup;
+
+  @Mock(lenient = true)
+  protected ParameterModel errorMappingsParameter;
+
+  @Mock(lenient = true)
+  protected ParameterGroupModel errorMappingsParameterGroup;
 
   @Mock(lenient = true)
   protected ParameterModel parameterRequiredForMetadata;
@@ -281,6 +292,20 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
       return empty();
     });
 
+    when(errorMappingsParameter.getName()).thenReturn(ERROR_MAPPINGS_PARAMETER_NAME);
+    when(errorMappingsParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
+    when(errorMappingsParameter.getModelProperty(any())).thenReturn(empty());
+    when(errorMappingsParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
+    when(errorMappingsParameter.getLayoutModel()).thenReturn(empty());
+    when(errorMappingsParameter.getRole()).thenReturn(BEHAVIOUR);
+    when(errorMappingsParameter.getType()).thenReturn(BaseTypeBuilder.create(JAVA).arrayType()
+                                                              .of(TYPE_LOADER.load(ErrorMapping.class)).build());
+
+    when(errorMappingsParameterGroup.getName()).thenReturn(ERROR_MAPPINGS);
+    when(errorMappingsParameterGroup.isShowInDsl()).thenReturn(false);
+    when(errorMappingsParameterGroup.getParameterModels()).thenReturn(asList(errorMappingsParameter));
+    when(errorMappingsParameterGroup.getParameter(ERROR_MAPPINGS_PARAMETER_NAME)).thenReturn(of(errorMappingsParameter));
+
     this.defaultGroupParameterModels = asList(nameParameter,
                                               actingParameter,
                                               providedParameter,
@@ -339,10 +364,10 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(source.getErrorCallback()).thenReturn(empty());
 
     when(operation.getName()).thenReturn(OPERATION_NAME);
-    when(operation.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
+    when(operation.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
 
     when(otherOperation.getName()).thenReturn(OTHER_OPERATION_NAME);
-    when(otherOperation.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
+    when(otherOperation.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
 
     visitableMock(operation, otherOperation, source);
 
