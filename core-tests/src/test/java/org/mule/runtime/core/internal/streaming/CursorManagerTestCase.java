@@ -147,6 +147,7 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     List<ManagedCursorProvider> captured = managedDecoratorCaptor.getAllValues();
     assertThat(captured, hasSize(1));
     assertThat(captured.get(0), is(sameInstance(managed)));
+    assertThat(captured.get(0).getDelegate(), is(sameInstance(provider)));
     assertThat(managed, is(sameInstance(managedSecond)));
   }
 
@@ -168,13 +169,61 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     List<ManagedCursorProvider> captured = managedDecoratorCaptor.getAllValues();
     assertThat(captured, hasSize(2));
     assertThat(captured.get(0), is(sameInstance(managed)));
+    assertThat(captured.get(0).getDelegate(), is(sameInstance(firstProvider)));
     assertThat(captured.get(1), is(sameInstance(managedSecond)));
+    assertThat(captured.get(1).getDelegate(), is(sameInstance(secondProvider)));
   }
 
-  public void lalalal() {
+  @Test
+  public void manageTwoDifferentCursorProviderWithSameProviderMultipleTimesWithConcurrency() {
     mockStatic(CursorUtils.class);
     given(CursorUtils.createKey(any())).willReturn(10);
 
-    when(ghostBuster.track(any())).thenReturn(new WeakReference<>(null));
+    final int threadCount = 6;
+    List<CursorProvider> managedProviders = new ArrayList<>(threadCount);
+    Latch latch = new Latch();
+    executorService = Executors.newFixedThreadPool(threadCount);
+
+    final CursorProvider firstProvider = mock(CursorStreamProvider.class);
+    final CursorProvider secondProvider = mock(CursorStreamProvider.class);
+
+    for (int i = 0; i < threadCount; i++) {
+      CursorProvider cursorProvider = ((i % 2) == 0) ? firstProvider: secondProvider;
+      executorService.submit(() -> {
+        try {
+          latch.await();
+        } catch (InterruptedException e) {
+          // doesn't matter
+        }
+
+        CursorProvider managed = cursorManager.manage(cursorProvider, ctx);
+
+        synchronized (managedProviders) {
+          managedProviders.add(managed);
+        }
+
+      });
+    }
+
+    latch.release();
+
+    check(5000, 100, () -> managedProviders.size() == threadCount);
+    assertThat(managedProviders.get(0), is(instanceOf(ManagedCursorProvider.class)));
+
+    ArgumentCaptor<ManagedCursorProvider> managedDecoratorCaptor = forClass(ManagedCursorProvider.class);
+    verify(ghostBuster, times(2)).track(managedDecoratorCaptor.capture());
+
+    assertThat(managedProviders.get(0), is(instanceOf(ManagedCursorProvider.class)));
+    assertThat(managedProviders.get(1), is(instanceOf(ManagedCursorProvider.class)));
+
+    List<ManagedCursorProvider> captured = managedDecoratorCaptor.getAllValues();
+    assertThat(captured, hasSize(2));
+    if(captured.get(0).getDelegate().equals(firstProvider)) {
+      assertThat(captured.get(0).getDelegate(), is(sameInstance(firstProvider)));
+      assertThat(captured.get(1).getDelegate(), is(sameInstance(secondProvider)));
+    } else {
+      assertThat(captured.get(0).getDelegate(), is(sameInstance(secondProvider)));
+      assertThat(captured.get(1).getDelegate(), is(sameInstance(firstProvider)));
+    }
   }
 }
