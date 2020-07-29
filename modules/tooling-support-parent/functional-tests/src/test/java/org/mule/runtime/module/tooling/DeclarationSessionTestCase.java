@@ -6,40 +6,31 @@
  */
 package org.mule.runtime.module.tooling;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArtifact;
 import static org.mule.test.infrastructure.maven.MavenTestUtils.getMavenLocalRepository;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.value.ValueResult;
-import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ArtifactDeclarer;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;
 
-import java.util.List;
-
+import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
 
-public class DeclarationSessionTestCase extends AbstractFakeMuleServerTestCase implements TestExtensionAware {
+public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerTestCase implements TestExtensionAware {
 
-  private static final String EXTENSION_GROUP_ID = "org.mule.tooling";
-  private static final String EXTENSION_ARTIFACT_ID = "tooling-support-test-extension";
-  private static final String EXTENSION_VERSION = "1.0.0-SNAPSHOT";
-  private static final String EXTENSION_CLASSIFIER = "mule-plugin";
-  private static final String EXTENSION_TYPE = "jar";
+  protected static final String EXTENSION_GROUP_ID = "org.mule.tooling";
+  protected static final String EXTENSION_ARTIFACT_ID = "tooling-support-test-extension";
+  protected static final String EXTENSION_VERSION = "1.0.0-SNAPSHOT";
+  protected static final String EXTENSION_CLASSIFIER = "mule-plugin";
+  protected static final String EXTENSION_TYPE = "jar";
 
-  private static final String CONFIG_NAME = "dummyConfig";
-  private static final String CLIENT_NAME = "client";
-  private static final String PROVIDED_PARAMETER_NAME = "providedParameter";
+  protected static final String CONFIG_NAME = "dummyConfig";
+  protected static final String CLIENT_NAME = "client";
+  protected static final String PROVIDED_PARAMETER_NAME = "providedParameter";
+  protected static final String WITH_ACTING_PARAMETER = "WITH-ACTING-PARAMETER-";
 
-  private DeclarationSession session;
+  protected DeclarationSession session;
 
   @ClassRule
   public static SystemProperty artifactsLocation =
@@ -52,7 +43,7 @@ public class DeclarationSessionTestCase extends AbstractFakeMuleServerTestCase i
   @Override
   public void setUp() throws Exception {
     ArtifactDeclarer artifactDeclarer = newArtifact();
-    artifactDeclarer.withGlobalElement(configurationDeclaration(CONFIG_NAME, connectionDeclaration(CLIENT_NAME)));
+    declareArtifact(artifactDeclarer);
     super.setUp();
     this.session = this.muleServer
         .toolingService()
@@ -67,59 +58,15 @@ public class DeclarationSessionTestCase extends AbstractFakeMuleServerTestCase i
     this.muleServer.start();
   }
 
-  @Test
-  public void testConnection() {
-    ConnectionValidationResult connectionValidationResult = session.testConnection(CONFIG_NAME);
-    assertThat(connectionValidationResult.isValid(), equalTo(true));
+  protected void declareArtifact(ArtifactDeclarer artifactDeclarer) {
+    artifactDeclarer.withGlobalElement(configurationDeclaration(CONFIG_NAME, connectionDeclaration(CLIENT_NAME)));
   }
 
-  private String expectedParameter(String actingParameter) {
-    return "WITH-ACTING-PARAMETER-" + actingParameter;
-  }
-
-  @Test
-  public void configLessConnectionLessOnOperation() {
-    ComponentElementDeclaration elementDeclaration = configLessConnectionLessOPDeclaration(CONFIG_NAME);
-    getResultAndValidate(elementDeclaration, PROVIDED_PARAMETER_NAME, "ConfigLessConnectionLessNoActingParameter");
-  }
-
-  @Test
-  public void configLessOnOperation() {
-    ComponentElementDeclaration elementDeclaration = configLessOPDeclaration(CONFIG_NAME);
-    getResultAndValidate(elementDeclaration, PROVIDED_PARAMETER_NAME, CLIENT_NAME);
-  }
-
-  @Test
-  public void actingParameterOnOperation() {
-    final String actingParameter = "actingParameter";
-    ComponentElementDeclaration elementDeclaration = actingParameterOPDeclaration(CONFIG_NAME, actingParameter);
-    getResultAndValidate(elementDeclaration, PROVIDED_PARAMETER_NAME, expectedParameter(actingParameter));
-  }
-
-  @Test
-  public void actingParameterGroup() {
-    final String stringValue = "stringValue";
-    final int intValue = 0;
-    final List<String> listValue = asList("one", "two", "three");
-    ComponentElementDeclaration elementDeclaration =
-        actingParameterGroupOPDeclaration(CONFIG_NAME, stringValue, intValue, listValue);
-    getResultAndValidate(elementDeclaration, PROVIDED_PARAMETER_NAME, "stringValue-0-one-two-three");
-  }
-
-  @Test
-  public void complexActingParameter() {
-    final String stringValue = "stringValue";
-    ComponentElementDeclaration elementDeclaration =
-        complexActingParameterOPDeclaration(CONFIG_NAME, stringValue);
-    getResultAndValidate(elementDeclaration, PROVIDED_PARAMETER_NAME, stringValue);
-  }
-
-  private void getResultAndValidate(ComponentElementDeclaration elementDeclaration, String parameterName, String expectedValue) {
-    ValueResult providerResult = session.getValues(elementDeclaration, parameterName);
-
-    assertThat(providerResult.isSuccess(), equalTo(true));
-    assertThat(providerResult.getValues(), hasSize(1));
-    assertThat(providerResult.getValues().iterator().next().getId(), is(expectedValue));
+  @After
+  public void disposeSession() {
+    if (session != null) {
+      session.dispose();
+    }
   }
 
 }

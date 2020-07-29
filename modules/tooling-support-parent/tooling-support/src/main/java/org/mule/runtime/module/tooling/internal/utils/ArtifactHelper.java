@@ -15,12 +15,15 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
@@ -65,10 +68,10 @@ public class ArtifactHelper {
 
   }
 
-  public Optional<? extends ComponentModel> findComponentModel(ElementDeclaration elementDeclaration) {
+  public <T extends ParameterizedModel & EnrichableModel> Optional<T> findModel(ElementDeclaration elementDeclaration) {
     final ExtensionModel extensionModel = getExtensionModel(elementDeclaration);
     final String componentName = elementDeclaration.getName();
-    final Reference<ComponentModel> foundModel = new Reference<>();
+    final Reference<T> foundModel = new Reference<>();
     new ExtensionWalker() {
 
       @Override
@@ -81,18 +84,24 @@ public class ArtifactHelper {
         setAndStop(model);
       }
 
-      private void setAndStop(ComponentModel model) {
+      @Override
+      protected void onConfiguration(ConfigurationModel model) {
+        setAndStop(model);
+      }
+
+      @Override
+      protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
+        setAndStop(model);
+      }
+
+      private void setAndStop(ParameterizedModel model) {
         if (Objects.equals(model.getName(), componentName)) {
-          foundModel.set(model);
+          foundModel.set((T) model);
           stop();
         }
       }
     }.walk(extensionModel);
     return ofNullable(foundModel.get());
-  }
-
-  public Optional<ConfigurationModel> findConfigurationModel(String configName) {
-    return findConfigurationProvider(configName).map(ConfigurationProvider::getConfigurationModel);
   }
 
   public Optional<ConfigurationElementDeclaration> findConfigurationDeclaration(String configName) {

@@ -12,15 +12,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.ValueResult;
-import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
+import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.AbstractArtifactAgnosticService;
 import org.mule.runtime.module.tooling.internal.ApplicationSupplier;
 
-//TODO: Refactor this, don't think we need to have the temporary application logic. Also, handle concurrency
-//and operations on disposed services.
 public class DefaultDeclarationSession extends AbstractArtifactAgnosticService implements DeclarationSession {
 
   private LazyValue<DeclarationSession> internalConfigurationService;
@@ -61,7 +59,7 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   }
 
   @Override
-  public ValueResult getValues(ComponentElementDeclaration component, String parameterName) {
+  public ValueResult getValues(ParameterizedElementDeclaration component, String parameterName) {
     return withInternalService().getValues(component, parameterName);
   }
 
