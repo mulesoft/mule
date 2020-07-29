@@ -71,10 +71,9 @@ public final class ErrorBuilder {
     this.detailedDescription = exceptionDescription;
     if (cause instanceof SuppressedMuleException) {
       // Setting a SuppressedMuleException would break backwards compatibility, so it must be unwrapped
-      cause = ((SuppressedMuleException) e).unwrap();
-      exception = cause;
+      exception = ((SuppressedMuleException) e).unwrap();
       addSuppressedErrors((SuppressedMuleException) e);
-      updateErrorDescription((MuleException) exception);
+      updateErrorDescription((SuppressedMuleException) e);
     } else {
       exception = cause;
       MuleException muleRoot = getRootMuleException(exception);
@@ -91,11 +90,15 @@ public final class ErrorBuilder {
     }
   }
 
+  /**
+   * Given a root {@link MuleException}, returns the less detailed (original) error message.
+   * @param exception (must be the result of a {@link org.mule.runtime.api.exception.ExceptionHelper#getRootMuleException(Throwable)} call.
+   */
   private void updateErrorDescription(MuleException exception) {
     MuleException muleRoot = exception;
-    // Returning the first suppression root message (if present) is equivalent to the behaviour prior to error suppression
-    if (!exception.getExceptionInfo().getSuppressedCauses().isEmpty()) {
-      List<MuleException> suppressedCauses = exception.getExceptionInfo().getSuppressedCauses();
+    // Returning the first suppression root message (if present) the behaviour without error suppression
+    List<MuleException> suppressedCauses = exception.getExceptionInfo().getSuppressedCauses();
+    if (!suppressedCauses.isEmpty()) {
       muleRoot = getRootMuleException(suppressedCauses.get(suppressedCauses.size() - 1));
     }
     if (muleRoot.getMessage() != null) {
@@ -150,7 +153,8 @@ public final class ErrorBuilder {
   }
 
   /**
-   * Sets the description of the error.
+   *
+   *  Sets the description of the error.
    *
    * The description if meant to be a short text that describes the error and should not contain any java specific detail.
    *
@@ -248,7 +252,7 @@ public final class ErrorBuilder {
   /**
    * Default and only implementation of {@link Error}.
    */
-  private final static class ErrorImplementation implements Error {
+  private static final class ErrorImplementation implements Error {
 
     private static final long serialVersionUID = -6904692174522094021L;
 
