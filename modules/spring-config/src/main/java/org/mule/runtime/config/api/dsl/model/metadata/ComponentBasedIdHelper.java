@@ -11,36 +11,7 @@ import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 
-import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.AttributeFieldType;
-import org.mule.metadata.api.model.AttributeKeyType;
-import org.mule.metadata.api.model.BinaryType;
-import org.mule.metadata.api.model.BooleanType;
-import org.mule.metadata.api.model.DateTimeType;
-import org.mule.metadata.api.model.DateType;
-import org.mule.metadata.api.model.FunctionType;
-import org.mule.metadata.api.model.IntersectionType;
-import org.mule.metadata.api.model.LocalDateTimeType;
-import org.mule.metadata.api.model.LocalTimeType;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.NothingType;
-import org.mule.metadata.api.model.NullType;
-import org.mule.metadata.api.model.NumberType;
-import org.mule.metadata.api.model.ObjectFieldType;
-import org.mule.metadata.api.model.ObjectKeyType;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.PeriodType;
-import org.mule.metadata.api.model.RegexType;
-import org.mule.metadata.api.model.SimpleType;
-import org.mule.metadata.api.model.StringType;
-import org.mule.metadata.api.model.TimeType;
-import org.mule.metadata.api.model.TimeZoneType;
-import org.mule.metadata.api.model.TupleType;
-import org.mule.metadata.api.model.TypeParameterType;
-import org.mule.metadata.api.model.UnionType;
-import org.mule.metadata.api.model.VoidType;
-import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -48,7 +19,6 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -136,6 +106,5 @@ public class ComponentBasedIdHelper {
     }
 
   }
-
 
 }

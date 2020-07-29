@@ -102,7 +102,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected static final String PROVIDED_PARAMETER_NAME = "providedParameter";
   protected static final String OTHER_PROVIDED_PARAMETER_NAME = "otherProvidedParameter";
   protected static final String PROVIDED_FROM_COMPLEX_PARAMETER_NAME = "fromComplexActingParameter";
-  protected static final String COMPLEX_ACTING_PARAMETER_NAME = "complexActingParameterName";
+  protected static final String COMPLEX_ACTING_PARAMETER_NAME = "complexActingParameter";
   protected static final String PROVIDED_PARAMETER_DEFAULT_VALUE = "providedParameter";
   protected static final String EXTENSION_NAME = "extension";
   protected static final String OPERATION_NAME = "mockOperation";
@@ -299,7 +299,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(errorMappingsParameter.getLayoutModel()).thenReturn(empty());
     when(errorMappingsParameter.getRole()).thenReturn(BEHAVIOUR);
     when(errorMappingsParameter.getType()).thenReturn(BaseTypeBuilder.create(JAVA).arrayType()
-                                                              .of(TYPE_LOADER.load(ErrorMapping.class)).build());
+        .of(TYPE_LOADER.load(ErrorMapping.class)).build());
 
     when(errorMappingsParameterGroup.getName()).thenReturn(ERROR_MAPPINGS);
     when(errorMappingsParameterGroup.isShowInDsl()).thenReturn(false);
@@ -364,10 +364,12 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(source.getErrorCallback()).thenReturn(empty());
 
     when(operation.getName()).thenReturn(OPERATION_NAME);
-    when(operation.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
+    when(operation.getParameterGroupModels())
+        .thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
 
     when(otherOperation.getName()).thenReturn(OTHER_OPERATION_NAME);
-    when(otherOperation.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
+    when(otherOperation.getParameterGroupModels())
+        .thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
 
     visitableMock(operation, otherOperation, source);
 
@@ -616,7 +618,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
     @Override
     public Optional<ComponentAst> get(Location location) {
-      return Optional.ofNullable(components.get(location)).map(cm -> cm);
+      return Optional.ofNullable(components.get(location));
     }
 
     private Location getLocation(ComponentAst component) {

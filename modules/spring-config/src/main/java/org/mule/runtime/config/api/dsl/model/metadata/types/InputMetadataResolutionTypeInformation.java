@@ -10,6 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
@@ -36,13 +37,30 @@ public class InputMetadataResolutionTypeInformation extends AbstractMetadataReso
                   "Cannot generate an Input Cache Key for the component since it does not have a parameter named "
                       + parameterName);
 
+    componentTypeMetadataCacheId = getTypeCacheId(parameterName);
+  }
+
+  public InputMetadataResolutionTypeInformation(DslElementModel<?> component, String parameterName) {
+    super(component, (typeResolversInformationModelProperty -> getResolverInformation(typeResolversInformationModelProperty,
+                                                                                      parameterName)));
+    checkArgument(component.getModel() != null, "Cannot generate an Input Cache Key for a 'null' component");
+    checkArgument(component.getModel() instanceof ParameterizedModel,
+                  "Cannot generate an Input Cache Key for a component with no parameters");
+    checkArgument(((ParameterizedModel) component.getModel()).getAllParameterModels().stream()
+                          .anyMatch(parameterModel -> parameterModel.getName().equals(parameterName)),
+                  "Cannot generate an Input Cache Key for the component since it does not have a parameter named "
+                  + parameterName);
+    componentTypeMetadataCacheId = getTypeCacheId(parameterName);
+  }
+
+  private MetadataCacheId getTypeCacheId(String parameterName) {
     String parameterTypeIdentifier;
     if (isDynamicType()) {
       parameterTypeIdentifier = TYPE_IDENTIFIER;
     } else {
       parameterTypeIdentifier = String.format("%s with parameter name : %s", TYPE_IDENTIFIER, parameterName);
     }
-    componentTypeMetadataCacheId = new MetadataCacheId(parameterTypeIdentifier.hashCode(), parameterTypeIdentifier);
+    return new MetadataCacheId(parameterTypeIdentifier.hashCode(), parameterTypeIdentifier);
   }
 
   /**

@@ -10,6 +10,7 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 
@@ -26,18 +27,28 @@ public abstract class AbstractMetadataResolutionTypeInformation implements Metad
   private String resolverCategory;
   private String resolverName;
 
+  private void setPrivateFields(EnrichableModel enrichableModel,
+                                Function<TypeResolversInformationModelProperty, Optional<ResolverInformation>> getResolverInformationFromModelProperty) {
+    Optional<TypeResolversInformationModelProperty> typeResolversInformationModelProperty =
+            enrichableModel.getModelProperty(TypeResolversInformationModelProperty.class);
+    if (typeResolversInformationModelProperty.isPresent()) {
+      resolverName = getResolverInformationFromModelProperty.apply(typeResolversInformationModelProperty.get())
+              .map(resolverInformation -> resolverInformation.getResolverName()).orElse(null);
+      resolverCategory = typeResolversInformationModelProperty.get().getCategoryName();
+    }
+  }
+
   public AbstractMetadataResolutionTypeInformation(ComponentAst component,
                                                    Function<TypeResolversInformationModelProperty, Optional<ResolverInformation>> getResolverInformationFromModelProperty) {
     component.getModel(EnrichableModel.class)
-        .ifPresent(em -> {
-          Optional<TypeResolversInformationModelProperty> typeResolversInformationModelProperty =
-              em.getModelProperty(TypeResolversInformationModelProperty.class);
-          if (typeResolversInformationModelProperty.isPresent()) {
-            resolverName = getResolverInformationFromModelProperty.apply(typeResolversInformationModelProperty.get())
-                .map(resolverInformation -> resolverInformation.getResolverName()).orElse(null);
-            resolverCategory = typeResolversInformationModelProperty.get().getCategoryName();
-          }
-        });
+        .ifPresent(em -> setPrivateFields(em, getResolverInformationFromModelProperty));
+  }
+
+  public AbstractMetadataResolutionTypeInformation(DslElementModel<?> component,
+                                                   Function<TypeResolversInformationModelProperty, Optional<ResolverInformation>> getResolverInformationFromModelProperty) {
+    if (component.getModel() instanceof EnrichableModel) {
+      this.setPrivateFields((EnrichableModel) component.getModel(), getResolverInformationFromModelProperty);
+    }
   }
 
   /**
