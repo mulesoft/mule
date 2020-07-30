@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static com.google.common.collect.Lists.partition;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -36,6 +39,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import io.qameta.allure.Issue;
 import org.junit.After;
@@ -154,6 +160,7 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("MULE-18573")
   public void manageTwoDifferentCursorProviderWithSameKey() {
+    // setup all cursor provider generate same key
     mockStatic(CursorUtils.class);
     given(CursorUtils.createKey(any())).willReturn(10);
 
@@ -175,7 +182,8 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void manageTwoDifferentCursorProviderWithSameProviderMultipleTimesWithConcurrency() {
+  public void manageThreeDifferentCursorProvidersWithSameKeyMultipleTimesWithConcurrency() {
+    // setup all cursor provider generate same key
     mockStatic(CursorUtils.class);
     given(CursorUtils.createKey(any())).willReturn(10);
 
@@ -184,25 +192,31 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     Latch latch = new Latch();
     executorService = Executors.newFixedThreadPool(threadCount);
 
-    final CursorProvider firstProvider = mock(CursorStreamProvider.class);
-    final CursorProvider secondProvider = mock(CursorStreamProvider.class);
+    List<CursorProvider> providers = new ArrayList<>();
+    providers.add(mock(CursorStreamProvider.class));
+    providers.add(mock(CursorStreamProvider.class));
+    providers.add(mock(CursorStreamProvider.class));
 
-    for (int i = 0; i < threadCount; i++) {
-      CursorProvider cursorProvider = ((i % 2) == 0) ? firstProvider: secondProvider;
-      executorService.submit(() -> {
-        try {
-          latch.await();
-        } catch (InterruptedException e) {
-          // doesn't matter
-        }
+    IntStream threads = IntStream.range(0, threadCount);
+    List<List<Integer>> threadsGroups = partition(threads.boxed().collect(toList()), 3);
 
-        CursorProvider managed = cursorManager.manage(cursorProvider, ctx);
+    for(List<Integer> threadGroups: threadsGroups) {
+      for(int i = 0; i < threadGroups.size(); i++) {
+        CursorProvider cursorProvider = providers.get(i);
+        executorService.submit(() -> {
+          try {
+            latch.await();
+          } catch (InterruptedException e) {
+            // doesn't matter
+          }
 
-        synchronized (managedProviders) {
-          managedProviders.add(managed);
-        }
+          CursorProvider managed = cursorManager.manage(cursorProvider, ctx);
 
-      });
+          synchronized (managedProviders) {
+            managedProviders.add(managed);
+          }
+        });
+      }
     }
 
     latch.release();
@@ -211,19 +225,19 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     assertThat(managedProviders.get(0), is(instanceOf(ManagedCursorProvider.class)));
 
     ArgumentCaptor<ManagedCursorProvider> managedDecoratorCaptor = forClass(ManagedCursorProvider.class);
-    verify(ghostBuster, times(2)).track(managedDecoratorCaptor.capture());
+    verify(ghostBuster, times(3)).track(managedDecoratorCaptor.capture());
 
     assertThat(managedProviders.get(0), is(instanceOf(ManagedCursorProvider.class)));
     assertThat(managedProviders.get(1), is(instanceOf(ManagedCursorProvider.class)));
+    assertThat(managedProviders.get(2), is(instanceOf(ManagedCursorProvider.class)));
 
     List<ManagedCursorProvider> captured = managedDecoratorCaptor.getAllValues();
-    assertThat(captured, hasSize(2));
-    if(captured.get(0).getDelegate().equals(firstProvider)) {
-      assertThat(captured.get(0).getDelegate(), is(sameInstance(firstProvider)));
-      assertThat(captured.get(1).getDelegate(), is(sameInstance(secondProvider)));
-    } else {
-      assertThat(captured.get(0).getDelegate(), is(sameInstance(secondProvider)));
-      assertThat(captured.get(1).getDelegate(), is(sameInstance(firstProvider)));
+    assertThat(captured, hasSize(3));
+
+    for(ManagedCursorProvider managedCursorProvider : captured) {
+      assertThat(providers, hasItem(managedCursorProvider.getDelegate()));
+      providers.remove(managedCursorProvider.getDelegate());
     }
+    assertThat(providers.size(), is(0));
   }
 }
