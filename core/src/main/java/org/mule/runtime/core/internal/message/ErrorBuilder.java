@@ -153,7 +153,6 @@ public final class ErrorBuilder {
   }
 
   /**
-   *
    *  Sets the description of the error.
    *
    * The description if meant to be a short text that describes the error and should not contain any java specific detail.
