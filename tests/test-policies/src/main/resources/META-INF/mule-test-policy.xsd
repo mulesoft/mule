@@ -59,11 +59,11 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-processor" type="customMessageProcessorType" substitutionGroup="mule:top-level-processor"/>
+    <xsd:element name="custom-processor" type="customMessageProcessorType" substitutionGroup="mule:abstract-message-processor"/>
 
     <xsd:complexType name="customMessageProcessorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:topLevelProcessorType">
+            <xsd:extension base="mule:abstractMessageProcessorType">
                 <xsd:sequence>
                     <xsd:group ref="mule:propertiesGroup"/>
                 </xsd:sequence>

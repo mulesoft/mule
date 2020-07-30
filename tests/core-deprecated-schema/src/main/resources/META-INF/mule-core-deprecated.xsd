@@ -7,14 +7,35 @@
 
     <xsd:include schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule-core-common.xsd"/>
 
-    <xsd:complexType name="commonTransformerType">
+    <xsd:element name="top-level-processor" abstract="true" type="topLevelProcessorType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for processors that can be defined as top level elements and referenced in flows.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="topLevelProcessorType">
         <xsd:complexContent>
-            <xsd:extension base="topLevelProcessorType">
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:attribute name="name" type="substitutableName" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the message processor in the registry.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-transformer" abstract="true" type="commonTransformerType" substitutionGroup="top-level-processor">
+    <xsd:complexType name="commonTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-transformer" abstract="true" type="commonTransformerType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for transformer elements. Transformers convert message payloads.
@@ -166,7 +187,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-processor" type="customMessageProcessorType" substitutionGroup="top-level-processor"/>
+    <xsd:element name="custom-processor" type="customMessageProcessorType" substitutionGroup="abstract-message-processor"/>
 
     <xsd:complexType name="customMessageProcessorType">
         <xsd:complexContent>
