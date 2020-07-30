@@ -120,6 +120,31 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
     assertThat(resources.hasMoreElements(), is(false));
   }
 
+  @Test
+  public void considersSdkApiUsagesInExtensions() {
+    final ModuleRepository moduleRepository = mock(ModuleRepository.class);
+    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
+    final List<MuleModule> modules = new ArrayList<>();
+    modules.add(new TestModuleBuilder("sdk-module")
+        .exportingPackages("org.mule.sdk.api.connectivity", "org.omg.test").build());
+    modules.add(new TestModuleBuilder("other-sdk-module")
+        .exportingPackages("org.mule.sdk.api.runtime.streaming", "org.mule.extension.validation.api.condition",
+                           "org.xml.sax.test")
+        .build());
+    when(moduleRepository.getModules()).thenReturn(modules);
+
+    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+
+    final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.sdk.api.connectivity.Foo"), sameInstance(CHILD_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.omg.test.Bar"), sameInstance(PARENT_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.sdk.api.runtime.streaming.SomeStreaming"),
+               sameInstance(CHILD_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.extension.validation.api.condition.SomeCondition"),
+               instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.xml.sax.test.Bar"), sameInstance(PARENT_FIRST));
+  }
+
   private ContainerClassLoaderFactory createClassLoaderExportingBootstrapProperties() {
     final ModuleRepository moduleRepository = mock(ModuleRepository.class);
     final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);

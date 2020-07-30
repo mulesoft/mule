@@ -14,6 +14,7 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ALLOW_JRE_EXTENSION;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_JRE_EXTENSION_PACKAGES;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
 import org.mule.runtime.container.api.ModuleRepository;
@@ -47,6 +48,7 @@ import com.google.common.collect.ImmutableSet;
 public class ContainerClassLoaderFactory {
 
   private static final String DEFAULT_JRE_EXTENSION_PACKAGES = "javax.,org.w3c.dom,org.omg.,org.xml.sax,org.ietf.jgss";
+  private static final String MULE_SDK_API_PACKAGE = "org.mule.sdk.api";
   private static final boolean ALLOW_JRE_EXTENSION = valueOf(getProperty(MULE_ALLOW_JRE_EXTENSION, "true"));
   private static final String[] JRE_EXTENDABLE_PACKAGES =
       getProperty(MULE_JRE_EXTENSION_PACKAGES, DEFAULT_JRE_EXTENSION_PACKAGES).split(",");
@@ -174,14 +176,32 @@ public class ContainerClassLoaderFactory {
     final Map<String, LookupStrategy> result = new HashMap<>();
     for (MuleModule muleModule : modules) {
       for (String exportedPackage : muleModule.getExportedPackages()) {
-        // Let artifacts extend non "java." JRE packages
-        result.put(exportedPackage, ALLOW_JRE_EXTENSION && stream(JRE_EXTENDABLE_PACKAGES).anyMatch(exportedPackage::startsWith)
-            ? PARENT_FIRST
-            : containerOnlyLookupStrategy);
+        LookupStrategy specialLookupStrategy = getSpecialLookupStrategy(exportedPackage);
+        result.put(exportedPackage, specialLookupStrategy == null ? containerOnlyLookupStrategy : specialLookupStrategy);
       }
     }
 
     return result;
+  }
+
+  /**
+   * Returns  the {@link LookupStrategy} if the one to use for the exportedPackage is other than
+   * a {@link ContainerOnlyLookupStrategy} or null.
+   *
+   * @param exportedPackage name of the package
+   * @return
+   */
+  private LookupStrategy getSpecialLookupStrategy(String exportedPackage) {
+    // If an extension uses a class provided by the mule-sdk-api artifact, the container classloader should use
+    // the class with which the extension was compiled.
+    if (exportedPackage.startsWith(MULE_SDK_API_PACKAGE)) {
+      return CHILD_FIRST;
+    }
+    // Let artifacts extend non "java." JRE packages
+    if (ALLOW_JRE_EXTENSION && stream(JRE_EXTENDABLE_PACKAGES).anyMatch(exportedPackage::startsWith)) {
+      return PARENT_FIRST;
+    }
+    return null;
   }
 
   /**
