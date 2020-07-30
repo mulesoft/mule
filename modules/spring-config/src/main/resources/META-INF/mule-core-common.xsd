@@ -91,7 +91,6 @@
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
             <xsd:element ref="sub-flow" />
-            <xsd:element ref="top-level-processor"/>
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
             <xsd:element ref="abstract-object-store"/>
         </xsd:choice>
@@ -370,27 +369,6 @@
                     </xsd:element>
                     <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="name" type="substitutableName" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the message processor in the registry.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="top-level-processor" abstract="true" type="topLevelProcessorType" substitutionGroup="abstract-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for processors that can be defined as top level elements and referenced in flows.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="topLevelProcessorType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
                 <xsd:attribute name="name" type="substitutableName" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -1834,7 +1812,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="set-payload" type="setPayloadTransformerType" substitutionGroup="top-level-processor">
+    <xsd:element name="set-payload" type="setPayloadTransformerType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A processor that sets the payload with the provided value.
@@ -1844,7 +1822,7 @@
 
     <xsd:complexType name="setPayloadTransformerType">
         <xsd:complexContent>
-            <xsd:extension base="topLevelProcessorType">
+            <xsd:extension base="abstractMessageProcessorType">
                 <xsd:attributeGroup ref="mimeTypeAttributes">
                     <xsd:annotation>
                         <xsd:documentation>
