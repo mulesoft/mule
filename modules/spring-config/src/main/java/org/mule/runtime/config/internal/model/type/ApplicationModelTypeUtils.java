@@ -21,10 +21,14 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
 import static org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
 import static org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
+import static org.mule.runtime.config.internal.model.type.decorator.IgnoreCustomQNameParameterModelDecorator.ignoreCustomQName;
+import static org.mule.runtime.config.internal.model.type.decorator.IgnoreCustomQNameParameterModelDecorator.unwrap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getInfrastructureMetadataTypeFor;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -56,7 +60,6 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntaxBuilder;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
-import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
 
 import java.util.HashMap;
 import java.util.List;
@@ -156,10 +159,25 @@ public final class ApplicationModelTypeUtils {
 
     // Check for infrastructure types, that are not present in an extension model
     if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
-      InfrastructureTypeMapping.getTypeFor(componentModel.getIdentifier())
-          .flatMap(extensionModelHelper::findMetadataType)
-          .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
-          .ifPresent(componentModel::setMetadataTypeModelAdapter);
+      final Optional<MetadataType> infrastructureMetadataType = getInfrastructureMetadataTypeFor(componentModel.getIdentifier(),
+                                                                                                 javaInfraType -> extensionModelHelper
+                                                                                                     .findMetadataType(javaInfraType)
+                                                                                                     .orElse(null));
+      infrastructureMetadataType
+          .map(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper)
+              .orElseGet(() -> createParameterizedTypeModelAdapter(type, extensionModelHelper)))
+          .ifPresent(infrastructureTypeParameterized -> {
+            componentModel.setMetadataTypeModelAdapter(infrastructureTypeParameterized);
+
+            extensionModelHelper.getExtensionsModels().stream()
+                .filter(extModel -> extModel.getXmlDslModel().getPrefix().equals(CORE_PREFIX))
+                .findAny()
+                .flatMap(coreExtensionModel -> extensionModelHelper
+                    .resolveDslElementModel(infrastructureTypeParameterized.getType(), coreExtensionModel))
+                .ifPresent(infraTypeDslElementModel -> onParameterizedModel(componentModel, infrastructureTypeParameterized,
+                                                                            extensionModelHelper,
+                                                                            infraTypeDslElementModel));
+          });
     }
 
     componentModel.setComponentType(resolveComponentType(componentModel, extensionModelHelper));
@@ -237,7 +255,8 @@ public final class ApplicationModelTypeUtils {
                                              ExtensionModelHelper extensionModelHelper,
                                              ParameterizedModel model, Predicate<ParameterModel> parameterModelFilter) {
     childrenComponentModels
-        .forEach(childComp -> extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
+        .forEach(childComp -> extensionModelHelper.findParameterModel(childComp.getIdentifier(), ignoreCustomQName(model))
+            .map(paramModel -> unwrap(paramModel))
             .filter(parameterModelFilter::test)
             // do not handle the callback parameters from the sources
             .filter(paramModel -> {
@@ -254,6 +273,15 @@ public final class ApplicationModelTypeUtils {
             })
             .filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
             .ifPresent(paramModel -> {
+              if (getInfrastructureMetadataTypeFor(childComp.getIdentifier(), c -> null).isPresent()) {
+                // just set the parameter, the model of the child will be set when this enrichment process gets to it.
+                componentModel.setParameter(paramModel,
+                                            new DefaultComponentParameterAst(childComp,
+                                                                             () -> paramModel, childComp.getMetadata()));
+
+                return;
+              }
+
               if (isContent(paramModel)) {
                 componentModel.setParameter(paramModel,
                                             new DefaultComponentParameterAst(trim(((ComponentModel) childComp)
@@ -261,6 +289,7 @@ public final class ApplicationModelTypeUtils {
                                                                              () -> paramModel, childComp.getMetadata()));
               } else {
                 enrichComponentModels(componentModel, nestedComponents,
+                                      // TODO apra redelivery policy asume el ns de http en lugar de core
                                       of(extensionModelHelper.resolveDslElementModel(paramModel,
                                                                                      componentModel
                                                                                          .getIdentifier())),
@@ -383,6 +412,39 @@ public final class ApplicationModelTypeUtils {
                   .getContainedElement(nestedParameter.getName());
               enrichComponentModels(paramComponent, nestedComponents, containedElement,
                                     nestedParameter, extensionModelHelper);
+            });
+      }
+
+      @Override
+      public void visitUnion(UnionType unionType) {
+        componentModel.setParameter(paramModel, new DefaultComponentParameterAst(paramComponent,
+                                                                                 () -> paramModel, paramComponent.getMetadata()));
+
+        MetadataTypeModelAdapter parameterizedModel = createParameterizedTypeModelAdapter(unionType, extensionModelHelper);
+        paramComponent.setMetadataTypeModelAdapter(parameterizedModel);
+
+        unionType.getTypes()
+            .forEach(type -> {
+              final Multimap<ComponentIdentifier, ComponentModel> nestedComponents =
+                  getNestedComponents(componentModel);
+              final MetadataTypeModelAdapter unionTypeParameterizedTypeModelAdapter =
+                  createParameterizedTypeModelAdapter(type, extensionModelHelper);
+
+              paramComponent.directChildrenStream()
+                  .filter(child -> getTypeId(type)
+                      .map(typeId -> typeId.equals(child.getIdentifier().getName()))
+                      .orElse(false))
+                  .forEach(typeChild -> unionTypeParameterizedTypeModelAdapter.getAllParameterModels()
+                      .stream()
+                      .forEach(pm -> {
+                        enrichComponentModels((ComponentModel) typeChild, nestedComponents,
+                                              extensionModelHelper
+                                                  .resolveDslElementModel(type, typeChild.getIdentifier().getNamespace())
+                                                  .flatMap(unionDsl -> unionDsl.getAttribute(pm.getName())),
+                                              pm, extensionModelHelper);
+
+                        ((ComponentModel) typeChild).setMetadataTypeModelAdapter(unionTypeParameterizedTypeModelAdapter);
+                      }));
             });
       }
 

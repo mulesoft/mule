@@ -35,6 +35,7 @@ import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper.ExtensionWalkerModelDelegate;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -63,6 +64,18 @@ public class ApplicationModelTypeUtilsTestCase extends AbstractMuleTestCase {
       .namespaceUri(XML_DSL_MODEL.getNamespace())
       .namespace(XML_DSL_MODEL.getPrefix())
       .name("simple-pojo")
+      .build();
+
+  private static final ComponentIdentifier SIMPLE_TEXT_POJO_ID = ComponentIdentifier.builder()
+      .namespaceUri(XML_DSL_MODEL.getNamespace())
+      .namespace(XML_DSL_MODEL.getPrefix())
+      .name("simple-text-pojo")
+      .build();
+
+  private static final ComponentIdentifier SIMPLE_TEXT_PARAM_POJO_ID = ComponentIdentifier.builder()
+      .namespaceUri(XML_DSL_MODEL.getNamespace())
+      .namespace(XML_DSL_MODEL.getPrefix())
+      .name("pojo-text-param")
       .build();
 
   private static final ComponentIdentifier COMPLEX_POJO_ID = ComponentIdentifier.builder()
@@ -111,6 +124,8 @@ public class ApplicationModelTypeUtilsTestCase extends AbstractMuleTestCase {
 
       if (identifier.equals(SIMPLE_POJO_ID)) {
         walker.onType(typeLoader.load(SimplePojo.class));
+      } else if (identifier.equals(SIMPLE_TEXT_POJO_ID)) {
+        walker.onType(typeLoader.load(SimpleTextPojo.class));
       } else if (identifier.equals(COMPLEX_POJO_ID)) {
         walker.onType(typeLoader.load(ComplexPojo.class));
       } else if (identifier.equals(SIMPLE_ID)) {
@@ -151,6 +166,22 @@ public class ApplicationModelTypeUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void simpleTextParamInSimpleTextPojo() {
+    final ComponentModel textComponent = createModel(SIMPLE_TEXT_PARAM_POJO_ID,
+                                                     emptyMap(),
+                                                     "myTextBody");
+    final ComponentModel component = createModel(SIMPLE_TEXT_POJO_ID,
+                                                 emptyMap(),
+                                                 asList(textComponent));
+
+    resolveTypedComponentIdentifier(component, extModelHelper);
+
+    verify(component).setParameter(argThat(new ParameterModelMatcher("pojoTextParam")),
+                                   argThat(new ParameterRawValueModelMatcher("myTextBody")));
+    verify(component).setMetadataTypeModelAdapter(any());
+  }
+
+  @Test
   public void pojoParamInComplexPojo() {
     final ComponentModel innerComponent = createModel(SIMPLE_ID,
                                                       singletonMap("pojoSimpleParam", "value"));
@@ -178,6 +209,14 @@ public class ApplicationModelTypeUtilsTestCase extends AbstractMuleTestCase {
     return component;
   }
 
+  private ComponentModel createModel(ComponentIdentifier identifier, Map<String, String> rawParams,
+                                     String body) {
+    final ComponentModel component = createModel(identifier, rawParams);
+    when(component.getTextContent()).thenReturn(body);
+
+    return component;
+  }
+
   private ComponentModel createModel(ComponentIdentifier identifier, Map<String, String> rawParams) {
     final ComponentModel component = mock(ComponentModel.class);
 
@@ -192,6 +231,14 @@ public class ApplicationModelTypeUtilsTestCase extends AbstractMuleTestCase {
 
     @Parameter
     private String pojoSimpleParam;
+
+  }
+
+  public static class SimpleTextPojo {
+
+    @Text
+    @Parameter
+    private String pojoTextParam;
 
   }
 

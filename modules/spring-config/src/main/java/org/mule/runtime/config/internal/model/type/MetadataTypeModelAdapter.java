@@ -41,6 +41,7 @@ import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExpressionSupportAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.LayoutTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class MetadataTypeModelAdapter implements ParameterizedModel {
 
@@ -91,6 +93,10 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
     }
   }
 
+  public MetadataType getType() {
+    return type;
+  }
+
   @Override
   public String toString() {
     return "MetadataTypeModelAdapter{" + type.toString() + "}";
@@ -123,6 +129,10 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
       this.adaptedType = adaptedType;
 
       final List<ParameterModel> tempParameterModels = adaptedType.getFields().stream()
+          .flatMap(wrappedFieldType -> wrappedFieldType.getAnnotation(FlattenedTypeAnnotation.class).isPresent()
+              && wrappedFieldType.getValue() instanceof ObjectType
+                  ? ((ObjectType) (wrappedFieldType.getValue())).getFields().stream()
+                  : Stream.of(wrappedFieldType))
           .map(ObjectFieldTypeAsParameterModelAdapter::new)
           .sorted(comparing(ObjectFieldTypeAsParameterModelAdapter::getName))
           .collect(toList());

@@ -21,10 +21,17 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isInfrastructure;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.TLS_XML_DSL_MODEL;
+import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getInfrastructureMetadataTypeFor;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.UnionType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -35,6 +42,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.ComposableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
@@ -50,6 +58,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.config.internal.model.type.decorator.BaseExtensionModelDecorator;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -59,6 +68,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -325,7 +335,28 @@ public class ExtensionModelHelper {
 
           return model.getAllParameterModels()
               .stream()
-              .filter(pm -> dslSyntaxResolver.resolve(pm).getElementName().equals(nestedComponentId.getName()))
+              .filter(pm -> {
+                final boolean nameMatches = dslSyntaxResolver.resolve(pm).getElementName().equals(nestedComponentId.getName());
+
+                if (!nameMatches && isInfrastructure(pm.getType())) {
+                  AtomicBoolean infrastructureNameMatches = new AtomicBoolean();
+                  getInfrastructureMetadataTypeFor(nestedComponentId, c -> null)
+                      .ifPresent(infrastructureMetadataTypeForNested -> {
+                        pm.getType().accept(new MetadataTypeVisitor() {
+
+                          @Override
+                          public void visitUnion(UnionType unionType) {
+                            infrastructureNameMatches
+                                .set(unionType.getTypes().stream().anyMatch(infrastructureMetadataTypeForNested::equals));
+                          }
+                        });
+                      });
+
+                  return infrastructureNameMatches.get();
+                }
+
+                return nameMatches;
+              })
               .findAny();
         });
   }
@@ -423,8 +454,30 @@ public class ExtensionModelHelper {
   }
 
   private Optional<ExtensionModel> lookupExtensionModelFor(ComponentIdentifier componentIdentifier) {
+    return lookupExtensionModelFor(componentIdentifier.getNamespace());
+  }
+
+  private Optional<ExtensionModel> lookupExtensionModelFor(final String componentNamespacePrefix) {
+    String namespacePrefix = componentNamespacePrefix.equals(TLS_PREFIX)
+        ? CORE_PREFIX
+        : componentNamespacePrefix;
+
     return extensionsModels.stream()
-        .filter(e -> e.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace()))
+        .filter(e -> e.getXmlDslModel().getPrefix().equals(namespacePrefix))
+        .map(e -> {
+          // Map infrastructure parameters to the extension model holding their type definition.
+          if (componentNamespacePrefix.equals(TLS_PREFIX)) {
+            return new BaseExtensionModelDecorator(e) {
+
+              @Override
+              public XmlDslModel getXmlDslModel() {
+                return TLS_XML_DSL_MODEL;
+              }
+            };
+          } else {
+            return e;
+          }
+        })
         .findFirst();
   }
 
@@ -445,6 +498,11 @@ public class ExtensionModelHelper {
 
   public Optional<DslElementSyntax> resolveDslElementModel(MetadataType metadataType, ExtensionModel extensionModel) {
     return dslSyntaxResolversByExtension.get(extensionModel).resolve(metadataType);
+  }
+
+  public Optional<DslElementSyntax> resolveDslElementModel(MetadataType metadataType, String dslNamespacePrefix) {
+    return lookupExtensionModelFor(dslNamespacePrefix)
+        .flatMap(extensionModel -> dslSyntaxResolversByExtension.get(extensionModel).resolve(metadataType));
   }
 
   public DslElementSyntax resolveDslElementModel(ParameterModel parameterModel, ComponentIdentifier componentIdentifier) {
