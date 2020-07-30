@@ -98,8 +98,6 @@ public class ArtifactContextBuilder {
   protected static final String CLASS_LOADER_REPOSITORY_WAS_NOT_SET = "classLoaderRepository was not set";
   protected static final String SERVICE_CONFIGURATOR_CANNOT_BE_NULL = "serviceConfigurator cannot be null";
 
-  private static final Boolean SHARE_ERROR_TYPE_REPOSITORY = getBoolean(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY);
-
   private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
   private ArtifactType artifactType = APP;
   private String[] configurationFiles = new String[0];
@@ -523,7 +521,7 @@ public class ArtifactContextBuilder {
 
   private ErrorTypeRepository createErrorTypeRepository(MuleContext parentContext) {
     if (POLICY.equals(artifactType)) {
-      if (SHARE_ERROR_TYPE_REPOSITORY) {
+      if (shareErrorTypeRepository()) {
         // Because MULE-18196 breaks backwards, we need this feature flag to allow legacy behavior
         return createCompositeErrorTypeRepository(parentContext.getErrorTypeRepository());
       } else {
@@ -536,6 +534,10 @@ public class ArtifactContextBuilder {
       }
     }
     return createCompositeErrorTypeRepository(parentContext.getErrorTypeRepository());
+  }
+
+  private boolean shareErrorTypeRepository() {
+    return getBoolean(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY);
   }
 
   protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties() {
