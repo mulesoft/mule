@@ -66,17 +66,18 @@ public final class ErrorBuilder {
    */
   private ErrorBuilder(Throwable e) {
     Throwable cause = e;
+    exception = cause;
     String exceptionDescription = e.getMessage() != null ? e.getMessage() : "unknown description";
     this.description = exceptionDescription;
     this.detailedDescription = exceptionDescription;
     if (cause instanceof SuppressedMuleException) {
-      // Setting a SuppressedMuleException would break backwards compatibility, so it must be unwrapped
-      exception = ((SuppressedMuleException) e).unwrap();
+      // We need to unwrap SuppressedMuleExceptions since they are not meant to be returned as error causes
+      cause = ((SuppressedMuleException) e).unwrap();
+      exception = cause;
       addSuppressedErrors((SuppressedMuleException) e);
       updateErrorDescription((SuppressedMuleException) e);
     } else {
-      exception = cause;
-      MuleException muleRoot = getRootMuleException(exception);
+      MuleException muleRoot = getRootMuleException(cause);
       if (muleRoot != null) {
         addSuppressedErrors(muleRoot);
         updateErrorDescription(muleRoot);
@@ -91,12 +92,12 @@ public final class ErrorBuilder {
   }
 
   /**
-   * Given a root {@link MuleException}, returns the less detailed (original) error message.
+   * Given a {@link MuleException}, sets the <code>description</code> field with the message of it's root cause, taking into account possible suppressions.
    * @param exception (must be the result of a {@link org.mule.runtime.api.exception.ExceptionHelper#getRootMuleException(Throwable)} call.
    */
   private void updateErrorDescription(MuleException exception) {
     MuleException muleRoot = exception;
-    // Returning the first suppression root message (if present) the behaviour without error suppression
+    // Finding the first suppression root message (if present) is needed to make the suppressions backward compatible
     List<MuleException> suppressedCauses = exception.getExceptionInfo().getSuppressedCauses();
     if (!suppressedCauses.isEmpty()) {
       muleRoot = getRootMuleException(suppressedCauses.get(suppressedCauses.size() - 1));
@@ -107,18 +108,17 @@ public final class ErrorBuilder {
   }
 
   /**
-   * Returns all the {@link Error} instances that the given {@link MuleException} inform as suppressed.
+   * Assigns to the <code>suppressedErrors</code> field all the {@link Error} instances that the given {@link MuleException} inform as suppressed.
    * @param muleException Given {@link MuleException}.
-   * @return {@link List<Error>} containing all the {@link Error} instances that the given {@link MuleException} inform as suppressed.
    * @see SuppressedMuleException
    */
   private void addSuppressedErrors(MuleException muleException) {
-    List<Error> suppressions = new ArrayList<>();
+    List<Error> suppressions = new ArrayList<>(4);
     for (MuleException suppressedException : muleException.getExceptionInfo().getSuppressedCauses()) {
       if (suppressedException instanceof MessagingException) {
         ((MessagingException) suppressedException).getEvent().getError().ifPresent(error -> {
           suppressions.add(error);
-          // Exception must be updated with the suppressed error cause in order to avoid backwards compatibility issues
+          // First suppressed error cause needs to be set in order to maintain backwards compatibility
           exception = error.getCause();
         });
       }

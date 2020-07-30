@@ -442,11 +442,17 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private boolean acceptsErrorType(CoreEvent event) {
     Error error = event.getError().get();
     return errorTypeMatcher == null || errorTypeMatcher.match(error.getErrorType())
-        || acceptsSuppressedErrorType(error.getSuppressedErrors(), event);
+        || matchesSuppressedErrorType(error, event);
   }
 
-  private boolean acceptsSuppressedErrorType(List<Error> suppressedErrors, CoreEvent coreEvent) {
-    for (Error suppressedError : suppressedErrors) {
+  /**
+   * Evaluates if the {@link #errorTypeMatcher} matches against any of the provided {@link Error#getSuppressedErrors()} error types.
+   * @param error {@link Error} that will be evaluated.
+   * @param coreEvent Event containing the provided error.
+   * @return True if at least one match is found.
+   */
+  private boolean matchesSuppressedErrorType(Error error, CoreEvent coreEvent) {
+    for (Error suppressedError : error.getSuppressedErrors()) {
       ErrorType suppressedErrorType = suppressedError.getErrorType();
       if (errorTypeMatcher.match(suppressedErrorType)) {
         logger
