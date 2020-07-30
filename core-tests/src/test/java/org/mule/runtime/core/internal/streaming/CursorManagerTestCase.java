@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static com.google.common.collect.Lists.partition;
+import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -38,10 +39,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import io.qameta.allure.Issue;
 import org.junit.After;
@@ -94,7 +92,7 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     final int threadCount = 5;
     List<CursorProvider> managedProviders = new ArrayList<>(threadCount);
     Latch latch = new Latch();
-    executorService = Executors.newFixedThreadPool(threadCount);
+    executorService = newFixedThreadPool(threadCount);
 
     final CursorProvider cursorProvider = mock(CursorStreamProvider.class);
 
@@ -187,10 +185,10 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     mockStatic(CursorUtils.class);
     given(CursorUtils.createKey(any())).willReturn(10);
 
-    final int threadCount = 6;
+    final int threadCount = 12;
     List<CursorProvider> managedProviders = new ArrayList<>(threadCount);
     Latch latch = new Latch();
-    executorService = Executors.newFixedThreadPool(threadCount);
+    executorService = newFixedThreadPool(threadCount);
 
     List<CursorProvider> providers = new ArrayList<>();
     providers.add(mock(CursorStreamProvider.class));
@@ -198,7 +196,7 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     providers.add(mock(CursorStreamProvider.class));
 
     IntStream threads = IntStream.range(0, threadCount);
-    List<List<Integer>> threadsGroups = partition(threads.boxed().collect(toList()), 3);
+    List<List<Integer>> threadsGroups = partition(threads.boxed().collect(toList()), providers.size());
 
     for(List<Integer> threadGroups: threadsGroups) {
       for(int i = 0; i < threadGroups.size(); i++) {
