@@ -23,4 +23,9 @@ public class TestComponentsOperationsTestCase extends MuleArtifactFunctionalTest
             .run().getMessage().getPayload().getValue());
     assertThat(payloadValue, is("The payload"));
   }
+
+  @Test
+  public void executeLifecycleFlow() throws Exception {
+    flowRunner("lifecycleFlow").run();
+  }
 }

@@ -13,13 +13,18 @@
 
         <logger level="WARN" />
 
-        <set-payload value="The payload" />
+        <!--<set-payload value="The payload" />-->
 
-        <test:queue-push config-ref="queueConfig"/>
+        <!--<test:queue-push config-ref="queueConfig"/>-->
 
-        <test:queue-push config-ref="queueConfig">
-            <test:content>The content</test:content>
-        </test:queue-push>
+        <!--<test:queue-push config-ref="queueConfig">-->
+            <!--<test:content>The content</test:content>-->
+        <!--</test:queue-push>-->
+    </flow>
+
+    <flow name="lifecycleFlow">
+        <test:check />
+        <logger level="WARN" />
     </flow>
 
 </mule>
