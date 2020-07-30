@@ -27,7 +27,7 @@ import org.springframework.core.convert.support.DefaultConversionService;
  */
 public class BasicTypeValueResolverFactoryTypeVisitor extends BasicTypeMetadataVisitor {
 
-  private final ConversionService conversionService = new DefaultConversionService();
+  private static final ConversionService CONVERSION_SERVICE = new DefaultConversionService();
 
   private final Reference<ValueResolver> resolverValueHolder = new Reference<>();
   private final String parameterName;
@@ -63,7 +63,7 @@ public class BasicTypeValueResolverFactoryTypeVisitor extends BasicTypeMetadataV
   }
 
   public ValueResolver basicTypeResolver() {
-    if (conversionService.canConvert(value.getClass(), expectedClass)) {
+    if (CONVERSION_SERVICE.canConvert(value.getClass(), expectedClass)) {
       return new StaticValueResolver<>(convertSimpleValue(value, expectedClass, parameterName));
     } else {
       return defaultResolver();
@@ -81,7 +81,7 @@ public class BasicTypeValueResolverFactoryTypeVisitor extends BasicTypeMetadataV
 
   private Object convertSimpleValue(Object value, Class<?> expectedClass, String parameterName) {
     try {
-      return conversionService.convert(value, expectedClass);
+      return CONVERSION_SERVICE.convert(value, expectedClass);
     } catch (Exception e) {
       throw new IllegalArgumentException(format("Could not transform simple value '%s' to type '%s' in parameter '%s'", value,
                                                 expectedClass.getSimpleName(), parameterName));
