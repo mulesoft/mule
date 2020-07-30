@@ -47,7 +47,7 @@ public class AbstractArtifactAgnosticService {
         application.start();
       } catch (Exception e) {
         //Clean everything if there is an error
-        disposeApp();
+        dispose();
         throw new ApplicationStartingException(e);
       }
     }
@@ -63,7 +63,7 @@ public class AbstractArtifactAgnosticService {
     } catch (ApplicationStartingException e) {
       return errorHandler.apply(e.getCauseException());
     } finally {
-      disposeApp();
+      dispose();
     }
   }
 

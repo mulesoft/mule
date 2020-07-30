@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.module.tooling.internal.config;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
+import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -55,12 +61,26 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
 
   @Override
   public ConnectionValidationResult testConnection(String configName) {
-    return withInternalService().testConnection(configName);
+    try {
+      return withInternalService().testConnection(configName);
+    } catch (Exception e) {
+      return failure(format("Unknown error while performing test connection on config: '%s'. %s", configName,
+                            getRootCauseMessage(e)),
+                     e);
+    }
   }
 
   @Override
   public ValueResult getValues(ParameterizedElementDeclaration component, String parameterName) {
-    return withInternalService().getValues(component, parameterName);
+    try {
+      return withInternalService().getValues(component, parameterName);
+    } catch (Exception e) {
+      return resultFrom(newFailure()
+          .withMessage(format("Unknown error while resolving values for parameter: '%s'. %s", parameterName,
+                              getRootCauseMessage(e)))
+          .withReason(getStackTrace(e))
+          .build());
+    }
   }
 
   @Override

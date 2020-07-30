@@ -7,7 +7,6 @@
 package org.mule.runtime.module.tooling.internal.config;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
@@ -110,11 +109,17 @@ public class InternalDeclarationSession implements DeclarationSession {
 
   @Override
   public ValueResult getValues(ParameterizedElementDeclaration component, String parameterName) {
-    return artifactHelper()
-        .findModel(component)
-        .map(cm -> discoverValues(cm, parameterName, parameterValueResolver(component, cm), getConfigRef(component)))
-        //TODO: if model is not found it should return a failure instead of empty Values
-        .orElse(resultFrom(emptySet()));
+    try {
+      return artifactHelper()
+          .findModel(component)
+          .map(cm -> discoverValues(cm, parameterName, parameterValueResolver(component, cm), getConfigRef(component)))
+          .orElse(resultFrom(newFailure()
+              .withMessage("Could not resolve values")
+              .withReason(format("Could not find component: %s:%s", component.getDeclaringExtension(), component.getName()))
+              .build()));
+    } catch (Exception e) {
+      return resultFrom(newFailure(e).build());
+    }
   }
 
   private Optional<String> getConfigRef(ParameterizedElementDeclaration component) {
