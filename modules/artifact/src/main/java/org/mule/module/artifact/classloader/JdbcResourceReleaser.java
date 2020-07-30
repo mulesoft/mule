@@ -20,6 +20,8 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -55,9 +57,9 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       getBoolean(AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME);
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
-  public static final String ORACLE_DRIVER_TIMER_THREAD_NAME = "Timer-";
   public static final String ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
   public static final String COMPOSITE_CLASS_LOADER_CLASS_NAME = "CompositeClassLoader";
+  public static final Pattern ORACLE_DRIVER_TIMER_THREAD_PATTERN = Pattern.compile("^Tester-\\d+$");
   private final static Logger logger = LoggerFactory.getLogger(JdbcResourceReleaser.class);
   private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
       Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
@@ -317,10 +319,15 @@ public class JdbcResourceReleaser implements ResourceReleaser {
   }
 
   private boolean isOracleTimerThread(Thread thread) {
-    String artifactId = ((ArtifactClassLoader) this.getClass().getClassLoader()).getArtifactId();
+    ClassLoader undeployedArtifactClassLoader = this.getClass().getClassLoader();
+    if (!(undeployedArtifactClassLoader instanceof ArtifactClassLoader)) {
+      return false;
+    }
+    String artifactId = ((ArtifactClassLoader) undeployedArtifactClassLoader).getArtifactId();
+    Matcher oracleTimerThreadNameMatcher = ORACLE_DRIVER_TIMER_THREAD_PATTERN.matcher(thread.getName());
 
     return thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
-        && thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)
+        && oracleTimerThreadNameMatcher.find()
         && (isThreadLoadedByDisposedApplication(artifactId, thread.getContextClassLoader())
             || isThreadLoadedByDisposedDomain(artifactId, thread.getContextClassLoader()));
   }
@@ -352,6 +359,9 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
   private boolean isThreadLoadedByDisposedApplication(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
     try {
+      if (!(threadContextClassLoader instanceof MuleArtifactClassLoader)) {
+        return false;
+      }
       String threadClassLoaderArtifactId = ((MuleArtifactClassLoader) threadContextClassLoader).getArtifactId();
       return threadClassLoaderArtifactId != null && threadClassLoaderArtifactId.equals(undeployedArtifactId);
     } catch (Exception e) {
