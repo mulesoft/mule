@@ -2,6 +2,7 @@ package org.mule.tooling.extensions.metadata.internal.operation;
 
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -12,8 +13,10 @@ import org.mule.tooling.extensions.metadata.internal.config.SimpleConfiguration;
 import org.mule.tooling.extensions.metadata.internal.connection.TstExtensionClient;
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessConnectionLessMetadataResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessMetadataResolver;
-import org.mule.tooling.extensions.metadata.internal.parameters.ActingParameter;
-import org.mule.tooling.extensions.metadata.internal.parameters.ActingParameterGroup;
+import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelPartialTypeKeysOutputTypeResolver;
+import org.mule.tooling.extensions.metadata.api.parameters.ActingParameter;
+import org.mule.tooling.extensions.metadata.api.parameters.ActingParameterGroup;
+import org.mule.tooling.extensions.metadata.api.parameters.LocationKey;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterGroupVP;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;
 import org.mule.tooling.extensions.metadata.internal.value.ComplexActingParameterVP;
@@ -22,6 +25,8 @@ import org.mule.tooling.extensions.metadata.internal.value.ConfigLessNoActingPar
 import org.mule.tooling.extensions.metadata.internal.value.LevelThreeVP;
 import org.mule.tooling.extensions.metadata.internal.value.LevelTwoVP;
 import org.mule.tooling.extensions.metadata.internal.value.MultipleValuesSimpleVP;
+
+import java.util.Map;
 
 public class SimpleOperations {
 
@@ -38,6 +43,18 @@ public class SimpleOperations {
                                            @Connection TstExtensionClient client,
                                            @Optional @OfValues(ConfigLessNoActingParamVP.class) String providedParameter,
                                            @Optional @MetadataKeyId(ConfigLessMetadataResolver.class) String metadataKey) {
+    return null;
+  }
+
+  @OutputResolver(output = MultiLevelPartialTypeKeysOutputTypeResolver.class, attributes = MultiLevelPartialTypeKeysOutputTypeResolver.class)
+  public Result<String, Object> multiLevelPartialTypeKeysMetadataKey(
+      @MetadataKeyId(MultiLevelPartialTypeKeysOutputTypeResolver.class) @ParameterGroup(name="LocationKey") LocationKey locationKey,
+      @TypeResolver(MultiLevelPartialTypeKeysOutputTypeResolver.class) Map<String, Object> dynamicParam) {
+    return null;
+  }
+
+  @OutputResolver(output = MultiLevelPartialTypeKeysOutputTypeResolver.class)
+  public Result<String, Object> multiLevelShowInDslGroupPartialTypeKeysMetadataKey(@MetadataKeyId(MultiLevelPartialTypeKeysOutputTypeResolver.class) @ParameterGroup(name="LocationKeyShowInDsl", showInDsl = true) LocationKey locationKeyShowInDslParam) {
     return null;
   }
 

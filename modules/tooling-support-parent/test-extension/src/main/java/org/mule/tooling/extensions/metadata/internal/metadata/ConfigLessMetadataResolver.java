@@ -1,9 +1,7 @@
 package org.mule.tooling.extensions.metadata.internal.metadata;
 
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;

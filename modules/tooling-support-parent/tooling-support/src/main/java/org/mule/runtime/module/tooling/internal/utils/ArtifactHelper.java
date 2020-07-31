@@ -15,6 +15,7 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -29,6 +30,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.GlobalElementDeclarationVisitor;
@@ -99,6 +101,10 @@ public class ArtifactHelper {
       }
     }.walk(extensionModel);
     return ofNullable(foundModel.get());
+  }
+
+  public Optional<? extends ComponentModel> findComponentModel(ComponentElementDeclaration<?> componentDeclaration) {
+    return findModel(componentDeclaration).filter(m -> m instanceof ComponentModel).map(m -> (ComponentModel) m);
   }
 
   public Optional<ConfigurationElementDeclaration> findConfigurationDeclaration(String configName) {

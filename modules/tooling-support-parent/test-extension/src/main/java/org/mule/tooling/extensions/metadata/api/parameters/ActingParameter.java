@@ -1,4 +1,4 @@
-package org.mule.tooling.extensions.metadata.internal.parameters;
+package org.mule.tooling.extensions.metadata.api.parameters;
 
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
