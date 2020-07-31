@@ -71,7 +71,7 @@ public final class ErrorBuilder {
     this.description = exceptionDescription;
     this.detailedDescription = exceptionDescription;
     if (cause instanceof SuppressedMuleException) {
-      // We need to unwrap SuppressedMuleExceptions since they are not meant to be returned as error causes
+      // We need to unwrap SuppressedMuleException instances since they are not meant to be returned as error causes
       cause = ((SuppressedMuleException) e).unwrap();
       exception = cause;
       addSuppressedErrors((SuppressedMuleException) e);
@@ -93,12 +93,12 @@ public final class ErrorBuilder {
 
   /**
    * Given a {@link MuleException}, sets the <code>description</code> field with the message of it's root cause, taking into account possible suppressions.
-   * @param exception (must be the result of a {@link org.mule.runtime.api.exception.ExceptionHelper#getRootMuleException(Throwable)} call.
+   * @param muleException (must be the result of a {@link org.mule.runtime.api.exception.ExceptionHelper#getRootMuleException(Throwable)} call.
    */
-  private void updateErrorDescription(MuleException exception) {
-    MuleException muleRoot = exception;
+  private void updateErrorDescription(MuleException muleException) {
+    MuleException muleRoot = muleException;
     // Finding the first suppression root message (if present) is needed to make the suppressions backward compatible
-    List<MuleException> suppressedCauses = exception.getExceptionInfo().getSuppressedCauses();
+    List<MuleException> suppressedCauses = muleException.getExceptionInfo().getSuppressedCauses();
     if (!suppressedCauses.isEmpty()) {
       muleRoot = getRootMuleException(suppressedCauses.get(suppressedCauses.size() - 1));
     }
@@ -113,17 +113,20 @@ public final class ErrorBuilder {
    * @see SuppressedMuleException
    */
   private void addSuppressedErrors(MuleException muleException) {
-    List<Error> suppressions = new ArrayList<>(4);
-    for (MuleException suppressedException : muleException.getExceptionInfo().getSuppressedCauses()) {
-      if (suppressedException instanceof MessagingException) {
-        ((MessagingException) suppressedException).getEvent().getError().ifPresent(error -> {
-          suppressions.add(error);
-          // First suppressed error cause needs to be set in order to maintain backwards compatibility
-          exception = error.getCause();
-        });
+    List<MuleException> suppressedCauses = muleException.getExceptionInfo().getSuppressedCauses();
+    if (!suppressedCauses.isEmpty()) {
+      List<Error> suppressions = new ArrayList<>(suppressedCauses.size());
+      for (MuleException suppressedException : suppressedCauses) {
+        if (suppressedException instanceof MessagingException) {
+          ((MessagingException) suppressedException).getEvent().getError().ifPresent(error -> {
+            suppressions.add(error);
+            // First suppressed error cause needs to be set in order to maintain backwards compatibility
+            exception = error.getCause();
+          });
+        }
       }
+      suppressedErrors = suppressions;
     }
-    suppressedErrors = suppressions;
   }
 
   /**
