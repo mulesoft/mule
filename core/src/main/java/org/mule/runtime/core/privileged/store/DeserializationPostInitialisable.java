@@ -25,9 +25,22 @@ public interface DeserializationPostInitialisable {
 
   class Implementation {
 
+    private static Method getInitAfterDeserialisationMethod(final Class<?> clazz) throws NoSuchMethodException {
+      try {
+        return clazz.getDeclaredMethod("initAfterDeserialisation", MuleContext.class);
+      } catch (NoSuchMethodException e) {
+        Class<?> parent = clazz.getSuperclass();
+        if (parent != null) {
+          return getInitAfterDeserialisationMethod(parent);
+        } else {
+          throw e;
+        }
+      }
+    }
+
     public static void init(final Object object, final MuleContext muleContext) throws Exception {
       try {
-        final Method m = object.getClass().getDeclaredMethod("initAfterDeserialisation", MuleContext.class);
+        final Method m = getInitAfterDeserialisationMethod(object.getClass());
 
         Object o = AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
           try {
