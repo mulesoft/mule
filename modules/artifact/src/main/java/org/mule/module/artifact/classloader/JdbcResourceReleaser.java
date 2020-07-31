@@ -343,9 +343,11 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       List<ClassLoader> classLoaderList = (List<ClassLoader>) getDelegateClassLoadersMethod.invoke(threadContextClassLoader);
 
       for (ClassLoader classLoaderDelegate : classLoaderList) {
-        ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoaderDelegate;
-        if (artifactClassLoader.getArtifactId().contains(undeployedArtifactId)) {
-          return true;
+        if (classLoaderDelegate instanceof ArtifactClassLoader) {
+          ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoaderDelegate;
+          if (artifactClassLoader.getArtifactId().contains(undeployedArtifactId)) {
+            return true;
+          }
         }
       }
 
