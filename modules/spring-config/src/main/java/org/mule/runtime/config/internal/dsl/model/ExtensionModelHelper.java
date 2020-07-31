@@ -423,9 +423,19 @@ public class ExtensionModelHelper {
   }
 
   private Optional<ExtensionModel> lookupExtensionModelFor(ComponentIdentifier componentIdentifier) {
+    return lookupExtensionModelFor(componentIdentifier.getNamespace());
+  }
+
+  private Optional<ExtensionModel> lookupExtensionModelFor(String namespacePrefix) {
     return extensionsModels.stream()
-        .filter(e -> e.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace()))
+        .filter(e -> e.getXmlDslModel().getPrefix().equals(namespacePrefix))
         .findFirst();
+  }
+
+  public Optional<DslElementSyntax> resolveDslElementModel(MetadataType type, String namespacePrefix) {
+    final DslSyntaxResolver dslSyntaxResolver = getDslSyntaxResolver(namespacePrefix);
+
+    return dslSyntaxResolver.resolve(type);
   }
 
   public DslElementSyntax resolveDslElementModel(NamedObject component, ComponentIdentifier componentIdentifier) {
@@ -439,6 +449,15 @@ public class ExtensionModelHelper {
     ExtensionModel extensionModel = optionalExtensionModel
         .orElseThrow(() -> new IllegalStateException("Extension Model in context not present for componentIdentifier: "
             + componentIdentifier));
+
+    return dslSyntaxResolversByExtension.get(extensionModel);
+  }
+
+  private DslSyntaxResolver getDslSyntaxResolver(String namespacePrefix) {
+    Optional<ExtensionModel> optionalExtensionModel = lookupExtensionModelFor(namespacePrefix);
+    ExtensionModel extensionModel = optionalExtensionModel
+        .orElseThrow(() -> new IllegalStateException("Extension Model in context not present for namespace: "
+            + namespacePrefix));
 
     return dslSyntaxResolversByExtension.get(extensionModel);
   }

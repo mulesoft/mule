@@ -11,7 +11,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_P
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 
 import java.util.List;
