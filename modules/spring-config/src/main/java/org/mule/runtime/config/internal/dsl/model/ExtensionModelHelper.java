@@ -428,7 +428,7 @@ public class ExtensionModelHelper {
 
   private Optional<ExtensionModel> lookupExtensionModelFor(String namespacePrefix) {
     return extensionsModels.stream()
-        .filter(e -> e.getXmlDslModel().getPrefix().equals(namespacePrefix))
+        .filter(e -> e.getXmlDslModel().getPrefix().equals(namespacePrefix.equals("tls") ? "mule" : namespacePrefix))
         .findFirst();
   }
 
