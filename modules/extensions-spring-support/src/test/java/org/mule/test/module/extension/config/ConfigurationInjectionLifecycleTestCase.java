@@ -10,6 +10,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExternalLibraryType.NATIVE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.createDefaultExtensionManager;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
@@ -20,6 +23,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
@@ -75,6 +79,20 @@ public class ConfigurationInjectionLifecycleTestCase extends ExtensionFunctional
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
         muleContext.getCustomizationService().registerCustomServiceClass("lifecycleTracker", LifecycleTracker.class);
+      }
+    });
+    builders.add(new AbstractConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) throws Exception {
+        ExtensionManager extensionManager;
+        if (muleContext.getExtensionManager() == null) {
+          extensionManager = createDefaultExtensionManager();
+          muleContext.setExtensionManager(extensionManager);
+          initialiseIfNeeded(extensionManager, muleContext);
+        }
+        extensionManager = muleContext.getExtensionManager();
+        extensionManager.registerExtension(getExtensionModel());
       }
     });
     super.addBuilders(builders);

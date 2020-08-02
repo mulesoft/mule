@@ -60,6 +60,7 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntaxBuilder;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -258,38 +259,42 @@ public final class ApplicationModelTypeUtils {
           final DslElementSyntax paramSyntax =
               extensionModelHelper.resolveDslElementModel(paramModel, componentModel.getIdentifier());
 
-          if (isInfrastructure(paramModel.getType())) {
-            paramModel.getType().accept(new MetadataTypeVisitor() {
+          getIdentifier(paramSyntax)
+              .ifPresent(id -> {
+                final Collection<ComponentModel> nestedForId = nestedComponents.get(id);
 
-              @Override
-              public void visitObject(ObjectType objectType) {
-                enrichComponentModels(componentModel, nestedComponents,
-                                      extensionModelHelper.resolveDslElementModel(objectType, "mule"),
-                                      paramModel, extensionModelHelper);
-              }
+                if (isInfrastructure(paramModel.getType())) {
+                  paramModel.getType().accept(new MetadataTypeVisitor() {
 
-              @Override
-              public void visitUnion(UnionType unionType) {
-                enrichComponentModels(componentModel, nestedComponents,
-                                      of(paramSyntax),
-                                      paramModel, extensionModelHelper);
+                    @Override
+                    public void visitObject(ObjectType objectType) {
+                      enrichComponentModels(componentModel, nestedComponents,
+                                            extensionModelHelper.resolveDslElementModel(objectType, "mule"),
+                                            paramModel, extensionModelHelper);
+                    }
 
-                unionType.getTypes().forEach(type -> type.accept(this));
-              }
-            });
-          } else if (isContent(paramModel)) {
-            getIdentifier(paramSyntax)
-                .ifPresent(paramDslModel -> nestedComponents.get(paramDslModel)
-                    .forEach(childComp -> componentModel
-                        .setParameter(paramModel,
-                                      new DefaultComponentParameterAst(trim(childComp.getTextContent()),
-                                                                       () -> paramModel,
-                                                                       childComp.getMetadata()))));
-          } else {
-            enrichComponentModels(componentModel, nestedComponents,
-                                  of(paramSyntax),
-                                  paramModel, extensionModelHelper);
-          }
+                    @Override
+                    public void visitUnion(UnionType unionType) {
+                      enrichComponentModels(componentModel, nestedComponents,
+                                            of(paramSyntax),
+                                            paramModel, extensionModelHelper);
+
+                      unionType.getTypes().forEach(type -> type.accept(this));
+                    }
+                  });
+                } else if (isContent(paramModel)) {
+                  nestedForId
+                      .forEach(childComp -> componentModel
+                          .setParameter(paramModel,
+                                        new DefaultComponentParameterAst(trim(childComp.getTextContent()),
+                                                                         () -> paramModel,
+                                                                         childComp.getMetadata())));
+                } else {
+                  enrichComponentModels(componentModel, nestedComponents,
+                                        of(paramSyntax),
+                                        paramModel, extensionModelHelper);
+                }
+              });
         });
   }
 

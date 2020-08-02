@@ -15534,13 +15534,21 @@
                         "model": {
                           "type": "Union",
                           "annotations": {
-                            "typeId": "RevocationCheck"
+                            "typeId": "RevocationCheck",
+                            "extensibleType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
                                 "typeId": "standard-revocation-check",
+                                "QName": {
+                                  "value": {
+                                    "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                    "localPart": "standard-revocation-check",
+                                    "prefix": "tls"
+                                  }
+                                },
                                 "description": {
                                   "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
                                 }
@@ -15616,6 +15624,13 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "custom-ocsp-responder",
+                                "QName": {
+                                  "value": {
+                                    "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                    "localPart": "custom-ocsp-responder",
+                                    "prefix": "tls"
+                                  }
+                                },
                                 "description": {
                                   "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
                                 }
@@ -15653,6 +15668,13 @@
                               "type": "Object",
                               "annotations": {
                                 "typeId": "crl-file",
+                                "QName": {
+                                  "value": {
+                                    "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                    "localPart": "crl-file",
+                                    "prefix": "tls"
+                                  }
+                                },
                                 "description": {
                                   "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
                                 }
@@ -44142,13 +44164,21 @@
                     "model": {
                       "type": "Union",
                       "annotations": {
-                        "typeId": "RevocationCheck"
+                        "typeId": "RevocationCheck",
+                        "extensibleType": {}
                       },
                       "of": [
                         {
                           "type": "Object",
                           "annotations": {
                             "typeId": "standard-revocation-check",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "standard-revocation-check",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
                             }
@@ -44224,6 +44254,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "custom-ocsp-responder",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "custom-ocsp-responder",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
                             }
@@ -44261,6 +44298,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "crl-file",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "crl-file",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
                             }
@@ -45592,13 +45636,21 @@
                 "model": {
                   "type": "Union",
                   "annotations": {
-                    "typeId": "RevocationCheck"
+                    "typeId": "RevocationCheck",
+                    "extensibleType": {}
                   },
                   "of": [
                     {
                       "type": "Object",
                       "annotations": {
                         "typeId": "standard-revocation-check",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "standard-revocation-check",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
                         }
@@ -45674,6 +45726,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "custom-ocsp-responder",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "custom-ocsp-responder",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
                         }
@@ -45711,6 +45770,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "crl-file",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "crl-file",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
                         }
