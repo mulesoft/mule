@@ -26,6 +26,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isI
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getTypeFor;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 
@@ -269,7 +270,7 @@ public final class ApplicationModelTypeUtils {
                     @Override
                     public void visitObject(ObjectType objectType) {
                       enrichComponentModels(componentModel, nestedComponents,
-                                            extensionModelHelper.resolveDslElementModel(objectType, "mule"),
+                                            extensionModelHelper.resolveDslElementModel(objectType, CORE_PREFIX),
                                             paramModel, extensionModelHelper);
                     }
 

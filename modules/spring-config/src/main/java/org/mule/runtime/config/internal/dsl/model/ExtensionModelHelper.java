@@ -21,6 +21,8 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
@@ -428,7 +430,7 @@ public class ExtensionModelHelper {
 
   private Optional<ExtensionModel> lookupExtensionModelFor(String namespacePrefix) {
     return extensionsModels.stream()
-        .filter(e -> e.getXmlDslModel().getPrefix().equals(namespacePrefix.equals("tls") ? "mule" : namespacePrefix))
+        .filter(e -> e.getXmlDslModel().getPrefix().equals(namespacePrefix.equals(TLS_PREFIX) ? CORE_PREFIX : namespacePrefix))
         .findFirst();
   }
 
