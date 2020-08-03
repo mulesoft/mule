@@ -302,6 +302,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
           try {
             thread.stop();
             thread.interrupt();
+            thread.join();
           } catch (Throwable e) {
             logger
                 .debug("An error occurred trying to close the '" + thread.getName() + "' Thread. This might cause memory leaks.",
