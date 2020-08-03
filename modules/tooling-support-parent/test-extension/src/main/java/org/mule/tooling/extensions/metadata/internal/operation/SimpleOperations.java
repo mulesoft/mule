@@ -43,6 +43,7 @@ public class SimpleOperations {
 
   public Result<Void, Object> actingParameterOP(@Config SimpleConfiguration configuration,
                                                 @Connection TstExtensionClient client,
+                                                String otherRequiredParameterNotRequiredForMetadataNeitherValueProvider,
                                                 String actingParameter,
                                                 @Optional @OfValues(ActingParameterVP.class) String providedParameter) {
     return null;

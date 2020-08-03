@@ -10,12 +10,24 @@ package org.mule.tooling.extensions.metadata.internal.config;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.tooling.extensions.metadata.internal.operation.SimpleOperations;
 import org.mule.tooling.extensions.metadata.internal.source.SimpleSource;
+import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;
 
 @Operations({SimpleOperations.class})
 @Sources({SimpleSource.class})
 @Configuration(name="config")
 public class SimpleConfiguration {
+
+  @Parameter
+  private String actingParameter;
+
+  @Parameter
+  @Optional
+  @OfValues(ActingParameterVP.class)
+  private String providedParameter;
 
 }

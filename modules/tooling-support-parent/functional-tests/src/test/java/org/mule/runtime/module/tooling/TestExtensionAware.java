@@ -15,6 +15,7 @@ import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.SourceElementDeclaration;
+import org.mule.runtime.app.declaration.api.fluent.ConfigurationElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
@@ -52,15 +53,27 @@ public interface TestExtensionAware {
   }
 
   default ConfigurationElementDeclaration configurationDeclaration(String name, ConnectionElementDeclaration connection) {
-    return TEST_EXTENSION_DECLARER.newConfiguration(CONFIG_ELEMENT_NAME)
+    ConfigurationElementDeclarer configurationElementDeclarer = TEST_EXTENSION_DECLARER.newConfiguration(CONFIG_ELEMENT_NAME)
         .withRefName(name)
-        .withConnection(connection)
-        .getDeclaration();
+        .withParameterGroup(newParameterGroup()
+            .withParameter(ACTING_PARAMETER_NAME, name)
+            .getDeclaration());
+    if (connection != null) {
+      configurationElementDeclarer.withConnection(connection);
+    }
+    return configurationElementDeclarer.getDeclaration();
+  }
+
+  default ConfigurationElementDeclaration configurationDeclaration(String name) {
+    return configurationDeclaration(name, null);
   }
 
   default ConnectionElementDeclaration connectionDeclaration(String clientName) {
     return TEST_EXTENSION_DECLARER.newConnection(CONNECTION_ELEMENT_NAME)
-        .withParameterGroup(newParameterGroup().withParameter(CONNECTION_CLIENT_NAME_PARAMETER, clientName).getDeclaration())
+        .withParameterGroup(newParameterGroup()
+            .withParameter(CONNECTION_CLIENT_NAME_PARAMETER, clientName)
+            .withParameter(ACTING_PARAMETER_NAME, clientName)
+            .getDeclaration())
         .getDeclaration();
   }
 

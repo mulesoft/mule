@@ -10,7 +10,7 @@ package org.mule.runtime.module.tooling.api.artifact;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.value.ValueResult;
-import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
+import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 
 /**
  * It is in charge or resolving connector's operations and retrieving metadata for all
@@ -36,15 +36,15 @@ public interface DeclarationSession {
 
   /**
    * Retrieve all {@link org.mule.runtime.api.value.Value} that can be configured for the given parameter.
-   * @param component a {@link ComponentElementDeclaration} for the Component (Operation, Source, etc) from which
+   * @param parameterizedElementDeclaration a {@link ParameterizedElementDeclaration} for the component from which
    *                  the available values can be used on the parameter {@param parameterName}. In case the value
    *                  provider requires any acting parameters to be able to resolve this values, those parameters
    *                  should be populated in this declaration. Also, if the Component requires values from a Configuration,
-   *                  then its name should be specified in the declaration.
+   *                  then its reference name should be specified in the declaration.
    * @param parameterName the name of the parameter for which to resolve the {@link org.mule.runtime.api.value.Value}s
    * @return a {@link ValueResult} with the accepted parameter values to use
    */
-  ValueResult getValues(ComponentElementDeclaration component, String parameterName);
+  ValueResult getValues(ParameterizedElementDeclaration parameterizedElementDeclaration, String parameterName);
 
   /**
    * Stops and disposes all resources used by this {@link DeclarationSession}
