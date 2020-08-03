@@ -33,10 +33,8 @@ import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.GlobalElementDeclarationVisitor;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -47,8 +45,7 @@ public class ArtifactHelper {
   private ArtifactDeclaration artifactDeclaration;
   private ConfigurationComponentLocator componentLocator;
 
-  public ArtifactHelper(
-                        ExtensionManager extensionManager,
+  public ArtifactHelper(ExtensionManager extensionManager,
                         ConfigurationComponentLocator componentLocator,
                         ArtifactDeclaration artifactDeclaration) {
     this.extensionManager = extensionManager;
@@ -119,7 +116,7 @@ public class ArtifactHelper {
     return ofNullable(configDeclaration.get());
   }
 
-  public Optional<ConfigurationProvider> findConfigurationProvider(String configName) {
+  private Optional<ConfigurationProvider> findConfigurationProvider(String configName) {
     return findConfigurationDeclaration(configName)
         .map(ced -> Location.builder().globalName(ced.getRefName()).build())
         .flatMap(cloc -> componentLocator.find(cloc))
@@ -128,35 +125,11 @@ public class ArtifactHelper {
   }
 
   public Optional<ConnectionProvider> findConnectionProvider(String configName) {
-    return findConfigurationDeclaration(configName)
-        .map(ced -> Location.builder().globalName(ced.getRefName()).addConnectionPart().build())
-        .flatMap(conloc -> componentLocator.find(conloc))
-        .filter(c -> c instanceof ConnectionProviderResolver)
-        .map(cpr -> (ConnectionProviderResolver) cpr)
-        .map(cpr -> handlingException(
-                                      () -> ((ConnectionProvider) cpr
-                                          .resolve(null)
-                                          .getFirst())));
+    return getConfigurationInstance(configName).flatMap(ci -> ci.getConnectionProvider());
   }
 
   public Optional<ConfigurationInstance> getConfigurationInstance(String configName) {
     return findConfigurationProvider(configName).map(cp -> cp.get(getNullEvent()));
   }
-
-  public Optional<Object> getConnectionInstance(String configName) {
-    return findConnectionProvider(configName).map(c -> handlingException((CheckedSupplier<Object>) c::connect));
-  }
-
-  private <T> T handlingException(CheckedSupplier<T> supplier, String... errorMessage) {
-    try {
-      return supplier.get();
-    } catch (RuntimeException e) {
-      if (errorMessage.length > 0) {
-        throw new MuleRuntimeException(createStaticMessage(errorMessage[0]), e);
-      }
-      throw e;
-    }
-  }
-
 
 }
