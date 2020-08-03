@@ -150,13 +150,13 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
     return getExtensionModelFrom(modulePath, emptySet());
   }
 
-  private ExtensionModel getExtensionModelFrom(String modulePath, Set<ExtensionModel> extensions) {
+  private ExtensionModel getExtensionModelFrom(String modulePath, Set<ExtensionModel> depedencyExtensions) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     parameters.put("COMPILATION_MODE", true);
 
-    Set<ExtensionModel> allExtensions = new HashSet<>(extensions);
+    Set<ExtensionModel> allExtensions = new HashSet<>(depedencyExtensions);
     allExtensions.add(getExtensionModel());
 
     return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(allExtensions), parameters);

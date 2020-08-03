@@ -9,14 +9,22 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.createDefaultExtensionManager;
+
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -52,7 +60,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   protected Registry registry;
 
   private volatile boolean tearingDown = false;
-  private Set<FlowRunner> runners = new HashSet<>();
+  private final Set<FlowRunner> runners = new HashSet<>();
 
   public FunctionalTestCase() {
     super();
@@ -91,6 +99,29 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
       return createConfigurationBuilder(configResources, artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
     }
     return createConfigurationBuilder(getConfigFiles(), artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
+  }
+
+  protected ConfigurationBuilder extensionManagerWithMuleExtModelBuilder() {
+    return new AbstractConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) throws Exception {
+        ExtensionManager extensionManager = createExtensionManager(muleContext);
+        extensionManager.registerExtension(getExtensionModel());
+      }
+
+    };
+  }
+
+  protected ExtensionManager createExtensionManager(MuleContext muleContext) throws InitialisationException {
+    ExtensionManager extensionManager;
+    if (muleContext.getExtensionManager() == null) {
+      extensionManager = createDefaultExtensionManager();
+      muleContext.setExtensionManager(extensionManager);
+      initialiseIfNeeded(extensionManager, muleContext);
+    }
+    extensionManager = muleContext.getExtensionManager();
+    return extensionManager;
   }
 
   /**
