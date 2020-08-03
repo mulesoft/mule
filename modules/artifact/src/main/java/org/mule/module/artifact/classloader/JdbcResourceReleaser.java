@@ -60,7 +60,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
   public static final String ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
   public static final String COMPOSITE_CLASS_LOADER_CLASS_NAME = "CompositeClassLoader";
   public static final Pattern ORACLE_DRIVER_TIMER_THREAD_PATTERN = Pattern.compile("^Timer-\\d+");
-  private final static Logger logger = LoggerFactory.getLogger(JdbcResourceReleaser.class);
+  private static final Logger logger = LoggerFactory.getLogger(JdbcResourceReleaser.class);
   private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
       Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
 
@@ -376,7 +376,8 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     return false;
   }
 
-  private void clearReferencesStopTimerThread(Thread thread) throws Exception {
+  private void clearReferencesStopTimerThread(Thread thread)
+      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
     // Need to get references to:
     // in Sun/Oracle JDK:
     // - newTasksMayBeScheduled field (in java.util.TimerThread)
