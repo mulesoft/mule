@@ -306,7 +306,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       for (Thread thread : threads) {
         if (isOracleTimerThread(undeployedArtifactClassLoader, thread)) {
           try {
-            thread.stop();
+            clearReferencesStopTimerThread(thread);
             thread.interrupt();
             thread.join();
           } catch (Throwable e) {
@@ -374,5 +374,39 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     }
 
     return false;
+  }
+
+  private void clearReferencesStopTimerThread(Thread thread) throws Exception {
+    // Need to get references to:
+    // in Sun/Oracle JDK:
+    // - newTasksMayBeScheduled field (in java.util.TimerThread)
+    // - queue field
+    // - queue.clear()
+    // in IBM JDK, Apache Harmony:
+    // - cancel() method (in java.util.Timer$TimerImpl)
+    try {
+      Field newTasksMayBeScheduledField =
+          thread.getClass().getDeclaredField("newTasksMayBeScheduled");
+      newTasksMayBeScheduledField.setAccessible(true);
+      Field queueField = thread.getClass().getDeclaredField("queue");
+      queueField.setAccessible(true);
+      Object queue = queueField.get(thread);
+      Method clearMethod = queue.getClass().getDeclaredMethod("clear");
+      clearMethod.setAccessible(true);
+      synchronized (queue) {
+        newTasksMayBeScheduledField.setBoolean(thread, false);
+        clearMethod.invoke(queue);
+        // In case queue was already empty. Should only be one
+        // thread waiting but use notifyAll() to be safe.
+        queue.notifyAll();
+      }
+    } catch (NoSuchFieldException noSuchFieldEx) {
+      logger.warn("Unable to clear timer references using 'clear' method. Attempting to use 'cancel' method.");
+      Method cancelMethod = thread.getClass().getDeclaredMethod("cancel");
+      synchronized (thread) {
+        cancelMethod.setAccessible(true);
+        cancelMethod.invoke(thread);
+      }
+    }
   }
 }
