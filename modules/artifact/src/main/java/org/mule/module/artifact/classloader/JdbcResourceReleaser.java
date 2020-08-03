@@ -54,7 +54,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
   private static final String AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME = "avoid.dispose.oracle.threads";
   private static final boolean JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_ORACLE_THREADS =
-          getBoolean(AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME);
+      getBoolean(AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME);
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
   public static final String ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
@@ -62,7 +62,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
   public static final Pattern ORACLE_DRIVER_TIMER_THREAD_PATTERN = Pattern.compile("^Timer-\\d+");
   private final static Logger logger = LoggerFactory.getLogger(JdbcResourceReleaser.class);
   private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
-          Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
+      Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
 
   @Override
   public void release() {
@@ -80,8 +80,8 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       } else {
         if (logger.isDebugEnabled()) {
           logger
-                  .debug(format("Skipping deregister driver %s. It wasn't loaded by the classloader of the artifact being released.",
-                          driver.getClass()));
+              .debug(format("Skipping deregister driver %s. It wasn't loaded by the classloader of the artifact being released.",
+                            driver.getClass()));
         }
       }
     }
@@ -208,7 +208,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       // artifact classloaders when several redeployments are performed.
       cleanMySqlCleanupThreadsThreadFactory(cleanupThreadsClass);
     } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
-            | IllegalArgumentException | InvocationTargetException e) {
+        | IllegalArgumentException | InvocationTargetException e) {
       logger.warn("Unable to shutdown MySql's AbandonedConnectionCleanupThread", e);
     }
   }
@@ -228,15 +228,15 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     // Note that the field 'cleanupThreadExcecutorService' is mispelled. There's actually a typo in MySql driver code.
     try {
       Field cleanupExecutorServiceField = cleanupThreadsClass
-              .getDeclaredField("cleanupThreadExcecutorService");
+          .getDeclaredField("cleanupThreadExcecutorService");
       cleanupExecutorServiceField.setAccessible(true);
       ExecutorService delegateCleanupExecutorService =
-              (ExecutorService) cleanupExecutorServiceField.get(cleanupThreadsClass);
+          (ExecutorService) cleanupExecutorServiceField.get(cleanupThreadsClass);
 
       Field realExecutorServiceField = delegateCleanupExecutorService.getClass().getSuperclass().getDeclaredField("e");
       realExecutorServiceField.setAccessible(true);
       ThreadPoolExecutor realExecutorService =
-              (ThreadPoolExecutor) realExecutorServiceField.get(delegateCleanupExecutorService);
+          (ThreadPoolExecutor) realExecutorServiceField.get(delegateCleanupExecutorService);
 
       // Set cleanup thread executor service thread factory to one whose classloader is the system one
       realExecutorService.setThreadFactory(Executors.defaultThreadFactory());
@@ -254,7 +254,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
    * @throws NoSuchMethodException
    */
   private void shutdownMySqlConnectionCleanupThreads(Class<?> classAbandonedConnectionCleanupThread)
-          throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+      throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
     try {
       Method uncheckedShutdown = classAbandonedConnectionCleanupThread.getMethod("uncheckedShutdown");
       uncheckedShutdown.invoke(null);
@@ -291,7 +291,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
         enumerate(threads);
       } catch (Throwable t) {
         logger
-                .debug("An error occurred trying to obtain available Threads. Thread cleanup will be skipped.", t);
+            .debug("An error occurred trying to obtain available Threads. Thread cleanup will be skipped.", t);
         return;
       }
 
@@ -311,8 +311,8 @@ public class JdbcResourceReleaser implements ResourceReleaser {
             thread.join();
           } catch (Throwable e) {
             logger
-                    .warn("An error occurred trying to close the '" + thread.getName() + "' Thread. This might cause memory leaks.",
-                            e);
+                .warn("An error occurred trying to close the '" + thread.getName() + "' Thread. This might cause memory leaks.",
+                      e);
           }
         }
       }
@@ -329,8 +329,8 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     Matcher oracleTimerThreadNameMatcher = ORACLE_DRIVER_TIMER_THREAD_PATTERN.matcher(thread.getName());
 
     return thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
-            && oracleTimerThreadNameMatcher.matches()
-            && (isThreadLoadedByDisposedApplication(artifactId, thread.getContextClassLoader())
+        && oracleTimerThreadNameMatcher.matches()
+        && (isThreadLoadedByDisposedApplication(artifactId, thread.getContextClassLoader())
             || isThreadLoadedByDisposedDomain(artifactId, thread.getContextClassLoader()));
   }
 
@@ -355,7 +355,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
     } catch (Exception e) {
       logger.warn("Exception occurred while attempting to compare {} and {} artifactId.", threadContextClassLoader,
-              this.getClass().getClassLoader());
+                  this.getClass().getClassLoader());
     }
 
     return false;
@@ -370,7 +370,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       return threadClassLoaderArtifactId != null && threadClassLoaderArtifactId.equals(undeployedArtifactId);
     } catch (Exception e) {
       logger.warn("Exception occurred while attempting to compare {} and {} artifact id.", threadContextClassLoader,
-              this.getClass().getClassLoader());
+                  this.getClass().getClassLoader());
     }
 
     return false;
