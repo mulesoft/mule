@@ -404,10 +404,8 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     } catch (NoSuchFieldException noSuchFieldEx) {
       logger.warn("Unable to clear timer references using 'clear' method. Attempting to use 'cancel' method.");
       Method cancelMethod = thread.getClass().getDeclaredMethod("cancel");
-      synchronized (thread) {
-        cancelMethod.setAccessible(true);
-        cancelMethod.invoke(thread);
-      }
+      cancelMethod.setAccessible(true);
+      cancelMethod.invoke(thread);
     }
   }
 }
