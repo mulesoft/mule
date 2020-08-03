@@ -6,23 +6,15 @@
  */
 package org.mule.runtime.config.dsl.model;
 
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-
 import java.util.List;
 
 public class ComplexActingParameter {
 
-  @Parameter
   private int intParam;
-
-  @Parameter
   private String stringParam;
-
-  @Parameter
   private List<String> listParam;
-
-  @Parameter
   private InnerPojo innerPojoParam;
+  //TODO: ADD other parameter of MAP type to test all cases.
 
   public int getIntParam() {
     return intParam;
@@ -40,7 +32,7 @@ public class ComplexActingParameter {
     return innerPojoParam;
   }
 
-  private static class InnerPojo {
+  public static class InnerPojo {
 
     private int intParam;
     private String stringParam;

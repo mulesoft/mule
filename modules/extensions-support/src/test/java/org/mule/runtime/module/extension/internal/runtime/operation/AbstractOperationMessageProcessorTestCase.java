@@ -315,7 +315,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
     when(extensionManager.getExtensions()).thenReturn(Collections.singleton(extensionModel));
 
-    when(cacheIdGeneratorFactory.create(any())).thenReturn(cacheIdGenerator);
+    when(cacheIdGeneratorFactory.create(any(), any())).thenReturn(cacheIdGenerator);
 
     Answer<Object> cacheIdAnswer = invocation -> of(new MetadataCacheId(UUID.getUUID(), null));
 

@@ -30,10 +30,10 @@ public abstract class AbstractMetadataResolutionTypeInformation implements Metad
   private void setPrivateFields(EnrichableModel enrichableModel,
                                 Function<TypeResolversInformationModelProperty, Optional<ResolverInformation>> getResolverInformationFromModelProperty) {
     Optional<TypeResolversInformationModelProperty> typeResolversInformationModelProperty =
-            enrichableModel.getModelProperty(TypeResolversInformationModelProperty.class);
+        enrichableModel.getModelProperty(TypeResolversInformationModelProperty.class);
     if (typeResolversInformationModelProperty.isPresent()) {
       resolverName = getResolverInformationFromModelProperty.apply(typeResolversInformationModelProperty.get())
-              .map(resolverInformation -> resolverInformation.getResolverName()).orElse(null);
+          .map(resolverInformation -> resolverInformation.getResolverName()).orElse(null);
       resolverCategory = typeResolversInformationModelProperty.get().getCategoryName();
     }
   }

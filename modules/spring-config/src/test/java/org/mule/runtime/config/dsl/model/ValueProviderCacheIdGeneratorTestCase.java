@@ -22,6 +22,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
+import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
@@ -29,12 +30,19 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedValueProviderCacheIdGenerator;
+import org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedMetadataCacheIdGenerator;
+import org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.ContextBasedValueProviderCacheIdGenerator;
+import org.mule.runtime.config.api.dsl.model.metadata.DslElementBasedMetadataCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DslElementBasedValueProviderCacheIdGenerator;
+import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.config.api.dsl.model.metadata.context.AstValueProviderCacheIdGeneratorContext;
 import org.mule.runtime.config.api.dsl.model.metadata.context.DeclarationValueProviderCacheIdGeneratorContextFactory;
 import org.mule.runtime.config.api.dsl.model.metadata.context.ValueProviderCacheIdGeneratorContext;
 import org.mule.runtime.config.internal.model.ApplicationModel;
+import org.mule.runtime.core.internal.locator.ComponentLocator;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 
@@ -66,13 +74,16 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
       throws Exception {
     ApplicationModel app = loadApplicationModel(appDeclaration);
     Locator locator = new Locator(app);
+    ComponentLocator<DslElementModel<?>> dslLocator = l -> getDeclaration(appDeclaration, l.toString()).map(d -> dslElementModelFactory.create(d).orElse(null));
     ValueProviderCacheIdGenerator<ComponentAst> componentAstBasedValueProviderCacheIdGenerator =
         new ComponentAstBasedValueProviderCacheIdGenerator(locator);
+    ValueProviderCacheIdGenerator<ComponentAst> dslDelegatingValueProviderCacheIdGenerator =
+        new ComponentBasedValueProviderCacheIdGenerator(dslContext, locator);
     ValueProviderCacheIdGenerator<DslElementModel<?>> dslElementModelValueProviderCacheIdGenerator =
-            new DslElementBasedValueProviderCacheIdGenerator(l -> locator.get(l).map(ast -> dslElementModelFactory.create(ast).orElse(null)));
+        new DslElementBasedValueProviderCacheIdGenerator(dslLocator);
 
     ComponentAst component = getComponentAst(app, location);
-    DslElementModel<?> dslElementModel = dslElementModelFactory.create(component).orElseThrow(() -> new AssertionError("Could not create dslElementModel"));
+    DslElementModel<?> dslElementModel = dslLocator.get(Location.builderFromStringRepresentation(location).build()).orElseThrow(() -> new AssertionError("Could not create dslElementModel"));
 
     Optional<ComponentAst> configAst = resolveConfigName(component)
         .flatMap(configName -> locator.get(Location.builderFromStringRepresentation(configName).build()));
@@ -113,14 +124,19 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
     Optional<ValueProviderCacheId> declarationContextId =
         contextBasedValueProviderCacheIdGenerator.getIdForResolvedValues(declarationContext, parameterName);
     Optional<ValueProviderCacheId> dslElementId =
-            dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName);
+        dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName);
+    Optional<ValueProviderCacheId> dslDelegatingId =
+        dslDelegatingValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
 
-    checkIdsAreEqual(astContextId, componentBasedId);
-    checkIdsAreEqual(componentBasedId, declarationContextId);
-    checkIdsAreEqual(declarationContextId, dslElementId);
+    MetadataCacheIdGenerator<DslElementModel<?>> cacheGenerator = new DslElementBasedMetadataCacheIdGenerator(dslLocator);
+    Optional<MetadataCacheId> generatedId = cacheGenerator.getIdForComponentMetadata(dslElementModelFactory.create(declareOperation(OPERATION_NAME)).get().getContainedElements().get(2));
+
+    //checkIdsAreEqual(astContextId, componentBasedId);
+    //checkIdsAreEqual(componentBasedId, declarationContextId);
+    checkIdsAreEqual(dslElementId, dslDelegatingId);
 
     //Any should be fine
-    return declarationContextId;
+    return dslElementId;
   }
 
   private Optional<String> resolveConfigName(ComponentAst elementModel) {

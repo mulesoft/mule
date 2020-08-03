@@ -47,9 +47,9 @@ public class InputMetadataResolutionTypeInformation extends AbstractMetadataReso
     checkArgument(component.getModel() instanceof ParameterizedModel,
                   "Cannot generate an Input Cache Key for a component with no parameters");
     checkArgument(((ParameterizedModel) component.getModel()).getAllParameterModels().stream()
-                          .anyMatch(parameterModel -> parameterModel.getName().equals(parameterName)),
+        .anyMatch(parameterModel -> parameterModel.getName().equals(parameterName)),
                   "Cannot generate an Input Cache Key for the component since it does not have a parameter named "
-                  + parameterName);
+                      + parameterName);
     componentTypeMetadataCacheId = getTypeCacheId(parameterName);
   }
 

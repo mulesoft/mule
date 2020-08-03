@@ -11,9 +11,11 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getGlobalElement;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getModelName;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getSourceElementName;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveConfigName;
+import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveSimpleValue;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.sourceElementNameFromSimpleValue;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -24,6 +26,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -282,72 +285,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
   }
 
   private Optional<MetadataCacheId> resolveKeyFromSimpleValue(DslElementModel<?> element) {
-    if (element == null || !element.getValue().isPresent()) {
-      return empty();
-    }
-
-    final String value = element.getValue().get();
-    final String sourceElementName = sourceElementNameFromSimpleValue(element);
-
-    final MetadataCacheId valuePart = new MetadataCacheId(value.hashCode(), sourceElementName);
-    if (value.contains(DEFAULT_EXPRESSION_PREFIX)) {
-      return of(valuePart);
-    }
-
-    Reference<MetadataCacheId> reference = new Reference<>();
-    if (element.getModel() instanceof ParameterModel) {
-      ParameterModel model = (ParameterModel) element.getModel();
-      model.getType()
-          .accept(new MetadataTypeVisitor() {
-
-            @Override
-            public void visitString(StringType stringType) {
-              if (!model.getAllowedStereotypes().isEmpty()) {
-                getHashedGlobal(value).ifPresent(reference::set);
-              }
-            }
-
-            @Override
-            public void visitArrayType(ArrayType arrayType) {
-              if (model.getDslConfiguration().allowsReferences()) {
-                getHashedGlobal(value).ifPresent(reference::set);
-              }
-            }
-
-            @Override
-            public void visitObject(ObjectType objectType) {
-              if (model.getDslConfiguration().allowsReferences()) {
-                getHashedGlobal(value).ifPresent(reference::set);
-              }
-            }
-
-          });
-
-    } else if (element.getModel() instanceof MetadataType) {
-      ((MetadataType) element.getModel()).accept(new MetadataTypeVisitor() {
-
-        @Override
-        public void visitArrayType(ArrayType arrayType) {
-          getHashedGlobal(value).ifPresent(reference::set);
-        }
-
-        @Override
-        public void visitObject(ObjectType objectType) {
-          boolean canBeGlobal = objectType.getAnnotation(TypeDslAnnotation.class)
-              .map(TypeDslAnnotation::allowsTopLevelDefinition).orElse(false);
-
-          if (canBeGlobal) {
-            getHashedGlobal(value).ifPresent(reference::set);
-          }
-        }
-
-      });
-    } else {
-      LOGGER.warn(format("Unknown model type '%s' found for element '%s'", String.valueOf(element.getModel()),
-                         element.getIdentifier().map(Object::toString).orElse(sourceElementName)));
-    }
-
-    return of(reference.get() == null ? valuePart : reference.get());
+    return resolveSimpleValue(element, locator).flatMap(either -> either.reduce(this::getIdForComponentMetadata, r -> of(new MetadataCacheId(r.hashCode(), sourceElementNameFromSimpleValue(element)))));
   }
 
   private MetadataCacheId createCategoryMetadataCacheId(String category) {
@@ -359,10 +297,6 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
   }
 
   private Optional<MetadataCacheId> getHashedGlobal(String name) {
-    if (!isBlank(name)) {
-      return locator.get(Location.builder().globalName(name).build())
-          .map(global -> getIdForComponentMetadata(global).orElse(null));
-    }
-    return empty();
+    return getGlobalElement(name, locator).flatMap(this::getIdForComponentMetadata);
   }
 }

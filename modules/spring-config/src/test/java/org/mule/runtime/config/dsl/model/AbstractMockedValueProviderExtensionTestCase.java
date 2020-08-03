@@ -55,6 +55,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
+import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
@@ -505,7 +506,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
   }
 
-  private OperationElementDeclaration declareOperation(String operationName) {
+  public OperationElementDeclaration declareOperation(String operationName) {
     return declarer.newOperation(operationName)
         .withConfig(MY_CONFIG)
         .withParameterGroup(newParameterGroup()
@@ -569,6 +570,10 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
       }
     });
     return componentAst.get();
+  }
+
+  protected Optional<ElementDeclaration> getDeclaration(ArtifactDeclaration app, String location) {
+    return app.findElement(org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation(location).build());
   }
 
 
