@@ -125,7 +125,7 @@ public class ArtifactHelper {
   }
 
   public Optional<ConnectionProvider> findConnectionProvider(String configName) {
-    return getConfigurationInstance(configName).flatMap(ci -> ci.getConnectionProvider());
+    return getConfigurationInstance(configName).flatMap(ConfigurationInstance::getConnectionProvider);
   }
 
   public Optional<ConfigurationInstance> getConfigurationInstance(String configName) {

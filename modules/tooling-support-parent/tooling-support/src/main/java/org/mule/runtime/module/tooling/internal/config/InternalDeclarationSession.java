@@ -37,7 +37,6 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBasedParameterResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
@@ -47,17 +46,15 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
+import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
 public class InternalDeclarationSession implements DeclarationSession {
-
-  private static final Supplier<Object> NULL_SUPPLIER = () -> null;
 
   @Inject
   private ConfigurationComponentLocator componentLocator;
