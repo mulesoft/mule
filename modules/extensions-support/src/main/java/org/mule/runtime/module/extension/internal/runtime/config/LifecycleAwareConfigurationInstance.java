@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.ASYNC_TEST_CONNECTIVITY_TIMEOUT_PROPERTY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_DISABLE_TEST_CONNECTION_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -20,7 +21,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -360,6 +360,8 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
   private boolean getDoTestConnectivityProperty() {
     return System.getProperty(DO_TEST_CONNECTIVITY_PROPERTY_NAME) != null
         ? valueOf(System.getProperty(DO_TEST_CONNECTIVITY_PROPERTY_NAME))
-        : !configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
+        : !configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY)
+            .orElse(configurationProperties.resolveBooleanProperty(MULE_DISABLE_TEST_CONNECTION_ON_DEPLOYMENT_PROPERTY)
+                .orElse(false));
   }
 }

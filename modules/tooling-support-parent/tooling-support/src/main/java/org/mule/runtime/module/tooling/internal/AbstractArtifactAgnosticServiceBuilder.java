@@ -27,6 +27,8 @@ import org.mule.runtime.module.deployment.impl.internal.application.DefaultAppli
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
 import org.mule.runtime.module.tooling.api.ArtifactAgnosticServiceBuilder;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
@@ -125,7 +127,9 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
       applicationDescriptor.setArtifactDeclaration(artifactDeclaration);
       applicationDescriptor.setConfigResources(singleton("empty-app.xml"));
       applicationDescriptor.setArtifactLocation(applicationFolder);
-      applicationDescriptor.setAppProperties(artifactProperties);
+      applicationDescriptor.setAppProperties(ImmutableMap.<String, String>builder()
+          .putAll(artifactProperties)
+          .putAll(forcedDeploymentProperties()).build());
       createDeployablePomFile(applicationFolder, model);
       updateArtifactPom(applicationFolder, model);
       MavenClientProvider mavenClientProvider =
@@ -138,6 +142,10 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
                         ArtifactType.APP));
       return defaultApplicationFactory.createArtifact(applicationDescriptor);
     });
+  }
+
+  protected Map<String, String> forcedDeploymentProperties() {
+    return emptyMap();
   }
 
   protected abstract S createService(ApplicationSupplier applicationSupplier);
