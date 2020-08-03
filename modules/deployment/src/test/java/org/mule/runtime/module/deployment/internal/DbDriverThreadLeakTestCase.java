@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -48,6 +49,7 @@ public abstract class DbDriverThreadLeakTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Issue("MULE-18542")
   public void oracleDriverTimerThreadsReleasedOnUndeploy() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder();
 
