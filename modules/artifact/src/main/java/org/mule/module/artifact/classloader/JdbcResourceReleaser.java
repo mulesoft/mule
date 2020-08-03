@@ -8,7 +8,6 @@ package org.mule.module.artifact.classloader;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static java.lang.Thread.activeCount;
 import static java.lang.Thread.enumerate;
 import static java.lang.Boolean.getBoolean;
@@ -17,8 +16,12 @@ import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
 
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -51,14 +54,15 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
   private static final String AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME = "avoid.dispose.oracle.threads";
   private static final boolean JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_ORACLE_THREADS =
-      getBoolean(AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME);
+          getBoolean(AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME);
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
-  public static final String ORACLE_DRIVER_TIMER_THREAD_NAME = "Timer-";
   public static final String ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
-  private final transient Logger logger = LoggerFactory.getLogger(getClass());
+  public static final String COMPOSITE_CLASS_LOADER_CLASS_NAME = "CompositeClassLoader";
+  public static final Pattern ORACLE_DRIVER_TIMER_THREAD_PATTERN = Pattern.compile("^Timer-\\d+");
+  private final static Logger logger = LoggerFactory.getLogger(JdbcResourceReleaser.class);
   private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
-      Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
+          Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
 
   @Override
   public void release() {
@@ -76,8 +80,8 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       } else {
         if (logger.isDebugEnabled()) {
           logger
-              .debug(format("Skipping deregister driver %s. It wasn't loaded by the classloader of the artifact being released.",
-                            driver.getClass()));
+                  .debug(format("Skipping deregister driver %s. It wasn't loaded by the classloader of the artifact being released.",
+                          driver.getClass()));
         }
       }
     }
@@ -204,7 +208,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       // artifact classloaders when several redeployments are performed.
       cleanMySqlCleanupThreadsThreadFactory(cleanupThreadsClass);
     } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
+            | IllegalArgumentException | InvocationTargetException e) {
       logger.warn("Unable to shutdown MySql's AbandonedConnectionCleanupThread", e);
     }
   }
@@ -224,15 +228,15 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     // Note that the field 'cleanupThreadExcecutorService' is mispelled. There's actually a typo in MySql driver code.
     try {
       Field cleanupExecutorServiceField = cleanupThreadsClass
-          .getDeclaredField("cleanupThreadExcecutorService");
+              .getDeclaredField("cleanupThreadExcecutorService");
       cleanupExecutorServiceField.setAccessible(true);
       ExecutorService delegateCleanupExecutorService =
-          (ExecutorService) cleanupExecutorServiceField.get(cleanupThreadsClass);
+              (ExecutorService) cleanupExecutorServiceField.get(cleanupThreadsClass);
 
       Field realExecutorServiceField = delegateCleanupExecutorService.getClass().getSuperclass().getDeclaredField("e");
       realExecutorServiceField.setAccessible(true);
       ThreadPoolExecutor realExecutorService =
-          (ThreadPoolExecutor) realExecutorServiceField.get(delegateCleanupExecutorService);
+              (ThreadPoolExecutor) realExecutorServiceField.get(delegateCleanupExecutorService);
 
       // Set cleanup thread executor service thread factory to one whose classloader is the system one
       realExecutorService.setThreadFactory(Executors.defaultThreadFactory());
@@ -250,7 +254,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
    * @throws NoSuchMethodException
    */
   private void shutdownMySqlConnectionCleanupThreads(Class<?> classAbandonedConnectionCleanupThread)
-      throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+          throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
     try {
       Method uncheckedShutdown = classAbandonedConnectionCleanupThread.getMethod("uncheckedShutdown");
       uncheckedShutdown.invoke(null);
@@ -287,59 +291,86 @@ public class JdbcResourceReleaser implements ResourceReleaser {
         enumerate(threads);
       } catch (Throwable t) {
         logger
-            .debug("An error occurred trying to obtain available Threads. Thread cleanup will be skipped.", t);
+                .debug("An error occurred trying to obtain available Threads. Thread cleanup will be skipped.", t);
         return;
       }
 
+      ClassLoader undeployedArtifactClassLoader = this.getClass().getClassLoader();
+
       /* IMPORTANT: this is done to avoid metaspace OOM caused by oracle driver
       thread leak. This is only meant to stop TimerThread threads spawned
-      by oracle driver's HAManger class. This timer cannot be fetched
+      by oracle driver's HAManager class. This timer cannot be fetched
       by reflection because, in order to do so, other oracle dependencies
       would be required.
       * */
       for (Thread thread : threads) {
-        if (isThreadApplicationTimerThread(thread)) {
+        if (isOracleTimerThread(undeployedArtifactClassLoader, thread)) {
           try {
             thread.stop();
             thread.interrupt();
             thread.join();
           } catch (Throwable e) {
             logger
-                .debug("An error occurred trying to close the '" + thread.getName() + "' Thread. This might cause memory leaks.",
-                       e);
+                    .warn("An error occurred trying to close the '" + thread.getName() + "' Thread. This might cause memory leaks.",
+                            e);
           }
         }
       }
     } catch (Exception e) {
-      logger.debug(e.getMessage());
+      logger.error("An exception occurred while attempting to dispose of oracle timer threads: {}", e.getMessage());
     }
   }
 
-  private boolean isThreadApplicationTimerThread(Thread thread) {
+  private boolean isOracleTimerThread(ClassLoader undeployedArtifactClassLoader, Thread thread) {
+    if (!(undeployedArtifactClassLoader instanceof ArtifactClassLoader)) {
+      return false;
+    }
+    String artifactId = ((ArtifactClassLoader) undeployedArtifactClassLoader).getArtifactId();
+    Matcher oracleTimerThreadNameMatcher = ORACLE_DRIVER_TIMER_THREAD_PATTERN.matcher(thread.getName());
+
     return thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
-        && thread.getName().contains(ORACLE_DRIVER_TIMER_THREAD_NAME)
-        && isThreadLoadedByThisClassLoader(thread.getContextClassLoader());
+            && oracleTimerThreadNameMatcher.matches()
+            && (isThreadLoadedByDisposedApplication(artifactId, thread.getContextClassLoader())
+            || isThreadLoadedByDisposedDomain(artifactId, thread.getContextClassLoader()));
   }
 
-  private boolean isThreadLoadedByThisClassLoader(ClassLoader threadBaseClassLoader) {
-    ClassLoader threadClassLoader = threadBaseClassLoader;
-    ClassLoader lastClassLoader = null;
-    ClassLoader resourceReleaserClassLoader = this.getClass().getClassLoader();
-
-    while (threadClassLoader != null) {
-      lastClassLoader = threadClassLoader;
-      // It has to be the same reference not equals to
-      if (threadClassLoader == resourceReleaserClassLoader) {
-        return true;
+  private boolean isThreadLoadedByDisposedDomain(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
+    try {
+      Class threadContextClassLoaderClass = threadContextClassLoader.getClass();
+      if (!threadContextClassLoaderClass.getSimpleName().equals(COMPOSITE_CLASS_LOADER_CLASS_NAME)) {
+        return false;
       }
-      threadClassLoader = threadClassLoader.getParent();
+
+      Method getDelegateClassLoadersMethod = threadContextClassLoaderClass.getMethod("getDelegates");
+      List<ClassLoader> classLoaderList = (List<ClassLoader>) getDelegateClassLoadersMethod.invoke(threadContextClassLoader);
+
+      for (ClassLoader classLoaderDelegate : classLoaderList) {
+        if (classLoaderDelegate instanceof ArtifactClassLoader) {
+          ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoaderDelegate;
+          if (artifactClassLoader.getArtifactId().contains(undeployedArtifactId)) {
+            return true;
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      logger.warn("Exception occurred while attempting to compare {} and {} artifactId.", threadContextClassLoader,
+              this.getClass().getClassLoader());
     }
 
-    while (resourceReleaserClassLoader != null) {
-      if (lastClassLoader == resourceReleaserClassLoader) {
-        return true;
+    return false;
+  }
+
+  private boolean isThreadLoadedByDisposedApplication(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
+    try {
+      if (!(threadContextClassLoader instanceof MuleArtifactClassLoader)) {
+        return false;
       }
-      resourceReleaserClassLoader = resourceReleaserClassLoader.getParent();
+      String threadClassLoaderArtifactId = ((MuleArtifactClassLoader) threadContextClassLoader).getArtifactId();
+      return threadClassLoaderArtifactId != null && threadClassLoaderArtifactId.equals(undeployedArtifactId);
+    } catch (Exception e) {
+      logger.warn("Exception occurred while attempting to compare {} and {} artifact id.", threadContextClassLoader,
+              this.getClass().getClassLoader());
     }
 
     return false;
