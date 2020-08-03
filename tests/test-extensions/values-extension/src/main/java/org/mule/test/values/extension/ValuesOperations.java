@@ -7,10 +7,12 @@
 package org.mule.test.values.extension;
 
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
+import org.mule.test.values.extension.resolver.WithComplexActingParameter;
 import org.mule.test.values.extension.resolver.WithConfigValueProvider;
 import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
 import org.mule.test.values.extension.resolver.WithErrorValueProvider;
@@ -66,4 +68,7 @@ public class ValuesOperations {
   public void withErrorValueProvider(@OfValues(WithErrorValueProvider.class) String values, String errorCode) {
 
   }
+
+  public void withComplexActingParameter(@Optional @OfValues(WithComplexActingParameter.class) String providedParameter,
+                                         ComplexActingParameter complexActingParameter) {}
 }
