@@ -10,6 +10,7 @@ import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -118,6 +119,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private ComponentLocation location;
 
   private Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>> fluxFactory;
+  private List<String> suppressedErrorTypeMatches = emptyList();
 
   private final class OnErrorHandlerFluxObjectFactory
       implements Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>>, Disposable {
@@ -442,26 +444,41 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private boolean acceptsErrorType(CoreEvent event) {
     Error error = event.getError().get();
     return errorTypeMatcher == null || errorTypeMatcher.match(error.getErrorType())
-        || matchesSuppressedErrorType(error, event);
+        || matchesSuppressedErrorType(error);
   }
 
   /**
    * Evaluates if the {@link #errorTypeMatcher} matches against any of the provided {@link Error#getSuppressedErrors()} error types.
    * @param error {@link Error} that will be evaluated.
-   * @param coreEvent Event containing the provided error.
    * @return True if at least one match is found.
    */
-  private boolean matchesSuppressedErrorType(Error error, CoreEvent coreEvent) {
+  private boolean matchesSuppressedErrorType(Error error) {
     for (Error suppressedError : error.getSuppressedErrors()) {
       ErrorType suppressedErrorType = suppressedError.getErrorType();
       if (errorTypeMatcher.match(suppressedErrorType)) {
-        logger
-            .warn("Error handler '{}' has matched the following underlying error: {}. Consider changing it to match the reported error: {}.",
-                  getLocation().getLocation(), suppressedErrorType, coreEvent.getError().get().getErrorType());
+        warnAboutSuppressedErrorTypeMatch(error.getErrorType(), suppressedErrorType);
         return true;
       }
     }
     return false;
+  }
+
+  /**
+   * If it was not previously logged, logs a warning about a suppressed {@link ErrorType} match.
+   * @param eventErrorType Unsuppressed {@link ErrorType} (recommended match).
+   * @param suppressedErrorType Suppressed {@link ErrorType} that has been matched.
+   */
+  private void warnAboutSuppressedErrorTypeMatch(ErrorType eventErrorType, ErrorType suppressedErrorType) {
+    // The warning message will be printed only once per matched error type
+    if (!suppressedErrorTypeMatches.contains(suppressedErrorType.getIdentifier())) {
+      logger
+          .warn("Expected error type from flow '{}' has matched the following underlying error: {}. Consider changing it to match the reported error: {}.",
+                getLocation().getLocation(), suppressedErrorType.getIdentifier(), eventErrorType.getIdentifier());
+      if (suppressedErrorTypeMatches.isEmpty()) {
+        suppressedErrorTypeMatches = new ArrayList<>(2);
+      }
+      suppressedErrorTypeMatches.add(suppressedErrorType.getIdentifier());
+    }
   }
 
   private boolean acceptsExpression(CoreEvent event) {
