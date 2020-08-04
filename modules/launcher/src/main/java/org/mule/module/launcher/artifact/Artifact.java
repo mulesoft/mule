@@ -71,4 +71,9 @@ public interface Artifact<D extends ArtifactDescriptor>
      * @return MuleContext created from the artifact configurations files.
      */
     MuleContext getMuleContext();
+
+    /**
+     * Cancels any ongoing process that prevents the startup fase from ending
+     */
+    void cancelStart();
 }

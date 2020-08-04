@@ -16,6 +16,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.transport.Connector;
 import org.mule.config.builders.ExtensionsManagerConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
@@ -340,6 +341,8 @@ public class DefaultMuleApplication implements Application
     @Override
     public void stop()
     {
+        this.cancelStart();
+
         if (this.muleContext == null || !this.muleContext.getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME))
         {
             return;
@@ -419,4 +422,18 @@ public class DefaultMuleApplication implements Application
         muleContext = null;
     }
 
+    @Override
+    public void cancelStart()
+    {
+        if(muleContext != null && muleContext.getRegistry() != null && !muleContext.getRegistry().lookupObjects(Connector.class).isEmpty())
+        {
+            for(Connector connector: muleContext.getRegistry().lookupObjects(Connector.class))
+            {
+                if(connector.getRetryPolicyTemplate() != null)
+                {
+                    connector.getRetryPolicyTemplate().stopRetrying();
+                }
+            }
+        }
+    }
 }
