@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
@@ -171,6 +172,7 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.verification.VerificationMode;
+import org.slf4j.Logger;
 
 @RunWith(Parameterized.class)
 /**
@@ -179,6 +181,8 @@ import org.mockito.verification.VerificationMode;
  * Provides a set of test artifacts and resources to use on different test classes.
  */
 public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
+
+  public static final Logger logger = getLogger(AbstractDeploymentTestCase.class);
 
   private static final String EXPRESSION_LANGUAGE_SERVICE_NAME = "expressionLanguageService";
   private static final String SCHEDULER_SERVICE_NAME = "schedulerService";
@@ -245,6 +249,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static File echoTestClassFile;
   protected static File echoTestJarFile;
+
+  protected static File oracleExtensionJarFile;
 
   private static File defaulServiceEchoJarFile;
 
@@ -316,6 +322,11 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                    "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
         .compile("mule-module-hello-1.0.0.jar", "1.0.0");
 
+    oracleExtensionJarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/oracle/OracleExtension.java"),
+                   getResourceFile("/org/foo/oracle/OracleOperation.java"))
+        .compile("mule-module-oracle-1.0.0.jar", "1.0.0");
+
     usingObjectStoreJarFile = new ExtensionCompiler()
         .compiling(getResourceFile("/org/foo/os/UsingObjectStoreExtension.java"))
         .compile("mule-module-using-object-store-1.0.0.jar", "1.0.0");
@@ -357,6 +368,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected final ArtifactPluginFileBuilder helloExtensionV1Plugin = createHelloExtensionV1PluginFileBuilder();
   protected final ArtifactPluginFileBuilder helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
   protected final ArtifactPluginFileBuilder goodbyeExtensionV1Plugin = createGoodbyeExtensionV1PluginFileBuilder();
+  protected final ArtifactPluginFileBuilder oracleExtensionPlugin = createOracleExtensionPluginFileBuilder();
 
   protected final ArtifactPluginFileBuilder exceptionThrowingPlugin = createExceptionThrowingPluginFileBuilder();
 
@@ -1524,6 +1536,30 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0.0")
         .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
         .describedBy((mulePluginModelBuilder.build()));
+  }
+
+  private ArtifactPluginFileBuilder createOracleExtensionPluginFileBuilder() {
+    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("oracleExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("oracleExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.oracle.OracleExtension")
+        .addProperty("version", "1.0.0");
+    ArtifactPluginFileBuilder pluginFileBuilder = new ArtifactPluginFileBuilder("oracleExtensionPlugin-1.0.0")
+        .dependingOn(new JarFileBuilder("oracleExtension", oracleExtensionJarFile))
+        .describedBy((mulePluginModelBuilder.build()));
+
+    try {
+      pluginFileBuilder
+          .dependingOnSharedLibrary(new JarFileBuilder("oracle-driver-v1", getResourceFile("/oracle/jdbc/oracle-driver-v1.jar")));
+
+    } catch (URISyntaxException e) {
+      logger.error(e.getMessage());
+    }
+    return pluginFileBuilder;
   }
 
   private ArtifactPluginFileBuilder createUsingObjectStorePluginFileBuilder() {
