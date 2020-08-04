@@ -573,7 +573,8 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   }
 
   protected Optional<ElementDeclaration> getDeclaration(ArtifactDeclaration app, String location) {
-    return app.findElement(org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation(location).build());
+    return app.findElement(org.mule.runtime.app.declaration.api.component.location.Location
+        .builderFromStringRepresentation(location).build());
   }
 
 

@@ -59,18 +59,18 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
   @Override
   public Optional<ValueProviderCacheId> getIdForResolvedValues(DslElementModel<?> containerComponent, String parameterName) {
     return ifContainsParameter(containerComponent, parameterName)
-            .flatMap(ParameterModel::getValueProviderModel)
-            .flatMap(valueProviderModel -> resolveParametersInformation(containerComponent)
-                    .flatMap(infoMap -> resolveId(containerComponent, valueProviderModel, infoMap)));
+        .flatMap(ParameterModel::getValueProviderModel)
+        .flatMap(valueProviderModel -> resolveParametersInformation(containerComponent)
+            .flatMap(infoMap -> resolveId(containerComponent, valueProviderModel, infoMap)));
   }
 
   private Optional<ParameterModel> ifContainsParameter(DslElementModel<?> containerComponent, String parameterName) {
     if (containerComponent.getModel() instanceof ParameterizedModel) {
       return ((ParameterizedModel) containerComponent.getModel())
-              .getAllParameterModels()
-              .stream()
-              .filter(p -> Objects.equal(parameterName, p.getName()))
-              .findAny();
+          .getAllParameterModels()
+          .stream()
+          .filter(p -> Objects.equal(parameterName, p.getName()))
+          .findAny();
     }
     return empty();
   }
@@ -79,10 +79,10 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     if (containerComponent.getModel() instanceof ParameterizedModel) {
       Map<String, ParameterModelInformation> parametersDslMap = new HashMap<>();
       containerComponent.getContainedElements()
-              .stream()
-              .filter(containedElement -> containedElement.getModel() instanceof ParameterModel)
-              .map(ParameterModelInformation::new)
-              .forEach(i -> parametersDslMap.put(i.getParameterModel().getName(), i));
+          .stream()
+          .filter(containedElement -> containedElement.getModel() instanceof ParameterModel)
+          .map(ParameterModelInformation::new)
+          .forEach(i -> parametersDslMap.put(i.getParameterModel().getName(), i));
       return of(parametersDslMap);
     }
     return empty();
@@ -128,19 +128,19 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     }
     List<ValueProviderCacheId> injectableIds = new LinkedList<>();
     Optional<DslElementModel<?>> configDslElementModel = resolveConfigName(containerComponent)
-            .flatMap(config -> locator.get(Location.builder().globalName(config).build()));
+        .flatMap(config -> locator.get(Location.builder().globalName(config).build()));
     if (configDslElementModel.isPresent() && configDslElementModel.get().getModel() instanceof ConfigurationModel) {
       if (valueProviderModel.requiresConfiguration()) {
         resolveIdForInjectedElement(configDslElementModel.get())
-                .ifPresent(id -> injectableIds.add(aValueProviderCacheId(fromElementWithName("config: ").containing(id))));
+            .ifPresent(id -> injectableIds.add(aValueProviderCacheId(fromElementWithName("config: ").containing(id))));
       }
       if (valueProviderModel.requiresConnection()) {
         configDslElementModel.get().getContainedElements().stream()
-                .filter(nested -> nested.getModel() instanceof ConnectionProviderModel).forEach(
-                connectionProvider -> resolveIdForInjectedElement(connectionProvider)
-                        .ifPresent(id -> injectableIds
-                                .add(aValueProviderCacheId(fromElementWithName("connection: ")
-                                                                   .containing(id)))));
+            .filter(nested -> nested.getModel() instanceof ConnectionProviderModel).forEach(
+                                                                                            connectionProvider -> resolveIdForInjectedElement(connectionProvider)
+                                                                                                .ifPresent(id -> injectableIds
+                                                                                                    .add(aValueProviderCacheId(fromElementWithName("connection: ")
+                                                                                                        .containing(id)))));
       }
     }
     return injectableIds;
@@ -153,29 +153,29 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     }
     List<ValueProviderCacheId> parts = new LinkedList<>();
     List<String> parametersRequiredForMetadata =
-            ((EnrichableModel) injectedElement.getModel())
-                    .getModelProperty(RequiredForMetadataModelProperty.class)
-                    .map(RequiredForMetadataModelProperty::getRequiredParameters)
-                    .orElse(emptyList());
+        ((EnrichableModel) injectedElement.getModel())
+            .getModelProperty(RequiredForMetadataModelProperty.class)
+            .map(RequiredForMetadataModelProperty::getRequiredParameters)
+            .orElse(emptyList());
     resolveParametersInformation(injectedElement)
-            .ifPresent(
-                    pi -> parametersRequiredForMetadata.forEach(requiredParameter -> {
-                      if (pi.containsKey(requiredParameter)) {
-                        ParameterModelInformation parameterInfo = pi.get(requiredParameter);
-                        resolveParameterId(parameterInfo.getParameterDslElementModel()).ifPresent(parts::add);
-                      }
-                    }));
+        .ifPresent(
+                   pi -> parametersRequiredForMetadata.forEach(requiredParameter -> {
+                     if (pi.containsKey(requiredParameter)) {
+                       ParameterModelInformation parameterInfo = pi.get(requiredParameter);
+                       resolveParameterId(parameterInfo.getParameterDslElementModel()).ifPresent(parts::add);
+                     }
+                   }));
     if (parts.isEmpty()) {
       return empty();
     }
     String sourceElementName = sourceElementNameFromSimpleValue(injectedElement);
     return of(aValueProviderCacheId(fromElementWithName(sourceElementName).withHashValueFrom(sourceElementName)
-                                            .containing(parts)));
+        .containing(parts)));
   }
 
   private ValueProviderCacheId resolveValueProviderId(ValueProviderModel valueProviderModel) {
     return aValueProviderCacheId(fromElementWithName("valueProvider: " + valueProviderModel.getProviderName())
-                                         .withHashValueFrom(valueProviderModel.getProviderName()));
+        .withHashValueFrom(valueProviderModel.getProviderName()));
   }
 
   private List<ValueProviderCacheId> resolveActingParameterIds(ValueProviderModel valueProviderModel,
@@ -183,12 +183,12 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     List<ValueProviderCacheId> parts = new LinkedList<>();
 
     valueProviderModel.getActingParameters().forEach(
-            ap -> {
-              if (parameterModelsInformation.containsKey(ap)) {
-                resolveParameterId(parameterModelsInformation.get(ap)
-                                           .getParameterDslElementModel()).ifPresent(parts::add);
-              }
-            });
+                                                     ap -> {
+                                                       if (parameterModelsInformation.containsKey(ap)) {
+                                                         resolveParameterId(parameterModelsInformation.get(ap)
+                                                             .getParameterDslElementModel()).ifPresent(parts::add);
+                                                       }
+                                                     });
 
     return parts;
 
@@ -200,23 +200,23 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
 
   private Optional<ValueProviderCacheId> resolveParameterId(DslElementModel<?> parameterModel) {
     return parameterModel
-            .getValue()
-            .map(v -> resolveSimpleValue(parameterModel, locator)
-                    .map(either -> either.reduce(
-                            l -> resolveIdRecursively(l).orElse(null),
-                            r -> aValueProviderCacheId(fromElementWithName(sourceElementNameFromSimpleValue(parameterModel)).withHashValueFrom(v)))
-                    ))
-            .orElse(resolveIdRecursively(parameterModel));
+        .getValue()
+        .map(v -> resolveSimpleValue(parameterModel, locator)
+            .map(either -> either.reduce(
+                                         l -> resolveIdRecursively(l).orElse(null),
+                                         r -> aValueProviderCacheId(fromElementWithName(sourceElementNameFromSimpleValue(parameterModel))
+                                             .withHashValueFrom(v)))))
+        .orElse(resolveIdRecursively(parameterModel));
   }
 
   private Optional<ValueProviderCacheId> resolveIdRecursively(DslElementModel<?> element) {
     if (element.getValue().isPresent()) {
       return empty();
-    }
-    else {
+    } else {
       String id = resolveDslTag(element).orElse(getSourceElementName(element));
       ValueProviderCacheId.ValueProviderCacheIdBuilder vpIdBuilder = fromElementWithName(id).withHashValueFrom(id);
-      element.getContainedElements().stream().map(this::resolveParameterId).forEach(resolvedId -> resolvedId.ifPresent(vpIdBuilder::containing));
+      element.getContainedElements().stream().map(this::resolveParameterId)
+          .forEach(resolvedId -> resolvedId.ifPresent(vpIdBuilder::containing));
       return of(aValueProviderCacheId(vpIdBuilder));
     }
   }

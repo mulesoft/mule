@@ -15,14 +15,11 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
-import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
-import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
@@ -30,19 +27,10 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedMetadataCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.config.api.dsl.model.metadata.ContextBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.config.api.dsl.model.metadata.DslElementBasedMetadataCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DslElementBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
-import org.mule.runtime.config.api.dsl.model.metadata.context.AstValueProviderCacheIdGeneratorContext;
-import org.mule.runtime.config.api.dsl.model.metadata.context.DeclarationValueProviderCacheIdGeneratorContextFactory;
-import org.mule.runtime.config.api.dsl.model.metadata.context.ValueProviderCacheIdGeneratorContext;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 
@@ -51,20 +39,16 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValueProviderExtensionTestCase {
 
-  private ValueProviderCacheIdGenerator<ValueProviderCacheIdGeneratorContext<?>> contextBasedValueProviderCacheIdGenerator =
-      new ContextBasedValueProviderCacheIdGenerator();
-  private DeclarationValueProviderCacheIdGeneratorContextFactory declarationContextFactory;
   private DslElementModelFactory dslElementModelFactory;
 
   @Override
   public void before() {
     super.before();
-    declarationContextFactory =
-        new DeclarationValueProviderCacheIdGeneratorContextFactory(DslElementModelFactory.getDefault(dslContext));
     dslElementModelFactory = DslElementModelFactory.getDefault(dslContext);
   }
 
@@ -74,25 +58,18 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
       throws Exception {
     ApplicationModel app = loadApplicationModel(appDeclaration);
     Locator locator = new Locator(app);
-    ComponentLocator<DslElementModel<?>> dslLocator = l -> getDeclaration(appDeclaration, l.toString()).map(d -> dslElementModelFactory.create(d).orElse(null));
+    ComponentLocator<DslElementModel<?>> dslLocator =
+        l -> getDeclaration(appDeclaration, l.toString()).map(d -> dslElementModelFactory.create(d).orElse(null));
     ValueProviderCacheIdGenerator<ComponentAst> componentAstBasedValueProviderCacheIdGenerator =
         new ComponentAstBasedValueProviderCacheIdGenerator(locator);
-    ValueProviderCacheIdGenerator<ComponentAst> dslDelegatingValueProviderCacheIdGenerator =
+    ValueProviderCacheIdGenerator<ComponentAst> componentBasedValueProviderCacheIdGenerator =
         new ComponentBasedValueProviderCacheIdGenerator(dslContext, locator);
     ValueProviderCacheIdGenerator<DslElementModel<?>> dslElementModelValueProviderCacheIdGenerator =
         new DslElementBasedValueProviderCacheIdGenerator(dslLocator);
 
     ComponentAst component = getComponentAst(app, location);
-    DslElementModel<?> dslElementModel = dslLocator.get(Location.builderFromStringRepresentation(location).build()).orElseThrow(() -> new AssertionError("Could not create dslElementModel"));
-
-    Optional<ComponentAst> configAst = resolveConfigName(component)
-        .flatMap(configName -> locator.get(Location.builderFromStringRepresentation(configName).build()));
-
-    ValueProviderCacheIdGeneratorContext astContext = configAst.map(
-                                                                    c -> new AstValueProviderCacheIdGeneratorContext(component,
-                                                                                                                     c))
-        .orElse(new AstValueProviderCacheIdGeneratorContext(component));
-
+    DslElementModel<?> dslElementModel = dslLocator.get(Location.builderFromStringRepresentation(location).build())
+        .orElseThrow(() -> new AssertionError("Could not create dslElementModel"));
 
     Optional<ParameterizedElementDeclaration> elementDeclaration =
         appDeclaration.findElement(builderFromStringRepresentation(location).build());
@@ -102,45 +79,19 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
       fail(format("missing declaration or model for: %s", location));
     }
 
-
-    ValueProviderCacheIdGeneratorContext declarationContext = configAst
-        .map(
-             c -> {
-               final Optional<ConfigurationElementDeclaration> configDeclaration =
-                   appDeclaration.findElement(builderFromStringRepresentation(c.getLocation().getLocation()).build());
-               final Optional<ConfigurationModel> configModel = c.getModel(ConfigurationModel.class);
-               if (!configDeclaration.isPresent() || !configModel.isPresent()) {
-                 fail(format("missing declaration or model for config: %s", c.getLocation().getLocation()));
-               }
-               return declarationContextFactory.createContext(elementDeclaration.get(), elementModel.get(),
-                                                              configDeclaration.get(), configModel.get());
-             })
-        .orElse(declarationContextFactory.createContext(elementDeclaration.get(), elementModel.get()));
-
-    Optional<ValueProviderCacheId> astContextId =
-        contextBasedValueProviderCacheIdGenerator.getIdForResolvedValues(astContext, parameterName);
-    Optional<ValueProviderCacheId> componentBasedId =
+    Optional<ValueProviderCacheId> astId =
         componentAstBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
-    Optional<ValueProviderCacheId> declarationContextId =
-        contextBasedValueProviderCacheIdGenerator.getIdForResolvedValues(declarationContext, parameterName);
     Optional<ValueProviderCacheId> dslElementId =
         dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName);
-    Optional<ValueProviderCacheId> dslDelegatingId =
-        dslDelegatingValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
+    Optional<ValueProviderCacheId> componentBasedId =
+        componentBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
 
-    MetadataCacheIdGenerator<DslElementModel<?>> cacheGenerator = new DslElementBasedMetadataCacheIdGenerator(dslLocator);
-    Optional<MetadataCacheId> generatedId = cacheGenerator.getIdForComponentMetadata(dslElementModelFactory.create(declareOperation(OPERATION_NAME)).get().getContainedElements().get(2));
-
-    //checkIdsAreEqual(astContextId, componentBasedId);
-    //checkIdsAreEqual(componentBasedId, declarationContextId);
-    checkIdsAreEqual(dslElementId, dslDelegatingId);
+    //TODO: ADD THIS CHECK MULE-18636
+    //checkIdsAreEqual(astId, dslElementId);
+    checkIdsAreEqual(dslElementId, componentBasedId);
 
     //Any should be fine
     return dslElementId;
-  }
-
-  private Optional<String> resolveConfigName(ComponentAst elementModel) {
-    return elementModel.getRawParameterValue(CONFIG_ATTRIBUTE_NAME);
   }
 
   private Optional<ParameterizedElementDeclaration> getParameterElementDeclaration(ArtifactDeclaration artifactDeclaration,
@@ -452,6 +403,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   }
 
   @Test
+  @Ignore("CMTS-49")
   public void differentHashForComplexActingParameterValue() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     int intParam = 0;

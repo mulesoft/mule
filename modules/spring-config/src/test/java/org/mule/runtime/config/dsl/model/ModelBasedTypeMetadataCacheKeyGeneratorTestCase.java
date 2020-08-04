@@ -37,7 +37,6 @@ import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -285,7 +285,9 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
   }
 
   private Optional<MetadataCacheId> resolveKeyFromSimpleValue(DslElementModel<?> element) {
-    return resolveSimpleValue(element, locator).flatMap(either -> either.reduce(this::getIdForComponentMetadata, r -> of(new MetadataCacheId(r.hashCode(), sourceElementNameFromSimpleValue(element)))));
+    return resolveSimpleValue(element, locator)
+        .flatMap(either -> either.reduce(this::getIdForComponentMetadata,
+                                         r -> of(new MetadataCacheId(r.hashCode(), sourceElementNameFromSimpleValue(element)))));
   }
 
   private MetadataCacheId createCategoryMetadataCacheId(String category) {

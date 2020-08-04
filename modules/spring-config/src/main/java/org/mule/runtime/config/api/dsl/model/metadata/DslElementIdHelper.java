@@ -42,10 +42,10 @@ public class DslElementIdHelper {
 
   static String getSourceElementName(DslElementModel<?> elementModel) {
     return elementModel.getDsl().getPrefix() + ":" +
-           getModelName(elementModel.getModel()).orElse(elementModel.getDsl().getElementName()) +
-           elementModel.getConfiguration()
-                   .map(c -> c.getParameters().get("name")).filter(Objects::nonNull)
-                   .map(n -> "[" + n + "]").orElse("");
+        getModelName(elementModel.getModel()).orElse(elementModel.getDsl().getElementName()) +
+        elementModel.getConfiguration()
+            .map(c -> c.getParameters().get("name")).filter(Objects::nonNull)
+            .map(n -> "[" + n + "]").orElse("");
   }
 
   static Optional<String> getModelName(Object model) {
@@ -62,8 +62,9 @@ public class DslElementIdHelper {
 
   static String sourceElementNameFromSimpleValue(DslElementModel<?> element) {
     return getModelName(element.getModel())
-            .map(modelName -> isBlank(element.getDsl().getPrefix()) ? modelName : element.getDsl().getPrefix() + ":" + modelName)
-            .orElseGet(() -> element.getIdentifier().map(Object::toString).orElse(isBlank(element.getDsl().getElementName()) ? element.getDsl().getAttributeName() : element.getDsl().getElementName()));
+        .map(modelName -> isBlank(element.getDsl().getPrefix()) ? modelName : element.getDsl().getPrefix() + ":" + modelName)
+        .orElseGet(() -> element.getIdentifier().map(Object::toString).orElse(isBlank(element.getDsl().getElementName())
+            ? element.getDsl().getAttributeName() : element.getDsl().getElementName()));
   }
 
   static Optional<String> resolveConfigName(DslElementModel<?> elementModel) {
@@ -95,33 +96,32 @@ public class DslElementIdHelper {
     if (element.getModel() instanceof ParameterModel) {
       ParameterModel model = (ParameterModel) element.getModel();
       model.getType()
-              .accept(new MetadataTypeVisitor() {
+          .accept(new MetadataTypeVisitor() {
 
-                @Override
-                public void visitString(StringType stringType) {
-                  if (!model.getAllowedStereotypes().isEmpty()) {
-                    getGlobalElement(value, locator).ifPresent(reference::set);
-                  }
-                }
+            @Override
+            public void visitString(StringType stringType) {
+              if (!model.getAllowedStereotypes().isEmpty()) {
+                getGlobalElement(value, locator).ifPresent(reference::set);
+              }
+            }
 
-                @Override
-                public void visitArrayType(ArrayType arrayType) {
-                  if (model.getDslConfiguration().allowsReferences()) {
-                    getGlobalElement(value, locator).ifPresent(reference::set);
-                  }
-                }
+            @Override
+            public void visitArrayType(ArrayType arrayType) {
+              if (model.getDslConfiguration().allowsReferences()) {
+                getGlobalElement(value, locator).ifPresent(reference::set);
+              }
+            }
 
-                @Override
-                public void visitObject(ObjectType objectType) {
-                  if (model.getDslConfiguration().allowsReferences()) {
-                    getGlobalElement(value, locator).ifPresent(reference::set);
-                  }
-                }
+            @Override
+            public void visitObject(ObjectType objectType) {
+              if (model.getDslConfiguration().allowsReferences()) {
+                getGlobalElement(value, locator).ifPresent(reference::set);
+              }
+            }
 
-              });
+          });
 
-    }
-    else if (element.getModel() instanceof MetadataType) {
+    } else if (element.getModel() instanceof MetadataType) {
       ((MetadataType) element.getModel()).accept(new MetadataTypeVisitor() {
 
         @Override
@@ -132,7 +132,7 @@ public class DslElementIdHelper {
         @Override
         public void visitObject(ObjectType objectType) {
           boolean canBeGlobal = objectType.getAnnotation(TypeDslAnnotation.class)
-                  .map(TypeDslAnnotation::allowsTopLevelDefinition).orElse(false);
+              .map(TypeDslAnnotation::allowsTopLevelDefinition).orElse(false);
 
           if (canBeGlobal) {
             getGlobalElement(value, locator).ifPresent(reference::set);
@@ -140,8 +140,7 @@ public class DslElementIdHelper {
         }
 
       });
-    }
-    else {
+    } else {
       LOGGER.warn(format("Unknown model type '%s' found for element '%s'", String.valueOf(element.getModel()),
                          element.getIdentifier().map(Object::toString).orElse(sourceElementName)));
     }
