@@ -10,7 +10,6 @@ import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -71,6 +70,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -119,7 +119,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private ComponentLocation location;
 
   private Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>> fluxFactory;
-  private List<String> suppressedErrorTypeMatches = emptyList();
+  private CopyOnWriteArrayList<String> suppressedErrorTypeMatches = new CopyOnWriteArrayList<>();
 
   private final class OnErrorHandlerFluxObjectFactory
       implements Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>>, Disposable {
@@ -470,14 +470,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    */
   private void warnAboutSuppressedErrorTypeMatch(ErrorType eventErrorType, ErrorType suppressedErrorType) {
     // The warning message will be printed only once per matched error type
-    if (!suppressedErrorTypeMatches.contains(suppressedErrorType.getIdentifier())) {
+    if (suppressedErrorTypeMatches.addIfAbsent(suppressedErrorType.getIdentifier())) {
       logger
           .warn("Expected error type from flow '{}' has matched the following underlying error: {}. Consider changing it to match the reported error: {}.",
                 getLocation().getLocation(), suppressedErrorType.getIdentifier(), eventErrorType.getIdentifier());
-      if (suppressedErrorTypeMatches.isEmpty()) {
-        suppressedErrorTypeMatches = new ArrayList<>(2);
-      }
-      suppressedErrorTypeMatches.add(suppressedErrorType.getIdentifier());
     }
   }
 
