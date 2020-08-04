@@ -19,7 +19,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
-import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.Collection;
 import java.util.List;

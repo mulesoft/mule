@@ -42,9 +42,9 @@ import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter;
-import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
+import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.ArrayList;
 import java.util.Collection;

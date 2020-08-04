@@ -8,20 +8,20 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
-import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getInfrastructureType;
+import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor.getInfrastructureType;
 import static org.springframework.core.ResolvableType.forMethodParameter;
 
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.InfrastructureType;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ParameterElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
-
-import javax.lang.model.element.VariableElement;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
+
+import javax.lang.model.element.VariableElement;
 
 /**
  * Wrapper for {@link Parameter} that provide utility methods to facilitate the introspection of a {@link Parameter}
@@ -79,7 +79,7 @@ public final class ParameterWrapper implements ParameterElement {
   @Override
   public String getAlias() {
     return getInfrastructureType(getType())
-        .map(InfrastructureTypeMapping.InfrastructureType::getName)
+        .map(InfrastructureType::getName)
         .orElse(ParameterElement.super.getAlias());
   }
 

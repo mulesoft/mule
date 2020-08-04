@@ -77,6 +77,7 @@ public class ConfigurationInjectionLifecycleTestCase extends ExtensionFunctional
         muleContext.getCustomizationService().registerCustomServiceClass("lifecycleTracker", LifecycleTracker.class);
       }
     });
+    builders.add(extensionManagerWithMuleExtModelBuilder());
     super.addBuilders(builders);
   }
 

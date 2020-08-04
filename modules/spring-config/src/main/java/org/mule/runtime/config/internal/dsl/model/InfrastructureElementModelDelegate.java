@@ -21,6 +21,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NA
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECT_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
+import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
@@ -34,6 +35,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.TLS_KEY_STORE_ELEMENT_I
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -47,14 +49,13 @@ import org.mule.runtime.dsl.internal.component.config.InternalComponentConfigura
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Delegate to be used by a {@link DeclarationBasedElementModelFactory} in order to resolve the {@link DslElementModel} of an
@@ -236,7 +237,7 @@ class InfrastructureElementModelDelegate {
                             .build());
 
                 if (TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER.equals(name)) {
-                  InfrastructureTypeMapping.getQName(objectValue.getTypeId())
+                  getQName(objectValue.getTypeId())
                       .map(QNameModelProperty::getValue)
                       .ifPresent(qname -> {
                         InternalComponentConfiguration.Builder nested = InternalComponentConfiguration.builder()

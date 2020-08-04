@@ -21,6 +21,8 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
@@ -423,9 +425,19 @@ public class ExtensionModelHelper {
   }
 
   private Optional<ExtensionModel> lookupExtensionModelFor(ComponentIdentifier componentIdentifier) {
+    return lookupExtensionModelFor(componentIdentifier.getNamespace());
+  }
+
+  private Optional<ExtensionModel> lookupExtensionModelFor(String namespacePrefix) {
     return extensionsModels.stream()
-        .filter(e -> e.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace()))
+        .filter(e -> e.getXmlDslModel().getPrefix().equals(namespacePrefix.equals(TLS_PREFIX) ? CORE_PREFIX : namespacePrefix))
         .findFirst();
+  }
+
+  public Optional<DslElementSyntax> resolveDslElementModel(MetadataType type, String namespacePrefix) {
+    final DslSyntaxResolver dslSyntaxResolver = getDslSyntaxResolver(namespacePrefix);
+
+    return dslSyntaxResolver.resolve(type);
   }
 
   public DslElementSyntax resolveDslElementModel(NamedObject component, ComponentIdentifier componentIdentifier) {
@@ -439,6 +451,15 @@ public class ExtensionModelHelper {
     ExtensionModel extensionModel = optionalExtensionModel
         .orElseThrow(() -> new IllegalStateException("Extension Model in context not present for componentIdentifier: "
             + componentIdentifier));
+
+    return dslSyntaxResolversByExtension.get(extensionModel);
+  }
+
+  private DslSyntaxResolver getDslSyntaxResolver(String namespacePrefix) {
+    Optional<ExtensionModel> optionalExtensionModel = lookupExtensionModelFor(namespacePrefix);
+    ExtensionModel extensionModel = optionalExtensionModel
+        .orElseThrow(() -> new IllegalStateException("Extension Model in context not present for namespace: "
+            + namespacePrefix));
 
     return dslSyntaxResolversByExtension.get(extensionModel);
   }

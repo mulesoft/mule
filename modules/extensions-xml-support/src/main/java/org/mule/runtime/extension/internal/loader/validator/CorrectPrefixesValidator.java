@@ -25,7 +25,7 @@ import org.mule.runtime.config.api.dsl.CoreDslConstants;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.model.ApplicationModel;
-import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;

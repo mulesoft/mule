@@ -7,8 +7,6 @@
 package org.mule.test.functional;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.createDefaultExtensionManager;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -62,14 +60,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
 
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
-        ExtensionManager extensionManager;
-        if (muleContext.getExtensionManager() == null) {
-          extensionManager = createDefaultExtensionManager();
-          muleContext.setExtensionManager(extensionManager);
-          initialiseIfNeeded(extensionManager, muleContext);
-        }
-        extensionManager = muleContext.getExtensionManager();
-        registerXmlExtensions(extensionManager);
+        registerXmlExtensions(createExtensionManager(muleContext));
       }
 
       private void registerXmlExtensions(ExtensionManager extensionManager) {
@@ -106,7 +97,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
   }
 
   /**
-   * Parameter to re-type operations' output if exists. It should map to 
+   * Parameter to re-type operations' output if exists. It should map to
    * @return the string of the parameter that represents the declaration file.
    */
   protected Optional<String> operationsOutputPath() {

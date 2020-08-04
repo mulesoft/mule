@@ -10,7 +10,9 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
@@ -41,14 +43,22 @@ import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExpressionSupportAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.LayoutTypeAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.QNameTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
+import org.mule.runtime.extension.api.property.QNameModelProperty;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
+
+import javax.xml.namespace.QName;
 
 public class MetadataTypeModelAdapter implements ParameterizedModel {
 
@@ -91,6 +101,10 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
     }
   }
 
+  public MetadataType getType() {
+    return type;
+  }
+
   @Override
   public String toString() {
     return "MetadataTypeModelAdapter{" + type.toString() + "}";
@@ -123,7 +137,12 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
       this.adaptedType = adaptedType;
 
       final List<ParameterModel> tempParameterModels = adaptedType.getFields().stream()
-          .map(ObjectFieldTypeAsParameterModelAdapter::new)
+          .flatMap(wrappedFieldType -> wrappedFieldType.getAnnotation(FlattenedTypeAnnotation.class).isPresent()
+              && wrappedFieldType.getValue() instanceof ObjectType
+                  ? ((ObjectType) (wrappedFieldType.getValue())).getFields().stream()
+                  : Stream.of(wrappedFieldType))
+          .map(field -> new ObjectFieldTypeAsParameterModelAdapter(field, adaptedType.getAnnotation(QNameTypeAnnotation.class)
+              .map(QNameTypeAnnotation::getValue)))
           .sorted(comparing(ObjectFieldTypeAsParameterModelAdapter::getName))
           .collect(toList());
 
@@ -209,10 +228,17 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
         .build();
 
     private final ObjectFieldType wrappedFieldType;
+    private final Map<Class<? extends ModelProperty>, ModelProperty> modelProperties = new LinkedHashMap<>();
     private final LayoutModel layoutModel;
 
-    public ObjectFieldTypeAsParameterModelAdapter(ObjectFieldType wrappedFieldType) {
+    public ObjectFieldTypeAsParameterModelAdapter(ObjectFieldType wrappedFieldType, Optional<QName> ownerCustomQName) {
       this.wrappedFieldType = wrappedFieldType;
+
+      ownerCustomQName
+          .map(qName -> new QNameModelProperty(new QName(qName.getNamespaceURI(),
+                                                         wrappedFieldType.getKey().getName().getLocalPart(), qName.getPrefix())))
+          .ifPresent(qnmp -> modelProperties.put(qnmp.getClass(), qnmp));
+
       Optional<LayoutTypeAnnotation> optionalLayoutTypeAnnotation =
           this.wrappedFieldType.getAnnotation(LayoutTypeAnnotation.class);
       if (optionalLayoutTypeAnnotation.isPresent()) {
@@ -245,12 +271,13 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
 
     @Override
     public <T extends ModelProperty> Optional<T> getModelProperty(Class<T> propertyType) {
-      return empty();
+      requireNonNull(propertyType);
+      return ofNullable((T) modelProperties.get(propertyType));
     }
 
     @Override
     public Set<ModelProperty> getModelProperties() {
-      return emptySet();
+      return unmodifiableSet(new LinkedHashSet<>(modelProperties.values()));
     }
 
     @Override

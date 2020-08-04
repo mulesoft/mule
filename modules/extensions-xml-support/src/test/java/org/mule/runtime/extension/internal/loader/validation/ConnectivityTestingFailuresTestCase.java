@@ -13,6 +13,7 @@ import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.MODULE_CONNECTION_MARKER_ATTRIBUTE;
 import static org.mule.runtime.extension.internal.loader.validator.TestConnectionValidator.TEST_CONNECTION_SELECTED_ELEMENT_INVALID;
@@ -149,11 +150,15 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
     return getExtensionModelFrom(modulePath, emptySet());
   }
 
-  private ExtensionModel getExtensionModelFrom(String modulePath, Set<ExtensionModel> extensions) {
+  private ExtensionModel getExtensionModelFrom(String modulePath, Set<ExtensionModel> depedencyExtensions) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     parameters.put("COMPILATION_MODE", true);
-    return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(extensions), parameters);
+
+    Set<ExtensionModel> allExtensions = new HashSet<>(depedencyExtensions);
+    allExtensions.add(getExtensionModel());
+
+    return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(allExtensions), parameters);
   }
 }

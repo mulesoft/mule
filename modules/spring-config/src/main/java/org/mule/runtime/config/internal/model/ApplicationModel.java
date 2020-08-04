@@ -89,12 +89,12 @@ import org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
+import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.ArrayList;
 import java.util.HashMap;

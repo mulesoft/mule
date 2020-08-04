@@ -17,6 +17,7 @@ import static org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurat
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.EMPTY_TYPE_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
@@ -220,17 +221,18 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   private Set<ExtensionModel> getDependencyExtensions() {
     ExtensionModel petstore = loadExtension(PetStoreConnector.class, emptySet());
     ExtensionModel heisenberg = loadExtension(HeisenbergExtension.class, emptySet());
-    return ImmutableSet.<ExtensionModel>builder().add(petstore, heisenberg).build();
+    return ImmutableSet.<ExtensionModel>builder().add(petstore, heisenberg, getExtensionModel()).build();
   }
 
-  private ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {
+  private ExtensionModel loadExtension(Class extension, Set<ExtensionModel> depedencyExtensions) {
     DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
     Map<String, Object> ctx = new HashMap<>();
     ctx.put(TYPE_PROPERTY_NAME, extension.getName());
     ctx.put(VERSION, "1.0.0-SNAPSHOT");
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     ctx.put("COMPILATION_MODE", true);
-    return loader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
+    return loader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(depedencyExtensions),
+                                     ctx);
   }
 
 }
