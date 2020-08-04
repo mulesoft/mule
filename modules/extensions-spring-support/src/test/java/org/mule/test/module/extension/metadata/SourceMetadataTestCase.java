@@ -34,6 +34,7 @@ import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.MetadataConnectionProvider;
@@ -127,12 +128,21 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
 
   @Test
   public void getSourceDynamicOutputMetadataExplicitResolution() throws Exception {
-    assertExpectedType(metadataService.getOutputMetadata(location, PERSON_METADATA_KEY), personType);
+    MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
+        metadataService.getOutputMetadata(location, PERSON_METADATA_KEY);
+    assertThat(outputMetadataResult.isSuccess(), is(true));
+    OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
+    assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
+    assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), personType);
   }
 
   @Test
   public void getSourceDynamicOutputAttributesMetadataExplicitResolution() throws Exception {
-    assertExpectedType(metadataService.getOutputAttributesMetadata(location, PERSON_METADATA_KEY), StringAttributes.class);
+    MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
+        metadataService.getOutputMetadata(location, PERSON_METADATA_KEY);
+    assertThat(outputMetadataResult.isSuccess(), is(true));
+    OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
+    assertExpectedType(outputMetadataDescriptor.getAttributesMetadata().getType(), StringAttributes.class);
   }
 
   /**

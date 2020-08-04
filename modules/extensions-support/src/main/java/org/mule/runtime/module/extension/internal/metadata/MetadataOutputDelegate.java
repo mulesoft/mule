@@ -121,7 +121,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return a {@link MetadataResult} with the {@link MetadataType} of the component's output
    */
-  MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final Object key) {
+  private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final Object key) {
     OutputModel output = ((HasOutputModel) model).getOutput();
     if (isVoid(output.getType()) || !output.hasDynamicType()) {
       return success(output.getType());
@@ -150,7 +150,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return a {@link MetadataResult} with the {@link MetadataType} of the components output {@link Message#getAttributes()}
    */
-  MetadataResult<MetadataType> getOutputAttributesMetadata(final MetadataContext context, Object key) {
+  private MetadataResult<MetadataType> getOutputAttributesMetadata(final MetadataContext context, Object key) {
     OutputModel attributes = ((HasOutputModel) model).getOutputAttributes();
     if (isVoid(attributes.getType()) || !attributes.hasDynamicType()) {
       return success(attributes.getType());
