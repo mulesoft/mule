@@ -9,17 +9,19 @@ package org.mule.runtime.config.dsl.model;
 import java.util.List;
 import java.util.Map;
 
-public class ComplexActingParameter {
+public class InnerPojo {
 
   private int intParam;
   private String stringParam;
-  private InnerPojo innerPojoParam;
-
   private List<String> listParam;
   private Map<String, String> mapParam;
 
-  private List<InnerPojo> complexListParam;
-  //private Map<String, InnerPojo> complexMapParam;
+  public InnerPojo(int intParam, String stringParam, List<String> listParam, Map<String, String> mapParam) {
+    this.intParam = intParam;
+    this.stringParam = stringParam;
+    this.listParam = listParam;
+    this.mapParam = mapParam;
+  }
 
   public int getIntParam() {
     return intParam;
@@ -33,19 +35,8 @@ public class ComplexActingParameter {
     return listParam;
   }
 
-  public InnerPojo getInnerPojoParam() {
-    return innerPojoParam;
-  }
-
   public Map<String, String> getMapParam() {
     return mapParam;
   }
 
-  public List<InnerPojo> getComplexListParam() {
-    return complexListParam;
-  }
-
-  //public Map<String, InnerPojo> getComplexMapParam() {
-  //  return complexMapParam;
-  //}
 }

@@ -72,6 +72,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
@@ -482,43 +483,74 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
         .getDeclaration();
   }
 
+  protected ParameterValue declareInnerPojo(InnerPojo innerPojo) {
+    ParameterListValue.Builder listBuilder = ParameterListValue.builder();
+    innerPojo.getListParam().forEach(listBuilder::withValue);
+
+    ParameterObjectValue.Builder mapBuilder = ParameterObjectValue.builder();
+    innerPojo.getMapParam().forEach(mapBuilder::withParameter);
+
+    return ParameterObjectValue.builder()
+        .ofType(InnerPojo.class.getName())
+        .withParameter("intParam", Integer.toString(innerPojo.getIntParam()))
+        .withParameter("stringParam", innerPojo.getStringParam())
+        .withParameter("listParam", listBuilder.build())
+        .withParameter("mapParam", mapBuilder.build())
+        .build();
+  }
+
   protected ParameterValue newComplexActingParameter(int intParam,
                                                      String stringParam,
                                                      List<String> listParam,
-                                                     int innerIntParam,
-                                                     String innerStringParam,
-                                                     List<String> innerListParam) {
+                                                     Map<String, String> mapParam,
+                                                     InnerPojo innerPojo,
+                                                     List<InnerPojo> complexList,
+                                                     Map<String, InnerPojo> complexMap) {
     ParameterListValue.Builder listValueBuilder = ParameterListValue.builder();
     listParam.forEach(listValueBuilder::withValue);
-    ParameterListValue.Builder innerListValueBuilder = ParameterListValue.builder();
-    innerListParam.forEach(innerListValueBuilder::withValue);
+
+    ParameterListValue.Builder complexListBuilder = ParameterListValue.builder();
+    complexList.forEach(i -> complexListBuilder.withValue(declareInnerPojo(i)));
+
+    ParameterObjectValue.Builder mapBuilder = ParameterObjectValue.builder();
+    mapParam.forEach(mapBuilder::withParameter);
+
+    ParameterObjectValue.Builder complexMapBuilder = ParameterObjectValue.builder();
+    complexMap.forEach((k, v) -> complexMapBuilder.withParameter(k, declareInnerPojo(v)));
+
     return ParameterObjectValue.builder()
-        .withParameter("innerPojoParam",
-                       ParameterObjectValue.builder()
-                           .withParameter("intParam", Integer.toString(innerIntParam))
-                           .withParameter("stringParam", innerStringParam)
-                           .withParameter("listParam", innerListValueBuilder.build())
-                           .build())
+        .withParameter("innerPojoParam", declareInnerPojo(innerPojo))
         .withParameter("intParam", Integer.toString(intParam))
         .withParameter("stringParam", stringParam)
         .withParameter("listParam", listValueBuilder.build())
+        .withParameter("mapParam", mapBuilder.build())
+        .withParameter("complexListParam", complexListBuilder.build())
+        .withParameter("complexMapParam", complexMapBuilder.build())
         .build();
 
   }
 
   public OperationElementDeclaration declareOperation(String operationName) {
+    final int defaultInt = 0;
+    final String defaultString = "zero";
+    final List<String> defaultList = asList("one", "two", "three");
+    final Map<String, String> defaultMap = ImmutableMap.of("0", "zero", "1", "one");
+    final InnerPojo defaultInnerPojo = new InnerPojo(defaultInt, defaultString, defaultList, defaultMap);
+    final List<InnerPojo> defaultComplexList = asList(defaultInnerPojo);
+    final Map<String, InnerPojo> defaultComplexMap = ImmutableMap.of("0", defaultInnerPojo);
     return declarer.newOperation(operationName)
         .withConfig(MY_CONFIG)
         .withParameterGroup(newParameterGroup()
             .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
             .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
             .withParameter(COMPLEX_ACTING_PARAMETER_NAME, newComplexActingParameter(
-                                                                                    0,
-                                                                                    "zero",
-                                                                                    asList("one", "two", "three"),
-                                                                                    0,
-                                                                                    "zero",
-                                                                                    asList("one", "two", "three")))
+                                                                                    defaultInt,
+                                                                                    defaultString,
+                                                                                    defaultList,
+                                                                                    defaultMap,
+                                                                                    defaultInnerPojo,
+                                                                                    defaultComplexList,
+                                                                                    defaultComplexMap))
             .withParameter(PROVIDED_FROM_COMPLEX_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
             .getDeclaration())
 

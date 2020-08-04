@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.metadata.cache;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 
-
 /**
  * Factory definition to create {@link MetadataCacheIdGenerator}s isolated from the application context in which it will be used.
  *

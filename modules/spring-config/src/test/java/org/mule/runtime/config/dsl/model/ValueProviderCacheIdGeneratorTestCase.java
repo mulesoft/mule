@@ -34,7 +34,10 @@ import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -105,7 +108,9 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
         .map(d -> isConnection.get() ? ((ConfigurationElementDeclaration) d).getConnection().orElse(null) : d);
   }
 
-  private void modifyParameter(ArtifactDeclaration artifactDeclaration, String ownerLocation, String parameterName,
+  private void modifyParameter(ArtifactDeclaration artifactDeclaration,
+                               String ownerLocation,
+                               String parameterName,
                                Consumer<ParameterElementDeclaration> parameterConsumer) {
     getParameterElementDeclaration(artifactDeclaration, ownerLocation)
         .map(
@@ -403,74 +408,53 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   }
 
   @Test
-  @Ignore("CMTS-49")
+  @Ignore("CMTS-49. Test is also failing because it can't handle the complex map. Check that.")
   public void differentHashForComplexActingParameterValue() throws Exception {
     ArtifactDeclaration app = getBaseApp();
-    int intParam = 0;
-    String stringParam = "zero";
-    List<String> listParam = asList("one", "two", "three");
-    int innerIntParam = 0;
-    String innerStringParam = "zero";
-    List<String> innerListParm = asList("one", "two", "three");
+    final int defaultInt = 0;
+    final String defaultString = "zero";
+    final List<String> defaultList = asList("one", "two", "three");
+    final Map<String, String> defaultMap = ImmutableMap.of("0", "zero", "1", "one");
+    final InnerPojo defaultInnerPojo = new InnerPojo(defaultInt, defaultString, defaultList, defaultMap);
+    final List<InnerPojo> defaultComplexList = asList(defaultInnerPojo);
+    final Map<String, InnerPojo> defaultComplexMap = ImmutableMap.of("0", defaultInnerPojo);
+
+
     Optional<ValueProviderCacheId> originalId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
 
     modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(1,
-                                                                                                                      stringParam,
-                                                                                                                      listParam,
-                                                                                                                      innerIntParam,
-                                                                                                                      innerStringParam,
-                                                                                                                      innerListParm)));
+                                                                                                                      defaultString,
+                                                                                                                      defaultList,
+                                                                                                                      defaultMap,
+                                                                                                                      defaultInnerPojo,
+                                                                                                                      defaultComplexList,
+                                                                                                                      defaultComplexMap)));
     Optional<ValueProviderCacheId> changedIntId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
 
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(intParam,
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
                                                                                                                       "one",
-                                                                                                                      listParam,
-                                                                                                                      innerIntParam,
-                                                                                                                      innerStringParam,
-                                                                                                                      innerListParm)));
+                                                                                                                      defaultList,
+                                                                                                                      defaultMap,
+                                                                                                                      defaultInnerPojo,
+                                                                                                                      defaultComplexList,
+                                                                                                                      defaultComplexMap)));
     Optional<ValueProviderCacheId> changedStringId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
 
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(intParam,
-                                                                                                                      stringParam,
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
+                                                                                                                      defaultString,
                                                                                                                       asList("one",
                                                                                                                              "two",
                                                                                                                              "four"),
-                                                                                                                      innerIntParam,
-                                                                                                                      innerStringParam,
-                                                                                                                      innerListParm)));
+                                                                                                                      defaultMap,
+                                                                                                                      defaultInnerPojo,
+                                                                                                                      defaultComplexList,
+                                                                                                                      defaultComplexMap)));
     Optional<ValueProviderCacheId> changedListId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
 
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(intParam,
-                                                                                                                      stringParam,
-                                                                                                                      listParam,
-                                                                                                                      1,
-                                                                                                                      innerStringParam,
-                                                                                                                      innerListParm)));
-    Optional<ValueProviderCacheId> changedInnerIntId =
-        computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
+    //TODO: CMTS-49. Validate all scenarios. Modifying parameters from all levels. (e.g: An int param from an inner pojo from the complex list)
 
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(intParam,
-                                                                                                                      stringParam,
-                                                                                                                      listParam,
-                                                                                                                      innerIntParam,
-                                                                                                                      "one",
-                                                                                                                      innerListParm)));
-    Optional<ValueProviderCacheId> changedInnerStringId =
-        computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
+    List<Optional<ValueProviderCacheId>> allIds = asList(originalId, changedIntId, changedStringId, changedListId);
 
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(intParam,
-                                                                                                                      stringParam,
-                                                                                                                      listParam,
-                                                                                                                      innerIntParam,
-                                                                                                                      innerStringParam,
-                                                                                                                      asList("one",
-                                                                                                                             "two",
-                                                                                                                             "four"))));
-    Optional<ValueProviderCacheId> changedInnerListId =
-        computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
-
-    List<Optional<ValueProviderCacheId>> allIds = asList(originalId, changedIntId, changedStringId, changedListId,
-                                                         changedInnerIntId, changedInnerStringId, changedInnerListId);
     for (Optional<ValueProviderCacheId> idA : allIds) {
       for (Optional<ValueProviderCacheId> idB : allIds) {
         if (idA != idB) {
