@@ -8,20 +8,28 @@ package org.mule.module.artifact.classloader;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
+import static java.lang.Thread.activeCount;
+import static java.lang.Thread.enumerate;
+import static java.lang.Boolean.getBoolean;
+
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
 
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Driver;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,8 +52,15 @@ import org.slf4j.LoggerFactory;
  */
 public class JdbcResourceReleaser implements ResourceReleaser {
 
+  private static final String AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME = "avoid.dispose.oracle.threads";
+  private static final boolean JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_ORACLE_THREADS =
+      getBoolean(AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME);
+
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
-  private final transient Logger logger = LoggerFactory.getLogger(getClass());
+  public static final String ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
+  public static final String COMPOSITE_CLASS_LOADER_CLASS_NAME = "CompositeClassLoader";
+  public static final Pattern ORACLE_DRIVER_TIMER_THREAD_PATTERN = Pattern.compile("^Timer-\\d+");
+  private static final Logger logger = LoggerFactory.getLogger(JdbcResourceReleaser.class);
   private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
       Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
 
@@ -99,6 +114,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
       if (isOracleDriver(driver)) {
         deregisterOracleDiagnosabilityMBean();
+        disposeOracleDriverThreads();
       }
       if (isMySqlDriver(driver)) {
         shutdownMySqlAbandonedConnectionCleanupThread();
@@ -264,4 +280,132 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     throw new ClassNotFoundException("No MySql's AbandonedConnectionCleanupThread class was found");
   }
 
+  private void disposeOracleDriverThreads() {
+    try {
+      if (JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_ORACLE_THREADS) {
+        return;
+      }
+
+      Thread[] threads = new Thread[activeCount()];
+      try {
+        enumerate(threads);
+      } catch (Throwable t) {
+        logger
+            .debug("An error occurred trying to obtain available Threads. Thread cleanup will be skipped.", t);
+        return;
+      }
+
+      ClassLoader undeployedArtifactClassLoader = this.getClass().getClassLoader();
+
+      /* IMPORTANT: this is done to avoid metaspace OOM caused by oracle driver
+      thread leak. This is only meant to stop TimerThread threads spawned
+      by oracle driver's HAManager class. This timer cannot be fetched
+      by reflection because, in order to do so, other oracle dependencies
+      would be required.
+      * */
+      for (Thread thread : threads) {
+        if (isOracleTimerThread(undeployedArtifactClassLoader, thread)) {
+          try {
+            clearReferencesStopTimerThread(thread);
+            thread.interrupt();
+            thread.join();
+          } catch (Throwable e) {
+            logger
+                .warn("An error occurred trying to close the '" + thread.getName() + "' Thread. This might cause memory leaks.",
+                      e);
+          }
+        }
+      }
+    } catch (Exception e) {
+      logger.error("An exception occurred while attempting to dispose of oracle timer threads: {}", e.getMessage());
+    }
+  }
+
+  private boolean isOracleTimerThread(ClassLoader undeployedArtifactClassLoader, Thread thread) {
+    if (!(undeployedArtifactClassLoader instanceof ArtifactClassLoader)) {
+      return false;
+    }
+    String artifactId = ((ArtifactClassLoader) undeployedArtifactClassLoader).getArtifactId();
+    Matcher oracleTimerThreadNameMatcher = ORACLE_DRIVER_TIMER_THREAD_PATTERN.matcher(thread.getName());
+
+    return thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
+        && oracleTimerThreadNameMatcher.matches()
+        && (isThreadLoadedByDisposedApplication(artifactId, thread.getContextClassLoader())
+            || isThreadLoadedByDisposedDomain(artifactId, thread.getContextClassLoader()));
+  }
+
+  private boolean isThreadLoadedByDisposedDomain(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
+    try {
+      Class threadContextClassLoaderClass = threadContextClassLoader.getClass();
+      if (!threadContextClassLoaderClass.getSimpleName().equals(COMPOSITE_CLASS_LOADER_CLASS_NAME)) {
+        return false;
+      }
+
+      Method getDelegateClassLoadersMethod = threadContextClassLoaderClass.getMethod("getDelegates");
+      List<ClassLoader> classLoaderList = (List<ClassLoader>) getDelegateClassLoadersMethod.invoke(threadContextClassLoader);
+
+      for (ClassLoader classLoaderDelegate : classLoaderList) {
+        if (classLoaderDelegate instanceof ArtifactClassLoader) {
+          ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoaderDelegate;
+          if (artifactClassLoader.getArtifactId().contains(undeployedArtifactId)) {
+            return true;
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      logger.warn("Exception occurred while attempting to compare {} and {} artifactId.", threadContextClassLoader,
+                  this.getClass().getClassLoader());
+    }
+
+    return false;
+  }
+
+  private boolean isThreadLoadedByDisposedApplication(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
+    try {
+      if (!(threadContextClassLoader instanceof MuleArtifactClassLoader)) {
+        return false;
+      }
+      String threadClassLoaderArtifactId = ((MuleArtifactClassLoader) threadContextClassLoader).getArtifactId();
+      return threadClassLoaderArtifactId != null && threadClassLoaderArtifactId.equals(undeployedArtifactId);
+    } catch (Exception e) {
+      logger.warn("Exception occurred while attempting to compare {} and {} artifact id.", threadContextClassLoader,
+                  this.getClass().getClassLoader());
+    }
+
+    return false;
+  }
+
+  private void clearReferencesStopTimerThread(Thread thread)
+      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    // Need to get references to:
+    // in Sun/Oracle JDK:
+    // - newTasksMayBeScheduled field (in java.util.TimerThread)
+    // - queue field
+    // - queue.clear()
+    // in IBM JDK, Apache Harmony:
+    // - cancel() method (in java.util.Timer$TimerImpl)
+    try {
+      Field newTasksMayBeScheduledField =
+          thread.getClass().getDeclaredField("newTasksMayBeScheduled");
+      newTasksMayBeScheduledField.setAccessible(true);
+      Field queueField = thread.getClass().getDeclaredField("queue");
+      queueField.setAccessible(true);
+      Object queue = queueField.get(thread);
+      Method clearMethod = queue.getClass().getDeclaredMethod("clear");
+      clearMethod.setAccessible(true);
+      synchronized (queue) {
+        newTasksMayBeScheduledField.setBoolean(thread, false);
+        clearMethod.invoke(queue);
+        // In case queue was already empty. Should only be one
+        // thread waiting but use notifyAll() to be safe.
+        queue.notifyAll();
+      }
+    } catch (NoSuchFieldException noSuchFieldEx) {
+      logger.warn("Unable to clear timer references using 'clear' method. Attempting to use 'cancel' method.");
+      Method cancelMethod = thread.getClass().getDeclaredMethod("cancel");
+      cancelMethod.setAccessible(true);
+      cancelMethod.invoke(thread);
+    }
+  }
 }
