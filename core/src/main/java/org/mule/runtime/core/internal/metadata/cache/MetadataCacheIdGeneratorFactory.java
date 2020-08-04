@@ -16,7 +16,6 @@ import org.mule.runtime.core.internal.locator.ComponentLocator;
  * @since 4.1.4, 4.2.0
  */
 public interface MetadataCacheIdGeneratorFactory<T> {
-
   /**
    * Creates a new {@link MetadataCacheIdGenerator} valid for the given context information provided.
    *
