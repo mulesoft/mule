@@ -79,4 +79,9 @@ public interface Artifact<D extends ArtifactDescriptor>
      * @param deploymentProperties deployment properties
      */
     void setDeploymentProperties(Properties deploymentProperties);
+
+    /**
+     * Cancels any ongoing process that prevents the startup fase from ending
+     */
+    void cancelStart();
 }
