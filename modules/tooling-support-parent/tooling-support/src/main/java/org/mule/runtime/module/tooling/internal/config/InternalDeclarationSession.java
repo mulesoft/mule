@@ -36,7 +36,8 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBasedParameterResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
@@ -45,17 +46,15 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
+import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
 public class InternalDeclarationSession implements DeclarationSession {
-
-  private static final Supplier<Object> NULL_SUPPLIER = () -> null;
 
   @Inject
   private ConfigurationComponentLocator componentLocator;
@@ -139,13 +138,20 @@ public class InternalDeclarationSession implements DeclarationSession {
                                                                                       ParameterValueResolver parameterValueResolver,
                                                                                       Optional<String> configName) {
     ValueProviderMediator<T> valueProviderMediator = createValueProviderMediator(componentModel);
+    ExtensionResolvingContext context =
+        new ExtensionResolvingContext(() -> configName.flatMap(name -> artifactHelper().getConfigurationInstance(name)),
+                                      connectionManager);
     try {
       return resultFrom(valueProviderMediator.getValues(parameterName,
                                                         parameterValueResolver,
-                                                        configName.map(this::connectionSupplier).orElse(NULL_SUPPLIER),
-                                                        configName.map(this::configSupplier).orElse(NULL_SUPPLIER)));
+                                                        (CheckedSupplier<Object>) () -> context
+                                                            .getConnection().orElse(null),
+                                                        (CheckedSupplier<Object>) () -> context
+                                                            .getConfig().orElse(null)));
     } catch (ValueResolvingException e) {
       return resultFrom(newFailure(e).build());
+    } finally {
+      context.dispose();
     }
   }
 
@@ -153,19 +159,6 @@ public class InternalDeclarationSession implements DeclarationSession {
     return new ValueProviderMediator<>(constructModel,
                                        () -> muleContext,
                                        () -> reflectionCache);
-  }
-
-  private Supplier<Object> connectionSupplier(String configName) {
-    return artifactHelper().getConnectionInstance(configName)
-        .map(ci -> (Supplier<Object>) () -> ci)
-        .orElse(NULL_SUPPLIER);
-
-  }
-
-  private Supplier<Object> configSupplier(String configName) {
-    return artifactHelper().getConfigurationInstance(configName)
-        .map(ci -> (Supplier<Object>) () -> ci)
-        .orElse(NULL_SUPPLIER);
   }
 
   private <T extends ParameterizedModel> ParameterValueResolver parameterValueResolver(ParameterizedElementDeclaration parameterizedElementDeclaration,
