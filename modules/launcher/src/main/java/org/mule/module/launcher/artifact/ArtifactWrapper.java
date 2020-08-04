@@ -115,6 +115,7 @@ public class ArtifactWrapper<T extends Artifact<D>, D extends ArtifactDescriptor
             @Override
             public void execute()
             {
+                delegate.cancelStart();
                 delegate.stop();
             }
         });
@@ -167,5 +168,17 @@ public class ArtifactWrapper<T extends Artifact<D>, D extends ArtifactDescriptor
     public void setDeploymentProperties(Properties deploymentProperties)
     {
         getDelegate().setDeploymentProperties(deploymentProperties);
+    }
+
+    @Override
+    public void cancelStart() {
+        executeWithinArtifactClassLoader(new ArtifactAction()
+        {
+            @Override
+            public void execute()
+            {
+                delegate.cancelStart();
+            }
+        });
     }
 }

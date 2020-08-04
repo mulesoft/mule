@@ -136,4 +136,9 @@ public class TestDomainWrapper implements Domain
     {
         this.deploymentProperties = deploymentProperties;
     }
+
+    @Override
+    public void cancelStart() {
+        delegate.cancelStart();
+    }
 }
