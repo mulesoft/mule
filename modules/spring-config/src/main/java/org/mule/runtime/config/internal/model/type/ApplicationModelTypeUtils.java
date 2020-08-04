@@ -254,7 +254,7 @@ public final class ApplicationModelTypeUtils {
             })
             .filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
             .ifPresent(paramModel -> {
-              if (isContent(paramModel)) {
+              if (isSimpleMetadataType(paramModel)) {
                 componentModel.setParameter(paramModel,
                                             new DefaultComponentParameterAst(trim(((ComponentModel) childComp)
                                                 .getTextContent()),
@@ -268,6 +268,10 @@ public final class ApplicationModelTypeUtils {
               }
 
             }));
+  }
+
+  private static boolean isSimpleMetadataType(ParameterModel paramModel) {
+    return paramModel.getType() instanceof org.mule.metadata.api.model.SimpleType;
   }
 
   private static Multimap<ComponentIdentifier, ComponentModel> getNestedComponents(ComponentModel componentModel) {
