@@ -283,7 +283,7 @@ public final class ApplicationModelTypeUtils {
                       unionType.getTypes().forEach(type -> type.accept(this));
                     }
                   });
-                } else if (isContent(paramModel)) {
+                } else if (isContent(paramModel) || isSimpleMetadataType(paramModel)) {
                   nestedForId
                       .forEach(childComp -> componentModel
                           .setParameter(paramModel,
@@ -297,6 +297,10 @@ public final class ApplicationModelTypeUtils {
                 }
               });
         });
+  }
+
+  private static boolean isSimpleMetadataType(ParameterModel paramModel) {
+    return paramModel.getType() instanceof org.mule.metadata.api.model.SimpleType;
   }
 
   private static Multimap<ComponentIdentifier, ComponentModel> getNestedComponents(ComponentModel componentModel) {
