@@ -12,7 +12,6 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -22,6 +21,8 @@ import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -72,27 +73,18 @@ public class LazyMetadataService implements MetadataService, Initialisable {
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<MetadataType> getInputMetadata(Location location, MetadataKey key, String parameterName) {
-    return (MetadataResult<MetadataType>) initializeComponent(location)
-        .orElseGet(() -> metadataService.getInputMetadata(location, key, parameterName));
+  public MetadataResult<InputMetadataDescriptor> getInputMetadata(Location location, MetadataKey key) {
+    return (MetadataResult<InputMetadataDescriptor>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getInputMetadata(location, key));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<MetadataType> getOutputMetadata(Location location, MetadataKey key) {
-    return (MetadataResult<MetadataType>) initializeComponent(location)
+  public MetadataResult<OutputMetadataDescriptor> getOutputMetadata(Location location, MetadataKey key) {
+    return (MetadataResult<OutputMetadataDescriptor>) initializeComponent(location)
         .orElseGet(() -> metadataService.getOutputMetadata(location, key));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public MetadataResult<MetadataType> getOutputAttributesMetadata(Location location, MetadataKey key) {
-    return (MetadataResult<MetadataType>) initializeComponent(location)
-        .orElseGet(() -> metadataService.getOutputAttributesMetadata(location, key));
   }
 
   /**

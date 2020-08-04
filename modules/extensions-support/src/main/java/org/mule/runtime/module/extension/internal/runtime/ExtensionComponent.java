@@ -25,7 +25,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -46,6 +45,8 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.Value;
@@ -377,33 +378,22 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   @Override
-  public MetadataResult<MetadataType> getInputMetadata(MetadataKey key, String parameterName) throws MetadataResolvingException {
+  public MetadataResult<InputMetadataDescriptor> getInputMetadata(MetadataKey key) throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getInputMetadata(context, key, parameterName)));
+                                        .getInputMetadata(context, key)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }
   }
 
   @Override
-  public MetadataResult<MetadataType> getOutputMetadata(MetadataKey key) throws MetadataResolvingException {
+  public MetadataResult<OutputMetadataDescriptor> getOutputMetadata(MetadataKey key) throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getOutputMetadata(context, key)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onComponent());
-    }
-  }
-
-  @Override
-  public MetadataResult<MetadataType> getOutputAttributesMetadata(MetadataKey key) throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getOutputAttributesMetadata(context, key)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }

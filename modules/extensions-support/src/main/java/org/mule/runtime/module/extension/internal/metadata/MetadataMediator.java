@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
@@ -16,7 +15,6 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADA
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -200,56 +198,44 @@ public final class MetadataMediator<T extends ComponentModel> {
     }
   }
 
-  public MetadataResult<MetadataType> getInputMetadata(MetadataContext context, MetadataKey key, String parameterName) {
+  public MetadataResult<InputMetadataDescriptor> getInputMetadata(MetadataContext context, MetadataKey key) {
     try {
       Object resolvedKey = keyIdObjectResolver.resolve(key);
-      Optional<ParameterModel> parameterModel = component.getParameterGroupModels().stream()
-          .flatMap(parameterGroup -> parameterGroup.getParameterModels().stream())
-          .filter(parameter -> parameter.getName().equals(parameterName))
-          .findFirst();
-      if (parameterModel.isPresent()) {
-        return newMetadataTypeResult(inputDelegate.getParameterMetadataDescriptor(parameterModel.get(), context, resolvedKey));
+      MetadataResult<InputMetadataDescriptor> input = inputDelegate.getInputMetadataDescriptors(context, resolvedKey);
+      Optional<MetadataResult<InputMetadataDescriptor>> successCallbackInput = successCallbackInputDelegate
+          .map(successCallbackInputDelegate -> successCallbackInputDelegate.getInputMetadataDescriptors(context, resolvedKey));
+      Optional<MetadataResult<InputMetadataDescriptor>> errorCallbackInput = errorCallbackInputDelegate
+          .map(errorCallbackInputDelegate -> errorCallbackInputDelegate.getInputMetadataDescriptors(context, resolvedKey));
+
+      if (input.isSuccess() && (!successCallbackInput.isPresent() || successCallbackInput.get().isSuccess())
+          && (!errorCallbackInput.isPresent() || errorCallbackInput.get().isSuccess())) {
+        InputMetadataDescriptor.InputMetadataDescriptorBuilder inputMetadataDescriptorBuilder = InputMetadataDescriptor.builder();
+        input.get().getAllParameters().forEach((name, parameterMetadataDescriptor) -> inputMetadataDescriptorBuilder
+            .withParameter(name, parameterMetadataDescriptor));
+        successCallbackInput.map(MetadataResult::get)
+            .ifPresent(successCallbackInputDescriptor -> successCallbackInputDescriptor.getAllParameters()
+                .forEach((name, parameterMetadataDescriptor) -> inputMetadataDescriptorBuilder
+                    .withParameter(name, parameterMetadataDescriptor)));
+        errorCallbackInput.map(MetadataResult::get)
+            .ifPresent(errorCallbackInputDescriptor -> errorCallbackInputDescriptor.getAllParameters()
+                .forEach((name, parameterMetadataDescriptor) -> inputMetadataDescriptorBuilder
+                    .withParameter(name, parameterMetadataDescriptor)));
+        return success(inputMetadataDescriptorBuilder.build());
       }
 
-      if (successCallbackInputDelegate.isPresent()) {
-        parameterModel = ((SourceModel) component).getSuccessCallback().get()
-            .getAllParameterModels()
-            .stream()
-            .filter(parameter -> parameter.getName().equals(parameterName))
-            .findFirst();
-        if (parameterModel.isPresent()) {
-          return newMetadataTypeResult(successCallbackInputDelegate.get().getParameterMetadataDescriptor(parameterModel.get(),
-                                                                                                         context, resolvedKey));
-        }
-      }
+      List<MetadataFailure> failures = ImmutableList.<MetadataFailure>builder()
+          .addAll(input.getFailures())
+          .addAll(successCallbackInput.map(MetadataResult::getFailures).orElse(emptyList()))
+          .addAll(errorCallbackInput.map(MetadataResult::getFailures).orElse(emptyList()))
+          .build();
 
-      if (errorCallbackInputDelegate.isPresent()) {
-        parameterModel = ((SourceModel) component).getErrorCallback().get()
-            .getAllParameterModels()
-            .stream()
-            .filter(parameter -> parameter.getName().equals(parameterName))
-            .findFirst();
-        if (parameterModel.isPresent()) {
-          return newMetadataTypeResult(errorCallbackInputDelegate.get().getParameterMetadataDescriptor(parameterModel.get(),
-                                                                                                       context, resolvedKey));
-        }
-      }
-      return failure(MetadataFailure.Builder.newFailure()
-          .withMessage(format("The given component has not the requested parameter model with name [%s]", parameterName))
-          .onComponent());
+      return failure(failures);
     } catch (MetadataResolvingException e) {
       return failure(newFailure(e).onComponent());
     }
   }
 
-  private MetadataResult<MetadataType> newMetadataTypeResult(MetadataResult<ParameterMetadataDescriptor> parameterMetadataDescriptorMetadataResult) {
-    if (parameterMetadataDescriptorMetadataResult.isSuccess()) {
-      return success(parameterMetadataDescriptorMetadataResult.get().getType());
-    }
-    return failure(parameterMetadataDescriptorMetadataResult.getFailures());
-  }
-
-  public MetadataResult<MetadataType> getOutputMetadata(MetadataContext context, MetadataKey key) {
+  public MetadataResult<OutputMetadataDescriptor> getOutputMetadata(MetadataContext context, MetadataKey key) {
     if (!(component instanceof HasOutputModel)) {
       return failure(MetadataFailure.Builder.newFailure()
           .withMessage("The given component has not output definition to be described").onComponent());
@@ -257,21 +243,7 @@ public final class MetadataMediator<T extends ComponentModel> {
 
     try {
       Object resolvedKey = keyIdObjectResolver.resolve(key);
-      return outputDelegate.getOutputMetadata(context, resolvedKey);
-    } catch (MetadataResolvingException e) {
-      return failure(newFailure(e).onComponent());
-    }
-  }
-
-  public MetadataResult<MetadataType> getOutputAttributesMetadata(MetadataContext context, MetadataKey key) {
-    if (!(component instanceof HasOutputModel)) {
-      return failure(MetadataFailure.Builder.newFailure()
-          .withMessage("The given component has not output definition to be described").onComponent());
-    }
-
-    try {
-      Object resolvedKey = keyIdObjectResolver.resolve(key);
-      return outputDelegate.getOutputAttributesMetadata(context, resolvedKey);
+      return outputDelegate.getOutputMetadataDescriptor(context, resolvedKey);
     } catch (MetadataResolvingException e) {
       return failure(newFailure(e).onComponent());
     }

@@ -96,8 +96,8 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * resolved using the {@link InputTypeResolver} if one is available to resolve its {@link MetadataType}, returning
    * {@link Optional#empty()} if no Content parameter is present Failure if the dynamic resolution fails for any reason.
    */
-  MetadataResult<ParameterMetadataDescriptor> getParameterMetadataDescriptor(ParameterModel parameter,
-                                                                             MetadataContext context, Object key) {
+  private MetadataResult<ParameterMetadataDescriptor> getParameterMetadataDescriptor(ParameterModel parameter,
+                                                                                     MetadataContext context, Object key) {
 
     ParameterMetadataDescriptorBuilder descriptorBuilder = ParameterMetadataDescriptor.builder(parameter.getName());
     if (!parameter.hasDynamicType()) {

@@ -51,6 +51,9 @@ import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterTypeWrapper;
@@ -238,15 +241,22 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   @Test
   public void multipleInputWithKeyIdExplicitParameterResolution() throws Exception {
     location = Location.builder().globalName(OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
-    assertExpectedType(metadataService.getInputMetadata(location, PERSON_METADATA_KEY, "type"), String.class);
-    assertExpectedType(metadataService.getInputMetadata(location, PERSON_METADATA_KEY, "firstPerson"), personType);
-    assertExpectedType(metadataService.getInputMetadata(location, PERSON_METADATA_KEY, "otherPerson"), personType);
+    MetadataResult<InputMetadataDescriptor> inputMetadataResult = metadataService.getInputMetadata(location, PERSON_METADATA_KEY);
+    assertThat(inputMetadataResult.isSuccess(), is(true));
+    InputMetadataDescriptor inputMetadataDescriptor = inputMetadataResult.get();
+    assertExpectedParameterMetadataDescriptor(inputMetadataDescriptor.getParameterMetadata("type"), String.class, false);
+    assertExpectedParameterMetadataDescriptor(inputMetadataDescriptor.getParameterMetadata("firstPerson"), personType);
+    assertExpectedParameterMetadataDescriptor(inputMetadataDescriptor.getParameterMetadata("otherPerson"), personType);
   }
 
   @Test
   public void outputMultipleInputWithKeyIdExplicitParameterResolution() throws Exception {
     location = Location.builder().globalName(OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
-    assertExpectedType(metadataService.getOutputMetadata(location, CAR_KEY), carType);
+    MetadataResult<OutputMetadataDescriptor> outputMetadataResult = metadataService.getOutputMetadata(location, CAR_KEY);
+    assertThat(outputMetadataResult.isSuccess(), is(true));
+    OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
+    assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
+    assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), carType);
   }
 
   @Test
@@ -357,13 +367,15 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   @Test
   public void messageAttributesStringTypeMetadataExplicitResolution() throws Exception {
     location = Location.builder().globalName(OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA).addProcessorsPart().addIndexPart(0).build();
-    MetadataResult<MetadataType> outputAttributesMetadata =
-        metadataService.getOutputAttributesMetadata(location, PERSON_METADATA_KEY);
+    MetadataResult<OutputMetadataDescriptor> outputMetadataDescriptorResult =
+        metadataService.getOutputMetadata(location, PERSON_METADATA_KEY);
 
-    assertThat(outputAttributesMetadata.isSuccess(), is(true));
-    MetadataType type = outputAttributesMetadata.get();
-    assertThat(type, is(instanceOf(ObjectType.class)));
-    ObjectType dictionary = (ObjectType) type;
+    assertThat(outputMetadataDescriptorResult.isSuccess(), is(true));
+    OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataDescriptorResult.get();
+    TypeMetadataDescriptor attributesMetadata = outputMetadataDescriptor.getAttributesMetadata();
+    assertThat(attributesMetadata.isDynamic(), is(true));
+    assertThat(attributesMetadata.getType(), is(instanceOf(ObjectType.class)));
+    ObjectType dictionary = (ObjectType) attributesMetadata.getType();
     assertThat(dictionary.getOpenRestriction().get(), is(instanceOf(StringType.class)));
   }
 

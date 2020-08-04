@@ -40,6 +40,7 @@ import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataComponent;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
@@ -269,17 +270,24 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
     assertThat(type, is(expectedType));
   }
 
+  protected void assertExpectedParameterMetadataDescriptor(ParameterMetadataDescriptor parameterMetadataDescriptor, Type type,
+                                                           boolean dynamic) {
+    assertThat(parameterMetadataDescriptor.isDynamic(), is(dynamic));
+    assertExpectedType(parameterMetadataDescriptor.getType(), type);
+  }
+
+  protected void assertExpectedParameterMetadataDescriptor(ParameterMetadataDescriptor parameterMetadataDescriptor,
+                                                           MetadataType type) {
+    assertThat(parameterMetadataDescriptor.isDynamic(), is(true));
+    assertExpectedType(parameterMetadataDescriptor.getType(), type);
+  }
+
   protected void assertExpectedType(Typed type, Type expectedType) {
     assertThat(type.getType(), is(TYPE_LOADER.load(expectedType)));
   }
 
-  protected void assertExpectedType(MetadataResult<MetadataType> metadataTypeMetadataResult, Type expectedType) {
-    assertExpectedType(metadataTypeMetadataResult, TYPE_LOADER.load(expectedType));
-  }
-
-  protected void assertExpectedType(MetadataResult<MetadataType> metadataTypeMetadataResult, MetadataType expectedType) {
-    assertThat(metadataTypeMetadataResult.isSuccess(), is(true));
-    assertThat(metadataTypeMetadataResult.get(), is(expectedType));
+  protected void assertExpectedType(MetadataType metadataType, Type expectedType) {
+    assertExpectedType(metadataType, TYPE_LOADER.load(expectedType));
   }
 
   protected void assertExpectedType(Typed typedModel, MetadataType expectedType, boolean isDynamic) {
