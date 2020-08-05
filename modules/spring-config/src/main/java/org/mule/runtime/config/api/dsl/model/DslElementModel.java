@@ -43,7 +43,7 @@ import java.util.function.Function;
  */
 public class DslElementModel<T> {
 
-  public static String COMPONENT_AST_KEY = "ComponentAst";
+  public static final String COMPONENT_AST_KEY = "ComponentAst";
 
   private final T model;
   private final String value;

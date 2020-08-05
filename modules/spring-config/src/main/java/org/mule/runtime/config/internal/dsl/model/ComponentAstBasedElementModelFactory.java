@@ -302,96 +302,92 @@ class ComponentAstBasedElementModelFactory {
         Optional<ComponentIdentifier> identifier = getIdentifier(modelDsl);
         String value = configuration.getRawParameterValue(name).orElse(null);
         LOGGER.trace("getComponentChildVisitor#defaultVisit: '{}': '{}'", identifier, value);
-        if (isBlank(value)) {
-          if (identifier.isPresent()) {
-            ComponentAst nested = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
-            if (nested != null && nested.getRawParameterValue(BODY_RAW_PARAM_NAME).isPresent()
-                && !isBlank(nested.getRawParameterValue(BODY_RAW_PARAM_NAME).get())) {
-              value = nested.getRawParameterValue(BODY_RAW_PARAM_NAME).get().trim();
-            }
-          } else if (defaultValue.isPresent()) {
-            value = defaultValue.get();
-            elementBuilder.isExplicitInDsl(false);
-          }
-        }
-
         if (!isBlank(value)) {
           typeBuilder.containing(elementBuilder.withValue(value).build());
+          return;
+        }
+
+        if (identifier.isPresent()) {
+          ComponentAst nested = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
+          if (nested != null) {
+            value = nested.getRawParameterValue(BODY_RAW_PARAM_NAME)
+                .flatMap(body -> !isBlank(body) ? of(body.trim()) : empty())
+                .orElse(null);
+          }
+        } else if (defaultValue.isPresent()) {
+          value = defaultValue.get();
+          elementBuilder.isExplicitInDsl(false);
         }
       }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
         Optional<ComponentIdentifier> identifier = getIdentifier(modelDsl);
-        if (identifier.isPresent()) {
-          LOGGER.trace("getComponentChildVisitor#visitArrayType: '{}'", identifier.get());
-          ComponentAst fieldComponent = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
-          if (fieldComponent != null) {
-            DslElementModel.Builder<Object> list = DslElementModel.builder()
-                .withModel(model)
-                .withDsl(modelDsl)
-                .withConfig(fieldComponent);
-
-            modelDsl.getGeneric(arrayType.getType())
-                .ifPresent(itemdsl -> {
-                  ComponentIdentifier itemIdentifier = getIdentifier(itemdsl).get();
-
-                  fieldComponent.directChildrenStream()
-                      .forEach(c -> {
-                        if (c.getIdentifier().equals(itemIdentifier)) {
-                          getComponentChildVisitor(list, c, arrayType.getType(), VALUE_ATTRIBUTE_NAME, itemdsl, defaultValue,
-                                                   typeResolvingStack);
-                        }
-                      });
-
-                });
-
-            typeBuilder.containing(list.build());
-            return;
-          }
+        if (!identifier.isPresent()) {
+          LOGGER.trace("getComponentChildVisitor#visitArrayType: noIdentifier");
+          visitNoIdentifier(typeBuilder, model, modelDsl, defaultValue);
+          return;
         }
 
-        LOGGER.trace("getComponentChildVisitor#visitArrayType: noIdentifier", identifier.get());
-        defaultValue.ifPresent(s -> typeBuilder.containing(DslElementModel.builder()
-            .withModel(model)
-            .withDsl(modelDsl)
-            .withValue(defaultValue.get())
-            .isExplicitInDsl(false)
-            .build()));
+        LOGGER.trace("getComponentChildVisitor#visitArrayType: '{}'", identifier.get());
+        ComponentAst fieldComponent = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
+        if (fieldComponent != null) {
+          DslElementModel.Builder<Object> list = DslElementModel.builder()
+              .withModel(model)
+              .withDsl(modelDsl)
+              .withConfig(fieldComponent);
+
+          modelDsl.getGeneric(arrayType.getType())
+              .ifPresent(itemdsl -> {
+                ComponentIdentifier itemIdentifier = getIdentifier(itemdsl).get();
+
+                fieldComponent.directChildrenStream()
+                    .filter(c -> c.getIdentifier().equals(itemIdentifier))
+                    .forEach(c -> getComponentChildVisitor(list, c, arrayType.getType(), VALUE_ATTRIBUTE_NAME, itemdsl,
+                                                           defaultValue,
+                                                           typeResolvingStack));
+
+              });
+
+          typeBuilder.containing(list.build());
+        }
       }
 
       @Override
       public void visitObject(ObjectType objectType) {
         Optional<ComponentIdentifier> identifier = getIdentifier(modelDsl);
-        if (identifier.isPresent()) {
-          LOGGER.trace("getComponentChildVisitor#visitObject: '{}'", identifier.get());
+        if (!identifier.isPresent()) {
+          LOGGER.trace("getComponentChildVisitor#visitObject: noIdentifier");
+          visitNoIdentifier(typeBuilder, model, modelDsl, defaultValue);
+        }
 
-          ComponentAst fieldComponent = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
+        LOGGER.trace("getComponentChildVisitor#visitObject: '{}'", identifier.get());
 
-          if (isMap(objectType)) {
-            LOGGER.trace("getComponentChildVisitor#visitObject: '{}' -> isMap", identifier.get());
-            typeBuilder.containing(createMapElement(objectType, modelDsl, fieldComponent));
-            return;
-          }
+        ComponentAst fieldComponent = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
 
-          fieldComponent = fieldComponent == null ? configuration : fieldComponent;
-
-          String value = fieldComponent.getRawParameterValue(modelDsl.getAttributeName()).orElse(null);
-          if (!isBlank(value)) {
-            typeBuilder.containing(DslElementModel.builder()
-                .withModel(model)
-                .withDsl(modelDsl)
-                .withValue(value)
-                .build());
-          } else {
-            resolveBasedOnType(objectType, fieldComponent, typeResolvingStack)
-                .ifPresent(typeBuilder::containing);
-          }
-
+        if (isMap(objectType)) {
+          LOGGER.trace("getComponentChildVisitor#visitObject: '{}' -> isMap", identifier.get());
+          typeBuilder.containing(createMapElement(objectType, modelDsl, fieldComponent));
           return;
         }
 
-        LOGGER.trace("getComponentChildVisitor#visitObject: noIdentifier");
+        fieldComponent = fieldComponent == null ? configuration : fieldComponent;
+
+        String value = fieldComponent.getRawParameterValue(modelDsl.getAttributeName()).orElse(null);
+        if (!isBlank(value)) {
+          typeBuilder.containing(DslElementModel.builder()
+              .withModel(model)
+              .withDsl(modelDsl)
+              .withValue(value)
+              .build());
+        } else {
+          resolveBasedOnType(objectType, fieldComponent, typeResolvingStack)
+              .ifPresent(typeBuilder::containing);
+        }
+      }
+
+      private void visitNoIdentifier(final DslElementModel.Builder typeBuilder, final MetadataType model,
+                                     final DslElementSyntax modelDsl, final Optional<String> defaultValue) {
         defaultValue.ifPresent(s -> typeBuilder.containing(DslElementModel.builder()
             .withModel(model)
             .withDsl(modelDsl)
@@ -688,15 +684,13 @@ class ComponentAstBasedElementModelFactory {
                       .ifPresent(itemdsl -> {
                         ComponentIdentifier itemIdentifier = getIdentifier(itemdsl).get();
 
-                        paramComponent.directChildrenStream().forEach(c -> {
-                          if (c.getIdentifier().equals(itemIdentifier)) {
-                            itemType.accept(
+                        paramComponent.directChildrenStream()
+                            .filter(c -> c.getIdentifier().equals(itemIdentifier))
+                            .forEach(c -> itemType.accept(
                                             getComponentChildVisitor(paramElementBuilder, c, itemType, VALUE_ATTRIBUTE_NAME,
                                                                      itemdsl,
                                                                      defaultValue,
-                                                                     new ArrayDeque<>()));
-                          }
-                        });
+                                                                                   new ArrayDeque<>())));
 
                       });
                 }
@@ -712,18 +706,16 @@ class ComponentAstBasedElementModelFactory {
                 }
               });
 
-            } else {
-              if (isBlank(value)) {
-                if (paramComponent != null && paramComponent.getRawParameterValue(BODY_RAW_PARAM_NAME).isPresent() && !isBlank(
-                                                                                                                               paramComponent
-                                                                                                                                   .getRawParameterValue(BODY_RAW_PARAM_NAME)
-                                                                                                                                   .get())) {
-                  value = paramComponent.getRawParameterValue(BODY_RAW_PARAM_NAME).get().trim();
-                } else if (defaultValue.isPresent()) {
-                  value = defaultValue.get();
-                  paramElementBuilder.isExplicitInDsl(false);
-                }
+            } else if (isBlank(value)) {
+              final Optional<String> body = paramComponent.getRawParameterValue(BODY_RAW_PARAM_NAME);
+              if (paramComponent != null && body.map(b -> !isBlank(b)).orElse(false)) {
+                value = body.get().trim();
+              } else if (defaultValue.isPresent()) {
+                value = defaultValue.get();
+                paramElementBuilder.isExplicitInDsl(false);
               }
+              paramElementBuilder.withValue(value);
+            } else {
               paramElementBuilder.withValue(value);
             }
 
@@ -745,8 +737,9 @@ class ComponentAstBasedElementModelFactory {
         ExtensionModel wrapperExtension = this.currentExtension;
         DslSyntaxResolver wrapperDsl = this.dsl;
 
-        ComponentAst wrappedComponent = paramComponent.directChildrenStream().findFirst().get();
-        this.create(wrappedComponent).ifPresent(paramElement::containing);
+        paramComponent.directChildrenStream().findFirst()
+            .flatMap(this::create)
+            .ifPresent(paramElement::containing);
 
         this.currentExtension = wrapperExtension;
         this.dsl = wrapperDsl;
@@ -781,21 +774,11 @@ class ComponentAstBasedElementModelFactory {
         if (reconnection != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, reconnection));
         }
-        return;
+        break;
 
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
-        ComponentIdentifier reconnectId = newIdentifier(RECONNECT_ELEMENT_IDENTIFIER,
-                                                        paramDsl.getPrefix());
-
-        ComponentAst config = nested.containsKey(reconnectId)
-            ? getSingleComponentConfiguration(nested, of(reconnectId))
-            : getSingleComponentConfiguration(nested,
-                                              of(newIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER, paramDsl.getPrefix())));
-
-        if (config != null) {
-          groupElementBuilder.containing(newElementModel(paramModel, paramDsl, config));
-        }
-        return;
+        handleReconnectionStrategy(paramModel, paramDsl, nested, groupElementBuilder);
+        break;
 
       case REDELIVERY_POLICY_PARAMETER_NAME:
         ComponentAst redelivery =
@@ -804,7 +787,7 @@ class ComponentAstBasedElementModelFactory {
         if (redelivery != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, redelivery));
         }
-        return;
+        break;
 
       case EXPIRATION_POLICY_PARAMETER_NAME:
         ComponentAst expiration =
@@ -813,14 +796,14 @@ class ComponentAstBasedElementModelFactory {
         if (expiration != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, expiration));
         }
-        return;
+        break;
 
       case POOLING_PROFILE_PARAMETER_NAME:
         ComponentAst pooling = getSingleComponentConfiguration(nested, getIdentifier(paramDsl));
         if (pooling != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, pooling));
         }
-        return;
+        break;
 
       case STREAMING_STRATEGY_PARAMETER_NAME:
         Set<ComponentIdentifier> streaming =
@@ -834,55 +817,84 @@ class ComponentAstBasedElementModelFactory {
         streaming.stream().filter(nested::containsKey).findFirst()
             .ifPresent(s -> groupElementBuilder
                 .containing(newElementModel(paramModel, paramDsl, getSingleComponentConfiguration(nested, of(s)))));
-        return;
+        break;
 
       case TLS_PARAMETER_NAME:
-        ComponentAst tls = getSingleComponentConfiguration(nested, getIdentifier(paramDsl));
-        if (tls != null) {
-          groupElementBuilder.containing(newElementModel(paramModel, paramDsl, tls));
-        } else if (!isBlank(parameters.get(TLS_PARAMETER_NAME))) {
-          groupElementBuilder.containing(DslElementModel.builder()
-              .withModel(paramModel)
-              .withDsl(paramDsl)
-              .withValue(parameters.get(TLS_PARAMETER_NAME))
-              .build());
-        }
-
-        return;
+        handleTlsParameter(paramModel, paramDsl, nested, parameters, groupElementBuilder);
+        break;
 
       case SCHEDULING_STRATEGY_PARAMETER_NAME:
-        ComponentAst schedulingStrategyWrapper =
-            getSingleComponentConfiguration(nested, of(ComponentIdentifier.builder()
-                .name(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER)
-                .namespace(CORE_PREFIX)
-                .build()));
-        if (schedulingStrategyWrapper != null) {
-          DslElementModel.Builder wrapper = DslElementModel.builder()
-              .withModel(paramModel)
-              .withDsl(paramDsl)
-              .withConfig(schedulingStrategyWrapper);
+        handleSchedulingStrategy(paramModel, paramDsl, nested, groupElementBuilder);
+        break;
 
-          Iterator<ComponentAst> nestedIt = schedulingStrategyWrapper.directChildrenStream().iterator();
-          if (nestedIt.hasNext()) {
-            final ComponentAst strategy = nestedIt.next();
-            final MetadataType type = CRON_STRATEGY_ELEMENT_IDENTIFIER.equals(strategy.getIdentifier().getName())
-                ? typeLoader.load(CronScheduler.class)
-                : typeLoader.load(FixedFrequencyScheduler.class);
-
-            dsl.resolve(type)
-                .ifPresent(typeDsl -> wrapper.containing(DslElementModel.builder()
-                    .withModel(type)
-                    .withDsl(typeDsl)
-                    .withConfig(strategy)
-                    .build()));
-          }
-
-          groupElementBuilder.containing(wrapper.build());
-        }
-
+      default:
         return;
     }
 
+  }
+
+  private void handleReconnectionStrategy(final ParameterModel paramModel, final DslElementSyntax paramDsl,
+                                          final Multimap<ComponentIdentifier, ComponentAst> nested,
+                                          final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
+    ComponentIdentifier reconnectId = newIdentifier(RECONNECT_ELEMENT_IDENTIFIER,
+                                                    paramDsl.getPrefix());
+
+    ComponentAst config = nested.containsKey(reconnectId)
+        ? getSingleComponentConfiguration(nested, of(reconnectId))
+        : getSingleComponentConfiguration(nested,
+                                          of(newIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER, paramDsl.getPrefix())));
+
+    if (config != null) {
+      groupElementBuilder.containing(newElementModel(paramModel, paramDsl, config));
+    }
+  }
+
+  private void handleTlsParameter(final ParameterModel paramModel, final DslElementSyntax paramDsl,
+                                  final Multimap<ComponentIdentifier, ComponentAst> nested, final Map<String, String> parameters,
+                                  final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
+    ComponentAst tls = getSingleComponentConfiguration(nested, getIdentifier(paramDsl));
+    if (tls != null) {
+      groupElementBuilder.containing(newElementModel(paramModel, paramDsl, tls));
+    } else if (!isBlank(parameters.get(TLS_PARAMETER_NAME))) {
+      groupElementBuilder.containing(DslElementModel.builder()
+          .withModel(paramModel)
+          .withDsl(paramDsl)
+          .withValue(parameters.get(TLS_PARAMETER_NAME))
+          .build());
+    }
+  }
+
+  private void handleSchedulingStrategy(final ParameterModel paramModel, final DslElementSyntax paramDsl,
+                                        final Multimap<ComponentIdentifier, ComponentAst> nested,
+                                        final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
+    ComponentAst schedulingStrategyWrapper =
+        getSingleComponentConfiguration(nested, of(ComponentIdentifier.builder()
+            .name(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER)
+            .namespace(CORE_PREFIX)
+            .build()));
+    if (schedulingStrategyWrapper != null) {
+      DslElementModel.Builder wrapper = DslElementModel.builder()
+          .withModel(paramModel)
+          .withDsl(paramDsl)
+          .withConfig(schedulingStrategyWrapper);
+
+      Iterator<ComponentAst> nestedIt = schedulingStrategyWrapper.directChildrenStream().iterator();
+      if (nestedIt.hasNext()) {
+        final ComponentAst strategy = nestedIt.next();
+        final MetadataType type = CRON_STRATEGY_ELEMENT_IDENTIFIER.equals(strategy.getIdentifier().getName())
+            ? typeLoader.load(CronScheduler.class)
+            : typeLoader.load(FixedFrequencyScheduler.class);
+
+        dsl.resolve(type)
+            .ifPresent(typeDsl -> wrapper.containing(DslElementModel.builder()
+                .withModel(type)
+                .withDsl(typeDsl)
+                .withConfig(strategy)
+                .build()));
+      }
+
+      groupElementBuilder.containing(wrapper.build());
+    }
   }
 
   private ComponentIdentifier newIdentifier(String name, String ns) {

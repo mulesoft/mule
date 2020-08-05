@@ -216,7 +216,9 @@ public class ApplicationModel implements ArtifactAst {
    *
    * @param artifactConfig the mule artifact configuration content.
    * @param artifactDeclaration an {@link ArtifactDeclaration}
+   * @param deploymentProperties values for replacement of properties in the DSL
    * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
+   * @param deploymentProperties
    * @param parentConfigurationProperties the {@link ConfigurationProperties} of the parent artifact. For instance, application
    *        will receive the domain resolver.
    * @param externalResourceProvider the provider for configuration properties files and ${file::name.txt} placeholders
@@ -238,12 +240,13 @@ public class ApplicationModel implements ArtifactAst {
    *
    * @param artifactConfig the mule artifact configuration content.
    * @param artifactDeclaration an {@link ArtifactDeclaration}
+   * @param deploymentProperties values for replacement of properties in the DSL
    * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
    * @param parentConfigurationProperties the {@link ConfigurationProperties} of the parent artifact. For instance, application
    *        will receive the domain resolver.
    * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
-   *                                            this model to their definitions expanded) false implies the mule is being created from a tooling perspective.
-   * @param externalResourceProvider            the provider for configuration properties files and ${file::name.txt} placeholders
+   *        this model to their definitions expanded) false implies the mule is being created from a tooling perspective.
+   * @param externalResourceProvider the provider for configuration properties files and ${file::name.txt} placeholders
    * @throws Exception when the application configuration has semantic errors.
    */
   // TODO: MULE-9638 remove this optional
