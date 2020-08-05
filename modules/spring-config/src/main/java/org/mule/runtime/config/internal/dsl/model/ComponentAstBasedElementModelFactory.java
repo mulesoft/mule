@@ -317,7 +317,6 @@ class ComponentAstBasedElementModelFactory {
 
         if (!isBlank(value)) {
           typeBuilder.containing(elementBuilder.withValue(value).build());
-          return;
         }
       }
 
