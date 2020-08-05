@@ -330,7 +330,7 @@ public class InternalDeclarationSession implements DeclarationSession {
                                                         (CheckedSupplier<Object>) () -> context
                                                             .getConfig().orElse(null)));
     } catch (ValueResolvingException e) {
-      return resultFrom(newFailure(e).build());
+      return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
     } finally {
       context.dispose();
     }
@@ -372,7 +372,7 @@ public class InternalDeclarationSession implements DeclarationSession {
       final ResolverSet resolverSet =
           ParametersResolver.fromValues(parametersMap,
                                         muleContext,
-                                        // Required parameters should not invalide the resolution of resolving ValueProviders
+                                        // Required parameters should not invalidate the resolution of resolving ValueProviders
                                         true,
                                         reflectionCache,
                                         expressionManager,

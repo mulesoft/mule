@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.tooling;
 
-import static org.mule.runtime.module.tooling.ComponentValueProviderTestCase.getResultAndValidate;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ArtifactDeclarer;
@@ -21,13 +20,13 @@ public class ConfigurationConnectionValueProviderTestCase extends DeclarationSes
   @Test
   public void testStaticValuesAtConnectionParameter() {
     ConnectionElementDeclaration connectionElementDeclaration = connectionDeclaration(CLIENT_NAME);
-    getResultAndValidate(session, connectionElementDeclaration, PROVIDED_PARAMETER_NAME, "WITH-ACTING-PARAMETER-" + CLIENT_NAME);
+    validateSuccess(session, connectionElementDeclaration, PROVIDED_PARAMETER_NAME, "WITH-ACTING-PARAMETER-" + CLIENT_NAME);
   }
 
   @Test
   public void testStaticValuesAtConfigurationParameter() {
     ConfigurationElementDeclaration configurationElementDeclaration = configurationDeclaration(CLIENT_NAME);
-    getResultAndValidate(session, configurationElementDeclaration, PROVIDED_PARAMETER_NAME,
+    validateSuccess(session, configurationElementDeclaration, PROVIDED_PARAMETER_NAME,
                          "WITH-ACTING-PARAMETER-" + CLIENT_NAME);
   }
 
