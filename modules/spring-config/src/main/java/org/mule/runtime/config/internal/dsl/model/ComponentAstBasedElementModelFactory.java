@@ -686,10 +686,10 @@ class ComponentAstBasedElementModelFactory {
 
                         paramComponent.directChildrenStream()
                             .filter(c -> c.getIdentifier().equals(itemIdentifier))
-                            .forEach(c -> itemType.accept(
-                                            getComponentChildVisitor(paramElementBuilder, c, itemType, VALUE_ATTRIBUTE_NAME,
-                                                                     itemdsl,
-                                                                     defaultValue,
+                            .forEach(c -> itemType.accept(getComponentChildVisitor(paramElementBuilder, c, itemType,
+                                                                                   VALUE_ATTRIBUTE_NAME,
+                                                                                   itemdsl,
+                                                                                   defaultValue,
                                                                                    new ArrayDeque<>())));
 
                       });
@@ -707,14 +707,16 @@ class ComponentAstBasedElementModelFactory {
               });
 
             } else if (isBlank(value)) {
-              final Optional<String> body = paramComponent.getRawParameterValue(BODY_RAW_PARAM_NAME);
-              if (paramComponent != null && body.map(b -> !isBlank(b)).orElse(false)) {
-                value = body.get().trim();
-              } else if (defaultValue.isPresent()) {
-                value = defaultValue.get();
-                paramElementBuilder.isExplicitInDsl(false);
-              }
-              paramElementBuilder.withValue(value);
+              final Optional<String> body = paramComponent != null
+                  ? paramComponent.getRawParameterValue(BODY_RAW_PARAM_NAME)
+                  : empty();
+
+              paramElementBuilder.withValue(body
+                  .map(String::trim)
+                  .orElseGet(() -> {
+                    paramElementBuilder.isExplicitInDsl(false);
+                    return defaultValue.get();
+                  }));
             } else {
               paramElementBuilder.withValue(value);
             }
