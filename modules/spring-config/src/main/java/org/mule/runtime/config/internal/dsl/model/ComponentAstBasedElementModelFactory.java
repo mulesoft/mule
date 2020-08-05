@@ -359,14 +359,14 @@ class ComponentAstBasedElementModelFactory {
         if (!identifier.isPresent()) {
           LOGGER.trace("getComponentChildVisitor#visitObject: noIdentifier");
           visitNoIdentifier(typeBuilder, model, modelDsl, defaultValue);
+        } else {
+          LOGGER.trace("getComponentChildVisitor#visitObject: '{}'", identifier.get());
         }
-
-        LOGGER.trace("getComponentChildVisitor#visitObject: '{}'", identifier.get());
 
         ComponentAst fieldComponent = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
 
         if (isMap(objectType)) {
-          LOGGER.trace("getComponentChildVisitor#visitObject: '{}' -> isMap", identifier.get());
+          LOGGER.trace("getComponentChildVisitor#visitObject: '{}' -> isMap", identifier.orElse(null));
           typeBuilder.containing(createMapElement(objectType, modelDsl, fieldComponent));
           return;
         }
