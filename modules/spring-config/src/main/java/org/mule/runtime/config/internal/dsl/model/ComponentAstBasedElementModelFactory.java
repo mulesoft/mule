@@ -735,17 +735,9 @@ class ComponentAstBasedElementModelFactory {
           .withDsl(pDsl)
           .withConfig(paramComponent);
 
-      if (paramComponent.directChildrenStream().count() > 0) {
-        ExtensionModel wrapperExtension = this.currentExtension;
-        DslSyntaxResolver wrapperDsl = this.dsl;
-
-        paramComponent.directChildrenStream().findFirst()
-            .flatMap(this::create)
-            .ifPresent(paramElement::containing);
-
-        this.currentExtension = wrapperExtension;
-        this.dsl = wrapperDsl;
-      }
+      paramComponent.directChildrenStream().findFirst()
+          .flatMap(this::create)
+          .ifPresent(paramElement::containing);
 
       groupElementBuilder.containing(paramElement.build());
     }
