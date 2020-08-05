@@ -17,16 +17,8 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
-import org.mule.runtime.api.meta.model.operation.HasOperationModels;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.meta.model.source.HasSourceModels;
-import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
@@ -36,7 +28,6 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public class ArtifactHelper {
@@ -66,39 +57,7 @@ public class ArtifactHelper {
   }
 
   public <T extends ParameterizedModel & EnrichableModel> Optional<T> findModel(ElementDeclaration elementDeclaration) {
-    final ExtensionModel extensionModel = getExtensionModel(elementDeclaration);
-    final String componentName = elementDeclaration.getName();
-    final Reference<T> foundModel = new Reference<>();
-    new ExtensionWalker() {
-
-      @Override
-      protected void onOperation(HasOperationModels owner, OperationModel model) {
-        setAndStop(model);
-      }
-
-      @Override
-      protected void onSource(HasSourceModels owner, SourceModel model) {
-        setAndStop(model);
-      }
-
-      @Override
-      protected void onConfiguration(ConfigurationModel model) {
-        setAndStop(model);
-      }
-
-      @Override
-      protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-        setAndStop(model);
-      }
-
-      private void setAndStop(ParameterizedModel model) {
-        if (Objects.equals(model.getName(), componentName)) {
-          foundModel.set((T) model);
-          stop();
-        }
-      }
-    }.walk(extensionModel);
-    return ofNullable(foundModel.get());
+    return ArtifactHelperUtils.findModel(getExtensionModel(elementDeclaration), elementDeclaration);
   }
 
   public Optional<ConfigurationElementDeclaration> findConfigurationDeclaration(String configName) {
