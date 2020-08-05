@@ -323,10 +323,6 @@ public final class ApplicationModelTypeUtils {
         });
   }
 
-  private static boolean isSimpleMetadataType(ParameterModel paramModel) {
-    return paramModel.getType() instanceof org.mule.metadata.api.model.SimpleType;
-  }
-
   private static Multimap<ComponentIdentifier, ComponentModel> getNestedComponents(ComponentModel componentModel) {
     Multimap<ComponentIdentifier, ComponentModel> result = ArrayListMultimap.create();
     componentModel.getInnerComponents().forEach(nestedComponent -> result.put(nestedComponent.getIdentifier(), nestedComponent));
