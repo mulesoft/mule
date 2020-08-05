@@ -38,6 +38,7 @@ import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.SimpleType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -283,18 +284,41 @@ public final class ApplicationModelTypeUtils {
                       unionType.getTypes().forEach(type -> type.accept(this));
                     }
                   });
-                } else if (isContent(paramModel) || isSimpleMetadataType(paramModel)) {
-                  nestedForId
-                      .forEach(childComp -> componentModel
-                          .setParameter(paramModel,
-                                        new DefaultComponentParameterAst(trim(childComp.getTextContent()),
-                                                                         () -> paramModel,
-                                                                         childComp.getMetadata())));
                 } else {
-                  enrichComponentModels(componentModel, nestedComponents,
-                                        of(paramSyntax),
-                                        paramModel, extensionModelHelper);
+                  paramModel.getType().accept(new MetadataTypeVisitor() {
+
+                    @Override
+                    protected void defaultVisit(MetadataType metadataType) {
+                      if (isContent(paramModel)) {
+                        // If this is a Map for example, this has to be set using 
+                        // text content as this does not depend on the dsl.
+                        addParameterUsingTextContent(componentModel, paramModel, nestedForId);
+                      } else {
+                        enrichComponentModels(componentModel, nestedComponents,
+                                              of(paramSyntax),
+                                              paramModel, extensionModelHelper);
+                      }
+                    }
+
+
+                    @Override
+                    public void visitSimpleType(SimpleType stringType) {
+                      addParameterUsingTextContent(componentModel, paramModel, nestedForId);
+                    }
+
+
+                    private void addParameterUsingTextContent(ComponentModel componentModel, ParameterModel paramModel,
+                                                              final Collection<ComponentModel> nestedForId) {
+                      nestedForId
+                          .forEach(childComp -> componentModel
+                              .setParameter(paramModel,
+                                            new DefaultComponentParameterAst(trim(childComp.getTextContent()),
+                                                                             () -> paramModel,
+                                                                             childComp.getMetadata())));
+                    }
+                  });
                 }
+
               });
         });
   }
