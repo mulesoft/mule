@@ -139,8 +139,6 @@ class ComponentAstBasedElementModelFactory {
     currentExtension = entry.get().getKey();
     dsl = entry.get().getValue();
 
-
-
     Reference<DslElementModel> elementModel = new Reference<>();
     new ExtensionWalker() {
 
@@ -302,21 +300,24 @@ class ComponentAstBasedElementModelFactory {
         Optional<ComponentIdentifier> identifier = getIdentifier(modelDsl);
         String value = configuration.getRawParameterValue(name).orElse(null);
         LOGGER.trace("getComponentChildVisitor#defaultVisit: '{}': '{}'", identifier, value);
+
+        if (isBlank(value)) {
+          if (identifier.isPresent()) {
+            ComponentAst nested = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
+            if (nested != null) {
+              value = nested.getRawParameterValue(BODY_RAW_PARAM_NAME)
+                  .flatMap(body -> !isBlank(body) ? of(body.trim()) : empty())
+                  .orElse(null);
+            }
+          } else if (defaultValue.isPresent()) {
+            value = defaultValue.get();
+            elementBuilder.isExplicitInDsl(false);
+          }
+        }
+
         if (!isBlank(value)) {
           typeBuilder.containing(elementBuilder.withValue(value).build());
           return;
-        }
-
-        if (identifier.isPresent()) {
-          ComponentAst nested = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
-          if (nested != null) {
-            value = nested.getRawParameterValue(BODY_RAW_PARAM_NAME)
-                .flatMap(body -> !isBlank(body) ? of(body.trim()) : empty())
-                .orElse(null);
-          }
-        } else if (defaultValue.isPresent()) {
-          value = defaultValue.get();
-          elementBuilder.isExplicitInDsl(false);
         }
       }
 
@@ -735,17 +736,18 @@ class ComponentAstBasedElementModelFactory {
           .withDsl(pDsl)
           .withConfig(paramComponent);
 
-      if (paramComponent.directChildrenStream().count() > 0) {
-        ExtensionModel wrapperExtension = this.currentExtension;
-        DslSyntaxResolver wrapperDsl = this.dsl;
+      paramComponent.directChildrenStream()
+          .findFirst()
+          .ifPresent(wrapper -> {
+            ExtensionModel wrapperExtension = this.currentExtension;
+            DslSyntaxResolver wrapperDsl = this.dsl;
 
-        paramComponent.directChildrenStream().findFirst()
-            .flatMap(this::create)
-            .ifPresent(paramElement::containing);
+            this.create(wrapper)
+                .ifPresent(paramElement::containing);
 
-        this.currentExtension = wrapperExtension;
-        this.dsl = wrapperDsl;
-      }
+            this.currentExtension = wrapperExtension;
+            this.dsl = wrapperDsl;
+          });
 
       groupElementBuilder.containing(paramElement.build());
     }
