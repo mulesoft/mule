@@ -26,12 +26,12 @@ public interface FlowConstructStatistics extends Statistics {
   void incReceivedEvents();
 
   /**
-   * Indicates that an execution error has ocurred
+   * Indicates that an execution error has occurred
    */
   void incExecutionError();
 
   /**
-   * Indicates that a fatal error has ocurred
+   * Indicates that a fatal error has occurred
    */
   void incFatalError();
 

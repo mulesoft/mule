@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import static java.lang.System.currentTimeMillis;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
@@ -23,8 +25,8 @@ public class ProcessingTime implements Serializable {
    */
   private static final long serialVersionUID = 1L;
 
-  private AtomicLong accumulator = new AtomicLong();
-  private FlowConstructStatistics statistics;
+  private final AtomicLong accumulator = new AtomicLong();
+  private final FlowConstructStatistics statistics;
 
   /**
    * Create a ProcessingTime for the specified MuleSession.
@@ -58,7 +60,7 @@ public class ProcessingTime implements Serializable {
    */
   public void addFlowExecutionBranchTime(long startTime) {
     if (statistics.isEnabled()) {
-      long elapsedTime = getEffectiveTime(System.currentTimeMillis() - startTime);
+      long elapsedTime = getEffectiveTime(currentTimeMillis() - startTime);
       statistics.addFlowExecutionBranchTime(elapsedTime, accumulator.addAndGet(elapsedTime));
     }
   }

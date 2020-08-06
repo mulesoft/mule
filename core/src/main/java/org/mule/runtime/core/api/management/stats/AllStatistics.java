@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import static java.lang.System.currentTimeMillis;
+
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>AllStatistics</code> TODO
@@ -21,11 +25,12 @@ public class AllStatistics {
 
   private boolean isStatisticsEnabled;
   private long startTime;
-  private ApplicationStatistics appStats;
-  private Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<String, FlowConstructStatistics>();
+  private final ApplicationStatistics appStats;
+  private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
+  private final Map<String, DataFlowStatistics> componentStatistics = new ConcurrentHashMap<>();
 
   /**
-   * 
+   *
    */
   public AllStatistics() {
     clear();
@@ -38,7 +43,7 @@ public class AllStatistics {
     for (FlowConstructStatistics statistics : getServiceStatistics()) {
       statistics.clear();
     }
-    startTime = System.currentTimeMillis();
+    startTime = currentTimeMillis();
   }
 
   /**
@@ -55,6 +60,9 @@ public class AllStatistics {
     isStatisticsEnabled = b;
 
     for (FlowConstructStatistics statistics : flowConstructStats.values()) {
+      statistics.setEnabled(b);
+    }
+    for (DataFlowStatistics statistics : componentStatistics.values()) {
       statistics.setEnabled(b);
     }
   }
@@ -85,5 +93,23 @@ public class AllStatistics {
 
   public FlowConstructStatistics getApplicationStatistics() {
     return appStats;
+  }
+
+  /**
+   * @return the available statistics for all components.
+   * @since 4.4, 4.3.1
+   */
+  public Collection<DataFlowStatistics> getDataFlowStatistics() {
+    return componentStatistics.values();
+  }
+
+  /**
+   * @param component the component to get the statistics for.
+   * @return the statistics for the component with the provided {@code component}.
+   * @since 4.4, 4.3.1
+   */
+  public DataFlowStatistics getDataFlowStatistics(Component component) {
+    return componentStatistics.computeIfAbsent(component.getLocation().getLocation(),
+                                               loc -> new DataFlowStatistics(loc, component.getIdentifier().toString()));
   }
 }
