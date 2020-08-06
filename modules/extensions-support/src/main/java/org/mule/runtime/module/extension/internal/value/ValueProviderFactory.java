@@ -73,16 +73,18 @@ public class ValueProviderFactory {
 
       if (factoryModelProperty.usesConnection()) {
         Object connection = connectionSupplier.get();
-        if(connection == null) {
-          throw new ValueResolvingException("The value provider requires a connection and none was provided", MISSING_REQUIRED_PARAMETERS);
+        if (connection == null) {
+          throw new ValueResolvingException("The value provider requires a connection and none was provided",
+                                            MISSING_REQUIRED_PARAMETERS);
         }
         injectValueIntoField(resolver, connectionSupplier.get(), connectionField);
       }
 
       if (factoryModelProperty.usesConfig()) {
         Object config = configurationSupplier.get();
-        if(config == null) {
-          throw new ValueResolvingException("The value provider requires a configuration and none was provided", MISSING_REQUIRED_PARAMETERS);
+        if (config == null) {
+          throw new ValueResolvingException("The value provider requires a configuration and none was provided",
+                                            MISSING_REQUIRED_PARAMETERS);
         }
         injectValueIntoField(resolver, configurationSupplier.get(), configField);
       }
