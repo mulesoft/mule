@@ -17,7 +17,6 @@ import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.module.tooling.internal.config.params.ParameterExtractor.extractValue;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
@@ -88,13 +87,11 @@ public class InternalDeclarationSession implements DeclarationSession {
 
   @Override
   public ConnectionValidationResult testConnection(String configName) {
-    Optional<ConnectionProvider> connectionProvider = artifactHelper()
-        .findConnectionProvider(configName);
-    if (!connectionProvider.isPresent()) {
-      return failure(format("Could not find a connection provider for configuration: '%s'", configName),
-                     new MuleRuntimeException(createStaticMessage("Could not find connection provider")));
-    }
-    return connectionManager.testConnectivity(connectionProvider.get());
+    return artifactHelper()
+        .findConnectionProvider(configName)
+        .map(cp -> connectionManager.testConnectivity(cp))
+        .orElseGet(() -> failure(format("Could not find a connection provider for configuration: '%s'", configName),
+                                 new MuleRuntimeException(createStaticMessage("Could not find connection provider"))));
   }
 
   @Override
