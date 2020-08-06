@@ -6,7 +6,7 @@ import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
-import org.mule.tooling.extensions.metadata.internal.parameters.ActingParameter;
+import org.mule.tooling.extensions.metadata.api.parameters.ActingParameter;
 
 import java.util.Set;
 

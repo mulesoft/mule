@@ -9,11 +9,14 @@ package org.mule.runtime.module.tooling.api.artifact;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.value.ValueResult;
+import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
+import org.mule.runtime.module.tooling.api.metadata.ComponentMetadataTypes;
 
 /**
- * It is in charge or resolving connector's operations and retrieving metadata for all
+ * It is in charge of resolving connector's operations and retrieving metadata for all
  * components related to the same session configuration. The session configuration should be
  * defined by multiple global elements, including Configurations, Connections, etc.
  * <p/>
@@ -28,14 +31,15 @@ public interface DeclarationSession {
 
   /**
    * Test connectivity for the connection associated to the configuration with the provided name.
-   * @param configName The name of the config for which to test connection.
    *
+   * @param configName The name of the config for which to test connection.
    * @return a {@link ConnectionValidationResult} with the result of the connectivity testing
    */
   ConnectionValidationResult testConnection(String configName);
 
   /**
    * Retrieve all {@link org.mule.runtime.api.value.Value} that can be configured for the given parameter.
+   *
    * @param parameterizedElementDeclaration a {@link ParameterizedElementDeclaration} for the component from which
    *                  the available values can be used on the parameter {@param parameterName}. In case the value
    *                  provider requires any acting parameters to be able to resolve this values, those parameters
@@ -45,6 +49,16 @@ public interface DeclarationSession {
    * @return a {@link ValueResult} with the accepted parameter values to use
    */
   ValueResult getValues(ParameterizedElementDeclaration parameterizedElementDeclaration, String parameterName);
+
+  /**
+   * Retrieve all the dynamic metadata for the given component.
+   * It includes input parameters, output (payload) and output attributes.
+   * If a metadata key is needed all parts of the key must be provided.
+   *
+   * @param component the component whose dynamic metadata types are required
+   * @return a {@link MetadataResult} of {@link ComponentMetadataTypes} containing all the dynamic types
+   */
+  MetadataResult<ComponentMetadataTypes> getMetadataTypes(ComponentElementDeclaration component);
 
   /**
    * Stops and disposes all resources used by this {@link DeclarationSession}
