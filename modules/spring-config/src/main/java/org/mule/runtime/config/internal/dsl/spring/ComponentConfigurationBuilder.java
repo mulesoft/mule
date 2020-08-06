@@ -16,7 +16,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -40,7 +39,7 @@ import org.springframework.beans.factory.support.ManagedMap;
 
 /**
  * Based on the object building definition provided by {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition} and
- * the user configuration defined in {@link ComponentModel} it populates all the spring
+ * the user configuration defined in {@link ComponentAst} it populates all the spring
  * {@link org.springframework.beans.factory.config.BeanDefinition} attributes using the helper class
  * {@link BeanDefinitionBuilderHelper}. {@link BeanDefinitionBuilderHelper}.
  *

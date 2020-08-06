@@ -8,13 +8,12 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.internal.model.ComponentModel;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 
 /**
- * Relates a {@link ComponentModel} to its Spring bean specification.
+ * Relates a {@link ComponentAst} to its Spring bean specification.
  *
  * @since 4.4
  */
