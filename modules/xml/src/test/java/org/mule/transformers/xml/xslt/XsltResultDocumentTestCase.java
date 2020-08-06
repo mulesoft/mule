@@ -65,7 +65,7 @@ public class XsltResultDocumentTestCase extends FunctionalTestCase
 
         executeFlowAndValidateOutput(cities, outputFile, FLOW_NAME_WITHOUT_CONTROLLER_RESET);
         Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
-        assertThat(controller.getInitialContextItem(), is(not(nullValue())));
+        assertThat(controller.getGlobalContextItem(), is(not(nullValue())));
     }
     
     @Test
@@ -77,7 +77,7 @@ public class XsltResultDocumentTestCase extends FunctionalTestCase
 
         executeFlowAndValidateOutput(cities, outputFile, FLOW_NAME_WITH_CONTROLLER_RESET);
         Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
-        assertThat(controller.getInitialContextItem(), is(nullValue()));
+        assertThat(controller.getGlobalContextItem(), is(nullValue()));
     }
 
 
