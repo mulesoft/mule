@@ -27,7 +27,7 @@ public class AllStatistics {
   private long startTime;
   private final ApplicationStatistics appStats;
   private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
-  private final Map<String, DataFlowStatistics> componentStatistics = new ConcurrentHashMap<>();
+  private final Map<String, PayloadStatistics> payloadStatistics = new ConcurrentHashMap<>();
 
   /**
    *
@@ -62,7 +62,7 @@ public class AllStatistics {
     for (FlowConstructStatistics statistics : flowConstructStats.values()) {
       statistics.setEnabled(b);
     }
-    for (DataFlowStatistics statistics : componentStatistics.values()) {
+    for (PayloadStatistics statistics : payloadStatistics.values()) {
       statistics.setEnabled(b);
     }
   }
@@ -96,20 +96,34 @@ public class AllStatistics {
   }
 
   /**
-   * @return the available statistics for all components.
+   * @return the available payload statistics for all components.
    * @since 4.4, 4.3.1
    */
-  public Collection<DataFlowStatistics> getDataFlowStatistics() {
-    return componentStatistics.values();
+  public Collection<PayloadStatistics> getPayloadStatistics() {
+    return payloadStatistics.values();
   }
 
   /**
    * @param component the component to get the statistics for.
-   * @return the statistics for the component with the provided {@code component}.
+   * @return the statistics for the provided {@code component}.
    * @since 4.4, 4.3.1
    */
-  public DataFlowStatistics getDataFlowStatistics(Component component) {
-    return componentStatistics.computeIfAbsent(component.getLocation().getLocation(),
-                                               loc -> new DataFlowStatistics(loc, component.getIdentifier().toString()));
+  public PayloadStatistics computePayloadStatisticsIfAbsent(Component component) {
+    return payloadStatistics.computeIfAbsent(component.getLocation().getLocation(),
+                                             loc -> {
+                                               final PayloadStatistics statistics =
+                                                   new PayloadStatistics(loc, component.getIdentifier().toString());
+                                               statistics.setEnabled(isEnabled());
+                                               return statistics;
+                                             });
+  }
+
+  /**
+   * @param componentLocation the location of the component to get the statistics for.
+   * @return the statistics for the component with the provided {@code componentLocation}.
+   * @since 4.4, 4.3.1
+   */
+  public PayloadStatistics getPayloadStatistics(String componentLocation) {
+    return payloadStatistics.get(componentLocation);
   }
 }

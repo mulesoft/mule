@@ -14,14 +14,33 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Contains statistics about the amount of data generated and consumed by a component.
  * <p>
- * Note: The {@code enabled} flag will be taken into account only at the point where a stream of data that may update this object
- * is generated. For instance, if a stream is generated while {@code enabled} flag is {@code false}, but when the stream is
+ * <h3>Example 1</h3> Assuming the following sequence of components:
+ * <p>
+ * {@code db:select} -> {@code ee:transform} -> {@code file:write}
+ * <p>
+ * <ul>
+ * <li>The statistics object for {@code db:select} will return the rows read in {@link #getOutputObjectCount()}.</li>
+ * <li>The statistics object for {@code file:write} will return the sum of the sizes of written files in
+ * {@link #getInputByteCount()}.</li>
+ * </ul>
+ * <h3>Example 2</h3> Assuming the same sequence of components for the previous example, but in a case where the
+ * {@code file:write} operation fails in the middle of the write, and the {@code ee:transform} is deferred (data from the
+ * {@code db:select} is only read and transformed as requested by the {@code file:write}):
+ * <ul>
+ * <li>The statistics object for {@code db:select} will return the rows read until the error occurred in
+ * {@link #getOutputObjectCount()}. Any remaining rows from the DB are not accounted.</li>
+ * <li>The statistics object for {@code file:write} will return the bytes written until the error occurred in
+ * {@link #getInputByteCount()}.</li>
+ * </ul>
+ * <p>
+ * <b>Note:</b> The {@code enabled} flag will be taken into account only at the point where a stream of data that may update this
+ * object is generated. For instance, if a stream is generated while {@code enabled} flag is {@code false}, but when the stream is
  * consumed {@code enabled} flag is {@code true}, the consumption for that specific stream will not modify this object.
  *
  * @since 4.4, 4.3.1
  */
 @NoExtend
-public class DataFlowStatistics implements Statistics {
+public class PayloadStatistics implements Statistics {
 
   private static final long serialVersionUID = 2335903369488757953L;
 
@@ -35,7 +54,7 @@ public class DataFlowStatistics implements Statistics {
   private final AtomicLong outputObjectCount = new AtomicLong();
   private final AtomicLong outputByteCount = new AtomicLong();
 
-  public DataFlowStatistics(String componentLocation, String componentIdentifier) {
+  public PayloadStatistics(String componentLocation, String componentIdentifier) {
     this.componentLocation = componentLocation;
     this.componentIdentifier = componentIdentifier;
   }
@@ -52,7 +71,7 @@ public class DataFlowStatistics implements Statistics {
   /**
    * Ref: {@link Component#getIdentifier()}
    *
-   * @return the id of the component this statistics are for. i.e: {@code http:request}
+   * @return the id of the component this statistics are for. i.e: {@code http:request} or {@code db:select}
    */
   public String getComponentIdentifier() {
     return componentIdentifier;
