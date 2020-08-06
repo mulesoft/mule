@@ -117,7 +117,7 @@ class DeclarationBasedElementModelFactory {
   public <T> Optional<DslElementModel<T>> create(ElementDeclaration declaration) {
 
     setupCurrentExtensionContext(declaration.getDeclaringExtension());
-    final Function<NamedObject, Boolean> equalsName = (named) -> named.getName().equals(declaration.getName());
+    final Function<NamedObject, Boolean> equalsName = named -> named.getName().equals(declaration.getName());
 
     if (declaration instanceof TopLevelParameterDeclaration) {
       return createFromType((TopLevelParameterDeclaration) declaration);
@@ -209,7 +209,9 @@ class DeclarationBasedElementModelFactory {
         .withIdentifier(asIdentifier(configDsl));
 
     if (componentDeclaration instanceof ReferableElementDeclaration) {
-      configuration.withParameter(NAME_ATTRIBUTE_NAME, ((ReferableElementDeclaration) componentDeclaration).getRefName());
+      model.getAllParameterModels().stream().filter(ParameterModel::isComponentId).findAny()
+          .ifPresent(pm -> configuration.withParameter(pm.getName(),
+                                                       ((ReferableElementDeclaration) componentDeclaration).getRefName()));
     }
 
     if (componentDeclaration.getConfigRef() != null) {
@@ -643,9 +645,8 @@ class DeclarationBasedElementModelFactory {
                                      InternalComponentConfiguration.Builder parentConfig,
                                      DslElementModel.Builder parentElement, ParameterModel parameterModel, boolean explicit) {
     if (paramDsl.supportsAttributeDeclaration()) {
-      // skip the name attribute for the case where it was already added
-      if (parameterModel.isComponentId()
-          && "name".equals(parameterModel.getName())) {
+      // skip the compId since it was already added in createComponentElement
+      if (parameterModel.isComponentId()) {
         return;
       }
 

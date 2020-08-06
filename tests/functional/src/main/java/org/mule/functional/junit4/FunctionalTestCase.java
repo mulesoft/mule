@@ -101,7 +101,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     return createConfigurationBuilder(getConfigFiles(), artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
   }
 
-  protected ConfigurationBuilder extensionManagerWithMuleExtModelBuilder() {
+  public static ConfigurationBuilder extensionManagerWithMuleExtModelBuilder() {
     return new AbstractConfigurationBuilder() {
 
       @Override
@@ -113,7 +113,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     };
   }
 
-  protected ExtensionManager createExtensionManager(MuleContext muleContext) throws InitialisationException {
+  protected static ExtensionManager createExtensionManager(MuleContext muleContext) throws InitialisationException {
     ExtensionManager extensionManager;
     if (muleContext.getExtensionManager() == null) {
       extensionManager = createDefaultExtensionManager();
