@@ -89,21 +89,9 @@ public class InternalDeclarationSession implements DeclarationSession {
   public ConnectionValidationResult testConnection(String configName) {
     return artifactHelper()
         .findConnectionProvider(configName)
-        .map(cp -> {
-          Object connection = null;
-          try {
-            connection = cp.connect();
-            return cp.validate(connection);
-          } catch (Exception e) {
-            return failure(format("Could not perform connectivity testing on configuration: '%s'", configName), e);
-          } finally {
-            if (connection != null) {
-              cp.disconnect(connection);
-            }
-          }
-        })
-        .orElse(failure(format("Could not find a connection provider for configuration: '%s'", configName),
-                        new MuleRuntimeException(createStaticMessage("Could not find connection provider"))));
+        .map(cp -> connectionManager.testConnectivity(cp))
+        .orElseGet(() -> failure(format("Could not find a connection provider for configuration: '%s'", configName),
+                                 new MuleRuntimeException(createStaticMessage("Could not find connection provider"))));
   }
 
   @Override
