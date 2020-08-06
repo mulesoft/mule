@@ -12,6 +12,7 @@ import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
@@ -52,6 +54,7 @@ class ForeachRouter {
       "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
   private final EventInternalContextResolver<Map<String, ForeachContext>> foreachContextResolver;
   private final Foreach owner;
+  private final StreamingManager streamingManager;
 
   private Flux<CoreEvent> upstreamFlux;
   private Flux<CoreEvent> innerFlux;
@@ -63,9 +66,10 @@ class ForeachRouter {
   private final AtomicInteger inflightEvents = new AtomicInteger(0);
   private final AtomicBoolean completeDeferred = new AtomicBoolean(false);
 
-  ForeachRouter(Foreach owner, Publisher<CoreEvent> publisher, String expression, int batchSize,
-                MessageProcessorChain nestedChain) {
+  ForeachRouter(Foreach owner, StreamingManager streamingManager, Publisher<CoreEvent> publisher, String expression,
+                int batchSize, MessageProcessorChain nestedChain) {
     this.owner = owner;
+    this.streamingManager = streamingManager;
     this.foreachContextResolver = new EventInternalContextResolver<>(MULE_FOREACH_CONTEXT_KEY,
                                                                      HashMap::new);
 
@@ -217,16 +221,19 @@ class ForeachRouter {
       // Support EventBuilderConfigurer currently used by Batch Module
       EventBuilderConfigurer configurer = (EventBuilderConfigurer) currentValue.getValue();
       configurer.configure(partEventBuilder);
-
+      // TODO: ML Revisar implementaciones de EventBuilderConfigurer
       Runnable onCompleteConsumer = configurer::eventCompleted;
       foreachContext.setOnComplete(onCompleteConsumer);
 
     } else if (currentValue.getValue() instanceof Message) {
       // If value is a Message then use it directly conserving attributes and properties.
-      partEventBuilder.message((Message) currentValue.getValue());
+      Message message = (Message) currentValue.getValue();
+      TypedValue managedValue = updateTypedValueForStreaming(message.getPayload(), event, streamingManager);
+      partEventBuilder.message(Message.builder(message).payload(managedValue).build());
     } else {
       // Otherwise create a new message
-      partEventBuilder.message(Message.builder().payload(currentValue).build());
+      TypedValue managedValue = updateTypedValueForStreaming(currentValue, event, streamingManager);
+      partEventBuilder.message(Message.builder().payload(managedValue).build());
     }
     return partEventBuilder
         .addVariable(owner.getCounterVariableName(), foreachContext.getElementNumber().incrementAndGet(), NUMBER)

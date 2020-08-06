@@ -47,13 +47,11 @@ public abstract class IdentifiableCursorProviderDecorator<T extends Cursor> exte
    * @param <T>            the generic {@link Cursor} type
    * @return a new decorator.
    */
-  public static <T extends Cursor> IdentifiableCursorProviderDecorator<T> of(CursorProvider<T> cursorProvider) {
+  public static <T extends Cursor> IdentifiableCursorProvider<T> of(CursorProvider<T> cursorProvider) {
     final CursorProvider<T> root = cursorProvider;
-    Integer id = null;
     do {
       if (cursorProvider instanceof IdentifiableCursorProvider) {
-        id = ((IdentifiableCursorProvider<T>) cursorProvider).getId();
-        break;
+        return (IdentifiableCursorProvider<T>) cursorProvider;
       }
 
       if (cursorProvider instanceof CursorProviderDecorator) {
@@ -61,9 +59,7 @@ public abstract class IdentifiableCursorProviderDecorator<T extends Cursor> exte
       }
     } while (cursorProvider instanceof CursorProviderDecorator);
 
-    if (id == null) {
-      id = ID_GENERATOR.incrementAndGet();
-    }
+    Integer id = ID_GENERATOR.incrementAndGet();
 
     if (cursorProvider instanceof CursorStreamProvider) {
       return (IdentifiableCursorProviderDecorator<T>) new IdentifiableCursorStreamProviderDecorator(
