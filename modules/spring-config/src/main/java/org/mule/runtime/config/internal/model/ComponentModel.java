@@ -42,8 +42,6 @@ import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter;
-import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.ArrayList;
@@ -446,22 +444,6 @@ public class ComponentModel implements ComponentAst {
    */
   public boolean isParameterValueProvidedBySchema(String parameterName) {
     return this.schemaValueParameter.contains(parameterName);
-  }
-
-  // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
-  @Deprecated
-  public ComponentConfiguration getConfiguration() {
-    InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
-        .withIdentifier(this.getIdentifier())
-        .withValue(textContent);
-
-    parameters.entrySet().forEach(e -> builder.withParameter(e.getKey(), e.getValue()));
-    innerComponents.forEach(i -> builder.withNestedComponent(i.getConfiguration()));
-    getMetadata().getParserAttributes().forEach(builder::withProperty);
-    builder.withComponentLocation(this.componentLocation);
-    builder.withProperty(COMPONENT_MODEL_KEY, this);
-
-    return builder.build();
   }
 
   /**

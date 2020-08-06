@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
 import javax.xml.namespace.QName;
@@ -161,7 +162,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     }
 
     beanAnnotations.putAll(metadata.getDocAttributes().entrySet().stream()
-        .collect(toMap(e -> QName.valueOf(e.getKey()), e -> e.getValue())));
+        .collect(toMap(e -> QName.valueOf(e.getKey()), Entry::getValue)));
   }
 
   private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final ObjectTypeVisitor objectTypeVisitor,
