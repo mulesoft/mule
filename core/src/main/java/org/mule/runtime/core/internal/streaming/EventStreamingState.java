@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static java.lang.System.identityHashCode;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
 import java.lang.ref.WeakReference;
 
@@ -32,19 +32,19 @@ public class EventStreamingState {
    * @return the {@link ManagedCursorProvider} that must continue to be used
    */
   public ManagedCursorProvider addProvider(ManagedCursorProvider provider, StreamingGhostBuster ghostBuster) {
-    final int hash = identityHashCode(provider.getDelegate());
-    ManagedCursorProvider managedProvider = getOrAddManagedProvider(hash, provider, ghostBuster);
+    final int id = provider.getId();
+    ManagedCursorProvider managedProvider = getOrAddManagedProvider(id, provider, ghostBuster);
 
     // This can happen when a foreach component splits a text document using a stream.
     // Iteration N might try to manage the same root provider that was already managed in iteration N-1, but the
     // managed decorator from that previous iteration has been collected, which causes the weak reference to yield
     // a null value. In which case we simply track it again.
     if (managedProvider == null) {
-      synchronized (provider.getDelegate()) {
-        managedProvider = getOrAddManagedProvider(hash, provider, ghostBuster);
+      synchronized (unwrap(provider)) {
+        managedProvider = getOrAddManagedProvider(id, provider, ghostBuster);
         if (managedProvider == null) {
-          providers.invalidate(hash);
-          managedProvider = getOrAddManagedProvider(hash, provider, ghostBuster);
+          providers.invalidate(id);
+          managedProvider = getOrAddManagedProvider(id, provider, ghostBuster);
         }
       }
     }
@@ -52,10 +52,10 @@ public class EventStreamingState {
     return managedProvider;
   }
 
-  private ManagedCursorProvider getOrAddManagedProvider(int hash,
+  private ManagedCursorProvider getOrAddManagedProvider(int id,
                                                         ManagedCursorProvider provider,
                                                         StreamingGhostBuster ghostBuster) {
-    return providers.get(hash, k -> ghostBuster.track(provider)).get();
+    return providers.get(id, k -> ghostBuster.track(provider)).get();
   }
 
   /**
