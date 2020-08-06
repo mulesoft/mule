@@ -181,7 +181,12 @@ public class InternalDeclarationSession implements DeclarationSession {
   private MetadataResult<ComponentMetadataTypes> collectMetadata(@Nonnull MetadataResult<InputMetadataDescriptor> inputMetadataResult,
                                                                  @Nullable MetadataResult<OutputMetadataDescriptor> outputMetadataResult) {
     if (inputMetadataResult.isSuccess() && (outputMetadataResult == null || outputMetadataResult.isSuccess())) {
-      return MetadataResult.success(new ComponentMetadataTypes(inputMetadataResult, outputMetadataResult));
+      ComponentMetadataTypes.Builder builder =
+          new ComponentMetadataTypes.Builder().withInputMetadataDescriptor(inputMetadataResult.get());
+      if (outputMetadataResult != null) {
+        builder.withOutputMetadataDescriptor(outputMetadataResult.get());
+      }
+      return MetadataResult.success(builder.build());
     }
     List<MetadataFailure> failures = new ArrayList<>(inputMetadataResult.getFailures());
     if (outputMetadataResult != null) {
