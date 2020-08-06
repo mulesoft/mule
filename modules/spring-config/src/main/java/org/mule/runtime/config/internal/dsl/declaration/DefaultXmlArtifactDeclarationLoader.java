@@ -573,9 +573,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           });
 
       if (!componentFound.get()) {
-        getComponentDeclaringWalker(declaration -> {
-          declarer.withComponent(declaration);
-        }, child, extensionElementsDeclarer)
+        getComponentDeclaringWalker(declaration -> declarer.withComponent(declaration), child, extensionElementsDeclarer)
             .walk(extensionModel);
       }
     });
