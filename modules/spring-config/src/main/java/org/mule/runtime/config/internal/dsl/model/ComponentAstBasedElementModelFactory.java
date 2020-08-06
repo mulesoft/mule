@@ -278,9 +278,8 @@ class ComponentAstBasedElementModelFactory {
 
   private Multimap<ComponentIdentifier, ComponentAst> getNestedComponents(ComponentAst configuration) {
     Multimap<ComponentIdentifier, ComponentAst> result = ArrayListMultimap.create();
-    configuration.directChildrenStream().forEach(componentConfiguration -> {
-      result.put(componentConfiguration.getIdentifier(), componentConfiguration);
-    });
+    configuration.directChildrenStream()
+        .forEach(componentConfiguration -> result.put(componentConfiguration.getIdentifier(), componentConfiguration));
     return result;
   }
 
@@ -515,9 +514,12 @@ class ComponentAstBasedElementModelFactory {
         .filter(p -> p.getRawValue() != null)
         .collect(toMap(p -> p.getModel().getName(), p -> p.getRawValue()));
 
+    model.getParameterGroupModels().stream()
+        .filter(ParameterGroupModel::isShowInDsl)
+        .forEach(group -> addInlineGroup(elementDsl, innerComponents, parameters, builder, group));
+
     List<ParameterModel> inlineGroupedParameters = model.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)
-        .peek(group -> addInlineGroup(elementDsl, innerComponents, parameters, builder, group))
         .flatMap(g -> g.getParameterModels().stream())
         .collect(toList());
 
