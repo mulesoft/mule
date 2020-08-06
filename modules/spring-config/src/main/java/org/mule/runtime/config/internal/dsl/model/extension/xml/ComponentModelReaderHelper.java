@@ -7,14 +7,14 @@
 package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
 /**
- * Internal object responsible to traverse the entire XMl of a given application to read the {@link ComponentModel} to
- * recreate the macro expanded XML of the application.
- *
+ * Internal object responsible to traverse the entire XMl of a given application to read the {@link ComponentAst} to recreate the
+ * macro expanded XML of the application.
+ * <p>
  * It will obfuscate attributes that matches with {@link LocationExecutionContextProvider#maskPasswords(String, String)}.
+ * 
  * @since 4.2.0
  */
 class ComponentModelReaderHelper {

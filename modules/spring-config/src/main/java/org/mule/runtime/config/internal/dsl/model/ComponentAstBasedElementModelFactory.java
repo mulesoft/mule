@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -509,7 +510,10 @@ class ComponentAstBasedElementModelFactory {
                                              DslElementModel.Builder builder, ComponentAst configuration) {
 
     Multimap<ComponentIdentifier, ComponentAst> innerComponents = getNestedComponents(configuration);
-    Map<String, String> parameters = ((org.mule.runtime.config.internal.model.ComponentModel) configuration).getRawParameters();
+    Map<String, String> parameters = configuration.getParameters()
+        .stream()
+        .filter(p -> p.getRawValue() != null)
+        .collect(toMap(p -> p.getModel().getName(), p -> p.getRawValue()));
 
     List<ParameterModel> inlineGroupedParameters = model.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)

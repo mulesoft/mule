@@ -28,7 +28,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.security.SecurityFilter;
@@ -36,9 +35,7 @@ import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
@@ -213,15 +210,6 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
           Pair<String, Object> propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
           beanDefinitionBuilder.addPropertyValue(propertyValue.getFirst(), propertyValue.getSecond());
         });
-  }
-
-  public static List<Pair<String, Object>> getPropertyValueFromPropertiesComponent(ComponentModel propertyComponentModel) {
-    List<Pair<String, Object>> propertyValues = new ArrayList<>();
-    propertyComponentModel.getInnerComponents().stream().forEach(entryComponentModel -> {
-      propertyValues.add(new Pair<>(entryComponentModel.getRawParameters().get("key"),
-                                    entryComponentModel.getRawParameters().get("value")));
-    });
-    return propertyValues;
   }
 
   private void processObjectConstructionParameters(Map<ComponentAst, SpringComponentModel> springComponentModels,

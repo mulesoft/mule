@@ -21,7 +21,6 @@ import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.HashMap;
@@ -35,7 +34,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 public class ComponentModelHelper {
 
   /**
-   * Resolves the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} from a {@link ComponentModel}.
+   * Resolves the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} from a {@link ComponentAst}.
    *
    * @param componentModel a {@link ComponentAst} that represents a component in the configuration.
    * @param extensionModelHelper helper to access components in extension model
