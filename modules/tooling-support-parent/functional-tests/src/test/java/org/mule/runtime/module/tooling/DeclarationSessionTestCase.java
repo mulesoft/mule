@@ -77,10 +77,10 @@ public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerT
     }
   }
 
-  protected void validateSuccess(DeclarationSession session,
-                                 ParameterizedElementDeclaration elementDeclaration,
-                                 String parameterName,
-                                 String expectedValue) {
+  protected void validateValuesSuccess(DeclarationSession session,
+                                       ParameterizedElementDeclaration elementDeclaration,
+                                       String parameterName,
+                                       String expectedValue) {
     ValueResult providerResult = session.getValues(elementDeclaration, parameterName);
 
     assertThat(providerResult.isSuccess(), equalTo(true));
@@ -88,12 +88,12 @@ public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerT
     assertThat(providerResult.getValues().iterator().next().getId(), is(expectedValue));
   }
 
-  protected void validateFailure(DeclarationSession session,
-                                 ParameterizedElementDeclaration elementDeclaration,
-                                 String parameterName,
-                                 String message,
-                                 String code,
-                                 String... reason) {
+  protected void validateValuesFailure(DeclarationSession session,
+                                       ParameterizedElementDeclaration elementDeclaration,
+                                       String parameterName,
+                                       String message,
+                                       String code,
+                                       String... reason) {
     ValueResult providerResult = session.getValues(elementDeclaration, parameterName);
 
     assertThat(providerResult.isSuccess(), equalTo(false));
@@ -101,7 +101,7 @@ public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerT
     final ResolvingFailure failure = providerResult.getFailure().get();
     assertThat(failure.getFailureCode(), is(code));
     assertThat(failure.getMessage(), is(message));
-    if(reason.length > 0) {
+    if (reason.length > 0) {
       assertThat(failure.getReason(), containsString(reason[0]));
     }
   }

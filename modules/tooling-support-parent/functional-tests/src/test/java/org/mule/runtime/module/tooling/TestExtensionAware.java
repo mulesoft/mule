@@ -26,6 +26,7 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.app.declaration.api.fluent.SourceElementDeclarer;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TestExtensionAware {
 
@@ -55,6 +56,14 @@ public interface TestExtensionAware {
       "multiLevelShowInDslGroupPartialTypeKeysMetadataKey";
 
   String CONNECTION_CLIENT_NAME_PARAMETER = "clientName";
+
+  String INT_PARAM_NAME = "intParam";
+  String STRING_PRAM_NAME = "stringParam";
+  String INNER_POJO_PARAM_NAME = "innerPojoParam";
+  String SIMPLE_MAP_PARAM_NAME = "simpleMapParam";
+  String SIMPLE_LIST_PARAM_NAME = "simpleListParam";
+  String COMPLEX_MAP_PARAM_NAME = "complexMapParam";
+  String COMPLEX_LIST_PARAM_NAME = "complexListParam";
 
   default ArtifactDeclaration artifactDeclaration(ConfigurationElementDeclaration config) {
     return newArtifact().withGlobalElement(config).getDeclaration();
@@ -179,12 +188,55 @@ public interface TestExtensionAware {
 
   }
 
+
+  default ParameterValue innerPojo(int intParam,
+                                   String stringParam,
+                                   List<String> listParam,
+                                   Map<String, String> mapParam) {
+    ParameterListValue.Builder listBuilder = ParameterListValue.builder();
+    listParam.forEach(listBuilder::withValue);
+    ParameterObjectValue.Builder mapBuilder = ParameterObjectValue.builder();
+    mapParam.forEach(mapBuilder::withParameter);
+    return ParameterObjectValue.builder()
+        .withParameter(INT_PARAM_NAME, Integer.toString(intParam))
+        .withParameter(STRING_PRAM_NAME, stringParam)
+        .withParameter(SIMPLE_LIST_PARAM_NAME, listBuilder.build())
+        .withParameter(SIMPLE_MAP_PARAM_NAME, mapBuilder.build())
+        .build();
+  }
+
+  default ParameterValue complexParameterValue(int intParam,
+                                               String stringParam,
+                                               List<String> listParam,
+                                               Map<String, String> mapParam,
+                                               ParameterValue innerPojoParam,
+                                               List<ParameterValue> complexListParam,
+                                               Map<String, ParameterValue> complexMapParam) {
+    ParameterListValue.Builder listBuilder = ParameterListValue.builder();
+    listParam.forEach(listBuilder::withValue);
+
+    ParameterObjectValue.Builder mapBuilder = ParameterObjectValue.builder();
+    mapParam.forEach(mapBuilder::withParameter);
+
+    ParameterListValue.Builder complexListBuilder = ParameterListValue.builder();
+    complexListParam.forEach(complexListBuilder::withValue);
+
+    ParameterObjectValue.Builder complexMapBuilder = ParameterObjectValue.builder();
+    complexMapParam.forEach(complexMapBuilder::withParameter);
+
+    return ParameterObjectValue.builder()
+        .withParameter(COMPLEX_LIST_PARAM_NAME, complexListBuilder.build())
+        .withParameter(COMPLEX_MAP_PARAM_NAME, complexMapBuilder.build())
+        .withParameter(INNER_POJO_PARAM_NAME, innerPojoParam)
+        .withParameter(INT_PARAM_NAME, Integer.toString(intParam))
+        .withParameter(STRING_PRAM_NAME, stringParam)
+        .withParameter(SIMPLE_LIST_PARAM_NAME, listBuilder.build())
+        .withParameter(SIMPLE_MAP_PARAM_NAME, mapBuilder.build())
+        .build();
+  }
+
   default OperationElementDeclaration complexActingParameterOPDeclaration(String configName,
-                                                                          String innerActingParameter) {
-    final ParameterValue innerPojoValue =
-        ParameterObjectValue.builder().ofType("InnerActingParameter").withParameter("stringParam", innerActingParameter).build();
-    final ParameterValue actingParameter =
-        ParameterObjectValue.builder().ofType("ActingParameter").withParameter("innerActingParameter", innerPojoValue).build();
+                                                                          ParameterValue actingParameter) {
     return TEST_EXTENSION_DECLARER
         .newOperation(COMPLEX_ACTING_PARAMETER_OP_ELEMENT_NAME)
         .withConfig(configName)

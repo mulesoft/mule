@@ -49,7 +49,7 @@ public class ArtifactHelper {
   public ExtensionModel getExtensionModel(ElementDeclaration declaration) {
     return extensionManager
         .getExtension(declaration.getDeclaringExtension())
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not get extension model for: %s",
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("There is no extensionModel for extension: %s",
                                                                         declaration.getDeclaringExtension())));
   }
 

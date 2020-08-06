@@ -31,7 +31,7 @@ public class ConnectivityTestingTestCase extends DeclarationSessionTestCase {
   }
 
   @Test
-  public void testConnectionShouldNotDoneOnDeployment() {
+  public void testConnectionShouldNotBeDoneOnDeployment() {
     ConnectionValidationResult connectionValidationResult = session.testConnection(CONFIG_NAME_TEST_CONNECTION_FAILS);
     assertThat(connectionValidationResult.isValid(), equalTo(false));
     // Configuration has a connection provider instance that will fail validate connections and count the number of times
