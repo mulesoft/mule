@@ -124,8 +124,9 @@ public class ArtifactHelper {
         .map(cp -> (ConfigurationProvider) cp);
   }
 
-  public Optional<ConnectionProvider> findConnectionProvider(String configName) {
-    return getConfigurationInstance(configName).flatMap(ConfigurationInstance::getConnectionProvider);
+  public <C> Optional<ConnectionProvider<C>> findConnectionProvider(String configName) {
+    return getConfigurationInstance(configName).flatMap(ConfigurationInstance::getConnectionProvider)
+        .map(cp -> (ConnectionProvider<C>) cp);
   }
 
   public Optional<ConfigurationInstance> getConfigurationInstance(String configName) {
