@@ -9,11 +9,11 @@ package org.mule.runtime.module.tooling.api.artifact;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
-import org.mule.runtime.module.tooling.api.metadata.ComponentMetadataTypes;
 
 /**
  * It is in charge of resolving connector's operations and retrieving metadata for all
@@ -56,9 +56,9 @@ public interface DeclarationSession {
    * If a metadata key is needed all parts of the key must be provided.
    *
    * @param component the component whose dynamic metadata types are required
-   * @return a {@link MetadataResult} of {@link ComponentMetadataTypes} containing all the dynamic types
+   * @return a {@link MetadataResult} of {@link ComponentMetadataTypesDescriptor} containing all the dynamic types
    */
-  MetadataResult<ComponentMetadataTypes> getMetadataTypes(ComponentElementDeclaration component);
+  MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentElementDeclaration component);
 
   /**
    * Stops and disposes all resources used by this {@link DeclarationSession}
