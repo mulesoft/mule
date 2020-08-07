@@ -67,14 +67,13 @@ public abstract class XsltResultDocumentTestCase extends FunctionalTestCase
             Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
             if (resetControllerAfterEachTransformation)
             {
-                assertThat(controller.getInitialContextItem(), is(nullValue()));
+                assertThat(controller.getGlobalContextItem(), is(nullValue()));
             }
             else
             {
-                assertThat(controller.getInitialContextItem(), is(not(nullValue())));
+                assertThat(controller.getGlobalContextItem(), is(not(nullValue())));
             }
         }
-
     }
 
     private void executeFlowAndValidateOutput(String payload, File outputFile) throws Exception
