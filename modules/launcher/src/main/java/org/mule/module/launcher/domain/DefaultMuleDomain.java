@@ -16,6 +16,7 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transport.Connector;
 import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.DefaultMuleContextFactory;
@@ -294,6 +295,7 @@ public class DefaultMuleDomain implements Domain
             }
             if (this.muleContext != null)
             {
+                this.cancelStart();
                 this.muleContext.stop();
             }
         }
@@ -382,5 +384,19 @@ public class DefaultMuleDomain implements Domain
     protected MuleContextFactory getMuleContextFactory ()
     {
          return new DefaultMuleContextFactory();
+    }
+
+    @Override
+    public void cancelStart() {
+        if(muleContext != null && muleContext.getRegistry() != null && !muleContext.getRegistry().lookupObjects(Connector.class).isEmpty())
+        {
+            for (Connector connector : muleContext.getRegistry().lookupObjects(Connector.class))
+            {
+                if(connector.getRetryPolicyTemplate() != null)
+                {
+                    connector.getRetryPolicyTemplate().stopRetrying();
+                }
+            }
+        }
     }
 }

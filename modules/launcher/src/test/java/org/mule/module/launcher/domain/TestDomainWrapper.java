@@ -122,4 +122,9 @@ public class TestDomainWrapper implements Domain
     {
         this.failOnDispose = true;
     }
+
+    @Override
+    public void cancelStart() {
+        delegate.cancelStart();
+    }
 }
