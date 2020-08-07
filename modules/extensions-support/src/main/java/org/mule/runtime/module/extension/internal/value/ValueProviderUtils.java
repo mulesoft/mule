@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -21,6 +24,7 @@ import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -110,5 +114,24 @@ public class ValueProviderUtils {
     }
 
     return values;
+  }
+
+  /**
+   * Creates an instance of the given {@link ValueProvider} class and retrieves its id.
+   *
+   * @param valueProviderClazz a class that implements the {@link ValueProvider} interface.
+   * @return The id of the value provider
+   * @since 4.4.0
+   */
+  public static String getValueProviderId(Class<? extends ValueProvider> valueProviderClazz) {
+    ValueProvider valueProvider;
+    try {
+      valueProvider = instantiateClass(valueProviderClazz);
+    } catch (Exception e) {
+      throw new IllegalStateException(format("There was an error creating an instance of %s to retrieve the Id of the provider",
+                                             valueProviderClazz.getName()),
+                                      e);
+    }
+    return valueProvider.getId();
   }
 }
