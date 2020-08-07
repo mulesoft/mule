@@ -420,7 +420,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
         Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
 
-        assertThat(controller.getInitialContextItem(), is(nullValue()));
+        assertThat(controller.getGlobalContextItem(), is(nullValue()));
     }
     
     @Test
@@ -430,7 +430,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         
         Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
 
-        assertThat(controller.getInitialContextItem(), is(not(nullValue())));
+        assertThat(controller.getGlobalContextItem(), is(not(nullValue())));
     }
 
     private void performTransformation(boolean resetController) throws InitialisationException, TransformerException
