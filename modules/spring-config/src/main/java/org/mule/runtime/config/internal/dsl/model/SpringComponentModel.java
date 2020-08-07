@@ -10,7 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.api.util.NameUtils.toCamelCase;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
@@ -173,7 +173,9 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
               .forEach(pg -> {
                 if (pg.isShowInDsl()) {
                   final Optional<ComponentAst> paramGroupComp = directChildrenStream()
-                      .filter(comp -> pg.getName().equals(toCamelCase(comp.getIdentifier().getName(), "-")))
+                      // Comparing the group model name with AST hyphenized name
+                      // TODO: this should be compared with a resolved DSLElementSyntax from the extension model.
+                      .filter(comp -> hyphenize(pg.getName()).equals(comp.getIdentifier().getName()))
                       .findAny();
 
                   if (paramGroupComp.isPresent()) {
