@@ -81,6 +81,16 @@ public class ComponentValueProviderTestCase extends DeclarationSessionTestCase {
   }
 
   @Test
+  public void actingParameterGroupWithDefaultValue() {
+    final int intValue = 0;
+    final List<String> listValue = asList("one", "two", "three");
+    ComponentElementDeclaration elementDeclaration =
+        actingParameterGroupOPDeclaration(CONFIG_NAME, "", intValue, listValue);
+    elementDeclaration.getParameterGroup(ACTING_PARAMETER_GROUP_NAME).get().getParameters().remove(0); //remove string value
+    validateValuesSuccess(session, elementDeclaration, PROVIDED_PARAMETER_NAME, "defaultStringValue-0-one-two-three");
+  }
+
+  @Test
   public void missingParameterFromParameterGroupFails() {
     final String stringValue = "stringValue";
     final int intValue = 0;
@@ -131,17 +141,17 @@ public class ComponentValueProviderTestCase extends DeclarationSessionTestCase {
                                             complexParameterValue(intParam, stringParam, listParam, mapParam, innerPojoValue,
                                                                   complexListParam, complexMapParam));
     String innerPojoStringValue = intParam +
-                                  stringParam +
-                                  "zeroonetwo" + //listParam
-                                  "0zero1one2two"; //mapParam
+        stringParam +
+        "zeroonetwo" + //listParam
+        "0zero1one2two"; //mapParam
 
     String expectedValue = intParam +
-                           stringParam +
-                           "zeroonetwo" + //listParam
-                           "0zero1one2two" + //mapParam
-                           innerPojoStringValue + //all inner pojo parameters
-                           innerPojoStringValue + //complex list with 1 inner pojo
-                           "0" + innerPojoStringValue + "1" + innerPojoStringValue; //complexMap
+        stringParam +
+        "zeroonetwo" + //listParam
+        "0zero1one2two" + //mapParam
+        innerPojoStringValue + //all inner pojo parameters
+        innerPojoStringValue + //complex list with 1 inner pojo
+        "0" + innerPojoStringValue + "1" + innerPojoStringValue; //complexMap
     validateValuesSuccess(session, elementDeclaration, PROVIDED_PARAMETER_NAME, expectedValue);
   }
 

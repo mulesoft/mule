@@ -17,7 +17,7 @@ public class GroupWithValuesParameter {
   @Parameter
   String channels;
 
-  @Optional
+  @Optional(defaultValue = "anyParameterDefaultValue")
   @Parameter
   String anyParameter;
 

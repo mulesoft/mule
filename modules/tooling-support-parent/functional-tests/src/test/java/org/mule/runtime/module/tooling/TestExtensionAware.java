@@ -37,6 +37,7 @@ public interface TestExtensionAware {
   String PROVIDED_PARAMETER_NAME = "providedParameter";
   String ACTING_PARAMETER_NAME = "actingParameter";
   String METADATA_KEY_PARAMETER_NAME = "metadataKey";
+  String ACTING_PARAMETER_GROUP_NAME = "Acting";
 
   String SOURCE_ELEMENT_NAME = "simple";
   String INDEPENDENT_SOURCE_PARAMETER_NAME = "independentParam";
@@ -256,7 +257,7 @@ public interface TestExtensionAware {
     return TEST_EXTENSION_DECLARER
         .newOperation(ACTING_PARAMETER_GROUP_OP_ELEMENT_NAME)
         .withConfig(configName)
-        .withParameterGroup(newParameterGroup("Acting")
+        .withParameterGroup(newParameterGroup(ACTING_PARAMETER_GROUP_NAME)
             .withParameter("stringParam", stringValue)
             .withParameter("intParam", ParameterSimpleValue.of(String.valueOf(intValue), NUMBER))
             .withParameter("listParams", listBuilder.build())

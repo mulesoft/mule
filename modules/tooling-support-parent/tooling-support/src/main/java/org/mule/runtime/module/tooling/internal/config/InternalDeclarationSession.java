@@ -346,12 +346,20 @@ public class InternalDeclarationSession implements DeclarationSession {
                                                                                        T model) {
     Map<String, Object> parametersMap = new HashMap<>();
 
-    Map<String, ParameterGroupModel> parameterGroups =
-        model.getParameterGroupModels().stream().collect(toMap(NamedObject::getName, identity()));
+    Map<String, ParameterGroupModel> parameterGroupModels = new HashMap<>();
+
+    model.getParameterGroupModels().forEach(pgm -> {
+      parameterGroupModels.put(pgm.getName(), pgm);
+      pgm.getParameterModels().forEach(pm -> {
+        if (!pm.isRequired() && pm.getDefaultValue() != null) {
+          parametersMap.put(pm.getName(), pm.getDefaultValue());
+        }
+      });
+    });
 
     for (ParameterGroupElementDeclaration parameterGroupElement : parameterizedElementDeclaration.getParameterGroups()) {
       final String parameterGroupName = parameterGroupElement.getName();
-      final ParameterGroupModel parameterGroupModel = parameterGroups.get(parameterGroupName);
+      final ParameterGroupModel parameterGroupModel = parameterGroupModels.get(parameterGroupName);
       if (parameterGroupModel == null) {
         throw new MuleRuntimeException(createStaticMessage("Could not find parameter group with name: %s in model",
                                                            parameterGroupName));

@@ -56,7 +56,6 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(channels, hasSize(4));
     assertThat(channels, hasValues("requiredInteger:2", "requiredBoolean:false", "strings:[1, 2]", "requiredString:aString"));
   }
-
   @Test
   public void singleOptionsEnabledParameterWithRequiredParametersUsingExpressions() throws Exception {
     Set<Value> channels = getValues("singleOptionsEnabledParameterWithRequiredParametersUsingExpressions", "channels");
@@ -90,6 +89,13 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     Set<Value> channels = getValues("singleValuesEnabledParameterRequiresValuesOfParameterGroup", "values");
     assertThat(channels, hasSize(1));
     assertThat(channels, hasValues("anyParameter:aParam"));
+  }
+
+  @Test
+  public void singleOptionsEnabledParameterRequiresValuesOfParameterGroupWithDefaultValue() throws Exception {
+    Set<Value> channels = getValues("singleValuesEnabledParameterRequiresValuesOfParameterGroupWithDefaultValue", "values");
+    assertThat(channels, hasSize(1));
+    assertThat(channels, hasValues("anyParameter:anyParameterDefaultValue"));
   }
 
   @Test
