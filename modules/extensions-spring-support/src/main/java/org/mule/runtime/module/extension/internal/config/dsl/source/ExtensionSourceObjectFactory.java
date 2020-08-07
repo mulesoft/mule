@@ -38,6 +38,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapterFactory;
@@ -122,8 +123,9 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
       return true;
     }
     try {
-      return (Boolean) nonCallbackParameters.getResolvers().get(PRIMARY_NODE_ONLY_PARAMETER_NAME)
-          .resolve(ValueResolvingContext.builder(getNullEvent()).build());
+      ValueResolver<?> primaryNodeOnlyValueResolver = nonCallbackParameters.getResolvers().get(PRIMARY_NODE_ONLY_PARAMETER_NAME);
+      return primaryNodeOnlyValueResolver == null ? false
+          : (Boolean) primaryNodeOnlyValueResolver.resolve(ValueResolvingContext.builder(getNullEvent()).build());
     } catch (MuleException e) {
       String errorMessage = format("There was a problem resolving the value of the %s parameter for the %s source.",
                                    PRIMARY_NODE_ONLY_PARAMETER_NAME, sourceModel.getName());
