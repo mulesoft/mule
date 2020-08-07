@@ -143,9 +143,9 @@ class ComponentAstBasedElementModelFactory {
     }
   }
 
-  private Optional<DslElementModel<ObjectType>> resolveBasedOnType(ObjectType type,
-                                                                   ComponentAst configuration,
-                                                                   Deque<String> typeResolvingStack) {
+  private Optional<DslElementModel.Builder<ObjectType>> resolveBasedOnType(ObjectType type,
+                                                                           ComponentAst configuration,
+                                                                           Deque<String> typeResolvingStack) {
     Optional<DslElementSyntax> typeDsl = dsl.resolve(type);
     if (typeDsl.isPresent()) {
       Optional<ComponentIdentifier> elementIdentifier = getIdentifier(typeDsl.get());
@@ -155,11 +155,12 @@ class ComponentAstBasedElementModelFactory {
             .withDsl(typeDsl.get())
             .withConfig(configuration);
 
-        getId(type).ifPresent(id -> withStackControl(typeResolvingStack, id,
-                                                     () -> populateObjectFields(type, configuration, typeDsl.get(),
-                                                                                typeBuilder, typeResolvingStack)));
+        enrichElementModel(configuration.getModel(ParameterizedModel.class).get(), typeDsl.get(), configuration, typeBuilder);
+        // getId(type).ifPresent(id -> withStackControl(typeResolvingStack, id,
+        // () -> populateObjectFields(type, configuration, typeDsl.get(),
+        // typeBuilder, typeResolvingStack)));
 
-        return of(typeBuilder.build());
+        return of(typeBuilder);
       }
     }
     return empty();
@@ -320,12 +321,14 @@ class ComponentAstBasedElementModelFactory {
               .withDsl(modelDsl)
               .withValue(value)
               .build());
-        } else if (model instanceof DefaultObjectFieldType) {
-          resolveBasedOnParameterType((DefaultObjectFieldType) model, modelDsl, objectType, fieldComponent, typeResolvingStack)
-              .ifPresent(typeBuilder::containing);
+          // } else if (model instanceof DefaultObjectFieldType) {
+          // resolveBasedOnParameterType((DefaultObjectFieldType) model, modelDsl, objectType, fieldComponent, typeResolvingStack)
+          // .ifPresent(typeBuilder::containing);
         } else {
           resolveBasedOnType(objectType, fieldComponent, typeResolvingStack)
-              .ifPresent(typeBuilder::containing);
+              .ifPresent(elementBuilder -> typeBuilder.containing(elementBuilder
+                  .withDsl(modelDsl)
+                  .build()));
         }
       }
 
@@ -373,9 +376,9 @@ class ComponentAstBasedElementModelFactory {
 
         String value = entryConfig.getRawParameterValue(VALUE_ATTRIBUTE_NAME).orElse(null);
         if (isBlank(value)) {
-          getComponentChildVisitor(entry, entryConfig, entryType,
-                                   VALUE_ATTRIBUTE_NAME, entryDsl.getAttribute(VALUE_ATTRIBUTE_NAME).get(),
-                                   empty(), new ArrayDeque<>());
+          entryType.accept(getComponentChildVisitor(entry, entryConfig, entryType,
+                                                    VALUE_ATTRIBUTE_NAME, entryDsl.getAttribute(VALUE_ATTRIBUTE_NAME).get(),
+                                                    empty(), new ArrayDeque<>()));
         } else {
           entry.containing(DslElementModel.builder()
               .withModel(typeLoader.load(String.class))
