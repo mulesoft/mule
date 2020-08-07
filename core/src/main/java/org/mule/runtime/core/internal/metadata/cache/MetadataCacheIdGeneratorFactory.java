@@ -23,6 +23,6 @@ public interface MetadataCacheIdGeneratorFactory<T> {
    * @param locator a {@link ComponentLocator} that allows the generator to locate any component in the current context.
    * @return a new {@link MetadataCacheIdGenerator} valid for the given context.
    */
-  MetadataCacheIdGenerator<T> create(ComponentLocator<T> locator);
+  MetadataCacheIdGenerator<T> create(DslResolvingContext context, ComponentLocator<T> locator);
 
 }

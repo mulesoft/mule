@@ -10,6 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
@@ -30,6 +31,13 @@ public class KeysMetadataResolutionTypeInformation extends AbstractMetadataResol
   public KeysMetadataResolutionTypeInformation(ComponentAst component) {
     super(component, (typeResolversInformationModelProperty -> getResolverInformation(typeResolversInformationModelProperty)));
     checkArgument(component.getModel(ParameterizedModel.class).isPresent(),
+                  "Cannot generate an Metadata Keys Cache Key for a component with no parameters");
+  }
+
+  public KeysMetadataResolutionTypeInformation(DslElementModel<?> component) {
+    super(component, (typeResolversInformationModelProperty -> getResolverInformation(typeResolversInformationModelProperty)));
+    checkArgument(component.getModel() != null, "Cannot generate an Metadata Keys Cache Key for a 'null' component");
+    checkArgument(component.getModel() instanceof ParameterizedModel,
                   "Cannot generate an Metadata Keys Cache Key for a component with no parameters");
   }
 

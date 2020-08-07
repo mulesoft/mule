@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeHashFor;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.getSourceElementName;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.resolveConfigName;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
@@ -203,7 +204,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
                                                   ComponentParameterAst componentParameterAst) {
     return aValueProviderCacheId(fromElementWithName("param:"
         + sourceElementNameFromSimpleValue(containerComponent, componentParameterAst))
-            .withHashValueFrom(componentParameterAst.getRawValue()));
+            .withHashValue(computeHashFor(componentParameterAst)));
   }
 
   private class ParameterModelInformation {

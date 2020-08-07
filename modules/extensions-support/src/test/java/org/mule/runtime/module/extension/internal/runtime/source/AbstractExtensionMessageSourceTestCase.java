@@ -246,7 +246,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
 
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("metadata.cache.id.model.generator.factory",
                                                                          cacheIdGeneratorFactory);
-    when(cacheIdGeneratorFactory.create(any())).thenReturn(cacheIdGenerator);
+    when(cacheIdGeneratorFactory.create(any(), any())).thenReturn(cacheIdGenerator);
     when(cacheIdGenerator.getIdForComponentMetadata(any()))
         .then(invocation -> of(new MetadataCacheId(UUID.getUUID(), null)));
     when(cacheIdGenerator.getIdForGlobalMetadata(any()))

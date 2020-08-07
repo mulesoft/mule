@@ -10,6 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
@@ -30,6 +31,13 @@ public class AttributesMetadataResolutionTypeInformation extends AbstractMetadat
   public AttributesMetadataResolutionTypeInformation(ComponentAst component) {
     super(component, (typeResolversInformationModelProperty -> getResolverInformation(typeResolversInformationModelProperty)));
     checkArgument(component.getModel(HasOutputModel.class).isPresent(),
+                  "Cannot generate an Attribute Cache Key for a component with no output");
+  }
+
+  public AttributesMetadataResolutionTypeInformation(DslElementModel<?> component) {
+    super(component, (typeResolversInformationModelProperty -> getResolverInformation(typeResolversInformationModelProperty)));
+    checkArgument(component.getModel() != null, "Cannot generate an Attribute Cache Key for a 'null' component");
+    checkArgument(component.getModel() instanceof HasOutputModel,
                   "Cannot generate an Attribute Cache Key for a component with no output");
   }
 
