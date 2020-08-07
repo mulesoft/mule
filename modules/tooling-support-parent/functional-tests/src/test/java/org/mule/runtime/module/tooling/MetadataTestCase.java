@@ -8,6 +8,7 @@ package org.mule.runtime.module.tooling;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import org.mule.metadata.internal.utils.MetadataTypeWriter;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
@@ -79,6 +80,15 @@ public class MetadataTestCase extends DeclarationSessionTestCase {
     MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult =
         session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(false));
+    assertThat(containerTypeMetadataResult.getFailures(), hasSize(2));
+  }
+
+  @Test
+  public void operationDynamicTypesNoKey() {
+    OperationElementDeclaration operationElementDeclaration = multiLevelOPDeclaration(CONFIG_NAME, null, null);
+    MetadataResult<ComponentMetadataTypes> containerTypeMetadataResult = session.getMetadataTypes(operationElementDeclaration);
+    assertThat(containerTypeMetadataResult.isSuccess(), is(false));
+    assertThat(containerTypeMetadataResult.getFailures(), hasSize(2));
   }
 
 }

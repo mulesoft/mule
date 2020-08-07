@@ -9,6 +9,7 @@ package org.mule.runtime.module.tooling.api.artifact;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.value.ValueResult;
@@ -49,6 +50,15 @@ public interface DeclarationSession {
    * @return a {@link ValueResult} with the accepted parameter values to use
    */
   ValueResult getValues(ParameterizedElementDeclaration parameterizedElementDeclaration, String parameterName);
+
+  /**
+   * Returns the list of keys that can be resolved associated to the specified component.
+   *
+   * @param component the location of the {@link org.mule.runtime.api.metadata.MetadataKeyProvider} component to query for its available keys.
+   * @return Successful {@link MetadataResult} if the keys are successfully resolved Failure {@link MetadataResult} if there is an
+   *         error while resolving the keys
+   */
+  MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration component);
 
   /**
    * Retrieve all the dynamic metadata for the given component.

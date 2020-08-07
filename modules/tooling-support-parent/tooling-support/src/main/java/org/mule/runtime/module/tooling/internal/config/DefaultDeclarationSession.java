@@ -13,9 +13,11 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.failure
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
+
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -84,6 +86,19 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
                               getRootCauseMessage(e)))
           .withReason(getStackTrace(e))
           .build());
+    }
+  }
+
+  @Override
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration component) {
+    try {
+      return withInternalService().getMetadataKeys(component);
+    } catch (Exception e) {
+      return MetadataResult.failure(MetadataFailure.Builder.newFailure()
+          .withMessage(format("Unknown error while resolving metadata keys on component: '%s'. %s", component.getName(),
+                              getRootCauseMessage(e)))
+          .withReason(getStackTrace(e))
+          .onComponent());
     }
   }
 
