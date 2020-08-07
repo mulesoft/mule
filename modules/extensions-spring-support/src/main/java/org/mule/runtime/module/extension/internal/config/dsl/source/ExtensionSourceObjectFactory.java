@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.api.util.ClassUtils.memoize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.PRIMARY_NODE_ONLY_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -33,7 +34,6 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.BackPressureStrategyModelProperty;
@@ -123,7 +123,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     }
     try {
       return (Boolean) nonCallbackParameters.getResolvers().get(PRIMARY_NODE_ONLY_PARAMETER_NAME)
-          .resolve(ValueResolvingContext.builder(NullEventFactory.getNullEvent()).build());
+          .resolve(ValueResolvingContext.builder(getNullEvent()).build());
     } catch (MuleException e) {
       String errorMessage = format("There was a problem resolving the value of the %s parameter for the %s source.",
                                    PRIMARY_NODE_ONLY_PARAMETER_NAME, sourceModel.getName());
