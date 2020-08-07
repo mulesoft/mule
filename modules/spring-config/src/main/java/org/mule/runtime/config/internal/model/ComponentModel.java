@@ -14,7 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
-import static org.mule.runtime.api.util.NameUtils.toCamelCase;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
@@ -25,24 +25,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIG
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
-
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.meta.model.construct.ConstructModel;
-import org.mule.runtime.api.meta.model.nested.NestableElementModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentMetadataAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.ast.api.util.AstTraversalDirection;
-import org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter;
-import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,6 +43,25 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import javax.xml.namespace.QName;
+
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.nested.NestableElementModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.util.NameUtils;
+import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentMetadataAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.util.AstTraversalDirection;
+import org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter;
+import org.mule.runtime.extension.api.error.ErrorMapping;
 
 /**
  * An {@code ComponentModel} represents the user configuration of a component (flow, config, message processor, etc) defined in an
@@ -254,7 +255,7 @@ public class ComponentModel implements ComponentAst {
               .forEach(pg -> {
                 if (pg.isShowInDsl()) {
                   final Optional<ComponentAst> paramGroupComp = directChildrenStream()
-                      .filter(comp -> pg.getName().equals(toCamelCase(comp.getIdentifier().getName(), "-")))
+                      .filter(comp -> hyphenize(pg.getName()).equals(comp.getIdentifier().getName()))
                       .findAny();
 
                   if (paramGroupComp.isPresent()) {
