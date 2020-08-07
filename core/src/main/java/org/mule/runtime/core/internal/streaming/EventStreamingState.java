@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
 import java.lang.ref.WeakReference;
+import java.util.Optional;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.slf4j.Logger;
 
 /**
  * Tracks the active streaming resources owned by a particular event.
@@ -19,6 +23,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
  * @since 4.3.0
  */
 public class EventStreamingState {
+
+  private final static Logger LOGGER = getLogger(EventStreamingState.class);
 
   private final Cache<Integer, WeakReference<ManagedCursorProvider>> providers = Caffeine.newBuilder().build();
 
@@ -55,8 +61,31 @@ public class EventStreamingState {
   private ManagedCursorProvider getOrAddManagedProvider(int id,
                                                         ManagedCursorProvider provider,
                                                         StreamingGhostBuster ghostBuster) {
+    Optional<WeakReference<ManagedCursorProvider>> alreadyManagedOpt = findAlreadyManagedProvider(id, provider);
+    if (alreadyManagedOpt.isPresent()) {
+      ManagedCursorProvider alreadyManagedCursorProvider = alreadyManagedOpt.get().get();
+      CursorProvider innerDelegate = unwrap(provider);
+      CursorProvider delegate = unwrap(alreadyManagedCursorProvider);
+      LOGGER.warn("Already managed provider: [" + provider.getId() + "], alreadyManagedCursorProvider: ["
+          + alreadyManagedCursorProvider.getId() + "]. InnerDelegate: " + System.identityHashCode(innerDelegate) + " delegate: "
+          + System.identityHashCode(delegate) + "]");
+    }
     return providers.get(id, k -> ghostBuster.track(provider)).get();
   }
+
+  private Optional<WeakReference<ManagedCursorProvider>> findAlreadyManagedProvider(int id, ManagedCursorProvider provider) {
+    return providers.asMap().values().stream().filter(wr -> {
+      ManagedCursorProvider alreadyManagedCursorProvider = wr.get();
+      if (alreadyManagedCursorProvider != null && alreadyManagedCursorProvider.getId() != id) {
+        CursorProvider innerDelegate = unwrap(provider);
+        CursorProvider delegate = unwrap(alreadyManagedCursorProvider);
+        return innerDelegate.equals(delegate);
+      } else {
+        return false;
+      }
+    }).findFirst();
+  }
+
 
   /**
    * The owning event MUST invoke this method when the event is completed
