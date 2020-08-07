@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
@@ -23,7 +24,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPP
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import java.util.ArrayList;
@@ -255,7 +255,7 @@ public class ComponentModel implements ComponentAst {
               .forEach(pg -> {
                 if (pg.isShowInDsl()) {
                   final Optional<ComponentAst> paramGroupComp = directChildrenStream()
-                      .filter(comp -> getSanitizedElementName(pg).equals(comp.getIdentifier().getName()))
+                      .filter(comp -> hyphenize(pg.getName()).equals(comp.getIdentifier().getName()))
                       .findAny();
 
                   if (paramGroupComp.isPresent()) {

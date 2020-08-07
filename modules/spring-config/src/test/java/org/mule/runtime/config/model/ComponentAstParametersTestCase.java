@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ARTIFACT_AST;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ParameterAst.PARAMETER_AST;
 
@@ -38,7 +38,6 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.model.DefaultComponentParameterAst;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Feature;
@@ -138,7 +137,7 @@ public class ComponentAstParametersTestCase extends AbstractMuleTestCase {
         .addParameter(PARAMETER_A, "a", false)
         .addParameter(PARAMETER_B, "b", false)
         .addChildComponentModel(baseComponentModelBuilder()
-            .setIdentifier(buildFromStringRepresentation("test:" + getSanitizedElementName(parameterGroupCName)))
+            .setIdentifier(buildFromStringRepresentation("test:" + hyphenize(parameterGroupCName)))
             .addParameter(PARAMETER_C, "c", false)
             .build())
         .build();
