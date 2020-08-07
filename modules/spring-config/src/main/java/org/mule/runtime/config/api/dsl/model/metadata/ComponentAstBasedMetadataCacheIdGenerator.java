@@ -18,6 +18,7 @@ import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHel
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.resolveConfigName;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.ObjectType;
@@ -44,6 +45,7 @@ import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
+import org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
@@ -219,7 +221,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
     final List<String> paramsAsChildrenNames = elementModel.getModel(ParameterizedModel.class)
         .map(pmz -> pmz.getAllParameterModels()
             .stream()
-            .map(pm -> hyphenize(pm.getName()))
+            .map(pm -> getSanitizedElementName(pm))
             .collect(toList()))
         .orElse(emptyList());
 
