@@ -24,11 +24,10 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -49,16 +48,16 @@ public class DslElementModel<T> {
   private final String value;
   private final DslElementSyntax dsl;
   private final boolean explicitInDsl;
-  private final Set<DslElementModel> containedElements;
+  private final List<DslElementModel> containedElements;
   private final ComponentConfiguration configuration;
   private final ComponentIdentifier identifier;
 
 
-  private DslElementModel(T model, DslElementSyntax dsl, Set<DslElementModel> containedElements,
+  private DslElementModel(T model, DslElementSyntax dsl, List<DslElementModel> containedElements,
                           ComponentConfiguration configuration, String value, boolean explicitInDsl) {
     this.dsl = dsl;
     this.model = model;
-    this.containedElements = containedElements;
+    this.containedElements = copyOf(containedElements);
     this.configuration = configuration;
     this.value = value;
     this.identifier = createIdentifier();
@@ -83,7 +82,7 @@ public class DslElementModel<T> {
    * @return a {@link List} with all the child {@link DslElementModel elements}
    */
   public List<DslElementModel> getContainedElements() {
-    return copyOf(containedElements);
+    return containedElements;
   }
 
   /**
@@ -189,7 +188,7 @@ public class DslElementModel<T> {
     private String value;
     private DslElementSyntax dsl;
     private ComponentConfiguration configuration;
-    private final Set<DslElementModel> contained = new LinkedHashSet<>();
+    private final List<DslElementModel> contained = new ArrayList<>();
     private boolean explicitInDsl = true;
 
     private Builder() {}
