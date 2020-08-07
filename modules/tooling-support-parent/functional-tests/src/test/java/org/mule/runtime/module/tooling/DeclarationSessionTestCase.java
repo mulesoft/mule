@@ -25,7 +25,7 @@ import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Rule;
 
-public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerTestCase implements TestExtensionAware {
+public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerTestCase {
 
   protected static final String EXTENSION_GROUP_ID = "org.mule.tooling";
   protected static final String EXTENSION_ARTIFACT_ID = "tooling-support-test-extension";

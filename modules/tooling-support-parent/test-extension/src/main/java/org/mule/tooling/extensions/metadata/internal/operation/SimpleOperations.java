@@ -18,7 +18,7 @@ import org.mule.tooling.extensions.metadata.internal.config.SimpleConfiguration;
 import org.mule.tooling.extensions.metadata.internal.connection.TstExtensionClient;
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessConnectionLessMetadataResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessMetadataResolver;
-import org.mule.tooling.extensions.metadata.internal.parameters.ComplexActingParameter;
+import org.mule.tooling.extensions.metadata.api.parameters.ComplexActingParameter;
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelPartialTypeKeysOutputTypeResolver;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterGroupVP;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;

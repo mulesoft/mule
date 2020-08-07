@@ -98,13 +98,6 @@ public class ComponentValueProviderTestCase extends DeclarationSessionTestCase {
 
     ComponentElementDeclaration elementDeclaration =
         actingParameterGroupOPDeclaration(CONFIG_NAME, stringValue, intValue, listValue);
-    elementDeclaration.getParameterGroups().get(0).getParameters().remove(0);
-    validateValuesFailure(session, elementDeclaration, PROVIDED_PARAMETER_NAME,
-                          "Unable to retrieve values. There are missing required parameters for the resolution: [stringParam]",
-                          MISSING_REQUIRED_PARAMETERS);
-
-    elementDeclaration =
-        actingParameterGroupOPDeclaration(CONFIG_NAME, stringValue, intValue, listValue);
     elementDeclaration.getParameterGroups().get(0).getParameters().remove(1);
     validateValuesFailure(session, elementDeclaration, PROVIDED_PARAMETER_NAME,
                           "Unable to retrieve values. There are missing required parameters for the resolution: [intParam]",
@@ -119,11 +112,10 @@ public class ComponentValueProviderTestCase extends DeclarationSessionTestCase {
 
     elementDeclaration =
         actingParameterGroupOPDeclaration(CONFIG_NAME, stringValue, intValue, listValue);
-    elementDeclaration.getParameterGroups().get(0).getParameters().remove(0);
-    elementDeclaration.getParameterGroups().get(0).getParameters().remove(0);
-    elementDeclaration.getParameterGroups().get(0).getParameters().remove(0);
+    elementDeclaration.getParameterGroups().get(0).getParameters().remove(1);
+    elementDeclaration.getParameterGroups().get(0).getParameters().remove(1);
     validateValuesFailure(session, elementDeclaration, PROVIDED_PARAMETER_NAME,
-                          "Unable to retrieve values. There are missing required parameters for the resolution: [stringParam, intParam, listParams]",
+                          "Unable to retrieve values. There are missing required parameters for the resolution: [intParam, listParams]",
                           MISSING_REQUIRED_PARAMETERS);
   }
 

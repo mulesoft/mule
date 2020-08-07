@@ -6,8 +6,8 @@ import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
-import org.mule.tooling.extensions.metadata.internal.parameters.ComplexActingParameter;
-import org.mule.tooling.extensions.metadata.internal.parameters.InnerPojo;
+import org.mule.tooling.extensions.metadata.api.parameters.ComplexActingParameter;
+import org.mule.tooling.extensions.metadata.api.parameters.InnerPojo;
 
 import java.util.Set;
 
