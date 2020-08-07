@@ -8,6 +8,8 @@ package org.mule.runtime.module.tooling;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configurationDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.connectionDeclaration;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.app.declaration.api.fluent.ArtifactDeclarer;
 
