@@ -36,6 +36,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.module.launcher.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.module.launcher.application.ApplicationStatus.CREATED;
+import static org.mule.module.launcher.application.ApplicationStatus.DESTROYED;
 import static org.mule.module.launcher.application.ApplicationStatus.STARTED;
 import static org.mule.module.launcher.application.ApplicationStatus.STOPPED;
 import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_CONFIG_RESOURCES;
@@ -47,6 +48,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.Registry;
+import org.mule.api.transport.Connector;
 import org.mule.config.StartupContext;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.module.launcher.application.Application;
@@ -94,6 +96,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -158,6 +163,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private final ApplicationFileBuilder httpAAppFileBuilder = new ApplicationFileBuilder("shared-http-app-a").definedBy("shared-http-a-app-config.xml").deployedWith("domain", "shared-http-domain");
     private final ApplicationFileBuilder httpBAppFileBuilder = new ApplicationFileBuilder("shared-http-app-b").definedBy("shared-http-b-app-config.xml").deployedWith("domain", "shared-http-domain");
     private final ApplicationFileBuilder badConfigAppFileBuilder = new ApplicationFileBuilder("bad-config-app").definedBy("bad-app-config.xml");
+    private final ApplicationFileBuilder retryPolicyForeverAppFileBuilder = new ApplicationFileBuilder("retry-policy-forever-app").definedBy("retry-policy-forever-app-config.xml");
 
     // Domain file builders
     private final DomainFileBuilder brokenDomainFileBuilder = new DomainFileBuilder("brokenDomain").corrupted();
@@ -3900,5 +3906,107 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         // Application was deployed
         assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    }
+
+    @Test
+    public void reconnectForeverAplicationCanBeSttopedWhenCancelingStart() throws Exception
+    {
+        DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
+        deploymentService.addDeploymentListener(mockDeploymentListener);
+        addPackedAppFromBuilder(retryPolicyForeverAppFileBuilder);
+
+        ExecutorService service = Executors.newFixedThreadPool(2);
+        final CountDownLatch latch = new CountDownLatch(2);
+
+        // Aquire the deployment lock and start the application
+        service.submit(new DeployRetryPolicyForeverApplicationRunnable(latch));
+
+        // Cancel start so that retry policy forever will stop retrying and the stop the app when the deployment lock gets released
+        service.submit(new RetryPolicyApplicationCancelStartAndStopRunnable(latch));
+
+        latch.await();
+
+        // Check status
+        assertStatus(retryPolicyForeverAppFileBuilder.getId(), STOPPED);
+        deploymentService.stop();
+        assertStatus(retryPolicyForeverAppFileBuilder.getId(), DESTROYED);
+
+        service.awaitTermination(1000, TimeUnit.MILLISECONDS);
+        service.shutdown();
+    }
+
+    private class ApplicationReconnectingProbe implements Probe
+    {
+        @Override
+        public boolean isSatisfied()
+        {
+            return deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()) != null
+                    && deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext() != null
+                    && deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext().getRegistry() != null
+                    && !deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext().getRegistry().lookupObjects(Connector.class).isEmpty()
+                    && deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getMuleContext().getRegistry().lookupObjects(Connector.class).iterator().next().getRetryPolicyTemplate() != null;
+        }
+
+        @Override
+        public String describeFailure()
+        {
+            return "Either the application, the connector or it's retry policy could not be found";
+        }
+    }
+
+    private class ApplicationStoppedProbe implements Probe
+    {
+        @Override
+        public boolean isSatisfied()
+        {
+            return STOPPED.equals(deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).getStatus());
+        }
+
+        @Override
+        public String describeFailure()
+        {
+            return "Application didn't stop";
+        }
+    }
+
+    private class DeployRetryPolicyForeverApplicationRunnable implements Runnable
+    {
+        private final CountDownLatch latch;
+
+        public DeployRetryPolicyForeverApplicationRunnable(CountDownLatch latch)
+        {
+            this.latch = latch;
+        }
+
+        @Override
+        public void run()
+        {
+            deploymentService.start();
+            latch.countDown();
+        }
+    }
+
+    private class RetryPolicyApplicationCancelStartAndStopRunnable implements Runnable
+    {
+        private final CountDownLatch latch;
+
+        public RetryPolicyApplicationCancelStartAndStopRunnable(CountDownLatch latch)
+        {
+            this.latch = latch;
+        }
+
+        @Override
+        public void run()
+        {
+            PollingProber pollingProber = new PollingProber(7000, 300);
+
+            pollingProber.check(new ApplicationReconnectingProbe());
+
+            deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).cancelStart();
+            deploymentService.findApplication(retryPolicyForeverAppFileBuilder.getId()).stop();
+
+            pollingProber.check(new ApplicationStoppedProbe());
+            latch.countDown();
+        }
     }
 }

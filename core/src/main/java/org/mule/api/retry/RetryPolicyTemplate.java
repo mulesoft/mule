@@ -32,4 +32,6 @@ public interface RetryPolicyTemplate
     RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception;
 
     boolean isSynchronous();
+
+    void stopRetrying();
 }
