@@ -303,4 +303,9 @@ public class DslElementModel<T> {
   public int hashCode() {
     return Objects.hash(model, value, dsl, explicitInDsl, containedElements, configuration, identifier);
   }
+
+  @Override
+  public String toString() {
+    return DslElementModel.class.getSimpleName() + "(" + (identifier != null ? identifier.toString() : "") + ")";
+  }
 }

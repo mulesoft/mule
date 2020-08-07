@@ -22,10 +22,16 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
+import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.builder.ObjectTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.SimpleType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -69,6 +75,32 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
         .map(st -> new MetadataTypeModelAdapterWithStereotype(type, st, extensionModelHelper));
   }
 
+  public static MetadataTypeModelAdapter createSimpleWrapperTypeModelAdapter(SimpleType simpleType,
+                                                                             ExtensionModelHelper extensionModelHelper) {
+    ObjectTypeBuilder entryObjectTypeBuilder = new BaseTypeBuilder(MetadataFormat.JAVA).objectType();
+    entryObjectTypeBuilder.addField().key(VALUE_ATTRIBUTE_NAME).value(simpleType);
+
+    return new MetadataTypeModelAdapter(entryObjectTypeBuilder.build(), extensionModelHelper) {
+
+      @Override
+      public boolean isWrapperFor(MetadataType type) {
+        return type instanceof StringType || super.isWrapperFor(type);
+      }
+    };
+  }
+
+  public static MetadataTypeModelAdapter createKeyValueWrapperTypeModelAdapter(String keyParamName,
+                                                                               MetadataType simpleKeyType,
+                                                                               String valueParamName,
+                                                                               MetadataType simpleValueType,
+                                                                               ExtensionModelHelper extensionModelHelper) {
+    ObjectTypeBuilder entryObjectTypeBuilder = new BaseTypeBuilder(MetadataFormat.JAVA).objectType();
+    entryObjectTypeBuilder.addField().key(keyParamName).value(simpleKeyType);
+    entryObjectTypeBuilder.addField().key(valueParamName).value(simpleValueType);
+
+    return new MetadataTypeModelAdapter(entryObjectTypeBuilder.build(), extensionModelHelper);
+  }
+
   public static MetadataTypeModelAdapter createParameterizedTypeModelAdapter(MetadataType type,
                                                                              ExtensionModelHelper extensionModelHelper) {
     return new MetadataTypeModelAdapter(type, extensionModelHelper);
@@ -103,6 +135,10 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
 
   public MetadataType getType() {
     return type;
+  }
+
+  public boolean isWrapperFor(MetadataType type) {
+    return this.type.equals(type);
   }
 
   @Override

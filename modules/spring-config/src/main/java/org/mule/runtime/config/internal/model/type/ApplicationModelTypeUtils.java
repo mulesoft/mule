@@ -20,8 +20,10 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
+import static org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter.createKeyValueWrapperTypeModelAdapter;
 import static org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
 import static org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
+import static org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter.createSimpleWrapperTypeModelAdapter;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isInfrastructure;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -31,14 +33,10 @@ import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.SimpleType;
-import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -290,7 +288,7 @@ public final class ApplicationModelTypeUtils {
                     @Override
                     protected void defaultVisit(MetadataType metadataType) {
                       if (isContent(paramModel)) {
-                        // If this is a Map for example, this has to be set using 
+                        // If this is a Map for example, this has to be set using
                         // text content as this does not depend on the dsl.
                         addParameterUsingTextContent(componentModel, paramModel, nestedForId);
                       } else {
@@ -549,12 +547,11 @@ public final class ApplicationModelTypeUtils {
                                                                                             entryComponent.getMetadata()));
             }
 
-            ObjectTypeBuilder entryObjectTypeBuilder = new BaseTypeBuilder(MetadataFormat.JAVA).objectType();
-            entryObjectTypeBuilder.addField().key(keyParamModel.getName()).value(keyParamModel.getType());
-            entryObjectTypeBuilder.addField().key(valueParamModel.getName()).value(valueParamModel.getType());
-
-            entryComponent.setMetadataTypeModelAdapter(createParameterizedTypeModelAdapter(entryObjectTypeBuilder.build(),
-                                                                                           extensionModelHelper));
+            entryComponent.setMetadataTypeModelAdapter(createKeyValueWrapperTypeModelAdapter(keyParamModel.getName(),
+                                                                                             keyParamModel.getType(),
+                                                                                             valueParamModel.getName(),
+                                                                                             valueParamModel.getType(),
+                                                                                             extensionModelHelper));
 
             return true;
           }
@@ -572,10 +569,7 @@ public final class ApplicationModelTypeUtils {
       @Override
       public void visitSimpleType(SimpleType simpleType) {
         if (paramComponent.getRawParameters().containsKey(VALUE_ATTRIBUTE_NAME)) {
-          ObjectTypeBuilder entryObjectTypeBuilder = new BaseTypeBuilder(MetadataFormat.JAVA).objectType();
-          entryObjectTypeBuilder.addField().key(VALUE_ATTRIBUTE_NAME).value(simpleType);
-
-          paramComponent.setMetadataTypeModelAdapter(createParameterizedTypeModelAdapter(entryObjectTypeBuilder.build(),
+          paramComponent.setMetadataTypeModelAdapter(createSimpleWrapperTypeModelAdapter(simpleType,
                                                                                          extensionModelHelper));
           return;
         }
@@ -588,12 +582,8 @@ public final class ApplicationModelTypeUtils {
                   .filter(c -> c.getIdentifier().equals(itemIdentifier))
                   .filter(valueComponentModel -> valueComponentModel.getRawParameters().containsKey(VALUE_ATTRIBUTE_NAME))
                   .map(valueComponentModel -> {
-                    ObjectTypeBuilder entryObjectTypeBuilder = new BaseTypeBuilder(MetadataFormat.JAVA).objectType();
-                    entryObjectTypeBuilder.addField().key(VALUE_ATTRIBUTE_NAME).value(simpleType);
-
                     valueComponentModel
-                        .setMetadataTypeModelAdapter(createParameterizedTypeModelAdapter(entryObjectTypeBuilder.build(),
-                                                                                         extensionModelHelper));
+                        .setMetadataTypeModelAdapter(createSimpleWrapperTypeModelAdapter(simpleType, extensionModelHelper));
                     return valueComponentModel;
                   })
                   .collect(toList());
