@@ -255,6 +255,8 @@ public class ComponentModel implements ComponentAst {
               .forEach(pg -> {
                 if (pg.isShowInDsl()) {
                   final Optional<ComponentAst> paramGroupComp = directChildrenStream()
+                      // Comparing the group model name with AST hyphenized name
+                      // TODO: this should be compared with a resolved DSLElementSyntax from the extension model.
                       .filter(comp -> hyphenize(pg.getName()).equals(comp.getIdentifier().getName()))
                       .findAny();
 
