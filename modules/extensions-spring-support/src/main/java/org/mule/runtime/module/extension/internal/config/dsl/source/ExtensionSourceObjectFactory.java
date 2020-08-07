@@ -13,10 +13,14 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.api.util.ClassUtils.memoize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.extension.api.ExtensionConstants.PRIMARY_NODE_ONLY_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -29,10 +33,12 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapterFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -44,6 +50,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import com.google.common.base.Joiner;
+import org.slf4j.Logger;
 
 
 /**
@@ -52,6 +59,8 @@ import com.google.common.base.Joiner;
  * @since 4.0
  */
 public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory<ExtensionMessageSource> {
+
+  private final Logger LOGGER = getLogger(ExtensionSourceObjectFactory.class);
 
   @Inject
   private ReflectionCache reflectionCache;
@@ -90,7 +99,6 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
       initialiseIfNeeded(errorCallbackParameters, true, muleContext);
 
       final BackPressureStrategy backPressureStrategy = getBackPressureStrategy();
-
       return new ExtensionMessageSource(extensionModel,
                                         sourceModel,
                                         getSourceAdapterFactory(nonCallbackParameters,
@@ -98,7 +106,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                                                 errorCallbackParameters,
                                                                 backPressureStrategy),
                                         getConfigurationProvider(),
-                                        primaryNodeOnly != null ? primaryNodeOnly : sourceModel.runsOnPrimaryNodeOnly(),
+                                        calculatePrimaryNodeOnly(nonCallbackParameters),
                                         getRetryPolicyTemplate(),
                                         cursorProviderFactory,
                                         backPressureStrategy,
@@ -107,6 +115,21 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                             .lookupObject(NotificationDispatcher.class),
                                         muleContext.getTransactionFactoryManager(), muleContext.getConfiguration().getId());
     });
+  }
+
+  private Boolean calculatePrimaryNodeOnly(ResolverSet nonCallbackParameters) {
+    if (sourceModel.runsOnPrimaryNodeOnly()) {
+      return true;
+    }
+    try {
+      return (Boolean) nonCallbackParameters.getResolvers().get(PRIMARY_NODE_ONLY_PARAMETER_NAME)
+          .resolve(ValueResolvingContext.builder(NullEventFactory.getNullEvent()).build());
+    } catch (MuleException e) {
+      String errorMessage = format("There was a problem resolving the value of the %s parameter for the %s source.",
+                                   PRIMARY_NODE_ONLY_PARAMETER_NAME, sourceModel.getName());
+      LOGGER.error(errorMessage);
+      throw new MuleRuntimeException(createStaticMessage(errorMessage), e);
+    }
   }
 
   // TODO(MULE-15641): REMOVE THIS METHOD. REPLACE WITH `nonCallbackParameters.isDynamic()`
