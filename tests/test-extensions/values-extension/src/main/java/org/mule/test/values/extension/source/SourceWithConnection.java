@@ -25,4 +25,6 @@ public class SourceWithConnection extends AbstractSource {
   @Connection
   ConnectionProvider<ValuesConnection> connection;
 
+
+
 }

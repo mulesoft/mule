@@ -23,4 +23,9 @@ public class WithConnectionValueProvider implements ValueProvider {
   public Set<Value> resolve() {
     return ValueBuilder.getValuesFor(connection.getEntities());
   }
+
+  @Override
+  public String getId() {
+    return "Value provider with connection";
+  }
 }
