@@ -100,8 +100,9 @@ class ComponentAstBasedElementModelFactory {
   private static final Logger LOGGER = getLogger(ComponentAstBasedElementModelFactory.class);
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+
+  // TODO MULE-18660 remove resolvers and dsl, and obtain the information provided by those from the AST being processed
   private final Map<ExtensionModel, DslSyntaxResolver> resolvers;
-  private ExtensionModel currentExtension;
   private DslSyntaxResolver dsl;
 
   ComponentAstBasedElementModelFactory(Map<ExtensionModel, DslSyntaxResolver> resolvers) {
@@ -120,7 +121,6 @@ class ComponentAstBasedElementModelFactory {
       return empty();
     }
 
-    currentExtension = entry.get().getKey();
     dsl = entry.get().getValue();
 
     return configuration.getModel(ParameterizedModel.class)
@@ -620,13 +620,11 @@ class ComponentAstBasedElementModelFactory {
       paramComponent.directChildrenStream()
           .findFirst()
           .ifPresent(wrapper -> {
-            ExtensionModel wrapperExtension = this.currentExtension;
             DslSyntaxResolver wrapperDsl = this.dsl;
 
             this.create(wrapper)
                 .ifPresent(paramElement::containing);
 
-            this.currentExtension = wrapperExtension;
             this.dsl = wrapperDsl;
           });
 
