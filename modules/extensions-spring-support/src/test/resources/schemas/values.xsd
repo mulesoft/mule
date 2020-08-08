@@ -552,6 +552,134 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithComplexActingParameterType" substitutionGroup="mule:abstract-operator" name="with-complex-acting-parameter"></xs:element>
+  <xs:complexType name="WithComplexActingParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="complex-acting-parameter">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.ComplexActingParameter"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="providedParameter"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="complexActingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="org.mule.test.values.extension.InnerPojo">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="list-param">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="list-param-item">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="map-params">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="map-param">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionInt" use="optional" name="intParam"></xs:attribute>
+        <xs:attribute type="mule:expressionList" use="optional" name="listParam"></xs:attribute>
+        <xs:attribute type="mule:expressionMap" use="optional" name="mapParam"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="stringParam"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:values="http://www.mulesoft.org/schema/mule/values" type="values:org.mule.test.values.extension.InnerPojo" abstract="true" name="abstract-inner-pojo"></xs:element>
+  <xs:element xmlns:values="http://www.mulesoft.org/schema/mule/values" substitutionGroup="values:abstract-inner-pojo" name="inner-pojo">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="values:org.mule.test.values.extension.InnerPojo"></xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="org.mule.test.values.extension.ComplexActingParameter">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="complex-list-param">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element xmlns:values="http://www.mulesoft.org/schema/mule/values" minOccurs="0" maxOccurs="unbounded" ref="values:abstract-inner-pojo"></xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="complex-map-params">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="complex-map-param">
+                  <xs:complexType>
+                    <xs:sequence maxOccurs="1">
+                      <xs:element xmlns:values="http://www.mulesoft.org/schema/mule/values" minOccurs="0" maxOccurs="1" ref="values:abstract-inner-pojo"></xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="inner-pojo-param">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.InnerPojo"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="list-param">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="list-param-item">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="map-params">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="map-param">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionList" use="optional" name="complexListParam"></xs:attribute>
+        <xs:attribute type="mule:expressionMap" use="optional" name="complexMapParam"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="innerPojoParam"></xs:attribute>
+        <xs:attribute type="mule:expressionInt" use="optional" name="intParam"></xs:attribute>
+        <xs:attribute type="mule:expressionList" use="optional" name="listParam"></xs:attribute>
+        <xs:attribute type="mule:expressionMap" use="optional" name="mapParam"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="stringParam"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithErrorValueProviderType" substitutionGroup="mule:abstract-operator" name="with-error-value-provider"></xs:element>
   <xs:complexType name="WithErrorValueProviderType">
     <xs:complexContent>
