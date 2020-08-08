@@ -68,6 +68,15 @@ import javax.xml.namespace.QName;
 
 public class MetadataTypeModelAdapter implements ParameterizedModel {
 
+  /**
+   * Adapts the provided {@code type} for treatment as both a {@link ParameterizedModel} and {@link HasStereotypeModel}.
+   *
+   * @param type the {@link MetadataType} to adapt.
+   * @param extensionModelHelper used for actions relative to {@link MetadataType}s.
+   * @return the newly created adapter if the provided {@code} is stereotyped, {@link Optional#empty()} if not.
+   *
+   * @since 4.3
+   */
   public static Optional<MetadataTypeModelAdapter> createMetadataTypeModelAdapterWithSterotype(MetadataType type,
                                                                                                ExtensionModelHelper extensionModelHelper) {
     return type.getAnnotation(StereotypeTypeAnnotation.class)
@@ -75,6 +84,18 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
         .map(st -> new MetadataTypeModelAdapterWithStereotype(type, st, extensionModelHelper));
   }
 
+  /**
+   * Adapts the provided {@code singleType} for treatment as a {@link ParameterizedModel}.
+   * <p>
+   * A new type is created around the provided {@code simpleType} to represent how it is represented in a DSL when it is nested in
+   * an array.
+   *
+   * @param simpleType the {@link MetadataType} to adapt.
+   * @param extensionModelHelper used for actions relative to {@link MetadataType}s.
+   * @return the newly created adapter.
+   *
+   * @since 4.4
+   */
   public static MetadataTypeModelAdapter createSimpleWrapperTypeModelAdapter(SimpleType simpleType,
                                                                              ExtensionModelHelper extensionModelHelper) {
     ObjectTypeBuilder entryObjectTypeBuilder = new BaseTypeBuilder(MetadataFormat.JAVA).objectType();
@@ -89,6 +110,21 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
     };
   }
 
+  /**
+   * Adapts the provided types representing the key/values of a map for treatment as a {@link ParameterizedModel}.
+   * <p>
+   * A new type is created around the provided types with the given paramNames to represent how it is represented in a DSL when it
+   * is nested in a map.
+   *
+   * @param keyParamName the name of the attribute in the DSL containing the entry key.
+   * @param simpleKeyType the {@link MetadataType} of the entry key
+   * @param valueParamName the name of the attribute in the DSL containing the entry value.
+   * @param simpleValueType the {@link MetadataType} of the entry value
+   * @param extensionModelHelper used for actions relative to {@link MetadataType}s.
+   * @return the newly created adapter.
+   *
+   * @since 4.4
+   */
   public static MetadataTypeModelAdapter createKeyValueWrapperTypeModelAdapter(String keyParamName,
                                                                                MetadataType simpleKeyType,
                                                                                String valueParamName,
@@ -101,6 +137,15 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
     return new MetadataTypeModelAdapter(entryObjectTypeBuilder.build(), extensionModelHelper);
   }
 
+  /**
+   * Adapts the provided {@code type} for treatment as a {@link ParameterizedModel}.
+   *
+   * @param type the {@link MetadataType} to adapt.
+   * @param extensionModelHelper used for actions relative to {@link MetadataType}s.
+   * @return the newly created adapter.
+   *
+   * @since 4.3
+   */
   public static MetadataTypeModelAdapter createParameterizedTypeModelAdapter(MetadataType type,
                                                                              ExtensionModelHelper extensionModelHelper) {
     return new MetadataTypeModelAdapter(type, extensionModelHelper);
