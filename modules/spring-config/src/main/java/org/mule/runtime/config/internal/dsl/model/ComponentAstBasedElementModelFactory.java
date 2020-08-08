@@ -58,6 +58,7 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -372,6 +373,8 @@ class ComponentAstBasedElementModelFactory {
   private <T extends ParameterizedModel> void enrichElementModel(T model, DslElementSyntax elementDsl,
                                                                  ComponentAst configuration,
                                                                  DslElementModel.Builder builder) {
+    // Have to keep the order of the elements consistent so the generated metadata keys are backwards compatible
+    populateConnectionProviderElements(model, elementDsl, builder, configuration);
     populateParameterizedElements(model, elementDsl, builder, configuration);
     populateComposableElements(model, elementDsl, builder, configuration);
 
@@ -407,6 +410,13 @@ class ComponentAstBasedElementModelFactory {
         .forEach(p -> addElementParameter(innerComponents, parameters, elementDsl, builder, p));
   }
 
+  private void populateConnectionProviderElements(NamedObject model, DslElementSyntax elementDsl,
+                                                  DslElementModel.Builder builder, ComponentAst configuration) {
+    configuration.directChildrenStream()
+        .filter(c -> c.getModel(ConnectionProviderModel.class).isPresent())
+        .forEach(nestedComponentConfig -> create(nestedComponentConfig).ifPresent(builder::containing));
+  }
+
   private void populateComposableElements(NamedObject model, DslElementSyntax elementDsl,
                                           DslElementModel.Builder builder, ComponentAst configuration) {
     final List<String> paramsAsChildrenNames = configuration.getModel(ParameterizedModel.class)
@@ -419,6 +429,7 @@ class ComponentAstBasedElementModelFactory {
     configuration.directChildrenStream()
         // TODO MULE-17711 Remove this filter
         .filter(c -> !paramsAsChildrenNames.contains(c.getIdentifier().getName()))
+        .filter(c -> !c.getModel(ConnectionProviderModel.class).isPresent())
         .forEach(nestedComponentConfig -> create(nestedComponentConfig).ifPresent(builder::containing));
   }
 
