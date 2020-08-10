@@ -405,9 +405,7 @@ public class ExtensionModelHelper {
 
             @Override
             protected void onNestable(NestableElementModel model) {
-              final DslElementSyntax dslSyntax = dslSyntaxResolver.resolve(model);
-              if (!dslSyntax.supportsTopLevelDeclaration() && !topLevel
-                  && dslSyntax.getElementName().equals(componentIdentifier.getName())) {
+              if (!topLevel && dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onNestableElement(model);
                 stop();
               }
