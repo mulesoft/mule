@@ -36,7 +36,8 @@ public class StreamingHelperArgumentResolver implements ArgumentResolver<Streami
   public StreamingHelper resolve(ExecutionContext executionContext) {
     initializeCursorProviderFactoriesIfNeeded(executionContext);
     ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter<OperationModel>) executionContext;
-    return new DefaultStreamingHelper(cursorStreamProviderFactory, cursorIteratorProviderFactory, context.getEvent());
+    return new DefaultStreamingHelper(cursorStreamProviderFactory, cursorIteratorProviderFactory, context.getEvent(),
+                                      context.getComponent().getLocation());
   }
 
   public void initializeCursorProviderFactoriesIfNeeded(ExecutionContext executionContext) {

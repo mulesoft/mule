@@ -52,7 +52,8 @@ public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase 
     cursorProviderFactory =
         new InMemoryCursorIteratorProviderFactory(InMemoryCursorIteratorConfig.getDefault(), streamingManager);
     event = testEvent();
-    streamingHelper = new DefaultStreamingHelper(cursorProviderFactory, streamingManager, event);
+    streamingHelper =
+        new DefaultStreamingHelper(cursorProviderFactory, streamingManager, event, event.getContext().getOriginatingLocation());
   }
 
   @Override

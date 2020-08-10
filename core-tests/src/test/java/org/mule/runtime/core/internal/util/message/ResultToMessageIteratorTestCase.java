@@ -60,7 +60,7 @@ public class ResultToMessageIteratorTestCase {
     CursorProviderFactory cursorProviderFactory = mock(CursorProviderFactory.class);
     BaseEventContext eventCtx = mock(BaseEventContext.class);
 
-    return new ResultToMessageIterator(list.iterator(), cursorProviderFactory, eventCtx);
+    return new ResultToMessageIterator(list.iterator(), cursorProviderFactory, eventCtx, eventCtx.getOriginatingLocation());
   }
 
   private static Result<Object, Object> resultOf(int output) {

@@ -191,7 +191,7 @@ public class FlowProcessMediator implements Initialisable {
                                                                                                      responseCompletion);
         ((InternalEvent) event).setFlowProcessMediatorContext(phaseContext);
 
-        //registering source interceptor callback to the event context
+        // registering source interceptor callback to the event context
         BaseEventContext rootContext = ((BaseEventContext) event.getContext()).getRootContext();
         sourceInterceptors.forEach(sourceInterceptor -> rootContext
             .onTerminated((e, t) -> sourceInterceptor.afterTerminated(messageSource.getLocation(), rootContext)));
@@ -505,12 +505,13 @@ public class FlowProcessMediator implements Initialisable {
                                         new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
                                                                                adapter.getPayloadMediaTypeResolver()),
                                         adapter.getCursorProviderFactory(),
-                                        ((BaseEventContext) eventCtx).getRootContext()))
+                                        ((BaseEventContext) eventCtx).getRootContext(),
+                                        source.getLocation()))
             .mediaType(result.getMediaType().orElse(ANY))
             .build());
       } else {
         eventMessage = toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(),
-                                 ((BaseEventContext) eventCtx).getRootContext());
+                                 ((BaseEventContext) eventCtx).getRootContext(), source.getLocation());
       }
 
       return eventMessage;

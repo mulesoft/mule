@@ -479,7 +479,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     final InputStream inputStream = mock(InputStream.class);
 
-    doReturn(provider).when(cursorStreamProviderFactory).of(getRoot(event.getContext()), inputStream);
+    doReturn(provider).when(cursorStreamProviderFactory).of(getRoot(event.getContext()), inputStream,
+                                                            event.getContext().getOriginatingLocation());
     stubComponentExecutor(operationExecutor, inputStream);
 
     messageProcessor.process(event);

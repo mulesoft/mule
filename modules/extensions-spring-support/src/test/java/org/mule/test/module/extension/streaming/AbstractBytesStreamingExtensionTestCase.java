@@ -242,7 +242,8 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
 
     CursorStreamProvider provider = (CursorStreamProvider) flowRunner("objectToStream")
         .keepStreamsOpen()
-        .withPayload(factory.of(testEvent().getContext(), new ByteArrayInputStream(data.getBytes())))
+        .withPayload(factory.of(testEvent().getContext(), new ByteArrayInputStream(data.getBytes()),
+                                testEvent().getContext().getOriginatingLocation()))
         .run().getMessage().getPayload().getValue();
 
     byte[] bytes = muleContext.getObjectSerializer().getInternalProtocol().serialize(provider);
