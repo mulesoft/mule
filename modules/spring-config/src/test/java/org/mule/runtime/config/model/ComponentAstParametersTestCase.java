@@ -18,9 +18,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ARTIFACT_AST;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ParameterAst.PARAMETER_AST;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
@@ -31,14 +39,6 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.model.DefaultComponentParameterAst;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -103,6 +103,12 @@ public class ComponentAstParametersTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("MULE-18513")
   public void paramsInShowDslGroupProperlyProcessed() {
+    paramsInShowDslGroupProperlyProcessed("GroupComponent B", "GroupComponent C");
+    paramsInShowDslGroupProperlyProcessed("groupB", "groupC");
+    paramsInShowDslGroupProperlyProcessed("Message", "Advanced");
+  }
+
+  private void paramsInShowDslGroupProperlyProcessed(String parameterGruupBName, String parameterGroupCName) {
     org.mule.runtime.api.meta.model.ComponentModel parameterizedModel =
         mock(org.mule.runtime.api.meta.model.ComponentModel.class);
 
@@ -117,11 +123,11 @@ public class ComponentAstParametersTestCase extends AbstractMuleTestCase {
     when(paramGroupA.getParameterModels()).thenReturn(singletonList(paramA));
     when(paramGroupA.isShowInDsl()).thenReturn(false);
     final ParameterGroupModel paramGroupB = mock(ParameterGroupModel.class);
-    when(paramGroupB.getName()).thenReturn("groupB");
+    when(paramGroupB.getName()).thenReturn(parameterGruupBName);
     when(paramGroupB.getParameterModels()).thenReturn(singletonList(paramB));
     when(paramGroupB.isShowInDsl()).thenReturn(false);
     final ParameterGroupModel paramGroupC = mock(ParameterGroupModel.class);
-    when(paramGroupC.getName()).thenReturn("groupC");
+    when(paramGroupC.getName()).thenReturn(parameterGroupCName);
     when(paramGroupC.getParameterModels()).thenReturn(singletonList(paramC));
     when(paramGroupC.isShowInDsl()).thenReturn(true);
 
@@ -131,7 +137,7 @@ public class ComponentAstParametersTestCase extends AbstractMuleTestCase {
         .addParameter(PARAMETER_A, "a", false)
         .addParameter(PARAMETER_B, "b", false)
         .addChildComponentModel(baseComponentModelBuilder()
-            .setIdentifier(buildFromStringRepresentation("test:group-c"))
+            .setIdentifier(buildFromStringRepresentation("test:" + hyphenize(parameterGroupCName)))
             .addParameter(PARAMETER_C, "c", false)
             .build())
         .build();
