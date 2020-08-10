@@ -18,8 +18,6 @@ import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
@@ -178,8 +176,7 @@ public class ComponentModel implements ComponentAst {
       return of(OBJECT_MULE_CONFIGURATION);
     } else if (getModel(ConstructModel.class)
         .map(cm -> cm.getName().equals("object"))
-        .orElse(getIdentifier().equals(ON_ERROR_CONTINE_IDENTIFIER)
-            || getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER))) {
+        .orElse(false)) {
       return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
     } else if (getIdentifier().equals(ERROR_HANDLER_IDENTIFIER) && getRawParameterValue("ref").isPresent()) {
       return empty();

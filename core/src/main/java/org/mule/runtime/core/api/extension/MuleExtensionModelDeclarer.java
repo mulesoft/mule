@@ -766,11 +766,18 @@ class MuleExtensionModelDeclarer {
 
     onError.onDefaultParameterGroup()
         .withRequiredParameter("ref")
+        .withAllowedStereotypes(asList(ON_ERROR))
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the error handler to reuse.");
 
     // TODO MULE-13277 errorHandler.isOneRouteRequired(true);
+
+    // global onError's that may be referenced from an error handler
+    declareGlobalOnErrorRoute(typeLoader, extensionDeclarer.withConstruct("onErrorContinue")
+        .describedAs("Error handler used to handle errors. It will commit any transaction as if the message was consumed successfully."));
+    declareGlobalOnErrorRoute(typeLoader, extensionDeclarer.withConstruct("onErrorPropagate")
+        .describedAs("Error handler used to propagate errors. It will rollback any transaction and not consume messages."));
   }
 
   private void declareOnErrorRoute(ClassTypeLoader typeLoader, NestedRouteDeclarer onError) {
@@ -803,6 +810,17 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs."
             + " Default is true.");
+  }
+
+  private void declareGlobalOnErrorRoute(ClassTypeLoader typeLoader, ConstructDeclarer onError) {
+    onError.withStereotype(ON_ERROR)
+        .allowingTopLevelDefinition()
+        .withChain();
+
+    onError.onDefaultParameterGroup()
+        .withRequiredParameter("name")
+        .asComponentId()
+        .ofType(typeLoader.load(String.class));
   }
 
   private void declareErrors(ExtensionDeclarer extensionDeclarer) {

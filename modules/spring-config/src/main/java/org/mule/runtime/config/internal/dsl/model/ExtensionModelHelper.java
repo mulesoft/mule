@@ -12,6 +12,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.CHAIN;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ON_ERROR;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
@@ -56,6 +57,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerMana
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
+import org.mule.runtime.internal.dsl.DslConstants;
 
 import java.util.Collection;
 import java.util.Map;
@@ -89,6 +91,7 @@ public class ExtensionModelHelper {
       Caffeine.newBuilder().build();
   private final Cache<ComponentIdentifier, Optional<NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
       Caffeine.newBuilder().build();
+  private final Optional<DslSyntaxResolver> muleTopLevelDslSyntaxResolver;
   private final LoadingCache<ExtensionModel, DslSyntaxResolver> dslSyntaxResolversByExtension;
 
   private final JavaTypeLoader javaTypeLoader = new JavaTypeLoader(ExtensionModelHelper.class.getClassLoader(),
@@ -105,6 +108,11 @@ public class ExtensionModelHelper {
 
   public ExtensionModelHelper(Set<ExtensionModel> extensionModels, DslResolvingContext dslResolvingCtx) {
     this.extensionsModels = extensionModels;
+    this.muleTopLevelDslSyntaxResolver =
+        extensionModels.stream()
+            .filter(extModel -> extModel.getName().equals(DslConstants.CORE_PREFIX))
+            .map(extModel -> DslSyntaxResolver.getDefault(extModel, dslResolvingCtx))
+            .findAny();
     this.dslSyntaxResolversByExtension =
         Caffeine.newBuilder().build(key -> DslSyntaxResolver.getDefault(key, dslResolvingCtx));
     this.dslResolvingContext = dslResolvingCtx;
@@ -125,7 +133,7 @@ public class ExtensionModelHelper {
           Optional<? extends NestableElementModel> nestableElementModelOptional = findNestableElementModel(componentIdentifier);
           return nestableElementModelOptional.map(nestableElementModel -> {
             Reference<ComponentType> componentTypeReference = new Reference<>();
-            nestableElementModel.accept(new IsRouteVisitor(componentTypeReference));
+            nestableElementModel.accept(new IsRouteVisitor(componentIdentifier, componentTypeReference));
             return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
           }).orElse(UNKNOWN);
         });
@@ -149,6 +157,10 @@ public class ExtensionModelHelper {
       public void visit(ConstructModel model) {
         if (model.getStereotype().equals(MuleStereotypes.ERROR_HANDLER)) {
           componentTypeReference.set(ERROR_HANDLER);
+          return;
+        }
+        if (model.getStereotype().equals(MuleStereotypes.ON_ERROR)) {
+          componentTypeReference.set(ON_ERROR);
           return;
         }
         if (model.getStereotype().equals(MuleStereotypes.FLOW)) {
@@ -337,9 +349,10 @@ public class ExtensionModelHelper {
    * {@code delegate} when found.
    *
    * @param componentIdentifier the identifier to use for the search.
+   * @param topLevel            whether the component being walked to is a top-level component.
    * @param delegate            the callback to execute on the found model.
    */
-  public void walkToComponent(ComponentIdentifier componentIdentifier, ExtensionWalkerModelDelegate delegate) {
+  public void walkToComponent(ComponentIdentifier componentIdentifier, boolean topLevel, ExtensionWalkerModelDelegate delegate) {
     lookupExtensionModelFor(componentIdentifier)
         .ifPresent(currentExtension -> {
           new IdempotentExtensionWalker() {
@@ -380,7 +393,11 @@ public class ExtensionModelHelper {
 
             @Override
             protected void onConstruct(ConstructModel model) {
-              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+              final DslElementSyntax dslSyntax = muleTopLevelDslSyntaxResolver
+                  .map(resolver -> resolver.resolve(model))
+                  .orElseGet(() -> dslSyntaxResolver.resolve(model));
+
+              if (dslSyntax.getElementName().equals(componentIdentifier.getName())) {
                 delegate.onConstruct(model);
                 stop();
               }
@@ -388,7 +405,7 @@ public class ExtensionModelHelper {
 
             @Override
             protected void onNestable(NestableElementModel model) {
-              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+              if (!topLevel && dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onNestableElement(model);
                 stop();
               }
@@ -526,9 +543,19 @@ public class ExtensionModelHelper {
 
   static class IsRouteVisitor implements NestableElementModelVisitor {
 
+    private static final String ON_ERROR_CONTINUE = "on-error-continue";
+    private static final String ON_ERROR_PROPAGATE = "on-error-propagate";
+
+    private static final ComponentIdentifier ON_ERROR_CONTINE_IDENTIFIER =
+        builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
+    private static final ComponentIdentifier ON_ERROR_PROPAGATE_IDENTIFIER =
+        builder().namespace(CORE_PREFIX).name(ON_ERROR_PROPAGATE).build();
+
+    private final ComponentIdentifier componentIdentifier;
     private final Reference<TypedComponentIdentifier.ComponentType> reference;
 
-    public IsRouteVisitor(Reference<TypedComponentIdentifier.ComponentType> reference) {
+    public IsRouteVisitor(ComponentIdentifier componentIdentifier, Reference<TypedComponentIdentifier.ComponentType> reference) {
+      this.componentIdentifier = componentIdentifier;
       this.reference = reference;
     }
 
@@ -542,7 +569,12 @@ public class ExtensionModelHelper {
 
     @Override
     public void visit(NestedRouteModel component) {
-      reference.set(ROUTE);
+      if (componentIdentifier.equals(ON_ERROR_CONTINE_IDENTIFIER)
+          || componentIdentifier.equals(ON_ERROR_PROPAGATE_IDENTIFIER)) {
+        reference.set(ON_ERROR);
+      } else {
+        reference.set(ROUTE);
+      }
     }
   }
 

@@ -137,7 +137,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
     assertThat(coreExtensionModel.getOperationModels(), hasSize(8));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(17));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(19));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -635,6 +635,31 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(onErrorRef.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(onErrorDelegate.getAllowedStereotypes(), hasSize(1));
     assertThat(onErrorDelegate.getAllowedStereotypes().iterator().next().getType(), is(ON_ERROR.getType()));
+  }
+
+  @Test
+  public void globalOnErrors() {
+    ConstructModel onErrorContinue = coreExtensionModel.getConstructModel("onErrorContinue").get();
+    assertThat(onErrorContinue.allowsTopLevelDeclaration(), is(true));
+    assertThat(onErrorContinue.getStereotype().getType(), is(ON_ERROR.getType()));
+
+    assertThat(onErrorContinue.getAllParameterModels(), hasSize(1));
+
+    ParameterModel nameParam = onErrorContinue.getAllParameterModels().get(0);
+    assertThat(nameParam.getName(), is("name"));
+    assertThat(nameParam.getDefaultValue(), is(nullValue()));
+    assertThat(nameParam.isComponentId(), is(true));
+
+    ConstructModel onErrorPropagate = coreExtensionModel.getConstructModel("onErrorPropagate").get();
+    assertThat(onErrorPropagate.allowsTopLevelDeclaration(), is(true));
+    assertThat(onErrorPropagate.getStereotype().getType(), is(ON_ERROR.getType()));
+
+    assertThat(onErrorPropagate.getAllParameterModels(), hasSize(1));
+
+    nameParam = onErrorPropagate.getAllParameterModels().get(0);
+    assertThat(nameParam.getName(), is("name"));
+    assertThat(nameParam.getDefaultValue(), is(nullValue()));
+    assertThat(nameParam.isComponentId(), is(true));
   }
 
   @Test
