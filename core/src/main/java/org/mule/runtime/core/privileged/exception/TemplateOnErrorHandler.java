@@ -61,6 +61,7 @@ import org.mule.runtime.core.internal.exception.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
@@ -445,15 +446,15 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private boolean acceptsErrorType(CoreEvent event) {
     Error error = event.getError().get();
     return errorTypeMatcher == null || errorTypeMatcher.match(error.getErrorType())
-        || matchesSuppressedErrorType(error);
+        || matchesSuppressedErrorType((PrivilegedError) error);
   }
 
   /**
-   * Evaluates if the {@link #errorTypeMatcher} matches against any of the provided {@link Error#getSuppressedErrors()} error types.
+   * Evaluates if the {@link #errorTypeMatcher} matches against any of the provided {@link PrivilegedError#getSuppressedErrors()} error types.
    * @param error {@link Error} that will be evaluated.
    * @return True if at least one match is found.
    */
-  private boolean matchesSuppressedErrorType(Error error) {
+  private boolean matchesSuppressedErrorType(PrivilegedError error) {
     for (Error suppressedError : error.getSuppressedErrors()) {
       ErrorType suppressedErrorType = suppressedError.getErrorType();
       if (errorTypeMatcher.match(suppressedErrorType)) {

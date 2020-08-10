@@ -32,6 +32,7 @@ import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
+import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 
@@ -122,7 +123,7 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
     Error errorWithSuppression = mock(Error.class);
     Error suppressedError = mock(Error.class);
     CoreEvent event = mock(CoreEvent.class);
-    when(errorWithSuppression.getSuppressedErrors()).thenReturn(singletonList(suppressedError));
+    when(((PrivilegedError) errorWithSuppression).getSuppressedErrors()).thenReturn(singletonList(suppressedError));
     when(errorWithSuppression.getErrorType()).thenReturn(unsuppressedErrorType);
     when(suppressedError.getErrorType()).thenReturn(suppressedErrorType);
     when(event.getError()).thenReturn(Optional.of(errorWithSuppression));

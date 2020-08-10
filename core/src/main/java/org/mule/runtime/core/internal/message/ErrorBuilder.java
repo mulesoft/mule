@@ -21,6 +21,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.internal.exception.SuppressedMuleException;
 
 import java.util.ArrayList;
@@ -141,7 +142,7 @@ public final class ErrorBuilder {
     this.errorType = e.getErrorType();
     this.errorMessage = e.getErrorMessage();
     this.errors = e.getChildErrors();
-    this.suppressedErrors = e.getSuppressedErrors();
+    this.suppressedErrors = ((PrivilegedError) e).getSuppressedErrors();
   }
 
   /**
@@ -254,7 +255,7 @@ public final class ErrorBuilder {
   /**
    * Default and only implementation of {@link Error}.
    */
-  private static final class ErrorImplementation implements Error {
+  private static final class ErrorImplementation implements PrivilegedError {
 
     private static final long serialVersionUID = -6904692174522094021L;
 
