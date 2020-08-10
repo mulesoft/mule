@@ -31,6 +31,7 @@ import static org.mule.runtime.extension.internal.loader.util.InfrastructureType
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -69,7 +70,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
@@ -82,7 +82,7 @@ import com.google.common.collect.Multimap;
  */
 public final class ApplicationModelTypeUtils {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationModelTypeUtils.class);
+  private static final Logger LOGGER = getLogger(ApplicationModelTypeUtils.class);
 
   private static final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
@@ -90,8 +90,10 @@ public final class ApplicationModelTypeUtils {
     // Nothing to do
   }
 
-  public static void resolveTypedComponentIdentifier(ComponentModel componentModel, ExtensionModelHelper extensionModelHelper) {
-    extensionModelHelper.walkToComponent(componentModel.getIdentifier(), new ExtensionWalkerModelDelegate() {
+  public static void resolveTypedComponentIdentifier(ComponentModel componentModel, boolean topLevel,
+                                                     ExtensionModelHelper extensionModelHelper) {
+    LOGGER.debug("resolveTypedComponentIdentifier for {}", componentModel);
+    extensionModelHelper.walkToComponent(componentModel.getIdentifier(), topLevel, new ExtensionWalkerModelDelegate() {
 
       @Override
       public void onConfiguration(ConfigurationModel model) {

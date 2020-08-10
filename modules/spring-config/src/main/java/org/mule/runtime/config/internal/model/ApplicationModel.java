@@ -290,6 +290,8 @@ public class ApplicationModel implements ArtifactAst {
     this.ast = originalAst;
     ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
     ast.recursiveStream().forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel,
+                                                                                    ast.topLevelComponentsStream()
+                                                                                        .anyMatch(componentModel::equals),
                                                                                     extensionModelHelper));
     // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
     // and crafted declared extension models)

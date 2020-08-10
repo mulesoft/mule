@@ -119,7 +119,7 @@ public class ApplicationModelTypeUtilsTestCase extends AbstractMuleTestCase {
 
       return null;
     })
-        .when(extModelHelper).walkToComponent(any(), any());
+        .when(extModelHelper).walkToComponent(any(), false, any());
 
     doAnswer(inv -> {
       final ParameterizedModel parameterized = inv.getArgument(0);
@@ -143,7 +143,7 @@ public class ApplicationModelTypeUtilsTestCase extends AbstractMuleTestCase {
     final ComponentModel component = createModel(SIMPLE_POJO_ID,
                                                  singletonMap("pojoSimpleParam", "value"));
 
-    resolveTypedComponentIdentifier(component, extModelHelper);
+    resolveTypedComponentIdentifier(component, false, extModelHelper);
 
     verify(component).setParameter(argThat(new ParameterModelMatcher("pojoSimpleParam")),
                                    argThat(new ParameterRawValueModelMatcher("value")));
@@ -158,7 +158,7 @@ public class ApplicationModelTypeUtilsTestCase extends AbstractMuleTestCase {
                                                  emptyMap(),
                                                  asList(innerComponent));
 
-    resolveTypedComponentIdentifier(component, extModelHelper);
+    resolveTypedComponentIdentifier(component, false, extModelHelper);
 
     verify(component).setParameter(argThat(new ParameterModelMatcher("simple")),
                                    argThat(new ParameterNestedValueModelMatcher(innerComponent)));
