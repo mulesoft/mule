@@ -274,8 +274,7 @@ public class ApplicationModel implements ArtifactAst {
     ConfigurationPropertiesProvider deploymentPropertiesConfigurationProperties = null;
     if (!deploymentProperties.isEmpty()) {
       deploymentPropertiesConfigurationProperties =
-          new MapConfigurationPropertiesProvider(deploymentProperties,
-                                                 "Deployment properties");
+          new MapConfigurationPropertiesProvider(deploymentProperties, "Deployment properties");
     }
 
     EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
@@ -326,20 +325,16 @@ public class ApplicationModel implements ArtifactAst {
 
     Optional<CompositeConfigurationPropertiesProvider> configurationAttributesProvider = empty();
     if (!configConfigurationPropertiesProviders.isEmpty()) {
-      configurationAttributesProvider = of(
-                                           new CompositeConfigurationPropertiesProvider(configConfigurationPropertiesProviders));
-      parentConfigurationPropertiesResolver = of(new DefaultConfigurationPropertiesResolver(
-                                                                                            deploymentPropertiesConfigurationProperties != null
-                                                                                                ?
-                                                                                                // deployment properties provider
-                                                                                                // has to go as parent here so we
-                                                                                                // can reference them from
-                                                                                                // configuration properties files
-                                                                                                of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
-                                                                                                                                              deploymentPropertiesConfigurationProperties))
-                                                                                                : parentConfigurationPropertiesResolver,
-                                                                                            configurationAttributesProvider
-                                                                                                .get()));
+      configurationAttributesProvider = of(new CompositeConfigurationPropertiesProvider(configConfigurationPropertiesProviders));
+      parentConfigurationPropertiesResolver =
+          of(new DefaultConfigurationPropertiesResolver(deploymentPropertiesConfigurationProperties != null
+              ?
+              // deployment properties provider has to go as parent here so we can reference them from configuration properties
+              // files
+              of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
+                                                            deploymentPropertiesConfigurationProperties))
+              : parentConfigurationPropertiesResolver,
+                                                        configurationAttributesProvider.get()));
     } else if (deploymentPropertiesConfigurationProperties != null) {
       parentConfigurationPropertiesResolver =
           of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
@@ -364,13 +359,12 @@ public class ApplicationModel implements ArtifactAst {
 
 
     DefaultConfigurationPropertiesResolver externalPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(
-                                                   deploymentPropertiesConfigurationProperties != null ?
-                                                   // deployment properties provider has to go as parent here so we can reference
-                                                   // them from external files
-                                                       of(new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
-                                                                                                     deploymentPropertiesConfigurationProperties))
-                                                       : of(systemPropertiesResolver),
+        new DefaultConfigurationPropertiesResolver(deploymentPropertiesConfigurationProperties != null ?
+        // deployment properties provider has to go as parent here so we can reference
+        // them from external files
+            of(new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
+                                                          deploymentPropertiesConfigurationProperties))
+            : of(systemPropertiesResolver),
                                                    externalPropertiesConfigurationProvider);
     if (deploymentPropertiesConfigurationProperties == null) {
       externalPropertiesResolver.setAsRootResolver();
@@ -566,19 +560,6 @@ public class ApplicationModel implements ArtifactAst {
     for (ComponentConfiguration childComponentConfiguration : componentConfiguration.getNestedComponents()) {
       convertComponentConfiguration(childComponentConfiguration, componentAstBuilder.addChildComponent());
     }
-
-    // ComponentModel.Builder builder = new ComponentModel.Builder()
-    // .setIdentifier(componentConfiguration.getIdentifier());
-    // for (Map.Entry<String, String> parameter : componentConfiguration.getParameters().entrySet()) {
-    // builder.addParameter(parameter.getKey(), parameter.getValue(), false);
-    // }
-    // for (ComponentConfiguration childComponentConfiguration : componentConfiguration.getNestedComponents()) {
-    // builder.addChildComponentModel(convertComponentConfiguration(childComponentConfiguration));
-    // }
-    //
-    // componentConfiguration.getValue().ifPresent(builder::setTextContent);
-    //
-    // return builder.build();
   }
 
 
@@ -615,14 +596,6 @@ public class ApplicationModel implements ArtifactAst {
             .forEach(topLevelConfigLine -> componentModelReader
                 .extractComponentDefinitionModel(topLevelConfigLine, configFile.getFilename(),
                                                  astBuilder.addTopLevelComponent())));
-
-    // List<ConfigFile> configFiles = artifactConfig.getConfigFiles();
-    // ComponentModelReader componentModelReader =
-    // new ComponentModelReader(configurationProperties.getConfigurationPropertiesResolver());
-    // configFiles.stream().forEach(configFile -> componentModelReader
-    // .extractComponentDefinitionModel(configFile.getConfigLines().get(0), configFile.getFilename())
-    // .directChildrenStream()
-    // .forEach(muleComponentModels::add));
   }
 
   private void validateModel() {
@@ -933,8 +906,7 @@ public class ApplicationModel implements ArtifactAst {
 
   @Override
   public void updatePropertiesResolver(UnaryOperator<String> newPropertiesResolver) {
-    // TODO Auto-generated method stub
-
+    ast.updatePropertiesResolver(newPropertiesResolver);
   }
 
 }

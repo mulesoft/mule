@@ -14,10 +14,10 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.dsl.api.xml.parser.SimpleConfigAttribute;
 import org.mule.runtime.internal.dsl.DslConstants;
@@ -28,7 +28,7 @@ import javax.xml.namespace.QName;
 
 /**
  * Class used to read xml files from {@link ConfigLine}s, unifying knowledge on how to properly read the files returning the
- * {@link ComponentModel} object.
+ * {@link ComponentAst} object.
  *
  * It also replaces the values of the attributes by using the {@link Properties} object parametrized in its constructor.
  */
