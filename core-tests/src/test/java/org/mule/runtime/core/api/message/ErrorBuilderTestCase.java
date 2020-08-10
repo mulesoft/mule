@@ -167,14 +167,13 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void givesStringRepresentation() {
     Error error = getComposedErrorMessageAwareWithSuppressionException();
-
     assertThat(error.toString(),
                is(equalToIgnoringLineBreaks("\norg.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
                    + "{\n"
                    + "  description=suppressed message\n"
                    + "  detailedDescription=message\n"
                    + "  errorType=MULE:TEST\n"
-                   + "  cause=org.mule.runtime.core.internal.exception.MessagingException\n"
+                   + "  cause=org.mule.runtime.core.api.message.ErrorBuilderTestCase$TestMuleException\n"
                    + "  errorMessage=\n"
                    + "org.mule.runtime.core.internal.message.DefaultMessageBuilder$MessageImplementation\n"
                    + "{\n"
@@ -189,7 +188,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
                    + "  description=suppressed message\n"
                    + "  detailedDescription=suppressed message\n"
                    + "  errorType=MULE:TEST\n"
-                   + "  cause=org.mule.runtime.core.internal.exception.MessagingException\n"
+                   + "  cause=org.mule.runtime.core.api.message.ErrorBuilderTestCase$TestMuleException\n"
                    + "  errorMessage=-\n"
                    + "  suppressedErrors=[]\n"
                    + "  childErrors=[]\n"
@@ -240,11 +239,19 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
 
   private MessagingException getMessagingException() {
     CoreEvent suppressedErrorEvent = mock(CoreEvent.class);
-    MessagingException suppressedMessagingException =
-        new MessagingException(createStaticMessage(SUPPRESSED_EXCEPTION_MESSAGE), suppressedErrorEvent);
-    Error suppressedError = builder(suppressedMessagingException).errorType(testError).build();
+    MuleException messagingExceptionCause = new TestMuleException(createStaticMessage(SUPPRESSED_EXCEPTION_MESSAGE));
+    Error suppressedError = builder(messagingExceptionCause).errorType(testError).build();
+    MessagingException messagingException =
+        new MessagingException(suppressedErrorEvent, messagingExceptionCause);
     when(suppressedErrorEvent.getError()).thenReturn(Optional.of(suppressedError));
-    return suppressedMessagingException;
+    return messagingException;
+  }
+
+  private class TestMuleException extends MuleException {
+
+    public TestMuleException(I18nMessage message) {
+      super(message);
+    }
   }
 
   private class ComposedErrorMessageAwareException extends MuleException implements ErrorMessageAwareException,
