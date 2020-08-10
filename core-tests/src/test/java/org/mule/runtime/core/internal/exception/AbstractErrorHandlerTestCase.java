@@ -120,7 +120,7 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
         ErrorTypeBuilder.builder().namespace("MULE").identifier("UNSUPPRESSED").parentErrorType(anyErrorType).build();
     ErrorType sourceResponseErrorType =
         ErrorTypeBuilder.builder().namespace("MULE").identifier("SOURCE_RESPONSE").parentErrorType(anyErrorType).build();
-    Error errorWithSuppression = mock(Error.class);
+    Error errorWithSuppression = mock(PrivilegedError.class);
     Error suppressedError = mock(Error.class);
     CoreEvent event = mock(CoreEvent.class);
     when(((PrivilegedError) errorWithSuppression).getSuppressedErrors()).thenReturn(singletonList(suppressedError));
