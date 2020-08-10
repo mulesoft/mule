@@ -8944,6 +8944,258 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
+        "type": "WITH_COMPLEX_ACTING_PARAMETER",
+        "namespace": "VALUES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VALUES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "valueProviderModel": {
+                "actingParameters": [
+                  "complexActingParameter"
+                ],
+                "partOrder": 1,
+                "providerName": "providedParameter",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
+              },
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "name": "providedParameter",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.values.extension.ComplexActingParameter"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "allowedStereotypeModels": [],
+              "name": "complexActingParameter",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "description": {
+                    "value": "Determines that an error thrown by this operation should be mapped to another"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": false
+                  }
+                },
+                "item": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "errorMapping"
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "source"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeMatcher",
+                          "enum": {
+                            "type": "[Ljava.lang.String;",
+                            "values": [
+                              "ANY",
+                              "REDELIVERY_EXHAUSTED",
+                              "TRANSFORMATION",
+                              "EXPRESSION",
+                              "SECURITY",
+                              "CLIENT_SECURITY",
+                              "SERVER_SECURITY",
+                              "ROUTING",
+                              "CONNECTIVITY",
+                              "RETRY_EXHAUSTED",
+                              "TIMEOUT"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "target",
+                        "required": "true"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeDefinition"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Error Mapping"
+              },
+              "allowedStereotypeModels": [],
+              "name": "errorMappings",
+              "description": "Set of error mappings",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "error-mapping",
+                    "prefix": "mule"
+                  }
+                },
+                "sinceMuleVersion": {
+                  "version": "4.4.0"
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 12
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
+          "showInDsl": false,
+          "name": "Error Mappings",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "withComplexActingParameter",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
         "type": "WITH_ERROR_VALUE_PROVIDER",
         "namespace": "VALUES",
         "parent": {
@@ -11605,5 +11857,569 @@
     }
   ],
   "modelProperties": {},
-  "types": []
+  "types": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.values.extension.ComplexActingParameter",
+        "classInformation": {
+          "classname": "org.mule.test.values.extension.ComplexActingParameter",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "ComplexActingParameter"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "complexListParam"
+          },
+          "model": {
+            "type": "Array",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.util.List",
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "java.util.Collection"
+                ],
+                "parent": "",
+                "genericTypes": [
+                  "org.mule.test.values.extension.InnerPojo"
+                ],
+                "isMap": false
+              }
+            },
+            "item": {
+              "type": "Object",
+              "annotations": {
+                "typeId": "org.mule.test.values.extension.InnerPojo",
+                "classInformation": {
+                  "classname": "org.mule.test.values.extension.InnerPojo",
+                  "hasDefaultConstructor": true,
+                  "isInterface": false,
+                  "isInstantiable": true,
+                  "isAbstract": false,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": [],
+                  "isMap": false
+                },
+                "typeAlias": {
+                  "value": "InnerPojo"
+                }
+              },
+              "fields": [
+                {
+                  "key": {
+                    "name": "intParam"
+                  },
+                  "model": {
+                    "type": "Number",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "int",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "int": {}
+                    }
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
+                },
+                {
+                  "key": {
+                    "name": "listParam"
+                  },
+                  "model": {
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "String"
+                    }
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
+                },
+                {
+                  "key": {
+                    "name": "mapParam"
+                  },
+                  "model": {
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.String"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "String"
+                    },
+                    "fields": []
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
+                },
+                {
+                  "key": {
+                    "name": "stringParam"
+                  },
+                  "model": {
+                    "type": "String"
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
+                }
+              ]
+            }
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "complexMapParam"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.util.Map",
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": [
+                  "java.lang.String",
+                  "org.mule.test.values.extension.InnerPojo"
+                ],
+                "isMap": true
+              }
+            },
+            "open": {
+              "type": "Object",
+              "annotations": {
+                "typeId": "org.mule.test.values.extension.InnerPojo",
+                "classInformation": {
+                  "classname": "org.mule.test.values.extension.InnerPojo",
+                  "hasDefaultConstructor": true,
+                  "isInterface": false,
+                  "isInstantiable": true,
+                  "isAbstract": false,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": [],
+                  "isMap": false
+                },
+                "typeAlias": {
+                  "value": "InnerPojo"
+                }
+              },
+              "fields": [
+                {
+                  "key": {
+                    "name": "intParam"
+                  },
+                  "model": {
+                    "type": "Number",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "int",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "int": {}
+                    }
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
+                },
+                {
+                  "key": {
+                    "name": "listParam"
+                  },
+                  "model": {
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "String"
+                    }
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
+                },
+                {
+                  "key": {
+                    "name": "mapParam"
+                  },
+                  "model": {
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.String"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "String"
+                    },
+                    "fields": []
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
+                },
+                {
+                  "key": {
+                    "name": "stringParam"
+                  },
+                  "model": {
+                    "type": "String"
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
+                }
+              ]
+            },
+            "fields": []
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "innerPojoParam"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.values.extension.InnerPojo",
+              "classInformation": {
+                "classname": "org.mule.test.values.extension.InnerPojo",
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "typeAlias": {
+                "value": "InnerPojo"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "intParam"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "int",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": true,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    },
+                    "int": {}
+                  }
+                },
+                "annotations": {
+                  "visibility": "READ_ONLY"
+                }
+              },
+              {
+                "key": {
+                  "name": "listParam"
+                },
+                "model": {
+                  "type": "Array",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "java.util.List",
+                      "hasDefaultConstructor": false,
+                      "isInterface": true,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": false,
+                      "implementedInterfaces": [
+                        "java.util.Collection"
+                      ],
+                      "parent": "",
+                      "genericTypes": [
+                        "java.lang.String"
+                      ],
+                      "isMap": false
+                    }
+                  },
+                  "item": {
+                    "type": "String"
+                  }
+                },
+                "annotations": {
+                  "visibility": "READ_ONLY"
+                }
+              },
+              {
+                "key": {
+                  "name": "mapParam"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "java.util.Map",
+                      "hasDefaultConstructor": false,
+                      "isInterface": true,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [
+                        "java.lang.String",
+                        "java.lang.String"
+                      ],
+                      "isMap": true
+                    }
+                  },
+                  "open": {
+                    "type": "String"
+                  },
+                  "fields": []
+                },
+                "annotations": {
+                  "visibility": "READ_ONLY"
+                }
+              },
+              {
+                "key": {
+                  "name": "stringParam"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "visibility": "READ_ONLY"
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "intParam"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "classInformation": {
+                "classname": "int",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": true,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "int": {}
+            }
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "listParam"
+          },
+          "model": {
+            "type": "Array",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.util.List",
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "java.util.Collection"
+                ],
+                "parent": "",
+                "genericTypes": [
+                  "java.lang.String"
+                ],
+                "isMap": false
+              }
+            },
+            "item": {
+              "type": "String"
+            }
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "mapParam"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.util.Map",
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": [
+                  "java.lang.String",
+                  "java.lang.String"
+                ],
+                "isMap": true
+              }
+            },
+            "open": {
+              "type": "String"
+            },
+            "fields": []
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "stringParam"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        }
+      ]
+    }
+  ]
 }
