@@ -239,7 +239,7 @@ public class InternalDeclarationSession implements DeclarationSession {
 
     MetadataKeyBuilder rootMetadataKeyBuilder = null;
     MetadataKeyBuilder metadataKeyBuilder = null;
-    Map<String, String> keyPartValues = getParameterValues(elementDeclaration, componentModel);
+    Map<String, String> keyPartValues = getMetadataKeyPartsValuesFromComponentDeclaration(elementDeclaration, componentModel);
     for (ParameterModel parameterModel : keyPartModels) {
       String id;
       if (keyPartValues.containsKey(parameterModel.getName())) {
@@ -274,8 +274,8 @@ public class InternalDeclarationSession implements DeclarationSession {
         .collect(toList());
   }
 
-  private <T extends ComponentModel> Map<String, String> getParameterValues(ComponentElementDeclaration componentElementDeclaration,
-                                                                            T model) {
+  private <T extends ComponentModel> Map<String, String> getMetadataKeyPartsValuesFromComponentDeclaration(ComponentElementDeclaration componentElementDeclaration,
+                                                                                                           T model) {
     Map<String, String> parametersMap = new HashMap<>();
 
     Map<String, ParameterGroupModel> parameterGroups =
