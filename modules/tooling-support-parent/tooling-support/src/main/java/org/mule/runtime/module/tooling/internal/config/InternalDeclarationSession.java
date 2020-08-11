@@ -21,7 +21,6 @@ import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.tooling.internal.config.params.ParameterExtractor.extractValue;
-
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -35,6 +34,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
+import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
@@ -66,7 +66,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
-import org.mule.runtime.module.tooling.api.metadata.ComponentMetadataTypes;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import org.mule.sdk.api.values.ValueResolvingException;
 
@@ -136,7 +135,7 @@ public class InternalDeclarationSession implements DeclarationSession {
   }
 
   @Override
-  public MetadataResult<ComponentMetadataTypes> getMetadataTypes(ComponentElementDeclaration component) {
+  public MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentElementDeclaration component) {
     return artifactHelper()
         .findComponentModel(component)
         .map(cm -> {
@@ -166,11 +165,11 @@ public class InternalDeclarationSession implements DeclarationSession {
             .onComponent()));
   }
 
-  private MetadataResult<ComponentMetadataTypes> collectMetadata(@Nonnull MetadataResult<InputMetadataDescriptor> inputMetadataResult,
-                                                                 @Nullable MetadataResult<OutputMetadataDescriptor> outputMetadataResult) {
+  private MetadataResult<ComponentMetadataTypesDescriptor> collectMetadata(@Nonnull MetadataResult<InputMetadataDescriptor> inputMetadataResult,
+                                                                           @Nullable MetadataResult<OutputMetadataDescriptor> outputMetadataResult) {
     if (inputMetadataResult.isSuccess() && (outputMetadataResult == null || outputMetadataResult.isSuccess())) {
-      ComponentMetadataTypes.Builder builder =
-          new ComponentMetadataTypes.Builder().withInputMetadataDescriptor(inputMetadataResult.get());
+      ComponentMetadataTypesDescriptor.ComponentMetadataTypesDescriptorBuilder builder =
+          ComponentMetadataTypesDescriptor.builder().withInputMetadataDescriptor(inputMetadataResult.get());
       if (outputMetadataResult != null) {
         builder.withOutputMetadataDescriptor(outputMetadataResult.get());
       }

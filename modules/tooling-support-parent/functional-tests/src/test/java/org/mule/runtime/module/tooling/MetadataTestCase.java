@@ -9,12 +9,11 @@ package org.mule.runtime.module.tooling;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.metadata.internal.utils.MetadataTypeWriter;
+import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
 import org.mule.runtime.app.declaration.api.SourceElementDeclaration;
-import org.mule.runtime.module.tooling.api.metadata.ComponentMetadataTypes;
 
 import org.junit.Test;
 
@@ -23,7 +22,8 @@ public class MetadataTestCase extends DeclarationSessionTestCase {
   @Test
   public void sourceDynamicTypes() {
     SourceElementDeclaration sourceElementDeclaration = sourceDeclaration(CONFIG_NAME, null, "America", "USA", "SFO");
-    MetadataResult<ComponentMetadataTypes> containerTypeMetadataResult = session.getMetadataTypes(sourceElementDeclaration);
+    MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult =
+        session.resolveComponentMetadata(sourceElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(true));
 
     //input parameters
@@ -50,7 +50,8 @@ public class MetadataTestCase extends DeclarationSessionTestCase {
   public void operationDynamicTypes() {
     OperationElementDeclaration operationElementDeclaration =
         multiLevelCompleteOPDeclaration(CONFIG_NAME, "America", "USA", "SFO");
-    MetadataResult<ComponentMetadataTypes> containerTypeMetadataResult = session.getMetadataTypes(operationElementDeclaration);
+    MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult =
+        session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(true));
 
     //input parameters
@@ -75,7 +76,8 @@ public class MetadataTestCase extends DeclarationSessionTestCase {
   @Test
   public void operationDynamicTypesPartialKey() {
     OperationElementDeclaration operationElementDeclaration = multiLevelOPDeclaration(CONFIG_NAME, "America", "USA");
-    MetadataResult<ComponentMetadataTypes> containerTypeMetadataResult = session.getMetadataTypes(operationElementDeclaration);
+    MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult =
+        session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(false));
   }
 

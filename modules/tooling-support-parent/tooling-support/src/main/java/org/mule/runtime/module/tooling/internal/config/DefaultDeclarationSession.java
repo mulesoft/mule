@@ -13,10 +13,10 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.failure
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
-
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.util.LazyValue;
@@ -26,7 +26,6 @@ import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
-import org.mule.runtime.module.tooling.api.metadata.ComponentMetadataTypes;
 import org.mule.runtime.module.tooling.internal.AbstractArtifactAgnosticService;
 import org.mule.runtime.module.tooling.internal.ApplicationSupplier;
 
@@ -89,9 +88,9 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   }
 
   @Override
-  public MetadataResult<ComponentMetadataTypes> getMetadataTypes(ComponentElementDeclaration component) {
+  public MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentElementDeclaration component) {
     try {
-      return withInternalService().getMetadataTypes(component);
+      return withInternalService().resolveComponentMetadata(component);
     } catch (Exception e) {
       return MetadataResult.failure(MetadataFailure.Builder.newFailure()
           .withMessage(format("Unknown error while resolving metadata on component: '%s'. %s", component.getName(),
