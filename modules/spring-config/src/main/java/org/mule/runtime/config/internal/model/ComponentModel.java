@@ -171,10 +171,13 @@ public class ComponentModel implements ComponentAst {
 
   @Override
   public Optional<String> getComponentId() {
+    if (getModel(ParameterizedModel.class).isPresent()) {
+      populateParameterAsts();
+    }
+
     if (getIdentifier().equals(ERROR_HANDLER_IDENTIFIER) && getRawParameterValue("ref").isPresent()) {
       return empty();
-    } else if (getModel(ParameterizedModel.class).isPresent()) {
-      populateParameterAsts();
+    } else if (componentId != null) {
       return ofNullable(componentId);
     } else if (getModel(HasStereotypeModel.class)
         .map(hsm -> hsm.getStereotype().equals(APP_CONFIG))
