@@ -56,6 +56,7 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(channels, hasSize(4));
     assertThat(channels, hasValues("requiredInteger:2", "requiredBoolean:false", "strings:[1, 2]", "requiredString:aString"));
   }
+
   @Test
   public void singleOptionsEnabledParameterWithRequiredParametersUsingExpressions() throws Exception {
     Set<Value> channels = getValues("singleOptionsEnabledParameterWithRequiredParametersUsingExpressions", "channels");
