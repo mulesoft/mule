@@ -21,6 +21,7 @@ import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.tooling.internal.config.params.ParameterExtractor.extractValue;
+import static org.mule.runtime.module.tooling.internal.config.params.ParameterSimpleValueExtractor.extractSimpleValue;
 
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -33,6 +34,7 @@ import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -57,7 +59,6 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.metadata.cache.DefaultMetadataCache;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
-import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
@@ -73,13 +74,12 @@ import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import org.mule.sdk.api.values.ValueResolvingException;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -151,11 +151,15 @@ public class InternalDeclarationSession implements DeclarationSession {
           ClassLoader extensionClassLoader = getClassLoader(artifactHelper().getExtensionModel(component));
           return withContextClassLoader(extensionClassLoader, () -> {
             DefaultMetadataContext metadataContext = createMetadataContext(configurationInstance, extensionClassLoader);
-            return new MetadataMediator<>(cm).getMetadataKeys(metadataContext, metadataKey, new ReflectionCache());
+            return withMetadataContext(metadataContext, () -> new MetadataMediator<>(cm)
+                .getMetadataKeys(metadataContext, metadataKey, reflectionCache));
           });
         })
-        .orElseGet(() -> MetadataResult.success(MetadataKeysContainerBuilder.getInstance()
-            .add(NullMetadataResolver.NULL_RESOLVER_NAME, ImmutableSet.of(new NullMetadataKey())).build()));
+        .orElseGet(() -> MetadataResult.failure(MetadataFailure.Builder.newFailure()
+            .withMessage(format("Error resolving metadata keys for the [%s:%s] component",
+                                component.getDeclaringExtension(), component.getName()))
+            .withFailureCode(COMPONENT_NOT_FOUND)
+            .onComponent()));
   }
 
   @Override
@@ -170,16 +174,16 @@ public class InternalDeclarationSession implements DeclarationSession {
           ClassLoader extensionClassLoader = getClassLoader(artifactHelper().getExtensionModel(component));
           return withContextClassLoader(extensionClassLoader, () -> {
             MetadataMediator<? extends ComponentModel> metadataMediator = new MetadataMediator<>(cm);
-            MetadataResult<InputMetadataDescriptor> inputMetadata = metadataMediator
-                .getInputMetadata(createMetadataContext(configurationInstance, extensionClassLoader),
-                                  metadataKey);
-            MetadataResult<OutputMetadataDescriptor> outputMetadata = null;
-            if (cm instanceof HasOutputModel) {
-              outputMetadata = metadataMediator
-                  .getOutputMetadata(createMetadataContext(configurationInstance, extensionClassLoader),
-                                     metadataKey);
-            }
-            return collectMetadata(inputMetadata, outputMetadata);
+            DefaultMetadataContext metadataContext = createMetadataContext(configurationInstance, extensionClassLoader);
+            return withMetadataContext(metadataContext, () -> {
+              MetadataResult<InputMetadataDescriptor> inputMetadata = metadataMediator
+                  .getInputMetadata(metadataContext, metadataKey);
+              MetadataResult<OutputMetadataDescriptor> outputMetadata = null;
+              if (cm instanceof HasOutputModel) {
+                outputMetadata = metadataMediator.getOutputMetadata(metadataContext, metadataKey);
+              }
+              return collectMetadata(inputMetadata, outputMetadata);
+            });
           });
         })
         .orElseGet(() -> MetadataResult.failure(MetadataFailure.Builder.newFailure()
@@ -214,21 +218,32 @@ public class InternalDeclarationSession implements DeclarationSession {
                                       new JavaTypeLoader(extensionClassLoader));
   }
 
-  private MetadataKey buildMetadataKey(ComponentModel componentModel, ComponentElementDeclaration<?> elementDeclaration) {
-    List<ParameterModel> keyParts = getMetadataKeyParts(componentModel);
+  private static <T> T withMetadataContext(MetadataContext metadataContext, Callable<T> callable) {
+    try {
+      return callable.call();
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    } finally {
+      metadataContext.dispose();
+    }
+  }
 
-    if (keyParts.isEmpty()) {
+  private MetadataKey buildMetadataKey(ComponentModel componentModel, ComponentElementDeclaration<?> elementDeclaration) {
+    List<ParameterModel> keyPartModels = getMetadataKeyParts(componentModel);
+
+    if (keyPartModels.isEmpty()) {
       return MetadataKeyBuilder.newKey(NullMetadataKey.ID).build();
     }
 
     MetadataKeyBuilder rootMetadataKeyBuilder = null;
     MetadataKeyBuilder metadataKeyBuilder = null;
-    Map<String, Object> componentElementDeclarationParameters =
-        getComponentElementDeclarationParameters(elementDeclaration, componentModel);
-    for (ParameterModel parameterModel : keyParts) {
+    Map<String, String> keyPartValues = getParameterValues(elementDeclaration, componentModel);
+    for (ParameterModel parameterModel : keyPartModels) {
       String id;
-      if (componentElementDeclarationParameters.containsKey(parameterModel.getName())) {
-        id = (String) componentElementDeclarationParameters.get(parameterModel.getName());
+      if (keyPartValues.containsKey(parameterModel.getName())) {
+        id = keyPartValues.get(parameterModel.getName());
       } else {
         // It is only supported to defined parts in order
         break;
@@ -259,14 +274,12 @@ public class InternalDeclarationSession implements DeclarationSession {
         .collect(toList());
   }
 
-  private <T extends ComponentModel> Map<String, Object> getComponentElementDeclarationParameters(ComponentElementDeclaration componentElementDeclaration,
-                                                                                                  T model) {
-    Map<String, Object> parametersMap = new HashMap<>();
+  private <T extends ComponentModel> Map<String, String> getParameterValues(ComponentElementDeclaration componentElementDeclaration,
+                                                                            T model) {
+    Map<String, String> parametersMap = new HashMap<>();
 
     Map<String, ParameterGroupModel> parameterGroups =
         model.getParameterGroupModels().stream().collect(toMap(NamedObject::getName, identity()));
-
-    List<String> parameterGroupsResolved = new ArrayList<>();
 
     for (ParameterGroupElementDeclaration parameterGroupElement : componentElementDeclaration.getParameterGroups()) {
       final String parameterGroupName = parameterGroupElement.getName();
@@ -276,25 +289,17 @@ public class InternalDeclarationSession implements DeclarationSession {
                                                            parameterGroupName));
       }
 
-      parameterGroupsResolved.add(parameterGroupName);
-
       for (ParameterElementDeclaration parameterElement : parameterGroupElement.getParameters()) {
         final String parameterName = parameterElement.getName();
         final ParameterModel parameterModel = parameterGroupModel.getParameter(parameterName)
             .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find parameter with name: %s in parameter group: %s",
                                                                             parameterName, parameterGroupName)));
-        parametersMap.put(parameterName,
-                          extractValue(parameterElement.getValue(),
-                                       artifactHelper().getParameterClass(parameterModel, componentElementDeclaration)));
+        if (parameterModel.getModelProperty(MetadataKeyPartModelProperty.class).isPresent()) {
+          parametersMap.put(parameterName, extractSimpleValue(parameterElement.getValue()));
+        }
       }
     }
 
-    // Default values
-    model.getParameterGroupModels().stream()
-        .filter(parameterGroupModel -> !parameterGroupsResolved.contains(parameterGroupModel.getName()))
-        .forEach(parameterGroupModel -> parameterGroupModel.getParameterModels()
-            .stream()
-            .forEach(parameterModel -> parametersMap.put(model.getName(), parameterModel.getDefaultValue())));
     return parametersMap;
   }
 

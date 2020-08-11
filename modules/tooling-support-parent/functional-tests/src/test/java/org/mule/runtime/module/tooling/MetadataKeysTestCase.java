@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -65,8 +66,10 @@ public class MetadataKeysTestCase extends DeclarationSessionTestCase {
     MetadataResult<MetadataKeysContainer> metadataKeys = session.getMetadataKeys(elementDeclaration);
     assertThat(metadataKeys.isSuccess(), is(true));
 
-    Set<MetadataKey> keys = metadataKeys.get().getKeysByCategory().get(MULTI_LEVEL_PARTIAL_TYPE_KEYS_OUTPUT_RESOLVER);
-    assertThat(keys, hasSize(0));
+    Set<MetadataKey> continents = metadataKeys.get().getKeysByCategory().get(MULTI_LEVEL_PARTIAL_TYPE_KEYS_OUTPUT_RESOLVER);
+    assertThat(continents, hasSize(2));
+    assertThat(continents, hasItem(metadataKeyWithId("AMERICA")));
+    assertThat(continents, hasItem(metadataKeyWithId("EUROPE")));
   }
 
   @Test
@@ -98,5 +101,13 @@ public class MetadataKeysTestCase extends DeclarationSessionTestCase {
     assertThat(countries, hasSize(2));
     assertThat(countries, hasItem(metadataKeyWithId("USA").withDisplayName("United States").withPartName("country")));
     assertThat(countries, hasItem(metadataKeyWithId("ARGENTINA").withDisplayName("ARGENTINA").withPartName("country")));
+  }
+
+  @Test
+  public void componentNotFoundOnDeclaration() {
+    MetadataResult<MetadataKeysContainer> metadataKeys = session.getMetadataKeys(invalidComponentDeclaration());
+    assertThat(metadataKeys.isSuccess(), is(false));
+    assertThat(metadataKeys.getFailures(), hasSize(1));
+    assertThat(metadataKeys.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
   }
 }
