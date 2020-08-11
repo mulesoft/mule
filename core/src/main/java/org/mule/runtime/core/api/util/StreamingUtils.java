@@ -112,6 +112,8 @@ public final class StreamingUtils {
    * @param eventContext          the root context of the event on which the {@code value} was generated
    * @param originatingLocation the {@link ComponentLocation} where the cursor was created
    * @return the {@code value} or a {@link CursorProvider}
+   *
+   * @since 4.4.0
    */
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory,
                                         EventContext eventContext, ComponentLocation originatingLocation) {
@@ -147,6 +149,8 @@ public final class StreamingUtils {
    * @param event                 the event on which the {@code value} was generated
    * @param originatingLocation   the {@link ComponentLocation} where the cursor was created
    * @return the {@code value} or a {@link CursorProvider}
+   *
+   * @since 4.4.0
    */
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, CoreEvent event,
                                         ComponentLocation originatingLocation) {
