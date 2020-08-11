@@ -286,7 +286,6 @@ public class ApplicationModel implements ArtifactAst {
         return topLevelComponentsStream().spliterator();
       }
     };
-    indexComponentModels(originalAst);
     this.ast = originalAst;
     ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
     ast.recursiveStream().forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel,
@@ -296,6 +295,7 @@ public class ApplicationModel implements ArtifactAst {
     // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
     // and crafted declared extension models)
     resolveMissingComponentTypes(ast.recursiveStream());
+    indexComponentModels(originalAst);
     recursiveStreamWithHierarchy(ast).forEach(new ComponentLocationVisitor());
 
     validateModel();

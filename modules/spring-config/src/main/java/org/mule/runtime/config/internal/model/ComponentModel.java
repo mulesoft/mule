@@ -22,7 +22,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPP
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
-import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -183,8 +182,7 @@ public class ComponentModel implements ComponentAst {
       populateParameterAsts();
       return ofNullable(componentId);
     } else {
-      // fallback for dsl elements that do not have an extension model declaration
-      return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
+      return empty();
     }
   }
 
