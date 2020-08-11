@@ -20,18 +20,21 @@ import java.util.Collection;
  */
 public class TestPolicyXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
+  public static final String TEST_POLICY_NAMESPACE = "http://www.mulesoft.org/schema/mule/test-policy";
+  public static final String TEST_POLICY_PREFIX = "test-policy";
+
   @Override
   public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
     return singletonList(new XmlNamespaceInfo() {
 
       @Override
       public String getNamespaceUriPrefix() {
-        return "http://www.mulesoft.org/schema/mule/test-policy";
+        return TEST_POLICY_NAMESPACE;
       }
 
       @Override
       public String getNamespace() {
-        return "test-policy";
+        return TEST_POLICY_PREFIX;
       }
     });
   }

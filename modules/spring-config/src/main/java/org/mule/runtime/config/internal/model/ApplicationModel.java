@@ -861,7 +861,7 @@ public class ApplicationModel implements ArtifactAst {
         throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have 'ANY' or an empty source type."));
       }
       List<String> sources = mappings.stream()
-          .map(model -> model.getSource())
+          .map(ErrorMapping::getSource)
           .collect(toList());
       List<String> distinctSources = sources.stream()
           .distinct()

@@ -6,12 +6,13 @@
  */
 package org.mule.functional.policy.api.extension;
 
+import static org.mule.functional.policy.api.TestPolicyXmlNamespaceInfoProvider.TEST_POLICY_NAMESPACE;
+import static org.mule.functional.policy.api.TestPolicyXmlNamespaceInfoProvider.TEST_POLICY_PREFIX;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -20,7 +21,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CustomLocationPartModelProperty;
 
@@ -32,28 +32,25 @@ import org.mule.runtime.module.extension.api.loader.java.property.CustomLocation
 class TestPolicyExtensionModelDeclarer {
 
   public ExtensionDeclarer createExtensionModel() {
-    final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault()
-        .createTypeLoader(TestPolicyExtensionModelDeclarer.class
-            .getClassLoader());
     final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JavaTypeLoader.JAVA);
 
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
-        .named("test-policy")
+        .named(TEST_POLICY_PREFIX)
         .describedAs("Mule Runtime and Integration Platform: test Policy components")
         .onVersion(MULE_VERSION)
         .fromVendor("MuleSoft, Inc.")
         .withCategory(SELECT)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
-            .setPrefix("test-policy")
-            .setNamespace("http://www.mulesoft.org/schema/mule/test-policy")
+            .setPrefix(TEST_POLICY_PREFIX)
+            .setNamespace(TEST_POLICY_NAMESPACE)
             .setSchemaVersion(MULE_VERSION)
             .setXsdFileName("mule-test-policy.xsd")
-            .setSchemaLocation(buildSchemaLocation("test-policy", "http://www.mulesoft.org/schema/mule/test-policy"))
+            .setSchemaLocation(buildSchemaLocation(TEST_POLICY_PREFIX, TEST_POLICY_NAMESPACE))
             .build());
 
     declareProxy(typeBuilder, extensionDeclarer);
-    declareExecuteNext(extensionDeclarer, typeBuilder, typeLoader);
+    declareExecuteNext(extensionDeclarer);
 
     return extensionDeclarer;
   }
@@ -83,7 +80,7 @@ class TestPolicyExtensionModelDeclarer {
   }
 
 
-  private void declareExecuteNext(ExtensionDeclarer extensionDeclarer, BaseTypeBuilder typeBuilder, ClassTypeLoader typeLoader) {
+  private void declareExecuteNext(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer executeNext = extensionDeclarer
         .withOperation("executeNext")
         .withModelProperty(new NoErrorMappingModelProperty());
@@ -91,7 +88,7 @@ class TestPolicyExtensionModelDeclarer {
     // By this operation alone we cannot determine what its output will be, it will depend on the context on which this operation
     // is located.
     executeNext.withOutput().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
-    executeNext.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).anyType().build());;
+    executeNext.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
   }
 
 }

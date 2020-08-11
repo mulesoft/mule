@@ -990,7 +990,7 @@ class MuleExtensionModelDeclarer {
         .allowingTopLevelDefinition()
         .withStereotype(newStereotype("NOTIFICATIONS", "MULE").withParent(APP_CONFIG).build())
         .describedAs("Registers listeners for notifications and associates interfaces with particular events.")
-        .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));;
+        .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
   }
 
 }

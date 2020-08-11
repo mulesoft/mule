@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
@@ -86,7 +87,7 @@ import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +118,7 @@ class DeclarationBasedElementModelFactory {
   public <T> Optional<DslElementModel<T>> create(ElementDeclaration declaration) {
 
     setupCurrentExtensionContext(declaration.getDeclaringExtension());
-    final Function<NamedObject, Boolean> equalsName = named -> named.getName().equals(declaration.getName());
+    final Predicate<NamedObject> equalsName = named -> named.getName().equals(declaration.getName());
 
     if (declaration instanceof TopLevelParameterDeclaration) {
       return createFromType((TopLevelParameterDeclaration) declaration);
@@ -128,7 +129,7 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       protected void onConfiguration(ConfigurationModel model) {
-        if (equalsName.apply(model) && declaration instanceof ConfigurationElementDeclaration) {
+        if (equalsName.test(model) && declaration instanceof ConfigurationElementDeclaration) {
           elementModel.set(createConfigurationElement(model, (ConfigurationElementDeclaration) declaration));
           stop();
         }
@@ -136,7 +137,7 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-        if (equalsName.apply(model) && declaration instanceof ConnectionElementDeclaration) {
+        if (equalsName.test(model) && declaration instanceof ConnectionElementDeclaration) {
           elementModel.set(createConnectionProviderModel(model, (ConnectionElementDeclaration) declaration));
           stop();
         }
@@ -144,7 +145,7 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       protected void onOperation(HasOperationModels owner, OperationModel model) {
-        if (equalsName.apply(model) && declaration instanceof OperationElementDeclaration) {
+        if (equalsName.test(model) && declaration instanceof OperationElementDeclaration) {
           elementModel.set(createComponentElement(model, (OperationElementDeclaration) declaration));
           stop();
         }
@@ -152,7 +153,7 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       protected void onConstruct(HasConstructModels owner, ConstructModel model) {
-        if (equalsName.apply(model) && declaration instanceof ConstructElementDeclaration) {
+        if (equalsName.test(model) && declaration instanceof ConstructElementDeclaration) {
           elementModel.set(createComponentElement(model, (ConstructElementDeclaration) declaration));
           stop();
         }
@@ -160,7 +161,7 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       protected void onSource(HasSourceModels owner, SourceModel model) {
-        if (equalsName.apply(model) && declaration instanceof SourceElementDeclaration) {
+        if (equalsName.test(model) && declaration instanceof SourceElementDeclaration) {
           elementModel.set(createComponentElement(model, (SourceElementDeclaration) declaration));
           stop();
         }
@@ -173,7 +174,7 @@ class DeclarationBasedElementModelFactory {
                           declaration.getName(), declaration.getClass().getName(), declaration.getDeclaringExtension()));
     }
 
-    return Optional.ofNullable(elementModel.get());
+    return ofNullable(elementModel.get());
   }
 
   private <T> Optional<DslElementModel<T>> createFromType(TopLevelParameterDeclaration declaration) {

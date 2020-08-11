@@ -6,7 +6,6 @@
  */
 package org.mule.functional.policy.api.extension;
 
-import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
@@ -18,8 +17,11 @@ import org.mule.runtime.internal.dsl.NullDslResolvingContext;
  *
  * @since 4.4
  */
-@NoInstantiate
-public class TestPolicyExtensionModelProvider {
+public final class TestPolicyExtensionModelProvider {
+
+  private TestPolicyExtensionModelProvider() {
+    // Nothing to do
+  }
 
   private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
       .create(new DefaultExtensionLoadingContext(new TestPolicyExtensionModelDeclarer().createExtensionModel(),
