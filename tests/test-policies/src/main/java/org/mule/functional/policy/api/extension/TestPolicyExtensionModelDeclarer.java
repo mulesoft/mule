@@ -73,26 +73,12 @@ class TestPolicyExtensionModelDeclarer {
         .withRoute("source")
         .withModelProperty(new CustomLocationPartModelProperty("source", false));
 
-    // sourceDeclarer
-    // .onDefaultParameterGroup()
-    // .withOptionalParameter("propagateMessageTransformations")
-    // .ofType(typeBuilder.booleanType().build())
-    // .describedAs("Whether changes made by the policy to the message before returning to the next policy or flow should be
-    // propagated to it.")
-    // .defaultingTo(false);
     sourceDeclarer.withChain();
 
     final NestedRouteDeclarer operationDeclarer = proxyDeclarer
         .withRoute("operation")
         .withModelProperty(new CustomLocationPartModelProperty("operation", false));
 
-    // operationDeclarer
-    // .onDefaultParameterGroup()
-    // .withOptionalParameter("propagateMessageTransformations")
-    // .ofType(typeBuilder.booleanType().build())
-    // .describedAs("Whether changes made by the policy to the message before returning to the next policy or flow should be
-    // propagated to it.")
-    // .defaultingTo(false);
     operationDeclarer.withChain();
   }
 
