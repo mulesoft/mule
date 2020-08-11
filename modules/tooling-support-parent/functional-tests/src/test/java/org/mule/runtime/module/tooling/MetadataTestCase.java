@@ -89,14 +89,16 @@ public class MetadataTestCase extends DeclarationSessionTestCase {
   @Test
   public void operationDynamicTypesNoKey() {
     OperationElementDeclaration operationElementDeclaration = multiLevelOPDeclaration(CONFIG_NAME, null, null);
-    MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult = session.resolveComponentMetadata(operationElementDeclaration);
+    MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult =
+        session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(false));
     assertThat(containerTypeMetadataResult.getFailures(), hasSize(2));
   }
 
   @Test
   public void componentNotFoundOnDeclaration() {
-    MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes = session.resolveComponentMetadata(invalidComponentDeclaration());
+    MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
+        session.resolveComponentMetadata(invalidComponentDeclaration());
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
