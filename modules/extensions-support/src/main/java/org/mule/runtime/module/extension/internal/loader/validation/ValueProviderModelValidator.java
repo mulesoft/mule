@@ -203,7 +203,7 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
     if (valueProviders.containsKey(providerName)) {
       String storedProviderId = valueProviders.get(providerName).getValueProviderModel().getProviderId();
       String providerId = valueProviderModel.getProviderId();
-      if (providerId != storedProviderId) {
+      if (!providerId.equals(storedProviderId)) {
         problemsReporter.addError(new Problem(model,
                                               format("There are two parameters that use the same ValueProvider implementation [%s] but its models have different ids [ %s, %s]",
                                                      providerName, storedProviderId, providerId)));
