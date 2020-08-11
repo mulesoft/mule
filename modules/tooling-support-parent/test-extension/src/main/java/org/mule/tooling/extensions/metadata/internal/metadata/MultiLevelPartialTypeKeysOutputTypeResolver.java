@@ -18,6 +18,7 @@ import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
 import org.mule.tooling.extensions.metadata.api.parameters.LocationKey;
 import org.mule.tooling.extensions.metadata.api.source.StringAttributes;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class MultiLevelPartialTypeKeysOutputTypeResolver implements PartialTypeKeysResolver<LocationKey>, OutputTypeResolver<LocationKey>,
@@ -97,7 +98,11 @@ public class MultiLevelPartialTypeKeysOutputTypeResolver implements PartialTypeK
 
   @Override
   public Set<MetadataKey> getKeys(MetadataContext metadataContext) throws MetadataResolvingException, ConnectionException {
-    return emptySet();
+    // populate first level only
+    Set<MetadataKey> keys = new HashSet<>();
+    keys.add(newKey(AMERICA).build());
+    keys.add(newKey(EUROPE).build());
+    return keys;
   }
 
   @Override

@@ -8,13 +8,17 @@ package org.mule.runtime.module.tooling;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
+
 import org.mule.metadata.internal.utils.MetadataTypeWriter;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
 import org.mule.runtime.app.declaration.api.SourceElementDeclaration;
 
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Test;
 
 public class MetadataTestCase extends DeclarationSessionTestCase {
@@ -79,6 +83,25 @@ public class MetadataTestCase extends DeclarationSessionTestCase {
     MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult =
         session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(false));
+    assertThat(containerTypeMetadataResult.getFailures(), hasSize(2));
+  }
+
+  @Test
+  public void operationDynamicTypesNoKey() {
+    OperationElementDeclaration operationElementDeclaration = multiLevelOPDeclaration(CONFIG_NAME, null, null);
+    MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult =
+        session.resolveComponentMetadata(operationElementDeclaration);
+    assertThat(containerTypeMetadataResult.isSuccess(), is(false));
+    assertThat(containerTypeMetadataResult.getFailures(), hasSize(2));
+  }
+
+  @Test
+  public void componentNotFoundOnDeclaration() {
+    MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
+        session.resolveComponentMetadata(invalidComponentDeclaration());
+    assertThat(metadataTypes.isSuccess(), is(false));
+    assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
+    assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
   }
 
 }

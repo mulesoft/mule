@@ -10,6 +10,7 @@ import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArt
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.NUMBER;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
@@ -216,6 +217,10 @@ public interface TestExtensionAware {
         .newOperation(MULTIPLE_NESTED_PARAMETERS_OP_ELEMENT_NAME)
         .withConfig(configName)
         .getDeclaration();
+  }
+
+  default ComponentElementDeclaration<?> invalidComponentDeclaration() {
+    return TEST_EXTENSION_DECLARER.newConstruct("invalid").getDeclaration();
   }
 
   default SourceElementDeclaration sourceDeclaration(String configName, String continentParameter,
