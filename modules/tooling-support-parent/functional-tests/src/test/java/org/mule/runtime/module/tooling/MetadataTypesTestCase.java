@@ -20,6 +20,8 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_PAYLOAD;
 
 import org.mule.metadata.internal.utils.MetadataTypeWriter;
+import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
+import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
 import org.mule.runtime.app.declaration.api.SourceElementDeclaration;
 

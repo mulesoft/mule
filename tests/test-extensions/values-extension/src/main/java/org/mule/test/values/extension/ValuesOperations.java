@@ -10,7 +10,6 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
-import org.mule.sdk.api.annotation.param.Optional;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
 import org.mule.test.values.extension.resolver.WithComplexActingParameter;
