@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:test-components="http://www.mulesoft.org/schema/mule/test-components"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                          http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd
+                          http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+    <heisenberg:config name="heisenberg"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="0"
+                       initialHealth="CANCER"
+                       enemies="#[[]]"
+                       finalHealth="CANCER">
+        <heisenberg:connection>
+            <reconnection failsDeployment="true"/>
+        </heisenberg:connection>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+    </heisenberg:config>
+
+
+    <flow name="source-default" initialState="stopped">
+        <heisenberg:listen-payments-cluster config-ref="heisenberg" initialBatchNumber="0">
+            <redelivery-policy maxRedeliveryCount="10" useSecureHash="true"/>
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info age="27">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="success address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:success-info>
+            <heisenberg:error-info knownAddresses="#[[]]"/>
+        </heisenberg:listen-payments-cluster>
+
+        <set-payload value="#[100]"/>
+    </flow>
+
+    <flow name="source-true" initialState="stopped">
+        <heisenberg:listen-payments-cluster config-ref="heisenberg" initialBatchNumber="0" primaryNodeOnly="true">
+            <redelivery-policy maxRedeliveryCount="10" useSecureHash="true"/>
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info age="27">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="success address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:success-info>
+            <heisenberg:error-info knownAddresses="#[[]]"/>
+        </heisenberg:listen-payments-cluster>
+
+        <set-payload value="#[100]"/>
+    </flow>
+
+    <flow name="source-false" initialState="stopped">
+        <heisenberg:listen-payments-cluster config-ref="heisenberg" initialBatchNumber="0" primaryNodeOnly="false">
+            <redelivery-policy maxRedeliveryCount="10" useSecureHash="true"/>
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info age="27">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="success address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:success-info>
+            <heisenberg:error-info knownAddresses="#[[]]"/>
+        </heisenberg:listen-payments-cluster>
+
+        <set-payload value="#[100]"/>
+    </flow>
+
+</mule>
