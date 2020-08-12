@@ -440,16 +440,6 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void muleParseConsecutiveSharpsEvaluated() {
-    TemplateParser tp = createMuleStyleParser();
-    final String expectedResult = "##[muleman] # ###[value]";
-    String expression = "#[payload]";
-    assertTrue(tp.isValid(expression));
-    String result = tp.parse(null, expression, token -> expectedResult);
-    assertEquals(expectedResult, result);
-  }
-
-  @Test
   public void muleParseMultiLine() {
     TemplateParser tp = createMuleStyleParser();
     final String expectedResult = "{\n" +
