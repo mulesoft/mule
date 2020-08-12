@@ -54,30 +54,32 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
 
   @Override
   public void validate(ExtensionModel model, ProblemsReporter problemsReporter) {
+    ReflectionCache reflectionCache = new ReflectionCache();
+    boolean isCompileTime = isCompiletime(model);
     final Map<String, ValueProviderInformation> valueProviders = new HashMap<>();
     new IdempotentExtensionWalker() {
 
       @Override
       protected void onConfiguration(ConfigurationModel model) {
-        validateModel(model, problemsReporter, false, valueProviders);
+        validateModel(model, problemsReporter, false, valueProviders, reflectionCache, isCompileTime);
       }
 
       @Override
       protected void onConnectionProvider(ConnectionProviderModel model) {
-        validateModel(model, problemsReporter, false, valueProviders);
+        validateModel(model, problemsReporter, false, valueProviders, reflectionCache, isCompileTime);
       }
 
       @Override
       protected void onSource(SourceModel model) {
-        validateModel(model, problemsReporter, true, valueProviders);
+        validateModel(model, problemsReporter, true, valueProviders, reflectionCache, isCompileTime);
       }
 
       @Override
       protected void onOperation(OperationModel model) {
-        validateModel(model, problemsReporter, true, valueProviders);
+        validateModel(model, problemsReporter, true, valueProviders, reflectionCache, isCompileTime);
       }
     }.walk(model);
-    if (isCompiletime(model)) {
+    if (isCompileTime) {
       validateProviderIds(valueProviders, problemsReporter);
     }
   }
@@ -111,27 +113,28 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
   }
 
   private void validateModel(ParameterizedModel model, ProblemsReporter problemsReporter, boolean supportsConnectionsAndConfigs,
-                             Map<String, ValueProviderInformation> valueProviders) {
-    ReflectionCache reflectionCache = new ReflectionCache();
+                             Map<String, ValueProviderInformation> valueProviders, ReflectionCache reflectionCache, boolean isCompileTime) {
     model.getAllParameterModels()
         .forEach(param -> param
             .getModelProperty(ValueProviderFactoryModelProperty.class)
             .ifPresent(modelProperty -> validateOptionsResolver(param, modelProperty, model, problemsReporter,
-                                                                supportsConnectionsAndConfigs, reflectionCache, valueProviders)));
+                                                                supportsConnectionsAndConfigs, reflectionCache, valueProviders, isCompileTime)));
   }
 
   private void validateOptionsResolver(ParameterModel param, ValueProviderFactoryModelProperty modelProperty,
                                        ParameterizedModel model, ProblemsReporter problemsReporter,
                                        boolean supportsConnectionsAndConfigs, ReflectionCache reflectionCache,
-                                       Map<String, ValueProviderInformation> valueProviders) {
+                                       Map<String, ValueProviderInformation> valueProviders, boolean isCompileTime) {
     Class<? extends ValueProvider> valueProvider = modelProperty.getValueProvider();
     String providerName = valueProvider.getSimpleName();
     Optional<ValueProviderModel> valueProviderModel = param.getValueProviderModel();
-    if (!valueProviderModel.isPresent()) {
-      throw new IllegalStateException(format("Parameter %s from %s with name %s has should have a ValueProviderModel associated.",
-                                             param.getName(), getComponentModelTypeName(model), getModelName(model)));
-    } else {
-      addValueProvider(valueProvider.getName(), valueProviderModel.get(), valueProviders, problemsReporter, model, param);
+    if(isCompileTime) {
+      if (!valueProviderModel.isPresent()) {
+        throw new IllegalStateException(format("Parameter %s from %s with name %s has should have a ValueProviderModel associated.",
+                param.getName(), getComponentModelTypeName(model), getModelName(model)));
+      } else {
+        addValueProvider(valueProvider.getName(), valueProviderModel.get(), valueProviders, problemsReporter, model, param);
+      }
     }
     Map<String, MetadataType> allParameters =
         model.getAllParameterModels().stream().collect(toMap(IntrospectionUtils::getImplementingName, ParameterModel::getType));
