@@ -79,11 +79,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
       if (target == null || duplicates.contains(target)) {
         continue;
       }
-
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("lifecycle phase: " + phase.getName() + " for object: " + target);
-      }
-
+      LOGGER.debug("lifecycle phase: {} for object: {}", phase.getName(), target.getClass().getSimpleName());
       applyLifecycle(phase, duplicates, target);
     }
   }
@@ -100,14 +96,14 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
                               "Skipping the application of the '%s' lifecycle phase over a certain object "
                                   + "because a %s interceptor of type [%s] indicated so. Object is: %s",
                               phase.getName(), LifecycleInterceptor.class.getSimpleName(),
-                              interceptor.getClass().getName(), target));
+                              interceptor.getClass().getName(), target.getClass().getSimpleName()));
         }
       }
     } catch (Exception e) {
       interceptor.afterPhaseExecution(phase, target, of(e));
       if (phase.getName().equals(Disposable.PHASE_NAME) || phase.getName().equals(Stoppable.PHASE_NAME)) {
-        LOGGER.info(format("Failure executing phase %s over object %s, error message is: %s", phase.getName(), target,
-                           e.getMessage()),
+        LOGGER.info(format("Failure executing phase %s over object %s, error message is: %s", phase.getName(),
+                           target.getClass().getSimpleName(), e.getMessage()),
                     e.getMessage());
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug(e.getMessage(), e);
