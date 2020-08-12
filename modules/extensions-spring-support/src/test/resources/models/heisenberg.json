@@ -17908,16 +17908,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [
-                      {
-                        "type": "RICIN",
-                        "namespace": "HEISENBERG",
-                        "parent": {
-                          "type": "WEAPON",
-                          "namespace": "HEISENBERG"
-                        }
-                      }
-                    ],
+                    "allowedStereotypeModels": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -17944,12 +17935,7 @@
                       "query": false,
                       "order": 20
                     },
-                    "allowedStereotypeModels": [
-                      {
-                        "type": "KNOCKEABLE_DOOR",
-                        "namespace": "HEISENBERG"
-                      }
-                    ],
+                    "allowedStereotypeModels": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -17998,16 +17984,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [
-                      {
-                        "type": "RICIN",
-                        "namespace": "HEISENBERG",
-                        "parent": {
-                          "type": "WEAPON",
-                          "namespace": "HEISENBERG"
-                        }
-                      }
-                    ],
+                    "allowedStereotypeModels": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -18112,24 +18089,7 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.time.LocalDateTime",
-                        "classInformation": {
-                          "classname": "java.time.LocalDateTime",
-                          "hasDefaultConstructor": false,
-                          "isInterface": false,
-                          "isInstantiable": false,
-                          "isAbstract": false,
-                          "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
-                          "parent": "",
-                          "genericTypes": [],
-                          "isMap": false
-                        }
+                        "typeId": "java.time.LocalDateTime"
                       }
                     },
                     "hasDynamicType": false,
@@ -18160,23 +18120,7 @@
                       "format": "java",
                       "type": "Date",
                       "annotations": {
-                        "typeId": "java.util.Date",
-                        "classInformation": {
-                          "classname": "java.util.Date",
-                          "hasDefaultConstructor": true,
-                          "isInterface": false,
-                          "isInstantiable": true,
-                          "isAbstract": false,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
-                          "parent": "",
-                          "genericTypes": [],
-                          "isMap": false
-                        }
+                        "typeId": "java.util.Date"
                       }
                     },
                     "hasDynamicType": false,
@@ -18207,23 +18151,7 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar",
-                        "classInformation": {
-                          "classname": "java.util.Calendar",
-                          "hasDefaultConstructor": false,
-                          "isInterface": false,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
-                          "parent": "",
-                          "genericTypes": [],
-                          "isMap": false
-                        }
+                        "typeId": "java.util.Calendar"
                       }
                     },
                     "hasDynamicType": false,
@@ -18257,23 +18185,7 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar",
-                        "classInformation": {
-                          "classname": "java.util.Calendar",
-                          "hasDefaultConstructor": false,
-                          "isInterface": false,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
-                          "parent": "",
-                          "genericTypes": [],
-                          "isMap": false
-                        }
+                        "typeId": "java.util.Calendar"
                       }
                     },
                     "hasDynamicType": false,
@@ -18507,16 +18419,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [
-                      {
-                        "type": "RICIN",
-                        "namespace": "HEISENBERG",
-                        "parent": {
-                          "type": "WEAPON",
-                          "namespace": "HEISENBERG"
-                        }
-                      }
-                    ],
+                    "allowedStereotypeModels": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -18543,12 +18446,7 @@
                       "query": false,
                       "order": 24
                     },
-                    "allowedStereotypeModels": [
-                      {
-                        "type": "KNOCKEABLE_DOOR",
-                        "namespace": "HEISENBERG"
-                      }
-                    ],
+                    "allowedStereotypeModels": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -18597,16 +18495,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "allowedStereotypeModels": [
-                      {
-                        "type": "RICIN",
-                        "namespace": "HEISENBERG",
-                        "parent": {
-                          "type": "WEAPON",
-                          "namespace": "HEISENBERG"
-                        }
-                      }
-                    ],
+                    "allowedStereotypeModels": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -18708,24 +18597,7 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.time.LocalDateTime",
-                        "classInformation": {
-                          "classname": "java.time.LocalDateTime",
-                          "hasDefaultConstructor": false,
-                          "isInterface": false,
-                          "isInstantiable": false,
-                          "isAbstract": false,
-                          "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.time.temporal.Temporal",
-                            "java.time.temporal.TemporalAdjuster",
-                            "java.time.chrono.ChronoLocalDateTime",
-                            "java.io.Serializable"
-                          ],
-                          "parent": "",
-                          "genericTypes": [],
-                          "isMap": false
-                        }
+                        "typeId": "java.time.LocalDateTime"
                       }
                     },
                     "hasDynamicType": false,
@@ -18756,23 +18628,7 @@
                       "format": "java",
                       "type": "Date",
                       "annotations": {
-                        "typeId": "java.util.Date",
-                        "classInformation": {
-                          "classname": "java.util.Date",
-                          "hasDefaultConstructor": true,
-                          "isInterface": false,
-                          "isInstantiable": true,
-                          "isAbstract": false,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
-                          "parent": "",
-                          "genericTypes": [],
-                          "isMap": false
-                        }
+                        "typeId": "java.util.Date"
                       }
                     },
                     "hasDynamicType": false,
@@ -18803,23 +18659,7 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar",
-                        "classInformation": {
-                          "classname": "java.util.Calendar",
-                          "hasDefaultConstructor": false,
-                          "isInterface": false,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
-                          "parent": "",
-                          "genericTypes": [],
-                          "isMap": false
-                        }
+                        "typeId": "java.util.Calendar"
                       }
                     },
                     "hasDynamicType": false,
@@ -18853,23 +18693,7 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar",
-                        "classInformation": {
-                          "classname": "java.util.Calendar",
-                          "hasDefaultConstructor": false,
-                          "isInterface": false,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.io.Serializable",
-                            "java.lang.Cloneable",
-                            "java.lang.Comparable"
-                          ],
-                          "parent": "",
-                          "genericTypes": [],
-                          "isMap": false
-                        }
+                        "typeId": "java.util.Calendar"
                       }
                     },
                     "hasDynamicType": false,
@@ -19275,12 +19099,7 @@
                     "query": false,
                     "order": 12
                   },
-                  "allowedStereotypeModels": [
-                    {
-                      "type": "WEAPON",
-                      "namespace": "HEISENBERG"
-                    }
-                  ],
+                  "allowedStereotypeModels": [],
                   "name": "usableWeapons",
                   "description": "",
                   "modelProperties": {}
@@ -19290,19 +19109,7 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                      "classInformation": {
-                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                        "hasDefaultConstructor": false,
-                        "isInterface": true,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": false,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      }
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
                     },
                     "fields": []
                   },
@@ -19378,18 +19185,6 @@
                           "FAIL",
                           "DROP"
                         ]
-                      },
-                      "classInformation": {
-                        "classname": "org.mule.runtime.extension.api.runtime.source.BackPressureMode",
-                        "hasDefaultConstructor": false,
-                        "isInterface": false,
-                        "isInstantiable": false,
-                        "isAbstract": false,
-                        "isFinal": true,
-                        "implementedInterfaces": [],
-                        "parent": "java.lang.Enum",
-                        "genericTypes": [],
-                        "isMap": false
                       }
                     }
                   },
