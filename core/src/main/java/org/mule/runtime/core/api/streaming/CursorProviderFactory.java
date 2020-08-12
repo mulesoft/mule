@@ -33,7 +33,7 @@ public interface CursorProviderFactory<T> {
    * @param originatingLocation the {@link ComponentLocation} where the cursor was created
    * @return A {@link CursorProvider} or the same given {@code inputStream}
    *
-   * @since 4.4.0
+   * @since 4.4.0, 4.3.1
    */
   Object of(EventContext eventContext, T value, ComponentLocation originatingLocation);
 
@@ -47,7 +47,7 @@ public interface CursorProviderFactory<T> {
    * @param value the stream to be cursored
    * @return A {@link CursorProvider} or the same given {@code inputStream}
    *
-   * @deprecated use {@link #of(EventContext, Object, ComponentLocation)} instead.
+   * @deprecated since 4.4.0 use {@link #of(EventContext, Object, ComponentLocation)} instead.
    */
   @Deprecated
   Object of(EventContext eventContext, T value);

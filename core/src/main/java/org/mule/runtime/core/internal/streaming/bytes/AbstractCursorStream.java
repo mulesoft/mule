@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.internal.streaming.ClosingCursorException;
 
 import java.io.IOException;
 
@@ -27,7 +28,7 @@ abstract class AbstractCursorStream extends CursorStream {
   private long mark = 0;
   private boolean released = false;
   protected long position = 0;
-  private Exception closerResponsible;
+  private ClosingCursorException closerResponsible;
   private final static boolean trackCursorProviderClose = getBoolean(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY);
 
   public AbstractCursorStream(CursorStreamProvider provider) {
@@ -88,7 +89,7 @@ abstract class AbstractCursorStream extends CursorStream {
   public final void close() throws IOException {
     if (!released) {
       if (trackCursorProviderClose) {
-        closerResponsible = new Exception("Responsible for closing the stream.");
+        closerResponsible = new ClosingCursorException("Responsible for closing the stream.");
       }
       release();
     }

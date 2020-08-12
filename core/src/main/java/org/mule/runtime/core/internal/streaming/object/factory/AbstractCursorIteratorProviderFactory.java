@@ -61,7 +61,7 @@ public abstract class AbstractCursorIteratorProviderFactory implements CursorIte
    */
   @Override
   public final Object of(EventContext eventContext, Iterator iterator) {
-    return of(eventContext, iterator, eventContext.getOriginatingLocation());
+    return of(eventContext, iterator, null);
   }
 
   /**
@@ -77,7 +77,7 @@ public abstract class AbstractCursorIteratorProviderFactory implements CursorIte
    */
   @Override
   public final Object of(CoreEvent event, Iterator value) {
-    return of(getRoot(event.getContext()), value, event.getContext().getOriginatingLocation());
+    return of(getRoot(event.getContext()), value, null);
   }
 
   /**
@@ -85,6 +85,7 @@ public abstract class AbstractCursorIteratorProviderFactory implements CursorIte
    *
    * @param iterator the streaming iterator
    * @param eventContext the root context of the event on which streaming is happening
+   * @param originatingLocation the {@link ComponentLocation} where the cursor was created
    */
   protected abstract Object resolve(Iterator iterator, EventContext eventContext, ComponentLocation originatingLocation);
 

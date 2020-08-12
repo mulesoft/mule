@@ -137,7 +137,7 @@ public final class StreamingUtils {
    */
   @Deprecated
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, EventContext eventContext) {
-    return streamingContent(value, cursorProviderFactory, eventContext, eventContext.getOriginatingLocation());
+    return streamingContent(value, cursorProviderFactory, eventContext, null);
   }
 
   /**
@@ -171,7 +171,7 @@ public final class StreamingUtils {
    */
   @Deprecated
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, CoreEvent event) {
-    return streamingContent(value, cursorProviderFactory, event, event.getContext().getOriginatingLocation());
+    return streamingContent(value, cursorProviderFactory, event, null);
   }
 
   /**

@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
@@ -53,7 +54,7 @@ public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase 
         new InMemoryCursorIteratorProviderFactory(InMemoryCursorIteratorConfig.getDefault(), streamingManager);
     event = testEvent();
     streamingHelper =
-        new DefaultStreamingHelper(cursorProviderFactory, streamingManager, event, event.getContext().getOriginatingLocation());
+        new DefaultStreamingHelper(cursorProviderFactory, streamingManager, event, from("log"));
   }
 
   @Override

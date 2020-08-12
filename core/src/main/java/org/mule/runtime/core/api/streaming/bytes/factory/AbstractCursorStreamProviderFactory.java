@@ -71,7 +71,7 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
    */
   @Override
   public final Object of(EventContext eventContext, InputStream inputStream) {
-    return of(eventContext, inputStream, eventContext.getOriginatingLocation());
+    return of(eventContext, inputStream, null);
   }
 
   /**
@@ -87,7 +87,7 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
    */
   @Override
   public final Object of(CoreEvent event, InputStream inputStream) {
-    return of(getRoot(event.getContext()), inputStream, event.getContext().getOriginatingLocation());
+    return of(getRoot(event.getContext()), inputStream, null);
   }
 
   /**

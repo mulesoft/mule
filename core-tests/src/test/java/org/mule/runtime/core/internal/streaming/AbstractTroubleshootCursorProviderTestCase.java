@@ -17,7 +17,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.junit.After;
 import org.junit.Before;
@@ -63,7 +63,7 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
   public void before() throws NoSuchFieldException, IllegalAccessException {
     setProperty(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY, trackStackTrace.toString());
 
-    componentLocation = setComponentLocation ? fromSingleComponent("log") : null;
+    componentLocation = setComponentLocation ? from("log") : null;
 
     cursorProvider = createCursorProvider();
   }
@@ -93,6 +93,7 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
     expectedException.expectMessage(containsString("The cursor provider was open by"));
     if (trackStackTrace) {
       expectedException.expectMessage(containsString("The cursor provider was closed by"));
+      expectedException.expectMessage(containsString("ClosingCursorException"));
     } else {
       expectedException.expectMessage(containsString("for more details"));
     }
