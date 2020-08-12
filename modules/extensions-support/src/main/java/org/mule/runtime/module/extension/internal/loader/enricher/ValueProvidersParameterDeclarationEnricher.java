@@ -12,6 +12,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderId;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
@@ -156,7 +157,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     valueProviderModelConsumer
         .accept(new ValueProviderModel(getRequiredParametersAliases(resolverParameters, containerParameterNames),
                                        requiresConfiguration.get(), requiresConnection.get(), resolverClass.open(), partOrder,
-                                       name));
+                                       name, getValueProviderId(resolverClass.value())));
   }
 
   /**

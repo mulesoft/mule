@@ -7,9 +7,11 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -22,6 +24,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.loader.Problem;
@@ -37,7 +40,6 @@ import org.mule.tck.size.SmallTest;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -109,7 +111,7 @@ public class ValueProviderModelValidatorTestCase {
   public void valueProviderShouldBeInstantiable() {
     ValueProviderFactoryModelPropertyBuilder builder =
         ValueProviderFactoryModelProperty.builder(NonInstantiableProvider.class);
-    when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class)).thenReturn(Optional.of(builder.build()));
+    mockParameter(operationParameter, builder, "anotherId");
 
     validate();
     assertProblems("The Value Provider [NonInstantiableProvider] is not instantiable but it should");
@@ -175,10 +177,35 @@ public class ValueProviderModelValidatorTestCase {
     assertProblems("The parameter [someName] of the operation 'superOperation' is not of String type. Parameters that provides Values should be of String type.");
   }
 
+  @Test
+  public void parameterWithValueProviderHasRepeatedIdInCompileTime() {
+    ValueProviderFactoryModelPropertyBuilder builder =
+        ValueProviderFactoryModelProperty.builder(SomeOtherValueProvider.class);
+    mockParameter(operationParameter, builder);
+
+    validate();
+    assertProblems("The following ValueProvider implementations [org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeValueProvider, org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeOtherValueProvider] use the same id [valueProviderId]. ValueProvider ids must be unique.");
+  }
+
+  @Test
+  public void parameterWithValueProviderHasDifferentIdInCompileTime() {
+    ValueProviderFactoryModelPropertyBuilder builder =
+        ValueProviderFactoryModelProperty.builder(SomeOtherValueProvider.class);
+    mockParameter(operationParameter, builder, "anotherId");
+
+    validate();
+    assertNoErrors();
+  }
+
   private void assertProblems(String errorMessage) {
     List<Problem> errors = problemsReporter.getErrors();
     assertThat(errors, hasSize(1));
     assertThat(errors.get(0).getMessage(), is(errorMessage));
+  }
+
+  private void assertNoErrors() {
+    List<Problem> errors = problemsReporter.getErrors();
+    assertThat(errors, hasSize(0));
   }
 
   private void validate() {
@@ -186,14 +213,31 @@ public class ValueProviderModelValidatorTestCase {
   }
 
   private void mockParameter(ParameterModel parameter, ValueProviderFactoryModelPropertyBuilder builder) {
+    mockParameter(parameter, builder, "valueProviderId");
+  }
+
+  private void mockParameter(ParameterModel parameter, ValueProviderFactoryModelPropertyBuilder builder, String valueProviderId) {
     when(parameter.getModelProperty(ValueProviderFactoryModelProperty.class)).thenReturn(Optional.of(builder.build()));
     when(parameter.getModelProperty(ImplementingParameterModelProperty.class)).thenReturn(empty());
     when(parameter.getModelProperty(DeclaringMemberModelProperty.class)).thenReturn(empty());
     when(parameter.getName()).thenReturn("someName");
     when(parameter.getType()).thenReturn(STRING_TYPE);
+    when(parameter.getValueProviderModel())
+        .thenReturn(of(new ValueProviderModel(emptyList(), false, false, true, 1, "name", valueProviderId)));
   }
 
   public static class SomeValueProvider implements ValueProvider {
+
+    @Connection
+    String connection;
+
+    @Override
+    public Set<Value> resolve() {
+      return emptySet();
+    }
+  }
+
+  public static class SomeOtherValueProvider implements ValueProvider {
 
     @Connection
     String connection;

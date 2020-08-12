@@ -19,4 +19,8 @@ public class SimpleValueProvider implements ValueProvider {
     return ValueBuilder.getValuesFor("channel1", "channel2", "channel3");
   }
 
+  @Override
+  public String getId() {
+    return "Simple value provider";
+  }
 }

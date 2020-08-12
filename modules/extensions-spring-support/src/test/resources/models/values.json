@@ -71,6 +71,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "channel",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -647,6 +648,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "valueParam",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -852,6 +854,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -1246,6 +1249,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "valueParam",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -1451,6 +1455,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -2135,6 +2140,7 @@
                     "actingParameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
+                    "providerId": "org.mule.test.values.extension.resolver.WithConfigValueProvider",
                     "requiresConfiguration": true,
                     "requiresConnection": false,
                     "isOpen": true
@@ -2599,6 +2605,7 @@
                     "actingParameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
+                    "providerId": "Value provider with connection",
                     "requiresConfiguration": false,
                     "requiresConnection": true,
                     "isOpen": true
@@ -3038,6 +3045,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "channel",
+                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValueProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -3390,6 +3398,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "valueParam",
+                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -3440,6 +3449,7 @@
                     "actingParameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
+                    "providerId": "Simple value provider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -3765,6 +3775,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "valueParam",
+                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -3815,6 +3826,7 @@
                     "actingParameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
+                    "providerId": "Simple value provider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -4426,6 +4438,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "values",
+                    "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -4748,6 +4761,7 @@
                     "actingParameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
+                    "providerId": "Simple value provider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -5077,6 +5091,7 @@
                     "actingParameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
+                    "providerId": "org.mule.test.values.extension.resolver.WithConfigValueProvider",
                     "requiresConfiguration": true,
                     "requiresConnection": false,
                     "isOpen": true
@@ -5410,6 +5425,7 @@
                     "actingParameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
+                    "providerId": "Value provider with connection",
                     "requiresConfiguration": false,
                     "requiresConnection": true,
                     "isOpen": true
@@ -5906,6 +5922,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
+                "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -6426,6 +6443,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -6745,6 +6763,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -6781,6 +6800,7 @@
                 "actingParameters": [],
                 "partOrder": 2,
                 "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -6817,6 +6837,7 @@
                 "actingParameters": [],
                 "partOrder": 3,
                 "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -7044,6 +7065,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
+                "providerId": "org.mule.test.values.extension.resolver.WithMuleContextValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -7267,6 +7289,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -7490,6 +7513,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -7742,6 +7766,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -7792,6 +7817,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -8046,6 +8072,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -8446,6 +8473,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterWithAliasValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -8671,6 +8699,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -8721,6 +8750,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -8973,6 +9003,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "providedParameter",
+                "providerId": "org.mule.test.values.extension.resolver.WithComplexActingParameter",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -9225,6 +9256,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -9486,6 +9518,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
+                "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -9767,6 +9800,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "hasBeenStarted",
+                "providerId": "org.mule.test.values.extension.resolver.TrueFalseValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -10270,6 +10304,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -10306,6 +10341,7 @@
                 "actingParameters": [],
                 "partOrder": 2,
                 "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -10342,6 +10378,7 @@
                 "actingParameters": [],
                 "partOrder": 3,
                 "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -10450,6 +10487,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -10679,6 +10717,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -11031,6 +11070,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterWithAliasValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -11327,6 +11367,7 @@
                 "actingParameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "Simple value provider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -11460,6 +11501,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "channels",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
