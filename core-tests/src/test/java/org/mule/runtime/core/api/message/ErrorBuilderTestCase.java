@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
@@ -233,7 +234,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     assertThat(error.getDescription(), containsString(suppressedCause.getMessage()));
     assertThat(error.getDetailedDescription(), containsString(EXCEPTION_MESSAGE));
     assertThat(error.getErrorType(), is(mockErrorType));
-    assertThat(error.getCause(), is(ExceptionUtils.getMessagingExceptionCause(suppressedCause)));
+    assertThat(error.getCause(), is(getMessagingExceptionCause(suppressedCause)));
     assertThat(((PrivilegedError) error).getSuppressedErrors(), contains(suppressedCause.getEvent().getError().get()));
     assertThat(error.getChildErrors(), is(empty()));
   }
