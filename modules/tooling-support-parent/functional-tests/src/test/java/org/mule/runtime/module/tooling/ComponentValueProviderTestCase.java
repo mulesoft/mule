@@ -10,7 +10,6 @@ import static java.util.Arrays.asList;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
-import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.ACTING_PARAMETER_GROUP_NAME;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.ACTING_PARAMETER_NAME;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.actingParameterGroupOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.actingParameterOPDeclaration;
@@ -87,16 +86,6 @@ public class ComponentValueProviderTestCase extends DeclarationSessionTestCase {
     ComponentElementDeclaration elementDeclaration =
         actingParameterGroupOPDeclaration(CONFIG_NAME, stringValue, intValue, listValue);
     validateValuesSuccess(session, elementDeclaration, PROVIDED_PARAMETER_NAME, "stringValue-0-one-two-three");
-  }
-
-  @Test
-  public void actingParameterGroupWithDefaultValue() {
-    final int intValue = 0;
-    final List<String> listValue = asList("one", "two", "three");
-    ComponentElementDeclaration elementDeclaration =
-        actingParameterGroupOPDeclaration(CONFIG_NAME, "", intValue, listValue);
-    elementDeclaration.getParameterGroup(ACTING_PARAMETER_GROUP_NAME).get().getParameters().remove(0); //remove string value
-    validateValuesSuccess(session, elementDeclaration, PROVIDED_PARAMETER_NAME, "defaultStringValue-0-one-two-three");
   }
 
   @Test
