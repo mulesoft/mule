@@ -186,7 +186,7 @@ public class ValueProviderModelValidatorTestCase {
     when(extensionModel.getModelProperty(CompileTimeModelProperty.class)).thenReturn(of(new CompileTimeModelProperty()));
 
     validate();
-    assertProblems("Parameter 'someName' from the operation 'superOperation' uses an implementation of ValueProviders [org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeOtherValueProvider] with id 'valueProviderId'. There is another implementations of ValueProviders [org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeValueProvider] that uses the same id. ValueProviders id must be unique.");
+    assertProblems("Parameter 'someName' from the configuration 'SomeConfig' uses an implementation of ValueProviders [org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeValueProvider] with id 'valueProviderId'. There are one or more other implementations of ValueProviders that use the same id [org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeOtherValueProvider]. ValueProvider's id must be unique.");
   }
 
   @Test

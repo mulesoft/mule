@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
+import static java.lang.String.join;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
@@ -26,6 +27,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
@@ -38,11 +40,9 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * {@link ExtensionModelValidator} for the correct usage of {@link ValueProviderModel} and
@@ -54,9 +54,9 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
 
   @Override
   public void validate(ExtensionModel model, ProblemsReporter problemsReporter) {
-    ReflectionCache reflectionCache = new ReflectionCache();
+    final ReflectionCache reflectionCache = new ReflectionCache();
     boolean isCompileTime = isCompiletime(model);
-    final Map<String, ValueProviderInformation> valueProviders = new HashMap<>();
+    final List<ValueProviderInformation> valueProviders = new ArrayList<>();
     new IdempotentExtensionWalker() {
 
       @Override
@@ -84,56 +84,75 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
     }
   }
 
-  private void validateProviderIds(Map<String, ValueProviderInformation> valueProviders, ProblemsReporter problemsReporter) {
-    Set<String> processedValueProviders = new HashSet<>();
-    valueProviders.entrySet().stream().forEach(entry -> {
-      ValueProviderInformation valueProviderInformation = entry.getValue();
-      ParameterizedModel ownerModel = valueProviderInformation.ownerModel;
-      String valueProviderId = valueProviderInformation.getValueProviderModel().getProviderId();
-      String valueProviderImplentation = entry.getKey();
-      processedValueProviders.add(valueProviderImplentation);
-      valueProviders.entrySet().stream().forEach(otherEntry -> {
-        String otherValueProviderId = otherEntry.getValue().getValueProviderModel().getProviderId();
-        String otherValueProviderImplentation = otherEntry.getKey();
-        if (processedValueProviders.contains(otherValueProviderImplentation)) {
-          return;
+  private void validateProviderIds(List<ValueProviderInformation> valueProviders, ProblemsReporter problemsReporter) {
+
+    Map<String, ValueProviderInformation> valueProvidersImplementationToInformation = new HashMap<>();
+    MultiMap<String, String> valueProvidersIdToImplementations = new MultiMap<>();
+
+    valueProviders.forEach(valueProviderInformation -> {
+      String valueProviderImplementation = valueProviderInformation.getImplementationClassName();
+      if (valueProvidersImplementationToInformation.containsKey(valueProviderImplementation)) {
+        ValueProviderInformation storedValueProviderInformation =
+            valueProvidersImplementationToInformation.get(valueProviderImplementation);
+        String valueProviderId = valueProviderInformation.getValueProviderModel().getProviderId();
+        String storedValueProviderId = storedValueProviderInformation.getValueProviderModel().getProviderId();
+        if (!storedValueProviderId.equals(valueProviderId)) {
+          problemsReporter.addError(new Problem(valueProviderInformation.getOwnerModel(),
+                                                format("There are two parameters that use the same ValueProvider implementation [%s] but its models have different ids [ %s, %s]",
+                                                       valueProviderImplementation, storedValueProviderId, valueProviderId)));
         }
-        if (valueProviderId.equals(otherValueProviderId)) {
-          problemsReporter.addError(new Problem(valueProviderInformation.ownerModel,
-                                                format("Parameter '%s' from the %s '%s' uses an implementation of ValueProviders"
-                                                    + " [%s] with id '%s'. There is another implementations of ValueProviders"
-                                                    + " [%s] that uses the same id. ValueProviders id must be unique.",
-                                                       valueProviderInformation.parameterModel.getName(),
-                                                       getComponentModelTypeName(ownerModel), getModelName(ownerModel),
-                                                       valueProviderImplentation, valueProviderId,
-                                                       otherValueProviderImplentation)));
-        }
-      });
+      } else {
+        valueProvidersImplementationToInformation.put(valueProviderImplementation, valueProviderInformation);
+        valueProvidersIdToImplementations.put(valueProviderInformation.getValueProviderModel().getProviderId(),
+                                              valueProviderImplementation);
+      }
+    });
+
+    valueProvidersIdToImplementations.keySet().forEach((valueProviderId) -> {
+      List<String> valueProviderImplementations = valueProvidersIdToImplementations.getAll(valueProviderId);
+
+      if (valueProviderImplementations.size() > 1) {
+        String firstValueProviderImplementation = valueProviderImplementations.get(0);
+        ValueProviderInformation valueProviderInformation =
+            valueProvidersImplementationToInformation.get(firstValueProviderImplementation);
+        ParameterizedModel ownerModel = valueProviderInformation.getOwnerModel();
+        problemsReporter.addError(new Problem(valueProviderInformation.ownerModel,
+                                              format("Parameter '%s' from the %s '%s' uses an implementation of ValueProviders"
+                                                  + " [%s] with id '%s'. There are one or more other implementations of ValueProviders"
+                                                  + " that use the same id [%s]. ValueProvider's id must be unique.",
+                                                     valueProviderInformation.getParameterModel().getName(),
+                                                     getComponentModelTypeName(ownerModel), getModelName(ownerModel),
+                                                     firstValueProviderImplementation, valueProviderId,
+                                                     join(", ", valueProviderImplementations
+                                                         .subList(1, valueProviderImplementations.size())))));
+      }
     });
   }
 
   private void validateModel(ParameterizedModel model, ProblemsReporter problemsReporter, boolean supportsConnectionsAndConfigs,
-                             Map<String, ValueProviderInformation> valueProviders, ReflectionCache reflectionCache, boolean isCompileTime) {
+                             List<ValueProviderInformation> valueProviders, ReflectionCache reflectionCache,
+                             boolean isCompileTime) {
     model.getAllParameterModels()
         .forEach(param -> param
             .getModelProperty(ValueProviderFactoryModelProperty.class)
             .ifPresent(modelProperty -> validateOptionsResolver(param, modelProperty, model, problemsReporter,
-                                                                supportsConnectionsAndConfigs, reflectionCache, valueProviders, isCompileTime)));
+                                                                supportsConnectionsAndConfigs, reflectionCache, valueProviders,
+                                                                isCompileTime)));
   }
 
   private void validateOptionsResolver(ParameterModel param, ValueProviderFactoryModelProperty modelProperty,
                                        ParameterizedModel model, ProblemsReporter problemsReporter,
                                        boolean supportsConnectionsAndConfigs, ReflectionCache reflectionCache,
-                                       Map<String, ValueProviderInformation> valueProviders, boolean isCompileTime) {
+                                       List<ValueProviderInformation> valueProviders, boolean isCompileTime) {
     Class<? extends ValueProvider> valueProvider = modelProperty.getValueProvider();
     String providerName = valueProvider.getSimpleName();
     Optional<ValueProviderModel> valueProviderModel = param.getValueProviderModel();
-    if(isCompileTime) {
+    if (isCompileTime) {
       if (!valueProviderModel.isPresent()) {
         throw new IllegalStateException(format("Parameter %s from %s with name %s has should have a ValueProviderModel associated.",
-                param.getName(), getComponentModelTypeName(model), getModelName(model)));
+                                               param.getName(), getComponentModelTypeName(model), getModelName(model)));
       } else {
-        addValueProvider(valueProvider.getName(), valueProviderModel.get(), valueProviders, problemsReporter, model, param);
+        valueProviders.add(new ValueProviderInformation(valueProviderModel.get(), param, model, valueProvider.getName()));
       }
     }
     Map<String, MetadataType> allParameters =
@@ -200,33 +219,19 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
     }
   }
 
-  private void addValueProvider(String providerName, ValueProviderModel valueProviderModel,
-                                Map<String, ValueProviderInformation> valueProviders, ProblemsReporter problemsReporter,
-                                ParameterizedModel model, ParameterModel parameterModel) {
-    if (valueProviders.containsKey(providerName)) {
-      String storedProviderId = valueProviders.get(providerName).getValueProviderModel().getProviderId();
-      String providerId = valueProviderModel.getProviderId();
-      if (!providerId.equals(storedProviderId)) {
-        problemsReporter.addError(new Problem(model,
-                                              format("There are two parameters that use the same ValueProvider implementation [%s] but its models have different ids [ %s, %s]",
-                                                     providerName, storedProviderId, providerId)));
-      }
-    } else {
-      valueProviders.put(providerName, new ValueProviderInformation(valueProviderModel, parameterModel, model));
-    }
-  }
-
   private static final class ValueProviderInformation {
 
     private ValueProviderModel valueProviderModel;
     private ParameterModel parameterModel;
     private ParameterizedModel ownerModel;
+    private String implementationClassName;
 
     public ValueProviderInformation(ValueProviderModel valueProviderModel, ParameterModel parameterModel,
-                                    ParameterizedModel ownerModel) {
+                                    ParameterizedModel ownerModel, String implementationClassName) {
       this.valueProviderModel = valueProviderModel;
       this.parameterModel = parameterModel;
       this.ownerModel = ownerModel;
+      this.implementationClassName = implementationClassName;
     }
 
     public ValueProviderModel getValueProviderModel() {
@@ -239,6 +244,10 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
 
     public ParameterizedModel getOwnerModel() {
       return ownerModel;
+    }
+
+    public String getImplementationClassName() {
+      return implementationClassName;
     }
   }
 }
