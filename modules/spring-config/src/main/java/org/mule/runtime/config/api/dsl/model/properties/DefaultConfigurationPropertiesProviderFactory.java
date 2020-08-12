@@ -8,6 +8,7 @@ package org.mule.runtime.config.api.dsl.model.properties;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
@@ -17,7 +18,9 @@ import org.mule.runtime.config.api.dsl.model.ResourceProvider;
  * Builds the provider for the configuration-properties element.
  *
  * @since 4.1
+ * @deprecated since 4.4, use the SDK instead of registering parsers manually.
  */
+@Deprecated
 public final class DefaultConfigurationPropertiesProviderFactory implements ConfigurationPropertiesProviderFactory {
 
   public static final String CONFIGURATION_PROPERTIES_ELEMENT = "configuration-properties";

@@ -30,7 +30,9 @@ import java.util.function.Consumer;
  * {@code ComponentBuildingDefinition}s are located using SPI class {@link ComponentBuildingDefinitionProvider}.
  *
  * @since 4.0
+ * @deprecated since 4.4, use the SDK instead of registering parsers manually.
  */
+@Deprecated
 public final class ComponentBuildingDefinitionRegistry {
 
   private final Map<ComponentIdentifier, ComponentBuildingDefinition<?>> builderDefinitionsMap = new HashMap<>();
