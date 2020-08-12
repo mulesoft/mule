@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.tooling;
 
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
+import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_PAYLOAD;
 
 import org.mule.metadata.internal.utils.MetadataTypeWriter;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
@@ -21,7 +24,7 @@ import org.mule.runtime.app.declaration.api.SourceElementDeclaration;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Test;
 
-public class MetadataTestCase extends DeclarationSessionTestCase {
+public class MetadataTypesTestCase extends DeclarationSessionTestCase {
 
   @Test
   public void sourceDynamicTypes() {
@@ -93,6 +96,27 @@ public class MetadataTestCase extends DeclarationSessionTestCase {
         session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(false));
     assertThat(containerTypeMetadataResult.getFailures(), hasSize(2));
+  }
+
+  @Test
+  public void operationDynamicTypesSingleLevelKey() {
+    OperationElementDeclaration operationElementDeclaration = configLessOPDeclaration(CONFIG_NAME, "item");
+    MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
+        session.resolveComponentMetadata(operationElementDeclaration);
+    assertThat(metadataTypes.isSuccess(), is(true));
+    assertThat(metadataTypes.get().getOutputMetadata().isPresent(), is(true));
+    assertThat(getTypeId(metadataTypes.get().getOutputMetadata().get()),
+               is(of("org.mule.tooling.extensions.metadata.api.parameters.ItemOutput")));
+  }
+
+  @Test
+  public void metadataKeyDefaultValueNotUsed() {
+    OperationElementDeclaration operationElementDeclaration = configLessOPDeclaration(CONFIG_NAME);
+    MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
+        session.resolveComponentMetadata(operationElementDeclaration);
+    assertThat(metadataTypes.isSuccess(), is(false));
+    assertThat(metadataTypes.getFailures(), hasSize(1));
+    assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(OUTPUT_PAYLOAD));
   }
 
   @Test

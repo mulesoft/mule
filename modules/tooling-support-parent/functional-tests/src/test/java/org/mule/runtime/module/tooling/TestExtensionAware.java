@@ -94,11 +94,20 @@ public interface TestExtensionAware {
   }
 
   default OperationElementDeclaration configLessOPDeclaration(String configName) {
-    return TEST_EXTENSION_DECLARER
-        .newOperation(CONFIG_LESS_OP_ELEMENT_NAME)
-        .withConfig(configName)
-        .getDeclaration();
+    return configLessOPDeclaration(configName, null);
+  }
 
+  default OperationElementDeclaration configLessOPDeclaration(String configName, String metadataKey) {
+    OperationElementDeclarer operationElementDeclarer = TEST_EXTENSION_DECLARER
+        .newOperation(CONFIG_LESS_OP_ELEMENT_NAME)
+        .withConfig(configName);
+
+    if (metadataKey != null) {
+      operationElementDeclarer.withParameterGroup(newParameterGroup()
+          .withParameter(METADATA_KEY_PARAMETER_NAME, metadataKey).getDeclaration());
+    }
+    return operationElementDeclarer
+        .getDeclaration();
   }
 
   default OperationElementDeclaration multiLevelOPDeclaration(String configName, String continent, String country) {
