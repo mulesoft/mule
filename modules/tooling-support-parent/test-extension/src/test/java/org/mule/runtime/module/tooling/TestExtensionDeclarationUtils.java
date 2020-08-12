@@ -2,6 +2,7 @@ package org.mule.runtime.module.tooling;
 
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.NUMBER;
+import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
@@ -92,11 +93,20 @@ public class TestExtensionDeclarationUtils {
   }
 
   public static OperationElementDeclaration configLessOPDeclaration(String configName) {
-    return TEST_EXTENSION_DECLARER
-            .newOperation(CONFIG_LESS_OP_ELEMENT_NAME)
-            .withConfig(configName)
-            .getDeclaration();
+    return configLessOPDeclaration(configName, null);
+  }
 
+  public static OperationElementDeclaration configLessOPDeclaration(String configName, String metadataKey) {
+    OperationElementDeclarer operationElementDeclarer = TEST_EXTENSION_DECLARER
+            .newOperation(CONFIG_LESS_OP_ELEMENT_NAME)
+            .withConfig(configName);
+
+    if (metadataKey != null) {
+      operationElementDeclarer.withParameterGroup(newParameterGroup()
+                                                          .withParameter(METADATA_KEY_PARAMETER_NAME, metadataKey).getDeclaration());
+    }
+    return operationElementDeclarer
+            .getDeclaration();
   }
 
   public static OperationElementDeclaration actingParameterOPDeclaration(String configName, String actingParameter) {
@@ -305,6 +315,10 @@ public class TestExtensionDeclarationUtils {
       elementDeclarer.withParameterGroup(parameterGroupElementDeclarer.getDeclaration());
     }
     return elementDeclarer.getDeclaration();
+  }
+
+  public static ComponentElementDeclaration<?> invalidComponentDeclaration() {
+    return TEST_EXTENSION_DECLARER.newConstruct("invalid").getDeclaration();
   }
 
 }
