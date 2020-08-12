@@ -35,6 +35,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
@@ -115,10 +116,10 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     // Backwards compatibility demands that the description has to be set to the suppressed exception message
     assertThat(error.getDescription(), equalTo(SUPPRESSED_EXCEPTION_MESSAGE));
     assertThat(((PrivilegedError) error).getSuppressedErrors(), hasSize(1));
-    Throwable suppressedError = ((PrivilegedError) error).getSuppressedErrors().get(0).getCause();
-    assertThat(suppressedError, instanceOf(MessagingException.class));
+    Throwable suppressedErrorCause = ((PrivilegedError) error).getSuppressedErrors().get(0).getCause();
+    assertThat(suppressedErrorCause, instanceOf(TestMuleException.class));
     // Backwards compatibility demands that the error cause has to be the suppressed exception
-    assertThat(error.getCause(), equalTo(suppressedError));
+    assertThat(error.getCause(), equalTo(suppressedErrorCause));
     // ComposedErrorMessageAwareException must be treated by the error builder
     assertThat(error.getErrorMessage().getPayload().getValue().toString(), equalTo(TEST_PAYLOAD));
     assertThat(error.getChildErrors(), contains(composedMessageAwareException.getErrors().toArray()));
@@ -232,7 +233,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     assertThat(error.getDescription(), containsString(suppressedCause.getMessage()));
     assertThat(error.getDetailedDescription(), containsString(EXCEPTION_MESSAGE));
     assertThat(error.getErrorType(), is(mockErrorType));
-    assertThat(error.getCause(), is(suppressedCause));
+    assertThat(error.getCause(), is(ExceptionUtils.getMessagingExceptionCause(suppressedCause)));
     assertThat(((PrivilegedError) error).getSuppressedErrors(), contains(suppressedCause.getEvent().getError().get()));
     assertThat(error.getChildErrors(), is(empty()));
   }
