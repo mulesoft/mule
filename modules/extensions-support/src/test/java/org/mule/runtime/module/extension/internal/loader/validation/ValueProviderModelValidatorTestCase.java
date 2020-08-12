@@ -31,7 +31,6 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
-import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
@@ -183,10 +182,9 @@ public class ValueProviderModelValidatorTestCase {
     ValueProviderFactoryModelPropertyBuilder builder =
         ValueProviderFactoryModelProperty.builder(SomeOtherValueProvider.class);
     mockParameter(operationParameter, builder);
-    when(extensionModel.getModelProperty(CompileTimeModelProperty.class)).thenReturn(of(new CompileTimeModelProperty()));
 
     validate();
-    assertProblems("Parameter 'someName' from the configuration 'SomeConfig' uses an implementation of ValueProviders [org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeValueProvider] with id 'valueProviderId'. There are one or more other implementations of ValueProviders that use the same id [org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeOtherValueProvider]. ValueProvider's id must be unique.");
+    assertProblems("The following ValueProvider implementations [org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeValueProvider, org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeOtherValueProvider] use the same id [valueProviderId]. ValueProvider ids must be unique.");
   }
 
   @Test
@@ -194,17 +192,6 @@ public class ValueProviderModelValidatorTestCase {
     ValueProviderFactoryModelPropertyBuilder builder =
         ValueProviderFactoryModelProperty.builder(SomeOtherValueProvider.class);
     mockParameter(operationParameter, builder, "anotherId");
-    when(extensionModel.getModelProperty(CompileTimeModelProperty.class)).thenReturn(of(new CompileTimeModelProperty()));
-
-    validate();
-    assertNoErrors();
-  }
-
-  @Test
-  public void parameterWithValueProviderHasRepeatedIdInRuntime() {
-    ValueProviderFactoryModelPropertyBuilder builder =
-        ValueProviderFactoryModelProperty.builder(SomeOtherValueProvider.class);
-    mockParameter(operationParameter, builder);
 
     validate();
     assertNoErrors();
