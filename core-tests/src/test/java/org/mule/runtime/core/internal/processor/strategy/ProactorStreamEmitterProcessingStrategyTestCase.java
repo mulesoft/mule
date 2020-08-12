@@ -61,6 +61,8 @@ import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedule
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
 import org.mule.tck.TriggerableMessageSource;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
@@ -75,6 +77,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 
 import io.qameta.allure.Description;
@@ -84,13 +87,14 @@ import io.qameta.allure.Story;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
+@RunWith(FlakinessDetectorTestRunner.class)
 public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
 
-  public ProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
-    super(mode);
+  public ProactorStreamEmitterProcessingStrategyTestCase() {
+    super(SOURCE);
   }
 
   @Override
@@ -489,7 +493,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   }
 
   @Test
-  @Ignore("MULE-18521")
+  @FlakyTest(times = 200)
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
     assumeThat(mode, is(SOURCE));
 
