@@ -9,7 +9,7 @@
 
     <hello:config name="default" message="Hello from policy!!!"/>
 
-    <test-policy:proxy>
+    <test-policy:proxy name="policy">
         <test-policy:operation>
             <hello:print-message config-ref="default"/>
 

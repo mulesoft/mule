@@ -286,7 +286,6 @@ public class ApplicationModel implements ArtifactAst {
         return topLevelComponentsStream().spliterator();
       }
     };
-    indexComponentModels(originalAst);
     this.ast = originalAst;
     ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
     ast.recursiveStream().forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel,
@@ -296,6 +295,7 @@ public class ApplicationModel implements ArtifactAst {
     // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
     // and crafted declared extension models)
     resolveMissingComponentTypes(ast.recursiveStream());
+    indexComponentModels(originalAst);
     recursiveStreamWithHierarchy(ast).forEach(new ComponentLocationVisitor());
 
     validateModel();
@@ -710,21 +710,23 @@ public class ApplicationModel implements ArtifactAst {
   }
 
   private void validateFlowRefPointsToExistingFlow() {
-    recursiveStream().forEach(componentModel -> {
-      if (componentModel.getIdentifier().equals(FLOW_REF_IDENTIFIER)) {
-        String nameAttribute = componentModel.getComponentId().orElse(null);
-        if (nameAttribute != null && !nameAttribute.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
-          Optional<ComponentAst> referencedFlow = findTopLevelNamedComponent(nameAttribute);
-          referencedFlow
-              .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("flow-ref at %s:%s is pointing to %s which does not exist",
-                                                                              componentModel.getMetadata().getFileName()
-                                                                                  .orElse("unknown"),
-                                                                              componentModel.getMetadata().getStartLine()
-                                                                                  .orElse(-1),
-                                                                              nameAttribute)));
-        }
-      }
-    });
+    recursiveStream()
+        .filter(componentModel -> componentModel.getIdentifier().equals(FLOW_REF_IDENTIFIER))
+        .forEach(componentModel -> {
+          componentModel.getParameter("name").getValue().applyRight(nameAttribute -> {
+            // Need to check this, since the name field is a reference according to the extModel and the AST assumes there are no
+            // expressions there.
+            if (!((String) nameAttribute).startsWith(DEFAULT_EXPRESSION_PREFIX)) {
+              findTopLevelNamedComponent((String) nameAttribute)
+                  .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("flow-ref at %s:%s is pointing to %s which does not exist",
+                                                                                  componentModel.getMetadata().getFileName()
+                                                                                      .orElse("unknown"),
+                                                                                  componentModel.getMetadata().getStartLine()
+                                                                                      .orElse(-1),
+                                                                                  nameAttribute)));
+            }
+          });
+        });
   }
 
   private void validateParameterAndChildForSameAttributeAreNotDefinedTogether() {
@@ -814,35 +816,38 @@ public class ApplicationModel implements ArtifactAst {
 
   private void validateNameIsNotRepeated() {
     Map<String, ComponentAst> existingObjectsWithName = new HashMap<>();
-    topLevelComponentsStream().forEach(componentModel -> {
-      String nameAttributeValue = componentModel.getComponentId().orElse(null);
-      if (nameAttributeValue != null && !ignoredNameValidationComponentList.contains(componentModel.getIdentifier())) {
-        if (existingObjectsWithName.containsKey(nameAttributeValue)) {
-          throw new MuleRuntimeException(createStaticMessage("Two configuration elements have been defined with the same global name. Global name [%s] must be unique. Clashing components are %s and %s",
-                                                             nameAttributeValue,
-                                                             existingObjectsWithName.get(nameAttributeValue).getIdentifier(),
-                                                             componentModel.getIdentifier()));
-        }
-        existingObjectsWithName.put(nameAttributeValue, componentModel);
-      }
-    });
+    topLevelComponentsStream()
+        .filter(componentModel -> !ignoredNameValidationComponentList.contains(componentModel.getIdentifier()))
+        .filter(componentModel -> !componentModel.getModel(HasStereotypeModel.class)
+            .map(sm -> sm.getStereotype().isAssignableTo(APP_CONFIG))
+            .orElse(false))
+        .forEach(componentModel -> componentModel.getComponentId()
+            .ifPresent(nameAttributeValue -> {
+              if (existingObjectsWithName.containsKey(nameAttributeValue)) {
+                throw new MuleRuntimeException(createStaticMessage("Two configuration elements have been defined with the same global name. Global name [%s] must be unique. Clashing components are %s and %s",
+                                                                   nameAttributeValue,
+                                                                   existingObjectsWithName.get(nameAttributeValue)
+                                                                       .getIdentifier(),
+                                                                   componentModel.getIdentifier()));
+              }
+              existingObjectsWithName.put(nameAttributeValue, componentModel);
+            }));
   }
 
   private void validateNameHasValidCharacters() {
-    topLevelComponentsStream().forEach(componentModel -> {
-      String nameAttributeValue = componentModel.getComponentId().orElse(null);
-      if (nameAttributeValue != null) {
-        try {
-          verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
-        } catch (IllegalArgumentException e) {
-          throw new MuleRuntimeException(createStaticMessage(format("Invalid global element name '%s' in %s:%s. Problem is: %s",
-                                                                    nameAttributeValue,
-                                                                    componentModel.getMetadata().getFileName().orElse("unknown"),
-                                                                    componentModel.getMetadata().getStartLine().orElse(-1),
-                                                                    e.getMessage())));
-        }
-      }
-    });
+    topLevelComponentsStream().forEach(componentModel -> componentModel.getComponentId()
+        .ifPresent(nameAttributeValue -> {
+          try {
+            verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
+          } catch (IllegalArgumentException e) {
+            throw new MuleRuntimeException(createStaticMessage(format("Invalid global element name '%s' in %s:%s. Problem is: %s",
+                                                                      nameAttributeValue,
+                                                                      componentModel.getMetadata().getFileName()
+                                                                          .orElse("unknown"),
+                                                                      componentModel.getMetadata().getStartLine().orElse(-1),
+                                                                      e.getMessage())));
+          }
+        }));
   }
 
   private void validateErrorMappings() {
@@ -856,7 +861,7 @@ public class ApplicationModel implements ArtifactAst {
         throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have 'ANY' or an empty source type."));
       }
       List<String> sources = mappings.stream()
-          .map(model -> model.getSource())
+          .map(ErrorMapping::getSource)
           .collect(toList());
       List<String> distinctSources = sources.stream()
           .distinct()

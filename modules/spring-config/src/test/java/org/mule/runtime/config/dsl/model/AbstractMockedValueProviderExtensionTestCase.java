@@ -33,9 +33,12 @@ import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_MAPPINGS;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.component.location.Location;
@@ -65,15 +68,12 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
-import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,6 +86,9 @@ import java.util.stream.Stream;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 public abstract class AbstractMockedValueProviderExtensionTestCase extends AbstractMuleTestCase {
 
@@ -351,6 +354,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
     when(configuration.getConnectionProviderModel(CONNECTION_PROVIDER_NAME)).thenReturn(of(connectionProvider));
     when(configuration.getModelProperty(RequiredForMetadataModelProperty.class)).thenReturn(of(requiredForMetadataModelProperty));
+    when(configuration.getStereotype()).thenReturn(CONFIG);
 
     when(otherConfiguration.getName()).thenReturn(OTHER_CONFIGURATION_NAME);
     when(otherConfiguration.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
@@ -359,6 +363,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(otherConfiguration.getConnectionProviders()).thenReturn(asList(connectionProvider));
     when(otherConfiguration.getModelProperty(RequiredForMetadataModelProperty.class))
         .thenReturn(of(requiredForMetadataModelProperty));
+    when(otherConfiguration.getStereotype()).thenReturn(CONFIG);
 
     when(source.getName()).thenReturn(SOURCE_NAME);
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
@@ -366,10 +371,12 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(source.getErrorCallback()).thenReturn(empty());
 
     when(operation.getName()).thenReturn(OPERATION_NAME);
+    when(operation.getStereotype()).thenReturn(PROCESSOR);
     when(operation.getParameterGroupModels())
         .thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
 
     when(otherOperation.getName()).thenReturn(OTHER_OPERATION_NAME);
+    when(otherOperation.getStereotype()).thenReturn(PROCESSOR);
     when(otherOperation.getParameterGroupModels())
         .thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
 

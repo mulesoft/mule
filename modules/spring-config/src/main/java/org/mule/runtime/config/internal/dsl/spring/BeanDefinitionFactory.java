@@ -30,6 +30,7 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -279,7 +280,7 @@ public class BeanDefinitionFactory {
         String identifier = childComponentModel.getIdentifier().getName();
         if (identifier.equals("password-encryption-strategy")
             || identifier.equals("secret-key-encryption-strategy")) {
-          registry.registerBeanDefinition(childComponentModel.getComponentId().orElse(null),
+          registry.registerBeanDefinition(childComponentModel.getRawParameterValue(NAME_ATTRIBUTE_NAME).get(),
                                           springComponentModels.get(childComponentModel).getBeanDefinition());
         }
       });

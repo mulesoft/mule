@@ -188,7 +188,8 @@ class MuleExtensionModelDeclarer {
         .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
 
     object.onDefaultParameterGroup()
-        .withOptionalParameter("name")
+        .withRequiredParameter("name")
+        .asComponentId()
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Name to use to reference this object.");
@@ -989,7 +990,7 @@ class MuleExtensionModelDeclarer {
         .allowingTopLevelDefinition()
         .withStereotype(newStereotype("NOTIFICATIONS", "MULE").withParent(APP_CONFIG).build())
         .describedAs("Registers listeners for notifications and associates interfaces with particular events.")
-        .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));;
+        .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
   }
 
 }

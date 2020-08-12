@@ -12,6 +12,7 @@ import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -107,7 +108,7 @@ public class ApplicationModelTypeUtilsTestCase extends AbstractMuleTestCase {
 
     doAnswer(inv -> {
       final ComponentIdentifier identifier = inv.getArgument(0);
-      final ExtensionWalkerModelDelegate walker = inv.getArgument(1);
+      final ExtensionWalkerModelDelegate walker = inv.getArgument(2);
 
       if (identifier.equals(SIMPLE_POJO_ID)) {
         walker.onType(typeLoader.load(SimplePojo.class));
@@ -119,7 +120,7 @@ public class ApplicationModelTypeUtilsTestCase extends AbstractMuleTestCase {
 
       return null;
     })
-        .when(extModelHelper).walkToComponent(any(), false, any());
+        .when(extModelHelper).walkToComponent(any(), eq(false), any());
 
     doAnswer(inv -> {
       final ParameterizedModel parameterized = inv.getArgument(0);

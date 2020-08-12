@@ -25,6 +25,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -258,6 +259,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(configuration.getOperationModels()).thenReturn(asList(operation));
     when(configuration.getSourceModels()).thenReturn(asList(source));
     when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
+    when(configuration.getStereotype()).thenReturn(CONFIG);
 
     when(configuration.getModelProperty(RequiredForMetadataModelProperty.class))
         .thenReturn(of(requiredForMetadataModelProperty));

@@ -9,7 +9,7 @@
 
     <hello:config name="default" message="Hello from policy!!!"/>
 
-    <test-policy:proxy>
+    <test-policy:proxy name="policy">
         <test-policy:operation>
             <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
             <hello:print-message config-ref="default"/>

@@ -6,8 +6,10 @@
  */
 package org.mule.functional.junit4;
 
+import static org.mule.functional.junit4.FunctionalTestCase.extensionManagerWithMuleExtModelBuilder;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -15,7 +17,6 @@ import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
-import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class ApplicationContextBuilder {
   private MuleContext domainContext;
   private String[] applicationResources = new String[0];
 
-  private MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(APP);
+  private final MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(APP);
 
   public ApplicationContextBuilder setContextId(String contextId) {
     this.contextId = contextId;
@@ -54,7 +55,7 @@ public class ApplicationContextBuilder {
     MuleContext context;
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builders = new ArrayList<>();
-    builders.add(new MockExtensionManagerConfigurationBuilder());
+    builders.add(extensionManagerWithMuleExtModelBuilder());
     builders.add(getAppBuilder(this.applicationResources));
     builders.add(new TestPolicyProviderConfigurationBuilder());
     addBuilders(builders);

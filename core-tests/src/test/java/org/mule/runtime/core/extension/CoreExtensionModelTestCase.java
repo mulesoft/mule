@@ -275,7 +275,8 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     ParameterModel name = paramModels.get(0);
     assertThat(name.getName(), is("name"));
-    assertThat(name.isRequired(), is(false));
+    assertThat(name.isRequired(), is(true));
+    assertThat(name.isComponentId(), is(true));
     assertThat(name.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(name.getType(), instanceOf(DefaultStringType.class));
 
