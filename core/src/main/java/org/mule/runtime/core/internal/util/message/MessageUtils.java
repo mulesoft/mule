@@ -214,15 +214,12 @@ public final class MessageUtils {
   private static Message toMessage(Result<?, ?> result, DataType dataType, Object value) {
     Message.Builder builder = Message.builder().payload(new TypedValue<>(value, dataType, result.getByteLength()));
 
-    if (result.getAttributes().isPresent()) {
-      Object att = result.getAttributes().get();
-
+    result.getAttributes().ifPresent(att -> {
       final Optional<MediaType> attributesMediaType = result.getAttributesMediaType();
       builder.attributes(new TypedValue<>(att, attributesMediaType.isPresent()
           ? builder().type(att.getClass()).mediaType(attributesMediaType.get()).build()
-          : DataType.fromObject(att),
-                                          OptionalLong.empty()));
-    }
+          : DataType.fromObject(att), OptionalLong.empty()));
+    });
 
     return builder.build();
   }
