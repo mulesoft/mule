@@ -13,6 +13,7 @@ import org.mule.runtime.core.internal.streaming.ClosingCursorException;
 import java.io.IOException;
 
 import static java.lang.Boolean.getBoolean;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
 
 /**
@@ -28,7 +29,7 @@ abstract class AbstractCursorStream extends CursorStream {
   private long mark = 0;
   private boolean released = false;
   protected long position = 0;
-  private ClosingCursorException closerResponsible;
+  private IOException closerResponsible;
   private final static boolean trackCursorProviderClose = getBoolean(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY);
 
   public AbstractCursorStream(CursorStreamProvider provider) {
@@ -78,7 +79,7 @@ abstract class AbstractCursorStream extends CursorStream {
 
   protected void assertNotDisposed() throws IOException {
     if (released) {
-      throw new IOException("Stream is closed", closerResponsible);
+      throw ofNullable(closerResponsible).orElse(new IOException("Stream is closed"));
     }
   }
 
