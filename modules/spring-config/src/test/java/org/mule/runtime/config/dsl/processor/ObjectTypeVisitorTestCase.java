@@ -7,8 +7,6 @@
 
 package org.mule.runtime.config.dsl.processor;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
@@ -17,9 +15,6 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
-import org.mule.runtime.ast.internal.builder.DefaultComponentAstBuilder;
-import org.mule.runtime.ast.internal.builder.PropertiesResolver;
-import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.internal.processor.AbstractProcessor;
 import org.mule.runtime.core.internal.processor.ReferenceProcessor;
@@ -93,7 +88,7 @@ public class ObjectTypeVisitorTestCase {
 
 
   private ComponentAstBuilder baseComponentModelBuilder() {
-    return new DefaultComponentAstBuilder(new PropertiesResolver(), new ExtensionModelHelper(emptySet()), emptyList())
+     return ComponentAstBuilder.builder()
         .withIdentifier(ComponentIdentifier.builder().namespace("ns").name("comp").build())
         .withMetadata(ComponentMetadataAst.builder().build());
   }
