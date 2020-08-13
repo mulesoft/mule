@@ -160,7 +160,7 @@ public final class TemplateParser {
           if (value == null) {
             value = NULL_AS_STRING;
           } else {
-            value = parseMule(props, escapeValue(enclosingTemplate, value.toString()), callback, true);
+            value = parseMule(props, escapeValue(enclosingTemplate, value.toString()), callback, value.equals(enclosingTemplate));
           }
         }
         result.append(value);
