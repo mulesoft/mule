@@ -42,6 +42,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.processor.ContextPropagationChecker;
@@ -81,6 +82,11 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
 
   public OnErrorPropagateHandlerTestCase(VerboseExceptions verbose) throws RegistrationException {
     super(verbose);
+  }
+
+  @Override
+  protected AbstractExceptionListener getErrorHandler() {
+    return onErrorPropagateHandler;
   }
 
   @Override

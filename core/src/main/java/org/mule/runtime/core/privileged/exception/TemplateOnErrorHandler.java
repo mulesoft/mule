@@ -44,6 +44,8 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -59,6 +61,7 @@ import org.mule.runtime.core.internal.exception.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
@@ -68,6 +71,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -116,6 +120,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private ComponentLocation location;
 
   private Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>> fluxFactory;
+
+  private final CopyOnWriteArrayList<String> suppressedErrorTypeMatches = new CopyOnWriteArrayList<>();
 
   private final class OnErrorHandlerFluxObjectFactory
       implements Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>>, Disposable {
@@ -437,9 +443,40 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return acceptsAll() || (acceptsErrorType(event) && acceptsExpression(event));
   }
 
-
   private boolean acceptsErrorType(CoreEvent event) {
-    return errorTypeMatcher == null || errorTypeMatcher.match(event.getError().get().getErrorType());
+    Error error = event.getError().get();
+    return errorTypeMatcher == null || errorTypeMatcher.match(error.getErrorType())
+        || matchesSuppressedErrorType((PrivilegedError) error);
+  }
+
+  /**
+   * Evaluates if the {@link #errorTypeMatcher} matches against any of the provided {@link PrivilegedError#getSuppressedErrors()} error types.
+   * @param error {@link Error} that will be evaluated.
+   * @return True if at least one match is found.
+   */
+  private boolean matchesSuppressedErrorType(PrivilegedError error) {
+    for (Error suppressedError : error.getSuppressedErrors()) {
+      ErrorType suppressedErrorType = suppressedError.getErrorType();
+      if (errorTypeMatcher.match(suppressedErrorType)) {
+        warnAboutSuppressedErrorTypeMatch(error.getErrorType(), suppressedErrorType);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * If it was not previously logged, logs a warning about a suppressed {@link ErrorType} match.
+   * @param eventErrorType Unsuppressed {@link ErrorType} (recommended match).
+   * @param suppressedErrorType Suppressed {@link ErrorType} that has been matched.
+   */
+  private void warnAboutSuppressedErrorTypeMatch(ErrorType eventErrorType, ErrorType suppressedErrorType) {
+    // The warning message will be printed only once per matched error type
+    if (suppressedErrorTypeMatches.addIfAbsent(suppressedErrorType.getIdentifier())) {
+      logger
+          .warn("Expected error type from flow '{}' has matched the following underlying error: {}. Consider changing it to match the reported error: {}.",
+                getLocation().getLocation(), suppressedErrorType.getIdentifier(), eventErrorType.getIdentifier());
+    }
   }
 
   private boolean acceptsExpression(CoreEvent event) {

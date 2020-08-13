@@ -152,8 +152,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("MULE-18041")
   @Story(ERROR_HANDLING)
-  @Ignore("MULE-18562")
-  public void supressMessagingException() {
+  public void suppressMessagingException() {
     when(event.getError()).thenReturn(Optional.empty());
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
