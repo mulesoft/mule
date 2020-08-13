@@ -10,6 +10,7 @@ import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
 import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
@@ -42,12 +43,12 @@ public abstract class AbstractCursorIteratorProviderFactory implements CursorIte
    * {@inheritDoc}
    */
   @Override
-  public final Object of(EventContext eventContext, Iterator iterator) {
+  public final Object of(EventContext eventContext, Iterator iterator, ComponentLocation originatingLocation) {
     if (iterator instanceof CursorIterator) {
       return streamingManager.manage(((CursorIterator) iterator).getProvider(), eventContext);
     }
 
-    Object value = resolve(iterator, eventContext);
+    Object value = resolve(iterator, eventContext, originatingLocation);
     if (value instanceof CursorProvider) {
       value = streamingManager.manage((CursorProvider) value, eventContext);
     }
@@ -55,9 +56,28 @@ public abstract class AbstractCursorIteratorProviderFactory implements CursorIte
     return value;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public Object of(CoreEvent event, Iterator value) {
-    return of(getRoot(event.getContext()), value);
+  public final Object of(EventContext eventContext, Iterator iterator) {
+    return of(eventContext, iterator, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final Object of(CoreEvent event, Iterator value, ComponentLocation originatingLocation) {
+    return of(getRoot(event.getContext()), value, originatingLocation);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final Object of(CoreEvent event, Iterator value) {
+    return of(getRoot(event.getContext()), value, null);
   }
 
   /**
@@ -65,8 +85,9 @@ public abstract class AbstractCursorIteratorProviderFactory implements CursorIte
    *
    * @param iterator the streaming iterator
    * @param eventContext the root context of the event on which streaming is happening
+   * @param originatingLocation the {@link ComponentLocation} where the cursor was created
    */
-  protected abstract Object resolve(Iterator iterator, EventContext eventContext);
+  protected abstract Object resolve(Iterator iterator, EventContext eventContext, ComponentLocation originatingLocation);
 
   /**
    * {@inheritDoc}

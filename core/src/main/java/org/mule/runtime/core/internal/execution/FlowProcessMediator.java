@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
@@ -33,6 +35,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.SourceRemoteConnectionException;
@@ -87,6 +90,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -142,11 +146,20 @@ public class FlowProcessMediator implements Initialisable {
     this.notificationHelper =
         new NotificationHelper(notificationManager, ConnectorMessageNotification.class, false);
 
-    sourceResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_GENERATE).get();
-    sourceResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_SEND).get();
-    sourceErrorResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_ERROR_RESPONSE_GENERATE).get();
-    sourceErrorResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_ERROR_RESPONSE_SEND).get();
-    flowBackPressureErrorType = errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE).get();
+    sourceResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_GENERATE)
+        .orElseThrow(createInitialisationExceptionFor(SOURCE_RESPONSE_GENERATE));
+
+    sourceResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_SEND)
+        .orElseThrow(createInitialisationExceptionFor(SOURCE_RESPONSE_SEND));
+
+    sourceErrorResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_ERROR_RESPONSE_GENERATE)
+        .orElseThrow(createInitialisationExceptionFor(SOURCE_ERROR_RESPONSE_GENERATE));
+
+    sourceErrorResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_ERROR_RESPONSE_SEND)
+        .orElseThrow(createInitialisationExceptionFor(SOURCE_ERROR_RESPONSE_SEND));
+
+    flowBackPressureErrorType = errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)
+        .orElseThrow(createInitialisationExceptionFor(FLOW_BACK_PRESSURE));
 
     if (processorInterceptorManager != null) {
       processorInterceptorManager.getSourceInterceptorFactories().stream().forEach(interceptorFactory -> {
@@ -165,6 +178,12 @@ public class FlowProcessMediator implements Initialisable {
         sourceInterceptors.add(0, interceptorFactory.get());
       });
     }
+  }
+
+  private Supplier<InitialisationException> createInitialisationExceptionFor(ComponentIdentifier sourceResponseGenerate) {
+    return () -> new InitialisationException(createStaticMessage("ErrorType %s not found in repository",
+                                                                 sourceResponseGenerate),
+                                             this);
   }
 
   public void process(FlowProcessTemplate template,
@@ -191,7 +210,7 @@ public class FlowProcessMediator implements Initialisable {
                                                                                                      responseCompletion);
         ((InternalEvent) event).setFlowProcessMediatorContext(phaseContext);
 
-        //registering source interceptor callback to the event context
+        // registering source interceptor callback to the event context
         BaseEventContext rootContext = ((BaseEventContext) event.getContext()).getRootContext();
         sourceInterceptors.forEach(sourceInterceptor -> rootContext
             .onTerminated((e, t) -> sourceInterceptor.afterTerminated(messageSource.getLocation(), rootContext)));
@@ -505,12 +524,13 @@ public class FlowProcessMediator implements Initialisable {
                                         new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
                                                                                adapter.getPayloadMediaTypeResolver()),
                                         adapter.getCursorProviderFactory(),
-                                        ((BaseEventContext) eventCtx).getRootContext()))
+                                        ((BaseEventContext) eventCtx).getRootContext(),
+                                        source.getLocation()))
             .mediaType(result.getMediaType().orElse(ANY))
             .build());
       } else {
         eventMessage = toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(),
-                                 ((BaseEventContext) eventCtx).getRootContext());
+                                 ((BaseEventContext) eventCtx).getRootContext(), source.getLocation());
       }
 
       return eventMessage;
@@ -558,7 +578,7 @@ public class FlowProcessMediator implements Initialisable {
       notificationHelper.fireNotification(source, event, flow.getLocation(), action);
     } catch (Exception e) {
       if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Could not fire notification. Action: " + action, e);
+        LOGGER.warn(format("Could not fire notification. Action: %s", action), e);
       }
     }
   }

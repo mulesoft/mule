@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -104,17 +105,20 @@ public final class StreamingUtils {
 
   /**
    * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
-   * {@link CursorProviderFactory#of(EventContext, Object)} is returned. Otherwise, the original {@code value} is.
+   * {@link CursorProviderFactory#of(EventContext, Object, ComponentLocation)} is returned. Otherwise, the original {@code value} is.
    *
    * @param value                 a value which may be a repeatable streaming resource
    * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
    * @param eventContext          the root context of the event on which the {@code value} was generated
+   * @param originatingLocation the {@link ComponentLocation} where the cursor was created
    * @return the {@code value} or a {@link CursorProvider}
+   *
+   * @since 4.4.0
    */
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory,
-                                        EventContext eventContext) {
+                                        EventContext eventContext, ComponentLocation originatingLocation) {
     if (cursorProviderFactory != null && cursorProviderFactory.accepts(value)) {
-      return cursorProviderFactory.of(eventContext, value);
+      return cursorProviderFactory.of(eventContext, value, originatingLocation);
     } else {
       return value;
     }
@@ -122,15 +126,52 @@ public final class StreamingUtils {
 
   /**
    * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
-   * {@link CursorProviderFactory#of(EventContext, Object)} is returned. Otherwise, the original {@code value} is.
+   * {@link CursorProviderFactory#of(EventContext, Object, ComponentLocation)} is returned. Otherwise, the original {@code value} is.
+   *
+   * @param value                 a value which may be a repeatable streaming resource
+   * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
+   * @param eventContext          the root context of the event on which the {@code value} was generated
+   * @return the {@code value} or a {@link CursorProvider}
+   * 
+   * @deprecated Use {@link #streamingContent(Object, CursorProviderFactory, EventContext, ComponentLocation)}
+   */
+  @Deprecated
+  public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, EventContext eventContext) {
+    return streamingContent(value, cursorProviderFactory, eventContext, null);
+  }
+
+  /**
+   * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
+   * {@link CursorProviderFactory#of(EventContext, Object, ComponentLocation)} is returned. Otherwise, the original {@code value} is.
+   *
+   * @param value                 a value which may be a repeatable streaming resource
+   * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
+   * @param event                 the event on which the {@code value} was generated
+   * @param originatingLocation   the {@link ComponentLocation} where the cursor was created
+   * @return the {@code value} or a {@link CursorProvider}
+   *
+   * @since 4.4.0
+   */
+  public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, CoreEvent event,
+                                        ComponentLocation originatingLocation) {
+    return streamingContent(value, cursorProviderFactory, getRoot(event.getContext()),
+                            originatingLocation);
+  }
+
+  /**
+   * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
+   * {@link CursorProviderFactory#of(EventContext, Object, ComponentLocation)} is returned. Otherwise, the original {@code value} is.
    *
    * @param value                 a value which may be a repeatable streaming resource
    * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
    * @param event                 the event on which the {@code value} was generated
    * @return the {@code value} or a {@link CursorProvider}
+   *
+   * @deprecated Use {@link #streamingContent(Object, CursorProviderFactory, EventContext, ComponentLocation)}
    */
+  @Deprecated
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, CoreEvent event) {
-    return streamingContent(value, cursorProviderFactory, getRoot(event.getContext()));
+    return streamingContent(value, cursorProviderFactory, event, null);
   }
 
   /**
