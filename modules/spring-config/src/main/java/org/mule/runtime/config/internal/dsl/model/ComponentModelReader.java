@@ -85,38 +85,9 @@ public class ComponentModelReader {
                                            resolveValueIfIsPlaceHolder(simpleConfigAttribute.getValue()));
     }
 
-    // ComponentModel.Builder builder = new ComponentModel.Builder()
-    // .setIdentifier(builder()
-    // .namespace(namespace)
-    // .namespaceUri(namespaceUri)
-    // .name(configLine.getIdentifier())
-    // .build())
-    // .setTextContent(resolveValueIfIsPlaceHolder(configLine.getTextContent()))
-    // .setConfigFileName(configFileName)
-    // .setLineNumber(configLine.getLineNumber())
-    // .setStartColumn(configLine.getStartColumn())
-    // .setSourceCode(configLine.getSourceCode());
-    //
-    // configLine.getCustomAttributes()
-    // .forEach((key, value) -> {
-    // builder.addCustomAttribute(key, value);
-    // });
-    //
-    // for (SimpleConfigAttribute simpleConfigAttribute : configLine.getConfigAttributes().values()) {
-    // builder.addParameter(simpleConfigAttribute.getName(), resolveValueIfIsPlaceHolder(simpleConfigAttribute.getValue()),
-    // simpleConfigAttribute.isValueFromSchema());
-    // }
-
     configLine.getChildren().stream()
         .forEach(childConfigLine -> extractComponentDefinitionModel(childConfigLine, configFileName,
                                                                     componentAstBuilder.addChildComponent()));
-
-    // List<ComponentAst> componentModels = configLine.getChildren().stream()
-    // .map(childConfigLine -> extractComponentDefinitionModel(childConfigLine, configFileName))
-    // .collect(toList());
-    // componentModels.stream()
-    // .forEach(componentDefinitionModel -> builder.addChildComponentModel((ComponentModel) componentDefinitionModel));
-    // return builder.build();
   }
 
   private String resolveValueIfIsPlaceHolder(String value) {
