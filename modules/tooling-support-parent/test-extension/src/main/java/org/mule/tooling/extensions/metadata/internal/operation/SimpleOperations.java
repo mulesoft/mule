@@ -12,13 +12,13 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.tooling.extensions.metadata.api.parameters.ActingParameter;
 import org.mule.tooling.extensions.metadata.api.parameters.ActingParameterGroup;
 import org.mule.tooling.extensions.metadata.api.parameters.LocationKey;
 import org.mule.tooling.extensions.metadata.internal.config.SimpleConfiguration;
 import org.mule.tooling.extensions.metadata.internal.connection.TstExtensionClient;
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessConnectionLessMetadataResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessMetadataResolver;
+import org.mule.tooling.extensions.metadata.api.parameters.ComplexActingParameter;
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelPartialTypeKeysOutputTypeResolver;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterGroupVP;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;
@@ -73,7 +73,7 @@ public class SimpleOperations {
 
   public Result<Void, Object> complexActingParameterOP(@Config SimpleConfiguration configuration,
                                                        @Connection TstExtensionClient client,
-                                                       ActingParameter actingParameter,
+                                                       ComplexActingParameter actingParameter,
                                                        @Optional @OfValues(ComplexActingParameterVP.class) String providedParameter) {
     return null;
   }

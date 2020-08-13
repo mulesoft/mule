@@ -6,8 +6,18 @@
  */
 package org.mule.runtime.module.tooling;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArtifact;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configurationDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.connectionDeclaration;
 import static org.mule.test.infrastructure.maven.MavenTestUtils.getMavenLocalRepository;
+import org.mule.runtime.api.value.ResolvingFailure;
+import org.mule.runtime.api.value.ValueResult;
+import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ArtifactDeclarer;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -17,7 +27,7 @@ import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Rule;
 
-public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerTestCase implements TestExtensionAware {
+public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerTestCase {
 
   protected static final String EXTENSION_GROUP_ID = "org.mule.tooling";
   protected static final String EXTENSION_ARTIFACT_ID = "tooling-support-test-extension";
@@ -66,6 +76,35 @@ public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerT
   public void disposeSession() {
     if (session != null) {
       session.dispose();
+    }
+  }
+
+  protected void validateValuesSuccess(DeclarationSession session,
+                                       ParameterizedElementDeclaration elementDeclaration,
+                                       String parameterName,
+                                       String expectedValue) {
+    ValueResult providerResult = session.getValues(elementDeclaration, parameterName);
+
+    assertThat(providerResult.isSuccess(), equalTo(true));
+    assertThat(providerResult.getValues(), hasSize(1));
+    assertThat(providerResult.getValues().iterator().next().getId(), is(expectedValue));
+  }
+
+  protected void validateValuesFailure(DeclarationSession session,
+                                       ParameterizedElementDeclaration elementDeclaration,
+                                       String parameterName,
+                                       String message,
+                                       String code,
+                                       String... reason) {
+    ValueResult providerResult = session.getValues(elementDeclaration, parameterName);
+
+    assertThat(providerResult.isSuccess(), equalTo(false));
+    assertThat(providerResult.getFailure().isPresent(), is(true));
+    final ResolvingFailure failure = providerResult.getFailure().get();
+    assertThat(failure.getFailureCode(), is(code));
+    assertThat(failure.getMessage(), is(message));
+    if (reason.length > 0) {
+      assertThat(failure.getReason(), containsString(reason[0]));
     }
   }
 

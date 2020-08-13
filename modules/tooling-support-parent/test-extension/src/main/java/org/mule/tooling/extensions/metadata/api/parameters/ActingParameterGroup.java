@@ -1,5 +1,6 @@
 package org.mule.tooling.extensions.metadata.api.parameters;
 
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 public class ActingParameterGroup {
 
   @Parameter
+  @Optional(defaultValue = "defaultStringValue")
   private String stringParam;
 
   @Parameter

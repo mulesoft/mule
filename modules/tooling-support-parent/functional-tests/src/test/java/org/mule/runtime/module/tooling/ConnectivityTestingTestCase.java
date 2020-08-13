@@ -8,6 +8,8 @@ package org.mule.runtime.module.tooling;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configurationDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.connectionDeclaration;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.app.declaration.api.fluent.ArtifactDeclarer;
 
@@ -31,7 +33,7 @@ public class ConnectivityTestingTestCase extends DeclarationSessionTestCase {
   }
 
   @Test
-  public void testConnectionShouldNotDoneOnDeployment() {
+  public void testConnectionShouldNotBeDoneOnDeployment() {
     ConnectionValidationResult connectionValidationResult = session.testConnection(CONFIG_NAME_TEST_CONNECTION_FAILS);
     assertThat(connectionValidationResult.isValid(), equalTo(false));
     // Configuration has a connection provider instance that will fail validate connections and count the number of times

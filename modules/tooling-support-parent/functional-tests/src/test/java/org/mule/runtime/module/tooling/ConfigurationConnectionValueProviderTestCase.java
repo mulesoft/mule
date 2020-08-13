@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.module.tooling;
 
-import static org.mule.runtime.module.tooling.ComponentValueProviderTestCase.getResultAndValidate;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.ACTING_PARAMETER_NAME;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configurationDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.connectionDeclaration;
+import static org.mule.sdk.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ArtifactDeclarer;
@@ -21,14 +25,48 @@ public class ConfigurationConnectionValueProviderTestCase extends DeclarationSes
   @Test
   public void testStaticValuesAtConnectionParameter() {
     ConnectionElementDeclaration connectionElementDeclaration = connectionDeclaration(CLIENT_NAME);
-    getResultAndValidate(session, connectionElementDeclaration, PROVIDED_PARAMETER_NAME, "WITH-ACTING-PARAMETER-" + CLIENT_NAME);
+    validateValuesSuccess(session, connectionElementDeclaration, PROVIDED_PARAMETER_NAME, "WITH-ACTING-PARAMETER-" + CLIENT_NAME);
+  }
+
+  @Test
+  public void missingActingParameterAtConnectionFails() {
+    ConnectionElementDeclaration connectionElementDeclaration = connectionDeclaration(CLIENT_NAME);
+    connectionElementDeclaration.getParameterGroups().get(0).getParameters().remove(1);
+    validateValuesFailure(session, connectionElementDeclaration, PROVIDED_PARAMETER_NAME,
+                          "Unable to retrieve values. There are missing required parameters for the resolution: [actingParameter]",
+                          MISSING_REQUIRED_PARAMETERS);
   }
 
   @Test
   public void testStaticValuesAtConfigurationParameter() {
     ConfigurationElementDeclaration configurationElementDeclaration = configurationDeclaration(CLIENT_NAME);
-    getResultAndValidate(session, configurationElementDeclaration, PROVIDED_PARAMETER_NAME,
-                         "WITH-ACTING-PARAMETER-" + CLIENT_NAME);
+    validateValuesSuccess(session, configurationElementDeclaration, PROVIDED_PARAMETER_NAME,
+                          "WITH-ACTING-PARAMETER-" + CLIENT_NAME);
+  }
+
+  @Test
+  public void missingActingParameterAtConfigurationFails() {
+    ConfigurationElementDeclaration configurationElementDeclaration = configurationDeclaration(CLIENT_NAME);
+    configurationElementDeclaration.getParameterGroups().get(0).getParameters().remove(0);
+    validateValuesFailure(session, configurationElementDeclaration, PROVIDED_PARAMETER_NAME,
+                          "Unable to retrieve values. There are missing required parameters for the resolution: [actingParameter]",
+                          MISSING_REQUIRED_PARAMETERS);
+  }
+
+  @Test
+  public void getValuesOnParameterWithNoValueProviderOnConnection() {
+    ConnectionElementDeclaration connectionElementDeclaration = connectionDeclaration(CLIENT_NAME);
+    validateValuesFailure(session, connectionElementDeclaration, ACTING_PARAMETER_NAME,
+                          "Unable to find model for parameter or parameter group with name 'actingParameter'.",
+                          INVALID_VALUE_RESOLVER_NAME);
+  }
+
+  @Test
+  public void getValuesOnParameterWithNoValueProviderOnConfig() {
+    ConfigurationElementDeclaration configurationElementDeclaration = configurationDeclaration(CLIENT_NAME);
+    validateValuesFailure(session, configurationElementDeclaration, ACTING_PARAMETER_NAME,
+                          "Unable to find model for parameter or parameter group with name 'actingParameter'.",
+                          INVALID_VALUE_RESOLVER_NAME);
   }
 
 }

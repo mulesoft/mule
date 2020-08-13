@@ -14,6 +14,7 @@
     <properties>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
         <settingsFile>${java.io.tmpdir}/settings.xml</settingsFile>
+        <testExtensionVersion>1.0.0-SNAPSHOT</testExtensionVersion>
     </properties>
 
     <dependencies>
@@ -39,6 +40,13 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tooling</groupId>
+            <artifactId>tooling-support-test-extension</artifactId>
+            <type>test-jar</type>
+            <version>${testExtensionVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
