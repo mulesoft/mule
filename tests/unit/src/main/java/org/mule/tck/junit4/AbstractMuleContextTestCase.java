@@ -19,7 +19,9 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -568,7 +570,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   protected static Map<QName, Object> getFlowComponentLocationAnnotations(String rootComponentName) {
-    return ImmutableMap.<QName, Object>builder().put(LOCATION_KEY, from(rootComponentName)).build();
+    return ImmutableMap.<QName, Object>builder()
+        .put(LOCATION_KEY, from(rootComponentName))
+        .put(ANNOTATION_NAME, buildFromStringRepresentation("ns:" + rootComponentName))
+        .build();
   }
 
   public static Object sleepFor(Object payload, long millis) {

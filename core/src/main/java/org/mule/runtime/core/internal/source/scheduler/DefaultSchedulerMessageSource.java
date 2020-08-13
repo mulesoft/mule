@@ -35,6 +35,8 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
+import org.mule.runtime.core.internal.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.internal.management.stats.PayloadStatisticsCursorDecoratorFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
@@ -78,6 +80,9 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   @Inject
   private MessageProcessingManager messageProcessingManager;
+
+  @Inject
+  private PayloadStatisticsCursorDecoratorFactory payloadStatisticsCursorDecoratorFactory;
 
   private boolean started;
   private volatile boolean executing = false;
@@ -205,7 +210,11 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
     // Flow execution configurations
     this.flowProcessingTemplate = new SchedulerFlowProcessingTemplate(listener, emptyList(), this);
-    this.flowProcessContext = new SchedulerProcessContext();
+
+    // doing this here instead of inlining in the method below that uses it avoids doing the map lookup per event received.
+    final CursorComponentDecoratorFactory componentDecoratorFactory =
+        payloadStatisticsCursorDecoratorFactory.componentDecoratorFactory(this);
+    this.flowProcessContext = new SchedulerProcessContext(componentDecoratorFactory);
 
     createScheduler();
   }
@@ -245,6 +254,11 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private class SchedulerProcessContext implements MessageProcessContext {
 
     private final MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(getMessageSource());
+    private final CursorComponentDecoratorFactory componentDecoratorFactory;
+
+    public SchedulerProcessContext(CursorComponentDecoratorFactory componentDecoratorFactory) {
+      this.componentDecoratorFactory = componentDecoratorFactory;
+    }
 
     @Override
     public MessageSource getMessageSource() {
@@ -269,6 +283,11 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     @Override
     public MessagingExceptionResolver getMessagingExceptionResolver() {
       return messagingExceptionResolver;
+    }
+
+    @Override
+    public CursorComponentDecoratorFactory getComponentDecoratorFactory() {
+      return componentDecoratorFactory;
     }
 
     @Override

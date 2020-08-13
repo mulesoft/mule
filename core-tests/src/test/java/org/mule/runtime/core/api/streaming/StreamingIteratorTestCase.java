@@ -7,11 +7,12 @@
 
 package org.mule.runtime.core.api.streaming;
 
-import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
-import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.streaming.iterator.Consumer;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
@@ -32,6 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -45,10 +47,10 @@ public class StreamingIteratorTestCase {
   private static final int PAGE_SIZE = 100;
   private static final int TOP = 3000;
 
-  private PagingProvider<Object, String> delegate = new TestPagingProvider();
+  private final PagingProvider<Object, String> delegate = new TestPagingProvider();
 
   @InjectMocks
-  private Producer<List<String>> producer = new Producer<List<String>>() {
+  private final Producer<List<String>> producer = new Producer<List<String>>() {
 
     @Override
     public int getSize() {
@@ -121,7 +123,7 @@ public class StreamingIteratorTestCase {
     @Override
     public List<String> getPage(Object con) {
       if (counter < TOP) {
-        List<String> page = new ArrayList<>(100);
+        List<String> page = new ArrayList<>(PAGE_SIZE);
         for (int i = 0; i < PAGE_SIZE; i++) {
           counter++;
           String value = RandomStringUtils.randomAlphabetic(5000);

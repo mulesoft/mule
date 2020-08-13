@@ -65,6 +65,7 @@ import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
+import org.mule.runtime.core.internal.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalEvent.Builder;
@@ -196,7 +197,8 @@ public class FlowProcessMediator implements Initialisable {
       final FlowProcessor flowExecutionProcessor =
           new FlowProcessor(publisher -> applyWithChildContext(from(publisher), template::routeEventAsync, Optional.empty()),
                             flowConstruct);
-      final CoreEvent event = createEvent(template, messageSource, responseCompletion, flowConstruct);
+      final CoreEvent event = createEvent(template, messageProcessContext.getComponentDecoratorFactory(), messageSource,
+                                          responseCompletion, flowConstruct);
       policyManager.addSourcePointcutParametersIntoEvent(messageSource, event.getMessage().getAttributes(),
                                                          (InternalEvent) event);
 
@@ -506,7 +508,8 @@ public class FlowProcessMediator implements Initialisable {
         .fireNotification(notificationFunction.apply(event, flowConstruct.getSource())));
   }
 
-  private CoreEvent createEvent(FlowProcessTemplate template, MessageSource source,
+  private CoreEvent createEvent(FlowProcessTemplate template,
+                                CursorComponentDecoratorFactory componentDecoratorFactory, MessageSource source,
                                 CompletableFuture<Void> responseCompletion, FlowConstruct flowConstruct) {
 
     SourceResultAdapter adapter = template.getSourceMessage();
