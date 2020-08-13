@@ -13,6 +13,12 @@ import java.util.Iterator;
 
 class NoOpCursorComponentDecoratorFactory implements CursorComponentDecoratorFactory {
 
+  public static final NoOpCursorComponentDecoratorFactory NO_OP_INSTANCE = new NoOpCursorComponentDecoratorFactory();
+
+  private NoOpCursorComponentDecoratorFactory() {
+    // Nothing to do
+  }
+
   @Override
   public <T> Iterator<T> decorateInput(Iterator<T> decorated) {
     return decorated;

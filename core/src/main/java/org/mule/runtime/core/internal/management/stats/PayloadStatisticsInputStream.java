@@ -29,13 +29,6 @@ final class PayloadStatisticsInputStream extends FilterInputStream {
     return read;
   }
 
-  // @Override
-  // public int read(byte[] b) throws IOException {
-  // final int read = super.read(b);
-  // populator.accept(read);
-  // return read;
-  // }
-
   @Override
   public int read(byte[] b, int off, int len) throws IOException {
     final int read = super.read(b, off, len);

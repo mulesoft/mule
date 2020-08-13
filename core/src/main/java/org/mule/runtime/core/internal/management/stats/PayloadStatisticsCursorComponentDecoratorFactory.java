@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
+
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
@@ -25,7 +27,7 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsIterator(decorated, payloadStatistics::addInputObjectCount);
     } else {
-      return decorated;
+      return NO_OP_INSTANCE.decorateInput(decorated);
     }
   }
 
@@ -34,7 +36,7 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsInputStream(decorated, payloadStatistics::addInputByteCount);
     } else {
-      return decorated;
+      return NO_OP_INSTANCE.decorateInput(decorated);
     }
   }
 
@@ -43,7 +45,7 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsPagingProvider<>(decorated, payloadStatistics::addOutputObjectCount);
     } else {
-      return decorated;
+      return NO_OP_INSTANCE.decorateOutput(decorated);
     }
   }
 
@@ -52,7 +54,7 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsIterator(decorated, payloadStatistics::addOutputObjectCount);
     } else {
-      return decorated;
+      return NO_OP_INSTANCE.decorateOutput(decorated);
     }
   }
 
@@ -61,7 +63,7 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsInputStream(decorated, payloadStatistics::addOutputByteCount);
     } else {
-      return decorated;
+      return NO_OP_INSTANCE.decorateOutput(decorated);
     }
   }
 }

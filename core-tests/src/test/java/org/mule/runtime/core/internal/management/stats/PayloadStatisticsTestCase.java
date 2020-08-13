@@ -474,7 +474,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
 
     @Override
     public Optional<Integer> getTotalResults(Object con) {
-      return of(63);
+      return of(totalSize);
     }
   }
 }

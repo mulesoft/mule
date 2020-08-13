@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -18,7 +20,7 @@ import java.util.Iterator;
 /**
  * Provides a {@link CursorComponentDecoratorFactory} for a given component according to its {@link Component#getLocation()
  * location}.
- * 
+ *
  * @since 4.4, 4.3.1
  */
 public class PayloadStatisticsCursorDecoratorFactory implements MuleContextAware {
@@ -42,7 +44,7 @@ public class PayloadStatisticsCursorDecoratorFactory implements MuleContextAware
     if (component.getLocation() != null) {
       return new PayloadStatisticsCursorComponentDecoratorFactory(statistics.computePayloadStatisticsIfAbsent(component));
     } else {
-      return new NoOpCursorComponentDecoratorFactory();
+      return NO_OP_INSTANCE;
     }
   }
 }
