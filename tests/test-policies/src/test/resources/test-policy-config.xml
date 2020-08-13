@@ -15,7 +15,7 @@
         <processor ref="disposeListener"/>
     </flow>
 
-    <test-policy:proxy>
+    <test-policy:proxy name="policy">
         <test-policy:source>
             <set-variable variableName="sourceState" value="before"/>
             <test-policy:execute-next/>

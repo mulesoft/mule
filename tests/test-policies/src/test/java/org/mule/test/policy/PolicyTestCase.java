@@ -37,7 +37,6 @@ import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -56,7 +55,6 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
 
   @Inject
   private SchedulerService schedulerService;
-  private CountDownLatch messageSentTimer;
 
   @Override
   protected String getConfigFile() {
@@ -89,7 +87,6 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
   @Before
   public void setUp() {
     processorWasDisposed.set(false);
-    messageSentTimer = new CountDownLatch(1);
   }
 
   @Test
