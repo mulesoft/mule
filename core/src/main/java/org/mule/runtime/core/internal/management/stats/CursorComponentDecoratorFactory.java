@@ -15,7 +15,7 @@ import java.util.Iterator;
 
 /**
  * Implementations provide the functionality to decorate {@link Cursor}s in order to capture {@link PayloadStatistics} from it.
- * 
+ *
  * @since 4.4, 4.3.1
  */
 public interface CursorComponentDecoratorFactory {
@@ -26,9 +26,11 @@ public interface CursorComponentDecoratorFactory {
    * Ref: {@link PayloadStatistics#getInputObjectCount()}.
    *
    * @param decorated the {@link Iterator} to decorate.
+   * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
+   *        measured volume to a specific execution.
    * @return the decorated {@link Iterator}.
    */
-  <T> Iterator<T> decorateInput(Iterator<T> decorated);
+  <T> Iterator<T> decorateInput(Iterator<T> decorated, String correlationId);
 
   /**
    * If statistics are enabled, decorates the provided {@link InputStream} for counting the streamed bytes.
@@ -36,9 +38,11 @@ public interface CursorComponentDecoratorFactory {
    * Ref: {@link PayloadStatistics#getInputByteCount()}.
    *
    * @param decorated the {@link InputStream} to decorate.
+   * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
+   *        measured volume to a specific execution.
    * @return the decorated {@link InputStream}.
    */
-  InputStream decorateInput(InputStream decorated);
+  InputStream decorateInput(InputStream decorated, String correlationId);
 
   /**
    * If statistics are enabled, decorates the provided {@link PagingProvider} for counting the received objects.
@@ -49,9 +53,11 @@ public interface CursorComponentDecoratorFactory {
    * Ref: {@link PayloadStatistics#getOutputObjectCount()}.
    *
    * @param decorated the {@link PagingProvider} to decorate.
+   * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
+   *        measured volume to a specific execution.
    * @return the decorated {@link PagingProvider}.
    */
-  <C, T> PagingProvider<C, T> decorateOutput(PagingProvider<C, T> decorated);
+  <C, T> PagingProvider<C, T> decorateOutput(PagingProvider<C, T> decorated, String correlationId);
 
   /**
    * If statistics are enabled, decorates the provided {@link Iterator} for counting the iterated objects.
@@ -62,9 +68,11 @@ public interface CursorComponentDecoratorFactory {
    * Ref: {@link PayloadStatistics#getOutputObjectCount()}.
    *
    * @param decorated the {@link Iterator} to decorate.
+   * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
+   *        measured volume to a specific execution.
    * @return the decorated {@link Iterator}.
    */
-  <T> Iterator<T> decorateOutput(Iterator<T> decorated);
+  <T> Iterator<T> decorateOutput(Iterator<T> decorated, String correlationId);
 
   /**
    * If statistics are enabled, decorates the provided {@link InputStream} for counting the streamed bytes.
@@ -72,8 +80,10 @@ public interface CursorComponentDecoratorFactory {
    * Ref: {@link PayloadStatistics#getOutputByteCount()}.
    *
    * @param decorated the {@link InputStream} to decorate.
+   * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
+   *        measured volume to a specific execution.
    * @return the decorated {@link InputStream}.
    */
-  InputStream decorateOutput(InputStream decorated);
+  InputStream decorateOutput(InputStream decorated, String correlationId);
 
 }

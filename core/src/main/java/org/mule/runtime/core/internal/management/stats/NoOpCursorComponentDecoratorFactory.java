@@ -20,27 +20,27 @@ class NoOpCursorComponentDecoratorFactory implements CursorComponentDecoratorFac
   }
 
   @Override
-  public <T> Iterator<T> decorateInput(Iterator<T> decorated) {
+  public <T> Iterator<T> decorateInput(Iterator<T> decorated, String correlationId) {
     return decorated;
   }
 
   @Override
-  public InputStream decorateInput(InputStream decorated) {
+  public InputStream decorateInput(InputStream decorated, String correlationId) {
     return decorated;
   }
 
   @Override
-  public <C, T> PagingProvider<C, T> decorateOutput(PagingProvider<C, T> decorated) {
+  public <C, T> PagingProvider<C, T> decorateOutput(PagingProvider<C, T> decorated, String correlationId) {
     return decorated;
   }
 
   @Override
-  public <T> Iterator<T> decorateOutput(Iterator<T> decorated) {
+  public <T> Iterator<T> decorateOutput(Iterator<T> decorated, String correlationId) {
     return decorated;
   }
 
   @Override
-  public InputStream decorateOutput(InputStream decorated) {
+  public InputStream decorateOutput(InputStream decorated, String correlationId) {
     return decorated;
   }
 

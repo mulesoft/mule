@@ -52,6 +52,8 @@ import io.qameta.allure.Story;
 @Story(STATISTICS)
 public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
 
+  private static final String CORR_ID = "corrId";
+
   private PayloadStatisticsCursorDecoratorFactory decoratorFactory;
   private Component component1;
   private Component component2;
@@ -80,7 +82,8 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateInputStreamNoLocation() throws IOException {
     final InputStream decorated = new ByteArrayInputStream("Hello World".getBytes(UTF_8));
-    final InputStream decorator = decoratorFactory.componentDecoratorFactory(componentNoLocation).decorateInput(decorated);
+    final InputStream decorator =
+        decoratorFactory.componentDecoratorFactory(componentNoLocation).decorateInput(decorated, CORR_ID);
 
     assertThat(decorated, sameInstance(decorator));
   }
@@ -90,7 +93,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
     muleContext.getStatistics().setEnabled(false);
 
     final InputStream decorated = new ByteArrayInputStream("Hello World".getBytes(UTF_8));
-    final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1).decorateInput(decorated);
+    final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1).decorateInput(decorated, CORR_ID);
 
     assertThat(decorated, sameInstance(decorator));
 
@@ -109,7 +112,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateInputStreamNotMixesComponents() throws IOException {
     final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateInput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)));
+        .decorateInput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)), CORR_ID);
     decoratorFactory.componentDecoratorFactory(component2);
 
     final PayloadStatistics statistics2 =
@@ -126,7 +129,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateInputStreamSingle() throws IOException {
     final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateInput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)));
+        .decorateInput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
     assertThat(statistics.getInputByteCount(), is(0L));
@@ -145,7 +148,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateInputStreamArray() throws IOException {
     final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateInput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)));
+        .decorateInput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
     assertThat(statistics.getInputByteCount(), is(0L));
@@ -164,7 +167,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateInputStreamArrayBoundaries() throws IOException {
     final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateInput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)));
+        .decorateInput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
     assertThat(statistics.getInputByteCount(), is(0L));
@@ -185,7 +188,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
     muleContext.getStatistics().setEnabled(false);
 
     final Iterator<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateInput(asList("Hello", "World").iterator());
+        .decorateInput(asList("Hello", "World").iterator(), CORR_ID);
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
 
     assertThat(statistics.getInputObjectCount(), is(0L));
@@ -201,7 +204,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateInputIteratorSingle() throws IOException {
     final Iterator<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateInput(asList("Hello", "World").iterator());
+        .decorateInput(asList("Hello", "World").iterator(), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
     assertThat(statistics.getInputObjectCount(), is(0L));
@@ -228,7 +231,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateInputIteratorForEachRemaining() throws IOException {
     final Iterator<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateInput(asList("Hello", "World").iterator());
+        .decorateInput(asList("Hello", "World").iterator(), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
     assertThat(statistics.getInputObjectCount(), is(0L));
@@ -247,7 +250,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
     muleContext.getStatistics().setEnabled(false);
 
     final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateOutput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)));
+        .decorateOutput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)), CORR_ID);
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
 
     assertThat(statistics.getInputByteCount(), is(0L));
@@ -263,7 +266,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateOutputStreamSingle() throws IOException {
     final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateOutput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)));
+        .decorateOutput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
     assertThat(statistics.getOutputByteCount(), is(0L));
@@ -282,7 +285,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateOutputStreamArray() throws IOException {
     final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateOutput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)));
+        .decorateOutput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
     assertThat(statistics.getOutputByteCount(), is(0L));
@@ -301,7 +304,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateOutputStreamArrayBoundaries() throws IOException {
     final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateOutput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)));
+        .decorateOutput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
     assertThat(statistics.getOutputByteCount(), is(0L));
@@ -322,7 +325,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
     muleContext.getStatistics().setEnabled(false);
 
     final Iterator<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateOutput(asList("Hello", "World").iterator());
+        .decorateOutput(asList("Hello", "World").iterator(), CORR_ID);
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
 
     assertThat(statistics.getOutputObjectCount(), is(0L));
@@ -338,7 +341,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateOutputIteratorSingle() throws IOException {
     final Iterator<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateOutput(asList("Hello", "World").iterator());
+        .decorateOutput(asList("Hello", "World").iterator(), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
     assertThat(statistics.getOutputObjectCount(), is(0L));
@@ -365,7 +368,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateOutputIteratorForEachRemaining() throws IOException {
     final Iterator<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateOutput(asList("Hello", "World").iterator());
+        .decorateOutput(asList("Hello", "World").iterator(), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
     assertThat(statistics.getOutputObjectCount(), is(0L));
@@ -384,7 +387,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
     muleContext.getStatistics().setEnabled(false);
 
     final PagingProvider<Object, String> decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateOutput(new TestPagingProvider(63, 20));
+        .decorateOutput(new TestPagingProvider(63, 20), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
 
@@ -401,7 +404,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void decorateOutputPagingProvider() throws IOException {
     final PagingProvider<Object, String> decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateOutput(new TestPagingProvider(63, 20));
+        .decorateOutput(new TestPagingProvider(63, 20), CORR_ID);
 
     final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
     assertThat(statistics.getOutputObjectCount(), is(0L));
@@ -433,7 +436,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
     when(decorated.getTotalResults(Mockito.any())).thenReturn(Optional.of(expectedTotal));
 
     final PagingProvider<Object, String> decorator = decoratorFactory.componentDecoratorFactory(component1)
-        .decorateOutput(decorated);
+        .decorateOutput(decorated, CORR_ID);
 
     assertThat(decorator.getTotalResults("conn").get(), is(expectedTotal));
 

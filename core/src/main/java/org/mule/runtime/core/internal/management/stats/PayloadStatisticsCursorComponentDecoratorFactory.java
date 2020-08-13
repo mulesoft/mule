@@ -23,47 +23,47 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
   }
 
   @Override
-  public <T> Iterator<T> decorateInput(Iterator<T> decorated) {
+  public <T> Iterator<T> decorateInput(Iterator<T> decorated, String correlationId) {
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsIterator(decorated, payloadStatistics::addInputObjectCount);
     } else {
-      return NO_OP_INSTANCE.decorateInput(decorated);
+      return NO_OP_INSTANCE.decorateInput(decorated, correlationId);
     }
   }
 
   @Override
-  public InputStream decorateInput(InputStream decorated) {
+  public InputStream decorateInput(InputStream decorated, String correlationId) {
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsInputStream(decorated, payloadStatistics::addInputByteCount);
     } else {
-      return NO_OP_INSTANCE.decorateInput(decorated);
+      return NO_OP_INSTANCE.decorateInput(decorated, correlationId);
     }
   }
 
   @Override
-  public <C, T> PagingProvider<C, T> decorateOutput(PagingProvider<C, T> decorated) {
+  public <C, T> PagingProvider<C, T> decorateOutput(PagingProvider<C, T> decorated, String correlationId) {
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsPagingProvider<>(decorated, payloadStatistics::addOutputObjectCount);
     } else {
-      return NO_OP_INSTANCE.decorateOutput(decorated);
+      return NO_OP_INSTANCE.decorateOutput(decorated, correlationId);
     }
   }
 
   @Override
-  public <T> Iterator<T> decorateOutput(Iterator<T> decorated) {
+  public <T> Iterator<T> decorateOutput(Iterator<T> decorated, String correlationId) {
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsIterator(decorated, payloadStatistics::addOutputObjectCount);
     } else {
-      return NO_OP_INSTANCE.decorateOutput(decorated);
+      return NO_OP_INSTANCE.decorateOutput(decorated, correlationId);
     }
   }
 
   @Override
-  public InputStream decorateOutput(InputStream decorated) {
+  public InputStream decorateOutput(InputStream decorated, String correlationId) {
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsInputStream(decorated, payloadStatistics::addOutputByteCount);
     } else {
-      return NO_OP_INSTANCE.decorateOutput(decorated);
+      return NO_OP_INSTANCE.decorateOutput(decorated, correlationId);
     }
   }
 }
