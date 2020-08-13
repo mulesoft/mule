@@ -12,18 +12,8 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
-import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 
-import java.io.InputStream;
-import java.util.Iterator;
-
-/**
- * Provides a {@link CursorComponentDecoratorFactory} for a given component according to its {@link Component#getLocation()
- * location}.
- *
- * @since 4.4, 4.3.1
- */
-public class PayloadStatisticsCursorDecoratorFactory implements MuleContextAware {
+public class PayloadStatisticsCursorDecoratorFactory implements MuleContextAware, CursorDecoratorFactory {
 
   // TODO MULE-18648 @Inject this
   private AllStatistics statistics;
@@ -34,12 +24,7 @@ public class PayloadStatisticsCursorDecoratorFactory implements MuleContextAware
     statistics = context.getStatistics();
   }
 
-  /**
-   * Creates a factory that will decorate cursors, to populate the {@link PayloadStatistics} for a specific component.
-   *
-   * @param component the component that will interact with the decorated {@link Iterator} or {@link InputStream}.
-   * @return the decorator factory for the provided component.
-   */
+  @Override
   public CursorComponentDecoratorFactory componentDecoratorFactory(Component component) {
     if (component.getLocation() != null) {
       return new PayloadStatisticsCursorComponentDecoratorFactory(statistics.computePayloadStatisticsIfAbsent(component));

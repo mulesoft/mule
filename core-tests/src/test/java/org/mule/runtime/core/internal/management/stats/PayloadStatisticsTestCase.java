@@ -54,7 +54,7 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
 
   private static final String CORR_ID = "corrId";
 
-  private PayloadStatisticsCursorDecoratorFactory decoratorFactory;
+  private CursorDecoratorFactory decoratorFactory;
   private Component component1;
   private Component component2;
   private Component componentNoLocation;

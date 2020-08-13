@@ -13,7 +13,7 @@ import static java.lang.System.getProperty;
 import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.util.MuleSystemProperties;
-import org.mule.runtime.core.internal.management.stats.PayloadStatisticsCursorDecoratorFactory;
+import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 
 /**
  * <code>MuleProperties</code> is a set of constants pertaining to Mule properties.
@@ -152,8 +152,8 @@ public class MuleProperties {
   public static final String OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER = "_muleMessageProcessingManager";
   public static final String OBJECT_PROCESSING_TIME_WATCHER = "_muleProcessingTimeWatcher";
   /**
-   * Registry key for {@link PayloadStatisticsCursorDecoratorFactory}
-   * 
+   * Registry key for {@link CursorDecoratorFactory}
+   *
    * @since 4.4, 4.3.1
    */
   public static final String OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY = "_mulePayloadStatisticsCursorDecoratorFactory";

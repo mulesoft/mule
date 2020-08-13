@@ -89,7 +89,7 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.internal.management.stats.PayloadStatisticsCursorDecoratorFactory;
+import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
@@ -216,7 +216,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private ExtensionConnectionSupplier extensionConnectionSupplier;
 
   @Inject
-  private PayloadStatisticsCursorDecoratorFactory payloadStatisticsCursorDecoratorFactory;
+  private CursorDecoratorFactory payloadStatisticsCursorDecoratorFactory;
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;

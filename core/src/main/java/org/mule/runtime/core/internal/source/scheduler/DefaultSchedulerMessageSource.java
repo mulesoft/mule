@@ -36,7 +36,7 @@ import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.internal.management.stats.PayloadStatisticsCursorDecoratorFactory;
+import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
@@ -82,7 +82,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private MessageProcessingManager messageProcessingManager;
 
   @Inject
-  private PayloadStatisticsCursorDecoratorFactory payloadStatisticsCursorDecoratorFactory;
+  private CursorDecoratorFactory cursorDecoratorFactory;
 
   private boolean started;
   private volatile boolean executing = false;
@@ -212,8 +212,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     this.flowProcessingTemplate = new SchedulerFlowProcessingTemplate(listener, emptyList(), this);
 
     // doing this here instead of inlining in the method below that uses it avoids doing the map lookup per event received.
-    final CursorComponentDecoratorFactory componentDecoratorFactory =
-        payloadStatisticsCursorDecoratorFactory.componentDecoratorFactory(this);
+    final CursorComponentDecoratorFactory componentDecoratorFactory = cursorDecoratorFactory.componentDecoratorFactory(this);
     this.flowProcessContext = new SchedulerProcessContext(componentDecoratorFactory);
 
     createScheduler();
