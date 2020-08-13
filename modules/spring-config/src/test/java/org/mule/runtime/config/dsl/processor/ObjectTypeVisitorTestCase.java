@@ -88,7 +88,7 @@ public class ObjectTypeVisitorTestCase {
 
 
   private ComponentAstBuilder baseComponentModelBuilder() {
-     return ComponentAstBuilder.builder()
+    return ComponentAstBuilder.builder()
         .withIdentifier(ComponentIdentifier.builder().namespace("ns").name("comp").build())
         .withMetadata(ComponentMetadataAst.builder().build());
   }
