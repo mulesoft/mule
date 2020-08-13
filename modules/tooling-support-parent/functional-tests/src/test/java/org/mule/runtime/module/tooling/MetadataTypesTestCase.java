@@ -11,15 +11,16 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
+import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONENT;
+import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_PAYLOAD;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessConnectionLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.invalidComponentDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelCompleteOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.sourceDeclaration;
-
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
-import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
-import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_PAYLOAD;
 
 import org.mule.metadata.internal.utils.MetadataTypeWriter;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
@@ -86,6 +87,7 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
                    "}"));
   }
 
+  // TODO BUG Optional levels are required for multi-level keys!
   @Test
   public void operationDynamicTypesPartialKey() {
     OperationElementDeclaration operationElementDeclaration = multiLevelOPDeclaration(CONFIG_NAME, "America", "USA");
@@ -95,6 +97,7 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
     assertThat(containerTypeMetadataResult.getFailures(), hasSize(2));
   }
 
+  // TODO BUG Optional levels are required for multi-level keys!
   @Test
   public void operationDynamicTypesNoKey() {
     OperationElementDeclaration operationElementDeclaration = multiLevelOPDeclaration(CONFIG_NAME, null, null);
@@ -113,6 +116,16 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
     assertThat(metadataTypes.get().getOutputMetadata().isPresent(), is(true));
     assertThat(getTypeId(metadataTypes.get().getOutputMetadata().get()),
                is(of("org.mule.tooling.extensions.metadata.api.parameters.ItemOutput")));
+  }
+
+  @Test
+  public void operationDynamicTypesSingleLevelKeyRequiredNotProvided() {
+    OperationElementDeclaration operationElementDeclaration = configLessConnectionLessOPDeclaration(CONFIG_NAME);
+    MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
+        session.resolveComponentMetadata(operationElementDeclaration);
+    assertThat(metadataTypes.isSuccess(), is(false));
+    assertThat(metadataTypes.getFailures(), hasSize(1));
+    assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(COMPONENT));
   }
 
   @Test

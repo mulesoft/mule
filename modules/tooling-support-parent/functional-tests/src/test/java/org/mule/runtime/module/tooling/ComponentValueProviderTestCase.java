@@ -155,7 +155,8 @@ public class ComponentValueProviderTestCase extends DeclarationSessionTestCase {
                 .getDeclaration())
             .getDeclaration();
     validateValuesFailure(session, operationElementDeclaration, "anyParameter",
-                          "There is no extensionModel for extension: WrongExtension", UNKNOWN);
+                          "Unknown error while resolving values for parameter: 'anyParameter'. MuleRuntimeException: There is no extensionModel for extension: WrongExtension",
+                          UNKNOWN);
   }
 
   @Test

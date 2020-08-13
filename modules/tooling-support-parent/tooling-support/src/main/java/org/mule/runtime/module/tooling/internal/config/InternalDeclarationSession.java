@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -64,6 +65,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.config.metadata.MetadataKeyDeclarationResolver;
+import org.mule.runtime.module.tooling.internal.config.metadata.MetadataKeyResult;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import org.mule.sdk.api.values.ValueResolvingException;
 
@@ -159,7 +161,15 @@ public class InternalDeclarationSession implements DeclarationSession {
           Optional<ConfigurationInstance> configurationInstance =
               ofNullable(component.getConfigRef()).flatMap(name -> artifactHelper().getConfigurationInstance(name));
 
-          MetadataKey metadataKey = new MetadataKeyDeclarationResolver(cm, component).resolveKey();
+          MetadataKeyResult metadataKeyResult = new MetadataKeyDeclarationResolver(cm, component).resolveKeyResult();
+          if (!metadataKeyResult.isComplete()) {
+            return MetadataResult.<ComponentMetadataTypesDescriptor>failure(
+                                                                            MetadataFailure.Builder.newFailure()
+                                                                                .withMessage(metadataKeyResult.getPartialReason())
+                                                                                .withFailureCode(INVALID_METADATA_KEY)
+                                                                                .onComponent());
+          }
+          MetadataKey metadataKey = metadataKeyResult.getMetadataKey();
           ClassLoader extensionClassLoader = getClassLoader(artifactHelper().getExtensionModel(component));
           return withContextClassLoader(extensionClassLoader, () -> {
             MetadataMediator<? extends ComponentModel> metadataMediator = new MetadataMediator<>(cm);
