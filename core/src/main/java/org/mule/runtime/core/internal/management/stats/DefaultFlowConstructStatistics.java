@@ -6,19 +6,30 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import static java.lang.System.currentTimeMillis;
+
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
+import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatistics {
+public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
   private static final long serialVersionUID = 5337576392583767442L;
+
+  protected final String flowConstructType;
+  protected String name;
+  protected boolean enabled = false;
+  private long samplePeriod = 0;
+  protected final AtomicLong receivedEvents = new AtomicLong(0);
+
   private final AtomicLong executionError = new AtomicLong(0);
   private final AtomicLong fatalError = new AtomicLong(0);
   protected final ComponentStatistics flowStatistics = new ComponentStatistics();
 
   public DefaultFlowConstructStatistics(String flowConstructType, String name) {
-    super(flowConstructType, name);
+    this.name = name;
+    this.flowConstructType = flowConstructType;
     flowStatistics.setEnabled(enabled);
     if (this.getClass() == DefaultFlowConstructStatistics.class) {
       clear();
@@ -48,13 +59,23 @@ public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatist
    */
   @Override
   public synchronized void setEnabled(boolean b) {
-    super.setEnabled(b);
+    enabled = b;
     flowStatistics.setEnabled(enabled);
   }
 
   @Override
+  public synchronized String getName() {
+    return name;
+  }
+
+  public synchronized void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
   public synchronized void clear() {
-    super.clear();
+    receivedEvents.set(0);
+    samplePeriod = currentTimeMillis();
 
     executionError.set(0);
     fatalError.set(0);
@@ -106,6 +127,20 @@ public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatist
   @Override
   public long getFatalErrors() {
     return fatalError.get();
+  }
+
+  @Override
+  public void incReceivedEvents() {
+    receivedEvents.addAndGet(1);
+  }
+
+  @Override
+  public long getTotalEventsReceived() {
+    return receivedEvents.get();
+  }
+
+  public long getSamplePeriod() {
+    return currentTimeMillis() - samplePeriod;
   }
 
 }
