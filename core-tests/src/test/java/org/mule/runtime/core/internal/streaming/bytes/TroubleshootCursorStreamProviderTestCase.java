@@ -39,8 +39,8 @@ public class TroubleshootCursorStreamProviderTestCase extends AbstractTroublesho
   }
 
   protected CursorStreamProvider createCursorProvider() {
-    int bufferSize = 1;
-    int maxBufferSize = 10;
+    int bufferSize = 10;
+    int maxBufferSize = 20;
     InputStream dataStream = new ByteArrayInputStream(DATA);
 
     bufferManager = new PoolingByteBufferManager();

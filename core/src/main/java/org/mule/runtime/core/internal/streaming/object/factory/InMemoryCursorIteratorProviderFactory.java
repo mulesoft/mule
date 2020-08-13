@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.object.factory;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
@@ -35,7 +36,7 @@ public class InMemoryCursorIteratorProviderFactory extends AbstractCursorIterato
    * @return a new {@link CursorIteratorProvider} wrapped in an {@link Either}
    */
   @Override
-  protected Object resolve(Iterator iterator, EventContext eventContext) {
-    return new InMemoryCursorIteratorProvider(iterator, config, eventContext.getOriginatingLocation(), trackCursorProviderClose);
+  protected Object resolve(Iterator iterator, EventContext eventContext, ComponentLocation originatingLocation) {
+    return new InMemoryCursorIteratorProvider(iterator, config, originatingLocation, trackCursorProviderClose);
   }
 }

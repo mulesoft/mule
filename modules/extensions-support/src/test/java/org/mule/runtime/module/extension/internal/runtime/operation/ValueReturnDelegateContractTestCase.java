@@ -33,6 +33,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -85,6 +86,9 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   @Mock
   protected ConnectableComponentModel componentModel;
 
+  @Mock
+  protected Component component;
+
   protected CoreEvent event;
 
   @Mock
@@ -119,6 +123,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     when(operationContext.getEvent()).thenReturn(event);
     when(operationContext.getMuleContext()).thenReturn(muleContext);
     when(operationContext.getComponentModel()).thenReturn(componentModel);
+    when(operationContext.getComponent()).thenReturn(component);
     when(operationContext.getVariable(contains(CONNECTION_PARAM))).thenReturn(connectionHandler);
   }
 

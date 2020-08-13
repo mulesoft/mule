@@ -12,6 +12,7 @@ import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -48,13 +49,16 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
     this.streamingManager = streamingManager;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public final Object of(EventContext eventContext, InputStream inputStream) {
+  public final Object of(EventContext eventContext, InputStream inputStream, ComponentLocation originatingLocation) {
     if (inputStream instanceof CursorStream) {
       return streamingManager.manage(((CursorStream) inputStream).getProvider(), eventContext);
     }
 
-    Object value = resolve(inputStream, eventContext);
+    Object value = resolve(inputStream, eventContext, originatingLocation);
     if (value instanceof CursorStreamProvider) {
       value = streamingManager.manage((CursorStreamProvider) value, eventContext);
     }
@@ -62,9 +66,28 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
     return value;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final Object of(EventContext eventContext, InputStream inputStream) {
+    return of(eventContext, inputStream, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final Object of(CoreEvent event, InputStream inputStream, ComponentLocation originatingLocation) {
+    return of(getRoot(event.getContext()), inputStream, originatingLocation);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public final Object of(CoreEvent event, InputStream inputStream) {
-    return of(getRoot(event.getContext()), inputStream);
+    return of(getRoot(event.getContext()), inputStream, null);
   }
 
   /**
@@ -77,20 +100,20 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
   /**
    * Implementations should use this method to actually create the output value
    *
-   * @param inputStream  a stream
+   * @param inputStream a stream
    * @param eventContext the context of the event on which the stream was opened
    * @return a resolved value
    */
-  protected abstract Object resolve(InputStream inputStream, EventContext eventContext);
+  protected abstract Object resolve(InputStream inputStream, EventContext eventContext, ComponentLocation originatingLocation);
 
   /**
    * Implementations should use this method to actually create the output value
    *
    * @param inputStream a stream
-   * @param event       the event on which the stream was opened
+   * @param event the event on which the stream was opened
    * @return a resolved value
-   * @deprecated Use {@link #resolve(InputStream, EventContext)} instead.
+   * @deprecated Use {@link #resolve(InputStream, EventContext, ComponentLocation)} instead.
    */
   @Deprecated
-  protected abstract Object resolve(InputStream inputStream, CoreEvent event);
+  protected abstract Object resolve(InputStream inputStream, CoreEvent event, ComponentLocation originatingLocation);
 }
