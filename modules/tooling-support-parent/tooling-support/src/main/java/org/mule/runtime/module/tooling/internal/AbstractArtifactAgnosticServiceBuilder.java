@@ -121,7 +121,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
   public S build() {
     checkState(artifactDeclaration != null, "artifact configuration cannot be null");
     return createService(() -> {
-      String applicationName = UUID.getUUID() + "-connectivity-testing-temp-app";
+      String applicationName = UUID.getUUID() + "-artifact-temp-app";
       File applicationFolder = new File(getExecutionFolder(), applicationName);
       ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(applicationName);
       applicationDescriptor.setArtifactDeclaration(artifactDeclaration);

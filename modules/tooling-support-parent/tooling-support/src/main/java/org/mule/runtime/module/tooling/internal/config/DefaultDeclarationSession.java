@@ -11,9 +11,9 @@ import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessa
 import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
-
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -31,9 +31,13 @@ import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.AbstractArtifactAgnosticService;
 import org.mule.runtime.module.tooling.internal.ApplicationSupplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DefaultDeclarationSession extends AbstractArtifactAgnosticService implements DeclarationSession {
 
   private LazyValue<DeclarationSession> internalConfigurationService;
+  private Logger LOGGER = LoggerFactory.getLogger(DefaultDeclarationSession.class);
 
   DefaultDeclarationSession(ApplicationSupplier applicationSupplier) {
     super(applicationSupplier);
@@ -41,6 +45,7 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
       try {
         return createInternalService(getStartedApplication());
       } catch (ApplicationStartingException e) {
+        LOGGER.error("Unknown error while starting temporary application for declaration", e);
         throw new MuleRuntimeException(e.getCause());
       }
     });
@@ -70,6 +75,7 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
     try {
       return withInternalService().testConnection(configName);
     } catch (Exception e) {
+      LOGGER.error(format("Unknown error while performing test connection on config: '%s'", configName), e);
       return failure(format("Unknown error while performing test connection on config: '%s'. %s", configName,
                             getRootCauseMessage(e)),
                      e);
@@ -80,7 +86,10 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   public ValueResult getValues(ParameterizedElementDeclaration component, String parameterName) {
     try {
       return withInternalService().getValues(component, parameterName);
-    } catch (Exception e) {
+    } catch (NoClassDefFoundError | Exception e) {
+      LOGGER.error(format("Unknown error while resolving values on component: '%s' for parameter: '%s'", component.getName(),
+                          parameterName),
+                   e);
       return resultFrom(newFailure()
           .withMessage(format("Unknown error while resolving values for parameter: '%s'. %s", parameterName,
                               getRootCauseMessage(e)))
@@ -93,11 +102,13 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration component) {
     try {
       return withInternalService().getMetadataKeys(component);
-    } catch (Exception e) {
+    } catch (NoClassDefFoundError | Exception e) {
+      LOGGER.error(format("Unknown error while resolving metadata keys on component: '%s'", component.getName()), e);
       return MetadataResult.failure(MetadataFailure.Builder.newFailure()
           .withMessage(format("Unknown error while resolving metadata keys on component: '%s'. %s", component.getName(),
                               getRootCauseMessage(e)))
           .withReason(getStackTrace(e))
+          .withFailureCode(UNKNOWN)
           .onComponent());
     }
   }
@@ -106,11 +117,14 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   public MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentElementDeclaration component) {
     try {
       return withInternalService().resolveComponentMetadata(component);
-    } catch (Exception e) {
+    } catch (NoClassDefFoundError | Exception e) {
+      LOGGER.error(format("Unknown error while resolving metadata on component: '%s'", component.getName()), e);
       return MetadataResult.failure(MetadataFailure.Builder.newFailure()
           .withMessage(format("Unknown error while resolving metadata on component: '%s'. %s", component.getName(),
                               getRootCauseMessage(e)))
           .withReason(getStackTrace(e))
+          .withFailureCode(UNKNOWN)
+
           .onComponent());
     }
   }
