@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.DataUnit.KB;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
@@ -241,7 +242,8 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
 
     CursorStreamProvider provider = (CursorStreamProvider) flowRunner("objectToStream")
         .keepStreamsOpen()
-        .withPayload(factory.of(testEvent().getContext(), new ByteArrayInputStream(data.getBytes())))
+        .withPayload(factory.of(testEvent().getContext(), new ByteArrayInputStream(data.getBytes()),
+                                fromSingleComponent("objectToStream")))
         .run().getMessage().getPayload().getValue();
 
     byte[] bytes = muleContext.getObjectSerializer().getInternalProtocol().serialize(provider);

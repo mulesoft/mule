@@ -10,6 +10,7 @@ import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -57,7 +58,7 @@ public final class MessageUtils {
    * @return a {@link Message}
    */
   public static Message toMessage(Result result, MediaType mediaType) {
-    return toMessage(result, mediaType, (CursorProviderFactory) null, (BaseEventContext) null);
+    return toMessage(result, mediaType, null, (BaseEventContext) null, null);
   }
 
   /**
@@ -69,8 +70,10 @@ public final class MessageUtils {
    * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
    * @return a {@link Message}
    */
-  public static Message toMessage(Result result, CursorProviderFactory cursorProviderFactory, BaseEventContext eventContext) {
-    return toMessage(result, ((Optional<MediaType>) result.getMediaType()).orElse(ANY), cursorProviderFactory, eventContext);
+  public static Message toMessage(Result result, CursorProviderFactory cursorProviderFactory, BaseEventContext eventContext,
+                                  ComponentLocation originatingLocation) {
+    return toMessage(result, ((Optional<MediaType>) result.getMediaType()).orElse(ANY), cursorProviderFactory, eventContext,
+                     originatingLocation);
   }
 
   /**
@@ -82,8 +85,10 @@ public final class MessageUtils {
    * @param event Used for the case where a {@link CursorProvider} is created, register the one in it.
    * @return a {@link Message}
    */
-  public static Message toMessage(Result result, CursorProviderFactory cursorProviderFactory, CoreEvent event) {
-    return toMessage(result, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
+  public static Message toMessage(Result result, CursorProviderFactory cursorProviderFactory, CoreEvent event,
+                                  ComponentLocation originatingLocation) {
+    return toMessage(result, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
+                     originatingLocation);
   }
 
   /**
@@ -100,8 +105,9 @@ public final class MessageUtils {
   public static Message toMessage(Result<?, ?> result,
                                   MediaType mediaType,
                                   CursorProviderFactory cursorProviderFactory,
-                                  BaseEventContext eventContext) {
-    Object value = streamingContent(result.getOutput(), cursorProviderFactory, eventContext);
+                                  BaseEventContext eventContext,
+                                  ComponentLocation originatingLocation) {
+    Object value = streamingContent(result.getOutput(), cursorProviderFactory, eventContext, originatingLocation);
     return toMessage(result, builder().fromObject(value).mediaType(mediaType).build(), value);
   }
 
@@ -120,8 +126,9 @@ public final class MessageUtils {
                                   MediaType mediaType,
                                   CursorProviderFactory cursorProviderFactory,
                                   BaseEventContext eventContext,
-                                  DataType dataType) {
-    Object value = streamingContent(result.getOutput(), cursorProviderFactory, eventContext);
+                                  DataType dataType,
+                                  ComponentLocation originatingLocation) {
+    Object value = streamingContent(result.getOutput(), cursorProviderFactory, eventContext, originatingLocation);
     return toMessage(result, builder(dataType).mediaType(mediaType).build(), value);
   }
 
@@ -140,8 +147,10 @@ public final class MessageUtils {
   public static Message toMessage(Result<?, ?> result,
                                   MediaType mediaType,
                                   CursorProviderFactory cursorProviderFactory,
-                                  CoreEvent event) {
-    return toMessage(result, mediaType, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
+                                  CoreEvent event,
+                                  ComponentLocation originatingLocation) {
+    return toMessage(result, mediaType, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
+                     originatingLocation);
   }
 
   /**
@@ -159,9 +168,10 @@ public final class MessageUtils {
                                   MediaType mediaType,
                                   CursorProviderFactory cursorProviderFactory,
                                   CoreEvent event,
-                                  DataType dataType) {
+                                  DataType dataType,
+                                  ComponentLocation originatinLocation) {
     return toMessage(result, mediaType, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
-                     dataType);
+                     dataType, originatinLocation);
   }
 
   /**
@@ -174,12 +184,12 @@ public final class MessageUtils {
    */
   public static List<Message> toMessageCollection(Collection<Result> results,
                                                   CursorProviderFactory cursorProviderFactory,
-                                                  BaseEventContext eventContext) {
+                                                  BaseEventContext eventContext, ComponentLocation originatingLocation) {
     if (!(results instanceof List)) {
       results = new ArrayList<>(results);
     }
 
-    return new ResultsToMessageList((List) results, cursorProviderFactory, eventContext);
+    return new ResultsToMessageList((List) results, cursorProviderFactory, eventContext, originatingLocation);
   }
 
   /**
@@ -192,11 +202,12 @@ public final class MessageUtils {
    */
   public static Iterator<Message> toMessageIterator(Iterator<Result> results,
                                                     CursorProviderFactory cursorProviderFactory,
-                                                    BaseEventContext eventContext) {
+                                                    BaseEventContext eventContext, ComponentLocation originatingLocation) {
     if (results instanceof StreamingIterator) {
-      return new ResultToMessageStreamingIterator((StreamingIterator<Result>) results, cursorProviderFactory, eventContext);
+      return new ResultToMessageStreamingIterator((StreamingIterator<Result>) results, cursorProviderFactory, eventContext,
+                                                  originatingLocation);
     } else {
-      return new ResultToMessageIterator((Iterator) results, cursorProviderFactory, eventContext);
+      return new ResultToMessageIterator((Iterator) results, cursorProviderFactory, eventContext, originatingLocation);
     }
   }
 
@@ -204,6 +215,8 @@ public final class MessageUtils {
     Message.Builder builder = Message.builder().payload(new TypedValue<>(value, dataType, result.getByteLength()));
 
     if (result.getAttributes().isPresent()) {
+      // Don't change: SonarQube detects this code as java:S3655 bug, but by using Optional#ifPresent(Consumer) introduces
+      // performance issues.
       Object att = result.getAttributes().get();
 
       final Optional<MediaType> attributesMediaType = result.getAttributesMediaType();

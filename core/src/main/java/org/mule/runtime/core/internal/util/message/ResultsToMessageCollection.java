@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.message;
 
 import static java.util.stream.Collectors.toList;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -37,16 +38,19 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
   private final Collection<Object> delegate;
   protected final CursorProviderFactory cursorProviderFactory;
   protected final BaseEventContext eventContext;
+  protected final ComponentLocation originatingLocation;
   protected final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
   protected final Lock readLock = readWriteLock.readLock();
   protected final Lock writeLock = readWriteLock.writeLock();
 
   public ResultsToMessageCollection(Collection<Object> delegate,
                                     CursorProviderFactory cursorProviderFactory,
-                                    BaseEventContext eventContext) {
+                                    BaseEventContext eventContext,
+                                    ComponentLocation originatingLocation) {
     this.delegate = delegate;
     this.cursorProviderFactory = cursorProviderFactory;
     this.eventContext = eventContext;
+    this.originatingLocation = originatingLocation;
   }
 
   @Override
@@ -85,7 +89,7 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public Iterator<Message> iterator() {
-    return new ResultToMessageIterator(delegate.iterator(), cursorProviderFactory, eventContext);
+    return new ResultToMessageIterator(delegate.iterator(), cursorProviderFactory, eventContext, originatingLocation);
   }
 
   @Override
@@ -257,7 +261,7 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
     if (value instanceof Message) {
       return (Message) value;
     } else {
-      return MessageUtils.toMessage((Result) value, cursorProviderFactory, eventContext);
+      return MessageUtils.toMessage((Result) value, cursorProviderFactory, eventContext, originatingLocation);
     }
   }
 }

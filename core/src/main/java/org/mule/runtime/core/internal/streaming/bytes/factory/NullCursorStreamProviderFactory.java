@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.streaming.bytes.factory;
 
 import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -39,13 +40,13 @@ public class NullCursorStreamProviderFactory extends AbstractCursorStreamProvide
    * @return the given {@code inputStream} wrapped in an {@link Either} instance
    */
   @Override
-  protected Object resolve(InputStream inputStream, EventContext creatorRootEventContext) {
+  protected Object resolve(InputStream inputStream, EventContext creatorRootEventContext, ComponentLocation originatingLocation) {
     streamingManager.manage((Closeable) inputStream, creatorRootEventContext);
     return inputStream;
   }
 
   @Override
-  protected Object resolve(InputStream inputStream, CoreEvent event) {
-    return resolve(inputStream, getRoot(event.getContext()));
+  protected Object resolve(InputStream inputStream, CoreEvent event, ComponentLocation originatingLocation) {
+    return resolve(inputStream, getRoot(event.getContext()), originatingLocation);
   }
 }

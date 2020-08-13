@@ -18,6 +18,8 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
+
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -57,6 +59,9 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected ComponentModel componentModel;
 
+  @Mock
+  protected Component component;
+
   protected CoreEvent event;
 
   @Mock
@@ -76,6 +81,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
     event = eventBuilder(muleContext).message(Message.builder().value("").attributesValue(attributes).build()).build();
     when(operationContext.getEvent()).thenReturn(event);
     when(operationContext.getMuleContext()).thenReturn(muleContext);
+    when(operationContext.getComponent()).thenReturn(component);
     when(componentModel.getModelProperty(MediaTypeModelProperty.class)).thenReturn(empty());
   }
 

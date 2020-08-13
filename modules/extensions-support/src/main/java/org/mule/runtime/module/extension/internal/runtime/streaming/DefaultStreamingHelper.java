@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.util.Pair;
@@ -38,6 +39,7 @@ public class DefaultStreamingHelper implements StreamingHelper {
   private final CursorStreamProviderFactory cursorStreamProviderFactory;
   private final CursorIteratorProviderFactory cursorIteratorProviderFactory;
   private final CoreEvent event;
+  private final ComponentLocation originatingLocation;
 
   /**
    * Creates a new instance
@@ -48,13 +50,14 @@ public class DefaultStreamingHelper implements StreamingHelper {
    */
   public DefaultStreamingHelper(CursorProviderFactory cursorProviderFactory,
                                 StreamingManager streamingManager,
-                                CoreEvent event) {
-    this(streamingManager.getPairFor(cursorProviderFactory), event);
+                                CoreEvent event,
+                                ComponentLocation originatingLocation) {
+    this(streamingManager.getPairFor(cursorProviderFactory), event, originatingLocation);
   }
 
   private DefaultStreamingHelper(Pair<CursorStreamProviderFactory, CursorIteratorProviderFactory> cursorProviderFactories,
-                                 CoreEvent event) {
-    this(cursorProviderFactories.getFirst(), cursorProviderFactories.getSecond(), event);
+                                 CoreEvent event, ComponentLocation originatingLocation) {
+    this(cursorProviderFactories.getFirst(), cursorProviderFactories.getSecond(), event, originatingLocation);
   }
 
   /**
@@ -66,10 +69,12 @@ public class DefaultStreamingHelper implements StreamingHelper {
    */
   public DefaultStreamingHelper(CursorStreamProviderFactory cursorStreamProviderFactory,
                                 CursorIteratorProviderFactory cursorIteratorProviderFactory,
-                                CoreEvent event) {
+                                CoreEvent event,
+                                ComponentLocation originatingLocation) {
     this.cursorStreamProviderFactory = cursorStreamProviderFactory;
     this.cursorIteratorProviderFactory = cursorIteratorProviderFactory;
     this.event = event;
+    this.originatingLocation = originatingLocation;
   }
 
   /**
@@ -117,11 +122,11 @@ public class DefaultStreamingHelper implements StreamingHelper {
   }
 
   private Object resolveCursorStreamProvider(InputStream value) {
-    return cursorStreamProviderFactory.of(getRoot(event.getContext()), value);
+    return cursorStreamProviderFactory.of(getRoot(event.getContext()), value, originatingLocation);
   }
 
   private Object resolveCursorIteratorProvider(Iterator value) {
-    return cursorIteratorProviderFactory.of(getRoot(event.getContext()), value);
+    return cursorIteratorProviderFactory.of(getRoot(event.getContext()), value, originatingLocation);
   }
 
   private TypedValue resolveCursorTypedValueProvider(TypedValue value) {
