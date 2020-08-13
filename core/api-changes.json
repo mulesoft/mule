@@ -9,7 +9,7 @@
           "classSimpleName": "AbstractCursorStreamProviderFactory",
           "methodName": "of",
           "elementKind": "method",
-          "justification": "MULE-18634: Add new method to receive ComponentLocator"
+          "justification": "TODO MULE-18676: this is a false positive because AbstractCursorStreamProviderFactory has @NoExtend annotation."
         },
         {
           "code": "java.method.finalMethodAddedToNonFinalClass",
@@ -18,7 +18,7 @@
           "classSimpleName": "AbstractCursorStreamProviderFactory",
           "methodName": "of",
           "elementKind": "method",
-          "justification": "MULE-18634: Add new method to receive ComponentLocator"
+          "justification": "TODO MULE-18676: this is a false positive because AbstractCursorStreamProviderFactory has @NoExtend annotation."
         },
         {
           "code": "java.class.removed",
