@@ -64,10 +64,6 @@
         <values:single-values-enabled-parameter-requires-values-of-parameter-group anyParameter="aParam" channels="dummyValue" values="dummyValue"/>
     </flow>
 
-    <flow name="singleValuesEnabledParameterRequiresValuesOfParameterGroupWithDefaultValue">
-        <values:single-values-enabled-parameter-requires-values-of-parameter-group channels="dummyValue" values="dummyValue"/>
-    </flow>
-
     <flow name="multiLevelValue">
         <values:multi-level-value />
     </flow>

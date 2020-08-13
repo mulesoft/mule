@@ -93,13 +93,6 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
-  public void singleOptionsEnabledParameterRequiresValuesOfParameterGroupWithDefaultValue() throws Exception {
-    Set<Value> channels = getValues("singleValuesEnabledParameterRequiresValuesOfParameterGroupWithDefaultValue", "values");
-    assertThat(channels, hasSize(1));
-    assertThat(channels, hasValues("anyParameter:anyParameterDefaultValue"));
-  }
-
-  @Test
   public void multiLevelOption() throws Exception {
     Set<Value> values = getValues("multiLevelValue", "values");
     ValueMatcher americaValue = valueWithId("America")
