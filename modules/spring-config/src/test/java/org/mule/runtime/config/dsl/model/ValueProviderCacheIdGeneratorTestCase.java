@@ -94,7 +94,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
     checkIdsAreEqual(dslElementId, componentBasedId);
 
     //Any should be fine
-    return dslElementId;
+    return componentBasedId;
   }
 
   private Optional<ParameterizedElementDeclaration> getParameterElementDeclaration(ArtifactDeclaration artifactDeclaration,

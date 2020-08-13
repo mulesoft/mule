@@ -9,6 +9,7 @@ package org.mule.runtime.config.dsl.model;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -23,6 +24,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
+import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
@@ -43,6 +45,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
@@ -52,6 +55,8 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -117,6 +122,9 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   protected ParameterModel nameParameter;
 
   @Mock(lenient = true)
+  protected ParameterModel configRefParameter;
+
+  @Mock(lenient = true)
   protected ParameterModel behaviourParameter;
 
   @Mock(lenient = true)
@@ -164,6 +172,18 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(nameParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
     when(nameParameter.isComponentId()).thenReturn(true);
 
+    when(configRefParameter.getName()).thenReturn("config-ref");
+    when(configRefParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
+    when(configRefParameter.getModelProperty(any())).thenReturn(empty());
+    when(configRefParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
+    when(configRefParameter.getLayoutModel()).thenReturn(empty());
+    when(configRefParameter.getRole()).thenReturn(BEHAVIOUR);
+    when(configRefParameter.getType()).thenReturn(TYPE_LOADER.load(ConfigurationProvider.class));
+    final List<StereotypeModel> configStereotypes = singletonList(
+                                                                  newStereotype(CONFIGURATION_NAME, EXTENSION_NAME)
+                                                                      .withParent(MuleStereotypes.CONFIG).build());
+    when(configRefParameter.getAllowedStereotypes()).thenReturn(configStereotypes);
+
     when(behaviourParameter.getName()).thenReturn(BEHAVIOUR_NAME);
     when(behaviourParameter.getExpressionSupport()).thenReturn(ExpressionSupport.NOT_SUPPORTED);
     when(behaviourParameter.getModelProperty(any())).thenReturn(empty());
@@ -199,7 +219,8 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(contentParameter.getType()).thenReturn(type.build());
     when(anotherContentParameter.getType()).thenReturn(type.build());
 
-    this.defaultGroupParameterModels = asList(nameParameter, contentParameter, behaviourParameter, listParameter);
+    this.defaultGroupParameterModels =
+        asList(nameParameter, configRefParameter, contentParameter, behaviourParameter, listParameter);
     when(parameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(parameterGroupModel.isShowInDsl()).thenReturn(false);
     when(parameterGroupModel.getParameterModels()).thenReturn(defaultGroupParameterModels);
@@ -217,7 +238,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
           return Optional.empty();
         });
 
-    this.anotherDefaultGroupParameterModels = asList(anotherContentParameter, listParameter);
+    this.anotherDefaultGroupParameterModels = asList(anotherContentParameter, listParameter, configRefParameter);
     when(anotherParameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(anotherParameterGroupModel.isShowInDsl()).thenReturn(false);
     when(anotherParameterGroupModel.getParameterModels()).thenReturn(anotherDefaultGroupParameterModels);

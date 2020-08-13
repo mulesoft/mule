@@ -40,7 +40,7 @@ public class ComponentBasedValueProviderCacheIdGenerator implements ValueProvide
       return getConnectionModel(containerComponent)
           .flatMap(connection -> delegate.getIdForResolvedValues(connection, parameterName));
     }
-    return elementModelFactory.create((ComponentModel) containerComponent)
+    return elementModelFactory.create(containerComponent)
         .flatMap(e -> delegate.getIdForResolvedValues(e, parameterName));
   }
 
