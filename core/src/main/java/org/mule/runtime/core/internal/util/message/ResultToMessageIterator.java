@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.message;
 
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.streaming.HasSize;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -31,13 +32,16 @@ final class ResultToMessageIterator implements Iterator<Message>, HasSize {
   private final Iterator<Object> delegate;
   private final CursorProviderFactory cursorProviderFactory;
   private final BaseEventContext eventContext;
+  private final ComponentLocation originatingLocation;
 
   ResultToMessageIterator(Iterator<Object> delegate,
                           CursorProviderFactory cursorProviderFactory,
-                          BaseEventContext eventContext) {
+                          BaseEventContext eventContext,
+                          ComponentLocation originatingLocation) {
     this.delegate = delegate;
     this.cursorProviderFactory = cursorProviderFactory;
     this.eventContext = eventContext;
+    this.originatingLocation = originatingLocation;
   }
 
   @Override
@@ -52,7 +56,7 @@ final class ResultToMessageIterator implements Iterator<Message>, HasSize {
       return (Message) value;
     }
 
-    return toMessage((Result) value, cursorProviderFactory, eventContext);
+    return toMessage((Result) value, cursorProviderFactory, eventContext, originatingLocation);
   }
 
   @Override
@@ -69,7 +73,7 @@ final class ResultToMessageIterator implements Iterator<Message>, HasSize {
   public void forEachRemaining(Consumer<? super Message> action) {
     delegate.forEachRemaining(value -> {
       if (value instanceof Result) {
-        value = toMessage((Result) value, cursorProviderFactory, eventContext);
+        value = toMessage((Result) value, cursorProviderFactory, eventContext, originatingLocation);
       }
       action.accept((Message) value);
     });

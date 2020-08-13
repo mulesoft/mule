@@ -23,6 +23,7 @@ import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.get
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.Message;
@@ -126,6 +127,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     final MediaType mediaType = resolveMediaType(value, contextMimeTypeParam, contextEncodingParam);
     final CoreEvent event = operationContext.getEvent();
 
+    ComponentLocation originatingLocation = operationContext.getComponent().getLocation();
     if (value instanceof Result) {
       Result resultValue = (Result) value;
       if (resultValue.getOutput() instanceof InputStream) {
@@ -137,8 +139,9 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
         }
       }
       return isSpecialHandling && returnHandler.handles(resultValue.getOutput())
-          ? MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event, returnHandler.getDataType())
-          : MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event);
+          ? MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event, returnHandler.getDataType(),
+                                   originatingLocation)
+          : MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event, originatingLocation);
     } else {
       PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(getDefaultEncoding(muleContext),
                                                                                        defaultMediaType,
@@ -147,14 +150,16 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       if (value instanceof Collection && returnsListOfMessages) {
         value = toLazyMessageCollection((Collection<Result>) value, operationContext, cursorProviderFactory, mediaType, event);
         value = toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) value, payloadMediaTypeResolver),
-                                    cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
+                                    cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
+                                    originatingLocation);
       } else if (value instanceof Iterator && returnsListOfMessages) {
         value = toMessageIterator(new MediaTypeDecoratedResultIterator((Iterator<Result>) value, payloadMediaTypeResolver),
-                                  cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
+                                  cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
+                                  originatingLocation);
       }
 
       value = streamingContent(value, operationContext, cursorProviderFactory,
-                               ((BaseEventContext) event.getContext()).getRootContext());
+                               ((BaseEventContext) event.getContext()).getRootContext(), originatingLocation);
 
       Message.Builder messageBuilder;
 
@@ -188,7 +193,8 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
               .build();
         }
 
-        Message message = MessageUtils.toMessage(value, mediaType, cursorProviderFactory, event);
+        Message message =
+            MessageUtils.toMessage(value, mediaType, cursorProviderFactory, event, operationContext.getComponent().getLocation());
 
         lazyMessageCollection.add(message);
       } else {
@@ -209,7 +215,8 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   private Object streamingContent(Object value,
                                   ExecutionContextAdapter operationContext,
                                   CursorProviderFactory cursorProviderFactory,
-                                  BaseEventContext eventContext) {
+                                  BaseEventContext eventContext,
+                                  ComponentLocation originatingLocation) {
     if (value instanceof InputStream) {
       ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
       if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
@@ -217,7 +224,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       }
     }
 
-    return StreamingUtils.streamingContent(value, cursorProviderFactory, eventContext);
+    return StreamingUtils.streamingContent(value, cursorProviderFactory, eventContext, originatingLocation);
   }
 
   /**
