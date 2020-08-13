@@ -29,7 +29,6 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;

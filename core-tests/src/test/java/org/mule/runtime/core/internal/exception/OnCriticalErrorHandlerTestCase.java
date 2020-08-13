@@ -24,6 +24,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 
 import java.util.function.Consumer;
@@ -44,6 +45,11 @@ public class OnCriticalErrorHandlerTestCase extends AbstractErrorHandlerTestCase
 
   public OnCriticalErrorHandlerTestCase(VerboseExceptions verbose) {
     super(verbose);
+  }
+
+  @Override
+  protected AbstractExceptionListener getErrorHandler() {
+    return handler;
   }
 
   @Override
