@@ -43,13 +43,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
@@ -73,7 +73,7 @@ public class MuleDeploymentService implements DeploymentService {
 
   private final ObservableList<Application> applications = new ObservableList<>();
   private final ObservableList<Domain> domains = new ObservableList<>();
-  private final List<StartupListener> startupListeners = new ArrayList<>();
+  private final List<StartupListener> startupListeners = new CopyOnWriteArrayList<>();
 
   /**
    * TODO: move to setter as in previous version.
