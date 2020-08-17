@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.config.dsl.model;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -21,7 +19,6 @@ import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newPar
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -29,28 +26,20 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
-import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
-import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
-import org.mule.runtime.config.internal.model.ApplicationModel;
+import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
-import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
-public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDslModelTestCase {
+public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMetadataCacheIdGeneratorTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelBasedMetadataCacheKeyGeneratorTestCase.class);
   private static final String MY_FLOW = "myFlow";
@@ -60,21 +49,6 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
 
   private static final String MY_OTHER_FLOW = "myOtherFlow";
   private static final String ANOTHER_OPERATION_LOCATION = MY_OTHER_FLOW + "/processors/0";
-
-  private Set<ExtensionModel> extensions;
-  private DslResolvingContext dslResolvingContext;
-  private ElementDeclarer declarer;
-
-  @Before
-  public void setUp() throws Exception {
-    extensions = ImmutableSet.<ExtensionModel>builder()
-        .add(MuleExtensionModelProvider.getExtensionModel())
-        .add(mockExtension)
-        .build();
-
-    dslResolvingContext = DslResolvingContext.getDefault(extensions);
-    declarer = ElementDeclarer.forExtension(EXTENSION_NAME);
-  }
 
   @Test
   public void operationsWithSameOutputType() throws Exception {
@@ -382,6 +356,7 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
         .add(newExtensionModel)
         .build();
     dslResolvingContext = DslResolvingContext.getDefault(extensions);
+    dslFactory = DslElementModelFactory.getDefault(dslResolvingContext);
 
     ElementDeclarer newElementDeclarer = forExtension(newExtensionModelName);
 
@@ -423,7 +398,7 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
     final String extensionOperationLocation = OPERATION_LOCATION;
     final String newExtensionOperationLocation = newFlowName + "/processors/0";
 
-    MetadataCacheId oldHash = getIdForComponentOutputMetadata(app, extensionOperationLocation);
+    MetadataCacheId oldHash = getIdForComponentOutputMetadata(baseApp, extensionOperationLocation);
     MetadataCacheId newHash = getIdForComponentOutputMetadata(app, newExtensionOperationLocation);
 
     assertThat(oldHash, is(not(newHash)));
@@ -466,32 +441,6 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
     assertThat(operationOutputMetadataCacheId, is(anotherOperationOutputMetadataCacheId));
     assertThat(operationListInputMetadataCacheId, is(anotherOperationListInputMetadataCacheId));
     assertThat(operationAttributesMetadataCacheId, is(anotherOperationAttributesMetadataCacheId));
-  }
-
-  protected MetadataCacheId getIdForComponentOutputMetadata(ArtifactDeclaration declaration, String location) throws Exception {
-    ApplicationModel app = loadApplicationModel(declaration);
-    ComponentAst component = new Locator(app)
-        .get(Location.builderFromStringRepresentation(location).build())
-        .get();
-    return createGenerator(app).getIdForComponentOutputMetadata(component).get();
-  }
-
-  protected MetadataCacheId getIdForComponentAttributesMetadata(ArtifactDeclaration declaration, String location)
-      throws Exception {
-    ApplicationModel app = loadApplicationModel(declaration);
-    ComponentAst component = new Locator(app)
-        .get(Location.builderFromStringRepresentation(location).build())
-        .get();
-    return createGenerator(app).getIdForComponentAttributesMetadata(component).get();
-  }
-
-  protected MetadataCacheId getIdForComponentInputMetadata(ArtifactDeclaration declaration, String location, String parameterName)
-      throws Exception {
-    ApplicationModel app = loadApplicationModel(declaration);
-    ComponentAst component = new Locator(app)
-        .get(Location.builderFromStringRepresentation(location).build())
-        .get();
-    return createGenerator(app).getIdForComponentInputMetadata(component, parameterName).get();
   }
 
   private ArtifactDeclaration getBaseApp() {
@@ -545,39 +494,4 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
             .getDeclaration())
         .getDeclaration();
   }
-
-  protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
-    return new ApplicationModel(new ArtifactConfig.Builder().build(),
-                                declaration, extensions, emptyMap(), empty(),
-                                uri -> getClass().getResourceAsStream(uri));
-  }
-
-  private MetadataCacheIdGenerator<ComponentAst> createGenerator(ApplicationModel app) {
-    return new ModelBasedMetadataCacheIdGeneratorFactory().create(dslResolvingContext, new Locator(app));
-  }
-
-  private static class Locator implements ComponentLocator<ComponentAst> {
-
-    private final Map<Location, ComponentAst> components = new HashMap<>();
-
-    Locator(ApplicationModel app) {
-      app.topLevelComponentsStream().forEach(this::addComponent);
-    }
-
-    @Override
-    public Optional<ComponentAst> get(Location location) {
-      return Optional.ofNullable(components.get(location));
-    }
-
-    private Location getLocation(ComponentAst component) {
-      return Location.builderFromStringRepresentation(component.getLocation().getLocation()).build();
-    }
-
-    private void addComponent(ComponentAst component) {
-      components.put(getLocation(component), component);
-      component.directChildrenStream().forEach(this::addComponent);
-    }
-
-  }
-
 }

@@ -28,6 +28,9 @@ import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -274,6 +277,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
 
     when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
     when(connectionProvider.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
+    when(connectionProvider.getStereotype()).thenReturn(CONNECTION);
 
     when(configuration.getName()).thenReturn(CONFIGURATION_NAME);
     when(configuration.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
@@ -291,10 +295,14 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
     when(source.getSuccessCallback()).thenReturn(empty());
     when(source.getErrorCallback()).thenReturn(empty());
+    when(source.getStereotype()).thenReturn(SOURCE);
+
     when(operation.getName()).thenReturn(OPERATION_NAME);
     when(operation.getParameterGroupModels()).thenReturn(asList(parameterGroupModel, errorMappingsParameterGroup));
+    when(operation.getStereotype()).thenReturn(PROCESSOR);
     when(anotherOperation.getName()).thenReturn(ANOTHER_OPERATION_NAME);
     when(anotherOperation.getParameterGroupModels()).thenReturn(asList(anotherParameterGroupModel, errorMappingsParameterGroup));
+    when(anotherOperation.getStereotype()).thenReturn(PROCESSOR);
     visitableMock(operation, source, anotherOperation);
 
     Map<String, String> parameterResolversNames = new HashMap<>();
