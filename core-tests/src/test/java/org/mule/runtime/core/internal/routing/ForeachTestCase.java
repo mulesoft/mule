@@ -462,7 +462,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   @Test
-  public void managedCursorStreamMuleMessage() throws Exception {
+  public void muleMessageContainingACursorStreamShouldBeManagedByCursorManager() throws Exception {
     AtomicReference<CoreEvent> eventReference = new AtomicReference<>();
     foreach = createForeach();
     InternalTestProcessor capturedEventProcessor = event -> {
@@ -485,7 +485,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   @Test
-  public void managedCursorStream() throws Exception {
+  public void cursorStreamShouldBeManagedByCursorManager() throws Exception {
     AtomicReference<CoreEvent> eventReference = new AtomicReference<>();
     foreach = createForeach();
     InternalTestProcessor capturedEventProcessor = event -> {

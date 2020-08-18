@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static java.lang.System.identityHashCode;
+import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
@@ -70,7 +72,13 @@ public class EventStreamingState {
           + alreadyManagedCursorProvider.getId() + "]. InnerDelegate: " + System.identityHashCode(innerDelegate) + " delegate: "
           + System.identityHashCode(delegate) + "]");
     }
-    return providers.get(id, k -> ghostBuster.track(provider)).get();
+    return providers.get(id, k -> {
+      if (LOGGER.isDebugEnabled()) {
+        CursorProvider innerDelegate = unwrap(provider);
+        LOGGER.debug(format("Added ManagedCursorProvider: %s, delegate: %s", k, identityHashCode(innerDelegate)));
+      }
+      return ghostBuster.track(provider);
+    }).get();
   }
 
   private Optional<WeakReference<ManagedCursorProvider>> findAlreadyManagedProvider(int id, ManagedCursorProvider provider) {

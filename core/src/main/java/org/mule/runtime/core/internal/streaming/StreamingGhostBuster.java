@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-
+import static java.lang.String.format;
+import static java.lang.System.identityHashCode;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -25,6 +28,7 @@ import java.util.concurrent.RejectedExecutionException;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.slf4j.Logger;
 
 /**
@@ -113,6 +117,10 @@ public class StreamingGhostBuster implements Lifecycle {
 
   private void bust(StreamingWeakReference ghost) {
     try {
+      if (LOGGER.isDebugEnabled()) {
+        CursorProvider innerDelegate = unwrap(ghost.janitor.provider);
+        LOGGER.debug(format("StreamingGhostBuster disposing ghost: %s, provider: %s", ghost.id, identityHashCode(innerDelegate)));
+      }
       ghost.dispose();
     } catch (Exception e) {
       if (LOGGER.isWarnEnabled()) {
@@ -136,12 +144,14 @@ public class StreamingGhostBuster implements Lifecycle {
    */
   private class StreamingWeakReference extends WeakReference<ManagedCursorProvider> {
 
+    private final int id;
     private final CursorProviderJanitor janitor;
     private boolean clear = false;
 
     public StreamingWeakReference(ManagedCursorProvider referent, ReferenceQueue<ManagedCursorProvider> referenceQueue) {
       super(referent, referenceQueue);
       this.janitor = referent.getJanitor();
+      this.id = referent.getId();
     }
 
     public void dispose() {
