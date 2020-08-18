@@ -9,6 +9,7 @@ package org.mule.runtime.module.tooling;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
@@ -87,24 +88,27 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
                    "}"));
   }
 
-  // TODO BUG Optional levels are required for multi-level keys!
+  // TODO MULE-18680: Optional levels are required for multi-level keys!
   @Test
   public void operationDynamicTypesPartialKey() {
     OperationElementDeclaration operationElementDeclaration = multiLevelOPDeclaration(CONFIG_NAME, "America", "USA");
     MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult =
         session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(false));
-    assertThat(containerTypeMetadataResult.getFailures(), hasSize(2));
+    assertThat(containerTypeMetadataResult.getFailures(), hasSize(1));
+    assertThat(containerTypeMetadataResult.getFailures().get(0).getMessage(), containsString("Missing levels: [city]"));
   }
 
-  // TODO BUG Optional levels are required for multi-level keys!
+  // TODO MULE-18680 Optional levels are required for multi-level keys!
   @Test
   public void operationDynamicTypesNoKey() {
     OperationElementDeclaration operationElementDeclaration = multiLevelOPDeclaration(CONFIG_NAME, null, null);
     MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult =
         session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(false));
-    assertThat(containerTypeMetadataResult.getFailures(), hasSize(2));
+    assertThat(containerTypeMetadataResult.getFailures(), hasSize(1));
+    assertThat(containerTypeMetadataResult.getFailures().get(0).getMessage(),
+               containsString("Missing levels: [continent, country, city]"));
   }
 
   @Test
@@ -126,6 +130,7 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(COMPONENT));
+    assertThat(metadataTypes.getFailures().get(0).getMessage(), containsString("Missing levels: [metadataKey]"));
   }
 
   @Test
@@ -136,6 +141,7 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(OUTPUT_PAYLOAD));
+    assertThat(metadataTypes.getFailures().get(0).getReason(), containsString("MetadataResolvingException: Unknown key:"));
   }
 
   @Test

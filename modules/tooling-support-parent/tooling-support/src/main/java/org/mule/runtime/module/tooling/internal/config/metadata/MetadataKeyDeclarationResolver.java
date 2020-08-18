@@ -85,7 +85,9 @@ public class MetadataKeyDeclarationResolver {
       }
     }
 
-    List<String> missingParts = keyPartModels.stream().filter(pm -> pm.isRequired() && !keyPartValues.containsKey(pm.getName()))
+    //TODO MULE-18680 remove `keyPartModels.size() > 1` once bug is fixed to accept optionals in multi-level keys
+    List<String> missingParts = keyPartModels.stream()
+        .filter(pm -> (keyPartModels.size() > 1 || pm.isRequired()) && !keyPartValues.containsKey(pm.getName()))
         .map(NamedObject::getName).collect(toList());
     String partialMessage = null;
     MetadataKey metadataKey = MetadataKeyBuilder.newKey(NullMetadataKey.ID).build();
