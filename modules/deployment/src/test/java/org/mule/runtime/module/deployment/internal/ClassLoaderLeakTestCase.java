@@ -36,6 +36,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -200,7 +201,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   @Test
   @Issue("MULE-18480")
   @Description("When an artifact is redeployed through the deployment service by name, objects associated to the original deployment are released befroe deploying the new one.")
-  @Ignore("MULE-18520")
+  @FlakyTest(times = 150)
   public void redeployByNamePreviousAppEagerlyGCd() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     AtomicReference<Throwable> redeploymentSuccessThrown = new AtomicReference<>();
