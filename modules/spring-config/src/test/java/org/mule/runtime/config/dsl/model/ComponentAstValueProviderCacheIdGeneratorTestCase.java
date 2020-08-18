@@ -12,13 +12,13 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.IntStream.range;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,19 +26,17 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
-import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_MAPPINGS;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -55,30 +53,26 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
-import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
-import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
-import org.mule.runtime.app.declaration.api.ParameterValue;
+import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
+import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
-import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
-import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
+import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
+import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -87,18 +81,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.slf4j.Logger;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-public abstract class AbstractMockedValueProviderExtensionTestCase extends AbstractMuleTestCase {
+public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractMuleTestCase {
 
-  private static final Logger LOGGER = getLogger(AbstractMockedValueProviderExtensionTestCase.class);
+  private static final Logger LOGGER = getLogger(ComponentAstValueProviderCacheIdGeneratorTestCase.class);
 
   protected static final String NAMESPACE = "vp-mockns";
   protected static final String NAMESPACE_URI = "http://www.mulesoft.org/schema/mule/vp-mockns";
@@ -111,9 +107,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected static final String PARAMETER_REQUIRED_FOR_METADATA_NAME = "requiredForMetadata";
   protected static final String PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE = "requiredForMetadata";
   protected static final String PROVIDED_PARAMETER_NAME = "providedParameter";
-  protected static final String OTHER_PROVIDED_PARAMETER_NAME = "otherProvidedParameter";
-  protected static final String PROVIDED_FROM_COMPLEX_PARAMETER_NAME = "fromComplexActingParameter";
-  protected static final String COMPLEX_ACTING_PARAMETER_NAME = "complexActingParameter";
   protected static final String PROVIDED_PARAMETER_DEFAULT_VALUE = "providedParameter";
   protected static final String EXTENSION_NAME = "extension";
   protected static final String OPERATION_NAME = "mockOperation";
@@ -123,14 +116,13 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected static final String OTHER_CONFIGURATION_NAME = "otherConfiguration";
   protected static final String CONNECTION_PROVIDER_NAME = "connection";
   protected static final String VALUE_PROVIDER_NAME = "valueProvider";
-  protected static final String COMPLEX_VALUE_PROVIDER_NAME = "complexValueProvider";
 
-  protected static final String MY_FLOW = "myFlow";
-  protected static final String MY_CONFIG = "myConfig";
-  protected static final String MY_CONNECTION = MY_CONFIG + "/connection"; // Not a valid location, hack to reuse helper function.
-  protected static final String SOURCE_LOCATION = MY_FLOW + "/source";
-  protected static final String OPERATION_LOCATION = MY_FLOW + "/processors/0";
-  protected static final String OTHER_OPERATION_LOCATION = MY_FLOW + "/processors/1";
+  private static final String MY_FLOW = "myFlow";
+  private static final String MY_CONFIG = "myConfig";
+  private static final String MY_CONNECTION = MY_CONFIG + "/connection"; // Not a valid location, hack to reuse helper function.
+  private static final String SOURCE_LOCATION = MY_FLOW + "/source";
+  private static final String OPERATION_LOCATION = MY_FLOW + "/processors/0";
+  private static final String OTHER_OPERATION_LOCATION = MY_FLOW + "/processors/1";
 
   @Mock(lenient = true)
   protected ExtensionModel mockExtension;
@@ -163,22 +155,10 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected ParameterModel nameParameter;
 
   @Mock(lenient = true)
-  protected ParameterModel configRefParameter;
-
-  @Mock(lenient = true)
   protected ParameterModel actingParameter;
 
   @Mock(lenient = true)
   protected ParameterModel providedParameter;
-
-  @Mock(lenient = true)
-  protected ParameterModel otherProvidedParameter;
-
-  @Mock(lenient = true)
-  protected ParameterModel providedParameterFromComplex;
-
-  @Mock(lenient = true)
-  protected ParameterModel complexActingParameter;
 
   @Mock(lenient = true)
   protected ParameterGroupModel parameterGroup;
@@ -197,9 +177,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
   @Mock(lenient = true)
   protected ValueProviderModel valueProviderModel;
-
-  @Mock(lenient = true)
-  protected ValueProviderModel complexValueProviderModel;
 
   protected ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   protected List<ParameterModel> customParameterGroupModels;
@@ -223,29 +200,11 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(nameParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
     when(nameParameter.isComponentId()).thenReturn(true);
 
-    when(configRefParameter.getName()).thenReturn("config-ref");
-    when(configRefParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(configRefParameter.getModelProperty(any())).thenReturn(empty());
-    when(configRefParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(configRefParameter.getLayoutModel()).thenReturn(empty());
-    when(configRefParameter.getRole()).thenReturn(BEHAVIOUR);
-    when(configRefParameter.getType()).thenReturn(TYPE_LOADER.load(ConfigurationProvider.class));
-    final List<StereotypeModel> configStereotypes = singletonList(
-                                                                  newStereotype(CONFIGURATION_NAME, EXTENSION_NAME)
-                                                                      .withParent(MuleStereotypes.CONFIG).build());
-    when(configRefParameter.getAllowedStereotypes()).thenReturn(configStereotypes);
-
     when(valueProviderModel.getPartOrder()).thenReturn(0);
     when(valueProviderModel.getProviderName()).thenReturn(VALUE_PROVIDER_NAME);
     when(valueProviderModel.getActingParameters()).thenReturn(asList(ACTING_PARAMETER_NAME, PARAMETER_IN_GROUP_NAME));
     when(valueProviderModel.requiresConfiguration()).thenReturn(false);
     when(valueProviderModel.requiresConnection()).thenReturn(false);
-
-    when(complexValueProviderModel.getPartOrder()).thenReturn(0);
-    when(complexValueProviderModel.getProviderName()).thenReturn(COMPLEX_VALUE_PROVIDER_NAME);
-    when(complexValueProviderModel.getActingParameters()).thenReturn(asList(COMPLEX_ACTING_PARAMETER_NAME));
-    when(complexValueProviderModel.requiresConfiguration()).thenReturn(false);
-    when(complexValueProviderModel.requiresConnection()).thenReturn(false);
 
     when(parameterInGroup.getName()).thenReturn(PARAMETER_IN_GROUP_NAME);
     when(parameterInGroup.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
@@ -272,32 +231,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(providedParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
     when(providedParameter.getValueProviderModel()).thenReturn(of(valueProviderModel));
 
-    when(otherProvidedParameter.getName()).thenReturn(OTHER_PROVIDED_PARAMETER_NAME);
-    when(otherProvidedParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(otherProvidedParameter.getModelProperty(any())).thenReturn(empty());
-    when(otherProvidedParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(otherProvidedParameter.getLayoutModel()).thenReturn(empty());
-    when(otherProvidedParameter.getRole()).thenReturn(BEHAVIOUR);
-    when(otherProvidedParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
-    when(otherProvidedParameter.getValueProviderModel()).thenReturn(of(valueProviderModel));
-
-    when(providedParameterFromComplex.getName()).thenReturn(PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
-    when(providedParameterFromComplex.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(providedParameterFromComplex.getModelProperty(any())).thenReturn(empty());
-    when(providedParameterFromComplex.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(providedParameterFromComplex.getLayoutModel()).thenReturn(empty());
-    when(providedParameterFromComplex.getRole()).thenReturn(BEHAVIOUR);
-    when(providedParameterFromComplex.getType()).thenReturn(TYPE_LOADER.load(String.class));
-    when(providedParameterFromComplex.getValueProviderModel()).thenReturn(of(complexValueProviderModel));
-
-    when(complexActingParameter.getName()).thenReturn(COMPLEX_ACTING_PARAMETER_NAME);
-    when(complexActingParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(complexActingParameter.getModelProperty(any())).thenReturn(empty());
-    when(complexActingParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(complexActingParameter.getLayoutModel()).thenReturn(empty());
-    when(complexActingParameter.getRole()).thenReturn(BEHAVIOUR);
-    when(complexActingParameter.getType()).thenReturn(TYPE_LOADER.load(ComplexActingParameter.class));
-
     when(parameterRequiredForMetadata.getName()).thenReturn(PARAMETER_REQUIRED_FOR_METADATA_NAME);
     when(parameterRequiredForMetadata.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
     when(parameterRequiredForMetadata.getModelProperty(any())).thenReturn(empty());
@@ -318,6 +251,24 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
       return empty();
     });
 
+    this.defaultGroupParameterModels = asList(nameParameter, actingParameter, providedParameter, parameterRequiredForMetadata);
+    when(parameterGroup.getName()).thenReturn(DEFAULT_GROUP_NAME);
+    when(parameterGroup.isShowInDsl()).thenReturn(false);
+    when(parameterGroup.getParameterModels()).thenReturn(defaultGroupParameterModels);
+    when(parameterGroup.getParameter(anyString())).then(invocation -> {
+      String paramName = invocation.getArgument(0);
+      switch (paramName) {
+        case ACTING_PARAMETER_NAME:
+          return of(actingParameter);
+        case PROVIDED_PARAMETER_NAME:
+          return of(providedParameter);
+        case PARAMETER_REQUIRED_FOR_METADATA_NAME:
+          return of(parameterRequiredForMetadata);
+
+      }
+      return empty();
+    });
+
     when(errorMappingsParameter.getName()).thenReturn(ERROR_MAPPINGS_PARAMETER_NAME);
     when(errorMappingsParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
     when(errorMappingsParameter.getModelProperty(any())).thenReturn(empty());
@@ -332,35 +283,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(errorMappingsParameterGroup.getParameterModels()).thenReturn(asList(errorMappingsParameter));
     when(errorMappingsParameterGroup.getParameter(ERROR_MAPPINGS_PARAMETER_NAME)).thenReturn(of(errorMappingsParameter));
 
-    this.defaultGroupParameterModels = asList(nameParameter,
-                                              configRefParameter,
-                                              actingParameter,
-                                              providedParameter,
-                                              parameterRequiredForMetadata,
-                                              complexActingParameter,
-                                              providedParameterFromComplex);
-    when(parameterGroup.getName()).thenReturn(DEFAULT_GROUP_NAME);
-    when(parameterGroup.isShowInDsl()).thenReturn(false);
-    when(parameterGroup.getParameterModels()).thenReturn(defaultGroupParameterModels);
-    when(parameterGroup.getParameter(anyString())).then(invocation -> {
-      String paramName = invocation.getArgument(0);
-      switch (paramName) {
-        case ACTING_PARAMETER_NAME:
-          return of(actingParameter);
-        case PROVIDED_PARAMETER_NAME:
-          return of(providedParameter);
-        case PARAMETER_REQUIRED_FOR_METADATA_NAME:
-          return of(parameterRequiredForMetadata);
-        case OTHER_PROVIDED_PARAMETER_NAME:
-          return of(otherProvidedParameter);
-        case PROVIDED_FROM_COMPLEX_PARAMETER_NAME:
-          return of(providedParameterFromComplex);
-        case COMPLEX_ACTING_PARAMETER_NAME:
-          return of(complexActingParameter);
-      }
-      return empty();
-    });
-
     RequiredForMetadataModelProperty requiredForMetadataModelProperty =
         new RequiredForMetadataModelProperty(asList(PARAMETER_REQUIRED_FOR_METADATA_NAME));
 
@@ -371,12 +293,10 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
     when(configuration.getName()).thenReturn(CONFIGURATION_NAME);
     when(configuration.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
-    when(configuration.getOperationModels()).thenReturn(asList(operation, otherOperation));
+    when(configuration.getOperationModels()).thenReturn(asList(operation));
     when(configuration.getSourceModels()).thenReturn(asList(source));
     when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
-    when(configuration.getConnectionProviderModel(CONNECTION_PROVIDER_NAME)).thenReturn(of(connectionProvider));
     when(configuration.getModelProperty(RequiredForMetadataModelProperty.class)).thenReturn(of(requiredForMetadataModelProperty));
-    when(configuration.getStereotype()).thenReturn(CONFIG);
 
     when(otherConfiguration.getName()).thenReturn(OTHER_CONFIGURATION_NAME);
     when(otherConfiguration.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
@@ -385,7 +305,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(otherConfiguration.getConnectionProviders()).thenReturn(asList(connectionProvider));
     when(otherConfiguration.getModelProperty(RequiredForMetadataModelProperty.class))
         .thenReturn(of(requiredForMetadataModelProperty));
-    when(otherConfiguration.getStereotype()).thenReturn(CONFIG);
 
     when(source.getName()).thenReturn(SOURCE_NAME);
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
@@ -393,16 +312,16 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(source.getErrorCallback()).thenReturn(empty());
 
     when(operation.getName()).thenReturn(OPERATION_NAME);
-    when(operation.getStereotype()).thenReturn(PROCESSOR);
     when(operation.getParameterGroupModels())
         .thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
 
+    visitableMock(operation, source);
+
     when(otherOperation.getName()).thenReturn(OTHER_OPERATION_NAME);
-    when(otherOperation.getStereotype()).thenReturn(PROCESSOR);
     when(otherOperation.getParameterGroupModels())
         .thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
 
-    visitableMock(operation, otherOperation, source);
+    visitableMock(otherOperation, source);
 
     when(dslContext.getExtension(any())).thenReturn(of(mockExtension));
     when(dslContext.getExtensions()).thenReturn(singleton(mockExtension));
@@ -418,10 +337,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
         .add(MuleExtensionModelProvider.getExtensionModel())
         .add(mockExtension)
         .build();
-
-    TypeCatalog typeCatalog = DslResolvingContext.getDefault(extensions).getTypeCatalog();
-
-    when(dslContext.getTypeCatalog()).thenReturn(typeCatalog);
 
     declarer = ElementDeclarer.forExtension(EXTENSION_NAME);
   }
@@ -464,9 +379,9 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(extension.getConnectionProviderModel(anyString())).thenReturn(of(connectionProvider));
   }
 
-  protected ConfigurationElementDeclaration declareConfig(ConnectionElementDeclaration connectionDeclaration, String name,
-                                                          String parameterRequiredForMetadata, String actingParameter,
-                                                          String providedParameter, String parameterInGroup) {
+  private ConfigurationElementDeclaration declareConfig(ConnectionElementDeclaration connectionDeclaration, String name,
+                                                        String parameterRequiredForMetadata, String actingParameter,
+                                                        String providedParameter, String parameterInGroup) {
     return declarer.newConfiguration(CONFIGURATION_NAME)
         .withRefName(name)
         .withParameterGroup(newParameterGroup()
@@ -481,9 +396,9 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
         .getDeclaration();
   }
 
-  protected ConfigurationElementDeclaration declareOtherConfig(ConnectionElementDeclaration connectionDeclaration, String name,
-                                                               String parameterRequiredForMetadata, String actingParameter,
-                                                               String providedParameter, String parameterInGroup) {
+  private ConfigurationElementDeclaration declareOtherConfig(ConnectionElementDeclaration connectionDeclaration, String name,
+                                                             String parameterRequiredForMetadata, String actingParameter,
+                                                             String providedParameter, String parameterInGroup) {
     return declarer.newConfiguration(OTHER_CONFIGURATION_NAME)
         .withRefName(name)
         .withParameterGroup(newParameterGroup()
@@ -498,8 +413,8 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
         .getDeclaration();
   }
 
-  protected ConnectionElementDeclaration declareConnection(String parameterRequiredForMetadata, String actingParameter,
-                                                           String providedParameter, String parameterInGroup) {
+  private ConnectionElementDeclaration declareConnection(String parameterRequiredForMetadata, String actingParameter,
+                                                         String providedParameter, String parameterInGroup) {
     return declarer.newConnection(CONNECTION_PROVIDER_NAME)
         .withParameterGroup(newParameterGroup()
             .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, parameterRequiredForMetadata)
@@ -512,85 +427,8 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
         .getDeclaration();
   }
 
-  protected ParameterValue declareInnerPojo(InnerPojo innerPojo) {
-    ParameterListValue.Builder listBuilder = ParameterListValue.builder();
-    innerPojo.getListParam().forEach(listBuilder::withValue);
 
-    ParameterObjectValue.Builder mapBuilder = ParameterObjectValue.builder();
-    innerPojo.getMapParam().forEach(mapBuilder::withParameter);
-
-    return ParameterObjectValue.builder()
-        .ofType(InnerPojo.class.getName())
-        .withParameter("intParam", Integer.toString(innerPojo.getIntParam()))
-        .withParameter("stringParam", innerPojo.getStringParam())
-        .withParameter("listParam", listBuilder.build())
-        .withParameter("mapParam", mapBuilder.build())
-        .build();
-  }
-
-  protected ParameterValue newComplexActingParameter(int intParam,
-                                                     String stringParam,
-                                                     List<String> listParam,
-                                                     Map<String, String> mapParam,
-                                                     InnerPojo innerPojo,
-                                                     List<InnerPojo> complexList,
-                                                     Map<String, InnerPojo> complexMap) {
-    ParameterListValue.Builder listValueBuilder = ParameterListValue.builder();
-    listParam.forEach(listValueBuilder::withValue);
-
-    ParameterListValue.Builder complexListBuilder = ParameterListValue.builder();
-    complexList.forEach(i -> complexListBuilder.withValue(declareInnerPojo(i)));
-
-    ParameterObjectValue.Builder mapBuilder = ParameterObjectValue.builder();
-    mapParam.forEach(mapBuilder::withParameter);
-
-    ParameterObjectValue.Builder complexMapBuilder = ParameterObjectValue.builder();
-    complexMap.forEach((k, v) -> complexMapBuilder.withParameter(k, declareInnerPojo(v)));
-
-    return ParameterObjectValue.builder()
-        .withParameter("innerPojoParam", declareInnerPojo(innerPojo))
-        .withParameter("intParam", Integer.toString(intParam))
-        .withParameter("stringParam", stringParam)
-        .withParameter("listParam", listValueBuilder.build())
-        .withParameter("mapParam", mapBuilder.build())
-        .withParameter("complexListParam", complexListBuilder.build())
-        .withParameter("complexMapParam", complexMapBuilder.build())
-        .build();
-
-  }
-
-  public OperationElementDeclaration declareOperation(String operationName) {
-    final int defaultInt = 0;
-    final String defaultString = "zero";
-    final List<String> defaultList = asList("one", "two", "three");
-    final Map<String, String> defaultMap = ImmutableMap.of("0", "zero", "1", "one");
-    final InnerPojo defaultInnerPojo = new InnerPojo(defaultInt, defaultString, defaultList, defaultMap);
-    final List<InnerPojo> defaultComplexList = asList(defaultInnerPojo);
-    final Map<String, InnerPojo> defaultComplexMap = ImmutableMap.of("0", defaultInnerPojo);
-    return declarer.newOperation(operationName)
-        .withConfig(MY_CONFIG)
-        .withParameterGroup(newParameterGroup()
-            .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
-            .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
-            .withParameter(COMPLEX_ACTING_PARAMETER_NAME, newComplexActingParameter(
-                                                                                    defaultInt,
-                                                                                    defaultString,
-                                                                                    defaultList,
-                                                                                    defaultMap,
-                                                                                    defaultInnerPojo,
-                                                                                    defaultComplexList,
-                                                                                    defaultComplexMap))
-            .withParameter(PROVIDED_FROM_COMPLEX_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
-            .getDeclaration())
-
-        .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
-            .withParameter(PARAMETER_IN_GROUP_NAME, PARAMETER_IN_GROUP_DEFAULT_VALUE)
-            .getDeclaration())
-        .getDeclaration();
-  }
-
-
-  protected ArtifactDeclaration getBaseApp() {
+  private ArtifactDeclaration getBaseApp() {
     return ElementDeclarer.newArtifact()
         .withGlobalElement(
                            declareConfig(
@@ -622,8 +460,21 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
         .getDeclaration();
   }
 
+  private OperationElementDeclaration declareOperation(String operationName) {
+    return declarer.newOperation(operationName)
+        .withConfig(MY_CONFIG)
+        .withParameterGroup(newParameterGroup()
+            .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
+            .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
+            .getDeclaration())
+        .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
+            .withParameter(PARAMETER_IN_GROUP_NAME, PARAMETER_IN_GROUP_DEFAULT_VALUE)
+            .getDeclaration())
+        .getDeclaration();
+  }
 
-  protected ComponentAst getComponentAst(ApplicationModel app, String location) {
+
+  private ComponentAst getComponentAst(ApplicationModel app, String location) {
     Reference<ComponentAst> componentAst = new Reference<>();
     app.recursiveStream().forEach(c -> {
       if (c.getLocation().getLocation().equals(location)) {
@@ -633,16 +484,22 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     return componentAst.get();
   }
 
-  protected Optional<ElementDeclaration> getDeclaration(ArtifactDeclaration app, String location) {
-    return app.findElement(org.mule.runtime.app.declaration.api.component.location.Location
-        .builderFromStringRepresentation(location).build());
-  }
-
 
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(new ArtifactConfig.Builder().build(),
                                 declaration, extensions, emptyMap(), empty(),
                                 uri -> getClass().getResourceAsStream(uri));
+  }
+
+  private Optional<ValueProviderCacheId> computeIdFor(ArtifactDeclaration appDeclaration,
+                                                      String location,
+                                                      String parameterName)
+      throws Exception {
+    ApplicationModel app = loadApplicationModel(appDeclaration);
+    Locator locator = new Locator(app);
+    ValueProviderCacheIdGenerator cacheIdGenerator = new ComponentAstBasedValueProviderCacheIdGenerator(locator);
+    ComponentAst component = getComponentAst(app, location);
+    return cacheIdGenerator.getIdForResolvedValues(component, parameterName);
   }
 
   private String collectLog(ValueProviderCacheId valueProviderCacheId, int level) {
@@ -662,20 +519,327 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     return logId.toString();
   }
 
-
-  protected void checkIdsAreEqual(Optional<ValueProviderCacheId> id1, Optional<ValueProviderCacheId> id2) {
+  private void checkIdsAreEqual(Optional<ValueProviderCacheId> id1, Optional<ValueProviderCacheId> id2) {
     LOGGER.debug("ID1: " + id1.map(i -> collectLog(i, 0)).orElse("empty"));
     LOGGER.debug("ID2: " + id2.map(i -> collectLog(i, 0)).orElse("empty"));
     assertThat(id1, equalTo(id2));
   }
 
-  protected void checkIdsAreDifferent(Optional<ValueProviderCacheId> id1, Optional<ValueProviderCacheId> id2) {
+  private void checkIdsAreDifferent(Optional<ValueProviderCacheId> id1, Optional<ValueProviderCacheId> id2) {
     LOGGER.debug("ID1: " + id1.map(i -> collectLog(i, 0)).orElse("empty"));
     LOGGER.debug("ID2: " + id2.map(i -> collectLog(i, 0)).orElse("empty"));
     assertThat(id1, not(equalTo(id2)));
   }
 
-  protected static class Locator implements ComponentLocator<ComponentAst> {
+  private Optional<ParameterizedElementDeclaration> getParameterElementDeclaration(ArtifactDeclaration artifactDeclaration,
+                                                                                   String location) {
+    AtomicBoolean isConnection = new AtomicBoolean(false);
+    if (location.endsWith("/connection")) {
+      isConnection.set(true);
+      location = location.split("/connection")[0];
+    }
+    return artifactDeclaration.<ParameterizedElementDeclaration>findElement(builderFromStringRepresentation(location).build())
+        .map(d -> isConnection.get() ? ((ConfigurationElementDeclaration) d).getConnection().orElse(null) : d);
+  }
+
+  private void modifyParameter(ArtifactDeclaration artifactDeclaration, String ownerLocation, String parameterName,
+                               Consumer<ParameterElementDeclaration> parameterConsumer) {
+    getParameterElementDeclaration(artifactDeclaration, ownerLocation)
+        .map(
+             owner -> owner.getParameterGroups()
+                 .stream()
+                 .flatMap(pg -> pg.getParameters().stream())
+                 .filter(p -> p.getName().equals(parameterName))
+                 .findAny()
+                 .map(fp -> {
+                   parameterConsumer.accept(fp);
+                   return EMPTY; // Needed to avoid exception
+                 })
+                 .orElseThrow(() -> new RuntimeException("Could not find parameter to modify")))
+        .orElseThrow(() -> new RuntimeException("Location not found"));
+  }
+
+
+  @Test
+  public void idForParameterWithNoProviderInConfig() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    assertThat(computeIdFor(app, MY_CONFIG, ACTING_PARAMETER_NAME).isPresent(), is(false));
+  }
+
+  @Test
+  public void idForParameterWithNoProviderInSource() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    assertThat(computeIdFor(app, SOURCE_LOCATION, ACTING_PARAMETER_NAME).isPresent(), is(false));
+  }
+
+  @Test
+  public void idForParameterWithNoProviderInOperation() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    assertThat(computeIdFor(app, OPERATION_LOCATION, ACTING_PARAMETER_NAME).isPresent(), is(false));
+  }
+
+  @Test
+  public void idForConfigNoChanges() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> configId = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
+    assertThat(configId.isPresent(), is(true));
+    checkIdsAreEqual(configId, computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME));
+  }
+
+
+
+  @Test
+  public void idForConfigChangingNotActingParameters() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> configId = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
+    assertThat(configId.isPresent(), is(true));
+    modifyParameter(app, MY_CONFIG, PARAMETER_REQUIRED_FOR_METADATA_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreEqual(configId, computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfigChangingActingParameter() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> configId = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
+    assertThat(configId.isPresent(), is(true));
+    modifyParameter(app, MY_CONFIG, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreDifferent(configId, computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfigChangingActingParameterInGroup() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> configId = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
+    assertThat(configId.isPresent(), is(true));
+    modifyParameter(app, MY_CONFIG, PARAMETER_IN_GROUP_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreDifferent(configId, computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfiglessAndConnectionlessOperationNoChanges() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(opId.isPresent(), is(true));
+    checkIdsAreEqual(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfiglessAndConnectionlessOperationChangingActingParameter() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(opId.isPresent(), is(true));
+    modifyParameter(app, OPERATION_LOCATION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreDifferent(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfiglessAndConnectionlessOperationChangingActingParameterInGroup() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(opId.isPresent(), is(true));
+    modifyParameter(app, OPERATION_LOCATION, PARAMETER_IN_GROUP_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreDifferent(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfiglessAndConnectionlessOperationChangesInConfig() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(opId.isPresent(), is(true));
+    modifyParameter(app, MY_CONFIG, PARAMETER_REQUIRED_FOR_METADATA_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    modifyParameter(app, MY_CONFIG, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreEqual(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfiglessAndConnectionlessOperationChangesInConnection() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(opId.isPresent(), is(true));
+    modifyParameter(app, MY_CONNECTION, PARAMETER_REQUIRED_FOR_METADATA_NAME,
+                    p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    modifyParameter(app, MY_CONNECTION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreEqual(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+
+  @Test
+  public void idForConfiglessAndConnectionlessSourceNoChanges() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(sourceId.isPresent(), is(true));
+    checkIdsAreEqual(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfiglessAndConnectionlessSourceChangingActingParameter() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(sourceId.isPresent(), is(true));
+    modifyParameter(app, SOURCE_LOCATION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreDifferent(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfiglessAndConnectionlessSourceChangingActingParameterInGroup() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(sourceId.isPresent(), is(true));
+    modifyParameter(app, SOURCE_LOCATION, PARAMETER_IN_GROUP_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreDifferent(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfiglessAndConnectionlessSourceChangesInConfig() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(sourceId.isPresent(), is(true));
+    modifyParameter(app, MY_CONFIG, PARAMETER_REQUIRED_FOR_METADATA_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    modifyParameter(app, MY_CONFIG, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreEqual(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfiglessAndConnectionlessSourceChangesInConnection() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(sourceId.isPresent(), is(true));
+    modifyParameter(app, MY_CONNECTION, PARAMETER_REQUIRED_FOR_METADATA_NAME,
+                    p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    modifyParameter(app, MY_CONNECTION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreEqual(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfigAwareOperationChangesInConfigNotRequiredForMetadata() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(opId.isPresent(), is(true));
+    modifyParameter(app, MY_CONFIG, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreEqual(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfigAwareOperationChangesInConfigRequiredForMetadata() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(opId.isPresent(), is(true));
+    modifyParameter(app, MY_CONFIG, PARAMETER_REQUIRED_FOR_METADATA_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreDifferent(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConnectionAwareOperationChangesInConnectionNotRequiredForMetadata() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    when(valueProviderModel.requiresConnection()).thenReturn(true);
+    Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(opId.isPresent(), is(true));
+    modifyParameter(app, MY_CONNECTION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreEqual(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConnectionAwareOperationChangesInConnectionRequiredForMetadata() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    when(valueProviderModel.requiresConnection()).thenReturn(true);
+    Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(opId.isPresent(), is(true));
+    modifyParameter(app, MY_CONNECTION, PARAMETER_REQUIRED_FOR_METADATA_NAME,
+                    p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreDifferent(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfigAwareSourceChangesInConfigNotRequiredForMetadata() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(sourceId.isPresent(), is(true));
+    modifyParameter(app, MY_CONFIG, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreEqual(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConfigAwareSourceChangesInConfigRequiredForMetadata() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(sourceId.isPresent(), is(true));
+    modifyParameter(app, MY_CONFIG, PARAMETER_REQUIRED_FOR_METADATA_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreDifferent(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConnectionAwareSourceChangesInConnectionNotRequiredForMetadata() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    when(valueProviderModel.requiresConnection()).thenReturn(true);
+    Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(sourceId.isPresent(), is(true));
+    modifyParameter(app, MY_CONNECTION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreEqual(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void idForConnectionAwareSourceChangesInConnectionRequiredForMetadata() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    when(valueProviderModel.requiresConnection()).thenReturn(true);
+    Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(sourceId.isPresent(), is(true));
+    modifyParameter(app, MY_CONNECTION, PARAMETER_REQUIRED_FOR_METADATA_NAME,
+                    p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreDifferent(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void equalConfigsWithDifferentNameGetSameHash() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
+    app.addGlobalElement(declareConfig(config.getConnection().get(), "newName",
+                                       PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
+                                       ACTING_PARAMETER_DEFAULT_VALUE,
+                                       PROVIDED_PARAMETER_DEFAULT_VALUE,
+                                       PARAMETER_IN_GROUP_DEFAULT_VALUE));
+    Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
+    Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
+    checkIdsAreEqual(config1Id, config2Id);
+  }
+
+  @Test
+  public void differentConfigsWithSameParameterGetDifferentHash() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
+    app.addGlobalElement(declareOtherConfig(config.getConnection().get(), "newName",
+                                            PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
+                                            ACTING_PARAMETER_DEFAULT_VALUE,
+                                            PROVIDED_PARAMETER_DEFAULT_VALUE,
+                                            PARAMETER_IN_GROUP_DEFAULT_VALUE));
+    Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
+    Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
+    checkIdsAreDifferent(config1Id, config2Id);
+  }
+
+  @Test
+  public void differentValueProviderNameGetsDifferentHash() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    when(valueProviderModel.requiresConnection()).thenReturn(true);
+    when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    when(valueProviderModel.getProviderName()).thenReturn("newValueProviderName");
+    Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    checkIdsAreDifferent(opId1, opId2);
+  }
+
+  @Test
+  public void differentOperationsWithSameParametersGetsDifferentHash() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OTHER_OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    checkIdsAreDifferent(opId1, opId2);
+  }
+
+  private static class Locator implements ComponentLocator<ComponentAst> {
 
     private final Map<Location, ComponentAst> components = new HashMap<>();
 
@@ -685,7 +849,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
     @Override
     public Optional<ComponentAst> get(Location location) {
-      return Optional.ofNullable(components.get(location));
+      return Optional.ofNullable(components.get(location)).map(cm -> cm);
     }
 
     private Location getLocation(ComponentAst component) {

@@ -343,7 +343,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       ResourceProvider externalResourceProvider = new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader());
       return new ApplicationModel(artifactConfig, artifactDeclaration, getExtensions(),
                                   artifactProperties, parentConfigurationProperties,
-                                  of(componentBuildingDefinitionRegistry),
                                   externalResourceProvider);
     } catch (MuleRuntimeException e) {
       throw e;

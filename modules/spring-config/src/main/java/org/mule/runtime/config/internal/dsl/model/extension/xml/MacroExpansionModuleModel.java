@@ -15,7 +15,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
-import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsNamespace;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
@@ -57,8 +56,6 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.stream.Stream;
 
-import javax.xml.namespace.QName;
-
 /**
  * A {@link MacroExpansionModuleModel} works tightly with a {@link ApplicationModel} to go over all the registered
  * {@link ExtensionModel}s that are XML based (see {@link XmlExtensionModelProperty}) looking for code to macro expand.
@@ -92,13 +89,6 @@ public class MacroExpansionModuleModel {
   public static final String MODULE_CONNECTION_GLOBAL_ELEMENT_NAME = "connection";
 
   public static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
-  /**
-   * Used to obtain the {@link ComponentIdentifier} element from the <module/>'s original {@ink ComponentModel} to be later added
-   * in the macro expanded element (aka: <module-operation-chain ../>) so that the location set by the
-   * {@link org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor} can properly set the paths for every element
-   * (even the macro expanded)
-   */
-  public static final QName ORIGINAL_IDENTIFIER = new QName(NS_MULE_PARSER_METADATA, "ORIGINAL_IDENTIFIER");
 
   /**
    * Reserved prefix in a <module/> to define a reference an operation of the same module (no circular dependencies allowed)

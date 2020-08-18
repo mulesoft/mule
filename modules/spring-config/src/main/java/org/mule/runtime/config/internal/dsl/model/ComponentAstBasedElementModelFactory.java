@@ -63,10 +63,11 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
+import org.mule.runtime.ast.internal.builder.MetadataTypeModelAdapter;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModel.Builder;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -465,9 +466,9 @@ class ComponentAstBasedElementModelFactory {
                                               ParameterGroupModel group,
                                               DslElementSyntax groupDsl,
                                               ComponentIdentifier identifier) {
-    final org.mule.runtime.config.internal.model.ComponentModel.Builder groupCompAstBuilder =
-        new org.mule.runtime.config.internal.model.ComponentModel.Builder();
-    groupCompAstBuilder.setIdentifier(identifier);
+    final ComponentAstBuilder groupCompAstBuilder = ComponentAstBuilder.builder();
+
+    groupCompAstBuilder.withIdentifier(identifier);
 
     group.getParameterModels()
         .forEach(paramModel -> groupDsl.getContainedElement(paramModel.getName())
@@ -481,13 +482,12 @@ class ComponentAstBasedElementModelFactory {
 
                   if (isContent(paramModel) || isText(paramModel)) {
                     getIdentifier(paramDsl)
-                        .ifPresent(tagId -> groupCompAstBuilder
-                            .addChildComponentModel(new org.mule.runtime.config.internal.model.ComponentModel.Builder()
-                                .setIdentifier(tagId)
-                                .setTextContent(defaultValue)
-                                .build()));
+                        .ifPresent(tagId -> groupCompAstBuilder.addChildComponent()
+                            .withIdentifier(tagId)
+                            .withRawParameter(BODY_RAW_PARAM_NAME, defaultValue)
+                            .build());
                   } else {
-                    groupCompAstBuilder.addParameter(paramDsl.getAttributeName(), defaultValue, true);
+                    groupCompAstBuilder.withRawParameter(defaultValue, paramDsl.getAttributeName());
                   }
 
                   groupElementBuilder.containing(paramElementBuilder.build());

@@ -33,7 +33,6 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
-import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveTypedComponentIdentifier;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
@@ -67,14 +66,14 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.builder.ArtifactAstBuilder;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
+import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
-import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
-import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
@@ -88,7 +87,6 @@ import org.mule.runtime.config.internal.dsl.model.extension.xml.property.Operati
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.util.NoOpXmlErrorHandler;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
@@ -195,7 +193,8 @@ public final class XmlExtensionLoaderDelegate {
   /**
    * ENUM used to discriminate which visibility an <operation/> has.
    *
-   * @see {@link XmlExtensionLoaderDelegate#loadOperationsFrom(HasOperationDeclarer, ComponentModel, DirectedGraph, XmlDslModel, XmlExtensionLoaderDelegate.OperationVisibility)}
+   * @see {@link XmlExtensionLoaderDelegate#loadOperationsFrom(HasOperationDeclarer, ComponentAst, DirectedGraph, XmlDslModel,
+   *      XmlExtensionLoaderDelegate.OperationVisibility, Optional<ExtensionModel>)}
    */
   public enum OperationVisibility {
     PRIVATE, PUBLIC
@@ -410,7 +409,10 @@ public final class XmlExtensionLoaderDelegate {
     final ConfigLine configLine = parseModule.get();
     final ConfigurationPropertiesResolver externalPropertiesResolver = getConfigurationPropertiesResolver(configLine);
     final ComponentModelReader componentModelReader = new ComponentModelReader(externalPropertiesResolver);
-    return componentModelReader.extractComponentDefinitionModel(configLine, modulePath);
+
+    final ArtifactAstBuilder artifactAstBuilder = ArtifactAstBuilder.builder(extensions);
+    componentModelReader.extractComponentDefinitionModel(configLine, modulePath, artifactAstBuilder.addTopLevelComponent());
+    return artifactAstBuilder.build().topLevelComponentsStream().findAny().get();
   }
 
   private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ConfigLine configLine) {
@@ -456,10 +458,6 @@ public final class XmlExtensionLoaderDelegate {
                                                                 MODULE_IDENTIFIER.toString(),
                                                                 moduleModel.getIdentifier().toString())));
     }
-
-    moduleModel.recursiveStream()
-        .forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel, false, extensionModelHelper));
-    recursiveStreamWithHierarchy(moduleModel).forEach(new ComponentLocationVisitor());
 
     final String name = moduleModel.getRawParameterValue(MODULE_NAME).orElse(null);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel

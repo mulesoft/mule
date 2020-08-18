@@ -7,19 +7,8 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ON_ERROR;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -33,44 +22,10 @@ import org.springframework.beans.factory.config.BeanDefinition;
 
 public class ComponentModelHelper {
 
-  /**
-   * Resolves the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} from a {@link ComponentAst}.
-   *
-   * @param componentModel a {@link ComponentAst} that represents a component in the configuration.
-   * @param extensionModelHelper helper to access components in extension model
-   * @return the componentModel type.
-   */
-  public static TypedComponentIdentifier.ComponentType resolveComponentType(ComponentAst componentModel,
-                                                                            ExtensionModelHelper extensionModelHelper) {
-    if (componentModel.getIdentifier().equals(ON_ERROR_CONTINE_IDENTIFIER)
-        || componentModel.getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER)) {
-      return ON_ERROR;
-    }
-    return extensionModelHelper.findComponentType(componentModel.getIdentifier());
-  }
-
   public static boolean isAnnotatedObject(SpringComponentModel springComponentModel) {
     return isOfType(springComponentModel, Component.class)
         // ValueResolver end up generating pojos from the extension whose class is enhanced to have annotations
         || isOfType(springComponentModel, ValueResolver.class);
-  }
-
-  public static boolean isProcessor(ComponentAst componentModel) {
-    return componentModel.getComponentType().equals(OPERATION)
-        || componentModel.getComponentType().equals(ROUTER)
-        || componentModel.getComponentType().equals(SCOPE);
-  }
-
-  public static boolean isMessageSource(ComponentAst componentModel) {
-    return componentModel.getComponentType().equals(SOURCE);
-  }
-
-  public static boolean isErrorHandler(ComponentAst componentModel) {
-    return componentModel.getComponentType().equals(ERROR_HANDLER);
-  }
-
-  public static boolean isTemplateOnErrorHandler(ComponentAst componentModel) {
-    return componentModel.getComponentType().equals(ON_ERROR);
   }
 
   private static boolean isOfType(SpringComponentModel springComponentModel, Class type) {
@@ -109,7 +64,4 @@ public class ComponentModelHelper {
     annotations.put(annotationKey, annotationValue);
   }
 
-  public static boolean isRouter(ComponentAst componentModel) {
-    return componentModel.getComponentType().equals(ROUTER);
-  }
 }

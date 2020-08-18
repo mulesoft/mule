@@ -27,9 +27,11 @@ import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 
 /**
  * Provides reusable base definition builders for plugin parsers
- * 
+ *
  * @since 4.0
+ * @deprecated since 4.4, use the SDK instead of registering parsers manually.
  */
+@Deprecated
 public class ComponentBuildingDefinitionProviderUtils {
 
   public static ComponentBuildingDefinition.Builder getTransformerBaseBuilder(Class<? extends AbstractTransformer> transformerClass,

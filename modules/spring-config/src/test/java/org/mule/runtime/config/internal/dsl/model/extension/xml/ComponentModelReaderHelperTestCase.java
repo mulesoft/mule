@@ -19,6 +19,7 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.Component
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.builder.ArtifactAstBuilder;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
@@ -187,6 +188,9 @@ public class ComponentModelReaderHelperTestCase extends AbstractMuleTestCase {
       }
     };
     final ComponentModelReader componentModelReader = new ComponentModelReader(externalPropertiesResolver);
-    return componentModelReader.extractComponentDefinitionModel(configLine, filename);
+
+    final ArtifactAstBuilder builder = ArtifactAstBuilder.builder(emptySet());
+    componentModelReader.extractComponentDefinitionModel(configLine, filename, builder.addTopLevelComponent());
+    return builder.build().topLevelComponentsStream().findFirst().get();
   }
 }

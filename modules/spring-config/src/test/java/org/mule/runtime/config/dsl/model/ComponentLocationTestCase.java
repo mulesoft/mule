@@ -63,7 +63,7 @@ public class ComponentLocationTestCase extends AbstractDslModelTestCase {
 
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(new ArtifactConfig.Builder().build(),
-                                declaration, extensions, emptyMap(), empty(), empty(),
+                                declaration, extensions, emptyMap(), empty(),
                                 uri -> getClass().getResourceAsStream(uri));
   }
 
