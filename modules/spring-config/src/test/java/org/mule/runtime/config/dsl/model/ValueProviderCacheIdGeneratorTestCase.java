@@ -66,7 +66,8 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
     ComponentLocator<DslElementModel<?>> dslLocator =
         l -> getDeclaration(appDeclaration, l.toString()).map(d -> dslElementModelFactory.create(d).orElse(null));
 
-    ComponentLocator<ElementDeclaration> declarationLocator = l -> appDeclaration.findElement(builderFromStringRepresentation(l.toString()).build());
+    ComponentLocator<ElementDeclaration> declarationLocator =
+        l -> appDeclaration.findElement(builderFromStringRepresentation(l.toString()).build());
 
     ValueProviderCacheIdGenerator<ComponentAst> componentAstBasedValueProviderCacheIdGenerator =
         new ComponentAstBasedValueProviderCacheIdGenerator(locator);
@@ -75,7 +76,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
     ValueProviderCacheIdGenerator<DslElementModel<?>> dslElementModelValueProviderCacheIdGenerator =
         new DslElementBasedValueProviderCacheIdGenerator(dslLocator);
     ValueProviderCacheIdGenerator<ElementDeclaration> elementDeclarationValueProviderCacheIdGenerator =
-            new DeclarationBaseValueProviderCacheIdGenerator(dslContext, declarationLocator);
+        new DeclarationBaseValueProviderCacheIdGenerator(dslContext, declarationLocator);
 
     ComponentAst component = getComponentAst(app, location);
     DslElementModel<?> dslElementModel = dslLocator.get(Location.builderFromStringRepresentation(location).build())
@@ -95,7 +96,8 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
         dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName);
     Optional<ValueProviderCacheId> componentBasedId =
         componentBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
-    Optional<ValueProviderCacheId> declarationBasedId = elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(), parameterName);
+    Optional<ValueProviderCacheId> declarationBasedId =
+        elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(), parameterName);
 
     //TODO: ADD THIS CHECK MULE-18636
     //checkIdsAreEqual(astId, dslElementId);

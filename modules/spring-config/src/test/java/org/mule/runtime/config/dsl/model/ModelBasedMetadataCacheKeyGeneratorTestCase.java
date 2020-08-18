@@ -110,10 +110,11 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     Map<String, MetadataCacheId> hashByLocation = new HashMap<>();
 
     applicationModel.topLevelComponentsStream()
-        .forEach(component ->  {
+        .forEach(component -> {
           try {
-            hashByLocation.put(component.getLocation().getLocation(), getIdForComponentMetadata(app, component.getLocation().getLocation()));
-          }catch (Exception e) {
+            hashByLocation.put(component.getLocation().getLocation(),
+                               getIdForComponentMetadata(app, component.getLocation().getLocation()));
+          } catch (Exception e) {
             throw new RuntimeException(e);
           }
         });
@@ -129,7 +130,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
             String location = component.getLocation().getLocation();
             MetadataCacheId previousHash = hashByLocation.get(location);
             assertThat(previousHash, is(getIdForComponentMetadata(reloadedApp, component.getLocation().getLocation())));
-          }catch (Exception e) {
+          } catch (Exception e) {
             throw new RuntimeException(e);
           }
         });

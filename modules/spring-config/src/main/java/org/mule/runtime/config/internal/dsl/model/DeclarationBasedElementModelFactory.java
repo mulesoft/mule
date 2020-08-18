@@ -193,8 +193,7 @@ class DeclarationBasedElementModelFactory {
 
     DslElementModel.Builder<ConfigurationModel> element = DslElementModel.<ConfigurationModel>builder()
         .withModel(model)
-        .withDsl(configDsl)
-            .containing();
+        .withDsl(configDsl);
 
     configDeclaration.getConnection()
         .ifPresent(connection -> addConnectionProvider(connection, model, configuration, element));

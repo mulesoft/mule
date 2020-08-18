@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.runtime.config.dsl.model;
 
 import static java.util.Collections.emptyMap;
@@ -44,9 +50,9 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
   @Before
   public void setUp() throws Exception {
     extensions = ImmutableSet.<ExtensionModel>builder()
-            .add(MuleExtensionModelProvider.getExtensionModel())
-            .add(mockExtension)
-            .build();
+        .add(MuleExtensionModelProvider.getExtensionModel())
+        .add(mockExtension)
+        .build();
 
     dslResolvingContext = DslResolvingContext.getDefault(extensions);
     declarer = ElementDeclarer.forExtension(EXTENSION_NAME);
@@ -56,15 +62,17 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
   protected MetadataCacheId getIdForComponentOutputMetadata(ArtifactDeclaration declaration, String location) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
     ComponentAst component = new Locator(app)
-            .get(Location.builderFromStringRepresentation(location).build())
-            .get();
+        .get(Location.builderFromStringRepresentation(location).build())
+        .get();
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
     //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentOutputMetadata(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForComponentOutputMetadata(component).get();
-    MetadataCacheId dslBasedId = createDslBasedGenerator(app, dslFactory).getIdForComponentOutputMetadata(dslFactory.create(component).get()).get();
-    MetadataCacheId declarationBasedId = createDeclarationBasedGenerator(declaration).getIdForComponentOutputMetadata(elementDeclaration).get();
+    MetadataCacheId dslBasedId =
+        createDslBasedGenerator(app, dslFactory).getIdForComponentOutputMetadata(dslFactory.create(component).get()).get();
+    MetadataCacheId declarationBasedId =
+        createDeclarationBasedGenerator(declaration).getIdForComponentOutputMetadata(elementDeclaration).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
@@ -77,18 +85,20 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
   }
 
   protected MetadataCacheId getIdForComponentAttributesMetadata(ArtifactDeclaration declaration, String location)
-          throws Exception {
+      throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
     ComponentAst component = new Locator(app)
-            .get(Location.builderFromStringRepresentation(location).build())
-            .get();
+        .get(Location.builderFromStringRepresentation(location).build())
+        .get();
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
     //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentAttributesMetadata(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForComponentAttributesMetadata(component).get();
-    MetadataCacheId dslBasedId = createDslBasedGenerator(app, dslFactory).getIdForComponentAttributesMetadata(dslFactory.create(component).get()).get();
-    MetadataCacheId declarationBasedId = createDeclarationBasedGenerator(declaration).getIdForComponentAttributesMetadata(elementDeclaration).get();
+    MetadataCacheId dslBasedId =
+        createDslBasedGenerator(app, dslFactory).getIdForComponentAttributesMetadata(dslFactory.create(component).get()).get();
+    MetadataCacheId declarationBasedId =
+        createDeclarationBasedGenerator(declaration).getIdForComponentAttributesMetadata(elementDeclaration).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
@@ -101,18 +111,20 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
   }
 
   protected MetadataCacheId getIdForComponentInputMetadata(ArtifactDeclaration declaration, String location, String parameterName)
-          throws Exception {
+      throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
     ComponentAst component = new Locator(app)
-            .get(Location.builderFromStringRepresentation(location).build())
-            .get();
+        .get(Location.builderFromStringRepresentation(location).build())
+        .get();
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
     //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentInputMetadata(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForComponentInputMetadata(component, parameterName).get();
-    MetadataCacheId dslBasedId = createDslBasedGenerator(app, dslFactory).getIdForComponentInputMetadata(dslFactory.create(component).get(), parameterName).get();
-    MetadataCacheId declarationBasedId = createDeclarationBasedGenerator(declaration).getIdForComponentInputMetadata(elementDeclaration, parameterName).get();
+    MetadataCacheId dslBasedId = createDslBasedGenerator(app, dslFactory)
+        .getIdForComponentInputMetadata(dslFactory.create(component).get(), parameterName).get();
+    MetadataCacheId declarationBasedId =
+        createDeclarationBasedGenerator(declaration).getIdForComponentInputMetadata(elementDeclaration, parameterName).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
@@ -127,14 +139,14 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
   protected MetadataCacheId getIdForComponentMetadata(ArtifactDeclaration declaration, String location) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
     ComponentAst component = new Locator(app)
-            .get(Location.builderFromStringRepresentation(location).build())
-            .get();
+        .get(Location.builderFromStringRepresentation(location).build())
+        .get();
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
     ComponentAst configAst = new Locator(app)
-            .get(Location.builderFromStringRepresentation("myConfig").build())
-            .get();
+        .get(Location.builderFromStringRepresentation("myConfig").build())
+        .get();
 
     ElementDeclaration configDeclaration = declaration.findElement(builderFromStringRepresentation("myConfig").build()).get();
 
@@ -143,8 +155,10 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
 
     //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentMetadata(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForComponentMetadata(component).get();
-    MetadataCacheId dslBasedId = createDslBasedGenerator(app, dslFactory).getIdForComponentMetadata(dslFactory.create(component).get()).get();
-    MetadataCacheId declarationBasedId = createDeclarationBasedGenerator(declaration).getIdForComponentMetadata(elementDeclaration).get();
+    MetadataCacheId dslBasedId =
+        createDslBasedGenerator(app, dslFactory).getIdForComponentMetadata(dslFactory.create(component).get()).get();
+    MetadataCacheId declarationBasedId =
+        createDeclarationBasedGenerator(declaration).getIdForComponentMetadata(elementDeclaration).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
@@ -159,15 +173,17 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
   protected MetadataCacheId getIdForMetadataKeys(ArtifactDeclaration declaration, String location) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
     ComponentAst component = new Locator(app)
-            .get(Location.builderFromStringRepresentation(location).build())
-            .get();
+        .get(Location.builderFromStringRepresentation(location).build())
+        .get();
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
     //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForMetadataKeys(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForMetadataKeys(component).get();
-    MetadataCacheId dslBasedId = createDslBasedGenerator(app, dslFactory).getIdForMetadataKeys(dslFactory.create(component).get()).get();
-    MetadataCacheId declarationBasedId = createDeclarationBasedGenerator(declaration).getIdForMetadataKeys(elementDeclaration).get();
+    MetadataCacheId dslBasedId =
+        createDslBasedGenerator(app, dslFactory).getIdForMetadataKeys(dslFactory.create(component).get()).get();
+    MetadataCacheId declarationBasedId =
+        createDeclarationBasedGenerator(declaration).getIdForMetadataKeys(elementDeclaration).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
@@ -182,15 +198,17 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
   protected MetadataCacheId getIdForGlobalMetadata(ArtifactDeclaration declaration, String location) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
     ComponentAst component = new Locator(app)
-            .get(Location.builderFromStringRepresentation(location).build())
-            .get();
+        .get(Location.builderFromStringRepresentation(location).build())
+        .get();
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
     //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForGlobalMetadata(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForGlobalMetadata(component).get();
-    MetadataCacheId dslBasedId = createDslBasedGenerator(app, dslFactory).getIdForGlobalMetadata(dslFactory.create(component).get()).get();
-    MetadataCacheId declarationBasedId = createDeclarationBasedGenerator(declaration).getIdForGlobalMetadata(elementDeclaration).get();
+    MetadataCacheId dslBasedId =
+        createDslBasedGenerator(app, dslFactory).getIdForGlobalMetadata(dslFactory.create(component).get()).get();
+    MetadataCacheId declarationBasedId =
+        createDeclarationBasedGenerator(declaration).getIdForGlobalMetadata(elementDeclaration).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
     assertThat(dslBasedId, equalTo(declarationBasedId));
@@ -203,21 +221,24 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
   }
 
   private MetadataCacheIdGenerator<ComponentAst> createModelBasedGenerator(ApplicationModel app) {
-    return new ModelBasedMetadataCacheIdGeneratorFactory().create(dslResolvingContext, new ModelBasedTypeMetadataCacheKeyGeneratorTestCase.Locator(app));
+    return new ModelBasedMetadataCacheIdGeneratorFactory()
+        .create(dslResolvingContext, new ModelBasedTypeMetadataCacheKeyGeneratorTestCase.Locator(app));
   }
 
   private MetadataCacheIdGenerator<ComponentAst> createAstBasedGenerator(ApplicationModel app) {
     return new ComponentAstBasedMetadataCacheIdGenerator(new ModelBasedTypeMetadataCacheKeyGeneratorTestCase.Locator(app));
   }
 
-  private MetadataCacheIdGenerator<DslElementModel<?>> createDslBasedGenerator(ApplicationModel app, DslElementModelFactory factory) {
+  private MetadataCacheIdGenerator<DslElementModel<?>> createDslBasedGenerator(ApplicationModel app,
+                                                                               DslElementModelFactory factory) {
     ComponentLocator<ComponentAst> astLocator = new ModelBasedTypeMetadataCacheKeyGeneratorTestCase.Locator(app);
     ComponentLocator<DslElementModel<?>> dslLocator = l -> astLocator.get(l).map(e -> factory.create(e).orElse(null));
     return new DslElementBasedMetadataCacheIdGenerator(dslLocator);
   }
 
   private MetadataCacheIdGenerator<ElementDeclaration> createDeclarationBasedGenerator(ArtifactDeclaration app) {
-    ComponentLocator<ElementDeclaration> declarationLocator = l -> app.findElement(builderFromStringRepresentation(l.toString()).build());
+    ComponentLocator<ElementDeclaration> declarationLocator =
+        l -> app.findElement(builderFromStringRepresentation(l.toString()).build());
     return new DeclarationBasedMetadataCacheIdGenerator(dslResolvingContext, declarationLocator);
   }
 
