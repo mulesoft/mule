@@ -62,6 +62,8 @@ import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
+import org.mule.runtime.core.internal.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -124,6 +126,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private ClusterService clusterService;
+
+  @Inject
+  private CursorDecoratorFactory cursorDecoratorFactory;
 
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
@@ -477,6 +482,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private MessageProcessContext createProcessingContext() {
+    // doing this here instead of inlining in the method below that uses it avoids doing the map lookup per event received.
+    final CursorComponentDecoratorFactory componentDecoratorFactory = cursorDecoratorFactory.componentDecoratorFactory(this);
 
     return new MessageProcessContext() {
 
@@ -505,6 +512,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       @Override
       public MessagingExceptionResolver getMessagingExceptionResolver() {
         return messagingExceptionResolver;
+      }
+
+      @Override
+      public CursorComponentDecoratorFactory getComponentDecoratorFactory() {
+        return componentDecoratorFactory;
       }
 
       @Override

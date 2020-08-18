@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY",
+          "elementKind": "field",
+          "justification": "MULE-18650: Need feature backported to 4.3"
+        },
+        {
           "code": "java.class.added",
           "new": "interface org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext",
           "package": "org.mule.runtime.core.privileged.event.context",
