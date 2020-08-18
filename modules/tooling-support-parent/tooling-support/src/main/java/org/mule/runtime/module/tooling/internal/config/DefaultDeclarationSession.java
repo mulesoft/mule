@@ -72,8 +72,7 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   }
 
   private <T> T withInternalDeclarationSession(String functionName, Function<DeclarationSession, T> function) {
-    DeclarationSession declarationSession =
-        actionCallWrapper(() -> getInternalDeclarationSession(), SERVICE_NAME, "getInternalDeclarationSession()");
+    DeclarationSession declarationSession = getInternalDeclarationSession();
     return actionCallWrapper(() -> function.apply(declarationSession), SERVICE_NAME, functionName);
   }
 
