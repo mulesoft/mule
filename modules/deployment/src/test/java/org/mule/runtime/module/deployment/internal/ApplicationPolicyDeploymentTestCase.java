@@ -684,6 +684,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Issue("MULE-18682")
+  @Feature(CLASSLOADING_ISOLATION)
   public void policyUpgradeOfPolicyWithExtensionUsingObjectStore() throws Exception {
     PolicyTemplateDescriptor templateDescriptor100 =
         policyManager.registerPolicyTemplate(policyWithPluginUsingObjectStore("1.0.0").getArtifactFile());
