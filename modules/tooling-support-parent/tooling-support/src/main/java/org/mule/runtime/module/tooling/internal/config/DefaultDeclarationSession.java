@@ -14,6 +14,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
+import static org.mule.runtime.module.tooling.internal.utils.ActionFunction.actionCallWrapper;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -31,17 +32,20 @@ import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.AbstractArtifactAgnosticService;
 import org.mule.runtime.module.tooling.internal.ApplicationSupplier;
 
+import java.util.function.Function;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DefaultDeclarationSession extends AbstractArtifactAgnosticService implements DeclarationSession {
 
-  private LazyValue<DeclarationSession> internalConfigurationService;
+  private static final String SERVICE_NAME = DefaultDeclarationSession.class.getSimpleName();
   private Logger LOGGER = LoggerFactory.getLogger(DefaultDeclarationSession.class);
+  private LazyValue<DeclarationSession> internalDeclarationSession;
 
   DefaultDeclarationSession(ApplicationSupplier applicationSupplier) {
     super(applicationSupplier);
-    this.internalConfigurationService = new LazyValue<>(() -> {
+    this.internalDeclarationSession = new LazyValue<>(() -> {
       try {
         return createInternalService(getStartedApplication());
       } catch (ApplicationStartingException e) {
@@ -54,7 +58,7 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   private DeclarationSession createInternalService(Application application) {
     final InternalDeclarationSession internalDataProviderService =
         new InternalDeclarationSession(application.getDescriptor().getArtifactDeclaration());
-    return application.getRegistry()
+    InternalDeclarationSession internalDeclarationSession = application.getRegistry()
         .lookupByType(MuleContext.class)
         .map(muleContext -> {
           try {
@@ -64,16 +68,23 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
           }
         })
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find injector to create InternalDeclarationSession")));
+    return internalDeclarationSession;
   }
 
-  private DeclarationSession withInternalService() {
-    return this.internalConfigurationService.get();
+  private <T> T withInternalDeclarationSession(String functionName, Function<DeclarationSession, T> function) {
+    DeclarationSession declarationSession =
+        actionCallWrapper(() -> getInternalDeclarationSession(), SERVICE_NAME, "getInternalDeclarationSession()");
+    return actionCallWrapper(() -> function.apply(declarationSession), SERVICE_NAME, functionName);
+  }
+
+  private DeclarationSession getInternalDeclarationSession() {
+    return this.internalDeclarationSession.get();
   }
 
   @Override
   public ConnectionValidationResult testConnection(String configName) {
     try {
-      return withInternalService().testConnection(configName);
+      return withInternalDeclarationSession("testConnection()", session -> session.testConnection(configName));
     } catch (Exception e) {
       LOGGER.error(format("Unknown error while performing test connection on config: '%s'", configName), e);
       return failure(format("Unknown error while performing test connection on config: '%s'. %s", configName,
@@ -85,7 +96,7 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   @Override
   public ValueResult getValues(ParameterizedElementDeclaration component, String parameterName) {
     try {
-      return withInternalService().getValues(component, parameterName);
+      return withInternalDeclarationSession("getValues()", session -> session.getValues(component, parameterName));
     } catch (NoClassDefFoundError | Exception e) {
       LOGGER.error(format("Unknown error while resolving values on component: '%s' for parameter: '%s'", component.getName(),
                           parameterName),
@@ -101,7 +112,7 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   @Override
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration component) {
     try {
-      return withInternalService().getMetadataKeys(component);
+      return withInternalDeclarationSession("getMetadataKeys()", session -> session.getMetadataKeys(component));
     } catch (NoClassDefFoundError | Exception e) {
       LOGGER.error(format("Unknown error while resolving metadata keys on component: '%s'", component.getName()), e);
       return MetadataResult.failure(MetadataFailure.Builder.newFailure()
@@ -116,7 +127,7 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   @Override
   public MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentElementDeclaration component) {
     try {
-      return withInternalService().resolveComponentMetadata(component);
+      return withInternalDeclarationSession("resolveComponentMetadata()", session -> session.resolveComponentMetadata(component));
     } catch (NoClassDefFoundError | Exception e) {
       LOGGER.error(format("Unknown error while resolving metadata on component: '%s'", component.getName()), e);
       return MetadataResult.failure(MetadataFailure.Builder.newFailure()

@@ -7,7 +7,9 @@
 package org.mule.runtime.module.tooling.internal;
 
 import static com.google.common.base.Throwables.getCausalChain;
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
+import static org.mule.runtime.module.tooling.internal.utils.ActionFunction.actionCallWrapper;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
@@ -19,8 +21,9 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AbstractArtifactAgnosticService {
+public abstract class AbstractArtifactAgnosticService {
 
+  private static final String SERVICE_NAME = AbstractArtifactAgnosticService.class.getSimpleName();
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractArtifactAgnosticService.class);
   private final ApplicationSupplier applicationSupplier;
 
@@ -33,7 +36,13 @@ public class AbstractArtifactAgnosticService {
   protected Application getStartedApplication() throws ApplicationStartingException {
     if (application == null) {
       try {
-        application = applicationSupplier.get();
+        application = actionCallWrapper(() -> {
+          try {
+            return applicationSupplier.get();
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        }, SERVICE_NAME, "createApplication()");
       } catch (Exception e) {
         throw getCausalChain(e).stream()
             .filter(exception -> exception.getClass().equals(ArtifactNotFoundException.class)
@@ -42,9 +51,12 @@ public class AbstractArtifactAgnosticService {
             .orElse(new MuleRuntimeException(e));
       }
       try {
-        application.install();
-        application.init();
-        application.start();
+        actionCallWrapper(() -> {
+          application.install();
+          application.init();
+          application.start();
+          return null;
+        }, SERVICE_NAME, format("startApplication()", application.getArtifactId()));
       } catch (Exception e) {
         //Clean everything if there is an error
         dispose();
