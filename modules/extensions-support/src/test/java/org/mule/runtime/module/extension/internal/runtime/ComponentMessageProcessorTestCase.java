@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -86,6 +87,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     extensionManager = mock(ExtensionManager.class);
     mockPolicyManager = mock(PolicyManager.class);
+    when(mockPolicyManager.createOperationPolicy(any(), any(), any())).thenReturn(noPolicyOperation());
 
     processor = new ComponentMessageProcessor<ComponentModel>(extensionModel,
                                                               componentModel, null, null, null,
@@ -102,6 +104,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
         return ProcessingType.CPU_LITE;
       }
     };
+    processor.setAnnotations(getAppleFlowComponentLocationAnnotations());
     processor.setComponentLocator(componentLocator);
     processor.setCacheIdGeneratorFactory(mock(MetadataCacheIdGeneratorFactory.class));
 

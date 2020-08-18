@@ -30,7 +30,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.tck.probe.PollingProber.probe;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -127,7 +126,6 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     extensionManager = mock(ExtensionManager.class);
     policyManager = mock(PolicyManager.class);
 
-    final ComponentLocation location = mock(ComponentLocation.class);
     processor = new ComponentMessageProcessor<ComponentModel>(extensionModel,
                                                               componentModel, null, null, null,
                                                               resolverSet, null, null,
@@ -146,11 +144,6 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
       @Override
       protected ExecutionMediator createExecutionMediator() {
         return mediator;
-      }
-
-      @Override
-      public ComponentLocation getLocation() {
-        return location;
       }
 
       @Override
@@ -175,6 +168,7 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
 
     processor.setComponentLocator(componentLocator);
     processor.setCacheIdGeneratorFactory(mock(MetadataCacheIdGeneratorFactory.class));
+    processor.setAnnotations(getAppleFlowComponentLocationAnnotations());
 
     initialiseIfNeeded(processor, muleContext);
     startIfNeeded(processor);
