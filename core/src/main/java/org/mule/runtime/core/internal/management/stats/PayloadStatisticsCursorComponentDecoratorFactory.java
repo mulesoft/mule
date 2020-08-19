@@ -73,7 +73,8 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
   }
 
   @Override
-  public Collection<Result> decorateOutputResultCollection(Collection<Result> decorated, String correlationId) {
+  public Collection<Result> decorateOutputResultCollection(Collection<Result> decorated,
+                                                           String correlationId) {
     if (payloadStatistics.isEnabled()) {
       payloadStatistics.addOutputObjectCount(decorated.size());
       return decorated.stream()

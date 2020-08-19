@@ -47,7 +47,8 @@ public class NoOpCursorComponentDecoratorFactory implements CursorComponentDecor
   }
 
   @Override
-  public Collection<Result> decorateOutputResultCollection(Collection<Result> decorated, String correlationId) {
+  public Collection<Result> decorateOutputResultCollection(Collection<Result> decorated,
+                                                           String correlationId) {
     return decorated;
   }
 

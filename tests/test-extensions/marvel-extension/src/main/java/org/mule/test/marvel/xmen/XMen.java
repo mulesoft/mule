@@ -17,5 +17,4 @@ public class XMen {
 
   public static final String CONFIG_NAME = "x-men";
 
-
 }

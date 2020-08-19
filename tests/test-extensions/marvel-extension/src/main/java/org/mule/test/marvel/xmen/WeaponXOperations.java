@@ -27,7 +27,6 @@ public class WeaponXOperations {
       injectors.add(Result.<InputStream, Void>builder()
           .output(new ReaderInputStream(new StringReader(randomAlphanumeric(1024 * 1024)), UTF_8))
           .build());
-
     }
 
     return injectors;

@@ -4,14 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.tck.junit4.rule;
+package org.mule.tck.util;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 
 import java.util.function.Supplier;
-
-import org.junit.rules.ExternalResource;
 
 /**
  * Ensures the test containing the rule runs with statistics enabled.
@@ -20,7 +18,7 @@ import org.junit.rules.ExternalResource;
  *
  * @since 4.4, 4.3.1
  */
-public class StatisticsEnabled extends ExternalResource {
+public class StatisticsEnabled {
 
   private final Supplier<MuleContext> muleContext;
 
@@ -30,13 +28,11 @@ public class StatisticsEnabled extends ExternalResource {
     this.muleContext = muleContext;
   }
 
-  @Override
   public void before() throws Throwable {
     oldValue = muleContext.get().getStatistics().isEnabled();
     muleContext.get().getStatistics().setEnabled(true);
   }
 
-  @Override
   public void after() {
     muleContext.get().getStatistics().setEnabled(oldValue);
   }
