@@ -34,10 +34,10 @@ import java.util.Map;
 public class SimpleOperations {
 
   @OutputResolver(output = ConfigLessConnectionLessMetadataResolver.class)
-  public Result<Void, Object> configLessConnectionLessOP(@Config SimpleConfiguration configuration,
+  public Result<Object, Void> configLessConnectionLessOP(@Config SimpleConfiguration configuration,
                                                          @Connection TstExtensionClient client,
                                                          @Optional @OfValues(ConfigLessConnectionLessNoActingParamVP.class) String providedParameter,
-                                                         @Optional @MetadataKeyId(ConfigLessConnectionLessMetadataResolver.class) String metadataKey) {
+                                                         @MetadataKeyId(ConfigLessConnectionLessMetadataResolver.class) String metadataKey) {
     return null;
   }
 

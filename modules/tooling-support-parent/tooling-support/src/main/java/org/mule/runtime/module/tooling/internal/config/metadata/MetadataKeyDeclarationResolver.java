@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.tooling.internal.config.metadata;
 
+import static java.lang.String.format;
 import static java.util.Comparator.comparingInt;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.tooling.internal.config.params.ParameterSimpleValueExtractor.extractSimpleValue;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -31,6 +33,8 @@ import java.util.Map;
 
 /**
  * Resolver that creates a {@link MetadataKey} from a {@link ComponentElementDeclaration}.
+ * Exposes a {@link MetadataKeyResult} that enables checking if the key is complete or not.
+ * Complete meaning that all required parts of the key have a value assigned.
  *
  * @since 4.4
  */
@@ -46,10 +50,14 @@ public class MetadataKeyDeclarationResolver {
   }
 
   public MetadataKey resolveKey() {
+    return resolveKeyResult().getMetadataKey();
+  }
+
+  public MetadataKeyResult resolveKeyResult() {
     List<ParameterModel> keyPartModels = getMetadataKeyParts(parameterizedModel);
 
     if (keyPartModels.isEmpty()) {
-      return MetadataKeyBuilder.newKey(NullMetadataKey.ID).build();
+      return new MetadataKeyResult(MetadataKeyBuilder.newKey(NullMetadataKey.ID).build());
     }
 
     MetadataKeyBuilder rootMetadataKeyBuilder = null;
@@ -77,10 +85,20 @@ public class MetadataKeyDeclarationResolver {
       }
     }
 
-    if (metadataKeyBuilder == null) {
-      return MetadataKeyBuilder.newKey(NullMetadataKey.ID).build();
+    //TODO MULE-18680 remove `keyPartModels.size() > 1` once bug is fixed to accept optionals in multi-level keys
+    List<String> missingParts = keyPartModels.stream()
+        .filter(pm -> (keyPartModels.size() > 1 || pm.isRequired()) && !keyPartValues.containsKey(pm.getName()))
+        .map(NamedObject::getName).collect(toList());
+    String partialMessage = null;
+    MetadataKey metadataKey = MetadataKeyBuilder.newKey(NullMetadataKey.ID).build();
+    if (!missingParts.isEmpty()) {
+      partialMessage = format("The given MetadataKey does not provide all the required levels. Missing levels: %s",
+                              missingParts);
     }
-    return rootMetadataKeyBuilder.build();
+    if (metadataKeyBuilder != null) {
+      metadataKey = rootMetadataKeyBuilder.build();
+    }
+    return new MetadataKeyResult(metadataKey, partialMessage);
   }
 
   private List<ParameterModel> getMetadataKeyParts(ParameterizedModel parameterizedModel) {
