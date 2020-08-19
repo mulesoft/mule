@@ -70,6 +70,14 @@ public class DefaultArtifactClassLoaderManagerTestCase extends AbstractMuleTestC
     manager.unregister(null);
   }
 
+  @Test
+  public void findReturnsEmptyWhenClassloaderMissing() {
+
+    Optional<ClassLoader> result = manager.find(ARTIFACT_ID);
+
+    assertThat(result, is(Optional.empty()));
+  }
+
   private ArtifactClassLoader getArtifactClassLoader() {
     ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
     when(artifactClassLoader.getArtifactId()).thenReturn(ARTIFACT_ID);

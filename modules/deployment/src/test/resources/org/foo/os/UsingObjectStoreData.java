@@ -15,6 +15,8 @@ import javax.inject.Inject;
 
 public class UsingObjectStoreData implements Serializable {
 
+  private static final long serialVersionUID = 123L;
+
   private String value;
 
   public UsingObjectStoreData(String value) {
