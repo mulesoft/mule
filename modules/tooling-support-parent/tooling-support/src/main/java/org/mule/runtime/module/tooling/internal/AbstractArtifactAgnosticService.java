@@ -7,6 +7,7 @@
 package org.mule.runtime.module.tooling.internal;
 
 import static com.google.common.base.Throwables.getCausalChain;
+import static java.lang.System.currentTimeMillis;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -19,7 +20,7 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AbstractArtifactAgnosticService {
+public abstract class AbstractArtifactAgnosticService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractArtifactAgnosticService.class);
   private final ApplicationSupplier applicationSupplier;
@@ -32,8 +33,15 @@ public class AbstractArtifactAgnosticService {
 
   protected Application getStartedApplication() throws ApplicationStartingException {
     if (application == null) {
+      long startTime = currentTimeMillis();
       try {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Creating application");
+        }
         application = applicationSupplier.get();
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Application: '{}' has been created", application.getArtifactId());
+        }
       } catch (Exception e) {
         throw getCausalChain(e).stream()
             .filter(exception -> exception.getClass().equals(ArtifactNotFoundException.class)
@@ -42,11 +50,18 @@ public class AbstractArtifactAgnosticService {
             .orElse(new MuleRuntimeException(e));
       }
       try {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Starting application: '{}'", application.getArtifactId());
+        }
         application.install();
         application.init();
         application.start();
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Application: '{}' has been started in [{}ms]", application.getArtifactId(),
+                       currentTimeMillis() - startTime);
+        }
       } catch (Exception e) {
-        //Clean everything if there is an error
+        // Clean everything if there is an error
         dispose();
         throw new ApplicationStartingException(e);
       }

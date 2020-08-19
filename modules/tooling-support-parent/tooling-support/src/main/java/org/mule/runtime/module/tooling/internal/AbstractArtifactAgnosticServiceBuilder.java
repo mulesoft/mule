@@ -9,6 +9,7 @@ package org.mule.runtime.module.tooling.internal;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
@@ -27,11 +28,10 @@ import org.mule.runtime.module.deployment.impl.internal.application.DefaultAppli
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
 import org.mule.runtime.module.tooling.api.ArtifactAgnosticServiceBuilder;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.model.Model;
 
@@ -123,13 +123,13 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
     return createService(() -> {
       String applicationName = UUID.getUUID() + "-artifact-temp-app";
       File applicationFolder = new File(getExecutionFolder(), applicationName);
-      ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(applicationName);
+      Properties deploymentProperties = new Properties();
+      deploymentProperties.putAll(forcedDeploymentProperties());
+      ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(applicationName, of(deploymentProperties));
       applicationDescriptor.setArtifactDeclaration(artifactDeclaration);
       applicationDescriptor.setConfigResources(singleton("empty-app.xml"));
       applicationDescriptor.setArtifactLocation(applicationFolder);
-      applicationDescriptor.setAppProperties(ImmutableMap.<String, String>builder()
-          .putAll(artifactProperties)
-          .putAll(forcedDeploymentProperties()).build());
+      applicationDescriptor.setAppProperties(artifactProperties);
       createDeployablePomFile(applicationFolder, model);
       updateArtifactPom(applicationFolder, model);
       MavenClientProvider mavenClientProvider =
