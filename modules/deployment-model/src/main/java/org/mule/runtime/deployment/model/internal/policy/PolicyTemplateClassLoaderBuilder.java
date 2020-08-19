@@ -64,7 +64,9 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
 
   @Override
   protected String getArtifactId(ArtifactDescriptor artifactDescriptor) {
-    return getPolicyId(artifactDescriptor.getName());
+    return getPolicyId(artifactDescriptor.getBundleDescriptor().getGroupId() + ":" +
+        artifactDescriptor.getBundleDescriptor().getArtifactId() + ":" +
+        artifactDescriptor.getBundleDescriptor().getVersion());
   }
 
   public String getPolicyId(String policyName) {
