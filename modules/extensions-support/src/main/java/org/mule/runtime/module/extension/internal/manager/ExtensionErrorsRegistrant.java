@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.SingleExtensionImportTypesStrategy;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.Optional;
@@ -91,7 +92,7 @@ class ExtensionErrorsRegistrant {
       }
 
       private void registerErrors(ComponentModel model) {
-        if (!errorTypes.isEmpty()) {
+        if (!errorTypes.isEmpty() && model.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
           ExceptionMapper.Builder builder = ExceptionMapper.builder();
           builder.addExceptionMapping(ConnectionException.class, getErrorType(connectivityErrorModel, extensionModel));
           builder.addExceptionMapping(RetryPolicyExhaustedException.class, getErrorType(retryExhaustedError, extensionModel));

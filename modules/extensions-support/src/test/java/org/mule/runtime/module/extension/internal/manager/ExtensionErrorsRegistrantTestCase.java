@@ -16,6 +16,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,6 +29,7 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVIT
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -42,6 +44,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.util.NameUtils;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -127,8 +130,11 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     when(extensionModel.getName()).thenReturn(TEST_EXTENSION_NAME);
 
     when(operationWithError.getErrorModels()).thenReturn(singleton(extensionConnectivityError));
+
     when(operationWithError.getName()).thenReturn(OPERATION_NAME);
-    when(operationWithError.getModelProperty(any())).thenReturn(empty());
+    //    when(operationWithError.getModelProperty(any())).thenReturn(empty());
+    when(operationWithError.getModelProperty(eq(ConnectivityModelProperty.class)))
+        .thenReturn(Optional.of(mock(ConnectivityModelProperty.class)));
 
     when(operationWithoutErrors.getName()).thenReturn("operationWithoutError");
     when(operationWithoutErrors.getErrorModels()).thenReturn(emptySet());
