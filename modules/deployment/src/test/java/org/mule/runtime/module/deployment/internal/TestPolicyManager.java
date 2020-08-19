@@ -56,7 +56,7 @@ public class TestPolicyManager implements DeploymentListener {
    *
    * @param policyTemplate policy artifact file. Non null.
    */
-  public void registerPolicyTemplate(File policyTemplate) {
+  public PolicyTemplateDescriptor registerPolicyTemplate(File policyTemplate) {
     final File tempFolder = new File(getPoliciesTempFolder(), getBaseName(policyTemplate.getName()));
     try {
       unzip(policyTemplate, tempFolder);
@@ -66,6 +66,7 @@ public class TestPolicyManager implements DeploymentListener {
 
     final PolicyTemplateDescriptor policyTemplateDescriptor = policyTemplateDescriptorFactory.create(tempFolder, empty());
     policyTemplateDescriptors.add(policyTemplateDescriptor);
+    return policyTemplateDescriptor;
   }
 
   /**
@@ -89,9 +90,27 @@ public class TestPolicyManager implements DeploymentListener {
       throw new IllegalStateException("Cannot find policy template descriptor with name: " + policyTemplateName);
     }
 
+    addPolicy(appName, policyTemplateDescriptor.get(), policyParametrization);
+  }
+
+  /**
+   * Adds a parameterized policy
+   *
+   * @param appName application where the policy must be applied. Non empty.
+   * @param policyTemplateDescriptor template that must be used to instantiate the parametrized policy. Non empty.
+   * @param policyParametrization parametrization to instantiate the policy. Non null.
+   */
+  public void addPolicy(String appName, PolicyTemplateDescriptor policyTemplateDescriptor,
+                        PolicyParametrization policyParametrization)
+      throws PolicyRegistrationException {
+
+    checkArgument(!isEmpty(appName), "appName cannot be empty");
+    checkArgument(policyTemplateDescriptor != null, "policyTemplateDescriptor cannot be empty");
+    checkArgument(policyParametrization != null, "policyParametrization cannot be ull");
+
     Application application = deploymentService.findApplication(appName);
     ApplicationPolicyManager policyManager = application.getPolicyManager();
-    policyManager.addPolicy(policyTemplateDescriptor.get(), policyParametrization);
+    policyManager.addPolicy(policyTemplateDescriptor, policyParametrization);
   }
 
   /**
