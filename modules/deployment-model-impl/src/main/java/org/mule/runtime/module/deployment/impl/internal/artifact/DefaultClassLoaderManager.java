@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -46,7 +47,7 @@ public class DefaultClassLoaderManager implements ArtifactClassLoaderManager, Cl
 
     ArtifactClassLoader artifactClassLoader = artifactClassLoaders.get(classLoaderId);
 
-    return of(artifactClassLoader.getClassLoader());
+    return artifactClassLoader != null ? of(artifactClassLoader.getClassLoader()) : empty();
   }
 
   @Override
