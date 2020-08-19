@@ -8,9 +8,11 @@ package org.mule.runtime.core.internal.management.stats;
 
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -86,4 +88,7 @@ public interface CursorComponentDecoratorFactory {
    */
   InputStream decorateOutput(InputStream decorated, String correlationId);
 
+  Collection<Result> decorateOutputResultCollection(Collection<Result> decorated, String correlationId);
+
+  Iterator<Result> decorateOutputResultIterator(Iterator<Result> decorated, String correlationId);
 }

@@ -12,16 +12,14 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class PayloadTargetReturnDelegateTestCase extends TargetReturnDelegateTestCase {
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
-    return new PayloadTargetReturnDelegate(TARGET, componentModel, getCursorProviderFactory(), muleContext);
+    return new PayloadTargetReturnDelegate(TARGET, componentModel, componentDecoratorFactory, getCursorProviderFactory(),
+                                           muleContext);
   }
 
   @Override

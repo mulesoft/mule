@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Iterator;
 
-class NoOpCursorComponentDecoratorFactory implements CursorComponentDecoratorFactory {
+public class NoOpCursorComponentDecoratorFactory implements CursorComponentDecoratorFactory {
 
   public static final NoOpCursorComponentDecoratorFactory NO_OP_INSTANCE = new NoOpCursorComponentDecoratorFactory();
 
@@ -44,4 +46,13 @@ class NoOpCursorComponentDecoratorFactory implements CursorComponentDecoratorFac
     return decorated;
   }
 
+  @Override
+  public Collection<Result> decorateOutputResultCollection(Collection<Result> decorated, String correlationId) {
+    return decorated;
+  }
+
+  @Override
+  public Iterator<Result> decorateOutputResultIterator(Iterator<Result> decorated, String correlationId) {
+    return decorated;
+  }
 }
