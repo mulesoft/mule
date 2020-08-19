@@ -708,8 +708,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     executeApplicationFlow("main");
 
     PolicyParametrization newParameters = new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                                  getResourceFile("/policy-using-object-store.xml"),
-                                                                  emptyList());
+                                                                    getResourceFile("/policy-using-object-store.xml"),
+                                                                    emptyList());
     policyManager.addPolicy(applicationFileBuilder.getId(), templateDescriptor101, newParameters);
     policyManager.removePolicy(applicationFileBuilder.getId(), parameters.getId());
 
