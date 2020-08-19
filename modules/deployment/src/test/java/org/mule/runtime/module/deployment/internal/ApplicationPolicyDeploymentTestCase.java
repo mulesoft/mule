@@ -65,6 +65,7 @@ import org.mule.runtime.core.api.policy.PolicyPointcut;
 import org.mule.runtime.core.api.security.AbstractSecurityProvider;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
@@ -72,15 +73,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilde
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.util.CompilerUtils;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import io.qameta.allure.Issue;
 import io.qameta.allure.Description;
@@ -660,6 +652,39 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Issue("MULE-18682")
+  @Feature(CLASSLOADING_ISOLATION)
+  public void policyUpgradeOfPolicyWithExtensionUsingObjectStore() throws Exception {
+    PolicyTemplateDescriptor templateDescriptor100 =
+        policyManager.registerPolicyTemplate(policyWithPluginUsingObjectStore("1.0.0").getArtifactFile());
+    PolicyTemplateDescriptor templateDescriptor101 =
+        policyManager.registerPolicyTemplate(policyWithPluginUsingObjectStore("1.0.1").getArtifactFile());
+
+    ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG,
+                                                                                           simpleExtensionPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    PolicyParametrization parameters = new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+                                                                 getResourceFile("/policy-using-object-store.xml"),
+                                                                 emptyList());
+    policyManager.addPolicy(applicationFileBuilder.getId(), templateDescriptor100, parameters);
+
+    executeApplicationFlow("main");
+
+    PolicyParametrization newParameters = new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
+                                                                    getResourceFile("/policy-using-object-store.xml"),
+                                                                    emptyList());
+    policyManager.addPolicy(applicationFileBuilder.getId(), templateDescriptor101, newParameters);
+    policyManager.removePolicy(applicationFileBuilder.getId(), parameters.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
   public void redeployPolicyWithSecurityManagerDefined() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
@@ -732,15 +757,20 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   private PolicyFileBuilder policyWithPluginUsingObjectStore() {
+    return policyWithPluginUsingObjectStore("1.0.0");
+  }
+
+  private PolicyFileBuilder policyWithPluginUsingObjectStore(String version) {
     MulePolicyModel.MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModel.MulePolicyModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
         .setRequiredProduct(Product.MULE)
         .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, version))
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
         .build())
-        .dependingOn(usingObjectStorePlugin);
+        .dependingOn(usingObjectStorePlugin)
+        .withVersion(version);
   }
 
   private PolicyFileBuilder createInjectedPolicy() throws URISyntaxException {
