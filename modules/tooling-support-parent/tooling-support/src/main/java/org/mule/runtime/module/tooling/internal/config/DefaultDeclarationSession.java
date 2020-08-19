@@ -7,6 +7,7 @@
 package org.mule.runtime.module.tooling.internal.config;
 
 import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
@@ -14,7 +15,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
-import static org.mule.runtime.module.tooling.internal.utils.ActionFunction.actionCallWrapper;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultDeclarationSession extends AbstractArtifactAgnosticService implements DeclarationSession {
 
-  private static final String SERVICE_NAME = DefaultDeclarationSession.class.getSimpleName();
   private Logger LOGGER = LoggerFactory.getLogger(DefaultDeclarationSession.class);
   private LazyValue<DeclarationSession> internalDeclarationSession;
 
@@ -56,6 +55,11 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   }
 
   private DeclarationSession createInternalService(Application application) {
+    long startTime = currentTimeMillis();
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Creating declaration session to delegate calls");
+    }
+
     final InternalDeclarationSession internalDataProviderService =
         new InternalDeclarationSession(application.getDescriptor().getArtifactDeclaration());
     InternalDeclarationSession internalDeclarationSession = application.getRegistry()
@@ -68,12 +72,28 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
           }
         })
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find injector to create InternalDeclarationSession")));
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Creation of declaration session to delegate calls took [{}ms]", currentTimeMillis() - startTime);
+    }
+
     return internalDeclarationSession;
   }
 
   private <T> T withInternalDeclarationSession(String functionName, Function<DeclarationSession, T> function) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Calling function: '{}'", functionName);
+    }
     DeclarationSession declarationSession = getInternalDeclarationSession();
-    return actionCallWrapper(() -> function.apply(declarationSession), SERVICE_NAME, functionName);
+
+    long initialTime = currentTimeMillis();
+    try {
+      return function.apply(declarationSession);
+    } finally {
+      long totalTimeSpent = currentTimeMillis() - initialTime;
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Function: '{}' completed in [{}ms]", functionName, totalTimeSpent);
+      }
+    }
   }
 
   private DeclarationSession getInternalDeclarationSession() {
