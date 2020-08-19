@@ -416,7 +416,7 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @MediaType(TEXT_PLAIN)
-  public String callGusFring() throws HeisenbergException {
+  public String callGusFring(@Connection HeisenbergConnection connection) throws HeisenbergException {
     throw new HeisenbergException(CALL_GUS_MESSAGE);
   }
 
@@ -503,7 +503,7 @@ public class HeisenbergOperations implements Disposable {
 
   @OnException(NullExceptionEnricher.class)
   public void failToExecute() throws HeisenbergException {
-    callGusFring();
+    callGusFring(null);
   }
 
   public void storeMoney(ObjectStore<Long> objectStore, Long money) throws Exception {
