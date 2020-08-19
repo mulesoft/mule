@@ -54,6 +54,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.metadata.cache.DefaultMetadataCache;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
@@ -67,7 +68,6 @@ import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.config.metadata.MetadataKeyDeclarationResolver;
 import org.mule.runtime.module.tooling.internal.config.metadata.MetadataKeyResult;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
-import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
