@@ -121,10 +121,10 @@ public class InternalDeclarationSession implements DeclarationSession {
   }
 
   @Override
-  public ValueResult getValues(ParameterizedElementDeclaration component, String parameterName) {
+  public ValueResult getValues(ParameterizedElementDeclaration component, String providerName) {
     return artifactHelper()
         .findModel(component)
-        .map(cm -> discoverValues(cm, parameterName, parameterValueResolver(component, cm), getConfigRef(component)))
+        .map(cm -> discoverValues(cm, providerName, parameterValueResolver(component, cm), getConfigRef(component)))
         .orElse(resultFrom(newFailure()
             .withMessage("Could not resolve values")
             .withReason(format("Could not find component: %s:%s", component.getDeclaringExtension(), component.getName()))
@@ -241,16 +241,16 @@ public class InternalDeclarationSession implements DeclarationSession {
     //do nothing
   }
 
-  private <T extends ParameterizedModel & EnrichableModel> ValueResult discoverValues(T componentModel,
-                                                                                      String parameterName,
+  private <T extends ParameterizedModel & EnrichableModel> ValueResult discoverValues(T containerModel,
+                                                                                      String providerName,
                                                                                       ParameterValueResolver parameterValueResolver,
                                                                                       Optional<String> configName) {
-    ValueProviderMediator<T> valueProviderMediator = createValueProviderMediator(componentModel);
+    ValueProviderMediator<T> valueProviderMediator = createValueProviderMediator(containerModel);
     ExtensionResolvingContext context =
         new ExtensionResolvingContext(() -> configName.flatMap(name -> artifactHelper().getConfigurationInstance(name)),
                                       connectionManager);
     try {
-      return resultFrom(valueProviderMediator.getValues(parameterName,
+      return resultFrom(valueProviderMediator.getValues(providerName,
                                                         parameterValueResolver,
                                                         (CheckedSupplier<Object>) () -> context
                                                             .getConnection().orElse(null),
@@ -263,8 +263,8 @@ public class InternalDeclarationSession implements DeclarationSession {
     }
   }
 
-  private <T extends ParameterizedModel & EnrichableModel> ValueProviderMediator<T> createValueProviderMediator(T constructModel) {
-    return new ValueProviderMediator<>(constructModel,
+  private <T extends ParameterizedModel & EnrichableModel> ValueProviderMediator<T> createValueProviderMediator(T model) {
+    return new ValueProviderMediator<>(model,
                                        () -> muleContext,
                                        () -> reflectionCache);
   }

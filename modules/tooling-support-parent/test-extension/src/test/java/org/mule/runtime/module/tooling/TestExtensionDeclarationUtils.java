@@ -15,6 +15,7 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterGroupElementDeclarer
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
+import org.mule.runtime.app.declaration.api.fluent.ParameterizedElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.SourceElementDeclarer;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 public class TestExtensionDeclarationUtils {
 
-  private static final ElementDeclarer TEST_EXTENSION_DECLARER = ElementDeclarer.forExtension("ToolingSupportTest");
+  public static final ElementDeclarer TEST_EXTENSION_DECLARER = ElementDeclarer.forExtension("ToolingSupportTest");
 
   public static final String CONFIG_ELEMENT_NAME = "config";
   public static final String CONNECTION_ELEMENT_NAME = "tstConnection";
@@ -47,6 +48,8 @@ public class TestExtensionDeclarationUtils {
 
   public static final String CONNECTION_CLIENT_NAME_PARAMETER = "clientName";
 
+  public static final String SOURCE_WITH_MULTI_LEVEL_VALUE ="SourceWithMultiLevelValue";
+
   public static final String INT_PARAM_NAME = "intParam";
   public static final String STRING_PRAM_NAME = "stringParam";
   public static final String INNER_POJO_PARAM_NAME = "innerPojoParam";
@@ -56,6 +59,7 @@ public class TestExtensionDeclarationUtils {
   public static final String COMPLEX_LIST_PARAM_NAME = "complexListParam";
 
   public static final String MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME = "multiLevelPartialTypeKeysMetadataKey";
+  public static final String MULTI_LEVEL_METADATA_KEY_OP_ELEMENT_NAME = "multiLevelTypeKeyMetadataKey";
   public static final String MULTI_LEVEL_SHOW_IN_DSL_GROUP_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME =
           "multiLevelShowInDslGroupPartialTypeKeysMetadataKey";
 
@@ -259,11 +263,33 @@ public class TestExtensionDeclarationUtils {
     return sourceElementDeclarer.getDeclaration();
   }
 
-  public static OperationElementDeclaration multiLevelOPDeclaration(String configName, String continent, String country) {
+  public static OperationElementDeclaration multiLevelOPDeclarationPartialTypeKeys(String configName, String continent, String country) {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    ParameterGroupElementDeclarer parameterGroupElementDeclarer = newParameterGroup("LocationKey");
+    setLocationParameterGroup(continent, country, elementDeclarer, "LocationKey");
+    return elementDeclarer.getDeclaration();
+  }
+
+  public static OperationElementDeclaration multiLevelOPDeclaration(String configName, String continent, String country) {
+    OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
+            .newOperation(MULTI_LEVEL_METADATA_KEY_OP_ELEMENT_NAME)
+            .withConfig(configName);
+    setLocationParameterGroup(continent, country, elementDeclarer, "LocationKey");
+    return elementDeclarer.getDeclaration();
+  }
+
+  public static SourceElementDeclaration sourceWithMultiLevelValue(String configName, String continent, String country) {
+    SourceElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
+            .newSource(SOURCE_WITH_MULTI_LEVEL_VALUE)
+            .withConfig(configName);
+    setLocationParameterGroup(continent, country, elementDeclarer, "values");
+
+    return elementDeclarer.getDeclaration();
+  }
+
+  private static void setLocationParameterGroup(String continent, String country, ParameterizedElementDeclarer elementDeclarer, String locationKey) {
+    ParameterGroupElementDeclarer parameterGroupElementDeclarer = newParameterGroup(locationKey);
     if (continent != null) {
       parameterGroupElementDeclarer.withParameter("continent", ParameterSimpleValue.of(continent));
     }
@@ -274,7 +300,6 @@ public class TestExtensionDeclarationUtils {
     if (continent != null || country != null) {
       elementDeclarer.withParameterGroup(parameterGroupElementDeclarer.getDeclaration());
     }
-    return elementDeclarer.getDeclaration();
   }
 
   public static OperationElementDeclaration multiLevelCompleteOPDeclaration(String configName, String continent, String country,
@@ -303,17 +328,7 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_SHOW_IN_DSL_GROUP_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    ParameterGroupElementDeclarer parameterGroupElementDeclarer = newParameterGroup("LocationKeyShowInDsl");
-    if (continent != null) {
-      parameterGroupElementDeclarer.withParameter("continent", ParameterSimpleValue.of(continent));
-    }
-    if (country != null) {
-      parameterGroupElementDeclarer.withParameter("country", ParameterSimpleValue.of(country));
-    }
-
-    if (continent != null || country != null) {
-      elementDeclarer.withParameterGroup(parameterGroupElementDeclarer.getDeclaration());
-    }
+    setLocationParameterGroup(continent, country, elementDeclarer, "LocationKeyShowInDsl");
     return elementDeclarer.getDeclaration();
   }
 

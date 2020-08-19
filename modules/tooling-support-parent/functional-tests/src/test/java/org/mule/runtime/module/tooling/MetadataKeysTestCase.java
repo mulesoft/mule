@@ -14,11 +14,10 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessConnectionLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.invalidComponentDeclaration;
-import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelOPDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelOPDeclarationPartialTypeKeys;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelShowInDslGroupOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.sourceDeclaration;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
-
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -60,7 +59,7 @@ public class MetadataKeysTestCase extends DeclarationSessionTestCase {
 
   @Test
   public void multiLevelOPMetadataKeysPartialEmptyFirstLevel() {
-    multiLevelComponentMetadataKeysPartialEmptyFirstLevel(multiLevelOPDeclaration(CONFIG_NAME, null, null));
+    multiLevelComponentMetadataKeysPartialEmptyFirstLevel(multiLevelOPDeclarationPartialTypeKeys(CONFIG_NAME, null, null));
   }
 
   @Test
@@ -80,7 +79,7 @@ public class MetadataKeysTestCase extends DeclarationSessionTestCase {
 
   @Test
   public void multiLevelOPMetadataKeyPartialWithFirstLevel() {
-    multiLevelComponentMetadataKeyPartialWithFirstLevel(multiLevelOPDeclaration(CONFIG_NAME, "America", null));
+    multiLevelComponentMetadataKeyPartialWithFirstLevel(multiLevelOPDeclarationPartialTypeKeys(CONFIG_NAME, "America", null));
   }
 
   @Test

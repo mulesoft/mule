@@ -1,7 +1,6 @@
 package org.mule.tooling.extensions.metadata.internal.operation;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
-
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
@@ -20,6 +19,7 @@ import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessConnecti
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessMetadataResolver;
 import org.mule.tooling.extensions.metadata.api.parameters.ComplexActingParameter;
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelPartialTypeKeysOutputTypeResolver;
+import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelTypeKeysOutputTypeResolver;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterGroupVP;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;
 import org.mule.tooling.extensions.metadata.internal.value.ComplexActingParameterVP;
@@ -54,6 +54,14 @@ public class SimpleOperations {
   public Result<String, Object> multiLevelPartialTypeKeysMetadataKey(
       @MetadataKeyId(MultiLevelPartialTypeKeysOutputTypeResolver.class) @ParameterGroup(name="LocationKey") LocationKey locationKey,
       @TypeResolver(MultiLevelPartialTypeKeysOutputTypeResolver.class) Map<String, Object> dynamicParam) {
+    return null;
+  }
+
+  @MediaType(TEXT_PLAIN)
+  @OutputResolver(output = MultiLevelTypeKeysOutputTypeResolver.class, attributes = MultiLevelTypeKeysOutputTypeResolver.class)
+  public Result<String, Object> multiLevelTypeKeyMetadataKey(
+          @MetadataKeyId(MultiLevelTypeKeysOutputTypeResolver.class) @ParameterGroup(name="LocationKey") LocationKey locationKey,
+          @TypeResolver(MultiLevelTypeKeysOutputTypeResolver.class) Map<String, Object> dynamicParam) {
     return null;
   }
 

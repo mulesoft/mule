@@ -20,9 +20,8 @@ import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.conf
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.invalidComponentDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelCompleteOPDeclaration;
-import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelOPDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelOPDeclarationPartialTypeKeys;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.sourceDeclaration;
-
 import org.mule.metadata.internal.utils.MetadataTypeWriter;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -91,7 +90,8 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
   // TODO MULE-18680: Optional levels are required for multi-level keys!
   @Test
   public void operationDynamicTypesPartialKey() {
-    OperationElementDeclaration operationElementDeclaration = multiLevelOPDeclaration(CONFIG_NAME, "America", "USA");
+    OperationElementDeclaration operationElementDeclaration =
+        multiLevelOPDeclarationPartialTypeKeys(CONFIG_NAME, "America", "USA");
     MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult =
         session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(false));
@@ -102,7 +102,7 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
   // TODO MULE-18680 Optional levels are required for multi-level keys!
   @Test
   public void operationDynamicTypesNoKey() {
-    OperationElementDeclaration operationElementDeclaration = multiLevelOPDeclaration(CONFIG_NAME, null, null);
+    OperationElementDeclaration operationElementDeclaration = multiLevelOPDeclarationPartialTypeKeys(CONFIG_NAME, null, null);
     MetadataResult<ComponentMetadataTypesDescriptor> containerTypeMetadataResult =
         session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(false));

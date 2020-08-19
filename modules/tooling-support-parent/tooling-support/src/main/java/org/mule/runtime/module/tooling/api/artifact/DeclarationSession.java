@@ -42,14 +42,14 @@ public interface DeclarationSession {
    * Retrieve all {@link org.mule.runtime.api.value.Value} that can be configured for the given parameter.
    *
    * @param parameterizedElementDeclaration a {@link ParameterizedElementDeclaration} for the component from which
-   *                  the available values can be used on the parameter {@param parameterName}. In case the value
+   *                  the available values can be used on the parameter {@param providerName}. In case the value
    *                  provider requires any acting parameters to be able to resolve this values, those parameters
    *                  should be populated in this declaration. Also, if the Component requires values from a Configuration,
    *                  then its reference name should be specified in the declaration.
-   * @param parameterName the name of the parameter for which to resolve the {@link org.mule.runtime.api.value.Value}s
+   * @param providerName the name of the value provider for which to resolve the {@link org.mule.runtime.api.value.Value}s
    * @return a {@link ValueResult} with the accepted parameter values to use
    */
-  ValueResult getValues(ParameterizedElementDeclaration parameterizedElementDeclaration, String parameterName);
+  ValueResult getValues(ParameterizedElementDeclaration parameterizedElementDeclaration, String providerName);
 
   /**
    * Returns the list of keys that can be resolved associated to the specified component.
