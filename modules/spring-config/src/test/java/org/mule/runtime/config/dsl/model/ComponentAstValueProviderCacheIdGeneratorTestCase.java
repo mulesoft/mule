@@ -73,6 +73,7 @@ import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
+import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -297,6 +298,7 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
     when(configuration.getSourceModels()).thenReturn(asList(source));
     when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
     when(configuration.getModelProperty(RequiredForMetadataModelProperty.class)).thenReturn(of(requiredForMetadataModelProperty));
+    when(configuration.getStereotype()).thenReturn(MuleStereotypes.CONFIG);
 
     when(otherConfiguration.getName()).thenReturn(OTHER_CONFIGURATION_NAME);
     when(otherConfiguration.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
@@ -305,6 +307,7 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
     when(otherConfiguration.getConnectionProviders()).thenReturn(asList(connectionProvider));
     when(otherConfiguration.getModelProperty(RequiredForMetadataModelProperty.class))
         .thenReturn(of(requiredForMetadataModelProperty));
+    when(otherConfiguration.getStereotype()).thenReturn(MuleStereotypes.CONFIG);
 
     when(source.getName()).thenReturn(SOURCE_NAME);
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
