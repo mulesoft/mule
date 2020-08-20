@@ -16,13 +16,13 @@ import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 
 import java.util.Optional;
 
-public class DeclarationBaseValueProviderCacheIdGenerator implements ValueProviderCacheIdGenerator<ElementDeclaration> {
+public class DeclarationBasedValueProviderCacheIdGenerator implements ValueProviderCacheIdGenerator<ElementDeclaration> {
 
   private final DslElementModelFactory elementModelFactory;
   private final DslElementBasedValueProviderCacheIdGenerator delegate;
 
-  public DeclarationBaseValueProviderCacheIdGenerator(DslResolvingContext context,
-                                                      ComponentLocator<ElementDeclaration> locator) {
+  public DeclarationBasedValueProviderCacheIdGenerator(DslResolvingContext context,
+                                                       ComponentLocator<ElementDeclaration> locator) {
     this.elementModelFactory = DslElementModelFactory.getDefault(context);
     this.delegate = new DslElementBasedValueProviderCacheIdGenerator(
                                                                      l -> locator.get(l)

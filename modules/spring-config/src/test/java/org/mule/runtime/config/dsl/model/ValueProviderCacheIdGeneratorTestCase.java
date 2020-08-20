@@ -29,7 +29,7 @@ import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBaseValueProviderCacheIdGenerator;
+import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DslElementBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
@@ -76,7 +76,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
     ValueProviderCacheIdGenerator<DslElementModel<?>> dslElementModelValueProviderCacheIdGenerator =
         new DslElementBasedValueProviderCacheIdGenerator(dslLocator);
     ValueProviderCacheIdGenerator<ElementDeclaration> elementDeclarationValueProviderCacheIdGenerator =
-        new DeclarationBaseValueProviderCacheIdGenerator(dslContext, declarationLocator);
+        new DeclarationBasedValueProviderCacheIdGenerator(dslContext, declarationLocator);
 
     ComponentAst component = getComponentAst(app, location);
     DslElementModel<?> dslElementModel = dslLocator.get(Location.builderFromStringRepresentation(location).build())

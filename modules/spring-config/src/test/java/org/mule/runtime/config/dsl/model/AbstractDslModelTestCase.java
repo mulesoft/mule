@@ -69,9 +69,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoRule;
 
 import com.google.common.collect.ImmutableList;
@@ -342,6 +344,11 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
         .thenReturn(ImmutableList.<ParameterModel>builder()
             .addAll(anotherDefaultGroupParameterModels)
             .add(errorMappingsParameter).build());
+  }
+
+  @After
+  public void tearDown() {
+    Mockito.framework().clearInlineMocks();
   }
 
   protected void initializeExtensionMock(ExtensionModel extension) {

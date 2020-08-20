@@ -36,6 +36,7 @@ import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newPar
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_MAPPINGS;
@@ -89,8 +90,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableMap;
@@ -210,6 +213,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
   @Before
   public void before() {
+    Mockito.reset();
     initMocks(this);
 
     initializeExtensionMock(mockExtension);
@@ -368,6 +372,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(connectionProvider.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
     when(connectionProvider.getModelProperty(RequiredForMetadataModelProperty.class))
         .thenReturn(of(requiredForMetadataModelProperty));
+    when(connectionProvider.getStereotype()).thenReturn(CONNECTION);
 
     when(configuration.getName()).thenReturn(CONFIGURATION_NAME);
     when(configuration.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
@@ -424,6 +429,11 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(dslContext.getTypeCatalog()).thenReturn(typeCatalog);
 
     declarer = ElementDeclarer.forExtension(EXTENSION_NAME);
+  }
+
+  @After
+  public void tearDown() {
+    Mockito.framework().clearInlineMocks();
   }
 
   protected void initializeExtensionMock(ExtensionModel extension) {
