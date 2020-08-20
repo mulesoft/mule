@@ -180,17 +180,21 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
                                     Consumer<CoreEvent> continueCallback,
                                     Consumer<Throwable> propagateCallback) {
-    FluxSink<CoreEvent> fluxSink = fluxFactory.apply(publisherPostProcessor);
-
     return new ExceptionRouter() {
+
+      private FluxSink<CoreEvent> fluxSink = null;
 
       @Override
       public void dispose() {
-        fluxSink.complete();
+        if (fluxSink != null) {
+          fluxSink.complete();
+        }
       }
 
       @Override
       public void accept(Exception error) {
+        fluxSink = fluxFactory.apply(publisherPostProcessor);
+
         // All calling methods will end up transforming any error class other than MessagingException into that one
         MessagingException messagingError = (MessagingException) error;
         CoreEvent failureEvent = messagingError.getEvent();
