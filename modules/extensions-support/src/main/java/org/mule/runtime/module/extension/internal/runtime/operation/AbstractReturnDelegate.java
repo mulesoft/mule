@@ -152,7 +152,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
                                                                                        contextEncodingParam,
                                                                                        contextMimeTypeParam);
       if (value instanceof Collection && returnsListOfMessages) {
-        value = toLazyMessageCollection((Collection<Result>) value, operationContext, cursorProviderFactory, mediaType, event);
+        value = toLazyMessageCollection((Collection<Result>) value, operationContext, cursorProviderFactory, event);
         value = toMessageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
             .decorateOutputResultCollection((Collection<Result>) value, event.getCorrelationId()),
                                                                            payloadMediaTypeResolver),
@@ -189,7 +189,6 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   private Collection<Object> toLazyMessageCollection(Collection<Result> values,
                                                      ExecutionContextAdapter operationContext,
                                                      CursorProviderFactory cursorProviderFactory,
-                                                     MediaType mediaType,
                                                      CoreEvent event) {
     Collection<Object> lazyMessageCollection = new ArrayList<>();
     values.forEach(value -> {

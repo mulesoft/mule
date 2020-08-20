@@ -28,7 +28,7 @@ public class StatisticsEnabled {
     this.muleContext = muleContext;
   }
 
-  public void before() throws Throwable {
+  public void before() {
     oldValue = muleContext.get().getStatistics().isEnabled();
     muleContext.get().getStatistics().setEnabled(true);
   }

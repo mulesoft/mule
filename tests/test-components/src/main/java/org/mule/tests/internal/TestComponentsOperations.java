@@ -42,10 +42,8 @@ public class TestComponentsOperations {
                         @Optional(defaultValue = "false") boolean consumeStream)
       throws InterruptedException {
 
-    if (consumeStream) {
-      if (content.getValue() instanceof InputStream) {
-        content = new TypedValue<>(toByteArray((InputStream) content.getValue()), content.getDataType());
-      }
+    if (consumeStream && content.getValue() instanceof InputStream) {
+      content = new TypedValue<>(toByteArray((InputStream) content.getValue()), content.getDataType());
     }
 
     Message message = Message.builder((Message) msg.getValue()).payload(content).build();
