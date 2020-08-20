@@ -20,12 +20,12 @@ import org.apache.commons.io.input.ReaderInputStream;
 
 public class WeaponXOperations {
 
-  public List<Result<InputStream, Void>> adamantiumInjectors(int injectorsToCreate) {
+  public List<Result<InputStream, Void>> adamantiumInjectors(int injectorsToCreate, int injectorLoad) {
     final List<Result<InputStream, Void>> injectors = new ArrayList<>();
 
     for (int i = 0; i < injectorsToCreate; ++i) {
       injectors.add(Result.<InputStream, Void>builder()
-          .output(new ReaderInputStream(new StringReader(randomAlphanumeric(1024 * 1024)), UTF_8))
+          .output(new ReaderInputStream(new StringReader(randomAlphanumeric(injectorLoad)), UTF_8))
           .build());
     }
 
