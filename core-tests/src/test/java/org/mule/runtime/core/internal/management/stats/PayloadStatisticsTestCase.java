@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STATISTICS;
 
@@ -68,11 +68,11 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
 
     component1 = mock(Component.class);
     when(component1.getIdentifier()).thenReturn(buildFromStringRepresentation("ns:comp1"));
-    when(component1.getLocation()).thenReturn(from("component1"));
+    when(component1.getLocation()).thenReturn(fromSingleComponent("component1"));
 
     component2 = mock(Component.class);
     when(component2.getIdentifier()).thenReturn(buildFromStringRepresentation("ns:comp2"));
-    when(component2.getLocation()).thenReturn(from("component2"));
+    when(component2.getLocation()).thenReturn(fromSingleComponent("component2"));
 
     componentNoLocation = mock(Component.class);
     when(componentNoLocation.getIdentifier()).thenReturn(buildFromStringRepresentation("ns:comp3"));
