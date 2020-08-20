@@ -7,8 +7,10 @@
 package org.mule.runtime.core.internal.execution;
 
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
@@ -53,6 +55,11 @@ public interface MessageProcessContext {
    * @return the exception resolver for this context's source
    */
   MessagingExceptionResolver getMessagingExceptionResolver();
+
+  /**
+   * @return the factory for payload decorators to accumulate {@link PayloadStatistics}.
+   */
+  CursorComponentDecoratorFactory getComponentDecoratorFactory();
 
   FlowConstruct getFlowConstruct();
 }

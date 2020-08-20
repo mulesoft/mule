@@ -13,7 +13,7 @@
         <metadata:connection/>
     </metadata:config>
 
-    <metadata:config name="dynamic-config" data="#[mel:'dynamic']">
+    <metadata:config name="dynamic-config" data="#['dynamic']">
         <metadata:connection/>
     </metadata:config>
 

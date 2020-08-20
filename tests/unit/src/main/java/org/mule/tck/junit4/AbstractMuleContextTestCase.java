@@ -18,7 +18,9 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -30,6 +32,7 @@ import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -61,8 +64,6 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -81,6 +82,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -565,7 +568,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   protected static Map<QName, Object> getFlowComponentLocationAnnotations(String rootComponentName) {
-    return ImmutableMap.<QName, Object>builder().put(LOCATION_KEY, fromSingleComponent(rootComponentName)).build();
+    return ImmutableMap.<QName, Object>builder()
+        .put(LOCATION_KEY, fromSingleComponent(rootComponentName))
+        .put(ANNOTATION_NAME, buildFromStringRepresentation("ns:" + rootComponentName))
+        .build();
   }
 
 }
