@@ -57,7 +57,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
 import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -213,7 +212,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
   @Before
   public void before() {
-    Mockito.reset();
     initMocks(this);
 
     initializeExtensionMock(mockExtension);
