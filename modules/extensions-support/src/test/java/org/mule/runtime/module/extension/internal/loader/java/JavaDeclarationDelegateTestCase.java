@@ -471,10 +471,10 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(60));
+    assertThat(extensionDeclaration.getOperations(), hasSize(59));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(23));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(24));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, NAME_AS_STREAM, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
@@ -491,7 +491,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, INJECTED_EXTENSION_MANAGER, "");
     assertOperation(extensionDeclaration, ALIAS, "");
     assertOperation(withOperationsDeclaration, CALL_SAUL, "");
-    assertOperation(extensionDeclaration, CALL_GUS_FRING, "");
+    assertOperation(withOperationsDeclaration, CALL_GUS_FRING, "");
     assertOperation(withOperationsDeclaration, GET_SAUL_PHONE, "");
     assertOperation(extensionDeclaration, GET_MEDICAL_HISTORY, "");
     assertOperation(extensionDeclaration, GET_GRAMS_IN_STORAGE, "");
