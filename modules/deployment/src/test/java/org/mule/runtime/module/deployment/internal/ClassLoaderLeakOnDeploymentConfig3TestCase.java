@@ -25,7 +25,7 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 @RunWith(FlakinessDetectorTestRunner.class)
 @Feature(LEAK_PREVENTION)
 @Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
-public class ClassLoaderLeakOnDeploymentTestCaseConfig3 extends ClassLoaderLeakTestCase {
+public class ClassLoaderLeakOnDeploymentConfig3TestCase extends ClassLoaderLeakTestCase {
 
   @Parameterized.Parameters(name = "Parallel: {0}, AppName: {1}, Use Plugin: {2}")
   public static List<Object[]> parameters() {
@@ -41,7 +41,7 @@ public class ClassLoaderLeakOnDeploymentTestCaseConfig3 extends ClassLoaderLeakT
     });
   }
 
-  public ClassLoaderLeakOnDeploymentTestCaseConfig3() {
+  public ClassLoaderLeakOnDeploymentConfig3TestCase() {
     super(false, "appWithExtensionPlugin-1.0.0-mule-application",
           "app-with-extension-plugin-config", true);
   }
