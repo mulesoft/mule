@@ -26,7 +26,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
@@ -569,7 +569,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   protected static Map<QName, Object> getFlowComponentLocationAnnotations(String rootComponentName) {
     return ImmutableMap.<QName, Object>builder()
-        .put(LOCATION_KEY, from(rootComponentName))
+        .put(LOCATION_KEY, fromSingleComponent(rootComponentName))
         .put(ANNOTATION_NAME, buildFromStringRepresentation("ns:" + rootComponentName))
         .build();
   }
