@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
@@ -31,6 +32,7 @@ import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -42,6 +44,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -50,34 +53,10 @@ import io.qameta.allure.Story;
 
 @Feature(STREAMING)
 @Story(STATISTICS)
-public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
+public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase {
 
-  private static final String CORR_ID = "corrId";
-
-  private CursorDecoratorFactory decoratorFactory;
-  private Component component1;
-  private Component component2;
-  private Component componentNoLocation;
-
-  @Before
-  public void before() throws RegistrationException, InitialisationException {
-    decoratorFactory = new PayloadStatisticsCursorDecoratorFactory();
-    initialiseIfNeeded(decoratorFactory, muleContext);
-
-    muleContext.getStatistics().setEnabled(true);
-
-    component1 = mock(Component.class);
-    when(component1.getIdentifier()).thenReturn(buildFromStringRepresentation("ns:comp1"));
-    when(component1.getLocation()).thenReturn(from("component1"));
-
-    component2 = mock(Component.class);
-    when(component2.getIdentifier()).thenReturn(buildFromStringRepresentation("ns:comp2"));
-    when(component2.getLocation()).thenReturn(from("component2"));
-
-    componentNoLocation = mock(Component.class);
-    when(componentNoLocation.getIdentifier()).thenReturn(buildFromStringRepresentation("ns:comp3"));
-    when(componentNoLocation.getLocation()).thenReturn(null);
-  }
+  @Rule
+  public SystemProperty muleEnableStatistics = new SystemProperty(MULE_ENABLE_STATISTICS, "true");
 
   @Test
   public void decorateInputStreamNoLocation() throws IOException {
@@ -102,11 +81,8 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
     assertThat(statistics.getInputByteCount(), is(0L));
 
     decorator.read();
-    assertThat(statistics.getInputByteCount(), is(0L));
 
-    assertThat(statistics.getInputObjectCount(), is(0L));
-    assertThat(statistics.getOutputByteCount(), is(0L));
-    assertThat(statistics.getOutputObjectCount(), is(0L));
+    verifyNoStatistics(statistics);
   }
 
   @Test
@@ -194,11 +170,8 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
     assertThat(statistics.getInputObjectCount(), is(0L));
 
     decorator.next();
-    assertThat(statistics.getInputObjectCount(), is(0L));
 
-    assertThat(statistics.getInputByteCount(), is(0L));
-    assertThat(statistics.getOutputByteCount(), is(0L));
-    assertThat(statistics.getOutputObjectCount(), is(0L));
+    verifyNoStatistics(statistics);
   }
 
   @Test
@@ -444,40 +417,4 @@ public class PayloadStatisticsTestCase extends AbstractMuleContextTestCase {
     verify(decorated).close("conn");
   }
 
-  public class TestPagingProvider implements PagingProvider<Object, String> {
-
-    private final int totalSize;
-    private final int pageSize;
-
-    private long counter = 0;
-
-    public TestPagingProvider(int totalSize, int pageSize) {
-      this.totalSize = totalSize;
-      this.pageSize = pageSize;
-    }
-
-    @Override
-    public List<String> getPage(Object con) {
-      if (counter < totalSize) {
-        List<String> page = new ArrayList<>(pageSize);
-        for (int i = 0; i < pageSize && counter < totalSize; i++) {
-          counter++;
-          String value = randomAlphabetic(5000);
-          page.add(value);
-        }
-
-        return page;
-      }
-
-      return emptyList();
-    }
-
-    @Override
-    public void close(Object con) throws MuleException {}
-
-    @Override
-    public Optional<Integer> getTotalResults(Object con) {
-      return of(totalSize);
-    }
-  }
 }
