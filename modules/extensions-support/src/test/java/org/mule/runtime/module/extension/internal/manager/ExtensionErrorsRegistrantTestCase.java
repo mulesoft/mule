@@ -11,6 +11,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -132,9 +133,8 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     when(operationWithError.getErrorModels()).thenReturn(singleton(extensionConnectivityError));
 
     when(operationWithError.getName()).thenReturn(OPERATION_NAME);
-    //    when(operationWithError.getModelProperty(any())).thenReturn(empty());
     when(operationWithError.getModelProperty(eq(ConnectivityModelProperty.class)))
-        .thenReturn(Optional.of(mock(ConnectivityModelProperty.class)));
+        .thenReturn(of(mock(ConnectivityModelProperty.class)));
 
     when(operationWithoutErrors.getName()).thenReturn("operationWithoutError");
     when(operationWithoutErrors.getErrorModels()).thenReturn(emptySet());
