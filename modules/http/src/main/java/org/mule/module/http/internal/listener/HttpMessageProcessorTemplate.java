@@ -8,6 +8,7 @@ package org.mule.module.http.internal.listener;
 
 import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MessagingException;
@@ -50,6 +51,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
     private HttpResponseBuilder errorResponseBuilder;
     private HttpThrottlingHeadersMapBuilder httpThrottlingHeadersMapBuilder = new HttpThrottlingHeadersMapBuilder();
     private Map<String, String> extraHeaders = new HashMap<>();
+    private String httpVersion;
 
     public HttpMessageProcessorTemplate(MuleEvent sourceMuleEvent,
                                         MessageProcessor messageProcessor,
@@ -62,6 +64,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
         this.responseBuilder = responseBuilder;
         this.errorResponseBuilder = errorResponseBuilder;
         this.responseReadyCallback = responseReadyCallback;
+        this.httpVersion = sourceMuleEvent.getMessage().<String> getInboundProperty(HTTP_VERSION_PROPERTY);
     }
 
     @Override
@@ -123,7 +126,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
     {
         try
         {
-            return this.responseBuilder.build(responseBuilder, muleEvent);
+            return this.responseBuilder.build(responseBuilder, muleEvent, httpVersion);
         }
         catch (Exception e)
         {
@@ -132,7 +135,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
                 // Handle errors that occur while building the response.
                 MuleEvent exceptionStrategyResult = responseCompletationCallback.responseSentWithFailure(e, muleEvent);
                 // Send the result from the event that was built from the Exception Strategy.
-                return this.responseBuilder.build(responseBuilder, exceptionStrategyResult);
+                return this.responseBuilder.build(responseBuilder, exceptionStrategyResult, null);
             }
             catch (Exception innerException)
             {
@@ -172,7 +175,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
         addThrottlingHeaders(failureResponseBuilder);
         MuleEvent event = messagingException.getEvent();
         event.getMessage().setPayload(messagingException.getMessage());
-        final HttpResponse response = errorResponseBuilder.build(failureResponseBuilder, event);
+        final HttpResponse response = errorResponseBuilder.build(failureResponseBuilder, event, null);
         responseReadyCallback.responseReady(response, getResponseFailureCallback(responseCompletationCallback, messagingException.getEvent()));
     }
 

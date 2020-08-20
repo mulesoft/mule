@@ -91,7 +91,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         reasonPhraseEvaluator = new AttributeEvaluator(reasonPhrase).initialize(muleContext.getExpressionManager());
     }
 
-    public HttpResponse build(org.mule.module.http.internal.domain.response.HttpResponseBuilder httpResponseBuilder, MuleEvent event) throws MessagingException
+    public HttpResponse build(org.mule.module.http.internal.domain.response.HttpResponseBuilder httpResponseBuilder, MuleEvent event, String httpVersion) throws MessagingException
     {
         final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
         final Set<String> outboundProperties = event.getMessage().getOutboundPropertyNames();
@@ -201,7 +201,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 {
                     if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null))
                     {
-                        if (supportsTransferEncoding(event))
+                        if (supportsTransferEncoding(event, httpVersion))
                         {
                             setupChunkedEncoding(httpResponseHeaderBuilder);
                         }
@@ -282,6 +282,15 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     private boolean supportsTransferEncoding(MuleEvent event)
     {
         String httpVersion = event.getMessage().<String> getInboundProperty(HTTP_VERSION_PROPERTY);
+        return !(HttpProtocol.HTTP_0_9.asString().equals(httpVersion) || HttpProtocol.HTTP_1_0.asString().equals(httpVersion));
+    }
+
+    private boolean supportsTransferEncoding(MuleEvent event, String httpOriginalVersion)
+    {
+        String httpVersion = event.getMessage().<String> getInboundProperty(HTTP_VERSION_PROPERTY);
+        if (httpVersion == null){
+            httpVersion = httpOriginalVersion;
+        }
         return !(HttpProtocol.HTTP_0_9.asString().equals(httpVersion) || HttpProtocol.HTTP_1_0.asString().equals(httpVersion));
     }
 
