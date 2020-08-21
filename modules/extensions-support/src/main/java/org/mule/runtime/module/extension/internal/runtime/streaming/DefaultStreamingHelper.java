@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -35,6 +36,7 @@ public class DefaultStreamingHelper implements StreamingHelper {
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
   private final CoreEvent event;
+  private final ComponentLocation originatingLocation;
 
   /**
    * Creates a new instance
@@ -45,10 +47,12 @@ public class DefaultStreamingHelper implements StreamingHelper {
    */
   public DefaultStreamingHelper(CursorProviderFactory cursorProviderFactory,
                                 StreamingManager streamingManager,
-                                CoreEvent event) {
+                                CoreEvent event,
+                                ComponentLocation originatingLocation) {
     this.cursorProviderFactory = cursorProviderFactory;
     this.streamingManager = streamingManager;
     this.event = event;
+    this.originatingLocation = originatingLocation;
   }
 
   /**
@@ -100,7 +104,7 @@ public class DefaultStreamingHelper implements StreamingHelper {
         ? cursorProviderFactory
         : streamingManager.forBytes().getDefaultCursorProviderFactory();
 
-    return factory.of(((BaseEventContext) event.getContext()).getRootContext(), value);
+    return factory.of(((BaseEventContext) event.getContext()).getRootContext(), value, originatingLocation);
   }
 
   private Object resolveCursorIteratorProvider(Iterator value) {
@@ -108,7 +112,7 @@ public class DefaultStreamingHelper implements StreamingHelper {
         ? cursorProviderFactory
         : streamingManager.forObjects().getDefaultCursorProviderFactory();
 
-    return factory.of(((BaseEventContext) event.getContext()).getRootContext(), value);
+    return factory.of(((BaseEventContext) event.getContext()).getRootContext(), value, originatingLocation);
   }
 
   private TypedValue resolveCursorTypedValueProvider(TypedValue value) {

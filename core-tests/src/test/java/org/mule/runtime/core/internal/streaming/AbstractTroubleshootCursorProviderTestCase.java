@@ -93,6 +93,7 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
     expectedException.expectMessage(containsString("The cursor provider was open by"));
     if (trackStackTrace) {
       expectedException.expectMessage(containsString("The cursor provider was closed by"));
+      expectedException.expectMessage(containsString("ClosingCursorException"));
     } else {
       expectedException.expectMessage(containsString("for more details"));
     }
