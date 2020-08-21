@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.util.StreamingUtils;
+import org.mule.runtime.core.internal.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultIterator;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
@@ -74,6 +75,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   protected final MuleContext muleContext;
   private boolean returnsListOfMessages = false;
+  private final CursorComponentDecoratorFactory componentDecoratorFactory;
   private final CursorProviderFactory cursorProviderFactory;
   private final MediaType defaultMediaType;
   private boolean isSpecialHandling = false;
@@ -85,11 +87,13 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
    * Creates a new instance
    *
    * @param componentModel the component which produces the return value
+   * @param componentDecoratorFactory
    * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be
    *        {@code null}
    * @param muleContext the {@link MuleContext} of the owning application
    */
   protected AbstractReturnDelegate(ComponentModel componentModel,
+                                   CursorComponentDecoratorFactory componentDecoratorFactory,
                                    CursorProviderFactory cursorProviderFactory,
                                    MuleContext muleContext) {
 
@@ -109,6 +113,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     }
 
     this.muleContext = muleContext;
+    this.componentDecoratorFactory = componentDecoratorFactory;
     this.cursorProviderFactory = cursorProviderFactory;
 
     defaultEncoding = getDefaultEncoding(muleContext);
@@ -147,12 +152,16 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
                                                                                        contextEncodingParam,
                                                                                        contextMimeTypeParam);
       if (value instanceof Collection && returnsListOfMessages) {
-        value = toLazyMessageCollection((Collection<Result>) value, operationContext, cursorProviderFactory, mediaType, event);
-        value = toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) value, payloadMediaTypeResolver),
+        value = toLazyMessageCollection((Collection<Result>) value, operationContext, cursorProviderFactory, event);
+        value = toMessageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
+            .decorateOutputResultCollection((Collection<Result>) value, event.getCorrelationId()),
+                                                                           payloadMediaTypeResolver),
                                     cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
                                     originatingLocation);
       } else if (value instanceof Iterator && returnsListOfMessages) {
-        value = toMessageIterator(new MediaTypeDecoratedResultIterator((Iterator<Result>) value, payloadMediaTypeResolver),
+        value = toMessageIterator(new MediaTypeDecoratedResultIterator(componentDecoratorFactory
+            .decorateOutputResultIterator((Iterator<Result>) value, event.getCorrelationId()),
+                                                                       payloadMediaTypeResolver),
                                   cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
                                   originatingLocation);
       }
@@ -180,7 +189,6 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   private Collection<Object> toLazyMessageCollection(Collection<Result> values,
                                                      ExecutionContextAdapter operationContext,
                                                      CursorProviderFactory cursorProviderFactory,
-                                                     MediaType mediaType,
                                                      CoreEvent event) {
     Collection<Object> lazyMessageCollection = new ArrayList<>();
     values.forEach(value -> {
@@ -188,17 +196,14 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
           value = value.copy()
-              .output(new ConnectedInputStreamWrapper((InputStream) value.getOutput(), connectionHandler))
+              .output(StreamingUtils.streamingContent(new ConnectedInputStreamWrapper(componentDecoratorFactory
+                  .decorateOutput((InputStream) value.getOutput(), event.getCorrelationId()), connectionHandler),
+                                                      cursorProviderFactory, event,
+                                                      operationContext.getComponent().getLocation()))
               .build();
         }
-
-        Message message =
-            MessageUtils.toMessage(value, mediaType, cursorProviderFactory, event, operationContext.getComponent().getLocation());
-
-        lazyMessageCollection.add(message);
-      } else {
-        lazyMessageCollection.add(value);
       }
+      lazyMessageCollection.add(value);
     });
     return lazyMessageCollection;
   }

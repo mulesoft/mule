@@ -6,6 +6,7 @@
  */
 package org.mule.tests.internal;
 
+import static org.mule.runtime.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
@@ -21,6 +22,8 @@ import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
+import java.io.InputStream;
+
 /**
  * This class is a container for operations, every public method in this class will be taken as an extension operation.
  */
@@ -35,7 +38,14 @@ public class TestComponentsOperations {
   public void queuePush(@Config QueueConfiguration configuration,
                         @Connection TestQueue queue,
                         @Content(primary = true) @Optional(defaultValue = "#[payload]") TypedValue<Object> content,
-                        @Optional(defaultValue = "#[message]") TypedValue<Object> msg) throws InterruptedException {
+                        @Optional(defaultValue = "#[message]") TypedValue<Object> msg,
+                        @Optional(defaultValue = "false") boolean consumeStream)
+      throws InterruptedException {
+
+    if (consumeStream && content.getValue() instanceof InputStream) {
+      content = new TypedValue<>(toByteArray((InputStream) content.getValue()), content.getDataType());
+    }
+
     Message message = Message.builder((Message) msg.getValue()).payload(content).build();
     EventContext eventContext = create("testEvent", "dummy", fromSingleComponent("test"), NullExceptionHandler.getInstance());
     CoreEvent event = CoreEvent.builder(eventContext).message(message).build();

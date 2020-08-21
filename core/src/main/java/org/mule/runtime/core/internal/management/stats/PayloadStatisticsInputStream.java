@@ -32,7 +32,10 @@ final class PayloadStatisticsInputStream extends FilterInputStream {
   @Override
   public int read(byte[] b, int off, int len) throws IOException {
     final int read = super.read(b, off, len);
-    populator.accept(read);
+    // ignore -1 indicating no data read
+    if (read > 0) {
+      populator.accept(read);
+    }
     return read;
   }
 }

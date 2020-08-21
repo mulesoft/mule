@@ -18,11 +18,8 @@ import org.mule.tck.size.SmallTest;
 
 import org.junit.After;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
   protected static final String TARGET = "myFlowVar";
@@ -30,7 +27,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
   @Override
   protected ReturnDelegate createReturnDelegate() {
     return new TargetReturnDelegate(TARGET, "#[message]", componentModel, muleContext.getExpressionManager(),
-                                    getCursorProviderFactory(),
+                                    componentDecoratorFactory, getCursorProviderFactory(),
                                     muleContext);
   }
 
