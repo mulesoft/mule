@@ -8,11 +8,13 @@ package org.mule.runtime.core.internal.exception;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
@@ -25,10 +27,12 @@ import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasR
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_PROPAGATE;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -42,13 +46,18 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -57,6 +66,7 @@ import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
@@ -77,7 +87,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
   private final TestTransaction mockXaTransaction =
       spy(new TestTransaction("appNAme", notificationDispatcher, true));
 
-  private OnErrorPropagateHandler onErrorPropagateHandler;
+  private TestOnErrorPropagateHandler onErrorPropagateHandler;
 
   public OnErrorPropagateHandlerTestCase(VerboseExceptions verbose) throws RegistrationException {
     super(verbose);
@@ -93,7 +103,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
       TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
     }
 
-    onErrorPropagateHandler = new OnErrorPropagateHandler();
+    onErrorPropagateHandler = new TestOnErrorPropagateHandler();
     onErrorPropagateHandler.setAnnotations(getFlowComponentLocationAnnotations(flow.getName()));
     onErrorPropagateHandler.setMuleContext(muleContext);
     onErrorPropagateHandler.setNotificationFirer(mock(NotificationDispatcher.class));
@@ -169,9 +179,9 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
   public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception {
     CoreEvent lastEventCreated = InternalEvent.builder(context).message(of("")).build();
     onErrorPropagateHandler
-        .setMessageProcessors(asList(createChagingEventMessageProcessor(InternalEvent.builder(context).message(of(""))
+        .setMessageProcessors(asList(createChangingEventMessageProcessor(InternalEvent.builder(context).message(of(""))
             .build()),
-                                     createChagingEventMessageProcessor(lastEventCreated)));
+                                     createChangingEventMessageProcessor(lastEventCreated)));
     onErrorPropagateHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(onErrorPropagateHandler, muleContext);
     startIfNeeded(onErrorPropagateHandler);
@@ -192,7 +202,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
   @Test
   public void testHandleExceptionWithErrorInHandling() throws Exception {
     final NullPointerException innerException = new NullPointerException();
-    onErrorPropagateHandler.setMessageProcessors(asList(createFailingEventMessageProcessor(innerException)));
+    onErrorPropagateHandler.setMessageProcessors(singletonList(createFailingEventMessageProcessor(innerException)));
     initialiseIfNeeded(onErrorPropagateHandler, muleContext);
     startIfNeeded(onErrorPropagateHandler);
 
@@ -246,7 +256,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
             .subscriberContext(contextPropagationChecker.contextPropagationFlag()),
                 e -> {
                 },
-                t -> thownRef.set(t));
+                thownRef::set);
 
     when(mockException.getEvent()).thenReturn(muleEvent);
     router.accept(mockException);
@@ -255,7 +265,37 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     assertThat(thownRef.get(), sameInstance(mockException));
   }
 
-  private Processor createChagingEventMessageProcessor(final CoreEvent lastEventCreated) {
+  @Test
+  public void exceptionRoutersAreDisposedWhenNoErrorInMono() throws MuleException {
+    initialiseIfNeeded(onErrorPropagateHandler, muleContext);
+    startIfNeeded(onErrorPropagateHandler);
+    MessageProcessorChain chain =
+        buildNewChainWithListOfProcessors(empty(), singletonList(createSetStringMessageProcessor("")), onErrorPropagateHandler);
+    just(testEvent()).transform(chain).block();
+    onErrorPropagateHandler.assertAllRoutersWereDisposed();
+  }
+
+  @Test
+  public void exceptionRoutersAreDisposedWhenErrorInMono() throws MuleException {
+    initialiseIfNeeded(onErrorPropagateHandler, muleContext);
+    startIfNeeded(onErrorPropagateHandler);
+    when(mockException.handled()).thenReturn(false);
+    when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
+    when(mockException.getEvent()).thenReturn(muleEvent);
+
+    MessageProcessorChain chain =
+        buildNewChainWithListOfProcessors(empty(), singletonList(createFailingEventMessageProcessor(mockException)),
+                                          onErrorPropagateHandler);
+    expectedException.expect(hasRootCause(sameInstance(mockException)));
+    try {
+      just(testEvent()).transform(chain).block();
+      fail("Expected exception");
+    } finally {
+      onErrorPropagateHandler.assertAllRoutersWereDisposed();
+    }
+  }
+
+  private Processor createChangingEventMessageProcessor(final CoreEvent lastEventCreated) {
     return event -> CoreEvent.builder(event)
         .message(lastEventCreated.getMessage())
         .variables(lastEventCreated.getVariables())
@@ -269,14 +309,33 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
   }
 
   private Processor createSetStringMessageProcessor(final String appendText) {
-    return event -> {
-      return CoreEvent.builder(event).message(InternalMessage.builder(event.getMessage()).value(appendText).build()).build();
-    };
+    return event -> CoreEvent.builder(event).message(InternalMessage.builder(event.getMessage()).value(appendText).build())
+        .build();
   }
 
   private void configureXaTransactionAndSingleResourceTransaction() throws TransactionException {
     TransactionCoordination.getInstance().bindTransaction(mockXaTransaction);
     TransactionCoordination.getInstance().suspendCurrentTransaction();
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
+  }
+
+  private static class TestOnErrorPropagateHandler extends OnErrorPropagateHandler {
+
+    private Set<ExceptionRouter> allRouters = new HashSet<>();
+
+    @Override
+    public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
+                                      Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
+      ExceptionRouter newRouter =
+          spy((ExceptionRouter) super.router(publisherPostProcessor, continueCallback, propagateCallback));
+      allRouters.add(newRouter);
+      return newRouter;
+    }
+
+    void assertAllRoutersWereDisposed() {
+      for (ExceptionRouter router : allRouters) {
+        verify(router).dispose();
+      }
+    }
   }
 }
