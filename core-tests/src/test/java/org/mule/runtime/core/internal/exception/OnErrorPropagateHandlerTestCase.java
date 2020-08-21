@@ -11,10 +11,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -50,7 +47,6 @@ import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -62,7 +58,6 @@ import org.junit.rules.ExpectedException;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -258,39 +253,6 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
 
     assertThat(thownRef.get().getCause(), not(instanceOf(AssertionError.class)));
     assertThat(thownRef.get(), sameInstance(mockException));
-  }
-
-  @Test
-  public void exceptionRouterCreatesItsFluxSinkOnAccept() throws MuleException, NoSuchFieldException, IllegalAccessException {
-    final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
-
-    onErrorPropagateHandler
-        .setMessageProcessors(singletonList(contextPropagationChecker));
-
-    initialiseIfNeeded(onErrorPropagateHandler, muleContext);
-
-    final Consumer<Exception> router = onErrorPropagateHandler
-        .router(pub -> Flux.from(pub)
-            .subscriberContext(contextPropagationChecker.contextPropagationFlag()),
-                e -> {
-                }, t -> {
-                });
-    FluxSink<CoreEvent> fluxSinkBeforeAccept = getFluxSink(router);
-    assertThat(fluxSinkBeforeAccept, is(nullValue()));
-
-    when(mockException.getEvent()).thenReturn(muleEvent);
-    router.accept(mockException);
-
-    FluxSink<CoreEvent> fluxSinkAfterAccept = getFluxSink(router);
-    assertThat(fluxSinkAfterAccept, is(notNullValue()));
-  }
-
-  private static FluxSink<CoreEvent> getFluxSink(Consumer<Exception> exceptionRouter)
-      throws NoSuchFieldException, IllegalAccessException {
-    Field fluxSinkField = exceptionRouter.getClass().getDeclaredField("fluxSink");
-    fluxSinkField.setAccessible(true);
-    Object fluxSink = fluxSinkField.get(exceptionRouter);
-    return (fluxSink instanceof FluxSink) ? (FluxSink<CoreEvent>) fluxSink : null;
   }
 
   private Processor createChagingEventMessageProcessor(final CoreEvent lastEventCreated) {
