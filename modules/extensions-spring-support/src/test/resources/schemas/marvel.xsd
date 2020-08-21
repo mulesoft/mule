@@ -471,6 +471,7 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionInt" use="required" name="injectorsToCreate"></xs:attribute>
+        <xs:attribute type="mule:expressionInt" use="required" name="injectorLoad"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
             <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
