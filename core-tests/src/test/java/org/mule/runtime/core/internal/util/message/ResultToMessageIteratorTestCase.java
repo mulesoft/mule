@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.util.message;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -60,7 +61,7 @@ public class ResultToMessageIteratorTestCase {
     CursorProviderFactory cursorProviderFactory = mock(CursorProviderFactory.class);
     BaseEventContext eventCtx = mock(BaseEventContext.class);
 
-    return new ResultToMessageIterator(list.iterator(), cursorProviderFactory, eventCtx);
+    return new ResultToMessageIterator(list.iterator(), cursorProviderFactory, eventCtx, fromSingleComponent("logger"));
   }
 
   private static Result<Object, Object> resultOf(int output) {

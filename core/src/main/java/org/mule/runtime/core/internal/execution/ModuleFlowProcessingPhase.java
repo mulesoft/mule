@@ -387,12 +387,12 @@ public class ModuleFlowProcessingPhase
             .output(toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
                                                                                adapter.getPayloadMediaTypeResolver()),
                                         adapter.getCursorProviderFactory(),
-                                        ((BaseEventContext) eventCtx).getRootContext()))
+                                        ((BaseEventContext) eventCtx).getRootContext(), source.getLocation()))
             .mediaType(result.getMediaType().orElse(ANY))
             .build());
       } else {
         eventMessage = toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(),
-                                 ((BaseEventContext) eventCtx).getRootContext());
+                                 ((BaseEventContext) eventCtx).getRootContext(), source.getLocation());
       }
 
       policyManager.addSourcePointcutParametersIntoEvent(source, eventMessage.getAttributes(), eventBuilder);
