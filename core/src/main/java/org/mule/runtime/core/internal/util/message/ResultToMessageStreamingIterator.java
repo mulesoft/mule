@@ -7,10 +7,11 @@
 package org.mule.runtime.core.internal.util.message;
 
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
+
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -27,13 +28,16 @@ final class ResultToMessageStreamingIterator implements StreamingIterator<Messag
   private final StreamingIterator<Result> delegate;
   private final CursorProviderFactory cursorProviderFactory;
   private final BaseEventContext eventContext;
+  private final ComponentLocation originatingLocation;
 
   ResultToMessageStreamingIterator(StreamingIterator<Result> delegate,
                                    CursorProviderFactory cursorProviderFactory,
-                                   BaseEventContext eventContext) {
+                                   BaseEventContext eventContext,
+                                   ComponentLocation originatingLocation) {
     this.delegate = delegate;
     this.cursorProviderFactory = cursorProviderFactory;
     this.eventContext = eventContext;
+    this.originatingLocation = originatingLocation;
   }
 
   @Override
@@ -43,7 +47,7 @@ final class ResultToMessageStreamingIterator implements StreamingIterator<Messag
 
   @Override
   public Message next() {
-    return toMessage(delegate.next(), cursorProviderFactory, eventContext);
+    return toMessage(delegate.next(), cursorProviderFactory, eventContext, originatingLocation);
   }
 
   @Override
@@ -53,7 +57,8 @@ final class ResultToMessageStreamingIterator implements StreamingIterator<Messag
 
   @Override
   public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(result -> action.accept(toMessage(result, cursorProviderFactory, eventContext)));
+    delegate.forEachRemaining(result -> action
+        .accept(toMessage(result, cursorProviderFactory, eventContext, originatingLocation)));
   }
 
   @Override
