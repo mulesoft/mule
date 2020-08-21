@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import org.mule.runtime.api.exception.MuleException;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
@@ -33,16 +35,19 @@ import org.mule.tck.size.SmallTest;
 import java.nio.charset.Charset;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleContextTestCase {
 
   private static final String TARGET = "myFlowVar";
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   private ExpressionManager expressionManager;
 
@@ -60,6 +65,8 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
   @Mock
   protected Object attributes;
 
+  public CursorComponentDecoratorFactory componentDecoratorFactory = NO_OP_INSTANCE;
+
   protected ReturnDelegate delegate;
   private final Object payload = "hello world!";
 
@@ -74,7 +81,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
 
   private TargetReturnDelegate createDelegate(String expression) {
     return new TargetReturnDelegate(TARGET, expression, componentModel, expressionManager,
-                                    getDefaultCursorStreamProviderFactory(), muleContext);
+                                    componentDecoratorFactory, getDefaultCursorStreamProviderFactory(), muleContext);
   }
 
   @Test

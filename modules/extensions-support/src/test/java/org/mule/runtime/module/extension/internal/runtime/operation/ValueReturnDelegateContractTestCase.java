@@ -47,12 +47,12 @@ import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
+import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.runtime.core.internal.util.message.ResultsToMessageList;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
-import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -65,16 +65,19 @@ import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleContextTestCase {
 
   public static final String HELLO_WORLD_MSG = "Hello world!";
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock(lenient = true)
   protected ExecutionContextAdapter operationContext;

@@ -501,8 +501,8 @@ public class FlowProcessMediator implements Initialisable {
       Message eventMessage;
       if (resultValue instanceof Collection && adapter.isCollection()) {
         eventMessage = toMessage(Result.<Collection<Message>, TypedValue<?>>builder()
-            .output(toMessageCollection(
-                                        new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
+            .output(toMessageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
+                .decorateOutputResultCollection((Collection<Result>) resultValue, adapter.getCorrelationId().orElse("")),
                                                                                adapter.getPayloadMediaTypeResolver()),
                                         adapter.getCursorProviderFactory(),
                                         ((BaseEventContext) eventCtx).getRootContext()))
