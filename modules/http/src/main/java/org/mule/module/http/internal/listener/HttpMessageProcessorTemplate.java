@@ -51,7 +51,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
     private HttpResponseBuilder errorResponseBuilder;
     private HttpThrottlingHeadersMapBuilder httpThrottlingHeadersMapBuilder = new HttpThrottlingHeadersMapBuilder();
     private Map<String, String> extraHeaders = new HashMap<>();
-    private String httpVersion;
+    private final String httpVersion;
 
     public HttpMessageProcessorTemplate(MuleEvent sourceMuleEvent,
                                         MessageProcessor messageProcessor,

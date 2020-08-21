@@ -26,7 +26,8 @@ public class Http10StreamingTestCase extends FunctionalTestCase {
 
     private static final int DEFAULT_TIMEOUT = 1000;
 
-    protected HttpVersion getHttpVersion() {
+    protected HttpVersion getHttpVersion()
+    {
         return HTTP_1_0;
     }
 
@@ -37,17 +38,20 @@ public class Http10StreamingTestCase extends FunctionalTestCase {
     @Rule
     public DynamicPort httpPortFlow2 = new DynamicPort("httpPortFlow2");
 
-    protected String getUrl() {
+    protected String getUrl()
+    {
         return String.format("http://localhost:%s/", httpPortFlow1.getNumber());
     }
 
     @Override
-    protected String getConfigFile() {
+    protected String getConfigFile()
+    {
         return "http-10-chunked.xml";
     }
 
     @Test
-    public void httpOutput() throws Exception {
+    public void httpOutput() throws Exception
+    {
         final String url = getUrl();
 
         final Response response = Get(url).version(getHttpVersion())

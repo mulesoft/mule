@@ -20,6 +20,9 @@ import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import static org.mule.module.http.api.requester.HttpStreamingType.ALWAYS;
 import static org.mule.module.http.api.requester.HttpStreamingType.AUTO;
+import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_0_9;
+import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -282,16 +285,17 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     private boolean supportsTransferEncoding(MuleEvent event)
     {
         String httpVersion = event.getMessage().<String> getInboundProperty(HTTP_VERSION_PROPERTY);
-        return !(HttpProtocol.HTTP_0_9.asString().equals(httpVersion) || HttpProtocol.HTTP_1_0.asString().equals(httpVersion));
+        return !(HTTP_0_9.asString().equals(httpVersion) || HTTP_1_0.asString().equals(httpVersion));
     }
 
     private boolean supportsTransferEncoding(MuleEvent event, String httpOriginalVersion)
     {
         String httpVersion = event.getMessage().<String> getInboundProperty(HTTP_VERSION_PROPERTY);
-        if (httpVersion == null){
+        if (httpVersion == null)
+        {
             httpVersion = httpOriginalVersion;
         }
-        return !(HttpProtocol.HTTP_0_9.asString().equals(httpVersion) || HttpProtocol.HTTP_1_0.asString().equals(httpVersion));
+        return !(HTTP_0_9.asString().equals(httpVersion) || HTTP_1_0.asString().equals(httpVersion));
     }
 
     private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder,
