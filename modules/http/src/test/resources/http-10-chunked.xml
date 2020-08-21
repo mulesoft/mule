@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+    <http:listener-config name="HTTP_Frontend_Listener_Configuration" host="0.0.0.0" port="${httpPortFlow1}"/>
+    <http:listener-config name="HTTP_Backend_Listener_Configuration" host="0.0.0.0" port="${httpPortFlow2}"/>
+    <http:request-config name="HTTP_Request_Configuration" host="localhost" port="${httpPortFlow2}"/>
+    <flow name="c4-chunked-transfer-encoding-reproducer-frontend">
+        <http:listener config-ref="HTTP_Frontend_Listener_Configuration" path="/test"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/test" method="GET"/>
+    </flow>
+    <flow name="c4-chunked-transfer-encoding-reproducer-backend">
+        <http:listener config-ref="HTTP_Backend_Listener_Configuration" path="/test"/>
+        <set-payload value="ok" encoding="UTF-8" mimeType="application/json"/>
+    </flow>
+   </mule>
