@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.object.factory;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 
@@ -19,7 +20,7 @@ public class NullCursorIteratorProviderFactory extends AbstractCursorIteratorPro
   }
 
   @Override
-  protected Object resolve(Iterator iterator, EventContext eventContext) {
+  protected Object resolve(Iterator iterator, EventContext eventContext, ComponentLocation originatingLocation) {
     if (iterator instanceof Closeable) {
       streamingManager.manage((Closeable) iterator, eventContext);
     }

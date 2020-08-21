@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -52,7 +53,7 @@ public final class StreamingUtils {
    * Closing the opened cursor, handling exceptions and return values are all taken care of by this utility method.
    *
    * @param event an {@link CoreEvent}
-   * @param f     the function to execute
+   * @param f the function to execute
    * @return the output {@link CoreEvent}
    * @throws MuleException
    */
@@ -104,17 +105,21 @@ public final class StreamingUtils {
 
   /**
    * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
-   * {@link CursorProviderFactory#of(EventContext, Object)} is returned. Otherwise, the original {@code value} is.
+   * {@link CursorProviderFactory#of(EventContext, Object, ComponentLocation)} is returned. Otherwise, the original {@code value}
+   * is.
    *
-   * @param value                 a value which may be a repeatable streaming resource
+   * @param value a value which may be a repeatable streaming resource
    * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
-   * @param eventContext          the root context of the event on which the {@code value} was generated
+   * @param eventContext the root context of the event on which the {@code value} was generated
+   * @param originatingLocation the {@link ComponentLocation} where the cursor was created
    * @return the {@code value} or a {@link CursorProvider}
+   *
+   * @since 4.4.0
    */
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory,
-                                        EventContext eventContext) {
+                                        EventContext eventContext, ComponentLocation originatingLocation) {
     if (cursorProviderFactory != null && cursorProviderFactory.accepts(value)) {
-      return cursorProviderFactory.of(eventContext, value);
+      return cursorProviderFactory.of(eventContext, value, originatingLocation);
     } else {
       return value;
     }
@@ -122,15 +127,55 @@ public final class StreamingUtils {
 
   /**
    * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
-   * {@link CursorProviderFactory#of(EventContext, Object)} is returned. Otherwise, the original {@code value} is.
+   * {@link CursorProviderFactory#of(EventContext, Object, ComponentLocation)} is returned. Otherwise, the original {@code value}
+   * is.
    *
-   * @param value                 a value which may be a repeatable streaming resource
+   * @param value a value which may be a repeatable streaming resource
    * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
-   * @param event                 the event on which the {@code value} was generated
+   * @param eventContext the root context of the event on which the {@code value} was generated
    * @return the {@code value} or a {@link CursorProvider}
+   * 
+   * @deprecated Use {@link #streamingContent(Object, CursorProviderFactory, EventContext, ComponentLocation)}
    */
+  @Deprecated
+  public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, EventContext eventContext) {
+    return streamingContent(value, cursorProviderFactory, eventContext, null);
+  }
+
+  /**
+   * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
+   * {@link CursorProviderFactory#of(EventContext, Object, ComponentLocation)} is returned. Otherwise, the original {@code value}
+   * is.
+   *
+   * @param value a value which may be a repeatable streaming resource
+   * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
+   * @param event the event on which the {@code value} was generated
+   * @param originatingLocation the {@link ComponentLocation} where the cursor was created
+   * @return the {@code value} or a {@link CursorProvider}
+   *
+   * @since 4.4.0
+   */
+  public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, CoreEvent event,
+                                        ComponentLocation originatingLocation) {
+    return streamingContent(value, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
+                            originatingLocation);
+  }
+
+  /**
+   * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
+   * {@link CursorProviderFactory#of(EventContext, Object, ComponentLocation)} is returned. Otherwise, the original {@code value}
+   * is.
+   *
+   * @param value a value which may be a repeatable streaming resource
+   * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
+   * @param event the event on which the {@code value} was generated
+   * @return the {@code value} or a {@link CursorProvider}
+   *
+   * @deprecated Use {@link #streamingContent(Object, CursorProviderFactory, EventContext, ComponentLocation)}
+   */
+  @Deprecated
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, CoreEvent event) {
-    return streamingContent(value, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
+    return streamingContent(value, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(), null);
   }
 
   /**
@@ -155,16 +200,15 @@ public final class StreamingUtils {
   /**
    * Returns a {@link CursorIteratorProvider} which is backed by the given {@code items}.
    * <p>
-   * Notice that since the {@code items} data is already fully loaded into memory, this kind of
-   * defeats the purpose of the cursor provider. The purpose of this method is to provide a way to
-   * bridge the given data with the {@link CursorIteratorProvider} abstraction. Possible use cases are
-   * mainly deserialization and testing. <b>Think twice</b> before using this method. Most likely you're
-   * doing something wrong.
+   * Notice that since the {@code items} data is already fully loaded into memory, this kind of defeats the purpose of the cursor
+   * provider. The purpose of this method is to provide a way to bridge the given data with the {@link CursorIteratorProvider}
+   * abstraction. Possible use cases are mainly deserialization and testing. <b>Think twice</b> before using this method. Most
+   * likely you're doing something wrong.
    * <p>
    * Also consider that because the data is already in memory, the cursors will never buffer into disk.
    *
    * @param items the items which back the returned provider
-   * @param <T>   the generic type of the provider's items
+   * @param <T> the generic type of the provider's items
    * @return a new {@link CursorIteratorProvider}
    */
   public static <T> CursorIteratorProvider asCursorProvider(List<T> items) {
@@ -174,11 +218,10 @@ public final class StreamingUtils {
   /**
    * Returns a {@link CursorStreamProvider} which is backed by the given {@code bytes}.
    * <p>
-   * Notice that since the {@code bytes} data is already fully loaded into memory, this kind of
-   * defeats the purpose of the cursor provider. The purpose of this method is to provide a way to
-   * bridge the given data with the {@link CursorStreamProvider} abstraction. Possible use cases are
-   * mainly deserialization and testing. <b>Think twice</b> before using this method. Most likely you're
-   * doing something wrong.
+   * Notice that since the {@code bytes} data is already fully loaded into memory, this kind of defeats the purpose of the cursor
+   * provider. The purpose of this method is to provide a way to bridge the given data with the {@link CursorStreamProvider}
+   * abstraction. Possible use cases are mainly deserialization and testing. <b>Think twice</b> before using this method. Most
+   * likely you're doing something wrong.
    * <p>
    * Also consider that because the data is already in memory, the cursors will never buffer into disk.
    *
@@ -190,12 +233,12 @@ public final class StreamingUtils {
   }
 
   /**
-   * If the {@code event} has a repeatable payload (instance of {@link CursorProvider}), then this method returns a new
-   * event which payload has an equivalent, already consumed structure. This functionality makes sense for cases like
-   * caching in which the contents of the stream need to survive the completion of the event that generated it.
+   * If the {@code event} has a repeatable payload (instance of {@link CursorProvider}), then this method returns a new event
+   * which payload has an equivalent, already consumed structure. This functionality makes sense for cases like caching in which
+   * the contents of the stream need to survive the completion of the event that generated it.
    * <p>
-   * If the payload is a {@link CursorStreamProvider}, then it will be consumed into a {@link ByteArrayCursorStreamProvider}
-   * so that the contents are fully in memory while still keeping repeatable byte streaming semantics.
+   * If the payload is a {@link CursorStreamProvider}, then it will be consumed into a {@link ByteArrayCursorStreamProvider} so
+   * that the contents are fully in memory while still keeping repeatable byte streaming semantics.
    * <p>
    * If the payload is a {@link CursorIteratorProvider}, then the contents will be consumed into a {@link List}.
    * <p>
@@ -229,8 +272,8 @@ public final class StreamingUtils {
    * {@link TypedValue} which payload has an equivalent, already consumed structure. This functionality makes sense for cases like
    * caching in which the contents of the stream need to survive the completion of the event that generated it.
    * <p>
-   * If the payload is a {@link CursorStreamProvider}, then it will be consumed into a {@link ByteArrayCursorStreamProvider}
-   * so that the contents are fully in memory while still keeping repeatable byte streaming semantics.
+   * If the payload is a {@link CursorStreamProvider}, then it will be consumed into a {@link ByteArrayCursorStreamProvider} so
+   * that the contents are fully in memory while still keeping repeatable byte streaming semantics.
    * <p>
    * If the payload is a {@link CursorIteratorProvider}, then the contents will be consumed into a {@link List}.
    * <p>
@@ -297,8 +340,8 @@ public final class StreamingUtils {
   /**
    * Updates the value a given {@link TypedValue} instance by replacing it with a {@link CursorProvider}.
    *
-   * @param value            the typed value to update
-   * @param event            the current event
+   * @param value the typed value to update
+   * @param event the current event
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
    */
@@ -351,8 +394,8 @@ public final class StreamingUtils {
   /**
    * Updates the {@link Cursor} value a given {@link TypedValue} instance by replacing it with a {@link CursorProvider}.
    *
-   * @param value            the typed value to update
-   * @param event            the current event
+   * @param value the typed value to update
+   * @param event the current event
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
    *
@@ -371,7 +414,7 @@ public final class StreamingUtils {
   /**
    * Updates the {@link Cursor} value a given {@link TypedValue} instance by replacing it with a {@link CursorProvider}.
    *
-   * @param value            the typed value to update
+   * @param value the typed value to update
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
    */
