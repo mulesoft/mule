@@ -76,20 +76,6 @@ public class EventStreamingState {
     }).get();
   }
 
-  private Optional<WeakReference<ManagedCursorProvider>> findAlreadyManagedProvider(int id, ManagedCursorProvider provider) {
-    return providers.asMap().values().stream().filter(wr -> {
-      ManagedCursorProvider alreadyManagedCursorProvider = wr.get();
-      if (alreadyManagedCursorProvider != null && alreadyManagedCursorProvider.getId() != id) {
-        CursorProvider innerDelegate = unwrap(provider);
-        CursorProvider delegate = unwrap(alreadyManagedCursorProvider);
-        return innerDelegate.equals(delegate);
-      } else {
-        return false;
-      }
-    }).findFirst();
-  }
-
-
   /**
    * The owning event MUST invoke this method when the event is completed
    */
