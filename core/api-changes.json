@@ -62,6 +62,15 @@
           "classSimpleName": "PayloadStatistics",
           "elementKind": "class",
           "justification": "MULE-18609: Need feature backported to 4.3"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.management.stats.AllStatistics::isPayloadStatisticsEnabled()",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "isPayloadStatisticsEnabled",
+          "elementKind": "method",
+          "justification": "EE-7419: Needed to verify if payload stats are enabled"
         }
       ]
     }

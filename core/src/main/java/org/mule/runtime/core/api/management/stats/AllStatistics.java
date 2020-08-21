@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.System.currentTimeMillis;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
@@ -23,7 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoExtend
 public class AllStatistics {
 
-  private boolean isStatisticsEnabled;
+  private boolean isStatisticsEnabled = getBoolean(MULE_ENABLE_STATISTICS);
+  private boolean payloadStatisticsDisabled = getBoolean(MULE_DISABLE_PAYLOAD_STATISTICS);
+
   private long startTime;
   private final ApplicationStatistics appStats;
   private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
@@ -56,12 +61,19 @@ public class AllStatistics {
   /**
    * Enable statistics logs (this is a dynamic parameter)
    */
-  public void setEnabled(boolean b) {
-    isStatisticsEnabled = b;
+  public void setEnabled(boolean enable) {
+    isStatisticsEnabled = enable;
 
     for (FlowConstructStatistics statistics : flowConstructStats.values()) {
-      statistics.setEnabled(b);
+      statistics.setEnabled(enable);
     }
+
+    if (isPayloadStatisticsEnabled()) {
+      enablePayloadStatistics(enable);
+    }
+  }
+
+  private void enablePayloadStatistics(boolean b) {
     for (PayloadStatistics statistics : payloadStatistics.values()) {
       statistics.setEnabled(b);
     }
@@ -77,6 +89,7 @@ public class AllStatistics {
 
   public synchronized void add(FlowConstructStatistics stat) {
     if (stat != null) {
+      stat.setEnabled(isStatisticsEnabled);
       flowConstructStats.put(stat.getName(), stat);
     }
   }
@@ -113,7 +126,7 @@ public class AllStatistics {
                                              loc -> {
                                                final PayloadStatistics statistics =
                                                    new PayloadStatistics(loc, component.getIdentifier().toString());
-                                               statistics.setEnabled(isEnabled());
+                                               statistics.setEnabled(isPayloadStatisticsEnabled());
                                                return statistics;
                                              });
   }
@@ -125,5 +138,13 @@ public class AllStatistics {
    */
   public PayloadStatistics getPayloadStatistics(String componentLocation) {
     return payloadStatistics.get(componentLocation);
+  }
+
+  /**
+   * @return whether the payload statistics are enabled
+   * @since 4.4, 4.3.1
+   */
+  public boolean isPayloadStatisticsEnabled() {
+    return isEnabled() && !payloadStatisticsDisabled;
   }
 }
