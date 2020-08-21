@@ -25,6 +25,7 @@ public class TestExtensionDeclarationUtils {
 
   public static final ElementDeclarer TEST_EXTENSION_DECLARER = ElementDeclarer.forExtension("ToolingSupportTest");
 
+  public static final String MISSING_CONFIG_ELEMENT_NAME = "missingConfigRefName";
   public static final String CONFIG_ELEMENT_NAME = "config";
   public static final String CONNECTION_ELEMENT_NAME = "tstConnection";
 
@@ -41,6 +42,7 @@ public class TestExtensionDeclarationUtils {
   public static final String CONFIG_LESS_CONNECTION_LESS_OP_ELEMENT_NAME = "configLessConnectionLessOP";
   public static final String CONFIG_LESS_OP_ELEMENT_NAME = "configLessOP";
   public static final String ACTING_PARAMETER_OP_ELEMENT_NAME = "actingParameterOP";
+  public static final String PARAMETER_VALUE_PROVIDER_OP_ELEMENT_NAME = "parameterValueProviderWithConfig";
   public static final String COMPLEX_ACTING_PARAMETER_OP_ELEMENT_NAME = "complexActingParameterOP";
   public static final String ACTING_PARAMETER_GROUP_OP_ELEMENT_NAME = "actingParameterGroupOP";
   public static final String NESTED_PARAMETERS_OP_ELEMENT_NAME = "nestedVPsOperation";
@@ -121,9 +123,14 @@ public class TestExtensionDeclarationUtils {
                                         .withParameter(ACTING_PARAMETER_NAME, actingParameter)
                                         .getDeclaration())
             .getDeclaration();
-
   }
 
+  public static OperationElementDeclaration parameterValueProviderWithConfig(String configName) {
+    return TEST_EXTENSION_DECLARER
+            .newOperation(PARAMETER_VALUE_PROVIDER_OP_ELEMENT_NAME)
+            .withConfig(configName)
+            .getDeclaration();
+  }
 
   public static ParameterValue innerPojo(int intParam,
                                          String stringParam,
@@ -334,6 +341,16 @@ public class TestExtensionDeclarationUtils {
 
   public static ComponentElementDeclaration<?> invalidComponentDeclaration() {
     return TEST_EXTENSION_DECLARER.newConstruct("invalid").getDeclaration();
+  }
+
+  public static ComponentElementDeclaration<?> componentDeclarationWrongConfigRef() {
+    return TEST_EXTENSION_DECLARER
+            .newOperation(MULTI_LEVEL_SHOW_IN_DSL_GROUP_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
+            .withConfig(MISSING_CONFIG_ELEMENT_NAME).getDeclaration();
+  }
+
+  public static ComponentElementDeclaration<?> invalidExtensionDeclaration() {
+    return ElementDeclarer.forExtension("invalid_extension_model").newConstruct("invalid").getDeclaration();
   }
 
 }

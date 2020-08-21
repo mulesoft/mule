@@ -117,10 +117,11 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
     try {
       return withInternalDeclarationSession("getValues()", session -> session.getValues(component, providerName));
     } catch (NoClassDefFoundError | Exception e) {
-      LOGGER.error(format("Unknown error while resolving values on component: '%s' for providerName: '%s'", component.getName(),
-                          providerName),
+      LOGGER.error(format("Unknown error while resolving values on component: '%s:%s' for providerName: '%s'",
+                          component.getDeclaringExtension(),
+                          component.getName(), providerName),
                    e);
-      return resultFrom(newFailure()
+      return resultFrom(newFailure(e)
           .withMessage(format("Unknown error while resolving values for providerName: '%s'. %s", providerName,
                               getRootCauseMessage(e)))
           .withReason(getStackTrace(e))
@@ -133,7 +134,9 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
     try {
       return withInternalDeclarationSession("getMetadataKeys()", session -> session.getMetadataKeys(component));
     } catch (NoClassDefFoundError | Exception e) {
-      LOGGER.error(format("Unknown error while resolving metadata keys on component: '%s'", component.getName()), e);
+      LOGGER.error(format("Unknown error while resolving metadata keys on component: '%s:%s'", component.getDeclaringExtension(),
+                          component.getName()),
+                   e);
       return MetadataResult.failure(MetadataFailure.Builder.newFailure()
           .withMessage(format("Unknown error while resolving metadata keys on component: '%s'. %s", component.getName(),
                               getRootCauseMessage(e)))
@@ -148,7 +151,9 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
     try {
       return withInternalDeclarationSession("resolveComponentMetadata()", session -> session.resolveComponentMetadata(component));
     } catch (NoClassDefFoundError | Exception e) {
-      LOGGER.error(format("Unknown error while resolving metadata on component: '%s'", component.getName()), e);
+      LOGGER.error(format("Unknown error while resolving metadata on component: '%s:%s'", component.getDeclaringExtension(),
+                          component.getName()),
+                   e);
       return MetadataResult.failure(MetadataFailure.Builder.newFailure()
           .withMessage(format("Unknown error while resolving metadata on component: '%s'. %s", component.getName(),
                               getRootCauseMessage(e)))

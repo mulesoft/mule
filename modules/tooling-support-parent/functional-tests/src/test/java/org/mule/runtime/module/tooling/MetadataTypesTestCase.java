@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.tooling;
 
+import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -16,9 +17,12 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONENT;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_PAYLOAD;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.MISSING_CONFIG_ELEMENT_NAME;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.componentDeclarationWrongConfigRef;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessConnectionLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.invalidComponentDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.invalidExtensionDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelCompleteOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelOPDeclarationPartialTypeKeys;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.sourceDeclaration;
@@ -151,6 +155,31 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataTypes.getFailures().get(0).getMessage(), is("Could not find component: 'ToolingSupportTest:invalid'"));
+  }
+
+  @Test
+  public void extensionModelNotFound() {
+    MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
+        session.resolveComponentMetadata(invalidExtensionDeclaration());
+    assertThat(metadataTypes.isSuccess(), is(false));
+    assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
+    assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataTypes.getFailures().get(0).getMessage(),
+               is("ElementDeclaration is defined for extension: 'invalid_extension_model' which is not part of the context: '[mule, ToolingSupportTest, module]'"));
+  }
+
+  @Test
+  public void configRefNotFound() {
+    MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
+        session.resolveComponentMetadata(componentDeclarationWrongConfigRef());
+    assertThat(metadataTypes.isSuccess(), is(false));
+    assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
+    assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataTypes.getFailures().get(0).getMessage(),
+               is(format("Configuration: '%s' referenced by component: 'ToolingSupportTest:multiLevelShowInDslGroupPartialTypeKeysMetadataKey' is not present",
+                         MISSING_CONFIG_ELEMENT_NAME)));
+
   }
 
 }

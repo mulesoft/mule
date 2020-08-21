@@ -46,7 +46,7 @@ public class ConnectivityTestingTestCase extends DeclarationSessionTestCase {
     ConnectionValidationResult connectionValidationResult = session.testConnection("invalidConfigName");
     assertThat(connectionValidationResult.isValid(), equalTo(false));
     assertThat(connectionValidationResult.getMessage(),
-               equalTo("Could not find a connection provider for configuration: 'invalidConfigName'"));
+               equalTo("Could not perform test connection for configuration: 'invalidConfigName' due to a connection provider is not defined"));
   }
 
 }

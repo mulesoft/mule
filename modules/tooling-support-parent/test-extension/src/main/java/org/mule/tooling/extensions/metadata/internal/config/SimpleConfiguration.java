@@ -14,8 +14,8 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.tooling.extensions.metadata.api.source.SimpleSource;
-import org.mule.tooling.extensions.metadata.api.source.SourceWithMultiLevelValue;
 import org.mule.tooling.extensions.metadata.internal.operation.SimpleOperations;
+import org.mule.tooling.extensions.metadata.api.source.SourceWithMultiLevelValue;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;
 
 @Operations({SimpleOperations.class})
@@ -30,5 +30,9 @@ public class SimpleConfiguration {
   @Optional
   @OfValues(ActingParameterVP.class)
   private String providedParameter;
+
+  public String getActingParameter() {
+    return actingParameter;
+  }
 
 }

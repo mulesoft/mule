@@ -12,12 +12,12 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tooling.extensions.metadata.api.parameters.ActingParameterGroup;
+import org.mule.tooling.extensions.metadata.api.parameters.ComplexActingParameter;
 import org.mule.tooling.extensions.metadata.api.parameters.LocationKey;
 import org.mule.tooling.extensions.metadata.internal.config.SimpleConfiguration;
 import org.mule.tooling.extensions.metadata.internal.connection.TstExtensionClient;
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessConnectionLessMetadataResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessMetadataResolver;
-import org.mule.tooling.extensions.metadata.api.parameters.ComplexActingParameter;
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelPartialTypeKeysOutputTypeResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelTypeKeysOutputTypeResolver;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterGroupVP;
@@ -28,6 +28,7 @@ import org.mule.tooling.extensions.metadata.internal.value.ConfigLessNoActingPar
 import org.mule.tooling.extensions.metadata.internal.value.LevelThreeVP;
 import org.mule.tooling.extensions.metadata.internal.value.LevelTwoVP;
 import org.mule.tooling.extensions.metadata.internal.value.MultipleValuesSimpleVP;
+import org.mule.tooling.extensions.metadata.internal.value.ValueProviderWithConfiguration;
 
 import java.util.Map;
 
@@ -67,7 +68,9 @@ public class SimpleOperations {
 
   @MediaType(TEXT_PLAIN)
   @OutputResolver(output = MultiLevelPartialTypeKeysOutputTypeResolver.class)
-  public Result<String, Object> multiLevelShowInDslGroupPartialTypeKeysMetadataKey(@MetadataKeyId(MultiLevelPartialTypeKeysOutputTypeResolver.class) @ParameterGroup(name="LocationKeyShowInDsl", showInDsl = true) LocationKey locationKeyShowInDslParam) {
+  public Result<String, Object> multiLevelShowInDslGroupPartialTypeKeysMetadataKey(
+          @Config SimpleConfiguration configuration,
+          @MetadataKeyId(MultiLevelPartialTypeKeysOutputTypeResolver.class) @ParameterGroup(name="LocationKeyShowInDsl", showInDsl = true) LocationKey locationKeyShowInDslParam) {
     return null;
   }
 
@@ -76,6 +79,10 @@ public class SimpleOperations {
                                                 String otherRequiredParameterNotRequiredForMetadataNeitherValueProvider,
                                                 String actingParameter,
                                                 @Optional @OfValues(ActingParameterVP.class) String providedParameter) {
+    return null;
+  }
+
+  public Result<Void, Object> parameterValueProviderWithConfig(@OfValues(ValueProviderWithConfiguration.class) String providedParameter) {
     return null;
   }
 
