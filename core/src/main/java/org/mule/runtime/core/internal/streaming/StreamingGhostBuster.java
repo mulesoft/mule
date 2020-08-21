@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
@@ -119,7 +121,10 @@ public class StreamingGhostBuster implements Lifecycle {
     try {
       if (LOGGER.isDebugEnabled()) {
         CursorProvider innerDelegate = unwrap(ghost.janitor.provider);
-        LOGGER.debug(format("StreamingGhostBuster disposing ghost: %s, provider: %s", ghost.id, identityHashCode(innerDelegate)));
+        Optional<ComponentLocation> originatingLocation = ghost.janitor.provider.getOriginatingLocation();
+        LOGGER.debug(format("StreamingGhostBuster disposing ghost: %s, provider: %s created by %s ", ghost.id,
+                            identityHashCode(innerDelegate), originatingLocation.map(ComponentLocation::getLocation)
+                                .orElse("unknown")));
       }
       ghost.dispose();
     } catch (Exception e) {

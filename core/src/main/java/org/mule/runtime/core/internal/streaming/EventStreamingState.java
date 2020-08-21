@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.slf4j.Logger;
 
@@ -63,19 +64,13 @@ public class EventStreamingState {
   private ManagedCursorProvider getOrAddManagedProvider(int id,
                                                         ManagedCursorProvider provider,
                                                         StreamingGhostBuster ghostBuster) {
-    Optional<WeakReference<ManagedCursorProvider>> alreadyManagedOpt = findAlreadyManagedProvider(id, provider);
-    if (alreadyManagedOpt.isPresent()) {
-      ManagedCursorProvider alreadyManagedCursorProvider = alreadyManagedOpt.get().get();
-      CursorProvider innerDelegate = unwrap(provider);
-      CursorProvider delegate = unwrap(alreadyManagedCursorProvider);
-      LOGGER.warn("Already managed provider: [" + provider.getId() + "], alreadyManagedCursorProvider: ["
-          + alreadyManagedCursorProvider.getId() + "]. InnerDelegate: " + System.identityHashCode(innerDelegate) + " delegate: "
-          + System.identityHashCode(delegate) + "]");
-    }
     return providers.get(id, k -> {
       if (LOGGER.isDebugEnabled()) {
         CursorProvider innerDelegate = unwrap(provider);
-        LOGGER.debug(format("Added ManagedCursorProvider: %s, delegate: %s", k, identityHashCode(innerDelegate)));
+        Optional<ComponentLocation> originatingLocation = provider.getOriginatingLocation();
+        LOGGER.debug(format("Added ManagedCursorProvider: %s for delegate: %s opened by: %s", k, identityHashCode(innerDelegate),
+                            originatingLocation.map(ComponentLocation::getLocation)
+                                .orElse("unknown")));
       }
       return ghostBuster.track(provider);
     }).get();
