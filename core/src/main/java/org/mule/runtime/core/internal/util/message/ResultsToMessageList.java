@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.util.message;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -33,8 +33,9 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
 
   public ResultsToMessageList(List<Object> delegate,
                               CursorProviderFactory cursorProviderFactory,
-                              BaseEventContext eventContext) {
-    super(delegate, cursorProviderFactory, eventContext);
+                              BaseEventContext eventContext,
+                              ComponentLocation originatingLocation) {
+    super(delegate, cursorProviderFactory, eventContext, originatingLocation);
     this.delegate = delegate;
   }
 
@@ -133,7 +134,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
   public List<Message> subList(int fromIndex, int toIndex) {
     return lock.withReadLock(r -> {
       List results = delegate.subList(fromIndex, toIndex);
-      return new ResultsToMessageList(results, cursorProviderFactory, eventContext);
+      return new ResultsToMessageList(results, cursorProviderFactory, eventContext, originatingLocation);
     });
   }
 

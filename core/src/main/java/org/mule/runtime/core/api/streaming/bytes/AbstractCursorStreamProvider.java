@@ -18,6 +18,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.CursorProviderAlreadyClosedException;
+import org.mule.runtime.core.internal.streaming.ClosingCursorException;
 
 /**
  * Base class for {@link CursorStreamProvider} implementations.
@@ -33,7 +34,7 @@ public abstract class AbstractCursorStreamProvider extends AbstractComponent imp
 
   private final ComponentLocation originatingLocation;
 
-  private Exception closerResponsible;
+  private ClosingCursorException closerResponsible;
 
   private final boolean trackCursorProviderClose;
 
@@ -83,7 +84,7 @@ public abstract class AbstractCursorStreamProvider extends AbstractComponent imp
   public void close() {
     closed.set(true);
     if (trackCursorProviderClose) {
-      closerResponsible = new Exception("Responsible for closing the stream.");
+      closerResponsible = new ClosingCursorException("Responsible for closing the stream.");
     }
   }
 

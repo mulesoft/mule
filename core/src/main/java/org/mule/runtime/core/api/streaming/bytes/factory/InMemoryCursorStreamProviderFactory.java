@@ -44,8 +44,8 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
   }
 
   @Override
-  protected Object resolve(InputStream inputStream, EventContext eventContext) {
-    return doResolve(inputStream, eventContext.getOriginatingLocation());
+  protected Object resolve(InputStream inputStream, EventContext eventContext, ComponentLocation originatingLocation) {
+    return doResolve(inputStream, originatingLocation);
   }
 
   /**
@@ -54,8 +54,8 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
    * @return a new {@link InMemoryCursorStreamProvider} wrapped in an {@link Either}
    */
   @Override
-  protected Object resolve(InputStream inputStream, CoreEvent event) {
-    return doResolve(inputStream, event.getContext().getOriginatingLocation());
+  protected Object resolve(InputStream inputStream, CoreEvent event, ComponentLocation originatingLocation) {
+    return doResolve(inputStream, originatingLocation);
   }
 
   private Object doResolve(InputStream inputStream, ComponentLocation originatingLocation) {

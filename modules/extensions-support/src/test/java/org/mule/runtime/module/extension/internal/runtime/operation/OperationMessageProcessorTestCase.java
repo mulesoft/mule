@@ -38,6 +38,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
@@ -480,7 +481,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     final InputStream inputStream = mock(InputStream.class);
 
     doReturn(provider).when(cursorStreamProviderFactory).of(((BaseEventContext) event.getContext()).getRootContext(),
-                                                            inputStream);
+                                                            inputStream, fromSingleComponent(FLOW_NAME));
     when(operationExecutor.execute(any())).thenReturn(just(inputStream));
 
     messageProcessor.process(event);
