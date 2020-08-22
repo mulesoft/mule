@@ -12,6 +12,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
+import static org.mule.runtime.api.metadata.resolving.MetadataComponent.KEYS;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.MISSING_CONFIG_ELEMENT_NAME;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.componentDeclarationWrongConfigRef;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessConnectionLessOPDeclaration;
@@ -20,6 +22,7 @@ import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.inva
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.invalidExtensionDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelOPDeclarationPartialTypeKeys;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelShowInDslGroupOPDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.requiresConfigurationOutputTypeKeyResolverOP;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.sourceDeclaration;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -118,6 +121,7 @@ public class MetadataKeysTestCase extends DeclarationSessionTestCase {
     assertThat(metadataKeys.isSuccess(), is(false));
     assertThat(metadataKeys.getFailures(), hasSize(1));
     assertThat(metadataKeys.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataKeys.getFailures().get(0).getFailingComponent(), is(KEYS));
     assertThat(metadataKeys.getFailures().get(0).getMessage(), is("Could not find component: 'ToolingSupportTest:invalid'"));
   }
 
@@ -127,6 +131,7 @@ public class MetadataKeysTestCase extends DeclarationSessionTestCase {
     assertThat(metadataKeys.isSuccess(), is(false));
     assertThat(metadataKeys.getFailures(), hasSize(1));
     assertThat(metadataKeys.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataKeys.getFailures().get(0).getFailingComponent(), is(KEYS));
     assertThat(metadataKeys.getFailures().get(0).getMessage(),
                is("ElementDeclaration is defined for extension: 'invalid_extension_model' which is not part of the context: '[mule, ToolingSupportTest, module]'"));
   }
@@ -137,10 +142,21 @@ public class MetadataKeysTestCase extends DeclarationSessionTestCase {
     assertThat(metadataKeys.isSuccess(), is(false));
     assertThat(metadataKeys.getFailures(), hasSize(1));
     assertThat(metadataKeys.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataKeys.getFailures().get(0).getFailingComponent(), is(KEYS));
     assertThat(metadataKeys.getFailures().get(0).getMessage(),
-               is(format("Configuration: '%s' referenced by component: 'ToolingSupportTest:multiLevelShowInDslGroupPartialTypeKeysMetadataKey' is not present",
+               is(format("The resolver requires a configuration but the one referenced by the component declaration with name: '%s' is not present",
                          MISSING_CONFIG_ELEMENT_NAME)));
+  }
 
+  @Test
+  public void operationDoesNotHaveConfigButResolverRequiresConfiguration() {
+    MetadataResult<MetadataKeysContainer> metadataKeys = session.getMetadataKeys(requiresConfigurationOutputTypeKeyResolverOP());
+    assertThat(metadataKeys.isSuccess(), is(false));
+    assertThat(metadataKeys.getFailures(), hasSize(1));
+    assertThat(metadataKeys.getFailures().get(0).getFailureCode(), is(UNKNOWN));
+    assertThat(metadataKeys.getFailures().get(0).getFailingComponent(), is(KEYS));
+    assertThat(metadataKeys.getFailures().get(0).getMessage(),
+               is("Configuration is not present, a message from resolver"));
   }
 
 }

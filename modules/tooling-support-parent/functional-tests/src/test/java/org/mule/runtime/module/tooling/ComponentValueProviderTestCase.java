@@ -169,11 +169,20 @@ public class ComponentValueProviderTestCase extends DeclarationSessionTestCase {
 
   @Test
   public void missingConfigRef() {
-    OperationElementDeclaration operationElementDeclaration = parameterValueProviderWithConfig("missing_config_ref");
+    OperationElementDeclaration operationElementDeclaration = parameterValueProviderWithConfig(null);
     validateValuesFailure(session, operationElementDeclaration, PROVIDED_PARAMETER_NAME,
                           "The value provider requires a configuration and none was provided",
                           MISSING_REQUIRED_PARAMETERS);
   }
+
+  @Test
+  public void notFoundConfigRef() {
+    OperationElementDeclaration operationElementDeclaration = parameterValueProviderWithConfig("missing_config_ref");
+    validateValuesFailure(session, operationElementDeclaration, PROVIDED_PARAMETER_NAME,
+                          "The provider requires a configuration but the one referenced by element declaration with name: 'missing_config_ref' is not present",
+                          COMPONENT_NOT_FOUND.getName());
+  }
+
 
   @Test
   public void getValuesOnParameterWithNoValueProvider() {

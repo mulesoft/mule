@@ -21,6 +21,7 @@ import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
@@ -71,6 +72,16 @@ public class ArtifactHelper {
   public Optional<? extends ComponentModel> findComponentModel(ExtensionModel extensionModel,
                                                                ComponentElementDeclaration<?> componentDeclaration) {
     return findModel(extensionModel, componentDeclaration).filter(m -> m instanceof ComponentModel).map(m -> (ComponentModel) m);
+  }
+
+  public boolean hasParameterOfType(ComponentModel componentModel,
+                                    StereotypeModel referenceStereotype) {
+    return componentModel.getAllParameterModels()
+        .stream()
+        .filter(paramModel -> paramModel.getAllowedStereotypes()
+            .stream()
+            .anyMatch(allowed -> allowed.isAssignableTo(referenceStereotype)))
+        .findAny().isPresent();
   }
 
   public Optional<ConfigurationElementDeclaration> findConfigurationDeclaration(String configName) {

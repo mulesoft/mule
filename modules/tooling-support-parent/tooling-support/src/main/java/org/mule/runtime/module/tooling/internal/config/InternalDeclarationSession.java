@@ -7,81 +7,40 @@
 package org.mule.runtime.module.tooling.internal.config;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
-import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import static org.mule.runtime.module.tooling.internal.config.params.ParameterExtractor.extractValue;
-import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.EnrichableModel;
-import org.mule.runtime.api.meta.model.HasOutputModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.api.metadata.MetadataContext;
-import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
-import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
-import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
-import org.mule.runtime.app.declaration.api.ParameterGroupElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.internal.metadata.cache.DefaultMetadataCache;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
-import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
-import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
-import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
-import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBasedParameterResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
-import org.mule.runtime.module.tooling.internal.config.metadata.MetadataKeyDeclarationResolver;
-import org.mule.runtime.module.tooling.internal.config.metadata.MetadataKeyResult;
+import org.mule.runtime.module.tooling.internal.config.metadata.MetadataComponentExecutor;
+import org.mule.runtime.module.tooling.internal.config.metadata.MetadataKeysExecutor;
+import org.mule.runtime.module.tooling.internal.config.value.ValueProviderExecutor;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 public class InternalDeclarationSession implements DeclarationSession {
@@ -104,15 +63,37 @@ public class InternalDeclarationSession implements DeclarationSession {
   @Inject
   private ExpressionManager expressionManager;
 
-  private LazyValue<ArtifactHelper> artifactHelperLazyValue;
+  private final LazyValue<ArtifactHelper> artifactHelperLazyValue;
+  private final LazyValue<ValueProviderExecutor> valueProviderExecutorLazyValue;
+  private final LazyValue<MetadataKeysExecutor> metadataKeysExecutorLazyValue;
+  private final LazyValue<MetadataComponentExecutor> metadataComponentExecutorLazyValue;
 
   InternalDeclarationSession(ArtifactDeclaration artifactDeclaration) {
     this.artifactHelperLazyValue =
         new LazyValue<>(() -> new ArtifactHelper(extensionManager, componentLocator, artifactDeclaration));
+    this.valueProviderExecutorLazyValue =
+        new LazyValue<>(() -> new ValueProviderExecutor(muleContext, connectionManager, expressionManager, reflectionCache,
+                                                        artifactHelper()));
+    this.metadataKeysExecutorLazyValue =
+        new LazyValue<>(() -> new MetadataKeysExecutor(connectionManager, reflectionCache, artifactHelper()));
+    this.metadataComponentExecutorLazyValue =
+        new LazyValue<>(() -> new MetadataComponentExecutor(connectionManager, reflectionCache, artifactHelper()));
   }
 
   private ArtifactHelper artifactHelper() {
     return artifactHelperLazyValue.get();
+  }
+
+  private ValueProviderExecutor valueProviderExecutor() {
+    return valueProviderExecutorLazyValue.get();
+  }
+
+  private MetadataKeysExecutor metadataKeysExecutor() {
+    return metadataKeysExecutorLazyValue.get();
+  }
+
+  private MetadataComponentExecutor metadataComponentExecutor() {
+    return metadataComponentExecutorLazyValue.get();
   }
 
   @Override
@@ -126,163 +107,71 @@ public class InternalDeclarationSession implements DeclarationSession {
   }
 
   @Override
-  public ValueResult getValues(ParameterizedElementDeclaration elementDeclaration, String providerName) {
-    return artifactHelper()
-        .findExtension(elementDeclaration)
-        .map(extensionModel -> artifactHelper()
-            .findModel(extensionModel, elementDeclaration)
-            .map(cm -> discoverValues(cm, providerName, parameterValueResolver(elementDeclaration, cm),
-                                      getConfigRef(elementDeclaration)))
-            .orElseGet(() -> resultFrom(newFailure()
-                .withMessage(couldNotFindComponentErrorMessage(elementDeclaration))
-                .withFailureCode(COMPONENT_NOT_FOUND.getName())
-                .build())))
-        .orElseGet(() -> resultFrom(newFailure()
-            .withMessage(extensionNotFoundErrorMessage(elementDeclaration.getDeclaringExtension()))
-            .withFailureCode(COMPONENT_NOT_FOUND.getName())
-            .build()));
+  public ValueResult getValues(ParameterizedElementDeclaration parameterizedElementDeclaration, String providerName) {
+    Optional<ExtensionModel> optionalExtensionModel = artifactHelper().findExtension(parameterizedElementDeclaration);
+    if (!optionalExtensionModel.isPresent()) {
+      return resultFrom(newFailure()
+          .withMessage(extensionNotFoundErrorMessage(parameterizedElementDeclaration.getDeclaringExtension()))
+          .withFailureCode(COMPONENT_NOT_FOUND.getName())
+          .build());
+    }
+
+    Optional<? extends ParameterizedModel> optionalParameterizedModel =
+        artifactHelper().findModel(optionalExtensionModel.get(), parameterizedElementDeclaration);
+    if (!optionalParameterizedModel.isPresent()) {
+      return resultFrom(newFailure()
+          .withMessage(couldNotFindComponentErrorMessage(parameterizedElementDeclaration))
+          .withFailureCode(COMPONENT_NOT_FOUND.getName())
+          .build());
+    }
+    return valueProviderExecutor().resolveValues(optionalParameterizedModel.get(), parameterizedElementDeclaration,
+                                                 providerName);
   }
 
   @Override
-  public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration component) {
-    return artifactHelper()
-        .findExtension(component)
-        .map(extensionModel -> artifactHelper()
-            .findComponentModel(extensionModel, component)
-            .map(cm -> {
-              final Reference<Optional<ConfigurationInstance>> configurationInstanceRef = new Reference<>(empty());
-              String configRef = component.getConfigRef();
-              if (configRef != null) {
-                configurationInstanceRef.set(artifactHelper().getConfigurationInstance(configRef));
-                if (requiresConfigurationMetadataKeyResolver(cm) && !configurationInstanceRef.get().isPresent()) {
-                  return MetadataResult.<MetadataKeysContainer>failure(
-                                                                       MetadataFailure.Builder.newFailure()
-                                                                           .withMessage(couldNotFindConfigurationErrorMessage(configRef,
-                                                                                                                              component))
-                                                                           .withFailureCode(COMPONENT_NOT_FOUND)
-                                                                           .onKeys());
-                }
-              }
-              //TODO MULE-15638 it is not correct the information provided by the TypeResolversInformationModelProperty model property, check connectionProvider is present
-              //if (requiresConnection() && !configurationInstance.map(ci -> ci.getConnectionProvider().isPresent()).orElse(false)) {
-              //  return MetadataResult.<ComponentMetadataTypesDescriptor>failure(
-              //          MetadataFailure.Builder.newFailure()
-              //                  .withMessage(connectionProvicerIsRequiredErrorMessage(configRef,
-              //                                                                     component))
-              //                  .withFailureCode(COMPONENT_NOT_FOUND)
-              //                  .onComponent());
-              //}
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration componentElementDeclaration) {
+    Optional<ExtensionModel> optionalExtensionModel = artifactHelper().findExtension(componentElementDeclaration);
+    if (!optionalExtensionModel.isPresent()) {
+      return MetadataResult.failure(MetadataFailure.Builder.newFailure()
+          .withMessage(extensionNotFoundErrorMessage(componentElementDeclaration.getDeclaringExtension()))
+          .withFailureCode(COMPONENT_NOT_FOUND)
+          .onKeys());
+    }
 
-              MetadataKey metadataKey = new MetadataKeyDeclarationResolver(cm, component).resolveKey();
-              ClassLoader extensionClassLoader = getClassLoader(artifactHelper().getExtensionModel(component));
-              return withContextClassLoader(extensionClassLoader, () -> {
-                DefaultMetadataContext metadataContext =
-                    createMetadataContext(configurationInstanceRef.get(), extensionClassLoader);
-                return withMetadataContext(metadataContext, () -> new MetadataMediator<>(cm)
-                    .getMetadataKeys(metadataContext, metadataKey, reflectionCache));
-              });
-            })
-            .orElseGet(() -> MetadataResult.failure(MetadataFailure.Builder.newFailure()
-                .withMessage(couldNotFindComponentErrorMessage(component))
-                .withFailureCode(COMPONENT_NOT_FOUND)
-                .onKeys())))
-        .orElseGet(() -> MetadataResult.failure(MetadataFailure.Builder.newFailure()
-            .withMessage(extensionNotFoundErrorMessage(component.getDeclaringExtension()))
-            .withFailureCode(COMPONENT_NOT_FOUND)
-            .onKeys()));
+    Optional<? extends ComponentModel> optionalComponentModel =
+        artifactHelper().findComponentModel(optionalExtensionModel.get(), componentElementDeclaration);
+    if (!optionalComponentModel.isPresent()) {
+      return MetadataResult.failure(MetadataFailure.Builder.newFailure()
+          .withMessage(couldNotFindComponentErrorMessage(componentElementDeclaration))
+          .withFailureCode(COMPONENT_NOT_FOUND)
+          .onKeys());
+    }
+
+    return metadataKeysExecutor().resolveMetadataKeys(optionalComponentModel.get(), componentElementDeclaration);
   }
+
 
   @Override
-  public MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentElementDeclaration component) {
-    return artifactHelper()
-        .findExtension(component)
-        .map(extensionModel -> artifactHelper()
-            .findComponentModel(extensionModel, component)
-            .map(cm -> {
-              Optional<ConfigurationInstance> configurationInstance = empty();
-              String configRef = component.getConfigRef();
-              if (configRef != null) {
-                configurationInstance = artifactHelper().getConfigurationInstance(configRef);
-                if (requiresConfigurationComponentMetadataResolver(cm) && !configurationInstance.isPresent()) {
-                  return MetadataResult.<ComponentMetadataTypesDescriptor>failure(
-                                                                                  MetadataFailure.Builder.newFailure()
-                                                                                      .withMessage(couldNotFindConfigurationErrorMessage(configRef,
-                                                                                                                                         component))
-                                                                                      .withFailureCode(COMPONENT_NOT_FOUND)
-                                                                                      .onComponent());
-                }
-              }
-              //TODO MULE-15638 it is not correct the information provided by the TypeResolversInformationModelProperty model property, check connectionProvider is present
-              //if (requiresConnection() && !configurationInstance.map(ci -> ci.getConnectionProvider().isPresent()).orElse(false)) {
-              //  return MetadataResult.<ComponentMetadataTypesDescriptor>failure(
-              //          MetadataFailure.Builder.newFailure()
-              //                  .withMessage(connectionProvicerIsRequiredErrorMessage(configRef,
-              //                                                                     component))
-              //                  .withFailureCode(COMPONENT_NOT_FOUND)
-              //                  .onComponent());
-              //}
+  public MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentElementDeclaration componentElementDeclaration) {
+    Optional<ExtensionModel> optionalExtensionModel = artifactHelper().findExtension(componentElementDeclaration);
+    if (!optionalExtensionModel.isPresent()) {
+      return MetadataResult.failure(MetadataFailure.Builder.newFailure()
+          .withMessage(extensionNotFoundErrorMessage(componentElementDeclaration.getDeclaringExtension()))
+          .withFailureCode(COMPONENT_NOT_FOUND)
+          .onComponent());
+    }
 
-              MetadataKeyResult metadataKeyResult = new MetadataKeyDeclarationResolver(cm, component).resolveKeyResult();
-              if (!metadataKeyResult.isComplete()) {
-                return MetadataResult.<ComponentMetadataTypesDescriptor>failure(
-                                                                                MetadataFailure.Builder.newFailure()
-                                                                                    .withMessage(metadataKeyResult
-                                                                                        .getPartialReason())
-                                                                                    .withFailureCode(INVALID_METADATA_KEY)
-                                                                                    .onComponent());
-              }
-              MetadataKey metadataKey = metadataKeyResult.getMetadataKey();
-              ClassLoader extensionClassLoader = getClassLoader(artifactHelper().getExtensionModel(component));
-              return resolveMetadata(cm, configurationInstance, metadataKey, extensionClassLoader);
-            })
-            .orElseGet(() -> MetadataResult.failure(MetadataFailure.Builder.newFailure()
-                .withMessage(couldNotFindComponentErrorMessage(component))
-                .withFailureCode(COMPONENT_NOT_FOUND)
-                .onComponent())))
-        .orElseGet(() -> MetadataResult.failure(MetadataFailure.Builder.newFailure()
-            .withMessage(extensionNotFoundErrorMessage(component.getDeclaringExtension()))
-            .withFailureCode(COMPONENT_NOT_FOUND)
-            .onComponent()));
-  }
+    Optional<? extends ComponentModel> optionalComponentModel =
+        artifactHelper().findComponentModel(optionalExtensionModel.get(), componentElementDeclaration);
+    if (!optionalComponentModel.isPresent()) {
+      return MetadataResult.failure(MetadataFailure.Builder.newFailure()
+          .withMessage(couldNotFindComponentErrorMessage(componentElementDeclaration))
+          .withFailureCode(COMPONENT_NOT_FOUND)
+          .onComponent());
+    }
 
-  private boolean requiresConfigurationComponentMetadataResolver(ComponentModel componentModel) {
-    //TODO MULE-15638 it is not correct the information provided by the TypeResolversInformationModelProperty model property
-    //return componentModel.getModelProperty(TypeResolversInformationModelProperty.class)
-    //.map(typeResolversInformationModelProperty ->  {
-    //  if (typeResolversInformationModelProperty.getOutputResolver().map(resolverInformation -> resolverInformation.isRequiresConfiguration()).orElse(false)) {
-    //    return true;
-    //  }
-    //  if (typeResolversInformationModelProperty.getAttributesResolver().map(resolverInformation -> resolverInformation.isRequiresConfiguration()).orElse(false)) {
-    //    return true;
-    //  }
-    //  return componentModel.getAllParameterModels().stream().map(parameter -> typeResolversInformationModelProperty.getParameterResolver(parameter.getName())
-    //          .map(resolverInformation -> resolverInformation.isRequiresConfiguration()).orElse(false)).findFirst().orElse(false);
-    //}).orElse(false);
-    return hasParameterOfType(componentModel, CONFIG);
-  }
+    return metadataComponentExecutor().resolveComponentMetadata(optionalComponentModel.get(), componentElementDeclaration);
 
-  private boolean requiresConfigurationMetadataKeyResolver(ComponentModel componentModel) {
-    //TODO MULE-15638 it is not correct the information provided by the TypeResolversInformationModelProperty model property
-    //return componentModel.getModelProperty(TypeResolversInformationModelProperty.class)
-    //        .map(typeResolversInformationModelProperty ->  typeResolversInformationModelProperty.getKeysResolver()
-    //                .map(resolverInformation -> resolverInformation.isRequiresConfiguration()).orElse(false))
-    //        .orElse(false);
-    return hasParameterOfType(componentModel, CONFIG);
-  }
-
-  private static boolean hasParameterOfType(ComponentModel componentModel,
-                                            StereotypeModel referenceStereotype) {
-    return componentModel.getAllParameterModels()
-        .stream()
-        .filter(paramModel -> paramModel.getAllowedStereotypes()
-            .stream()
-            .anyMatch(allowed -> allowed.isAssignableTo(referenceStereotype)))
-        .findAny().isPresent();
-  }
-
-  private String couldNotFindConfigurationErrorMessage(String configRef, ElementDeclaration declaration) {
-    return format("Configuration: '%s' referenced by component: '%s:%s' is not present", configRef,
-                  declaration.getDeclaringExtension(), declaration.getName());
   }
 
   private String couldNotFindComponentErrorMessage(ElementDeclaration declaration) {
@@ -294,142 +183,9 @@ public class InternalDeclarationSession implements DeclarationSession {
                   artifactHelper().getExtensions());
   }
 
-  private MetadataResult<ComponentMetadataTypesDescriptor> resolveMetadata(ComponentModel cm,
-                                                                           Optional<ConfigurationInstance> configurationInstance,
-                                                                           MetadataKey metadataKey,
-                                                                           ClassLoader extensionClassLoader) {
-    return withContextClassLoader(extensionClassLoader, () -> {
-      MetadataMediator<? extends ComponentModel> metadataMediator = new MetadataMediator<>(cm);
-      DefaultMetadataContext metadataContext = createMetadataContext(configurationInstance, extensionClassLoader);
-      return withMetadataContext(metadataContext, () -> {
-        MetadataResult<InputMetadataDescriptor> inputMetadata = metadataMediator
-            .getInputMetadata(metadataContext, metadataKey);
-        MetadataResult<OutputMetadataDescriptor> outputMetadata = null;
-        if (cm instanceof HasOutputModel) {
-          outputMetadata = metadataMediator.getOutputMetadata(metadataContext, metadataKey);
-        }
-        return collectMetadata(inputMetadata, outputMetadata);
-      });
-    });
-  }
-
-  private MetadataResult<ComponentMetadataTypesDescriptor> collectMetadata(@Nonnull MetadataResult<InputMetadataDescriptor> inputMetadataResult,
-                                                                           @Nullable MetadataResult<OutputMetadataDescriptor> outputMetadataResult) {
-    if (inputMetadataResult.isSuccess() && (outputMetadataResult == null || outputMetadataResult.isSuccess())) {
-      ComponentMetadataTypesDescriptor.ComponentMetadataTypesDescriptorBuilder builder =
-          ComponentMetadataTypesDescriptor.builder().withInputMetadataDescriptor(inputMetadataResult.get());
-      if (outputMetadataResult != null) {
-        builder.withOutputMetadataDescriptor(outputMetadataResult.get());
-      }
-      return MetadataResult.success(builder.build());
-    }
-    List<MetadataFailure> failures = new ArrayList<>(inputMetadataResult.getFailures());
-    if (outputMetadataResult != null) {
-      failures.addAll(outputMetadataResult.getFailures());
-    }
-    return MetadataResult.failure(failures);
-  }
-
-  private DefaultMetadataContext createMetadataContext(Optional<ConfigurationInstance> configurationInstance,
-                                                       ClassLoader extensionClassLoader) {
-    return new DefaultMetadataContext(() -> configurationInstance,
-                                      connectionManager,
-                                      new DefaultMetadataCache(),
-                                      new JavaTypeLoader(extensionClassLoader));
-  }
-
-  private static <T> T withMetadataContext(MetadataContext metadataContext, Callable<T> callable) {
-    try {
-      return callable.call();
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new MuleRuntimeException(e);
-    } finally {
-      metadataContext.dispose();
-    }
-  }
-
-  private Optional<String> getConfigRef(ParameterizedElementDeclaration component) {
-    if (component instanceof ComponentElementDeclaration) {
-      return ofNullable(((ComponentElementDeclaration) component).getConfigRef());
-    }
-    return empty();
-  }
-
   @Override
   public void dispose() {
     //do nothing
-  }
-
-  private <T extends ParameterizedModel & EnrichableModel> ValueResult discoverValues(T containerModel,
-                                                                                      String providerName,
-                                                                                      ParameterValueResolver parameterValueResolver,
-                                                                                      Optional<String> configNameOptional) {
-    ValueProviderMediator<T> valueProviderMediator = createValueProviderMediator(componentModel);
-    ExtensionResolvingContext context =
-        new ExtensionResolvingContext(() -> artifactHelper().getConfigurationInstance(configNameOptional.get()),
-                                      connectionManager);
-    try {
-      return resultFrom(valueProviderMediator.getValues(providerName,
-                                                        parameterValueResolver,
-                                                        (CheckedSupplier<Object>) () -> context
-                                                            .getConnection().orElse(null),
-                                                        (CheckedSupplier<Object>) () -> context
-                                                            .getConfig().orElse(null)));
-    } catch (ValueResolvingException e) {
-      return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
-    } finally {
-      context.dispose();
-    }
-  }
-
-  private <T extends ParameterizedModel & EnrichableModel> ValueProviderMediator<T> createValueProviderMediator(T model) {
-    return new ValueProviderMediator<>(model,
-                                       () -> muleContext,
-                                       () -> reflectionCache);
-  }
-
-  private <T extends ParameterizedModel> ParameterValueResolver parameterValueResolver(ParameterizedElementDeclaration parameterizedElementDeclaration,
-                                                                                       T model) {
-    Map<String, Object> parametersMap = new HashMap<>();
-
-    Map<String, ParameterGroupModel> parameterGroups =
-        model.getParameterGroupModels().stream().collect(toMap(NamedObject::getName, identity()));
-
-    for (ParameterGroupElementDeclaration parameterGroupElement : parameterizedElementDeclaration.getParameterGroups()) {
-      final String parameterGroupName = parameterGroupElement.getName();
-      final ParameterGroupModel parameterGroupModel = parameterGroups.get(parameterGroupName);
-      if (parameterGroupModel == null) {
-        throw new MuleRuntimeException(createStaticMessage("Could not find parameter group with name: '%s' in model",
-                                                           parameterGroupName));
-      }
-
-      for (ParameterElementDeclaration parameterElement : parameterGroupElement.getParameters()) {
-        final String parameterName = parameterElement.getName();
-        final ParameterModel parameterModel = parameterGroupModel.getParameter(parameterName)
-            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find parameter with name: '%s' in parameter group: '%s'",
-                                                                            parameterName, parameterGroupName)));
-        parametersMap.put(parameterName,
-                          extractValue(parameterElement.getValue(),
-                                       artifactHelper().getParameterClass(parameterModel, parameterizedElementDeclaration)));
-      }
-    }
-
-    try {
-      final ResolverSet resolverSet =
-          ParametersResolver.fromValues(parametersMap,
-                                        muleContext,
-                                        // Required parameters should not invalidate the resolution of resolving ValueProviders
-                                        true,
-                                        reflectionCache,
-                                        expressionManager,
-                                        model.getName())
-              .getParametersAsResolverSet(model, muleContext);
-      return new ResolverSetBasedParameterResolver(resolverSet, model, reflectionCache, expressionManager);
-    } catch (ConfigurationException e) {
-      throw new MuleRuntimeException(e);
-    }
   }
 
 }

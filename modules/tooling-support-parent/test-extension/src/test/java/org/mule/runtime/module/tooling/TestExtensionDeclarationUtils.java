@@ -65,6 +65,8 @@ public class TestExtensionDeclarationUtils {
   public static final String MULTI_LEVEL_SHOW_IN_DSL_GROUP_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME =
           "multiLevelShowInDslGroupPartialTypeKeysMetadataKey";
 
+  public static final String REQUIRES_CONFIGURATION_OUTPUT_TYPE_RESOLVER_OP_ELEMENT_NAME = "requiresConfigurationOutputTypeKeyResolver";
+
   public static ConfigurationElementDeclaration configurationDeclaration(String name, ConnectionElementDeclaration connection) {
     ConfigurationElementDeclarer configurationElementDeclarer = TEST_EXTENSION_DECLARER.newConfiguration(CONFIG_ELEMENT_NAME)
             .withRefName(name)
@@ -347,6 +349,13 @@ public class TestExtensionDeclarationUtils {
     return TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_SHOW_IN_DSL_GROUP_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(MISSING_CONFIG_ELEMENT_NAME).getDeclaration();
+  }
+
+  public static ComponentElementDeclaration<?> requiresConfigurationOutputTypeKeyResolverOP() {
+    return TEST_EXTENSION_DECLARER
+            .newOperation(REQUIRES_CONFIGURATION_OUTPUT_TYPE_RESOLVER_OP_ELEMENT_NAME)
+            .withParameterGroup(newParameterGroup().withParameter("type", ParameterSimpleValue.of("someType")).getDeclaration())
+            .getDeclaration();
   }
 
   public static ComponentElementDeclaration<?> invalidExtensionDeclaration() {

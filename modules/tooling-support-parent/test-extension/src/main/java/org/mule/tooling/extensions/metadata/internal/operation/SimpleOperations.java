@@ -19,6 +19,7 @@ import org.mule.tooling.extensions.metadata.internal.connection.TstExtensionClie
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessConnectionLessMetadataResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessMetadataResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelPartialTypeKeysOutputTypeResolver;
+import org.mule.tooling.extensions.metadata.internal.metadata.RequiresConfigurationOutputTypeKeyResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelTypeKeysOutputTypeResolver;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterGroupVP;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;
@@ -71,6 +72,13 @@ public class SimpleOperations {
   public Result<String, Object> multiLevelShowInDslGroupPartialTypeKeysMetadataKey(
           @Config SimpleConfiguration configuration,
           @MetadataKeyId(MultiLevelPartialTypeKeysOutputTypeResolver.class) @ParameterGroup(name="LocationKeyShowInDsl", showInDsl = true) LocationKey locationKeyShowInDslParam) {
+    return null;
+  }
+
+  @MediaType(TEXT_PLAIN)
+  @OutputResolver(output = RequiresConfigurationOutputTypeKeyResolver.class)
+  public Result<String, Object> requiresConfigurationOutputTypeKeyResolver(
+          @MetadataKeyId(RequiresConfigurationOutputTypeKeyResolver.class) String type) {
     return null;
   }
 

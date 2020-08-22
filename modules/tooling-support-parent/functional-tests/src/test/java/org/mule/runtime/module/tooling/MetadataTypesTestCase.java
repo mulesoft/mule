@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONENT;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_PAYLOAD;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.MISSING_CONFIG_ELEMENT_NAME;
@@ -24,6 +25,7 @@ import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.conf
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.invalidComponentDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.invalidExtensionDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelCompleteOPDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.requiresConfigurationOutputTypeKeyResolverOP;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelOPDeclarationPartialTypeKeys;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.sourceDeclaration;
 import org.mule.metadata.internal.utils.MetadataTypeWriter;
@@ -155,6 +157,7 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(COMPONENT));
     assertThat(metadataTypes.getFailures().get(0).getMessage(), is("Could not find component: 'ToolingSupportTest:invalid'"));
   }
 
@@ -165,6 +168,7 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(COMPONENT));
     assertThat(metadataTypes.getFailures().get(0).getMessage(),
                is("ElementDeclaration is defined for extension: 'invalid_extension_model' which is not part of the context: '[mule, ToolingSupportTest, module]'"));
   }
@@ -176,10 +180,22 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(COMPONENT));
     assertThat(metadataTypes.getFailures().get(0).getMessage(),
-               is(format("Configuration: '%s' referenced by component: 'ToolingSupportTest:multiLevelShowInDslGroupPartialTypeKeysMetadataKey' is not present",
+               is(format("The resolver requires a configuration but the one referenced by the component declaration with name: '%s' is not present",
                          MISSING_CONFIG_ELEMENT_NAME)));
+  }
 
+  @Test
+  public void operationDoesNotHaveConfigButResolverRequiresConfiguration() {
+    MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
+        session.resolveComponentMetadata(requiresConfigurationOutputTypeKeyResolverOP());
+    assertThat(metadataTypes.isSuccess(), is(false));
+    assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
+    assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(UNKNOWN));
+    assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(OUTPUT_PAYLOAD));
+    assertThat(metadataTypes.getFailures().get(0).getMessage(),
+               is("Configuration is not present, a message from resolver"));
   }
 
 }
