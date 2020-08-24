@@ -113,15 +113,15 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   }
 
   @Override
-  public ValueResult getValues(ParameterizedElementDeclaration component, String parameterName) {
+  public ValueResult getValues(ParameterizedElementDeclaration component, String providerName) {
     try {
-      return withInternalDeclarationSession("getValues()", session -> session.getValues(component, parameterName));
+      return withInternalDeclarationSession("getValues()", session -> session.getValues(component, providerName));
     } catch (NoClassDefFoundError | Exception e) {
-      LOGGER.error(format("Unknown error while resolving values on component: '%s' for parameter: '%s'", component.getName(),
-                          parameterName),
+      LOGGER.error(format("Unknown error while resolving values on component: '%s' for providerName: '%s'", component.getName(),
+                          providerName),
                    e);
       return resultFrom(newFailure()
-          .withMessage(format("Unknown error while resolving values for parameter: '%s'. %s", parameterName,
+          .withMessage(format("Unknown error while resolving values for providerName: '%s'. %s", providerName,
                               getRootCauseMessage(e)))
           .withReason(getStackTrace(e))
           .build());

@@ -83,11 +83,17 @@ public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerT
                                        ParameterizedElementDeclaration elementDeclaration,
                                        String parameterName,
                                        String expectedValue) {
+    ValueResult providerResult = getValueResult(session, elementDeclaration, parameterName);
+    assertThat(providerResult.getValues(), hasSize(1));
+    assertThat(providerResult.getValues().iterator().next().getId(), is(expectedValue));
+  }
+
+  protected ValueResult getValueResult(DeclarationSession session, ParameterizedElementDeclaration elementDeclaration,
+                                       String parameterName) {
     ValueResult providerResult = session.getValues(elementDeclaration, parameterName);
 
     assertThat(providerResult.isSuccess(), equalTo(true));
-    assertThat(providerResult.getValues(), hasSize(1));
-    assertThat(providerResult.getValues().iterator().next().getId(), is(expectedValue));
+    return providerResult;
   }
 
   protected void validateValuesFailure(DeclarationSession session,
@@ -96,9 +102,7 @@ public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerT
                                        String message,
                                        String code,
                                        String... reason) {
-    ValueResult providerResult = session.getValues(elementDeclaration, parameterName);
-
-    assertThat(providerResult.isSuccess(), equalTo(false));
+    ValueResult providerResult = getValueResult(session, elementDeclaration, parameterName);
     assertThat(providerResult.getFailure().isPresent(), is(true));
     final ResolvingFailure failure = providerResult.getFailure().get();
     assertThat(failure.getFailureCode(), is(code));

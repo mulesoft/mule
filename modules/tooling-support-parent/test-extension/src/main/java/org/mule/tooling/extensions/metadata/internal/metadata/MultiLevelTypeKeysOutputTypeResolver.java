@@ -9,15 +9,18 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.FailureCode;
-import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
+import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.tooling.extensions.metadata.api.parameters.LocationKey;
 import org.mule.tooling.extensions.metadata.api.source.StringAttributes;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class MultiLevelPartialTypeKeysOutputTypeResolver extends MultiLevelTypeKeysOutputTypeResolver implements PartialTypeKeysResolver<LocationKey> {
+public class MultiLevelTypeKeysOutputTypeResolver implements TypeKeysResolver, OutputTypeResolver<LocationKey>,
+        InputTypeResolver<LocationKey>, AttributesTypeResolver<LocationKey> {
   // continents
   public static final String AMERICA = "AMERICA";
   public static final String EUROPE = "EUROPE";
@@ -40,31 +43,6 @@ public class MultiLevelPartialTypeKeysOutputTypeResolver extends MultiLevelTypeK
   }
 
   @Override
-  public MetadataKey resolveChilds(MetadataContext context, LocationKey partial)
-          throws MetadataResolvingException, ConnectionException {
-
-    // This is incomplete but you get the idea
-    if (AMERICA.equalsIgnoreCase(partial.getContinent())) {
-
-      if (ARGENTINA.equalsIgnoreCase(partial.getCountry())) {
-        return newKey(AMERICA).withDisplayName(AMERICA)
-                .withChild(newKey(ARGENTINA)
-                                   .withChild(newKey(BUENOS_AIRES))
-                                   .withChild(newKey(LA_PLATA)))
-                .build();
-      }
-
-      return buildAmericaKey();
-
-    } else if (EUROPE.equalsIgnoreCase(partial.getContinent())) {
-      return buildEuropeKey();
-
-    } else {
-      throw new MetadataResolvingException("Invalid Continent", FailureCode.INVALID_METADATA_KEY);
-    }
-  }
-
-  @Override
   public MetadataType getOutputType(MetadataContext metadataContext, LocationKey locationKey) throws MetadataResolvingException, ConnectionException {
     return BaseTypeBuilder.create(JAVA).stringType().defaultValue(locationKey.toString()).build();
   }
@@ -83,11 +61,20 @@ public class MultiLevelPartialTypeKeysOutputTypeResolver extends MultiLevelTypeK
 
   @Override
   public Set<MetadataKey> getKeys(MetadataContext metadataContext) throws MetadataResolvingException, ConnectionException {
-    // populate first level only
-    Set<MetadataKey> keys = new HashSet<>();
-    keys.add(newKey(AMERICA).build());
-    keys.add(newKey(EUROPE).build());
+    Set keys = new HashSet<>();
+    keys.add(buildAmericaKey());
+    keys.add(buildEuropeKey());
     return keys;
+  }
+
+  public static MetadataKey buildEuropeKey() {
+    return newKey(EUROPE).withDisplayName(EUROPE).withChild(newKey(FRANCE).withChild(newKey(PARIS))).build();
+  }
+
+  public static MetadataKey buildAmericaKey() {
+    return newKey(AMERICA).withDisplayName(AMERICA)
+            .withChild(newKey(ARGENTINA).withChild(newKey(BUENOS_AIRES)).withChild(newKey(LA_PLATA)))
+            .withChild(newKey(USA).withDisplayName(USA_DISPLAY_NAME).withChild(newKey(SAN_FRANCISCO))).build();
   }
 
   @Override
