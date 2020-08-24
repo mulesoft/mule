@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method java.util.Map<java.lang.String, java.lang.Object> org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::getClassLoaderModelAttributes(java.util.Optional<java.util.Properties>, org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor, org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "AbstractArtifactDescriptorFactory",
+          "methodName": "getClassLoaderModelAttributes",
+          "elementKind": "method",
+          "justification": "MULE-16230"
+        },
+        {
           "code": "java.class.added",
           "new": "class org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader.NonCachingURLStreamHandlerFactory",
           "package": "org.mule.runtime.module.artifact.api.classloader",

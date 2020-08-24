@@ -192,6 +192,8 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
       } else {
         final List<ZipResource> zipResources = new LinkedList<>(resources);
         zipResources.add(new ZipResource(getArtifactPomFile().getAbsolutePath(), getArtifactFileBundledPomPartialUrl()));
+        zipResources.add(new ZipResource(getArtifactPomPropertiesFile().getAbsolutePath(),
+                                         getArtifactFileBundledPomPropertiesPartialUrl()));
         zipResources.addAll(getCustomResources());
         compress(tempFile, zipResources.toArray(new ZipResource[0]));
       }

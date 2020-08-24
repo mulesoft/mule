@@ -7,13 +7,19 @@
 
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomPropertiesFolder;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomPropertiesFromJar;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -24,6 +30,7 @@ import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderEx
 
 import java.io.File;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.model.Model;
 
@@ -32,6 +39,8 @@ import org.apache.maven.model.Model;
  * {@value ArtifactPluginDescriptor#MULE_PLUGIN_POM} file.
  */
 public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
+
+  private static final String JAR = "jar";
 
   @Override
   public String getId() {
@@ -65,25 +74,42 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           .setClassifier(packagerClassLoaderModel.getArtifactCoordinates().getClassifier())
           .build();
     } else {
-      return getBundleDescriptor(artifactFile);
+      return getBundleDescriptor(artifactFile, artifactType);
     }
   }
 
-  public static BundleDescriptor getBundleDescriptor(File artifactFile) {
-    Model model;
-    if (artifactFile.isDirectory()) {
-      model = getPomModelFolder(artifactFile);
-    } else {
-      model = getPomModelFromJar(artifactFile);
-    }
+  private BundleDescriptor getBundleDescriptor(File artifactFile, ArtifactType artifactType) {
+    BundleDescriptor.Builder builder = new BundleDescriptor.Builder();
 
-    return new BundleDescriptor.Builder()
-        .setArtifactId(model.getArtifactId())
-        .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
-        .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
-        .setType(EXTENSION_BUNDLE_TYPE)
-        .setClassifier(MULE_PLUGIN_CLASSIFIER)
-        .build();
+    if (artifactType.equals(APP) || artifactType.equals(DOMAIN)) {
+      Properties pomProperties;
+      if (artifactFile.isDirectory()) {
+        pomProperties = getPomPropertiesFolder(artifactFile);
+      } else {
+        pomProperties = getPomPropertiesFromJar(artifactFile);
+      }
+      return builder.setGroupId(pomProperties.getProperty("groupId"))
+          .setArtifactId(pomProperties.getProperty("artifactId"))
+          .setVersion(pomProperties.getProperty("version"))
+          .setClassifier(artifactType.equals(APP) ? MULE_APPLICATION_CLASSIFIER : MULE_DOMAIN_CLASSIFIER)
+          .build();
+    } else {
+      Model model;
+      if (artifactFile.isDirectory()) {
+        model = getPomModelFolder(artifactFile);
+      } else {
+        model = getPomModelFromJar(artifactFile);
+      }
+
+      return new BundleDescriptor.Builder()
+          .setArtifactId(model.getArtifactId())
+          .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
+          .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
+          .setType(JAR)
+          // Handle manually the packaging for mule plugin as the mule plugin maven plugin defines the packaging as mule-extension
+          .setClassifier(artifactType.equals(PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging())
+          .build();
+    }
   }
 
   private boolean isHeavyPackage(File artifactFile) {

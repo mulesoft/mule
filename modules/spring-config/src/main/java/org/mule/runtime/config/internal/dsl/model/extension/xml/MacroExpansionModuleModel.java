@@ -291,6 +291,9 @@ public class MacroExpansionModuleModel {
     processorChainBuilder.addParameter("moduleOperation", operationModel.getName(), false);
     Map<String, String> propertiesMap = extractProperties(configRefName);
     Map<String, String> parametersMap = extractParameters(operationRefModel, operationModel.getAllParameterModels());
+    parametersMap.forEach((k, v) -> processorChainBuilder.addParameter(k, v, false));
+    operationRefModel.getParameters().forEach((k, v) -> processorChainBuilder.addParameter(k, v, false));
+
     ComponentModel propertiesComponentModel =
         getParameterChild(propertiesMap, "module-operation-properties", "module-operation-property-entry");
     ComponentModel parametersComponentModel =
@@ -321,6 +324,7 @@ public class MacroExpansionModuleModel {
 
     operationRefModel.getConfigFileName().ifPresent(processorChainBuilder::setConfigFileName);
     operationRefModel.getLineNumber().ifPresent(processorChainBuilder::setLineNumber);
+    operationRefModel.getStartColumn().ifPresent(processorChainBuilder::setStartColumn);
     processorChainBuilder.addCustomAttribute(ORIGINAL_IDENTIFIER, operationRefModel.getIdentifier());
     return processorChainModel;
   }
@@ -620,6 +624,7 @@ public class MacroExpansionModuleModel {
   private ComponentModel buildFrom(ComponentModel componentModelOrigin, ComponentModel.Builder operationReplacementModel) {
     componentModelOrigin.getConfigFileName().ifPresent(operationReplacementModel::setConfigFileName);
     componentModelOrigin.getLineNumber().ifPresent(operationReplacementModel::setLineNumber);
+    componentModelOrigin.getStartColumn().ifPresent(operationReplacementModel::setStartColumn);
     ComponentModel componentModel = operationReplacementModel.build();
     for (ComponentModel child : componentModel.getInnerComponents()) {
       child.setParent(componentModel);

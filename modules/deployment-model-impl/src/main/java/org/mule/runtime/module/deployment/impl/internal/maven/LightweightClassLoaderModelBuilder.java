@@ -13,6 +13,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -46,18 +47,18 @@ import org.apache.maven.model.Plugin;
  */
 public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
 
+  private static final String POM = "pom";
   private MavenClient mavenClient;
   private Set<BundleDependency> nonProvidedDependencies;
   private File temporaryFolder;
 
-  public LightweightClassLoaderModelBuilder(File artifactFolder,
-                                            MavenClient mavenClient,
-                                            Set<BundleDependency> nonProvidedDependencies,
-                                            File temporaryFolder) {
-    super(artifactFolder);
+  public LightweightClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor,
+                                            MavenClient mavenClient, Set<BundleDependency> nonProvidedDependencies) {
+    super(artifactFolder, artifactBundleDescriptor);
     this.mavenClient = mavenClient;
     this.nonProvidedDependencies = nonProvidedDependencies;
-    this.temporaryFolder = temporaryFolder;
+    File localMavenRepositoryLocation = mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation();
+    this.temporaryFolder = new File(localMavenRepositoryLocation, ".mule");
   }
 
   @Override
@@ -152,6 +153,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
       throw new MuleRuntimeException(createStaticMessage("Could not create temporary folder under "
           + temporaryPomFolder.getAbsolutePath()));
     }
+
     Map<BundleDescriptor, Set<BundleDescriptor>> deployableArtifactAdditionalLibrariesMap =
         super.doProcessAdditionalPluginLibraries(packagingPlugin);
     Map<BundleDescriptor, Set<BundleDescriptor>> effectivePluginsAdditionalLibrariesMap =
@@ -161,8 +163,21 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
         .forEach(bundleDependency -> {
           Model effectiveModel;
           try {
-            effectiveModel =
-                mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), of(temporaryPomFolder));
+            // system scope dependencies are always availables and are not looked up in a repository
+            if (bundleDependency.getScope().equals(SYSTEM)) {
+              effectiveModel =
+                  mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), of(temporaryPomFolder));
+            } else {
+              BundleDescriptor descriptor = bundleDependency.getDescriptor();
+              effectiveModel = mavenClient.getEffectiveModel(toFile(mavenClient
+                  .resolveBundleDescriptor(new org.mule.maven.client.api.model.BundleDescriptor.Builder()
+                      .setGroupId(descriptor.getGroupId())
+                      .setArtifactId(descriptor.getArtifactId())
+                      .setVersion(descriptor.getVersion())
+                      .setType(POM)
+                      .build())
+                  .getBundleUri().toURL()), empty());
+            }
           } catch (MalformedURLException e) {
             throw new MuleRuntimeException(e);
           }

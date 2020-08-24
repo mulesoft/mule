@@ -40,8 +40,8 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient, File temporaryFolder) {
-    super(mavenClient, temporaryFolder);
+  public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient) {
+    super(mavenClient);
   }
 
   @Override
@@ -50,18 +50,20 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
   }
 
   @Override
-  protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile, MavenClient mavenClient,
+  protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile,
+                                                                                     BundleDescriptor artifactBundleDescriptor,
+                                                                                     MavenClient mavenClient,
                                                                                      Map<String, Object> attributes,
-                                                                                     Set<BundleDependency> nonProvidedDependencies,
-                                                                                     File temporaryFolder) {
-    return new LightweightClassLoaderModelBuilder(artifactFile, mavenClient, nonProvidedDependencies, temporaryFolder);
+                                                                                     Set<BundleDependency> nonProvidedDependencies) {
+    return new LightweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, mavenClient, nonProvidedDependencies);
   }
 
   @Override
   protected HeavyweightClassLoaderModelBuilder newHeavyWeightClassLoaderModelBuilder(File artifactFile,
+                                                                                     BundleDescriptor artifactBundleDescriptor,
                                                                                      org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
                                                                                      Map<String, Object> attributes) {
-    return new HeavyweightClassLoaderModelBuilder(artifactFile, packagerClassLoaderModel);
+    return new HeavyweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, packagerClassLoaderModel);
   }
 
   @Override

@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static com.google.common.collect.ImmutableList.of;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.empty;
@@ -31,11 +29,11 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.maven.client.api.model.RemoteRepository;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
-import org.mule.tck.junit4.rule.SystemProperty;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,13 +42,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -73,10 +70,10 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
 
   private List<org.mule.maven.client.api.model.BundleDependency> BASE_DEPENDENCIES = asList(API_BUNDLE, LIB_BUNDLE, TRAIT_BUNDLE);
 
+  private MavenClient mockMavenClient = mock(MavenClient.class, RETURNS_DEEP_STUBS);
+
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-  private MavenClient mockMavenClient = mock(MavenClient.class, RETURNS_DEEP_STUBS);
 
   @Test
   @io.qameta.allure.Description("Heavyweight packaged apps will deploy ok with shared libraries information in classloader-model.json")
@@ -185,7 +182,9 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   private ClassLoaderModel buildAndValidateModel(int expectedDependencies) throws Exception {
     File app = toFile(getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, "no-dependencies").toString()));
 
-    when(mockMavenClient.getMavenConfiguration()).thenReturn(mock(MavenConfiguration.class, RETURNS_DEEP_STUBS));
+    MavenConfiguration mockMavenConfiguration = mock(MavenConfiguration.class, RETURNS_DEEP_STUBS);
+    when(mockMavenConfiguration.getLocalMavenRepositoryLocation()).thenReturn(temporaryFolder.newFolder());
+    when(mockMavenClient.getMavenConfiguration()).thenReturn(mockMavenConfiguration);
 
     ClassLoaderModel classLoaderModel = buildClassLoaderModel(app);
     assertThat(classLoaderModel.getDependencies(), hasSize(expectedDependencies));
@@ -240,11 +239,20 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   }
 
   private ClassLoaderModel buildClassLoaderModel(File rootApplication)
-      throws InvalidDescriptorLoaderException, IOException {
+      throws InvalidDescriptorLoaderException {
     DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader =
-        new DeployableMavenClassLoaderModelLoader(mockMavenClient, temporaryFolder.newFolder());
+        new DeployableMavenClassLoaderModelLoader(mockMavenClient);
 
-    return deployableMavenClassLoaderModelLoader.load(rootApplication, emptyMap(), APP);
+    Map<String, Object> attributes =
+        ImmutableMap.of(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
+                        new org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.Builder()
+                            .setGroupId("groupId")
+                            .setArtifactId("artifactId")
+                            .setVersion("1.0.0")
+                            .setType("jar")
+                            .setClassifier("mule-application")
+                            .build());
+    return deployableMavenClassLoaderModelLoader.load(rootApplication, attributes, APP);
   }
 
   private class FileNameMatcher extends TypeSafeMatcher<File> {

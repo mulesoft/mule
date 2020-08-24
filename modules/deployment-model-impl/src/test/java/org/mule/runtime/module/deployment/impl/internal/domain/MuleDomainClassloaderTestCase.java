@@ -25,8 +25,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -53,6 +55,7 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
   private final ClassLoader domainClassloader = mock(ClassLoader.class);
   private final ArtifactContext artifactContext = mock(ArtifactContext.class);
   private final MuleContext muleContext = mock(MuleContext.class);
+  private final LifecycleManager lifecycleManager = mock(LifecycleManager.class);
   private ClassLoader classloaderUsedInDispose;
   private Domain domain;
 
@@ -66,6 +69,10 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
     when(domainDescriptor.getDataFolderName()).thenReturn("dataFolderName");
     when(artifactContextBuilder.build()).thenReturn(artifactContext);
     when(artifactContext.getMuleContext()).thenReturn(muleContext);
+    when(muleContext.getLifecycleManager()).thenReturn(lifecycleManager);
+
+    when(lifecycleManager.isDirectTransition(Stoppable.PHASE_NAME)).thenReturn(true);
+
     domain.init();
     when(artifactClassLoader.getClassLoader()).thenReturn(domainClassloader);
   }
