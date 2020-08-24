@@ -68,6 +68,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.tck.TriggerableMessageSource;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
@@ -82,6 +84,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.slf4j.Logger;
 
@@ -92,6 +95,7 @@ import io.qameta.allure.Story;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
+@RunWith(FlakinessDetectorTestRunner.class)
 public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   private static final Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategyTestCase.class);
@@ -99,8 +103,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Rule
   public ExpectedException expectedException = none();
 
-  public ProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
-    super(mode);
+  public ProactorStreamEmitterProcessingStrategyTestCase() {
+    super(SOURCE);
   }
 
   @Override
@@ -532,7 +536,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   }
 
   @Test
-  @Ignore("MULE-18521")
+  @FlakyTest(times = 500)
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
     assumeThat(mode, is(SOURCE));
 
