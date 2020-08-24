@@ -196,12 +196,17 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                                 .map(event -> right(MessagingException.class, event))
                                                 .doOnNext(r -> errorSwitchSinkSinkRef.next(r)),
                                             inflightEvents,
-                                            () -> errorSwitchSinkSinkRef.complete(),
-                                            t -> errorSwitchSinkSinkRef.error(t)))
+                                            () -> {
+                                              errorSwitchSinkSinkRef.complete();
+                                              disposeIfNeeded(errorRouter, LOGGER);
+                                            },
+                                            t -> {
+                                              errorSwitchSinkSinkRef.error(t);
+                                              disposeIfNeeded(errorRouter, LOGGER);
+                                            }))
                                                 .map(result -> result.reduce(me -> {
                                                   throw propagateWrappingFatal(me);
-                                                }, response -> response))
-                                                .doOnTerminate(() -> disposeIfNeeded(errorRouter, LOGGER));
+                                                }, response -> response));
           });
 
     } else {
