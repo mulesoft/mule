@@ -12,13 +12,16 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArtifact;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.TEST_EXTENSION_DECLARER;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configurationDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.connectionDeclaration;
 import static org.mule.test.infrastructure.maven.MavenTestUtils.getMavenLocalRepository;
 import org.mule.runtime.api.value.ResolvingFailure;
 import org.mule.runtime.api.value.ValueResult;
+import org.mule.runtime.app.declaration.api.ConstructElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ArtifactDeclarer;
+import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;
@@ -84,16 +87,14 @@ public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerT
                                        String parameterName,
                                        String expectedValue) {
     ValueResult providerResult = getValueResult(session, elementDeclaration, parameterName);
+    assertThat(providerResult.isSuccess(), equalTo(true));
     assertThat(providerResult.getValues(), hasSize(1));
     assertThat(providerResult.getValues().iterator().next().getId(), is(expectedValue));
   }
 
   protected ValueResult getValueResult(DeclarationSession session, ParameterizedElementDeclaration elementDeclaration,
                                        String parameterName) {
-    ValueResult providerResult = session.getValues(elementDeclaration, parameterName);
-
-    assertThat(providerResult.isSuccess(), equalTo(true));
-    return providerResult;
+    return session.getValues(elementDeclaration, parameterName);
   }
 
   protected void validateValuesFailure(DeclarationSession session,
@@ -103,6 +104,7 @@ public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerT
                                        String code,
                                        String... reason) {
     ValueResult providerResult = getValueResult(session, elementDeclaration, parameterName);
+    assertThat(providerResult.isSuccess(), is(false));
     assertThat(providerResult.getFailure().isPresent(), is(true));
     final ResolvingFailure failure = providerResult.getFailure().get();
     assertThat(failure.getFailureCode(), is(code));
@@ -110,6 +112,14 @@ public abstract class DeclarationSessionTestCase extends AbstractFakeMuleServerT
     if (reason.length > 0) {
       assertThat(failure.getReason(), containsString(reason[0]));
     }
+  }
+
+  protected ConstructElementDeclaration invalidComponentDeclaration(String component) {
+    return TEST_EXTENSION_DECLARER.newConstruct(component).getDeclaration();
+  }
+
+  protected ConstructElementDeclaration invalidExtensionModel(String invalidExtensionModel) {
+    return ElementDeclarer.forExtension(invalidExtensionModel).newConstruct("invalid").getDeclaration();
   }
 
 }

@@ -101,7 +101,7 @@ public class InternalDeclarationSession implements DeclarationSession {
     return artifactHelper()
         .findConnectionProvider(configName)
         .map(cp -> connectionManager.testConnectivity(cp))
-        .orElseGet(() -> failure(format("Could not perform test connection for configuration: '%s' due to a connection provider is not defined",
+        .orElseGet(() -> failure(format("Could not perform test connection for configuration: '%s'. Connection provider is not defined",
                                         configName),
                                  new MuleRuntimeException(createStaticMessage("Could not find connection provider"))));
   }

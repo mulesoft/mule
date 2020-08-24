@@ -66,17 +66,17 @@ public class ValueProviderExecutor {
   }
 
   public ValueResult resolveValues(ParameterizedModel parameterizedModel,
-                                   ParameterizedElementDeclaration parameterizedElementDeclaration, String parameterName) {
+                                   ParameterizedElementDeclaration parameterizedElementDeclaration, String providerName) {
     try {
       Optional<ConfigurationInstance> optionalConfigurationInstance =
-          getConfigurationInstance(parameterizedModel, parameterizedElementDeclaration, parameterName);
+          getConfigurationInstance(parameterizedModel, parameterizedElementDeclaration, providerName);
 
       ParameterValueResolver parameterValueResolver = parameterValueResolver(parameterizedElementDeclaration, parameterizedModel);
       ValueProviderMediator valueProviderMediator = createValueProviderMediator(parameterizedModel);
 
       ExtensionResolvingContext context = new ExtensionResolvingContext(() -> optionalConfigurationInstance, connectionManager);
       try {
-        return resultFrom(valueProviderMediator.getValues(parameterName,
+        return resultFrom(valueProviderMediator.getValues(providerName,
                                                           parameterValueResolver,
                                                           (CheckedSupplier<Object>) () -> context
                                                               .getConnection().orElse(null),
@@ -94,7 +94,7 @@ public class ValueProviderExecutor {
 
   private Optional<ConfigurationInstance> getConfigurationInstance(ParameterizedModel parameterizedModel,
                                                                    ParameterizedElementDeclaration parameterizedElementDeclaration,
-                                                                   String parameterName)
+                                                                   String providerName)
       throws ValueResolvingException {
     Optional<String> optionalConfigRef = getConfigRef(parameterizedElementDeclaration);
     Optional<ConfigurationInstance> optionalConfigurationInstance = optionalConfigRef
@@ -102,8 +102,7 @@ public class ValueProviderExecutor {
         .orElse(empty());
 
     if (optionalConfigRef.isPresent()) {
-      //TODO CMTS-30 Change this to look for providerName
-      Optional<ValueProviderModel> valueProviderModelOptional = getValueProviderModel(parameterizedModel, parameterName);
+      Optional<ValueProviderModel> valueProviderModelOptional = getValueProviderModel(parameterizedModel, providerName);
       if (valueProviderModelOptional.isPresent() && valueProviderModelOptional.get().requiresConfiguration()
           && !optionalConfigurationInstance.isPresent()) {
         // Improves the error message when configuration is required and not present, as we do the resolve parameter with lazyInit in order
@@ -117,9 +116,10 @@ public class ValueProviderExecutor {
     return optionalConfigurationInstance;
   }
 
-  private Optional<ValueProviderModel> getValueProviderModel(ParameterizedModel parameterizedModel, String parameterName) {
+  private Optional<ValueProviderModel> getValueProviderModel(ParameterizedModel parameterizedModel, String providerName) {
     return parameterizedModel.getAllParameterModels().stream()
-        .filter(parameterModel -> parameterModel.getName().equals(parameterName))
+        .filter(parameterModel -> parameterModel.getValueProviderModel()
+            .map(vpm -> vpm.getProviderName().equals(providerName)).orElse(false))
         .findFirst().flatMap(parameterModel -> parameterModel.getValueProviderModel());
   }
 

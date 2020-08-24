@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.tooling;
 
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configurationDeclaration;
@@ -43,10 +44,12 @@ public class ConnectivityTestingTestCase extends DeclarationSessionTestCase {
 
   @Test
   public void testConnectionWrongConfigurationName() {
-    ConnectionValidationResult connectionValidationResult = session.testConnection("invalidConfigName");
+    String invalidConfigName = "invalidConfigName";
+    ConnectionValidationResult connectionValidationResult = session.testConnection(invalidConfigName);
     assertThat(connectionValidationResult.isValid(), equalTo(false));
     assertThat(connectionValidationResult.getMessage(),
-               equalTo("Could not perform test connection for configuration: 'invalidConfigName' due to a connection provider is not defined"));
+               equalTo(format("Could not perform test connection for configuration: '%s'. Connection provider is not defined",
+                              invalidConfigName)));
   }
 
 }

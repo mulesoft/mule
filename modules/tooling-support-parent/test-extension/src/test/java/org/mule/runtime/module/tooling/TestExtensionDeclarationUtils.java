@@ -25,7 +25,6 @@ public class TestExtensionDeclarationUtils {
 
   public static final ElementDeclarer TEST_EXTENSION_DECLARER = ElementDeclarer.forExtension("ToolingSupportTest");
 
-  public static final String MISSING_CONFIG_ELEMENT_NAME = "missingConfigRefName";
   public static final String CONFIG_ELEMENT_NAME = "config";
   public static final String CONNECTION_ELEMENT_NAME = "tstConnection";
 
@@ -225,9 +224,8 @@ public class TestExtensionDeclarationUtils {
             .getDeclaration();
   }
 
-  public static SourceElementDeclaration sourceDeclaration(String configName, String continentParameter,
-                                                     String countryParameter) {
-    return sourceDeclaration(configName, null, continentParameter, countryParameter);
+  public static SourceElementDeclaration sourceDeclaration(String configName, String continent, String country) {
+    return sourceDeclaration(configName, null, continent, country);
   }
 
   public static SourceElementDeclaration sourceDeclaration(String configName, String actingParameter) {
@@ -253,22 +251,7 @@ public class TestExtensionDeclarationUtils {
                                           .withParameter(ACTING_PARAMETER_NAME, actingParameter)
                                           .getDeclaration());
     }
-
-    ParameterGroupElementDeclarer parameterGroupElementDeclarer = newParameterGroup("LocationKey");
-
-    if (continentParameter != null) {
-      parameterGroupElementDeclarer.withParameter("continent", ParameterSimpleValue.of(continentParameter));
-    }
-    if (countryParameter != null) {
-      parameterGroupElementDeclarer.withParameter("country", ParameterSimpleValue.of(countryParameter));
-    }
-    if (cityParameter != null) {
-      parameterGroupElementDeclarer.withParameter("city", ParameterSimpleValue.of(cityParameter));
-    }
-    if (continentParameter != null || countryParameter != null || cityParameter != null) {
-      sourceElementDeclarer.withParameterGroup(parameterGroupElementDeclarer.getDeclaration());
-    }
-
+    setLocationParameterGroup(continentParameter, countryParameter, cityParameter, sourceElementDeclarer, "LocationKey");
     return sourceElementDeclarer.getDeclaration();
   }
 
@@ -276,7 +259,7 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, elementDeclarer, "LocationKey");
+    setLocationParameterGroup(continent, country, null, elementDeclarer, "LocationKey");
     return elementDeclarer.getDeclaration();
   }
 
@@ -284,7 +267,7 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, elementDeclarer, "LocationKey");
+    setLocationParameterGroup(continent, country, null, elementDeclarer, "LocationKey");
     return elementDeclarer.getDeclaration();
   }
 
@@ -292,18 +275,21 @@ public class TestExtensionDeclarationUtils {
     SourceElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newSource(SOURCE_WITH_MULTI_LEVEL_VALUE)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, elementDeclarer, "values");
+    setLocationParameterGroup(continent, country, null, elementDeclarer, "values");
 
     return elementDeclarer.getDeclaration();
   }
 
-  private static void setLocationParameterGroup(String continent, String country, ParameterizedElementDeclarer elementDeclarer, String locationKey) {
+  private static void setLocationParameterGroup(String continent, String country, String city, ParameterizedElementDeclarer elementDeclarer, String locationKey) {
     ParameterGroupElementDeclarer parameterGroupElementDeclarer = newParameterGroup(locationKey);
     if (continent != null) {
       parameterGroupElementDeclarer.withParameter("continent", ParameterSimpleValue.of(continent));
     }
     if (country != null) {
       parameterGroupElementDeclarer.withParameter("country", ParameterSimpleValue.of(country));
+    }
+    if (city != null) {
+      parameterGroupElementDeclarer.withParameter("city", ParameterSimpleValue.of(city));
     }
 
     if (continent != null || country != null) {
@@ -316,20 +302,7 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    ParameterGroupElementDeclarer parameterGroupElementDeclarer = newParameterGroup("LocationKey");
-    if (continent != null) {
-      parameterGroupElementDeclarer.withParameter("continent", ParameterSimpleValue.of(continent));
-    }
-    if (country != null) {
-      parameterGroupElementDeclarer.withParameter("country", ParameterSimpleValue.of(country));
-    }
-    if (city != null) {
-      parameterGroupElementDeclarer.withParameter("city", ParameterSimpleValue.of(city));
-    }
-
-    if (continent != null || country != null) {
-      elementDeclarer.withParameterGroup(parameterGroupElementDeclarer.getDeclaration());
-    }
+    setLocationParameterGroup(continent, country, city, elementDeclarer, "LocationKey");
     return elementDeclarer.getDeclaration();
   }
 
@@ -341,42 +314,15 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_SHOW_IN_DSL_GROUP_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    ParameterGroupElementDeclarer parameterGroupElementDeclarer = newParameterGroup("LocationKeyShowInDsl");
-    if (continent != null) {
-      parameterGroupElementDeclarer.withParameter("continent", ParameterSimpleValue.of(continent));
-    }
-    if (country != null) {
-      parameterGroupElementDeclarer.withParameter("country", ParameterSimpleValue.of(country));
-    }
-    if (city != null) {
-      parameterGroupElementDeclarer.withParameter("city", ParameterSimpleValue.of(city));
-    }
-
-    if (continent != null || country != null || city != null) {
-      elementDeclarer.withParameterGroup(parameterGroupElementDeclarer.getDeclaration());
-    }
+    setLocationParameterGroup(continent, country, city, elementDeclarer, "LocationKeyShowInDsl");
     return elementDeclarer.getDeclaration();
   }
 
-  public static ComponentElementDeclaration<?> invalidComponentDeclaration() {
-    return TEST_EXTENSION_DECLARER.newConstruct("invalid").getDeclaration();
-  }
-
-  public static ComponentElementDeclaration<?> componentDeclarationWrongConfigRef() {
-    return TEST_EXTENSION_DECLARER
-            .newOperation(MULTI_LEVEL_SHOW_IN_DSL_GROUP_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
-            .withConfig(MISSING_CONFIG_ELEMENT_NAME).getDeclaration();
-  }
-
-  public static ComponentElementDeclaration<?> requiresConfigurationOutputTypeKeyResolverOP() {
+  public static ComponentElementDeclaration<?> requiresConfigurationOutputTypeKeyResolverOP(String type) {
     return TEST_EXTENSION_DECLARER
             .newOperation(REQUIRES_CONFIGURATION_OUTPUT_TYPE_RESOLVER_OP_ELEMENT_NAME)
-            .withParameterGroup(newParameterGroup().withParameter("type", ParameterSimpleValue.of("someType")).getDeclaration())
+            .withParameterGroup(newParameterGroup().withParameter("type", ParameterSimpleValue.of(type)).getDeclaration())
             .getDeclaration();
-  }
-
-  public static ComponentElementDeclaration<?> invalidExtensionDeclaration() {
-    return ElementDeclarer.forExtension("invalid_extension_model").newConstruct("invalid").getDeclaration();
   }
 
 }

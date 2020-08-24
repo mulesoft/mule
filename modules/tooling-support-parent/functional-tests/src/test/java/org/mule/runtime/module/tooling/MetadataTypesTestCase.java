@@ -18,15 +18,12 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONENT;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_PAYLOAD;
-import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.MISSING_CONFIG_ELEMENT_NAME;
-import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.componentDeclarationWrongConfigRef;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessConnectionLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessOPDeclaration;
-import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.invalidComponentDeclaration;
-import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.invalidExtensionDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelCompleteOPDeclaration;
-import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.requiresConfigurationOutputTypeKeyResolverOP;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelOPDeclarationPartialTypeKeys;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelShowInDslGroupOPDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.requiresConfigurationOutputTypeKeyResolverOP;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.sourceDeclaration;
 import org.mule.metadata.internal.utils.MetadataTypeWriter;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
@@ -152,44 +149,49 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
 
   @Test
   public void componentNotFoundOnDeclaration() {
+    String invalidComponentName = "invalid";
     MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
-        session.resolveComponentMetadata(invalidComponentDeclaration());
-    assertThat(metadataTypes.isSuccess(), is(false));
-    assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
-    assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
-    assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(COMPONENT));
-    assertThat(metadataTypes.getFailures().get(0).getMessage(), is("Could not find component: 'ToolingSupportTest:invalid'"));
-  }
-
-  @Test
-  public void extensionModelNotFound() {
-    MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
-        session.resolveComponentMetadata(invalidExtensionDeclaration());
+        session.resolveComponentMetadata(invalidComponentDeclaration(invalidComponentName));
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
     assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(COMPONENT));
     assertThat(metadataTypes.getFailures().get(0).getMessage(),
-               is("ElementDeclaration is defined for extension: 'invalid_extension_model' which is not part of the context: '[mule, ToolingSupportTest, module]'"));
+               is(format("Could not find component: 'ToolingSupportTest:%s'", invalidComponentName)));
+  }
+
+  @Test
+  public void extensionModelNotFound() {
+    String invalidExtensionModel = "invalidExtensionName";
+    MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
+        session.resolveComponentMetadata(invalidExtensionModel(invalidExtensionModel));
+    assertThat(metadataTypes.isSuccess(), is(false));
+    assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
+    assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(COMPONENT));
+    assertThat(metadataTypes.getFailures().get(0).getMessage(),
+               is(format("ElementDeclaration is defined for extension: '%s' which is not part of the context: '[mule, ToolingSupportTest, module]'",
+                         invalidExtensionModel)));
   }
 
   @Test
   public void configRefNotFound() {
+    String missingConfigName = "missingConfigName";
     MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
-        session.resolveComponentMetadata(componentDeclarationWrongConfigRef());
+        session.resolveComponentMetadata(multiLevelShowInDslGroupOPDeclaration(missingConfigName, null, null));
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
     assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(COMPONENT));
     assertThat(metadataTypes.getFailures().get(0).getMessage(),
                is(format("The resolver requires a configuration but the one referenced by the component declaration with name: '%s' is not present",
-                         MISSING_CONFIG_ELEMENT_NAME)));
+                         missingConfigName)));
   }
 
   @Test
   public void failOnOperationDoesNotHaveConfigButResolverRequiresConfiguration() {
     MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
-        session.resolveComponentMetadata(requiresConfigurationOutputTypeKeyResolverOP());
+        session.resolveComponentMetadata(requiresConfigurationOutputTypeKeyResolverOP("someType"));
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), IsCollectionWithSize.hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(UNKNOWN));
