@@ -253,7 +253,7 @@
         <muleMetadataExtensionTestVersion>4.1.6-20200824</muleMetadataExtensionTestVersion>
         <muleVeganExtensionTestVersion>4.1.6-20200824</muleVeganExtensionTestVersion>
         <muleHeisenbergExtensionTestVersion>4.1.6-20200824</muleHeisenbergExtensionTestVersion>
-        <muleMarvelExtensionTestVersion>4.1.6-HF-SNAPSHOT</muleMarvelExtensionTestVersion>
+        <muleMarvelExtensionTestVersion>4.1.6-20200824</muleMarvelExtensionTestVersion>
         <mulePetstoreExtensionTestVersion>4.1.6-HF-SNAPSHOT</mulePetstoreExtensionTestVersion>
         <muleSubtypesExtensionTestVersion>4.1.6-HF-SNAPSHOT</muleSubtypesExtensionTestVersion>
 
