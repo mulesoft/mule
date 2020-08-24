@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStrategyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory.TransactionAwareProactorStreamEmitterProcessingStrategy;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.Collection;
@@ -37,20 +36,20 @@ import org.junit.After;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(FlakinessDetectorTestRunner.class)
+@RunWith(Parameterized.class)
 @Feature(PROCESSING_STRATEGIES)
 @Story(DEFAULT)
 public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     extends ProactorStreamEmitterProcessingStrategyTestCase
     implements TransactionAwareProcessingStrategyTestCase {
 
-  public TransactionAwareProactorStreamEmitterProcessingStrategyTestCase() {
-    super();
+  public TransactionAwareProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
+    super(mode);
   }
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Mode> parameters() {
-    return asList(Mode.FLOW, SOURCE);
+    return asList(new Mode[] {Mode.FLOW, SOURCE});
   }
 
   @After
