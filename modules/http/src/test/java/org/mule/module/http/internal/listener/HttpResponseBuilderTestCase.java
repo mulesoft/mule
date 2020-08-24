@@ -31,7 +31,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleContextTestCase
         int contentLengthDifferingPayloadSize = 12;
         MuleEvent event = mockEvent(new ByteArrayInputStream(EXAMPLE_STRING.getBytes(UTF_8)), contentLengthDifferingPayloadSize);
 
-        HttpResponse httpResponse = httpResponseBuilder.build(new org.mule.module.http.internal.domain.response.HttpResponseBuilder(), event);
+        HttpResponse httpResponse = httpResponseBuilder.build(new org.mule.module.http.internal.domain.response.HttpResponseBuilder(), event, null);
         assertThat(httpResponse.getHeaderValue(CONTENT_LENGTH), is(String.valueOf(EXAMPLE_STRING.length())));
     }
 
