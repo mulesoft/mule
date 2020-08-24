@@ -228,7 +228,7 @@
         <staxonVersion>1.2</staxonVersion>
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
         <unirestVersion>1.4.9</unirestVersion>
-        <weaveVersion>2.1.8-CH-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.1.8-CH-SE-10548-SE-10638-SE-10706-SE-9379-SE-11664-DW-112</weaveVersion>
         <woodstoxVersion>4.4.1</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
