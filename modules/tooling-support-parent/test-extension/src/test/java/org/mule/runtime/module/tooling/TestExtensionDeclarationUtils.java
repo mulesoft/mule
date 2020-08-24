@@ -334,10 +334,27 @@ public class TestExtensionDeclarationUtils {
   }
 
   public static OperationElementDeclaration multiLevelShowInDslGroupOPDeclaration(String configName, String continent, String country) {
+    return multiLevelShowInDslGroupOPDeclaration(configName, continent, country, null);
+  }
+
+  public static OperationElementDeclaration multiLevelShowInDslGroupOPDeclaration(String configName, String continent, String country, String city) {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_SHOW_IN_DSL_GROUP_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, elementDeclarer, "LocationKeyShowInDsl");
+    ParameterGroupElementDeclarer parameterGroupElementDeclarer = newParameterGroup("LocationKeyShowInDsl");
+    if (continent != null) {
+      parameterGroupElementDeclarer.withParameter("continent", ParameterSimpleValue.of(continent));
+    }
+    if (country != null) {
+      parameterGroupElementDeclarer.withParameter("country", ParameterSimpleValue.of(country));
+    }
+    if (city != null) {
+      parameterGroupElementDeclarer.withParameter("city", ParameterSimpleValue.of(city));
+    }
+
+    if (continent != null || country != null || city != null) {
+      elementDeclarer.withParameterGroup(parameterGroupElementDeclarer.getDeclaration());
+    }
     return elementDeclarer.getDeclaration();
   }
 

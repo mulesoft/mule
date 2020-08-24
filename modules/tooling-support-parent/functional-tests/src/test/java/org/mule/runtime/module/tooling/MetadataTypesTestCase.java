@@ -187,7 +187,7 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
   }
 
   @Test
-  public void operationDoesNotHaveConfigButResolverRequiresConfiguration() {
+  public void failOnOperationDoesNotHaveConfigButResolverRequiresConfiguration() {
     MetadataResult<ComponentMetadataTypesDescriptor> metadataTypes =
         session.resolveComponentMetadata(requiresConfigurationOutputTypeKeyResolverOP());
     assertThat(metadataTypes.isSuccess(), is(false));

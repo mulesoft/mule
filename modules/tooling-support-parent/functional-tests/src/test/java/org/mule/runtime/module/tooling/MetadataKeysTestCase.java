@@ -149,7 +149,7 @@ public class MetadataKeysTestCase extends DeclarationSessionTestCase {
   }
 
   @Test
-  public void operationDoesNotHaveConfigButResolverRequiresConfiguration() {
+  public void failOnOperationDoesNotHaveConfigButResolverRequiresConfiguration() {
     MetadataResult<MetadataKeysContainer> metadataKeys = session.getMetadataKeys(requiresConfigurationOutputTypeKeyResolverOP());
     assertThat(metadataKeys.isSuccess(), is(false));
     assertThat(metadataKeys.getFailures(), hasSize(1));
