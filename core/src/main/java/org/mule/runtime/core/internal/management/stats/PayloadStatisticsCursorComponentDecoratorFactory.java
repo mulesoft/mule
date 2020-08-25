@@ -6,13 +6,18 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Iterator;
+
+import org.apache.commons.collections.iterators.AbstractIteratorDecorator;
 
 class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponentDecoratorFactory {
 
@@ -66,4 +71,51 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
       return NO_OP_INSTANCE.decorateOutput(decorated, correlationId);
     }
   }
+
+  @Override
+  public Collection<Result> decorateOutputResultCollection(Collection<Result> decorated,
+                                                           String correlationId) {
+    if (payloadStatistics.isEnabled()) {
+      payloadStatistics.addOutputObjectCount(decorated.size());
+      return decorated.stream()
+          .map(r -> decorateResult(r, correlationId))
+          .collect(toList());
+    } else {
+      return NO_OP_INSTANCE.decorateOutputResultCollection(decorated, correlationId);
+    }
+  }
+
+  @Override
+  public Iterator<Result> decorateOutputResultIterator(Iterator<Result> decorated, String correlationId) {
+    if (payloadStatistics.isEnabled()) {
+      return decorateOutput(new AbstractIteratorDecorator(decorated) {
+
+        @Override
+        public Object next() {
+          return decorateResult((Result) super.next(), correlationId);
+        }
+      }, correlationId);
+    } else {
+      return NO_OP_INSTANCE.decorateOutputResultIterator(decorated, correlationId);
+    }
+  }
+
+  private Result decorateResult(Result decorated, String correlationId) {
+    Object decoratedOutput;
+
+    if (decorated.getOutput() instanceof InputStream) {
+      decoratedOutput = decorateOutput((InputStream) decorated.getOutput(), correlationId);
+    } else if (decorated.getOutput() instanceof Iterator) {
+      decoratedOutput = decorateOutput((Iterator) decorated.getOutput(), correlationId);
+    } else {
+      decoratedOutput = decorated.getOutput();
+    }
+
+    if (decoratedOutput == decorated.getOutput()) {
+      return decorated;
+    } else {
+      return decorated.copy().output(decoratedOutput).build();
+    }
+  }
+
 }

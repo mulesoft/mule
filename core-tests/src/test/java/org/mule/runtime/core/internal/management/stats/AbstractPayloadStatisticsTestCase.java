@@ -17,20 +17,21 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.management.stats.AllStatistics;
+import org.mule.runtime.core.api.management.stats.PayloadStatistics;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
-import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.management.stats.PayloadStatistics;
-import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class AbstractPayloadStatisticsTestCase extends AbstractMuleContextTestCase {
 
@@ -104,5 +105,9 @@ public class AbstractPayloadStatisticsTestCase extends AbstractMuleContextTestCa
     public Optional<Integer> getTotalResults(Object con) {
       return of(totalSize);
     }
+  }
+
+  protected AllStatistics getStatistics() {
+    return muleContext.getStatistics();
   }
 }
