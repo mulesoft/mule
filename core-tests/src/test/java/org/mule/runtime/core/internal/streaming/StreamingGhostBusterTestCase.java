@@ -28,42 +28,42 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.lang.ref.WeakReference;
 
 @Feature(STREAMING)
-public class StreamingGhostBusterTestCase  extends AbstractMuleContextTestCase {
+public class StreamingGhostBusterTestCase extends AbstractMuleContextTestCase {
 
-    private StreamingGhostBuster ghostBuster;
+  private StreamingGhostBuster ghostBuster;
 
-    @Override
-    protected void doSetUp() throws Exception {
-        ghostBuster = new StreamingGhostBuster();
-        initialiseIfNeeded(ghostBuster, true, muleContext);
-        startIfNeeded(ghostBuster);
+  @Override
+  protected void doSetUp() throws Exception {
+    ghostBuster = new StreamingGhostBuster();
+    initialiseIfNeeded(ghostBuster, true, muleContext);
+    startIfNeeded(ghostBuster);
+  }
+
+  @Override
+  protected void doTearDown() throws MuleException {
+    ghostBuster.stop();
+    ghostBuster.dispose();
+  }
+
+  @Test
+  public void releaseResourcesWhenReferenceIsCollected() {
+    MutableStreamingStatistics statistics = mock(MutableStreamingStatistics.class);
+    CursorStreamProvider provider = mock(CursorStreamProvider.class);
+    ManagedCursorStreamProvider managedCursorProvider = new ManagedCursorStreamProvider(of(provider), statistics);
+
+    WeakReference<ManagedCursorProvider> reference = ghostBuster.track(managedCursorProvider);
+
+    // Force GC collection
+    managedCursorProvider = null;
+    gc();
+    assertThat(reference.get(), is(nullValue()));
+
+    try {
+      sleep(1000);
+    } catch (InterruptedException e) {
+      // ignore
     }
-
-    @Override
-    protected void doTearDown() throws MuleException {
-        ghostBuster.stop();
-        ghostBuster.dispose();
-    }
-
-    @Test
-    public void releaseResourcesWhenReferenceIsCollected() {
-        MutableStreamingStatistics statistics = mock(MutableStreamingStatistics.class);
-        CursorStreamProvider provider = mock(CursorStreamProvider.class);
-        ManagedCursorStreamProvider managedCursorProvider = new ManagedCursorStreamProvider(of(provider), statistics);
-
-        WeakReference<ManagedCursorProvider> reference = ghostBuster.track(managedCursorProvider);
-
-        // Force GC collection
-        managedCursorProvider = null;
-        gc();
-        assertThat(reference.get(), is(nullValue()));
-
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            // ignore
-        }
-        verify(provider).releaseResources();
-    }
+    verify(provider).releaseResources();
+  }
 
 }
