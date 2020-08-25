@@ -60,11 +60,40 @@ public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTes
   }
 
   @Test
+  public void decorateSimpleCursorStreamProviderTwice() {
+    CursorStreamProvider provider = mock(CursorStreamProvider.class);
+    IdentifiableCursorProviderDecorator decorator = IdentifiableCursorProviderDecorator.of(provider);
+    assertThat(decorator.getDelegate(), is(sameInstance(provider)));
+    assertThat(decorator, is(instanceOf(CursorStreamProvider.class)));
+
+    IdentifiableCursorProviderDecorator decoratorTwice = IdentifiableCursorProviderDecorator.of(decorator);
+    assertThat(decoratorTwice.getDelegate(), is(sameInstance(provider)));
+    assertThat(decoratorTwice, is(instanceOf(CursorStreamProvider.class)));
+    assertThat(decoratorTwice, is(sameInstance(decorator)));
+
+    getId(decorator);
+  }
+
+  @Test
   public void decorateSimpleCursorIteratorProvider() {
     CursorIteratorProvider provider = mock(CursorIteratorProvider.class);
     IdentifiableCursorProviderDecorator decorator = IdentifiableCursorProviderDecorator.of(provider);
     assertThat(decorator.getDelegate(), is(sameInstance(provider)));
     assertThat(decorator, is(instanceOf(CursorIteratorProvider.class)));
+    getId(decorator);
+  }
+
+  @Test
+  public void decorateSimpleCursorIteratorProviderTwice() {
+    CursorIteratorProvider provider = mock(CursorIteratorProvider.class);
+    IdentifiableCursorProviderDecorator decorator = IdentifiableCursorProviderDecorator.of(provider);
+    assertThat(decorator.getDelegate(), is(sameInstance(provider)));
+    assertThat(decorator, is(instanceOf(CursorIteratorProvider.class)));
+
+    IdentifiableCursorProviderDecorator decoratorTwice = IdentifiableCursorProviderDecorator.of(decorator);
+    assertThat(decoratorTwice.getDelegate(), is(sameInstance(provider)));
+    assertThat(decoratorTwice, is(instanceOf(CursorIteratorProvider.class)));
+    assertThat(decoratorTwice, is(sameInstance(decorator)));
     getId(decorator);
   }
 

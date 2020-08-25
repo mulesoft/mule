@@ -49,6 +49,9 @@ public abstract class IdentifiableCursorProviderDecorator<T extends Cursor> exte
    */
   public static <T extends Cursor> IdentifiableCursorProviderDecorator<T> of(CursorProvider<T> cursorProvider) {
     final CursorProvider<T> root = cursorProvider;
+    if (cursorProvider instanceof IdentifiableCursorProviderDecorator) {
+      return (IdentifiableCursorProviderDecorator<T>) cursorProvider;
+    }
     Integer id = null;
     do {
       if (cursorProvider instanceof IdentifiableCursorProvider) {

@@ -221,6 +221,7 @@ class ForeachRouter {
       // Support EventBuilderConfigurer currently used by Batch Module
       EventBuilderConfigurer configurer = (EventBuilderConfigurer) currentValue.getValue();
       configurer.configure(partEventBuilder);
+
       Runnable onCompleteConsumer = configurer::eventCompleted;
       foreachContext.setOnComplete(onCompleteConsumer);
 

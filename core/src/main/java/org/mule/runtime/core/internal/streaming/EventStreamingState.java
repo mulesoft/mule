@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static java.lang.System.identityHashCode;
-import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.STREAMING_VERBOSE;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
 import java.lang.ref.WeakReference;
@@ -65,12 +65,11 @@ public class EventStreamingState {
                                                         ManagedCursorProvider provider,
                                                         StreamingGhostBuster ghostBuster) {
     return providers.get(id, k -> {
-      if (LOGGER.isDebugEnabled()) {
+      if (STREAMING_VERBOSE) {
         CursorProvider innerDelegate = unwrap(provider);
         Optional<ComponentLocation> originatingLocation = provider.getOriginatingLocation();
-        LOGGER.debug(format("Added ManagedCursorProvider: %s for delegate: %s opened by: %s", k, identityHashCode(innerDelegate),
-                            originatingLocation.map(ComponentLocation::getLocation)
-                                .orElse("unknown")));
+        LOGGER.info("Added ManagedCursorProvider: {} for delegate: {} opened by: {}", k, identityHashCode(innerDelegate),
+                    originatingLocation.map(ComponentLocation::getLocation).orElse("unknown"));
       }
       return ghostBuster.track(provider);
     }).get();

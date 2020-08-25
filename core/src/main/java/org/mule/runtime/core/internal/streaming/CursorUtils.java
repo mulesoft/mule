@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.runtime.api.util.MuleSystemProperties.STREAMING_VERBOSE_PROPERTY;
+
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 
@@ -17,6 +20,8 @@ import org.mule.runtime.api.streaming.CursorProvider;
 public final class CursorUtils {
 
   private CursorUtils() {}
+
+  public static final boolean STREAMING_VERBOSE = getBoolean(STREAMING_VERBOSE_PROPERTY);
 
   /**
    * Used to get the original {@link CursorProvider} when {@link CursorProviderDecorator} is used.

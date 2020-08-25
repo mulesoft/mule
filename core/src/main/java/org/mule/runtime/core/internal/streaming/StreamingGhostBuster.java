@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.STREAMING_VERBOSE;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -119,12 +119,11 @@ public class StreamingGhostBuster implements Lifecycle {
 
   private void bust(StreamingWeakReference ghost) {
     try {
-      if (LOGGER.isDebugEnabled()) {
+      if (STREAMING_VERBOSE) {
         CursorProvider innerDelegate = unwrap(ghost.janitor.provider);
         Optional<ComponentLocation> originatingLocation = ghost.janitor.provider.getOriginatingLocation();
-        LOGGER.debug(format("StreamingGhostBuster disposing ghost: %s, provider: %s created by %s ", ghost.id,
-                            identityHashCode(innerDelegate), originatingLocation.map(ComponentLocation::getLocation)
-                                .orElse("unknown")));
+        LOGGER.info("StreamingGhostBuster disposing ghost: {}, provider: {} created by {}", ghost.id,
+                    identityHashCode(innerDelegate), originatingLocation.map(ComponentLocation::getLocation).orElse("unknown"));
       }
       ghost.dispose();
     } catch (Exception e) {
