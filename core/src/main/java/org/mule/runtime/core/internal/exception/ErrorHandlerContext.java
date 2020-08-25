@@ -42,6 +42,10 @@ public class ErrorHandlerContext {
     items.put(parameterId, new ErrorHandlerContextItem(exception, originalEvent, successCallback, errorCallback));
   }
 
+  public void removeContextItem(String parameterId) {
+    items.remove(parameterId);
+  }
+
   public Exception getException(String parameterId) {
     return items.get(parameterId).exception;
   }
