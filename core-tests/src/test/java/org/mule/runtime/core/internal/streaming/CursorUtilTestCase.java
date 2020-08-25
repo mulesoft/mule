@@ -16,6 +16,7 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STREAM_MANAGEMENT;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -24,6 +25,7 @@ import org.junit.Test;
 
 @Feature(STREAMING)
 @Story(STREAM_MANAGEMENT)
+@Issue("MULE-18573")
 public class CursorUtilTestCase extends AbstractMuleTestCase {
 
   @Test

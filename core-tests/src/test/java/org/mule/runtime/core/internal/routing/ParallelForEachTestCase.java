@@ -134,7 +134,6 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Description("When a custom target is configured the router result is set in a variable and the input event is output.")
-  @Issue("MULE-18573")
   public void customTargetMessage() throws Exception {
     final String variableName = "foo";
 
@@ -186,6 +185,7 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Description("Cursor provider should be managed by cursor manager inside parallel-foreach.")
+  @Issue("MULE-18573")
   public void cursorStreamShouldBeManagedByCursorManager() throws Exception {
     CursorProvider cursorProvider = mock(CursorStreamProvider.class);
     CoreEvent original = getEventBuilder().message(Message.of(singletonList(cursorProvider))).build();
