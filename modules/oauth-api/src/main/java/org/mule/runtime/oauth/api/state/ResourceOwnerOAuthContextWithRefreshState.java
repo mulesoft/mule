@@ -114,6 +114,9 @@ public final class ResourceOwnerOAuthContextWithRefreshState implements Resource
 
   @Override
   public void setDancerState(DancerState dancerState) {
+    if (dancerState == NO_TOKEN) {
+      this.accessToken = null;
+    }
     this.dancerState = dancerState;
   }
 
