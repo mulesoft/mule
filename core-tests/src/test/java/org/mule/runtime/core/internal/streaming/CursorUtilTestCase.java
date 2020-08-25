@@ -25,16 +25,17 @@ import org.junit.Test;
 
 @Feature(STREAMING)
 @Story(STREAM_MANAGEMENT)
-@Issue("MULE-18573")
 public class CursorUtilTestCase extends AbstractMuleTestCase {
 
   @Test
+  @Issue("MULE-18573")
   public void unwrapNonDecoratedProvider() {
     CursorProvider provider = mock(CursorProvider.class);
     assertThat(unwrap(provider), is(sameInstance(provider)));
   }
 
   @Test
+  @Issue("MULE-18573")
   public void unwrapOneLevelDecorator() {
     CursorProvider provider = mock(CursorProvider.class);
     CursorProviderDecorator decorator = mock(CursorProviderDecorator.class);
@@ -44,6 +45,7 @@ public class CursorUtilTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("MULE-18573")
   public void unwrap42thLevelDecorator() {
     CursorProvider provider = mock(CursorProvider.class);
     CursorProviderDecorator decorator = mock(CursorProviderDecorator.class);

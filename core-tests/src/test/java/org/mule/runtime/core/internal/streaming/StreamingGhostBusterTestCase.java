@@ -33,7 +33,6 @@ import java.lang.ref.WeakReference;
 
 @Feature(STREAMING)
 @Story(STREAM_MANAGEMENT)
-@Issue("MULE-18573")
 public class StreamingGhostBusterTestCase extends AbstractMuleContextTestCase {
 
   private static final int GC_POLLING_TIMEOUT = 10000;
@@ -54,6 +53,7 @@ public class StreamingGhostBusterTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  @Issue("MULE-18573")
   public void releaseResourcesWhenReferenceIsCollected() {
     MutableStreamingStatistics statistics = mock(MutableStreamingStatistics.class);
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
