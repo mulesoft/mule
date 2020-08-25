@@ -41,6 +41,7 @@ public class TestExtensionDeclarationUtils {
   public static final String CONFIG_LESS_CONNECTION_LESS_OP_ELEMENT_NAME = "configLessConnectionLessOP";
   public static final String CONFIG_LESS_OP_ELEMENT_NAME = "configLessOP";
   public static final String ACTING_PARAMETER_OP_ELEMENT_NAME = "actingParameterOP";
+  public static final String PARAMETER_VALUE_PROVIDER_OP_ELEMENT_NAME = "parameterValueProviderWithConfig";
   public static final String COMPLEX_ACTING_PARAMETER_OP_ELEMENT_NAME = "complexActingParameterOP";
   public static final String ACTING_PARAMETER_GROUP_OP_ELEMENT_NAME = "actingParameterGroupOP";
   public static final String NESTED_PARAMETERS_OP_ELEMENT_NAME = "nestedVPsOperation";
@@ -62,6 +63,8 @@ public class TestExtensionDeclarationUtils {
   public static final String MULTI_LEVEL_METADATA_KEY_OP_ELEMENT_NAME = "multiLevelTypeKeyMetadataKey";
   public static final String MULTI_LEVEL_SHOW_IN_DSL_GROUP_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME =
           "multiLevelShowInDslGroupPartialTypeKeysMetadataKey";
+
+  public static final String REQUIRES_CONFIGURATION_OUTPUT_TYPE_RESOLVER_OP_ELEMENT_NAME = "requiresConfigurationOutputTypeKeyResolver";
 
   public static ConfigurationElementDeclaration configurationDeclaration(String name, ConnectionElementDeclaration connection) {
     ConfigurationElementDeclarer configurationElementDeclarer = TEST_EXTENSION_DECLARER.newConfiguration(CONFIG_ELEMENT_NAME)
@@ -121,9 +124,14 @@ public class TestExtensionDeclarationUtils {
                                         .withParameter(ACTING_PARAMETER_NAME, actingParameter)
                                         .getDeclaration())
             .getDeclaration();
-
   }
 
+  public static OperationElementDeclaration parameterValueProviderWithConfig(String configName) {
+    return TEST_EXTENSION_DECLARER
+            .newOperation(PARAMETER_VALUE_PROVIDER_OP_ELEMENT_NAME)
+            .withConfig(configName)
+            .getDeclaration();
+  }
 
   public static ParameterValue innerPojo(int intParam,
                                          String stringParam,
@@ -216,9 +224,8 @@ public class TestExtensionDeclarationUtils {
             .getDeclaration();
   }
 
-  public static SourceElementDeclaration sourceDeclaration(String configName, String continentParameter,
-                                                     String countryParameter) {
-    return sourceDeclaration(configName, null, continentParameter, countryParameter);
+  public static SourceElementDeclaration sourceDeclaration(String configName, String continent, String country) {
+    return sourceDeclaration(configName, null, continent, country);
   }
 
   public static SourceElementDeclaration sourceDeclaration(String configName, String actingParameter) {
@@ -244,22 +251,7 @@ public class TestExtensionDeclarationUtils {
                                           .withParameter(ACTING_PARAMETER_NAME, actingParameter)
                                           .getDeclaration());
     }
-
-    ParameterGroupElementDeclarer parameterGroupElementDeclarer = newParameterGroup("LocationKey");
-
-    if (continentParameter != null) {
-      parameterGroupElementDeclarer.withParameter("continent", ParameterSimpleValue.of(continentParameter));
-    }
-    if (countryParameter != null) {
-      parameterGroupElementDeclarer.withParameter("country", ParameterSimpleValue.of(countryParameter));
-    }
-    if (cityParameter != null) {
-      parameterGroupElementDeclarer.withParameter("city", ParameterSimpleValue.of(cityParameter));
-    }
-    if (continentParameter != null || countryParameter != null || cityParameter != null) {
-      sourceElementDeclarer.withParameterGroup(parameterGroupElementDeclarer.getDeclaration());
-    }
-
+    setLocationParameterGroup(continentParameter, countryParameter, cityParameter, sourceElementDeclarer, "LocationKey");
     return sourceElementDeclarer.getDeclaration();
   }
 
@@ -267,7 +259,7 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, elementDeclarer, "LocationKey");
+    setLocationParameterGroup(continent, country, null, elementDeclarer, "LocationKey");
     return elementDeclarer.getDeclaration();
   }
 
@@ -275,7 +267,7 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, elementDeclarer, "LocationKey");
+    setLocationParameterGroup(continent, country, null, elementDeclarer, "LocationKey");
     return elementDeclarer.getDeclaration();
   }
 
@@ -283,31 +275,13 @@ public class TestExtensionDeclarationUtils {
     SourceElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newSource(SOURCE_WITH_MULTI_LEVEL_VALUE)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, elementDeclarer, "values");
+    setLocationParameterGroup(continent, country, null, elementDeclarer, "values");
 
     return elementDeclarer.getDeclaration();
   }
 
-  private static void setLocationParameterGroup(String continent, String country, ParameterizedElementDeclarer elementDeclarer, String locationKey) {
+  private static void setLocationParameterGroup(String continent, String country, String city, ParameterizedElementDeclarer elementDeclarer, String locationKey) {
     ParameterGroupElementDeclarer parameterGroupElementDeclarer = newParameterGroup(locationKey);
-    if (continent != null) {
-      parameterGroupElementDeclarer.withParameter("continent", ParameterSimpleValue.of(continent));
-    }
-    if (country != null) {
-      parameterGroupElementDeclarer.withParameter("country", ParameterSimpleValue.of(country));
-    }
-
-    if (continent != null || country != null) {
-      elementDeclarer.withParameterGroup(parameterGroupElementDeclarer.getDeclaration());
-    }
-  }
-
-  public static OperationElementDeclaration multiLevelCompleteOPDeclaration(String configName, String continent, String country,
-                                                                      String city) {
-    OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
-            .newOperation(MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
-            .withConfig(configName);
-    ParameterGroupElementDeclarer parameterGroupElementDeclarer = newParameterGroup("LocationKey");
     if (continent != null) {
       parameterGroupElementDeclarer.withParameter("continent", ParameterSimpleValue.of(continent));
     }
@@ -321,19 +295,34 @@ public class TestExtensionDeclarationUtils {
     if (continent != null || country != null) {
       elementDeclarer.withParameterGroup(parameterGroupElementDeclarer.getDeclaration());
     }
+  }
+
+  public static OperationElementDeclaration multiLevelCompleteOPDeclaration(String configName, String continent, String country,
+                                                                      String city) {
+    OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
+            .newOperation(MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
+            .withConfig(configName);
+    setLocationParameterGroup(continent, country, city, elementDeclarer, "LocationKey");
     return elementDeclarer.getDeclaration();
   }
 
   public static OperationElementDeclaration multiLevelShowInDslGroupOPDeclaration(String configName, String continent, String country) {
+    return multiLevelShowInDslGroupOPDeclaration(configName, continent, country, null);
+  }
+
+  public static OperationElementDeclaration multiLevelShowInDslGroupOPDeclaration(String configName, String continent, String country, String city) {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_SHOW_IN_DSL_GROUP_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, elementDeclarer, "LocationKeyShowInDsl");
+    setLocationParameterGroup(continent, country, city, elementDeclarer, "LocationKeyShowInDsl");
     return elementDeclarer.getDeclaration();
   }
 
-  public static ComponentElementDeclaration<?> invalidComponentDeclaration() {
-    return TEST_EXTENSION_DECLARER.newConstruct("invalid").getDeclaration();
+  public static ComponentElementDeclaration<?> requiresConfigurationOutputTypeKeyResolverOP(String type) {
+    return TEST_EXTENSION_DECLARER
+            .newOperation(REQUIRES_CONFIGURATION_OUTPUT_TYPE_RESOLVER_OP_ELEMENT_NAME)
+            .withParameterGroup(newParameterGroup().withParameter("type", ParameterSimpleValue.of(type)).getDeclaration())
+            .getDeclaration();
   }
 
 }

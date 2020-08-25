@@ -7,6 +7,7 @@
 package org.mule.runtime.module.tooling.internal.utils;
 
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
@@ -20,6 +21,7 @@ import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
@@ -30,6 +32,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ArtifactHelper {
@@ -47,10 +50,13 @@ public class ArtifactHelper {
   }
 
   public ExtensionModel getExtensionModel(ElementDeclaration declaration) {
-    return extensionManager
-        .getExtension(declaration.getDeclaringExtension())
+    return findExtension(declaration)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("There is no extensionModel for extension: %s",
                                                                         declaration.getDeclaringExtension())));
+  }
+
+  public Optional<ExtensionModel> findExtension(ElementDeclaration declaration) {
+    return extensionManager.getExtension(declaration.getDeclaringExtension());
   }
 
   public <T> Class<T> getParameterClass(ParameterModel parameterModel, ElementDeclaration containerDeclaration) {
@@ -58,12 +64,24 @@ public class ArtifactHelper {
 
   }
 
-  public <T extends ParameterizedModel & EnrichableModel> Optional<T> findModel(ElementDeclaration elementDeclaration) {
-    return ArtifactHelperUtils.findModel(getExtensionModel(elementDeclaration), elementDeclaration);
+  public <T extends ParameterizedModel & EnrichableModel> Optional<T> findModel(ExtensionModel extensionModel,
+                                                                                ElementDeclaration elementDeclaration) {
+    return ArtifactHelperUtils.findModel(extensionModel, elementDeclaration);
   }
 
-  public Optional<? extends ComponentModel> findComponentModel(ComponentElementDeclaration<?> componentDeclaration) {
-    return findModel(componentDeclaration).filter(m -> m instanceof ComponentModel).map(m -> (ComponentModel) m);
+  public Optional<? extends ComponentModel> findComponentModel(ExtensionModel extensionModel,
+                                                               ComponentElementDeclaration<?> componentDeclaration) {
+    return findModel(extensionModel, componentDeclaration).filter(m -> m instanceof ComponentModel).map(m -> (ComponentModel) m);
+  }
+
+  public boolean hasParameterOfType(ComponentModel componentModel,
+                                    StereotypeModel referenceStereotype) {
+    return componentModel.getAllParameterModels()
+        .stream()
+        .filter(paramModel -> paramModel.getAllowedStereotypes()
+            .stream()
+            .anyMatch(allowed -> allowed.isAssignableTo(referenceStereotype)))
+        .findAny().isPresent();
   }
 
   public Optional<ConfigurationElementDeclaration> findConfigurationDeclaration(String configName) {
@@ -96,6 +114,10 @@ public class ArtifactHelper {
 
   public Optional<ConfigurationInstance> getConfigurationInstance(String configName) {
     return findConfigurationProvider(configName).map(cp -> cp.get(getNullEvent()));
+  }
+
+  public List<String> getExtensions() {
+    return extensionManager.getExtensions().stream().map(extensionModel -> extensionModel.getName()).collect(toList());
   }
 
 }

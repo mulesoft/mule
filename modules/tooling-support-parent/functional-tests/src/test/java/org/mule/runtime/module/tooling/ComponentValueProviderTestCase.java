@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
@@ -21,8 +22,8 @@ import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.comp
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessConnectionLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.innerPojo;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.parameterValueProviderWithConfig;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.sourceWithMultiLevelValue;
-import static org.mule.sdk.api.values.ValueResolvingException.UNKNOWN;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
@@ -161,8 +162,26 @@ public class ComponentValueProviderTestCase extends DeclarationSessionTestCase {
                 .getDeclaration())
             .getDeclaration();
     validateValuesFailure(session, operationElementDeclaration, "anyParameter",
-                          "There is no extensionModel for extension: WrongExtension", UNKNOWN);
+                          "ElementDeclaration is defined for extension: 'WrongExtension' which is not part of the context: '[mule, ToolingSupportTest, module]'",
+                          COMPONENT_NOT_FOUND.getName());
   }
+
+  @Test
+  public void missingConfigRef() {
+    OperationElementDeclaration operationElementDeclaration = parameterValueProviderWithConfig(null);
+    validateValuesFailure(session, operationElementDeclaration, PROVIDED_PARAMETER_NAME,
+                          "The value provider requires a configuration and none was provided",
+                          MISSING_REQUIRED_PARAMETERS);
+  }
+
+  @Test
+  public void notFoundConfigRef() {
+    OperationElementDeclaration operationElementDeclaration = parameterValueProviderWithConfig("missing_config_ref");
+    validateValuesFailure(session, operationElementDeclaration, PROVIDED_PARAMETER_NAME,
+                          "The provider requires a configuration but the one referenced by element declaration with name: 'missing_config_ref' is not present",
+                          COMPONENT_NOT_FOUND.getName());
+  }
+
 
   @Test
   public void getValuesOnParameterWithNoValueProvider() {
@@ -178,6 +197,7 @@ public class ComponentValueProviderTestCase extends DeclarationSessionTestCase {
     ComponentElementDeclaration elementDeclaration = sourceWithMultiLevelValue(CONFIG_NAME, "America", "USA");
     // ProviderName is groupName
     ValueResult valueResult = getValueResult(session, elementDeclaration, "values");
+    assertThat(valueResult.isSuccess(), is(true));
     // ValueResult for multi level no matter if previous levels are set it would always return the whole tree
     assertThat(valueResult.getValues(), hasSize(1));
     Value america = valueResult.getValues().stream().findFirst().get();

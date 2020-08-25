@@ -13,12 +13,11 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.tooling.internal.config.params.ParameterSimpleValueExtractor.extractSimpleValue;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
@@ -40,12 +39,12 @@ import java.util.Map;
  */
 public class MetadataKeyDeclarationResolver {
 
-  private ParameterizedModel parameterizedModel;
+  private ComponentModel componentModel;
   private ComponentElementDeclaration componentElementDeclaration;
 
-  public MetadataKeyDeclarationResolver(ParameterizedModel parameterizedModel,
+  public MetadataKeyDeclarationResolver(ComponentModel componentModel,
                                         ComponentElementDeclaration componentElementDeclaration) {
-    this.parameterizedModel = parameterizedModel;
+    this.componentModel = componentModel;
     this.componentElementDeclaration = componentElementDeclaration;
   }
 
@@ -54,7 +53,7 @@ public class MetadataKeyDeclarationResolver {
   }
 
   public MetadataKeyResult resolveKeyResult() {
-    List<ParameterModel> keyPartModels = getMetadataKeyParts(parameterizedModel);
+    List<ParameterModel> keyPartModels = getMetadataKeyParts(componentModel);
 
     if (keyPartModels.isEmpty()) {
       return new MetadataKeyResult(MetadataKeyBuilder.newKey(NullMetadataKey.ID).build());
@@ -63,7 +62,7 @@ public class MetadataKeyDeclarationResolver {
     MetadataKeyBuilder rootMetadataKeyBuilder = null;
     MetadataKeyBuilder metadataKeyBuilder = null;
     Map<String, String> keyPartValues =
-        getMetadataKeyPartsValuesFromComponentDeclaration(componentElementDeclaration, parameterizedModel);
+        getMetadataKeyPartsValuesFromComponentDeclaration(componentElementDeclaration, componentModel);
     for (ParameterModel parameterModel : keyPartModels) {
       String id;
       if (keyPartValues.containsKey(parameterModel.getName())) {
@@ -101,19 +100,19 @@ public class MetadataKeyDeclarationResolver {
     return new MetadataKeyResult(metadataKey, partialMessage);
   }
 
-  private List<ParameterModel> getMetadataKeyParts(ParameterizedModel parameterizedModel) {
-    return parameterizedModel.getAllParameterModels().stream()
+  private List<ParameterModel> getMetadataKeyParts(ComponentModel componentModel) {
+    return componentModel.getAllParameterModels().stream()
         .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
         .sorted(comparingInt(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder()))
         .collect(toList());
   }
 
   private Map<String, String> getMetadataKeyPartsValuesFromComponentDeclaration(ComponentElementDeclaration componentElementDeclaration,
-                                                                                ParameterizedModel parameterizedModel) {
+                                                                                ComponentModel componentModel) {
     Map<String, String> parametersMap = new HashMap<>();
 
     Map<String, ParameterGroupModel> parameterGroups =
-        parameterizedModel.getParameterGroupModels().stream().collect(toMap(NamedObject::getName, identity()));
+        componentModel.getParameterGroupModels().stream().collect(toMap(NamedObject::getName, identity()));
 
     for (ParameterGroupElementDeclaration parameterGroupElement : componentElementDeclaration.getParameterGroups()) {
       final String parameterGroupName = parameterGroupElement.getName();

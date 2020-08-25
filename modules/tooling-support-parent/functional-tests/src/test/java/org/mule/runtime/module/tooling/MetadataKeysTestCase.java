@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.module.tooling;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
+import static org.mule.runtime.api.metadata.resolving.MetadataComponent.KEYS;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessConnectionLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessOPDeclaration;
-import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.invalidComponentDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelOPDeclarationPartialTypeKeys;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelShowInDslGroupOPDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.requiresConfigurationOutputTypeKeyResolverOP;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.sourceDeclaration;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -110,9 +113,55 @@ public class MetadataKeysTestCase extends DeclarationSessionTestCase {
 
   @Test
   public void componentNotFoundOnDeclaration() {
-    MetadataResult<MetadataKeysContainer> metadataKeys = session.getMetadataKeys(invalidComponentDeclaration());
+    String invalidComponentName = "invalid";
+    MetadataResult<MetadataKeysContainer> metadataKeys =
+        session.getMetadataKeys(invalidComponentDeclaration(invalidComponentName));
     assertThat(metadataKeys.isSuccess(), is(false));
     assertThat(metadataKeys.getFailures(), hasSize(1));
     assertThat(metadataKeys.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataKeys.getFailures().get(0).getFailingComponent(), is(KEYS));
+    assertThat(metadataKeys.getFailures().get(0).getMessage(),
+               is(format("Could not find component: 'ToolingSupportTest:%s'", invalidComponentName)));
   }
+
+  @Test
+  public void extensionModelNotFound() {
+    String invalidExtensionModel = "invalidExtension";
+    MetadataResult<MetadataKeysContainer> metadataKeys = session.getMetadataKeys(
+                                                                                 invalidExtensionModel(invalidExtensionModel));
+    assertThat(metadataKeys.isSuccess(), is(false));
+    assertThat(metadataKeys.getFailures(), hasSize(1));
+    assertThat(metadataKeys.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataKeys.getFailures().get(0).getFailingComponent(), is(KEYS));
+    assertThat(metadataKeys.getFailures().get(0).getMessage(),
+               is(format("ElementDeclaration is defined for extension: '%s' which is not part of the context: '[mule, ToolingSupportTest, module]'",
+                         invalidExtensionModel)));
+  }
+
+  @Test
+  public void configRefNotFound() {
+    String missingConfigName = "missingConfigName";
+    MetadataResult<MetadataKeysContainer> metadataKeys =
+        session.getMetadataKeys(multiLevelShowInDslGroupOPDeclaration(missingConfigName, null, null));
+    assertThat(metadataKeys.isSuccess(), is(false));
+    assertThat(metadataKeys.getFailures(), hasSize(1));
+    assertThat(metadataKeys.getFailures().get(0).getFailureCode(), is(COMPONENT_NOT_FOUND));
+    assertThat(metadataKeys.getFailures().get(0).getFailingComponent(), is(KEYS));
+    assertThat(metadataKeys.getFailures().get(0).getMessage(),
+               is(format("The resolver requires a configuration but the one referenced by the component declaration with name: '%s' is not present",
+                         missingConfigName)));
+  }
+
+  @Test
+  public void failOnOperationDoesNotHaveConfigButResolverRequiresConfiguration() {
+    MetadataResult<MetadataKeysContainer> metadataKeys =
+        session.getMetadataKeys(requiresConfigurationOutputTypeKeyResolverOP("someType"));
+    assertThat(metadataKeys.isSuccess(), is(false));
+    assertThat(metadataKeys.getFailures(), hasSize(1));
+    assertThat(metadataKeys.getFailures().get(0).getFailureCode(), is(UNKNOWN));
+    assertThat(metadataKeys.getFailures().get(0).getFailingComponent(), is(KEYS));
+    assertThat(metadataKeys.getFailures().get(0).getMessage(),
+               is("Configuration is not present, a message from resolver"));
+  }
+
 }
