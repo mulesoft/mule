@@ -94,6 +94,7 @@ public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTes
   }
 
   @Test
+  @Issue("MULE-18573")
   public void decorateSimpleCursorIteratorProviderTwice() {
     CursorIteratorProvider provider = mock(CursorIteratorProvider.class);
     IdentifiableCursorProviderDecorator decorator = IdentifiableCursorProviderDecorator.of(provider);
