@@ -10,7 +10,7 @@ import static java.lang.System.identityHashCode;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.mule.runtime.core.internal.streaming.CursorUtils.STREAMING_VERBOSE;
+import static org.mule.runtime.core.internal.streaming.CursorManager.STREAMING_VERBOSE;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
 import org.mule.runtime.api.component.location.ComponentLocation;

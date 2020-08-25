@@ -15,7 +15,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STREAM_MANAGEMENT;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -30,6 +34,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+@Feature(STREAMING)
+@Story(STREAM_MANAGEMENT)
 public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTestCase {
 
   private static List<Integer> COLLECTED_IDS;

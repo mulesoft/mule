@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.STREAMING_VERBOSE_PROPERTY;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -26,6 +28,8 @@ import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProv
  * @since 4.0
  */
 public class CursorManager {
+
+  public static final boolean STREAMING_VERBOSE = getBoolean(STREAMING_VERBOSE_PROPERTY);
 
   private final MutableStreamingStatistics statistics;
   private final StreamingGhostBuster ghostBuster;

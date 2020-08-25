@@ -34,6 +34,7 @@ import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ParallelForEachStory.PARALLEL_FOR_EACH;
 import static reactor.core.publisher.Flux.from;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -133,6 +134,7 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Description("When a custom target is configured the router result is set in a variable and the input event is output.")
+  @Issue("MULE-18573")
   public void customTargetMessage() throws Exception {
     final String variableName = "foo";
 

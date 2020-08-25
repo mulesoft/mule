@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.streaming;
 
 import static java.lang.System.identityHashCode;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.mule.runtime.core.internal.streaming.CursorUtils.STREAMING_VERBOSE;
+import static org.mule.runtime.core.internal.streaming.CursorManager.STREAMING_VERBOSE;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
 import java.lang.ref.WeakReference;
