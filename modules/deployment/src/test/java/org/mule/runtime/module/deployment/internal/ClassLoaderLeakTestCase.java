@@ -199,7 +199,6 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   @Test
   @Issue("MULE-18480")
-  @Ignore("MULE-18520")
   @Description("When an artifact is redeployed through the deployment service by name, objects associated to the original deployment are released before deploying the new one.")
   public void redeployByNamePreviousAppEagerlyGCd() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
