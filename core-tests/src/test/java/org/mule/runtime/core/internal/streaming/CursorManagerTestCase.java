@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 import static org.mule.tck.probe.PollingProber.check;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -87,6 +88,7 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     executorService = Executors.newFixedThreadPool(threadCount);
 
     final CursorProvider cursorProvider = mock(CursorStreamProvider.class);
+    IdentifiableCursorProvider identifiableCursorProvider = IdentifiableCursorProviderDecorator.of(cursorProvider);
 
     for (int i = 0; i < threadCount; i++) {
       executorService.submit(() -> {
@@ -95,7 +97,7 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
         } catch (InterruptedException e) {
           // doesn't matter
         }
-        CursorProvider managed = cursorManager.manage(cursorProvider, ctx);
+        CursorProvider managed = cursorManager.manage(identifiableCursorProvider, ctx);
         synchronized (managedProviders) {
           managedProviders.add(managed);
         }
@@ -108,7 +110,7 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     assertThat(managedProviders.get(0), is(instanceOf(ManagedCursorProvider.class)));
 
     ManagedCursorProvider managedProvider = (ManagedCursorProvider) managedProviders.get(0);
-    assertThat(managedProvider.getDelegate(), is(sameInstance(cursorProvider)));
+    assertThat(unwrap(managedProvider), is(sameInstance(cursorProvider)));
     assertThat(managedProviders.stream().allMatch(p -> p == managedProvider), is(true));
 
     verify(ghostBuster).track(managedProvider);
