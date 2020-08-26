@@ -15,7 +15,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STREAM_MANAGEMENT;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -30,6 +35,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+@Feature(STREAMING)
+@Story(STREAM_MANAGEMENT)
 public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTestCase {
 
   private static List<Integer> COLLECTED_IDS;
@@ -51,6 +58,7 @@ public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTes
   }
 
   @Test
+  @Issue("MULE-18573")
   public void decorateSimpleCursorStreamProvider() {
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     IdentifiableCursorProviderDecorator decorator = IdentifiableCursorProviderDecorator.of(provider);
@@ -60,6 +68,23 @@ public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTes
   }
 
   @Test
+  @Issue("MULE-18573")
+  public void decorateSimpleCursorStreamProviderTwice() {
+    CursorStreamProvider provider = mock(CursorStreamProvider.class);
+    IdentifiableCursorProviderDecorator decorator = IdentifiableCursorProviderDecorator.of(provider);
+    assertThat(decorator.getDelegate(), is(sameInstance(provider)));
+    assertThat(decorator, is(instanceOf(CursorStreamProvider.class)));
+
+    IdentifiableCursorProviderDecorator decoratorTwice = IdentifiableCursorProviderDecorator.of(decorator);
+    assertThat(decoratorTwice.getDelegate(), is(sameInstance(provider)));
+    assertThat(decoratorTwice, is(instanceOf(CursorStreamProvider.class)));
+    assertThat(decoratorTwice, is(sameInstance(decorator)));
+
+    getId(decorator);
+  }
+
+  @Test
+  @Issue("MULE-18573")
   public void decorateSimpleCursorIteratorProvider() {
     CursorIteratorProvider provider = mock(CursorIteratorProvider.class);
     IdentifiableCursorProviderDecorator decorator = IdentifiableCursorProviderDecorator.of(provider);
@@ -69,6 +94,22 @@ public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTes
   }
 
   @Test
+  @Issue("MULE-18573")
+  public void decorateSimpleCursorIteratorProviderTwice() {
+    CursorIteratorProvider provider = mock(CursorIteratorProvider.class);
+    IdentifiableCursorProviderDecorator decorator = IdentifiableCursorProviderDecorator.of(provider);
+    assertThat(decorator.getDelegate(), is(sameInstance(provider)));
+    assertThat(decorator, is(instanceOf(CursorIteratorProvider.class)));
+
+    IdentifiableCursorProviderDecorator decoratorTwice = IdentifiableCursorProviderDecorator.of(decorator);
+    assertThat(decoratorTwice.getDelegate(), is(sameInstance(provider)));
+    assertThat(decoratorTwice, is(instanceOf(CursorIteratorProvider.class)));
+    assertThat(decoratorTwice, is(sameInstance(decorator)));
+    getId(decorator);
+  }
+
+  @Test
+  @Issue("MULE-18573")
   public void decorateIdentifiableCursorStreamProvider() {
     IdentifiableCursorProvider provider =
         mock(IdentifiableCursorProvider.class, withSettings().extraInterfaces(CursorStreamProvider.class));
@@ -82,6 +123,7 @@ public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTes
   }
 
   @Test
+  @Issue("MULE-18573")
   public void decorateIdentifiableCursorIteratorProvider() {
     IdentifiableCursorProvider provider =
         mock(IdentifiableCursorProvider.class, withSettings().extraInterfaces(CursorIteratorProvider.class));
@@ -95,6 +137,7 @@ public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTes
   }
 
   @Test
+  @Issue("MULE-18573")
   public void doubleDecorateCursorStreamProvider() {
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     CursorProviderDecorator firstDecorator =
@@ -108,6 +151,7 @@ public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTes
   }
 
   @Test
+  @Issue("MULE-18573")
   public void doubleDecorateIdentifiableCursorStreamProvider() {
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     CursorProviderDecorator firstDecorator =
@@ -124,6 +168,7 @@ public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTes
   }
 
   @Test
+  @Issue("MULE-18573")
   public void doubleDecorateCursorIteratorProvider() {
     CursorIteratorProvider provider = mock(CursorIteratorProvider.class);
     CursorProviderDecorator firstDecorator =
@@ -137,6 +182,7 @@ public class IdentifiableCursorProviderDecoratorTestCase extends AbstractMuleTes
   }
 
   @Test
+  @Issue("MULE-18573")
   public void doubleDecorateIdentifiableCursorIteratorProvider() {
     CursorIteratorProvider provider = mock(CursorIteratorProvider.class);
     CursorProviderDecorator firstDecorator =

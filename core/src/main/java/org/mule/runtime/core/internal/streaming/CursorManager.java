@@ -6,9 +6,14 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static java.lang.Boolean.getBoolean;
+import static java.lang.System.identityHashCode;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.STREAMING_VERBOSE_PROPERTY;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -21,11 +26,13 @@ import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProv
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.lang.ref.WeakReference;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import org.slf4j.Logger;
 
 /**
  * Keeps track of active {@link Cursor cursors} and their {@link CursorProvider providers}
@@ -33,6 +40,9 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
  * @since 4.0
  */
 public class CursorManager {
+
+  public static final boolean STREAMING_VERBOSE = getBoolean(STREAMING_VERBOSE_PROPERTY);
+  private static final Logger LOGGER = getLogger(CursorManager.class);
 
   private final LoadingCache<BaseEventContext, EventStreamingState> registry =
       Caffeine.newBuilder()
@@ -114,7 +124,15 @@ public class CursorManager {
     }
 
     private ManagedCursorProvider getOrAddManagedProvider(ManagedCursorProvider provider, int hash) {
-      return providers.get(hash, k -> ghostBuster.track(provider)).get();
+      return providers.get(hash, k -> {
+        if (STREAMING_VERBOSE) {
+          CursorProvider innerDelegate = unwrap(provider);
+          Optional<ComponentLocation> originatingLocation = provider.getOriginatingLocation();
+          LOGGER.info("Added ManagedCursorProvider: {} for delegate: {} opened by: {}", k, identityHashCode(innerDelegate),
+                      originatingLocation.map(ComponentLocation::getLocation).orElse("unknown"));
+        }
+        return ghostBuster.track(provider);
+      }).get();
     }
 
     private void dispose() {

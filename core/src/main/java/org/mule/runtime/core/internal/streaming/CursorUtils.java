@@ -12,7 +12,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 /**
  * Utilities for handling {@link Cursor cursors}
  *
- * @since 4.3.0 - 4.2.3
+ * @since 4.4, 4.3.1, 4.2.3
  */
 public final class CursorUtils {
 

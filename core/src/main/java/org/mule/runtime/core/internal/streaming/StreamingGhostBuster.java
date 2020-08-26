@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-
+import static java.lang.System.identityHashCode;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.mule.runtime.core.internal.streaming.CursorManager.STREAMING_VERBOSE;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
+
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -20,11 +24,13 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.slf4j.Logger;
 
 /**
@@ -113,6 +119,12 @@ public class StreamingGhostBuster implements Lifecycle {
 
   private void bust(StreamingWeakReference ghost) {
     try {
+      if (STREAMING_VERBOSE) {
+        CursorProvider innerDelegate = unwrap(ghost.janitor.provider);
+        Optional<ComponentLocation> originatingLocation = ghost.janitor.provider.getOriginatingLocation();
+        LOGGER.info("StreamingGhostBuster disposing ghost: {}, provider: {} created by {}", ghost.id,
+                    identityHashCode(innerDelegate), originatingLocation.map(ComponentLocation::getLocation).orElse("unknown"));
+      }
       ghost.dispose();
     } catch (Exception e) {
       if (LOGGER.isWarnEnabled()) {
@@ -136,12 +148,14 @@ public class StreamingGhostBuster implements Lifecycle {
    */
   private class StreamingWeakReference extends WeakReference<ManagedCursorProvider> {
 
+    private final int id;
     private final CursorProviderJanitor janitor;
     private boolean clear = false;
 
     public StreamingWeakReference(ManagedCursorProvider referent, ReferenceQueue<ManagedCursorProvider> referenceQueue) {
       super(referent, referenceQueue);
       this.janitor = referent.getJanitor();
+      this.id = referent.getId();
     }
 
     public void dispose() {
