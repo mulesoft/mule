@@ -11,6 +11,7 @@ import static java.time.Duration.ofMillis;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.core.internal.exception.ErrorHandlerContext.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static reactor.core.Exceptions.propagate;
@@ -31,8 +32,10 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
@@ -151,6 +154,9 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                                                                    onTimeout(processingStrategy, delayErrors, timeoutErrorType,
                                                                              pair),
                                                                    timeoutScheduler)
+                                                          .map(event -> (CoreEvent) ((DefaultEventBuilder) CoreEvent
+                                                              .builder(event)).removeInternalParameter(ERROR_HANDLER_CONTEXT)
+                                                                  .build())
                                                           .onErrorResume(MessagingException.class,
                                                                          me -> delayErrors ? just(me.getEvent()) : error(me))
 
