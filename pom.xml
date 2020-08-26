@@ -221,7 +221,7 @@
         <powermockVersion>1.6.6</powermockVersion>
         <quartzVersion>2.3.2</quartzVersion>
         <reflectionsVersion>0.9.9</reflectionsVersion>
-        <rhinoVersion>1.7.11</rhinoVersion>
+        <rhinoVersion>1.7.12</rhinoVersion>
         <rhinoJsr223Version>1.1</rhinoJsr223Version>
         <romeVersion>1.12.2</romeVersion>
         <saajVersion>1.3</saajVersion>
