@@ -11,6 +11,7 @@ import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.Files.lines;
 import static java.util.Arrays.asList;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
@@ -21,6 +22,7 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
+import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentStatusTracker.DeploymentState.DEPLOYED;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_EE_SERVICE_NAME;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_SERVICE_NAME;
 
@@ -233,7 +235,15 @@ public class Controller {
   }
 
   protected boolean isDeployed(String appName) {
-    return new File(appsDir, appName + ANCHOR_SUFFIX).exists();
+    return new File(appsDir, appName + ANCHOR_SUFFIX).exists() && isDeployedMessageAtLogs(appName);
+  }
+
+  protected boolean isDeployedMessageAtLogs(String appName) {
+    try {
+      return lines(getLog().toPath()).anyMatch(l -> l.contains(appName) && l.contains(DEPLOYED.toString()));
+    } catch (IOException e) {
+      return false;
+    }
   }
 
   protected boolean wasRemoved(String appName) {
@@ -241,7 +251,7 @@ public class Controller {
   }
 
   protected boolean isDomainDeployed(String domainName) {
-    return new File(domainsDir, domainName + ANCHOR_SUFFIX).exists();
+    return new File(domainsDir, domainName + ANCHOR_SUFFIX).exists() && isDeployedMessageAtLogs(domainName);
   }
 
   /**
