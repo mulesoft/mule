@@ -2021,6 +2021,7 @@
                                             <message>No Snapshots Allowed in Deps!</message>
                                             <excludes>
                                                 <exclude>org.mule.tests:test-components</exclude>
+                                                <exclude>org.mule.tooling:tooling-support-test-extension</exclude>
                                             </excludes>
                                         </requireReleaseDeps>
                                         <requireReleaseVersion>
