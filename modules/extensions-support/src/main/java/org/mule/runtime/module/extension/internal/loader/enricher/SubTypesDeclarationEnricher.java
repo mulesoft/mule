@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -77,12 +76,11 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
     }
 
     typeMappings.forEach(mapping -> {
-      final MetadataType baseType = mapping.getClassValue(SubTypeMapping::baseType).asMetadataType();
-      final List<MetadataType> subTypes = mapping.getClassArrayValue(SubTypeMapping::subTypes)
-          .stream()
+      final Type baseType = mapping.getClassValue(SubTypeMapping::baseType);
+      final List<Type> subTypes = mapping.getClassArrayValue(SubTypeMapping::subTypes);
+      declarer.withSubTypes(baseType.asMetadataType(), subTypes.stream()
           .map(Type::asMetadataType)
-          .collect(toImmutableList());
-      declarer.withSubTypes(baseType, subTypes);
+          .collect(toImmutableList()));
 
       // For subtypes that reference types from other artifacts, auto-import them.
       autoImportReferencedTypes(declarer, dslResolvingContext, baseType);
@@ -92,14 +90,14 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
   }
 
   private void autoImportReferencedTypes(ExtensionDeclarer declarer, DslResolvingContext dslResolvingContext,
-                                         MetadataType subType) {
-    final Optional<String> subTypeId = getTypeId(subType);
-    subTypeId.flatMap(dslResolvingContext::getExtensionForType).ifPresent(importedDeclaringExtension -> {
-      declarer.withImportedType(new ImportedTypeModel(subTypeId
-          .flatMap(importedTypeId -> dslResolvingContext.getTypeCatalog()
-              .getType(importedTypeId))
-          .orElse((ObjectType) subType)));
-    });
+                                         Type subType) {
+    getTypeId(subType.asMetadataType())
+        .filter(importedDeclaringExtension -> subType.getDeclaringClass()
+            .map(c -> !c.getClassLoader().equals(currentThread().getContextClassLoader()))
+            .orElse(true))
+        .ifPresent(subTypeId -> dslResolvingContext.getTypeCatalog().getType(subTypeId)
+            .map(ImportedTypeModel::new)
+            .ifPresent(declarer::withImportedType));
   }
 
 }

@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
+import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.capability.xml.DefaultExtensionSchemaGeneratorTestCase.SchemaGeneratorTestUnit.newTestUnit;
@@ -217,7 +218,28 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
 
     //TODO MULE-11797: as this utils is consumed from org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel), this util should get dropped once the ticket gets implemented.
     final DslResolvingContext dslResolvingContext = getDefault(new LinkedHashSet<>(extensionModels.values()));
-    return loader.loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
+
+    final String basePackage = clazz.getPackage().toString();
+    final ClassLoader pluginClassLoader = new ClassLoader(clazz.getClassLoader()) {
+
+      @Override
+      protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        if (name.startsWith(basePackage)) {
+          byte[] classBytes;
+          try {
+            classBytes =
+                toByteArray(this.getClass().getResourceAsStream("/" + name.replaceAll("\\.", "/") + ".class"));
+            return this.defineClass(null, classBytes, 0, classBytes.length);
+          } catch (Exception e) {
+            return super.loadClass(name);
+          }
+        } else {
+          return super.loadClass(name, resolve);
+        }
+      }
+    };
+
+    return loader.loadExtensionModel(pluginClassLoader, dslResolvingContext, params);
   }
 
   static class SchemaGeneratorTestUnit {
