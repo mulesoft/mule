@@ -35,7 +35,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
