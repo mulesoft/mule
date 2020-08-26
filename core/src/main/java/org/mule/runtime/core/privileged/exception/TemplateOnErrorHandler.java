@@ -10,7 +10,8 @@ import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
-import static java.util.Collections.*;
+import static java.util.Collections.newSetFromMap;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
@@ -56,17 +57,19 @@ import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
@@ -146,8 +149,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
               .doOnNext(result -> {
                 final ErrorHandlerContext ctx = ErrorHandlerContext.from(result);
                 final String parameterId = getParameterId(result);
-                fireEndNotification(ctx.getOriginalEvent(parameterId), resultWithoutErrorHandlerContext(result),
-                                    ctx.getException(parameterId));
+                fireEndNotification(ctx.getOriginalEvent(parameterId), result, ctx.getException(parameterId));
               })
               .doOnNext(TemplateOnErrorHandler.this::resolveHandling)))
           .doAfterTerminate(() -> {
@@ -200,17 +202,14 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         CoreEvent failureEvent = messagingError.getEvent();
 
         ErrorHandlerContext ctx = ErrorHandlerContext.from(failureEvent);
-        CoreEvent failureEventWithContext;
 
         if (ctx == null) {
           ctx = new ErrorHandlerContext();
-          failureEventWithContext = quickCopy(failureEvent, of(ERROR_HANDLER_CONTEXT, ctx));
-        } else {
-          failureEventWithContext = failureEvent;
+          failureEvent = quickCopy(failureEvent, of(ERROR_HANDLER_CONTEXT, ctx));
         }
 
-        ctx.addContextItem(getParameterId(failureEventWithContext), error, failureEvent, continueCallback, propagateCallback);
-        fluxSink.next(failureEventWithContext);
+        ctx.addContextItem(getParameterId(failureEvent), error, failureEvent, continueCallback, propagateCallback);
+        fluxSink.next(failureEvent);
       }
     };
   }
@@ -234,10 +233,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     });
   }
 
-  private CoreEvent resultWithoutErrorHandlerContext(CoreEvent event) {
-    return event;
-  }
-
   private void resolveHandling(CoreEvent result) {
     final ErrorHandlerContext ctx = ErrorHandlerContext.from(result);
 
@@ -245,15 +240,14 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     Exception exception = ctx.getException(parameterId);
     Consumer<CoreEvent> successfullyHandledConsumer = ctx.getSuccessCallback(parameterId);
     Consumer<Throwable> errorConsumer = ctx.getRethrowCallback(parameterId);
-    ctx.removeContextItem(parameterId);
 
     if (exception instanceof MessagingException) {
       final MessagingException messagingEx = (MessagingException) exception;
       if (messagingEx.handled()) {
-        successfullyHandledConsumer.accept(resultWithoutErrorHandlerContext(result));
+        successfullyHandledConsumer.accept(result);
       } else {
         if (messagingEx.getEvent() != result) {
-          messagingEx.setProcessedEvent(resultWithoutErrorHandlerContext(result));
+          messagingEx.setProcessedEvent(result);
         }
         errorConsumer.accept(exception);
       }
@@ -284,7 +278,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       final ErrorHandlerContext ctx = ErrorHandlerContext.from(result);
 
       final String parameterId = getParameterId(result);
-      fireEndNotification(ctx.getOriginalEvent(parameterId), resultWithoutErrorHandlerContext(result), me);
+      fireEndNotification(ctx.getOriginalEvent(parameterId), result, me);
       ctx.getRethrowCallback(parameterId).accept(me);
     };
   }
