@@ -19,6 +19,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -41,6 +42,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -66,6 +68,7 @@ import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -97,13 +100,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.google.common.reflect.TypeToken;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-
-import com.google.common.reflect.TypeToken;
 
 @SmallTest
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
@@ -136,7 +138,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Test
   public void operationContextIsWellFormed() throws Exception {
-    ArgumentCaptor<ExecutionContext> operationContextCaptor = ArgumentCaptor.forClass(ExecutionContext.class);
+    ArgumentCaptor<ExecutionContext> operationContextCaptor = forClass(ExecutionContext.class);
     messageProcessor.process(event);
 
     verify(operationExecutor).execute(operationContextCaptor.capture(), any());
@@ -392,7 +394,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(configurationInstance.getValue()).thenReturn(defaultConfigInstance);
     when(extensionManager.getConfiguration(extensionModel, operationModel, event)).thenReturn(of(configurationInstance));
 
-    ArgumentCaptor<ExecutionContext> operationContextCaptor = ArgumentCaptor.forClass(ExecutionContext.class);
+    ArgumentCaptor<ExecutionContext> operationContextCaptor = forClass(ExecutionContext.class);
     messageProcessor.process(event);
 
     verify(operationExecutor).execute(operationContextCaptor.capture(), any());
@@ -485,7 +487,10 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     stubComponentExecutor(operationExecutor, inputStream);
 
     messageProcessor.process(event);
-    verify(streamingManager).manage(same(provider), any(EventContext.class));
+    ArgumentCaptor<CursorProvider> providerCaptor = forClass(CursorProvider.class);
+    verify(streamingManager).manage(providerCaptor.capture(), any(EventContext.class));
+
+    assertThat(unwrap(providerCaptor.getValue()), is(sameInstance(provider)));
   }
 
   private void assertProcessingType(ExecutionType executionType, ProcessingType expectedProcessingType) {

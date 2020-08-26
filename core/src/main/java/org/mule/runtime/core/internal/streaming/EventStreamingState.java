@@ -7,11 +7,18 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static java.lang.System.identityHashCode;
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.mule.runtime.core.internal.streaming.CursorManager.STREAMING_VERBOSE;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
 import java.lang.ref.WeakReference;
+import java.util.Optional;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.slf4j.Logger;
 
 /**
  * Tracks the active streaming resources owned by a particular event.
@@ -19,6 +26,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
  * @since 4.3.0
  */
 public class EventStreamingState {
+
+  private final static Logger LOGGER = getLogger(EventStreamingState.class);
 
   private final Cache<Integer, WeakReference<ManagedCursorProvider>> providers = Caffeine.newBuilder().build();
 
@@ -32,19 +41,19 @@ public class EventStreamingState {
    * @return the {@link ManagedCursorProvider} that must continue to be used
    */
   public ManagedCursorProvider addProvider(ManagedCursorProvider provider, StreamingGhostBuster ghostBuster) {
-    final int hash = identityHashCode(provider.getDelegate());
-    ManagedCursorProvider managedProvider = getOrAddManagedProvider(hash, provider, ghostBuster);
+    final int id = provider.getId();
+    ManagedCursorProvider managedProvider = getOrAddManagedProvider(id, provider, ghostBuster);
 
     // This can happen when a foreach component splits a text document using a stream.
     // Iteration N might try to manage the same root provider that was already managed in iteration N-1, but the
     // managed decorator from that previous iteration has been collected, which causes the weak reference to yield
     // a null value. In which case we simply track it again.
     if (managedProvider == null) {
-      synchronized (provider.getDelegate()) {
-        managedProvider = getOrAddManagedProvider(hash, provider, ghostBuster);
+      synchronized (unwrap(provider)) {
+        managedProvider = getOrAddManagedProvider(id, provider, ghostBuster);
         if (managedProvider == null) {
-          providers.invalidate(hash);
-          managedProvider = getOrAddManagedProvider(hash, provider, ghostBuster);
+          providers.invalidate(id);
+          managedProvider = getOrAddManagedProvider(id, provider, ghostBuster);
         }
       }
     }
@@ -52,10 +61,18 @@ public class EventStreamingState {
     return managedProvider;
   }
 
-  private ManagedCursorProvider getOrAddManagedProvider(int hash,
+  private ManagedCursorProvider getOrAddManagedProvider(int id,
                                                         ManagedCursorProvider provider,
                                                         StreamingGhostBuster ghostBuster) {
-    return providers.get(hash, k -> ghostBuster.track(provider)).get();
+    return providers.get(id, k -> {
+      if (STREAMING_VERBOSE) {
+        CursorProvider innerDelegate = unwrap(provider);
+        Optional<ComponentLocation> originatingLocation = provider.getOriginatingLocation();
+        LOGGER.info("Added ManagedCursorProvider: {} for delegate: {} opened by: {}", k, identityHashCode(innerDelegate),
+                    originatingLocation.map(ComponentLocation::getLocation).orElse("unknown"));
+      }
+      return ghostBuster.track(provider);
+    }).get();
   }
 
   /**

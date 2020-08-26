@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
 import org.mule.runtime.core.privileged.processor.Scope;
@@ -63,6 +64,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   @Inject
   protected ExpressionManager expressionManager;
 
+  @Inject
+  protected StreamingManager streamingManager;
+
   private List<Processor> messageProcessors;
   private String expression = DEFAULT_SPLIT_EXPRESSION;
   private int batchSize = 1;
@@ -77,7 +81,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return new ForeachRouter(this, publisher, expression, batchSize, nestedChain).getDownstreamPublisher();
+    return new ForeachRouter(this, streamingManager, publisher, expression, batchSize, nestedChain).getDownstreamPublisher();
   }
 
   @Override
