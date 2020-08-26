@@ -128,7 +128,7 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>test-components</artifactId>
-            <version>${project.version}</version>
+            <version>${muleTestComponentsVersion}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
