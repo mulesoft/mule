@@ -390,13 +390,13 @@
 /mule-standalone-${productVersion}/lib/opt/raml-parser-2-1.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
-/mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
+/mule-standalone-${productVersion}/lib/opt/rhino-1.7.12.jar
 /mule-standalone-${productVersion}/lib/opt/rome-1.5.0.jar
 /mule-standalone-${productVersion}/lib/opt/rome-utils-1.5.0.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-10.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-10-xqj.jar
 /mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
-/mule-standalone-${productVersion}/lib/opt/smack-3.4.1.jar
+/mule-standalone-${productVersion}/lib/opt/sack-3.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/smackx-3.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/snakeyaml-1.23.jar
 /mule-standalone-${productVersion}/lib/opt/spring-aop-4.3.19.RELEASE.jar
