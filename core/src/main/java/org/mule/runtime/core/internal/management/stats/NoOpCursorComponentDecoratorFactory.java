@@ -22,6 +22,11 @@ public class NoOpCursorComponentDecoratorFactory implements CursorComponentDecor
   }
 
   @Override
+  public void incrementInvocationCount(String correlationId) {
+    // Nothing to do
+  }
+
+  @Override
   public <T> Iterator<T> decorateInput(Iterator<T> decorated, String correlationId) {
     return decorated;
   }

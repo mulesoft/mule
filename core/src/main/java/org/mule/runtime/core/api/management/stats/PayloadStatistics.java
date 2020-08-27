@@ -49,6 +49,8 @@ public class PayloadStatistics implements Statistics {
   private final String componentLocation;
   private final String componentIdentifier;
 
+  private final AtomicLong invocationCount = new AtomicLong();
+
   private final AtomicLong inputObjectCount = new AtomicLong();
   private final AtomicLong inputByteCount = new AtomicLong();
   private final AtomicLong outputObjectCount = new AtomicLong();
@@ -105,6 +107,13 @@ public class PayloadStatistics implements Statistics {
     return outputByteCount.get();
   }
 
+  /**
+   * @return how many times this component was executed.
+   */
+  public long getInvocationCount() {
+    return invocationCount.get();
+  }
+
   public long addInputObjectCount(long delta) {
     return inputObjectCount.addAndGet(delta);
   }
@@ -119,6 +128,10 @@ public class PayloadStatistics implements Statistics {
 
   public long addOutputByteCount(long delta) {
     return outputByteCount.addAndGet(delta);
+  }
+
+  public long incrementInvocationCount() {
+    return invocationCount.incrementAndGet();
   }
 
   /**
