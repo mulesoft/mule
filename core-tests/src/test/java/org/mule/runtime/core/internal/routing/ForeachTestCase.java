@@ -8,10 +8,12 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
@@ -19,26 +21,32 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -60,6 +68,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
@@ -410,6 +419,53 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
     assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getDataType(), equalTo(DataType.builder().type(Integer.class).build()));
     assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getValue(), equalTo(2));
+  }
+
+  @Test
+  @Issue("MULE-18573")
+  public void muleMessageContainingACursorStreamShouldBeManagedByCursorManager() throws Exception {
+    AtomicReference<CoreEvent> eventReference = new AtomicReference<>();
+    foreach = createForeach();
+    InternalTestProcessor capturedEventProcessor = event -> {
+      eventReference.set(event);
+      return event;
+    };
+    foreach.setMessageProcessors(asList(capturedEventProcessor));
+    initialiseIfNeeded(foreach, muleContext);
+
+    CursorProvider cursorProvider = mock(CursorStreamProvider.class);
+
+    CoreEvent input = eventBuilder(muleContext).message(of(singletonList(of(cursorProvider)))).build();
+    CoreEvent result = process(foreach, input);
+
+    assertThat(result.getMessage(), equalTo(input.getMessage()));
+    assertThat(eventReference.get().getMessage().getPayload().getValue(), is(instanceOf(ManagedCursorProvider.class)));
+    ManagedCursorProvider managedCursorProvider =
+        (ManagedCursorProvider) eventReference.get().getMessage().getPayload().getValue();
+    assertThat(unwrap(managedCursorProvider), is(sameInstance(cursorProvider)));
+  }
+
+  @Test
+  @Issue("MULE-18573")
+  public void cursorStreamShouldBeManagedByCursorManager() throws Exception {
+    AtomicReference<CoreEvent> eventReference = new AtomicReference<>();
+    foreach = createForeach();
+    InternalTestProcessor capturedEventProcessor = event -> {
+      eventReference.set(event);
+      return event;
+    };
+    foreach.setMessageProcessors(asList(capturedEventProcessor));
+    initialiseIfNeeded(foreach, muleContext);
+
+    CursorProvider cursorProvider = mock(CursorStreamProvider.class);
+    CoreEvent input = eventBuilder(muleContext).message(of(singletonList(cursorProvider))).build();
+    CoreEvent result = process(foreach, input);
+
+    assertThat(result.getMessage(), equalTo(input.getMessage()));
+    assertThat(eventReference.get().getMessage().getPayload().getValue(), is(instanceOf(ManagedCursorProvider.class)));
+    ManagedCursorProvider managedCursorProvider =
+        (ManagedCursorProvider) eventReference.get().getMessage().getPayload().getValue();
+    assertThat(unwrap(managedCursorProvider), is(sameInstance(cursorProvider)));
   }
 
   @Test
