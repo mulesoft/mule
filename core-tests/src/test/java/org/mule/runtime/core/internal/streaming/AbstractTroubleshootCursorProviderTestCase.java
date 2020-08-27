@@ -7,7 +7,6 @@
 
 package org.mule.runtime.core.internal.streaming;
 
-import static java.lang.System.setProperty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -16,7 +15,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
-import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.junit.After;
@@ -61,8 +59,6 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
 
   @Before
   public void before() throws NoSuchFieldException, IllegalAccessException {
-    setProperty(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY, trackStackTrace.toString());
-
     componentLocation = setComponentLocation ? from("log") : null;
 
     cursorProvider = createCursorProvider();
