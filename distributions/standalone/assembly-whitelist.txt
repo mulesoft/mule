@@ -291,6 +291,7 @@
 /mule-standalone-${productVersion}/lib/opt/jasper-6.0.53.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-el-6.0.53.jar
 /mule-standalone-${productVersion}/lib/opt/javassist-3.7.ga.jar
+/mule-standalone-${productVersion}/lib/opt/javassist-3.11.0.GA.jar
 /mule-standalone-${productVersion}/lib/opt/javax.annotation-api-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/javax.inject-1.jar
 /mule-standalone-${productVersion}/lib/opt/javax.json-1.0.4.jar
@@ -380,7 +381,7 @@
 /mule-standalone-${productVersion}/lib/opt/mx4j-tools-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/nailgun-server-0.9.1.jar
 /mule-standalone-${productVersion}/lib/opt/neethi-3.0.3.jar
-/mule-standalone-${productVersion}/lib/opt/ognl-2.7.3.jar
+/mule-standalone-${productVersion}/lib/opt/ognl-3.0.12.jar
 /mule-standalone-${productVersion}/lib/opt/options-1.4.jar
 /mule-standalone-${productVersion}/lib/opt/oro-2.0.8.jar
 /mule-standalone-${productVersion}/lib/opt/osgi-resource-locator-1.0.1.jar
