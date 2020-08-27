@@ -10,6 +10,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -33,6 +34,7 @@ import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
@@ -77,6 +79,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   @Inject
   protected ExpressionManager expressionManager;
+
+  @Inject
+  protected StreamingManager streamingManager;
 
   private List<Processor> messageProcessors;
   private String expression = DEFAULT_SPLIT_EXPRESSION;
@@ -183,10 +188,13 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             });
           } else if (typedValue.getValue() instanceof Message) {
             // If value is a Message then use it directly conserving attributes and properties.
-            partEventBuilder.message((Message) typedValue.getValue());
+            Message message = (Message) typedValue.getValue();
+            TypedValue managedValue = updateTypedValueForStreaming(message.getPayload(), currentEvent.get(), streamingManager);
+            partEventBuilder.message(Message.builder(message).payload(managedValue).build());
           } else {
             // Otherwise create a new message
-            partEventBuilder.message(Message.builder().payload(typedValue).build());
+            TypedValue managedValue = updateTypedValueForStreaming(typedValue, currentEvent.get(), streamingManager);
+            partEventBuilder.message(Message.builder().payload(managedValue).build());
           }
 
           return Mono
