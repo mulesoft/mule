@@ -30,6 +30,7 @@ public class TestExtensionDeclarationUtils {
 
   public static final String PROVIDED_PARAMETER_NAME = "providedParameter";
   public static final String ACTING_PARAMETER_NAME = "actingParameter";
+  public static final String NOT_ACTING_PARAMETER_NAME = "notActingParameter";
   public static final String METADATA_KEY_PARAMETER_NAME = "metadataKey";
   public static final String ACTING_PARAMETER_GROUP_NAME = "Acting";
 
@@ -49,7 +50,7 @@ public class TestExtensionDeclarationUtils {
 
   public static final String CONNECTION_CLIENT_NAME_PARAMETER = "clientName";
 
-  public static final String SOURCE_WITH_MULTI_LEVEL_VALUE ="SourceWithMultiLevelValue";
+  public static final String SOURCE_WITH_MULTI_LEVEL_VALUE = "SourceWithMultiLevelValue";
 
   public static final String INT_PARAM_NAME = "intParam";
   public static final String STRING_PRAM_NAME = "stringParam";
@@ -71,6 +72,20 @@ public class TestExtensionDeclarationUtils {
             .withRefName(name)
             .withParameterGroup(newParameterGroup()
                                         .withParameter(ACTING_PARAMETER_NAME, name)
+                                        .withParameter(NOT_ACTING_PARAMETER_NAME, name)
+                                        .getDeclaration());
+    if (connection != null) {
+      configurationElementDeclarer.withConnection(connection);
+    }
+    return configurationElementDeclarer.getDeclaration();
+  }
+
+  public static ConfigurationElementDeclaration configurationDeclaration(String name, String actingParameter, String notActingParameter, ConnectionElementDeclaration connection) {
+    ConfigurationElementDeclarer configurationElementDeclarer = TEST_EXTENSION_DECLARER.newConfiguration(CONFIG_ELEMENT_NAME)
+            .withRefName(name)
+            .withParameterGroup(newParameterGroup()
+                                        .withParameter(ACTING_PARAMETER_NAME, actingParameter)
+                                        .withParameter(NOT_ACTING_PARAMETER_NAME, notActingParameter)
                                         .getDeclaration());
     if (connection != null) {
       configurationElementDeclarer.withConnection(connection);
@@ -224,8 +239,9 @@ public class TestExtensionDeclarationUtils {
             .getDeclaration();
   }
 
-  public static SourceElementDeclaration sourceDeclaration(String configName, String continent, String country) {
-    return sourceDeclaration(configName, null, continent, country);
+  public static SourceElementDeclaration sourceDeclaration(String configName, String continentParameter,
+                                                           String countryParameter) {
+    return sourceDeclaration(configName, null, continentParameter, countryParameter);
   }
 
   public static SourceElementDeclaration sourceDeclaration(String configName, String actingParameter) {
@@ -233,12 +249,12 @@ public class TestExtensionDeclarationUtils {
   }
 
   public static SourceElementDeclaration sourceDeclaration(String configName, String actingParameter, String continentParameter,
-                                                     String countryParameter) {
+                                                           String countryParameter) {
     return sourceDeclaration(configName, actingParameter, continentParameter, countryParameter, null);
   }
 
   public static SourceElementDeclaration sourceDeclaration(String configName, String actingParameter, String continentParameter,
-                                                     String countryParameter, String cityParameter) {
+                                                           String countryParameter, String cityParameter) {
     SourceElementDeclarer sourceElementDeclarer = TEST_EXTENSION_DECLARER
             .newSource(SOURCE_ELEMENT_NAME)
             .withConfig(configName);
@@ -298,7 +314,7 @@ public class TestExtensionDeclarationUtils {
   }
 
   public static OperationElementDeclaration multiLevelCompleteOPDeclaration(String configName, String continent, String country,
-                                                                      String city) {
+                                                                            String city) {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);

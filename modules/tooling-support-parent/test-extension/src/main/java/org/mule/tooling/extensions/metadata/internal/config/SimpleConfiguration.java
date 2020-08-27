@@ -27,6 +27,9 @@ public class SimpleConfiguration {
   private String actingParameter;
 
   @Parameter
+  private String notActingParameter;
+
+  @Parameter
   @Optional
   @OfValues(ActingParameterVP.class)
   private String providedParameter;
