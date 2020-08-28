@@ -10,6 +10,7 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
@@ -19,6 +20,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -26,6 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
+
+import javax.inject.Inject;
 
 /**
  * <p>
@@ -42,6 +46,9 @@ import org.reactivestreams.Publisher;
  * @since 4.2.0
  */
 public class ParallelForEach extends AbstractForkJoinRouter {
+
+  @Inject
+  protected StreamingManager streamingManager;
 
   private String collectionExpression = DEFAULT_SPLIT_EXPRESSION;
   private SplittingStrategy<CoreEvent, Iterator<TypedValue<?>>> splittingStrategy;
@@ -60,7 +67,10 @@ public class ParallelForEach extends AbstractForkJoinRouter {
   @Override
   protected Publisher<ForkJoinStrategy.RoutingPair> getRoutingPairs(CoreEvent event) {
     return fromIterable(() -> splittingStrategy.split(event))
-        .map(partTypedValue -> CoreEvent.builder(event).message(Message.builder().payload(partTypedValue).build()).build())
+        .map(partTypedValue -> {
+          TypedValue managedValue = updateTypedValueForStreaming(partTypedValue, event, streamingManager);
+          return CoreEvent.builder(event).message(Message.builder().payload(managedValue).build()).build();
+        })
         .map(partEvent -> of(partEvent, nestedChain));
   }
 
