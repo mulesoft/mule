@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultDeclarationSession extends AbstractArtifactAgnosticService implements DeclarationSession {
 
-  private Logger LOGGER = LoggerFactory.getLogger(DefaultDeclarationSession.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDeclarationSession.class);
   private LazyValue<DeclarationSession> internalDeclarationSession;
 
   DefaultDeclarationSession(ApplicationSupplier applicationSupplier) {
