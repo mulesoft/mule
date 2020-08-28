@@ -197,8 +197,12 @@ public class FlowProcessMediator implements Initialisable {
       final Pipeline flowConstruct = (Pipeline) messageProcessContext.getFlowConstruct();
       final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
       final FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct);
-      final CoreEvent event = createEvent(template, messageProcessContext.getComponentDecoratorFactory(), messageSource,
+
+      final CursorComponentDecoratorFactory componentDecoratorFactory = messageProcessContext.getComponentDecoratorFactory();
+      final CoreEvent event = createEvent(template, componentDecoratorFactory, messageSource,
                                           responseCompletion, flowConstruct);
+      componentDecoratorFactory.incrementInvocationCount(event.getCorrelationId());
+
       policyManager.addSourcePointcutParametersIntoEvent(messageSource, event.getMessage().getAttributes(),
                                                          (InternalEvent) event);
 

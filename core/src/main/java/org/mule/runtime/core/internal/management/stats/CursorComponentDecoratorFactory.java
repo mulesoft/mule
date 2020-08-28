@@ -23,6 +23,16 @@ import java.util.Iterator;
 public interface CursorComponentDecoratorFactory {
 
   /**
+   * If statistics are enabled, increment the invocation count.
+   * <p>
+   * Ref: {@link PayloadStatistics#incrementInvocationCount()}.
+   *
+   * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
+   *        measured volume to a specific execution.
+   */
+  void incrementInvocationCount(String correlationId);
+
+  /**
    * If statistics are enabled, decorates the provided {@link Iterator} for counting the iterated objects.
    * <p>
    * Ref: {@link PayloadStatistics#getInputObjectCount()}.
