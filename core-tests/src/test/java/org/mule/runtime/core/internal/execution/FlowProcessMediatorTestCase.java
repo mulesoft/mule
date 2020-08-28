@@ -61,6 +61,7 @@ import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -199,6 +200,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     when(context.getMessagingExceptionResolver()).thenReturn(new MessagingExceptionResolver(source));
     when(context.getTransactionConfig()).thenReturn(empty());
     when(context.getFlowConstruct()).thenReturn(flow);
+    when(context.getComponentDecoratorFactory()).thenReturn(mock(CursorComponentDecoratorFactory.class));
 
     template = mock(FlowProcessTemplate.class);
     resultAdapter = mock(SourceResultAdapter.class);

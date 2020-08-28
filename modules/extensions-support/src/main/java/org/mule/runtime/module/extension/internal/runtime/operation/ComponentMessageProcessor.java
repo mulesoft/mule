@@ -351,6 +351,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               }
             })
             .doOnNext(event -> {
+              componentDecoratorFactory.incrementInvocationCount(event.getCorrelationId());
+
               final ExecutorCallback executorCallback = new ExecutorCallback() {
 
                 @Override

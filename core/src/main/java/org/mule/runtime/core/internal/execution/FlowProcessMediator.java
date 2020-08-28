@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -195,10 +196,14 @@ public class FlowProcessMediator implements Initialisable {
       final Pipeline flowConstruct = (Pipeline) messageProcessContext.getFlowConstruct();
       final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
       final FlowProcessor flowExecutionProcessor =
-          new FlowProcessor(publisher -> applyWithChildContext(from(publisher), template::routeEventAsync, Optional.empty()),
+          new FlowProcessor(publisher -> applyWithChildContext(from(publisher), template::routeEventAsync, empty()),
                             flowConstruct);
-      final CoreEvent event = createEvent(template, messageProcessContext.getComponentDecoratorFactory(), messageSource,
+
+      final CursorComponentDecoratorFactory componentDecoratorFactory = messageProcessContext.getComponentDecoratorFactory();
+      final CoreEvent event = createEvent(template, componentDecoratorFactory, messageSource,
                                           responseCompletion, flowConstruct);
+      componentDecoratorFactory.incrementInvocationCount(event.getCorrelationId());
+
       policyManager.addSourcePointcutParametersIntoEvent(messageSource, event.getMessage().getAttributes(),
                                                          (InternalEvent) event);
 
