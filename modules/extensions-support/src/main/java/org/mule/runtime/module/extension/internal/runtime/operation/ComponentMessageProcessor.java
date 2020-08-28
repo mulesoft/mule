@@ -78,6 +78,7 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
@@ -88,7 +89,6 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
@@ -564,7 +564,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                             CoreEvent event, Scheduler currentScheduler) {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, componentModel, event,
-                                         getCursorProviderFactory(), streamingManager, this,
+                                         getCursorProviderFactory(), componentDecoratorFactory, streamingManager, this,
                                          getRetryPolicyTemplate(configuration), currentScheduler, transactionConfig, muleContext);
   }
 

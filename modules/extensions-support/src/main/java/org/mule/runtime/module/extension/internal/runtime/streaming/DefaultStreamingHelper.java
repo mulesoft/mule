@@ -12,10 +12,8 @@ import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -38,27 +36,9 @@ public class DefaultStreamingHelper implements StreamingHelper {
 
   private final CursorStreamProviderFactory cursorStreamProviderFactory;
   private final CursorIteratorProviderFactory cursorIteratorProviderFactory;
+  private final CursorComponentDecoratorFactory componentDecoratorFactory;
   private final CoreEvent event;
   private final ComponentLocation originatingLocation;
-
-  /**
-   * Creates a new instance
-   *
-   * @param cursorProviderFactory the {@link CursorProviderFactory} configured on the executing component
-   * @param streamingManager      the application's {@link StreamingManager}
-   * @param event                 the {@link CoreEvent} being currently executed
-   */
-  public DefaultStreamingHelper(CursorProviderFactory cursorProviderFactory,
-                                StreamingManager streamingManager,
-                                CoreEvent event,
-                                ComponentLocation originatingLocation) {
-    this(streamingManager.getPairFor(cursorProviderFactory), event, originatingLocation);
-  }
-
-  private DefaultStreamingHelper(Pair<CursorStreamProviderFactory, CursorIteratorProviderFactory> cursorProviderFactories,
-                                 CoreEvent event, ComponentLocation originatingLocation) {
-    this(cursorProviderFactories.getFirst(), cursorProviderFactories.getSecond(), event, originatingLocation);
-  }
 
   /**
    * Creates a new instance
@@ -69,10 +49,12 @@ public class DefaultStreamingHelper implements StreamingHelper {
    */
   public DefaultStreamingHelper(CursorStreamProviderFactory cursorStreamProviderFactory,
                                 CursorIteratorProviderFactory cursorIteratorProviderFactory,
+                                CursorComponentDecoratorFactory componentDecoratorFactory,
                                 CoreEvent event,
                                 ComponentLocation originatingLocation) {
     this.cursorStreamProviderFactory = cursorStreamProviderFactory;
     this.cursorIteratorProviderFactory = cursorIteratorProviderFactory;
+    this.componentDecoratorFactory = componentDecoratorFactory;
     this.event = event;
     this.originatingLocation = originatingLocation;
   }
@@ -111,9 +93,11 @@ public class DefaultStreamingHelper implements StreamingHelper {
     }
 
     if (value instanceof InputStream) {
-      value = resolveCursorStreamProvider((InputStream) value);
+      value = resolveCursorStreamProvider(componentDecoratorFactory
+          .decorateOutput((InputStream) value, event.getCorrelationId()));
     } else if (value instanceof Iterator) {
-      value = resolveCursorIteratorProvider((Iterator) value);
+      value = resolveCursorIteratorProvider(componentDecoratorFactory
+          .decorateOutput((Iterator) value, event.getCorrelationId()));
     } else if (value instanceof TypedValue) {
       value = resolveCursorTypedValueProvider((TypedValue) value);
     }

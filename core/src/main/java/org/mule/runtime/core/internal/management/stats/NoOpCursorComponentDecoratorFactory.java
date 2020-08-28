@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 

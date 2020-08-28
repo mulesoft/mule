@@ -16,7 +16,7 @@ import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponen
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;

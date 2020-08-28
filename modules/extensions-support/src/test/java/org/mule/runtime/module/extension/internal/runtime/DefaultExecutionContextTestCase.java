@@ -23,6 +23,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -38,18 +39,21 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
 
   private static final String CONFIG_NAME = "config";
   private static final String PARAM_NAME = "param1";
   private static final String VALUE = "Do you want to build a snowman?";
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
   private ExtensionModel extensionModel;
@@ -74,6 +78,9 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
 
   @Mock
   private CursorProviderFactory<Object> cursorProviderFactory;
+
+  @Mock
+  private CursorComponentDecoratorFactory componentDecoratorFactory;
 
   @Mock
   private Component component;
@@ -107,8 +114,8 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
 
     operationContext =
         new DefaultExecutionContext<>(extensionModel, of(configuration), resolverSetResult.asMap(), operationModel,
-                                      event, cursorProviderFactory, streamingManager, component, retryPolicyTemplate,
-                                      IMMEDIATE_SCHEDULER, empty(), muleContext);
+                                      event, cursorProviderFactory, componentDecoratorFactory, streamingManager, component,
+                                      retryPolicyTemplate, IMMEDIATE_SCHEDULER, empty(), muleContext);
   }
 
   @Test
