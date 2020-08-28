@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
@@ -39,6 +40,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -46,6 +48,8 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -53,6 +57,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
+import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -174,6 +179,32 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
     assertThat(List.class.isAssignableFrom(typedValue.getDataType().getType()), is(true));
     List<Message> resultList = (List<Message>) typedValue.getValue();
     assertThat(resultList, hasSize(2));
+  }
+
+  @Test
+  @Description("Cursor provider should be managed by cursor manager inside parallel-foreach.")
+  @Issue("MULE-18573")
+  public void cursorStreamShouldBeManagedByCursorManager() throws Exception {
+    CursorProvider cursorProvider = mock(CursorStreamProvider.class);
+    CoreEvent original = getEventBuilder().message(Message.of(singletonList(cursorProvider))).build();
+
+    MessageProcessorChain nested = newChain(empty(), event -> event);
+    nested.setMuleContext(muleContext);
+    router.setMessageProcessors(singletonList(nested));
+
+    muleContext.getInjector().inject(router);
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    router.initialise();
+
+    Event result = router.process(original);
+
+    assertThat(result.getMessage().getPayload().getValue(), instanceOf(List.class));
+    List<Message> resultList = (List<Message>) result.getMessage().getPayload().getValue();
+    assertThat(resultList, hasSize(1));
+
+    assertThat(resultList.get(0).getPayload().getValue(), is(instanceOf(ManagedCursorProvider.class)));
+    ManagedCursorProvider managedCursorProvider = (ManagedCursorProvider) resultList.get(0).getPayload().getValue();
+    assertThat(unwrap(managedCursorProvider), is(sameInstance(cursorProvider)));
   }
 
   @Test
