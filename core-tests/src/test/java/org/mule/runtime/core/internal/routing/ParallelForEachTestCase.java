@@ -40,7 +40,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-
 import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
