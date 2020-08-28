@@ -11,6 +11,7 @@ import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.Files.lines;
 import static java.util.Arrays.asList;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
@@ -18,14 +19,17 @@ import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
+import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentStatusTracker.DeploymentState.DEPLOYED;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_EE_SERVICE_NAME;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_SERVICE_NAME;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +42,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class Controller {
 
@@ -49,6 +54,7 @@ public class Controller {
   private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
   private static final int IS_RUNNING_STATUS_CODE = 0;
   private static final Pattern pattern = compile("wrapper\\.java\\.additional\\.(\\d*)=");
+  private static final Logger LOGGER = getLogger(Controller.class);
 
   private final AbstractOSController osSpecificController;
 
@@ -233,7 +239,17 @@ public class Controller {
   }
 
   protected boolean isDeployed(String appName) {
-    return new File(appsDir, appName + ANCHOR_SUFFIX).exists();
+    return new File(appsDir, appName + ANCHOR_SUFFIX).exists() && isDeployedMessageAtLogs(appName);
+  }
+
+  protected boolean isDeployedMessageAtLogs(String appName) {
+    boolean isDeployed = false;
+    try (Stream<String> stream = lines(getLog().toPath())) {
+      isDeployed = stream.anyMatch(line -> line.contains(appName) && line.contains(DEPLOYED.toString()));
+    } catch (IOException e1) {
+      LOGGER.warn("Failed to read log server log");
+    }
+    return isDeployed;
   }
 
   protected boolean wasRemoved(String appName) {
@@ -241,7 +257,7 @@ public class Controller {
   }
 
   protected boolean isDomainDeployed(String domainName) {
-    return new File(domainsDir, domainName + ANCHOR_SUFFIX).exists();
+    return new File(domainsDir, domainName + ANCHOR_SUFFIX).exists() && isDeployedMessageAtLogs(domainName);
   }
 
   /**
