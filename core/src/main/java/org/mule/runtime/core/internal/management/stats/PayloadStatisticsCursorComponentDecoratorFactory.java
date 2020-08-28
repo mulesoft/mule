@@ -28,6 +28,13 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
   }
 
   @Override
+  public void incrementInvocationCount(String correlationId) {
+    if (payloadStatistics.isEnabled()) {
+      payloadStatistics.incrementInvocationCount();
+    }
+  }
+
+  @Override
   public <T> Iterator<T> decorateInput(Iterator<T> decorated, String correlationId) {
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsIterator(decorated, payloadStatistics::addInputObjectCount);
