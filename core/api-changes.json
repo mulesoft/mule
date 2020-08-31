@@ -12,6 +12,14 @@
           "justification": "MULE-18650: Need feature backported to 4.3"
         },
         {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "CursorComponentDecoratorFactory",
+          "elementKind": "interface",
+          "justification": "MULE-18650: Need feature backported to 4.3"
+        },
+        {
           "code": "java.method.added",
           "new": "method java.lang.Object org.mule.runtime.core.api.util.StreamingUtils::streamingContent(java.lang.Object, org.mule.runtime.core.api.streaming.CursorProviderFactory, org.mule.runtime.api.event.EventContext, org.mule.runtime.api.component.location.ComponentLocation)",
           "package": "org.mule.runtime.core.api.util",

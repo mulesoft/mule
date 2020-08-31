@@ -55,6 +55,7 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -136,6 +137,9 @@ public class SourceAdapter implements Lifecycle, Restartable {
 
   @Inject
   private ExpressionManager expressionManager;
+
+  @Inject
+  private CursorDecoratorFactory cursorDecoratorFactory;
 
   @Inject
   private Collection<ExceptionContextProvider> exceptionContextProviders;
@@ -223,6 +227,8 @@ public class SourceAdapter implements Lifecycle, Restartable {
                                                                              sourceModel,
                                                                              sourceInvokationTarget.get(),
                                                                              m, cursorProviderFactory,
+                                                                             cursorDecoratorFactory
+                                                                                 .componentDecoratorFactory(component),
                                                                              streamingManager,
                                                                              component,
                                                                              muleContext,

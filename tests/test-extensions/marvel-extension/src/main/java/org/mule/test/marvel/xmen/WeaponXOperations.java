@@ -7,6 +7,7 @@
 package org.mule.test.marvel.xmen;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -14,6 +15,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.input.ReaderInputStream;
@@ -30,5 +32,9 @@ public class WeaponXOperations {
     }
 
     return injectors;
+  }
+
+  public Iterator<String> wolverineBlacklist() {
+    return asList("Sabretooth", "Omega Red", "Dr. Cornelius", "Lady Deathstrike", "Mystique", "Silver Samurai").iterator();
   }
 }
