@@ -95,10 +95,6 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
             muleContext.getNotificationManager().addListener(pipelineProcessorDebugger);
             listenersAdded = true;
         }
-        else
-        {
-            removeNotificationListeners();
-        }
     }
 
     protected synchronized void removeNotificationListeners()
