@@ -32,6 +32,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -60,16 +61,18 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleContextTestCase {
 
   private static final String CONFIG_NAME = "config";
   private static final DataType DATA_TYPE = STRING;
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
@@ -96,6 +99,9 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
   private CursorProviderFactory cursorProviderFactory;
 
   @Mock
+  private CursorComponentDecoratorFactory componentDecoratorFactory;
+
+  @Mock
   private StreamingManager streamingManager;
 
   @Mock
@@ -112,7 +118,7 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
   private ExecutionContextAdapter operationContext;
   private HeisenbergExtension config;
   private HeisenbergOperations operations;
-  private PrimitiveTypesTestOperations primitiveTypesTestOperations = new PrimitiveTypesTestOperations();
+  private final PrimitiveTypesTestOperations primitiveTypesTestOperations = new PrimitiveTypesTestOperations();
 
 
   @Before
@@ -127,9 +133,11 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
 
     when(muleEvent.getMessage().getPayload()).thenReturn(new TypedValue<>(null, DATA_TYPE));
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
-    operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
-                                                   muleEvent, cursorProviderFactory, streamingManager, component,
-                                                   retryPolicyTemplate, IMMEDIATE_SCHEDULER, empty(), muleContext);
+    operationContext =
+        new DefaultExecutionContext<>(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
+                                      muleEvent, cursorProviderFactory, componentDecoratorFactory,
+                                      streamingManager, component,
+                                      retryPolicyTemplate, IMMEDIATE_SCHEDULER, empty(), muleContext);
     operationContext = spy(operationContext);
   }
 

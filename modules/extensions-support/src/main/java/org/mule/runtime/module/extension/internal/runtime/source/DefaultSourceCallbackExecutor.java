@@ -23,6 +23,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -56,6 +57,7 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
   private final Optional<ConfigurationInstance> configurationInstance;
   private final SourceModel sourceModel;
   private final CursorProviderFactory cursorProviderFactory;
+  private final CursorComponentDecoratorFactory componentDecoratorFactory;
   private final StreamingManager streamingManager;
   private final MuleContext muleContext;
   private final boolean async;
@@ -82,6 +84,7 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
                                        Object source,
                                        Method method,
                                        CursorProviderFactory cursorProviderFactory,
+                                       CursorComponentDecoratorFactory componentDecoratorFactory,
                                        StreamingManager streamingManager,
                                        Component component,
                                        MuleContext muleContext,
@@ -91,6 +94,7 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
     this.configurationInstance = configurationInstance;
     this.sourceModel = sourceModel;
     this.cursorProviderFactory = cursorProviderFactory;
+    this.componentDecoratorFactory = componentDecoratorFactory;
     this.streamingManager = streamingManager;
     this.component = component;
     this.muleContext = muleContext;
@@ -138,6 +142,7 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
                                                                                           sourceModel,
                                                                                           event,
                                                                                           cursorProviderFactory,
+                                                                                          componentDecoratorFactory,
                                                                                           streamingManager,
                                                                                           component,
                                                                                           null,
