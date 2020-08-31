@@ -621,7 +621,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="connectionTimeout" type="xsd:int" use="optional">
+                <xsd:attribute name="connectionTimeout" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             Maximum time in seconds that this data source will wait while attempting to connect to a
