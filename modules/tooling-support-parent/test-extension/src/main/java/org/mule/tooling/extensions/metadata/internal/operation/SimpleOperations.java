@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.tooling.extensions.metadata.api.parameters.ActingParameterGroup;
 import org.mule.tooling.extensions.metadata.api.parameters.ActingParameterGroupWithAlias;
 import org.mule.tooling.extensions.metadata.api.parameters.ComplexActingParameter;
@@ -22,6 +23,9 @@ import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessMetadata
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelPartialTypeKeysOutputTypeResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelTypeKeysOutputTypeResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.RequiresConfigurationOutputTypeKeyResolver;
+import org.mule.tooling.extensions.metadata.internal.sampledata.ActingParameterSampleDataProvider;
+import org.mule.tooling.extensions.metadata.internal.sampledata.ConfigLessConnectionLessSampleDataProvider;
+import org.mule.tooling.extensions.metadata.internal.sampledata.ConfigLessSampleDataProvider;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterGroupVP;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterGroupVPWithAlias;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;
@@ -38,6 +42,7 @@ import java.util.Map;
 public class SimpleOperations {
 
   @OutputResolver(output = ConfigLessConnectionLessMetadataResolver.class)
+  @SampleData(ConfigLessConnectionLessSampleDataProvider.class)
   public Result<Object, Void> configLessConnectionLessOP(@Config SimpleConfiguration configuration,
                                                          @Connection TstExtensionClient client,
                                                          @Optional @OfValues(ConfigLessConnectionLessNoActingParamVP.class) String providedParameter,
@@ -46,6 +51,7 @@ public class SimpleOperations {
   }
 
   @OutputResolver(output = ConfigLessMetadataResolver.class)
+  @SampleData(ConfigLessSampleDataProvider.class)
   public Result<Object, Void> configLessOP(@Config SimpleConfiguration configuration,
                                            @Connection TstExtensionClient client,
                                            @Optional @OfValues(ConfigLessNoActingParamVP.class) String providedParameter,
@@ -84,6 +90,7 @@ public class SimpleOperations {
     return null;
   }
 
+  @SampleData(ActingParameterSampleDataProvider.class)
   public Result<Void, Object> actingParameterOP(@Config SimpleConfiguration configuration,
                                                 @Connection TstExtensionClient client,
                                                 String otherRequiredParameterNotRequiredForMetadataNeitherValueProvider,
