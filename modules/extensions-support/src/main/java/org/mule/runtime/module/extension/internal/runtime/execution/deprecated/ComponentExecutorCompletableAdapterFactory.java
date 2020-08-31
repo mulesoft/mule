@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution.deprecated;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -24,8 +25,10 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 
 import java.util.Map;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 
@@ -50,16 +53,16 @@ public class ComponentExecutorCompletableAdapterFactory<T extends ComponentModel
 
   @Override
   public CompletableComponentExecutor<T> createExecutor(T componentModel, Map<String, Object> parameters) {
-    return new ComponentExecutorCompletableAdapter(delegate.createExecutor(componentModel, parameters));
+    return new ComponentExecutorCompletableAdapter<>(delegate.createExecutor(componentModel, parameters));
   }
 
   private static class ComponentExecutorCompletableAdapter<T extends ComponentModel> implements CompletableComponentExecutor<T>,
-      Lifecycle, MuleContextAware {
+      OperationArgumentResolverFactory<T>, Lifecycle, MuleContextAware {
 
     private final ComponentExecutor<T> delegate;
     private MuleContext muleContext;
 
-    public ComponentExecutorCompletableAdapter(ComponentExecutor<T> delegate) {
+    ComponentExecutorCompletableAdapter(ComponentExecutor<T> delegate) {
       this.delegate = delegate;
     }
 
@@ -97,6 +100,12 @@ public class ComponentExecutorCompletableAdapterFactory<T extends ComponentModel
     @Override
     public void setMuleContext(MuleContext muleContext) {
       this.muleContext = muleContext;
+    }
+
+    @Override
+    public Function<ExecutionContext<T>, Map<String, Object>> createArgumentResolver(T operationModel) {
+      return delegate instanceof OperationArgumentResolverFactory
+          ? ((OperationArgumentResolverFactory<T>) delegate).createArgumentResolver(operationModel) : ec -> emptyMap();
     }
   }
 }
