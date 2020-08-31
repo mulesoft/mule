@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApplyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
@@ -201,7 +202,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
 
       try {
-        CoreEvent returnEvent = processNext(event);
+        CoreEvent returnEvent = processToApplyWithChildContext(event, next);
         counter = findCounter(messageId);
         if (counter != null) {
           resetCounter(messageId);
