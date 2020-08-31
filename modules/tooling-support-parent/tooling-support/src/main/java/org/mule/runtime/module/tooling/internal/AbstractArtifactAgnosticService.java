@@ -40,7 +40,8 @@ public abstract class AbstractArtifactAgnosticService {
         }
         application = applicationSupplier.get();
         if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Application: '{}' has been created", application.getArtifactId());
+          LOGGER.debug("Application: '{}' has been created in [{}ms]", application.getArtifactId(),
+                       currentTimeMillis() - startTime);
         }
       } catch (Exception e) {
         throw getCausalChain(e).stream()
@@ -50,6 +51,7 @@ public abstract class AbstractArtifactAgnosticService {
             .orElse(new MuleRuntimeException(e));
       }
       try {
+        startTime = currentTimeMillis();
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Starting application: '{}'", application.getArtifactId());
         }

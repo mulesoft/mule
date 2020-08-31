@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.tooling.internal.config.metadata;
+package org.mule.runtime.module.tooling.internal.artifact.metadata;
 
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
@@ -15,6 +15,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
+import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
@@ -26,7 +27,6 @@ import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
@@ -93,19 +93,19 @@ public class MetadataComponentExecutor extends MetadataExecutor {
                                                                            Optional<ConfigurationInstance> configurationInstance,
                                                                            MetadataKey metadataKey,
                                                                            ClassLoader extensionClassLoader) {
-    return withContextClassLoader(extensionClassLoader, () -> {
-      MetadataMediator<? extends ComponentModel> metadataMediator = new MetadataMediator<>(componentModel);
-      DefaultMetadataContext metadataContext = createMetadataContext(configurationInstance, extensionClassLoader);
-      return withMetadataContext(metadataContext, () -> {
-        MetadataResult<InputMetadataDescriptor> inputMetadata = metadataMediator
-            .getInputMetadata(metadataContext, metadataKey);
-        MetadataResult<OutputMetadataDescriptor> outputMetadata = null;
-        if (componentModel instanceof HasOutputModel) {
-          outputMetadata = metadataMediator.getOutputMetadata(metadataContext, metadataKey);
-        }
-        return collectMetadata(inputMetadata, outputMetadata);
-      });
-    });
+    MetadataMediator<? extends ComponentModel> metadataMediator = new MetadataMediator<>(componentModel);
+
+    MetadataContext metadataContext = createMetadataContext(configurationInstance, extensionClassLoader);
+
+    return withContextClassLoader(extensionClassLoader, () -> withMetadataContext(metadataContext, () -> {
+      MetadataResult<InputMetadataDescriptor> inputMetadata = metadataMediator
+          .getInputMetadata(metadataContext, metadataKey);
+      MetadataResult<OutputMetadataDescriptor> outputMetadata = null;
+      if (componentModel instanceof HasOutputModel) {
+        outputMetadata = metadataMediator.getOutputMetadata(metadataContext, metadataKey);
+      }
+      return collectMetadata(inputMetadata, outputMetadata);
+    }));
   }
 
   private MetadataResult<ComponentMetadataTypesDescriptor> collectMetadata(@Nonnull MetadataResult<InputMetadataDescriptor> inputMetadataResult,

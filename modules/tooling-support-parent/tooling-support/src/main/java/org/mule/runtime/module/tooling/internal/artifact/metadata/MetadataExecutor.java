@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.tooling.internal.config.metadata;
+package org.mule.runtime.module.tooling.internal.artifact.metadata;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -19,14 +19,18 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.internal.metadata.cache.DefaultMetadataCache;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class MetadataExecutor {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetadataExecutor.class);
 
   protected ConnectionManager connectionManager;
   protected ReflectionCache reflectionCache;
@@ -64,12 +68,12 @@ public abstract class MetadataExecutor {
   protected abstract boolean resolverRequiresConfiguration(Optional<TypeResolversInformationModelProperty> typeResolversInformationModelProperty,
                                                            ComponentModel componentModel);
 
-  protected DefaultMetadataContext createMetadataContext(Optional<ConfigurationInstance> configurationInstance,
-                                                         ClassLoader extensionClassLoader) {
-    return new DefaultMetadataContext(() -> configurationInstance,
-                                      connectionManager,
-                                      new DefaultMetadataCache(),
-                                      new JavaTypeLoader(extensionClassLoader));
+  protected MetadataContext createMetadataContext(Optional<ConfigurationInstance> configurationInstance,
+                                                  ClassLoader extensionClassLoader) {
+    return new LoggingMetadataResolvingContext(() -> configurationInstance,
+                                               connectionManager,
+                                               new DefaultMetadataCache(),
+                                               new JavaTypeLoader(extensionClassLoader));
   }
 
   protected static <T> T withMetadataContext(MetadataContext metadataContext, Callable<T> callable) {

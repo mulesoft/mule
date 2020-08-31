@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.tooling.internal.config.value;
+package org.mule.runtime.module.tooling.internal.artifact.value;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -15,7 +15,9 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
-import static org.mule.runtime.module.tooling.internal.config.params.ParameterExtractor.extractValue;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.extractValue;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -41,13 +43,20 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersRes
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
+import org.mule.runtime.module.tooling.internal.artifact.context.LoggingResolvingContext;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ValueProviderExecutor {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ValueProviderExecutor.class);
 
   private final MuleContext muleContext;
   private final ConnectionManager connectionManager;
@@ -74,14 +83,15 @@ public class ValueProviderExecutor {
       ParameterValueResolver parameterValueResolver = parameterValueResolver(parameterizedElementDeclaration, parameterizedModel);
       ValueProviderMediator valueProviderMediator = createValueProviderMediator(parameterizedModel);
 
-      ExtensionResolvingContext context = new ExtensionResolvingContext(() -> optionalConfigurationInstance, connectionManager);
+      LoggingResolvingContext context =
+          new LoggingResolvingContext(new ExtensionResolvingContext(() -> optionalConfigurationInstance,
+                                                                    connectionManager));
+      ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(parameterizedElementDeclaration));
       try {
-        return resultFrom(valueProviderMediator.getValues(providerName,
-                                                          parameterValueResolver,
-                                                          (CheckedSupplier<Object>) () -> context
-                                                              .getConnection().orElse(null),
-                                                          (CheckedSupplier<Object>) () -> context
-                                                              .getConfig().orElse(null)));
+        return resultFrom(withContextClassLoader(extensionClassLoader, () -> valueProviderMediator.getValues(providerName,
+                                                                                                             parameterValueResolver,
+                                                                                                             connectionSupplier(context),
+                                                                                                             configSupplier(context))));
       } finally {
         context.dispose();
       }
@@ -90,6 +100,14 @@ public class ValueProviderExecutor {
     } catch (Exception e) {
       return resultFrom(newFailure(e).build());
     }
+  }
+
+  private Supplier<Object> connectionSupplier(LoggingResolvingContext context) {
+    return (CheckedSupplier<Object>) () -> context.getConnection().orElse(null);
+  }
+
+  private Supplier<Object> configSupplier(LoggingResolvingContext context) {
+    return (CheckedSupplier<Object>) () -> context.getConfig().orElse(null);
   }
 
   private Optional<ConfigurationInstance> getConfigurationInstance(ParameterizedModel parameterizedModel,

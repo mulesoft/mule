@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.tooling.internal.config.params;
+package org.mule.runtime.module.tooling.internal.artifact.params;
 
 import static java.util.stream.Collectors.toList;
 import org.mule.runtime.app.declaration.api.ParameterValue;
