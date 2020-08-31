@@ -12,6 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -22,6 +23,8 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.sampledata.SampleDataFailure;
+import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -37,6 +40,7 @@ import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.artifact.metadata.MetadataComponentExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.metadata.MetadataKeysExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.value.ValueProviderExecutor;
+import org.mule.runtime.module.tooling.internal.artifact.sampledata.SampleDataExecutor;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
@@ -67,6 +71,7 @@ public class InternalDeclarationSession implements DeclarationSession {
   private final LazyValue<ValueProviderExecutor> valueProviderExecutorLazyValue;
   private final LazyValue<MetadataKeysExecutor> metadataKeysExecutorLazyValue;
   private final LazyValue<MetadataComponentExecutor> metadataComponentExecutorLazyValue;
+  private final LazyValue<SampleDataExecutor> sampleDataExecutorLazyValue;
 
   InternalDeclarationSession(ArtifactDeclaration artifactDeclaration) {
     this.artifactHelperLazyValue =
@@ -78,6 +83,8 @@ public class InternalDeclarationSession implements DeclarationSession {
         new LazyValue<>(() -> new MetadataKeysExecutor(connectionManager, reflectionCache, artifactHelper()));
     this.metadataComponentExecutorLazyValue =
         new LazyValue<>(() -> new MetadataComponentExecutor(connectionManager, reflectionCache, artifactHelper()));
+    this.sampleDataExecutorLazyValue =
+        new LazyValue<>(() -> new SampleDataExecutor(connectionManager, reflectionCache, artifactHelper()));
   }
 
   private ArtifactHelper artifactHelper() {
@@ -94,6 +101,10 @@ public class InternalDeclarationSession implements DeclarationSession {
 
   private MetadataComponentExecutor metadataComponentExecutor() {
     return metadataComponentExecutorLazyValue.get();
+  }
+
+  private SampleDataExecutor sampleDataExecutor() {
+    return sampleDataExecutorLazyValue.get();
   }
 
   @Override
@@ -172,6 +183,33 @@ public class InternalDeclarationSession implements DeclarationSession {
 
     return metadataComponentExecutor().resolveComponentMetadata(optionalComponentModel.get(), componentElementDeclaration);
 
+  }
+
+  @Override
+  public SampleDataResult getSampleData(ComponentElementDeclaration componentElementDeclaration) {
+    Optional<ExtensionModel> optionalExtensionModel = artifactHelper().findExtension(componentElementDeclaration);
+    if (!optionalExtensionModel.isPresent()) {
+      return SampleDataResult.resultFrom(SampleDataFailure.Builder.newFailure()
+          .withMessage(extensionNotFoundErrorMessage(componentElementDeclaration.getDeclaringExtension()))
+          .withFailureCode(COMPONENT_NOT_FOUND.getName())
+          .build());
+    }
+
+    Optional<? extends ComponentModel> optionalComponentModel =
+        artifactHelper().findComponentModel(optionalExtensionModel.get(), componentElementDeclaration);
+    if (!optionalComponentModel.isPresent()) {
+      return SampleDataResult.resultFrom(SampleDataFailure.Builder.newFailure()
+          .withMessage(couldNotFindComponentErrorMessage(componentElementDeclaration))
+          .withFailureCode(COMPONENT_NOT_FOUND.getName())
+          .build());
+    }
+
+    return sampleDataExecutor().getSampleData(optionalComponentModel.get(), componentElementDeclaration);
+  }
+
+  @Override
+  public ExpressionManager getExpressionManager() {
+    return expressionManager;
   }
 
   private String couldNotFindComponentErrorMessage(ElementDeclaration declaration) {

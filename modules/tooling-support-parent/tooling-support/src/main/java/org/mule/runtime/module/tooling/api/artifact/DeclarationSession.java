@@ -12,12 +12,14 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
+import org.mule.runtime.core.api.el.ExpressionManager;
 
 /**
- * It is in charge of resolving connector's operations and retrieving metadata for all
+ * It is in charge of resolving connector's operations and retrieving metadata and sample data for all
  * components related to the same session configuration. The session configuration should be
  * defined by multiple global elements, including Configurations, Connections, etc.
  * <p/>
@@ -69,6 +71,19 @@ public interface DeclarationSession {
    * @return a {@link MetadataResult} of {@link ComponentMetadataTypesDescriptor} containing all the dynamic types
    */
   MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentElementDeclaration component);
+
+  /**
+   * Retrieves any sample data available for the component.
+   *
+   * @param component the component whose sample data is required
+   * @return a {@link SampleDataResult} with the sample data message
+   */
+  SampleDataResult getSampleData(ComponentElementDeclaration component);
+
+  /**
+   * Exposes the application Expression Manager.
+   */
+  ExpressionManager getExpressionManager();
 
   /**
    * Stops and disposes all resources used by this {@link DeclarationSession}
