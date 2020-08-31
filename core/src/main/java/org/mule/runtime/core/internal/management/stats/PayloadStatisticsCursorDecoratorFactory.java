@@ -12,6 +12,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 
 public class PayloadStatisticsCursorDecoratorFactory implements MuleContextAware, CursorDecoratorFactory {
 

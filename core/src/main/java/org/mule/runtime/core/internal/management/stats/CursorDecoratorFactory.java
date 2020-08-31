@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.management.stats;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 
 import java.io.InputStream;

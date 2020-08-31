@@ -19,6 +19,7 @@ import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -47,6 +48,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private CoreEvent event;
   private SecurityContext securityContext;
   private final CursorProviderFactory cursorProviderFactory;
+  private final CursorComponentDecoratorFactory componentDecoratorFactory;
   private final StreamingManager streamingManager;
   private final Optional<TransactionConfig> transactionConfig;
   private final Component component;
@@ -72,6 +74,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
                                  M componentModel,
                                  CoreEvent event,
                                  CursorProviderFactory cursorProviderFactory,
+                                 CursorComponentDecoratorFactory componentDecoratorFactory,
                                  StreamingManager streamingManager,
                                  Component component,
                                  RetryPolicyTemplate retryPolicyTemplate,
@@ -85,6 +88,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.componentModel = componentModel;
     this.parameters = parameters;
     this.cursorProviderFactory = cursorProviderFactory;
+    this.componentDecoratorFactory = componentDecoratorFactory;
     this.streamingManager = streamingManager;
     this.muleContext = muleContext;
     this.component = component;
@@ -232,6 +236,11 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   @Override
   public CursorProviderFactory getCursorProviderFactory() {
     return cursorProviderFactory;
+  }
+
+  @Override
+  public CursorComponentDecoratorFactory getComponentDecoratorFactory() {
+    return componentDecoratorFactory;
   }
 
   /**

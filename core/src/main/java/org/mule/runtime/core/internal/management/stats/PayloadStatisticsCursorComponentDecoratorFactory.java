@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.management.stats;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -108,20 +109,22 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
   }
 
   private Result decorateResult(Result decorated, String correlationId) {
-    Object decoratedOutput;
-
-    if (decorated.getOutput() instanceof InputStream) {
-      decoratedOutput = decorateOutput((InputStream) decorated.getOutput(), correlationId);
-    } else if (decorated.getOutput() instanceof Iterator) {
-      decoratedOutput = decorateOutput((Iterator) decorated.getOutput(), correlationId);
-    } else {
-      decoratedOutput = decorated.getOutput();
-    }
+    Object decoratedOutput = decorateOutput(decorated.getOutput(), correlationId);
 
     if (decoratedOutput == decorated.getOutput()) {
       return decorated;
     } else {
       return decorated.copy().output(decoratedOutput).build();
+    }
+  }
+
+  private Object decorateOutput(Object decorated, String correlationId) {
+    if (decorated instanceof InputStream) {
+      return decorateOutput((InputStream) decorated, correlationId);
+    } else if (decorated instanceof Iterator) {
+      return decorateOutput((Iterator) decorated, correlationId);
+    } else {
+      return decorated;
     }
   }
 
