@@ -51,12 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ValueProviderExecutor {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ValueProviderExecutor.class);
 
   private final MuleContext muleContext;
   private final ConnectionManager connectionManager;
@@ -91,12 +86,18 @@ public class ValueProviderExecutor {
         return resultFrom(withContextClassLoader(extensionClassLoader, () -> valueProviderMediator.getValues(providerName,
                                                                                                              parameterValueResolver,
                                                                                                              connectionSupplier(context),
-                                                                                                             configSupplier(context))));
+                                                                                                             configSupplier(context)),
+                                                 ValueResolvingException.class,
+                                                 e -> {
+                                                   throw new ExecutorExceptionWrapper(e);
+                                                 }));
       } finally {
         context.dispose();
       }
     } catch (ValueResolvingException e) {
       return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
+    } catch (ExecutorExceptionWrapper e) {
+      return resultFrom(newFailure(e.getCause()).build());
     } catch (Exception e) {
       return resultFrom(newFailure(e).build());
     }
@@ -196,5 +197,12 @@ public class ValueProviderExecutor {
     return empty();
   }
 
+  private class ExecutorExceptionWrapper extends MuleRuntimeException {
+
+    public ExecutorExceptionWrapper(Throwable cause) {
+      super(cause);
+    }
+
+  }
 
 }
