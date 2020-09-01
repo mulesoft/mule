@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.tooling.internal.config;
 
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_DISABLE_TEST_CONNECTION_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
@@ -32,7 +32,7 @@ public class DefaultDeclarationSessionBuilder
   protected Map<String, String> forcedDeploymentProperties() {
     return ImmutableMap.<String, String>builder()
         .put(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY, TRUE)
-        .put(MULE_DISABLE_TEST_CONNECTION_ON_DEPLOYMENT_PROPERTY, TRUE)
+        .put(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, TRUE)
         .build();
   }
 
