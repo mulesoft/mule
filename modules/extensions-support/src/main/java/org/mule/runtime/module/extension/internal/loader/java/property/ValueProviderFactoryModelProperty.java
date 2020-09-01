@@ -102,7 +102,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
   }
 
   /**
-   * @return The {@link List} of parameters that requires to be inyected into the {@link ValueProvider}
+   * @return The {@link List} of parameters that requires to be injected into the {@link ValueProvider}
    */
   public List<InjectableParameterInfo> getInjectableParameters() {
     return injectableParameters;
@@ -163,43 +163,6 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
     public void withConfig(Field configField) {
       this.configField = configField;
-    }
-  }
-
-  public static class InjectableParameterInfo {
-
-    String parameterName;
-    MetadataType type;
-    boolean required;
-
-    InjectableParameterInfo(String parameterName, MetadataType type, boolean required) {
-      this.parameterName = parameterName;
-      this.type = type;
-      this.required = required;
-    }
-
-    public String getParameterName() {
-      return parameterName;
-    }
-
-    public void setParameterName(String parameterName) {
-      this.parameterName = parameterName;
-    }
-
-    public MetadataType getType() {
-      return type;
-    }
-
-    public void setType(MetadataType type) {
-      this.type = type;
-    }
-
-    public boolean isRequired() {
-      return required;
-    }
-
-    public void setRequired(boolean required) {
-      this.required = required;
     }
   }
 }

@@ -6,29 +6,27 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
-import static java.lang.String.format;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.setValueIntoField;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides instances of the {@link ValueProvider}
@@ -75,18 +73,18 @@ public class ValueProviderFactory {
         Object connection = connectionSupplier.get();
         if (connection == null) {
           throw new ValueResolvingException("The value provider requires a connection and none was provided",
-                                            MISSING_REQUIRED_PARAMETERS);
+                  MISSING_REQUIRED_PARAMETERS);
         }
-        injectValueIntoField(resolver, connectionSupplier.get(), connectionField);
+        setValueIntoField(resolver, connectionSupplier.get(), connectionField);
       }
 
       if (factoryModelProperty.usesConfig()) {
         Object config = configurationSupplier.get();
         if (config == null) {
           throw new ValueResolvingException("The value provider requires a configuration and none was provided",
-                                            MISSING_REQUIRED_PARAMETERS);
+                  MISSING_REQUIRED_PARAMETERS);
         }
-        injectValueIntoField(resolver, configurationSupplier.get(), configField);
+        setValueIntoField(resolver, configurationSupplier.get(), configField);
       }
       return resolver;
     } catch (ValueResolvingException e) {
@@ -104,11 +102,13 @@ public class ValueProviderFactory {
       try {
         parameterValue = parameterValueResolver.getParameterValue(parameterName);
       } catch (org.mule.runtime.module.extension.internal.runtime.ValueResolvingException ignored) {
-        LOGGER.debug("An error occurred while resolving parameter " + parameterName, ignored);
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("An error occurred while resolving parameter " + parameterName, ignored);
+        }
       }
 
       if (parameterValue != null) {
-        injectValueIntoField(resolver, parameterValue, parameterName, reflectionCache);
+        setValueIntoField(resolver, parameterValue, parameterName, reflectionCache);
       } else if (injectableParam.isRequired()) {
         missingParameters.add(parameterName);
       }
@@ -116,21 +116,7 @@ public class ValueProviderFactory {
 
     if (!missingParameters.isEmpty()) {
       throw new ValueResolvingException("Unable to retrieve values. There are missing required parameters for the resolution: "
-          + missingParameters, MISSING_REQUIRED_PARAMETERS);
+              + missingParameters, MISSING_REQUIRED_PARAMETERS);
     }
-  }
-
-  private static void injectValueIntoField(ValueProvider fieldContainer, Object valueToInject, String requiredParamName,
-                                           ReflectionCache reflectionCache) {
-    Optional<Field> optionalField = IntrospectionUtils.getField(fieldContainer.getClass(), requiredParamName, reflectionCache);
-    if (optionalField.isPresent()) {
-      Field field = optionalField.get();
-      injectValueIntoField(fieldContainer, valueToInject, field);
-    }
-  }
-
-  private static void injectValueIntoField(ValueProvider fieldContainer, Object valueToInject, Field field) {
-    field.setAccessible(true);
-    org.springframework.util.ReflectionUtils.setField(field, fieldContainer, valueToInject);
   }
 }
