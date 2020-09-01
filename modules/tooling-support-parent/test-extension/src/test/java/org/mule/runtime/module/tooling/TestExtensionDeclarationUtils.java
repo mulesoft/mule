@@ -32,6 +32,7 @@ public class TestExtensionDeclarationUtils {
   public static final String ACTING_PARAMETER_NAME = "actingParameter";
   public static final String NOT_ACTING_PARAMETER_NAME = "notActingParameter";
   public static final String METADATA_KEY_PARAMETER_NAME = "metadataKey";
+  public static final String CONTINENT_PARAMETER_NAME = "continent";
   public static final String ACTING_PARAMETER_GROUP_NAME = "Acting";
 
   public static final String SOURCE_ELEMENT_NAME = "simple";
@@ -106,9 +107,29 @@ public class TestExtensionDeclarationUtils {
             .getDeclaration();
   }
 
+  public static ConnectionElementDeclaration connectionDeclaration(String clientName, String actingParameter) {
+    return TEST_EXTENSION_DECLARER.newConnection(CONNECTION_ELEMENT_NAME)
+            .withParameterGroup(newParameterGroup()
+                                        .withParameter(CONNECTION_CLIENT_NAME_PARAMETER, clientName)
+                                        .withParameter(ACTING_PARAMETER_NAME, actingParameter)
+                                        .getDeclaration())
+            .getDeclaration();
+  }
+
   public static OperationElementDeclaration configLessConnectionLessOPDeclaration(String configName) {
     return TEST_EXTENSION_DECLARER
             .newOperation(CONFIG_LESS_CONNECTION_LESS_OP_ELEMENT_NAME)
+            .withConfig(configName)
+            .getDeclaration();
+
+  }
+
+  public static OperationElementDeclaration configLessConnectionLessOPDeclaration(String configName, String metadataKey) {
+    return TEST_EXTENSION_DECLARER
+            .newOperation(CONFIG_LESS_CONNECTION_LESS_OP_ELEMENT_NAME)
+            .withParameterGroup(newParameterGroup()
+                                        .withParameter(METADATA_KEY_PARAMETER_NAME, metadataKey)
+                                        .getDeclaration())
             .withConfig(configName)
             .getDeclaration();
 

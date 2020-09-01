@@ -6,6 +6,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.metadata.RequiredForMetadata;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
@@ -22,6 +23,7 @@ public class TstConnectionProvider implements ConnectionProvider<TstExtensionCli
   private String clientName;
 
   @Parameter
+  @RequiredForMetadata
   private String actingParameter;
 
   @Parameter
