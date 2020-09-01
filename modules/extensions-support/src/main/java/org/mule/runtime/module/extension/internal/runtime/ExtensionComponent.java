@@ -115,7 +115,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final ExtensionModel extensionModel;
   private final AtomicReference<ConfigurationProvider> configurationProvider = new AtomicReference<>();
   private final MetadataMediator<T> metadataMediator;
-  private final ValueProviderMediator<T> valueProviderMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
 
@@ -124,6 +123,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected final T componentModel;
 
   protected CursorProviderFactory cursorProviderFactory;
+  private ValueProviderMediator<T> valueProviderMediator;
 
   protected MuleContext muleContext;
 
@@ -168,7 +168,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.extensionManager = extensionManager;
     this.cursorProviderFactory = cursorProviderFactory;
     this.metadataMediator = new MetadataMediator<>(componentModel);
-    this.valueProviderMediator = new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
 
@@ -407,7 +406,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   public Set<Value> getValues(String parameterName) throws ValueResolvingException {
     try {
       return runWithValueProvidersContext(context -> withContextClassLoader(classLoader,
-                                                                            () -> valueProviderMediator
+                                                                            () -> getValueProviderMediator()
                                                                                 .getValues(parameterName,
                                                                                            getParameterValueResolver(),
                                                                                            (CheckedSupplier<Object>) () -> context
@@ -610,6 +609,18 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
 
     this.cacheIdGenerator = cacheIdGeneratorFactory.create(context, configLocator);
+  }
+
+  private ValueProviderMediator getValueProviderMediator() {
+    if (valueProviderMediator == null) {
+      synchronized (this) {
+        if (valueProviderMediator == null) {
+          this.valueProviderMediator = new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
+        }
+      }
+    }
+
+    return valueProviderMediator;
   }
 
   protected abstract ParameterValueResolver getParameterValueResolver();

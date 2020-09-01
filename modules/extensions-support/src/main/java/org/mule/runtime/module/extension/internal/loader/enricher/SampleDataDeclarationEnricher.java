@@ -56,7 +56,7 @@ import java.util.Optional;
  * Operation, Configuration and Connection Provider Parameters and ParameterGroups annotated with {@link OfValues}.
  * If a parameter or parameter group is annotated, this one will have a related {@link ValueProvider}
  *
- * @since 4.0
+ * @since 4.4.0
  */
 public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
 
