@@ -8,9 +8,7 @@ package org.mule.runtime.core.internal.management.stats;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -20,22 +18,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STATISTICS;
 
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
-import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.ByteArrayInputStream;
@@ -47,10 +37,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -188,6 +176,124 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     decorator.next();
 
     verifyNoStatistics(statistics);
+  }
+
+  @Test
+  public void decorateInputListIterate() throws IOException {
+    final Iterator<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
+        .decorateInput(asList("Hello", "World"), CORR_ID).iterator();
+
+    final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
+    assertThat(statistics.getInputObjectCount(), is(0L));
+
+    decorator.next();
+    assertThat(statistics.getInputObjectCount(), is(1L));
+
+    decorator.next();
+    assertThat(statistics.getInputObjectCount(), is(2L));
+
+    try {
+      decorator.next();
+      fail("Expected NoSuchElementException");
+    } catch (NoSuchElementException e) {
+      // nothing to do
+    }
+    assertThat(statistics.getInputObjectCount(), is(2L));
+
+    assertThat(statistics.getInputByteCount(), is(0L));
+    assertThat(statistics.getOutputByteCount(), is(0L));
+    assertThat(statistics.getOutputObjectCount(), is(0L));
+  }
+
+  @Test
+  public void decorateInputListEnhancedFor() throws IOException {
+    final Collection<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
+        .decorateInput(asList("Hello", "World"), CORR_ID);
+
+    final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
+    assertThat(statistics.getInputObjectCount(), is(0L));
+
+    for (String value : decorator) {
+      // Nothing to do
+    }
+
+    assertThat(statistics.getInputObjectCount(), is(2L));
+
+    assertThat(statistics.getInputByteCount(), is(0L));
+    assertThat(statistics.getOutputByteCount(), is(0L));
+    assertThat(statistics.getOutputObjectCount(), is(0L));
+  }
+
+  @Test
+  public void decorateInputListForEach() throws IOException {
+    final Collection<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
+        .decorateInput(asList("Hello", "World"), CORR_ID);
+
+    final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
+    assertThat(statistics.getInputObjectCount(), is(0L));
+
+    decorator.forEach(value -> {
+      // Nothing to do
+    });
+
+    assertThat(statistics.getInputObjectCount(), is(2L));
+
+    assertThat(statistics.getInputByteCount(), is(0L));
+    assertThat(statistics.getOutputByteCount(), is(0L));
+    assertThat(statistics.getOutputObjectCount(), is(0L));
+  }
+
+  @Test
+  public void decorateInputListStream() throws IOException {
+    final Collection<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
+        .decorateInput(asList("Hello", "World"), CORR_ID);
+
+    final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
+    assertThat(statistics.getInputObjectCount(), is(0L));
+
+    decorator.stream().forEach(value -> {
+      // Nothing to do
+    });
+
+    assertThat(statistics.getInputObjectCount(), is(2L));
+
+    assertThat(statistics.getInputByteCount(), is(0L));
+    assertThat(statistics.getOutputByteCount(), is(0L));
+    assertThat(statistics.getOutputObjectCount(), is(0L));
+  }
+
+  @Test
+  public void decorateInputListToArray() throws IOException {
+    final Collection<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
+        .decorateInput(asList("Hello", "World"), CORR_ID);
+
+    final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
+    assertThat(statistics.getInputObjectCount(), is(0L));
+
+    decorator.toArray();
+
+    assertThat(statistics.getInputObjectCount(), is(2L));
+
+    assertThat(statistics.getInputByteCount(), is(0L));
+    assertThat(statistics.getOutputByteCount(), is(0L));
+    assertThat(statistics.getOutputObjectCount(), is(0L));
+  }
+
+  @Test
+  public void decorateInputListToArrayContent() throws IOException {
+    final Collection<String> decorator = decoratorFactory.componentDecoratorFactory(component1)
+        .decorateInput(asList("Hello", "World"), CORR_ID);
+
+    final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
+    assertThat(statistics.getInputObjectCount(), is(0L));
+
+    decorator.toArray(new String[0]);
+
+    assertThat(statistics.getInputObjectCount(), is(2L));
+
+    assertThat(statistics.getInputByteCount(), is(0L));
+    assertThat(statistics.getOutputByteCount(), is(0L));
+    assertThat(statistics.getOutputObjectCount(), is(0L));
   }
 
   @Test
