@@ -6,10 +6,13 @@
  */
 package org.mule.test.module.extension.typed.value;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.test.typed.value.extension.extension.TypedValueParameterOperations.THIS_IS_A_DEFAULT_STRING;
 
@@ -18,24 +21,30 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
+import org.mule.test.runner.RunnerDelegateTo;
 import org.mule.test.typed.value.extension.extension.SimplePojo;
 import org.mule.test.typed.value.extension.extension.TypedValueSource;
 import org.mule.test.vegan.extension.VeganProductInformation;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunnerDelegateTo(Parameterized.class)
 public class TypedValueParameterOperationExecutionTestCase extends AbstractTypedValueTestCase {
 
   private static final String STRING_VALUE = "string";
@@ -44,14 +53,21 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
       "}";
   private static final String THIS_IS_A_STRING = "This is a string";
 
-  @Override
-  protected String[] getConfigFiles() {
-    return new String[] {"typed-value-config.xml"};
+  @Parameters(name = "enableStatistics: {0}")
+  public static Collection<String> data() {
+    return asList("false", "true");
+  }
+
+  @Rule
+  public SystemProperty withStatistics;
+
+  public TypedValueParameterOperationExecutionTestCase(String enableStatistics) {
+    this.withStatistics = new SystemProperty(MULE_ENABLE_STATISTICS, enableStatistics);
   }
 
   @Override
-  protected boolean isDisposeContextPerClass() {
-    return true;
+  protected String getConfigFile() {
+    return "typed-value-config.xml";
   }
 
   @After
@@ -126,7 +142,7 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
   @Test
   public void typedValueOperationStringMapListParameter() throws Exception {
     Map<Object, Object> mapStringList = new LinkedHashMap<>();
-    mapStringList.put("key", Collections.singletonList("string"));
+    mapStringList.put("key", singletonList("string"));
     runAndAssertTypedValue("typedValueOperationStringMapListParameter", mapStringList, ANY, null);
   }
 
@@ -134,8 +150,12 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
   public void typedValueForStringOnSourceOnSuccess() throws Exception {
     Flow flow = (Flow) getFlowConstruct("typedValueForStringOnSourceOnSuccess");
     flow.start();
-    new PollingProber(100000, 100).check(new JUnitLambdaProbe(() -> TypedValueSource.onSuccessValue != null));
-    assertTypedValue(TypedValueSource.onSuccessValue, STRING_VALUE, WILDCARD, null);
+    try {
+      new PollingProber(100000, 100).check(new JUnitLambdaProbe(() -> TypedValueSource.onSuccessValue != null));
+      assertTypedValue(TypedValueSource.onSuccessValue, STRING_VALUE, WILDCARD, null);
+    } finally {
+      flow.stop();
+    }
   }
 
   @Test
