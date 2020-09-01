@@ -10,6 +10,7 @@ package org.mule.tooling.extensions.metadata.internal.config;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.extension.api.annotation.metadata.RequiredForMetadata;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
@@ -24,6 +25,7 @@ import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;
 public class SimpleConfiguration {
 
   @Parameter
+  @RequiredForMetadata
   private String actingParameter;
 
   @Parameter
