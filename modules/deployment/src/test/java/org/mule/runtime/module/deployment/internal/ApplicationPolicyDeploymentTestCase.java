@@ -260,27 +260,9 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     doApplicationPolicyExecutionTest(parameters -> false, 0, "");
   }
 
-  private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations,
-                                                Object expectedPolicyParametrization)
-      throws Exception {
-    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
-
-    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin);
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-    startDeployment();
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-
-    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
-                            new PolicyParametrization(FOO_POLICY_ID, pointcut, 1,
-                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
-
-
-    executeApplicationFlow("main");
-    assertThat(invocationCount, equalTo(expectedPolicyInvocations));
-    assertThat(policyParametrization, equalTo(expectedPolicyParametrization));
+  @Test
+  public void appliesApplicationPolicyUsingAsyncScope() throws Exception {
+    doApplicationPolicyExecutionTest(parameters -> true, 1, POLICY_PROPERTY_VALUE, "/policy-using-async-scope.xml");
   }
 
   @Test
@@ -696,6 +678,35 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(2));
+  }
+
+  private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations,
+                                                Object expectedPolicyParametrization)
+      throws Exception {
+    doApplicationPolicyExecutionTest(pointcut, expectedPolicyInvocations, expectedPolicyParametrization, "/fooPolicy.xml");
+  }
+
+  private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations,
+                                                Object expectedPolicyParametrization, String policyFile)
+      throws Exception {
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointcut, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
+                                                      getResourceFile(policyFile), emptyList()));
+
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(expectedPolicyInvocations));
+    assertThat(policyParametrization, equalTo(expectedPolicyParametrization));
   }
 
   private PolicyFileBuilder policyWithPluginAndResource() {
