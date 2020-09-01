@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 import static java.lang.System.arraycopy;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
+import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
@@ -22,15 +23,18 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
@@ -50,6 +54,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
+import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
@@ -87,6 +92,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -146,6 +153,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
   private final List<ParameterGroupModel> parameterGroupModels;
   private final Method method;
+  private final CursorComponentDecoratorFactory componentDecoratorFactory;
   private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
   private ArgumentResolver<Object>[] argumentResolvers;
   private Map<java.lang.reflect.Parameter, ParameterGroupArgumentResolver<?>> parameterGroupResolvers;
@@ -155,10 +163,13 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
    *
    * @param parameterGroupModels {@link List} of {@link ParameterGroupModel} from the corresponding model
    * @param method the {@link Method} to be called
+   * @param componentDecoratorFactory
    */
-  public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method) {
+  public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method,
+                                        CursorComponentDecoratorFactory componentDecoratorFactory) {
     this.parameterGroupModels = parameterGroupModels;
     this.method = method;
+    this.componentDecoratorFactory = componentDecoratorFactory;
   }
 
   private void initArgumentResolvers() {
@@ -238,7 +249,9 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }
 
-      argumentResolvers[i] = addResolverDecorators((ArgumentResolver<Object>) argumentResolver, parameter);
+      argumentResolvers[i] =
+          addResolverDecorators((ArgumentResolver<Object>) argumentResolver,
+                                annotations.containsKey(Content.class) ? componentDecoratorFactory : NO_OP_INSTANCE, parameter);
     }
   }
 
@@ -271,24 +284,28 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     return parameterValues;
   }
 
-  private ArgumentResolver<Object> addResolverDecorators(ArgumentResolver<Object> resolver, Parameter parameter) {
+  private ArgumentResolver<Object> addResolverDecorators(ArgumentResolver<Object> resolver,
+                                                         CursorComponentDecoratorFactory componentDecoratorFactory,
+                                                         Parameter parameter) {
     Class<?> argumentType = parameter.getType();
     if (argumentType.isPrimitive()) {
       resolver = addPrimitiveTypeDefaultValueDecorator(resolver, argumentType);
     } else if (InputStream.class.equals(argumentType)) {
-      resolver = new InputStreamArgumentResolverDecorator(resolver);
+      resolver = new InputStreamArgumentResolverDecorator(resolver, componentDecoratorFactory);
     } else if (TypedValue.class.equals(argumentType)) {
       if (parameter.getParameterizedType() instanceof ParameterizedType) {
         Type generic = ((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments()[0];
         if (generic instanceof Class) {
           Class<?> genericClass = (Class<?>) generic;
           if (CursorProvider.class.isAssignableFrom(genericClass) || Object.class.equals(genericClass)) {
-            resolver = new TypedValueCursorArgumentResolverDecorator(resolver);
+            resolver = new TypedValueCursorArgumentResolverDecorator(resolver, componentDecoratorFactory);
+          } else {
+            resolver = new TypedValueArgumentResolverDecorator(resolver, componentDecoratorFactory);
           }
         }
       }
-    } else if (Object.class.equals(argumentType)) {
-      resolver = new ObjectArgumentResolverDecorator(resolver);
+    } else {
+      resolver = new ObjectArgumentResolverDecorator(resolver, componentDecoratorFactory);
     }
 
     return resolver;
@@ -344,23 +361,27 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     initArgumentResolvers();
   }
 
-  private class InputStreamArgumentResolverDecorator extends ArgumentResolverDecorator {
+  private static class InputStreamArgumentResolverDecorator extends ArgumentResolverDecorator {
 
-    public InputStreamArgumentResolverDecorator(ArgumentResolver<Object> decoratee) {
+    private final CursorComponentDecoratorFactory componentDecoratorFactory;
+
+    public InputStreamArgumentResolverDecorator(ArgumentResolver<Object> decoratee,
+                                                CursorComponentDecoratorFactory componentDecoratorFactory) {
       super(decoratee);
+      this.componentDecoratorFactory = componentDecoratorFactory;
     }
 
     @Override
-    protected Object decorate(Object value) {
+    protected Object decorate(Object value, String eventCorrelationId) {
       if (value instanceof CursorStream) {
-        return new UnclosableCursorStream((CursorStream) value);
+        return componentDecoratorFactory.decorateInput(new UnclosableCursorStream((CursorStream) value), eventCorrelationId);
+      } else {
+        return componentDecoratorFactory.decorateInput((InputStream) value, eventCorrelationId);
       }
-
-      return value;
     }
   }
 
-  private class DefaultValueArgumentResolverDecorator extends ArgumentResolverDecorator {
+  private static class DefaultValueArgumentResolverDecorator extends ArgumentResolverDecorator {
 
     private final Object defaultValue;
 
@@ -370,7 +391,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     }
 
     @Override
-    protected Object decorate(Object value) {
+    protected Object decorate(Object value, String eventCorrelationId) {
       return value != null ? value : defaultValue;
     }
 
@@ -380,31 +401,87 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     }
   }
 
-  private class TypedValueCursorArgumentResolverDecorator extends ArgumentResolverDecorator {
+  private static class TypedValueCursorArgumentResolverDecorator extends ArgumentResolverDecorator {
 
-    public TypedValueCursorArgumentResolverDecorator(ArgumentResolver<Object> decoratee) {
+    private final CursorComponentDecoratorFactory componentDecoratorFactory;
+
+    public TypedValueCursorArgumentResolverDecorator(ArgumentResolver<Object> decoratee,
+                                                     CursorComponentDecoratorFactory componentDecoratorFactory) {
       super(decoratee);
+      this.componentDecoratorFactory = componentDecoratorFactory;
     }
 
     @Override
-    protected Object decorate(Object value) {
-      return resolveCursor((TypedValue) value);
+    protected Object decorate(Object value, String eventCorrelationId) {
+      return resolveCursor((TypedValue) value, v -> {
+        if (v instanceof InputStream) {
+          return componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
+        } else if (v instanceof Collection) {
+          return componentDecoratorFactory.decorateInput((Collection) v, eventCorrelationId);
+        } else if (v instanceof Iterator) {
+          return componentDecoratorFactory.decorateInput((Iterator) v, eventCorrelationId);
+        } else {
+          return v;
+        }
+      });
     }
   }
 
-  private class ObjectArgumentResolverDecorator extends ArgumentResolverDecorator {
+  private static class TypedValueArgumentResolverDecorator extends ArgumentResolverDecorator {
 
-    public ObjectArgumentResolverDecorator(ArgumentResolver<Object> decoratee) {
+    private final CursorComponentDecoratorFactory componentDecoratorFactory;
+
+    public TypedValueArgumentResolverDecorator(ArgumentResolver<Object> decoratee,
+                                               CursorComponentDecoratorFactory componentDecoratorFactory) {
       super(decoratee);
+      this.componentDecoratorFactory = componentDecoratorFactory;
     }
 
     @Override
-    protected Object decorate(Object value) {
-      return resolveCursor(value);
+    protected Object decorate(Object value, String eventCorrelationId) {
+      Object v = ((TypedValue) value).getValue();
+
+      if (v instanceof InputStream) {
+        v = componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
+      } else if (v instanceof Collection) {
+        v = componentDecoratorFactory.decorateInput((Collection) v, eventCorrelationId);
+      } else if (v instanceof Iterator) {
+        v = componentDecoratorFactory.decorateInput((Iterator) v, eventCorrelationId);
+      }
+      return new TypedValue<>(v, DataType.builder()
+          .type(v.getClass())
+          .mediaType(((TypedValue) value).getDataType().getMediaType())
+          .build(), ((TypedValue) value).getByteLength());
+
     }
   }
 
-  private abstract class ArgumentResolverDecorator implements ArgumentResolver<Object> {
+  private static class ObjectArgumentResolverDecorator extends ArgumentResolverDecorator {
+
+    private final CursorComponentDecoratorFactory componentDecoratorFactory;
+
+    public ObjectArgumentResolverDecorator(ArgumentResolver<Object> decoratee,
+                                           CursorComponentDecoratorFactory componentDecoratorFactory) {
+      super(decoratee);
+      this.componentDecoratorFactory = componentDecoratorFactory;
+    }
+
+    @Override
+    protected Object decorate(Object value, String eventCorrelationId) {
+      final Object resolved = resolveCursor(value);
+      if (resolved instanceof InputStream) {
+        return componentDecoratorFactory.decorateInput((InputStream) resolved, eventCorrelationId);
+      } else if (resolved instanceof Collection) {
+        return componentDecoratorFactory.decorateInput((Collection) resolved, eventCorrelationId);
+      } else if (resolved instanceof Iterator) {
+        return componentDecoratorFactory.decorateInput((Iterator) resolved, eventCorrelationId);
+      } else {
+        return resolved;
+      }
+    }
+  }
+
+  private static abstract class ArgumentResolverDecorator implements ArgumentResolver<Object> {
 
     private final ArgumentResolver<Object> decoratee;
 
@@ -414,10 +491,13 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     public Object resolve(ExecutionContext executionContext) {
-      return decorate(decoratee.resolve(executionContext));
+      return decorate(decoratee.resolve(executionContext),
+                      executionContext instanceof EventedExecutionContext
+                          ? ((EventedExecutionContext) executionContext).getEvent().getCorrelationId()
+                          : "");
     }
 
-    protected abstract Object decorate(Object value);
+    protected abstract Object decorate(Object value, String eventCorrelationId);
 
     @Override
     public String toString() {

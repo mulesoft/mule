@@ -10,6 +10,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
@@ -37,4 +40,18 @@ public class WeaponXOperations {
   public Iterator<String> wolverineBlacklist() {
     return asList("Sabretooth", "Omega Red", "Dr. Cornelius", "Lady Deathstrike", "Mystique", "Silver Samurai").iterator();
   }
+
+  public void wolverineShred(@Content @Optional(defaultValue = "#[payload]") List enemies) {
+    for (Object enemy : enemies) {
+      // Operation too violent to implement explicitly
+    }
+  }
+
+  public void gambitChargeItems(@Content @Optional(defaultValue = "#[payload]") TypedValue<Iterator> items) {
+    final Iterator iter = items.getValue();
+    while (iter.hasNext()) {
+      Object value = iter.next();
+    }
+  }
+
 }

@@ -31,6 +31,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.stackable
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
+import java.util.function.UnaryOperator;
 
 /**
  * Utility class to share common behaviour between resolvers
@@ -131,11 +132,15 @@ public class ResolverUtils {
   }
 
   public static Object resolveCursor(TypedValue<?> typedValue) {
+    return resolveCursor(typedValue, UnaryOperator.identity());
+  }
+
+  public static Object resolveCursor(TypedValue<?> typedValue, UnaryOperator valueMapper) {
     Object objectValue = typedValue.getValue();
 
     if (objectValue instanceof CursorProvider) {
       Cursor cursor = ((CursorProvider) objectValue).openCursor();
-      return new TypedValue<>(cursor, DataType.builder()
+      return new TypedValue<>(valueMapper.apply(cursor), DataType.builder()
           .type(cursor.getClass())
           .mediaType(typedValue.getDataType().getMediaType())
           .build(), typedValue.getByteLength());

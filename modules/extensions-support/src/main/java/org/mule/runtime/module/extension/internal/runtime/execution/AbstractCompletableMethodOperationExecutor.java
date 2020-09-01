@@ -21,7 +21,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -32,6 +32,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
 /**
@@ -40,16 +42,19 @@ import org.slf4j.Logger;
  * @since 4.3.0
  */
 abstract class AbstractCompletableMethodOperationExecutor<M extends ComponentModel>
-    implements CompletableComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
+    implements CompletableComponentExecutor<M>, OperationArgumentResolverFactory<M>, Lifecycle {
 
   private static final Logger LOGGER = getLogger(AbstractCompletableMethodOperationExecutor.class);
 
   protected final GeneratedMethodComponentExecutor<M> executor;
+
+  @Inject
   private MuleContext muleContext;
 
-  public AbstractCompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
+  public AbstractCompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance,
+                                                    CursorComponentDecoratorFactory componentDecoratorFactory) {
     executor = new GeneratedMethodComponentExecutor<>(operationModel.getParameterGroupModels(),
-                                                      operationMethod, operationInstance);
+                                                      operationMethod, operationInstance, componentDecoratorFactory);
   }
 
   @Override
@@ -98,12 +103,6 @@ abstract class AbstractCompletableMethodOperationExecutor<M extends ComponentMod
   @Override
   public void dispose() {
     disposeIfNeeded(executor, LOGGER);
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
-    executor.setMuleContext(muleContext);
   }
 
   @Override

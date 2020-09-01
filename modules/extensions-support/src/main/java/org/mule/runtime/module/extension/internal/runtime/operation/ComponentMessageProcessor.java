@@ -136,6 +136,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -152,6 +153,7 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -581,7 +583,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       returnDelegate = createReturnDelegate();
       valueReturnDelegate = getValueReturnDelegate();
       initialiseIfNeeded(resolverSet, muleContext);
-      componentExecutor = createComponentExecutor();
+      componentExecutor = createComponentExecutor(componentDecoratorFactory);
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
 
@@ -797,7 +799,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return delegate;
   }
 
-  private CompletableComponentExecutor<T> createComponentExecutor() throws InitialisationException {
+  private CompletableComponentExecutor<T> createComponentExecutor(CursorComponentDecoratorFactory componentDecoratorFactory)
+      throws InitialisationException {
     Map<String, Object> params = new HashMap<>();
 
     LazyValue<ValueResolvingContext> resolvingContext =
@@ -860,7 +863,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
       }
 
-      return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
+      final CompletableComponentExecutorFactory<T> operationExecutorFactory = getOperationExecutorFactory(componentModel);
+
+      try {
+        BeanUtils.setProperty(operationExecutorFactory, "componentDecoratorFactory", componentDecoratorFactory);
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        throw new MuleRuntimeException(e);
+      }
+
+      return operationExecutorFactory
+          .createExecutor(componentModel, params);
     } finally {
       resolvingContext.ifComputed(ValueResolvingContext::close);
     }

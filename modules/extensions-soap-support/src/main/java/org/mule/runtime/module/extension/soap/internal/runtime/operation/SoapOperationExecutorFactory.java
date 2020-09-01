@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.soap.internal.runtime.operation;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 
@@ -16,6 +17,8 @@ import java.util.Map;
  * {@link CompletableComponentExecutorFactory} that creates instances of {@link SoapOperationExecutor}.
  */
 public final class SoapOperationExecutorFactory implements CompletableComponentExecutorFactory<OperationModel> {
+
+  private CursorComponentDecoratorFactory componentDecoratorFactory;
 
   /**
    * Creates a new executor for soap operations.
@@ -29,5 +32,9 @@ public final class SoapOperationExecutorFactory implements CompletableComponentE
   public CompletableComponentExecutor<OperationModel> createExecutor(OperationModel operationModel,
                                                                      Map<String, Object> parameters) {
     return new SoapOperationExecutor();
+  }
+
+  public void setComponentDecoratorFactory(CursorComponentDecoratorFactory componentDecoratorFactory) {
+    this.componentDecoratorFactory = componentDecoratorFactory;
   }
 }
