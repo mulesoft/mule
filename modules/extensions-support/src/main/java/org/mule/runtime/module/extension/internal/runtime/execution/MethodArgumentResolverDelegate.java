@@ -448,11 +448,15 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (v instanceof Iterator) {
         v = componentDecoratorFactory.decorateInput((Iterator) v, eventCorrelationId);
       }
-      return new TypedValue<>(v, DataType.builder()
-          .type(v.getClass())
-          .mediaType(((TypedValue) value).getDataType().getMediaType())
-          .build(), ((TypedValue) value).getByteLength());
 
+      if (v != ((TypedValue) value).getValue()) {
+        return new TypedValue<>(v, DataType.builder()
+            .type(v.getClass())
+            .mediaType(((TypedValue) value).getDataType().getMediaType())
+            .build(), ((TypedValue) value).getByteLength());
+      } else {
+        return value;
+      }
     }
   }
 
