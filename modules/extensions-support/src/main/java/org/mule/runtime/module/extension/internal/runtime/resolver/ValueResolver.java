@@ -10,6 +10,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.annotation.param.Content;
 
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
+
 /**
  * Provides a value which is dependant on a {@link CoreEvent}
  *
@@ -27,8 +29,20 @@ public interface ValueResolver<T> {
   T resolve(ValueResolvingContext context) throws MuleException;
 
   /**
-   * Returns {@code false} if subsequent invocations to {@link #resolve(ValueResolvingContext)} will return the same value.
-   * Notice that if it returns {@code true}, then it might return different values per invocation but that's not guaranteed.
+   * Resolves a decorated value from the given {@code event} using {@code facotory} for the decorator
+   *
+   * @param context the {@link ValueResolvingContext context} for the current resolution attempt
+   * @return a resolved value
+   * @throws MuleException if the resolution of the value fails
+   */
+  default T resolve(ValueResolvingContext context, CursorComponentDecoratorFactory factory) throws MuleException {
+    return resolve(context);
+  }
+
+
+  /**
+   * Returns {@code false} if subsequent invocations to {@link #resolve(ValueResolvingContext)} will return the same value. Notice
+   * that if it returns {@code true}, then it might return different values per invocation but that's not guaranteed.
    *
    * @return whether the resolved value changes based or the resolution context or not
    */

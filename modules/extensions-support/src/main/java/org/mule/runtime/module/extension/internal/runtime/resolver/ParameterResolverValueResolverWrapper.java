@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -19,6 +20,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
 import java.util.Optional;
@@ -44,7 +46,7 @@ public class ParameterResolverValueResolverWrapper<T>
       @Override
       public T resolve() {
         try {
-          return resolveRecursively((ValueResolver<T>) resolver, context);
+          return resolveRecursively((ValueResolver<T>) resolver, context, NO_OP_INSTANCE);
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
         }

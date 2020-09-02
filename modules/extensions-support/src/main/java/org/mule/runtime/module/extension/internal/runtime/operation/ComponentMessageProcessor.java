@@ -1168,7 +1168,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
         .withProperty(COMPONENT_DECORATOR_FACTORY_KEY, componentDecoratorFactory)
         .withConfig(configuration).build()) {
-      return resolverSet.resolve(context).asMap();
+      return resolverSet.resolve(context, componentDecoratorFactory).asMap();
     }
   }
 
