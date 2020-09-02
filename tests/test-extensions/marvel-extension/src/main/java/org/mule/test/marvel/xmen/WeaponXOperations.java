@@ -9,10 +9,12 @@ package org.mule.test.marvel.xmen;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.mule.runtime.api.util.IOUtils.toByteArray;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
@@ -45,6 +47,19 @@ public class WeaponXOperations {
     for (Object enemy : enemies) {
       // Operation too violent to implement explicitly
     }
+  }
+
+  public void wolverineChillOut(@ParameterGroup(name = "forest", showInDsl = true) CanadianForest forest) {
+    // Wolverine takes a vacation back home before the next mission
+    wolverineChillOutQuick(forest);
+  }
+
+  public void wolverineChillOutQuick(@ParameterGroup(name = "forest") CanadianForest forest) {
+    // Wolverine takes a short vacation back home before the next mission
+    for (String bear : forest.getBears()) {
+      // He pets them, what did you expect wolverine to do?
+    }
+    toByteArray((InputStream) forest.getRiver().getValue());
   }
 
   public void gambitChargeItems(@Content @Optional(defaultValue = "#[payload]") TypedValue<Iterator> items) {

@@ -1165,6 +1165,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
+        .withProperty("componentDecoratorFactory", componentDecoratorFactory)
         .withConfig(configuration).build()) {
       return resolverSet.resolve(context).asMap();
     }

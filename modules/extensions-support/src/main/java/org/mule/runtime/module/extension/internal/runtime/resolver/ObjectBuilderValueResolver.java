@@ -65,6 +65,11 @@ public class ObjectBuilderValueResolver<T> extends AbstractComponent
   }
 
   @Override
+  public boolean isContent() {
+    return false;
+  }
+
+  @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(builder, true, muleContext);
   }

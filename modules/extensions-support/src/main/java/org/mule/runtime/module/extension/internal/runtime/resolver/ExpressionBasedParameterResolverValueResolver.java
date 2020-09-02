@@ -33,6 +33,7 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
 
   private final String expression;
   private final DataType expectedDataType;
+  private final boolean content;
 
   @Inject
   private TransformationService transformationService;
@@ -52,9 +53,15 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
   private TypeSafeExpressionValueResolver<T> delegateResolver;
 
   public ExpressionBasedParameterResolverValueResolver(String expression, Class<T> type, DataType expectedDataType) {
+    this(expression, type, expectedDataType, false);
+  }
+
+  public ExpressionBasedParameterResolverValueResolver(String expression, Class<T> type, DataType expectedDataType,
+                                                       boolean content) {
     this.expression = expression;
     this.type = type;
     this.expectedDataType = expectedDataType;
+    this.content = content;
   }
 
   @Override
@@ -102,5 +109,10 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
   @Override
   public String getExpression() {
     return expression;
+  }
+
+  @Override
+  public boolean isContent() {
+    return content;
   }
 }

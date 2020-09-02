@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.function.UnaryOperator.identity;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -32,8 +34,11 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -114,10 +119,32 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
   public T build(ValueResolvingContext context) throws MuleException {
     T object = createInstance(prototypeClass);
 
+    final CursorComponentDecoratorFactory componentDecoratorFactory =
+        (CursorComponentDecoratorFactory) context.getProperty("componentDecoratorFactory");
+
     for (Map.Entry<FieldSetter, ValueResolver<Object>> entry : resolvers.entrySet()) {
+      final Object resolvedValue = resolveValue(entry.getValue(), context);
       entry.getKey().set(object,
-                         context == null || context.resolveCursors() ? resolveCursor(resolveValue(entry.getValue(), context))
-                             : resolveValue(entry.getValue(), context));
+                         context == null || context.resolveCursors()
+                             ? resolveCursor(resolvedValue,
+                                             entry.getValue().isContent() && componentDecoratorFactory != null ? v -> {
+                                               if (v instanceof InputStream) {
+                                                 return componentDecoratorFactory.decorateInput((InputStream) v,
+                                                                                                context.getEvent()
+                                                                                                    .getCorrelationId());
+                                               } else if (v instanceof Collection) {
+                                                 return componentDecoratorFactory.decorateInput((Collection) v,
+                                                                                                context.getEvent()
+                                                                                                    .getCorrelationId());
+                                               } else if (v instanceof Iterator) {
+                                                 return componentDecoratorFactory.decorateInput((Iterator) v,
+                                                                                                context.getEvent()
+                                                                                                    .getCorrelationId());
+                                               } else {
+                                                 return v;
+                                               }
+                                             } : identity())
+                             : resolvedValue);
     }
 
     injectFields(object, name, encoding, reflectionCache);

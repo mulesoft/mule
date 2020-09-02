@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.Optional.empty;
+import static java.util.function.UnaryOperator.identity;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -121,18 +122,27 @@ public class ResolverUtils {
    * @return the given {@code value} but converting a {@link CursorProvider} to a {@link Cursor} if any is present.
    */
   public static Object resolveCursor(Object value) {
+    return resolveCursor(value, identity());
+  }
+
+  /**
+   * Obtains a {@link Cursor} based on the {@code value}, if one is available.
+   *
+   * @return the given {@code value} but converting a {@link CursorProvider} to a {@link Cursor} if any is present.
+   */
+  public static Object resolveCursor(Object value, UnaryOperator valueMapper) {
     if (value instanceof CursorProvider) {
-      return ((CursorProvider) value).openCursor();
+      return valueMapper.apply(((CursorProvider) value).openCursor());
 
     } else if (value instanceof TypedValue) {
-      return resolveCursor((TypedValue) value);
+      return resolveCursor((TypedValue) value, valueMapper);
     }
 
-    return value;
+    return valueMapper.apply(value);
   }
 
   public static Object resolveCursor(TypedValue<?> typedValue) {
-    return resolveCursor(typedValue, UnaryOperator.identity());
+    return resolveCursor(typedValue, identity());
   }
 
   public static Object resolveCursor(TypedValue<?> typedValue, UnaryOperator valueMapper) {
@@ -144,9 +154,15 @@ public class ResolverUtils {
           .type(cursor.getClass())
           .mediaType(typedValue.getDataType().getMediaType())
           .build(), typedValue.getByteLength());
-    }
+    } else {
+      final Object mappedValue = valueMapper.apply(objectValue);
 
-    return typedValue;
+      if (mappedValue == objectValue) {
+        return typedValue;
+      } else {
+        return new TypedValue<>(mappedValue, typedValue.getDataType(), typedValue.getByteLength());
+      }
+    }
   }
 
   private static ValueResolver<?> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,

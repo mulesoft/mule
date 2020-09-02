@@ -44,7 +44,7 @@ import java.util.Optional;
  */
 public class StackableTypesParameterContributor implements ParameterDeclarerContributor {
 
-  private Map<Type, StackableType> stackableTypes;
+  private final Map<Type, StackableType> stackableTypes;
 
   private StackableTypesParameterContributor(Map<Type, StackableType> stackableTypes) {
     this.stackableTypes = stackableTypes;
@@ -101,8 +101,8 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
 
   public static class Builder {
 
-    private Map<Type, StackableType> stackableTypes = new HashMap<>();
-    private ClassTypeLoader typeLoader;
+    private final Map<Type, StackableType> stackableTypes = new HashMap<>();
+    private final ClassTypeLoader typeLoader;
 
     public Builder(ClassTypeLoader typeLoader) {
       this.typeLoader = typeLoader;
@@ -125,21 +125,23 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
             .builder(ParameterResolver.class)
             .setStaticResolverFactory(value -> new StaticValueResolver<>(new StaticParameterResolver<>(value)))
             .setDelegateResolverFactory(resolver -> new ParameterResolverValueResolverWrapper(resolver))
-            .setExpressionBasedResolverFactory((value, expectedType) -> new ExpressionBasedParameterResolverValueResolver(value,
-                                                                                                                          expectedType,
-                                                                                                                          fromType(expectedType)))
+            .setExpressionBasedResolverFactory((value, expectedType,
+                                                content) -> new ExpressionBasedParameterResolverValueResolver(value, expectedType,
+                                                                                                              fromType(expectedType),
+                                                                                                              content))
             .build())
         .addType(StackableType
             .builder(TypedValue.class)
             .setStaticResolverFactory(value -> new StaticValueResolver<>(new TypedValue<>(value, DataType.fromObject(value))))
             .setDelegateResolverFactory(valueResolver -> new TypedValueValueResolverWrapper(valueResolver))
-            .setExpressionBasedResolverFactory((expression, expectedType) -> new ExpressionTypedValueValueResolver(expression,
-                                                                                                                   expectedType))
+            .setExpressionBasedResolverFactory((expression, expectedType,
+                                                content) -> new ExpressionTypedValueValueResolver(expression,
+                                                                                                  expectedType, content))
             .build())
         .addType(StackableType
             .builder(Literal.class)
-            .setExpressionBasedResolverFactory((expression, expectedType) -> new StaticLiteralValueResolver(expression,
-                                                                                                            expectedType))
+            .setExpressionBasedResolverFactory((expression, expectedType, content) -> new StaticLiteralValueResolver(expression,
+                                                                                                                     expectedType))
             .setStaticResolverFactory((value) -> new StaticLiteralValueResolver(value.toString(), value.getClass()))
             .build())
         .build();
