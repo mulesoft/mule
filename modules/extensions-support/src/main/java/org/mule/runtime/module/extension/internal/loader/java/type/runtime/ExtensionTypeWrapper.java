@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -27,7 +28,6 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -110,7 +110,7 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
     private Map<String, Optional<MetadataType>> typeIdentifierMetadataTypeMap = new HashMap<>();
 
     public CachedClassTypeLoader(ClassTypeLoader classTypeLoader) {
-      Objects.requireNonNull(classTypeLoader, "classTypeLoader cannot be null");
+      requireNonNull(classTypeLoader, "classTypeLoader cannot be null");
 
       this.classTypeLoader = classTypeLoader;
     }
