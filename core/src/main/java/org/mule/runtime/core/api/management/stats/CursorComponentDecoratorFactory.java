@@ -32,6 +32,18 @@ public interface CursorComponentDecoratorFactory {
   void incrementInvocationCount(String correlationId);
 
   /**
+   * If statistics are enabled, decorates the provided {@link Collection} for counting the read objects.
+   * <p>
+   * Ref: {@link PayloadStatistics#getInputObjectCount()}.
+   *
+   * @param decorated the {@link Collection} to decorate.
+   * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
+   *        measured volume to a specific execution.
+   * @return the decorated {@link Collection}.
+   */
+  <T> Collection<T> decorateInput(Collection<T> decorated, String correlationId);
+
+  /**
    * If statistics are enabled, decorates the provided {@link Iterator} for counting the iterated objects.
    * <p>
    * Ref: {@link PayloadStatistics#getInputObjectCount()}.
