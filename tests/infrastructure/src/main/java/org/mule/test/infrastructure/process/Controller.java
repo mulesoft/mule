@@ -23,7 +23,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
-import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentStatusTracker.DeploymentState.DEPLOYED;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_EE_SERVICE_NAME;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_SERVICE_NAME;
 
@@ -52,6 +51,7 @@ public class Controller {
   private static final String DOMAIN_BUNDLE_DEPLOY_ERROR = "Error deploying domain bundle %s.";
   private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule Runtime.";
   private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
+  private static final String STARTED_LOGGED_PREFIX = "Started app '";
   private static final int IS_RUNNING_STATUS_CODE = 0;
   private static final Pattern pattern = compile("wrapper\\.java\\.additional\\.(\\d*)=");
   private static final Logger LOGGER = getLogger(Controller.class);
@@ -245,7 +245,7 @@ public class Controller {
   protected boolean isDeployedMessageAtLogs(String appName) {
     boolean isDeployed = false;
     try (Stream<String> stream = lines(getLog().toPath())) {
-      isDeployed = stream.anyMatch(line -> line.contains(format("Started app '%s'", appName)));
+      isDeployed = stream.anyMatch(line -> line.contains(STARTED_LOGGED_PREFIX + appName));
     } catch (IOException e1) {
       LOGGER.warn("Failed to read log server log");
     }
