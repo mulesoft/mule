@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -42,7 +43,9 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
 
+import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -249,12 +252,48 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
                                                                                      encodingParam,
                                                                                      mimeTypeInitParam);
 
+    T resultValue = result.getOutput();
+
+    Result<?, ?> decoratedResult = result;
+
+    if (resultValue instanceof InputStream) {
+      decoratedResult = decorateInputStream(result, context);
+    } else if (resultValue instanceof Iterator) {
+      decoratedResult = decorateIterator(result, context);
+    }
+
     SourceResultAdapter resultAdapter =
-        new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
+        new SourceResultAdapter(decoratedResult, cursorProviderFactory, mediaType, returnsListOfMessages,
                                 context.getCorrelationId(), payloadMediaTypeResolver);
 
     executeFlow(context, messageProcessContext, resultAdapter);
     contextAdapter.dispatched();
+  }
+
+  private Result<InputStream, A> decorateInputStream(Result<T, A> result, SourceCallbackContext context) {
+    InputStream resultValue = (InputStream) result.getOutput();
+
+    Result.Builder<InputStream, A> builder = Result.<InputStream, A>builder();
+    result.getAttributes().ifPresent(attrs -> builder.attributes(attrs));
+    builder
+        .output(messageProcessContext.getComponentDecoratorFactory().decorateOutput((InputStream) resultValue,
+                                                                                    context.getCorrelationId()
+                                                                                        .orElse("")))
+        .mediaType(result.getMediaType().orElse(ANY));
+    return builder.build();
+  }
+
+  private Result<Iterator, A> decorateIterator(Result<T, A> result, SourceCallbackContext context) {
+    Iterator resultValue = (Iterator) result.getOutput();
+
+    Result.Builder<Iterator, A> builder = Result.<Iterator, A>builder();
+    result.getAttributes().ifPresent(attrs -> builder.attributes(attrs));
+    builder
+        .output(messageProcessContext.getComponentDecoratorFactory().decorateOutput((Iterator) resultValue,
+                                                                                    context.getCorrelationId()
+                                                                                        .orElse("")))
+        .mediaType(result.getMediaType().orElse(ANY));
+    return builder.build();
   }
 
   private void validateNotifications(SourceCallbackContextAdapter contextAdapter) {
