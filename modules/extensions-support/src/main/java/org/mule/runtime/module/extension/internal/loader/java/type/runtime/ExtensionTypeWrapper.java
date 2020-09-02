@@ -25,10 +25,10 @@ import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTypeElement;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
 /**
@@ -106,8 +106,8 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
 
     private ClassTypeLoader classTypeLoader;
 
-    private Map<Type, MetadataType> typeMetadataTypeMap = new HashMap<>();
-    private Map<String, Optional<MetadataType>> typeIdentifierMetadataTypeMap = new HashMap<>();
+    private Map<Type, MetadataType> typeMetadataTypeMap = new WeakHashMap<>();
+    private Map<String, Optional<MetadataType>> typeIdentifierMetadataTypeMap = new WeakHashMap<>();
 
     public CachedClassTypeLoader(ClassTypeLoader classTypeLoader) {
       requireNonNull(classTypeLoader, "classTypeLoader cannot be null");
