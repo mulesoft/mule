@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.OptionalLong;
 
 /**
- * An operation execution {@link Result} that is created based on the resulting {@link CoreEvent}
+ * A {@link Result} that is created based on the resulting {@link CoreEvent}
  * of that execution.
  * This allows for executions to be concatenated by the plugin's developer without losing
  * information of the event propagated through the flow.
