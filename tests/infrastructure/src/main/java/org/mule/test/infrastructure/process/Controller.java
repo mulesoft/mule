@@ -245,7 +245,7 @@ public class Controller {
   protected boolean isDeployedMessageAtLogs(String appName) {
     boolean isDeployed = false;
     try (Stream<String> stream = lines(getLog().toPath())) {
-      isDeployed = stream.anyMatch(line -> line.contains(appName) && line.contains(DEPLOYED.toString()));
+      isDeployed = stream.anyMatch(line -> line.contains(format("Started app '%s'", appName)));
     } catch (IOException e1) {
       LOGGER.warn("Failed to read log server log");
     }
