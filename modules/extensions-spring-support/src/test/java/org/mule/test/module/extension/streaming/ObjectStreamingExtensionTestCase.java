@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 
@@ -19,20 +20,22 @@ import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.apache.commons.collections.IteratorUtils;
 import org.hamcrest.BaseMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(STREAMING)
 @Story(OBJECT_STREAMING)
@@ -44,6 +47,10 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
 
   @Rule
   public ExpectedException expectedException = none();
+
+  // This test asserts internals that are modified when statistics are enabled
+  @Rule
+  public SystemProperty withStatistics = new SystemProperty(MULE_DISABLE_PAYLOAD_STATISTICS, "true");
 
   @Override
   protected void doSetUp() throws Exception {
