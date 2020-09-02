@@ -39,7 +39,7 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
                                                  public void run() throws Exception
                                                  {
                                                      WSConsumerConfig config = createConsumerConfig();
-                                                     MessageProcessor mp = config.createOutboundMessageProcessor();
+                                                     MessageProcessor mp = config.createOutboundMessageProcessor(null);
                                                      assertThat(mp, instanceOf(OutboundEndpoint.class));
                                                  }
                                              });
@@ -51,7 +51,7 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
         WSConsumerConfig config = createConsumerConfig();
         HttpConnector httpConnector = new HttpConnector(muleContext);
         config.setConnector(httpConnector);
-        OutboundEndpoint outboundEndpoint = (OutboundEndpoint) config.createOutboundMessageProcessor();
+        OutboundEndpoint outboundEndpoint = (OutboundEndpoint) config.createOutboundMessageProcessor(null);
         assertEquals(httpConnector, outboundEndpoint.getConnector());
     }
 
@@ -60,7 +60,7 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
     {
         WSConsumerConfig config = createConsumerConfig();
         config.setServiceAddress("unsupported://test");
-        config.createOutboundMessageProcessor();
+        config.createOutboundMessageProcessor(null);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -70,7 +70,7 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
         config.setServiceAddress("jms://test");
         HttpConnector httpConnector = new HttpConnector(muleContext);
         config.setConnector(httpConnector);
-        config.createOutboundMessageProcessor();
+        config.createOutboundMessageProcessor(null);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -78,7 +78,7 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
     {
         WSConsumerConfig config = createConsumerConfig();
         config.setServiceAddress(null);
-        config.createOutboundMessageProcessor();
+        config.createOutboundMessageProcessor(null);
     }
 
     @Test
