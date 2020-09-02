@@ -92,15 +92,20 @@ class ExtensionErrorsRegistrant {
       }
 
       private void registerErrors(ComponentModel model) {
-        if (!errorTypes.isEmpty() && model.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
+        if (!errorTypes.isEmpty() && containsConnectivityErrorModel(model)) {
           ExceptionMapper.Builder builder = ExceptionMapper.builder();
           builder.addExceptionMapping(ConnectionException.class, getErrorType(connectivityErrorModel, extensionModel));
           builder.addExceptionMapping(RetryPolicyExhaustedException.class, getErrorType(retryExhaustedError, extensionModel));
-
           String elementName = syntaxResolver.resolve(model).getElementName();
           errorTypeLocator.addComponentExceptionMapper(createIdentifier(elementName, extensionNamespace),
                                                        builder.build());
         }
+      }
+
+      // Esto es asi porque no se puede garantizar solamente con el ConnectivityModelProperty (como se hace en otros lugares de este modulo)
+      // Ejemplo: operacion insert del db connector
+      private boolean containsConnectivityErrorModel(ComponentModel model) {
+        return model.getErrorModels().stream().anyMatch(errorModel -> errorModel.getType().equals("CONNECTIVITY"));
       }
     };
     extensionWalker.walk(extensionModel);
