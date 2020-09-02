@@ -48,8 +48,8 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   @Rule
   public ExpectedException expectedException = none();
 
-  @Rule
   // This test asserts internals that are modified when statistics are enabled
+  @Rule
   public SystemProperty withStatistics = new SystemProperty(MULE_DISABLE_PAYLOAD_STATISTICS, "true");
 
   @Override

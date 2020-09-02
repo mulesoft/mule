@@ -14,7 +14,9 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.typed.value.extension.extension.TypedValueParameterOperations.THIS_IS_A_DEFAULT_STRING;
+import static org.mule.test.typed.value.extension.extension.TypedValueSource.onSuccessValue;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -22,8 +24,6 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 import org.mule.test.runner.RunnerDelegateTo;
 import org.mule.test.typed.value.extension.extension.SimplePojo;
@@ -151,8 +151,8 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
     Flow flow = (Flow) getFlowConstruct("typedValueForStringOnSourceOnSuccess");
     flow.start();
     try {
-      new PollingProber(100000, 100).check(new JUnitLambdaProbe(() -> TypedValueSource.onSuccessValue != null));
-      assertTypedValue(TypedValueSource.onSuccessValue, STRING_VALUE, WILDCARD, null);
+      probe(() -> onSuccessValue != null);
+      assertTypedValue(onSuccessValue, STRING_VALUE, WILDCARD, null);
     } finally {
       flow.stop();
     }
