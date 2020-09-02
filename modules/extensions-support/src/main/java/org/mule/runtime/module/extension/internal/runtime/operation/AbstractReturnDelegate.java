@@ -10,8 +10,8 @@ import static org.apache.commons.io.IOUtils.EOF;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageIterator;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.messageCollection;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.messageIterator;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isJavaCollection;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
@@ -40,12 +40,13 @@ import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCol
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultIterator;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.runtime.core.internal.util.message.MessageUtils;
+import org.mule.runtime.core.internal.util.message.SdkResultAdapter;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.CollectionReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.MapReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler;
+import org.mule.sdk.api.runtime.operation.Result;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -125,6 +126,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       return ((Event) value).getMessage();
     }
 
+    if (value instanceof org.mule.runtime.extension.api.runtime.operation.Result) {
+      value = new SdkResultAdapter<>((org.mule.runtime.extension.api.runtime.operation.Result) value);
+    }
+
     Map<String, Object> params = operationContext.getParameters();
     MediaType contextMimeTypeParam = getContextMimeType(params);
     Charset contextEncodingParam = getContextEncoding(params);
@@ -132,6 +137,8 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     final CoreEvent event = operationContext.getEvent();
 
     ComponentLocation originatingLocation = operationContext.getComponent().getLocation();
+
+
     if (value instanceof Result) {
       Result resultValue = (Result) value;
       if (resultValue.getOutput() instanceof InputStream) {
@@ -154,19 +161,19 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
                                                                                        contextEncodingParam,
                                                                                        contextMimeTypeParam);
       if (value instanceof Collection && returnsListOfMessages) {
-        value = toLazyMessageCollection((Collection<Result>) value, operationContext, cursorProviderFactory, event);
-        value = toMessageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
+        value = toLazyMessageCollection((Collection) value, operationContext, cursorProviderFactory, event);
+        value = messageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
             .decorateOutputResultCollection((Collection<Result>) value, event.getCorrelationId()),
-                                                                           payloadMediaTypeResolver),
-                                    cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
-                                    originatingLocation);
+                                                                         payloadMediaTypeResolver),
+                                  cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
+                                  originatingLocation);
       } else if (value instanceof Iterator) {
         if (returnsListOfMessages) {
-          value = toMessageIterator(new MediaTypeDecoratedResultIterator(componentDecoratorFactory
+          value = messageIterator(new MediaTypeDecoratedResultIterator(componentDecoratorFactory
               .decorateOutputResultIterator((Iterator<Result>) value, event.getCorrelationId()),
-                                                                         payloadMediaTypeResolver),
-                                    cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
-                                    originatingLocation);
+                                                                       payloadMediaTypeResolver),
+                                  cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
+                                  originatingLocation);
         } else {
           value = componentDecoratorFactory.decorateOutput((Iterator) value, event.getCorrelationId());
         }
@@ -193,24 +200,33 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   }
 
 
-  private Collection<Object> toLazyMessageCollection(Collection<Result> values,
+  private Collection<Object> toLazyMessageCollection(Collection<?> values,
                                                      ExecutionContextAdapter operationContext,
                                                      CursorProviderFactory cursorProviderFactory,
                                                      CoreEvent event) {
     Collection<Object> lazyMessageCollection = new ArrayList<>();
     values.forEach(value -> {
-      if (value.getOutput() instanceof InputStream) {
+      Result result;
+      if (value instanceof Result) {
+        result = (Result) value;
+      } else if (value instanceof org.mule.runtime.extension.api.runtime.operation.Result) {
+        result = new SdkResultAdapter<>((org.mule.runtime.extension.api.runtime.operation.Result) value);
+      } else {
+        throw new IllegalArgumentException("Result was expected but value found instead: " + value.getClass().getName());
+      }
+
+      if (result.getOutput() instanceof InputStream) {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
-          value = value.copy()
+          result = result.copy()
               .output(StreamingUtils.streamingContent(new ConnectedInputStreamWrapper(componentDecoratorFactory
-                  .decorateOutput((InputStream) value.getOutput(), event.getCorrelationId()), connectionHandler),
+                  .decorateOutput((InputStream) result.getOutput(), event.getCorrelationId()), connectionHandler),
                                                       cursorProviderFactory, event,
                                                       operationContext.getComponent().getLocation()))
               .build();
         }
       }
-      lazyMessageCollection.add(value);
+      lazyMessageCollection.add(result);
     });
     return lazyMessageCollection;
   }

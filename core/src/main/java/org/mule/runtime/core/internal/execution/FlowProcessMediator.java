@@ -28,8 +28,8 @@ import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.messageCollection;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -77,10 +77,11 @@ import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceFailureCallbackAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceSuccessCallbackAdapter;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
+import org.mule.runtime.core.internal.util.message.SdkResultAdapter;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.operation.Result;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -522,18 +523,19 @@ public class FlowProcessMediator implements Initialisable {
         createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, adapter.getCorrelationId().orElse(null));
 
     return eventBuilder.message(eventCtx -> {
-      final Result<?, ?> result = adapter.getResult();
+      // TODO: the adapter should return a new Result in the first place. Adaptation shouldn't happen here
+      final Result<?, ?> result = new SdkResultAdapter<>(adapter.getResult());
       final Object resultValue = result.getOutput();
 
       Message eventMessage;
       if (resultValue instanceof Collection && adapter.isCollection()) {
         eventMessage = toMessage(Result.<Collection<Message>, TypedValue<?>>builder()
-            .output(toMessageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
+            .output(messageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
                 .decorateOutputResultCollection((Collection<Result>) resultValue, adapter.getCorrelationId().orElse("")),
-                                                                               adapter.getPayloadMediaTypeResolver()),
-                                        adapter.getCursorProviderFactory(),
-                                        ((BaseEventContext) eventCtx).getRootContext(),
-                                        source.getLocation()))
+                                                                             adapter.getPayloadMediaTypeResolver()),
+                                      adapter.getCursorProviderFactory(),
+                                      ((BaseEventContext) eventCtx).getRootContext(),
+                                      source.getLocation()))
             .mediaType(result.getMediaType().orElse(ANY))
             .build());
       } else {

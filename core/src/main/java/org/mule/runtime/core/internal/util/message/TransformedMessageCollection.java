@@ -8,10 +8,7 @@ package org.mule.runtime.core.internal.util.message;
 
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
@@ -21,36 +18,35 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * Wraps a {@link Collection} of {@link Result} instances and exposes
- * its contents as {@link Message} instances.
+ * Decorates a {@link Collection} with items of random types and uses a {@link Function} 
+ * to guarantee that those items always surfaced in the form of a {@link Message}
  *
- * This allows to avoid preemptive transformations of an entire collection
- * of {@link Result} to {@link Message}
+ * This allows to avoid preemptive transformations of an entire collection.
  *
- * @since 4.0
+ * @since 4.4.0
  */
-abstract class ResultsToMessageCollection implements Collection<Message> {
+abstract class TransformedMessageCollection implements Collection<Message> {
 
   private final Collection<Object> delegate;
-  protected final CursorProviderFactory cursorProviderFactory;
-  protected final BaseEventContext eventContext;
-  protected final ComponentLocation originatingLocation;
+  protected final Function<Object, Message> transformer;
   protected final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
   protected final Lock readLock = readWriteLock.readLock();
   protected final Lock writeLock = readWriteLock.writeLock();
 
-  public ResultsToMessageCollection(Collection<Object> delegate,
-                                    CursorProviderFactory cursorProviderFactory,
-                                    BaseEventContext eventContext,
-                                    ComponentLocation originatingLocation) {
+  public TransformedMessageCollection(Collection<Object> delegate, Function<Object, Message> transformer) {
     this.delegate = delegate;
-    this.cursorProviderFactory = cursorProviderFactory;
-    this.eventContext = eventContext;
-    this.originatingLocation = originatingLocation;
+    this.transformer = value -> {
+      if (value instanceof Message) {
+        return (Message) value;
+      } else {
+        return transformer.apply(value);
+      }
+    };
   }
 
   @Override
@@ -89,7 +85,7 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public Iterator<Message> iterator() {
-    return new ResultToMessageIterator(delegate.iterator(), cursorProviderFactory, eventContext, originatingLocation);
+    return new TransformedMessageIterator(delegate.iterator(), transformer);
   }
 
   @Override
@@ -114,7 +110,7 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
 
   private <T> T[] transformArray(T[] array) {
     return (T[]) Stream.of(array)
-        .map(result -> toMessage(result, cursorProviderFactory, eventContext))
+        .map(result -> transformer.apply(result))
         .toArray(Object[]::new);
   }
 
@@ -157,7 +153,7 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
           if (o instanceof Message) {
             return o;
           } else {
-            return toMessage(o, cursorProviderFactory, eventContext);
+            return transformer.apply(o);
           }
         }).collect(toList());
   }
@@ -184,7 +180,7 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
       for (Object value : c) {
         boolean itemRemoved = delegate.remove(c);
         if (!itemRemoved) {
-          itemRemoved = delegate.remove(toMessage(value, cursorProviderFactory, eventContext));
+          itemRemoved = delegate.remove(transformer.apply(value));
         }
 
         removed = removed || itemRemoved;
@@ -198,7 +194,7 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public boolean removeIf(Predicate<? super Message> filter) {
-    return delegate.removeIf(result -> filter.test(toMessage(result, cursorProviderFactory, eventContext)));
+    return delegate.removeIf(result -> filter.test(transformer.apply(result)));
   }
 
   @Override
@@ -238,30 +234,22 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public Spliterator<Message> spliterator() {
-    return delegate.stream().map(result -> toMessage(result, cursorProviderFactory, eventContext)).collect(toList())
+    return delegate.stream().map(result -> transformer.apply(result)).collect(toList())
         .spliterator();
   }
 
   @Override
   public Stream<Message> stream() {
-    return delegate.stream().map(result -> toMessage(result, cursorProviderFactory, eventContext));
+    return delegate.stream().map(result -> transformer.apply(result));
   }
 
   @Override
   public Stream<Message> parallelStream() {
-    return delegate.parallelStream().map(result -> toMessage(result, cursorProviderFactory, eventContext));
+    return delegate.parallelStream().map(result -> transformer.apply(result));
   }
 
   @Override
   public void forEach(Consumer<? super Message> action) {
     stream().forEach(action);
-  }
-
-  protected Message toMessage(Object value, CursorProviderFactory cursorProviderFactory, BaseEventContext eventContext) {
-    if (value instanceof Message) {
-      return (Message) value;
-    } else {
-      return MessageUtils.toMessage((Result) value, cursorProviderFactory, eventContext, originatingLocation);
-    }
   }
 }

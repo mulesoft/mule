@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.message;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
@@ -17,25 +14,20 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.function.Function;
 
 /**
- * Wraps a {@link List} of {@link Result} instances and exposes
- * its contents as {@link Message} instances.
- * <p>
- * This allows to avoid preemptive transformations of an entire List
- * of {@link Result} to {@link Message}
+ * Specialization of {@link TransformedMessageCollection} for collections that implement the {@link List}
+ * interface
  *
- * @since 4.0
+ * @since 4.4.0
  */
-public final class ResultsToMessageList extends ResultsToMessageCollection implements List<Message> {
+public final class TransformedMessageList extends TransformedMessageCollection implements List<Message> {
 
   private final List<Object> delegate;
 
-  public ResultsToMessageList(List<Object> delegate,
-                              CursorProviderFactory cursorProviderFactory,
-                              BaseEventContext eventContext,
-                              ComponentLocation originatingLocation) {
-    super(delegate, cursorProviderFactory, eventContext, originatingLocation);
+  public TransformedMessageList(List<Object> delegate, Function<Object, Message> transformer) {
+    super(delegate, transformer);
     this.delegate = delegate;
   }
 
@@ -93,8 +85,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
   public void sort(Comparator<? super Message> c) {
     writeLock.lock();
     try {
-      delegate.sort((o1, o2) -> c.compare(toMessage(o1, cursorProviderFactory, eventContext),
-                                          toMessage(o2, cursorProviderFactory, eventContext)));
+      delegate.sort((o1, o2) -> c.compare(transformer.apply(o1), transformer.apply(o2)));
     } finally {
       writeLock.unlock();
     }
@@ -115,7 +106,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
         if (update instanceof Message) {
           return (Message) update;
         }
-        update = toMessage(update, cursorProviderFactory, eventContext);
+        update = transformer.apply(update);
         delegate.set(index, update);
 
         return (Message) update;
@@ -133,7 +124,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
     writeLock.lock();
     try {
       Object previous = delegate.set(index, message);
-      return previous != null ? toMessage(previous, cursorProviderFactory, eventContext) : null;
+      return previous != null ? transformer.apply(previous) : null;
     } finally {
       writeLock.unlock();
     }
@@ -144,7 +135,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
     writeLock.lock();
     try {
       Object previous = delegate.remove(index);
-      return previous != null ? toMessage(previous, cursorProviderFactory, eventContext) : null;
+      return previous != null ? transformer.apply(previous) : null;
     } finally {
       writeLock.unlock();
     }
@@ -157,12 +148,12 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
 
   @Override
   public ListIterator<Message> listIterator() {
-    return new ResultToMessageListIterator(this);
+    return new TransformedMessageListIterator(this);
   }
 
   @Override
   public ListIterator<Message> listIterator(int index) {
-    return new ResultToMessageListIterator(this);
+    return new TransformedMessageListIterator(this);
   }
 
   @Override
@@ -170,7 +161,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
     readLock.lock();
     try {
       List results = delegate.subList(fromIndex, toIndex);
-      return new ResultsToMessageList(results, cursorProviderFactory, eventContext, originatingLocation);
+      return new TransformedMessageList(results, transformer);
     } finally {
       readLock.unlock();
     }

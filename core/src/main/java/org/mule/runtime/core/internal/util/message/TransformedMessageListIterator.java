@@ -7,33 +7,32 @@
 package org.mule.runtime.core.internal.util.message;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
+import java.util.function.Function;
 
 /**
- * Wraps an {@link ListIterator} of {@link Result} instances and exposes
- * its contents as {@link Message} instances.
+ * Decorates an {@link ListIterator} of elements of random types using a {@link Function} which guarantees
+ * that the items are always surfaced as a {@link Message}
  *
- * This allows to avoid preemptive transformations of an entire collection
- * of {@link Result} to {@link Message}
+ * This allows to avoid preemptive transformations of an entire dataset
  *
- * @since 4.0
+ * @since 4.4.0
  */
-final class ResultToMessageListIterator implements ListIterator<Message> {
+final class TransformedMessageListIterator implements ListIterator<Message> {
 
   private final List<Message> delegate;
   private final int size;
   private int index;
   private int lastIndex = 0;
 
-  ResultToMessageListIterator(List<Message> delegate) {
+  TransformedMessageListIterator(List<Message> delegate) {
     this(delegate, 0);
   }
 
-  ResultToMessageListIterator(List<Message> delegate, int startIndex) {
+  TransformedMessageListIterator(List<Message> delegate, int startIndex) {
     this.delegate = delegate;
     index = startIndex;
     size = delegate.size();

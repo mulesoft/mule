@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.util.mediatype;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.operation.Result;
 
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -65,14 +65,6 @@ public class MediaTypeDecoratedResult extends Result {
   @Override
   public Optional<MediaType> getMediaType() {
     return of(mediaType);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Optional<Long> getLength() {
-    return delegate.getLength();
   }
 
   /**
