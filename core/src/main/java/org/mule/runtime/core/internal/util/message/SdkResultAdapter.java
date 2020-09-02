@@ -31,11 +31,11 @@ public class SdkResultAdapter<T, A> extends org.mule.sdk.api.runtime.operation.R
   @Override
   public Builder<T, A> copy() {
     final Builder<T, A> builder = org.mule.sdk.api.runtime.operation.Result.<T, A>builder()
-            .output(getOutput())
-            .attributes(getAttributes().orElse(null))
-            .mediaType(getMediaType().orElse(null))
-            .attributesMediaType(getAttributesMediaType().orElse(null))
-            .attributesMediaType(getAttributesMediaType().orElse(null));
+        .output(getOutput())
+        .attributes(getAttributes().orElse(null))
+        .mediaType(getMediaType().orElse(null))
+        .attributesMediaType(getAttributesMediaType().orElse(null))
+        .attributesMediaType(getAttributesMediaType().orElse(null));
     getByteLength().ifPresent(builder::length);
     return builder;
   }
