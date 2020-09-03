@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -32,6 +33,7 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.metadata.extension.LocationKey;
 
 import java.lang.reflect.Field;
@@ -41,12 +43,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-@RunWith(MockitoJUnitRunner.class)
-public class MetadataKeyIdObjectResolverTestCase {
+public class MetadataKeyIdObjectResolverTestCase extends AbstractMuleTestCase {
 
   private static final String CITY = "city";
   private static final String SFO = "SFO";
@@ -73,6 +74,9 @@ public class MetadataKeyIdObjectResolverTestCase {
 
   @Mock
   public ParameterModel cityParam;
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();

@@ -16,9 +16,15 @@ import org.mule.runtime.api.exception.MuleException;
 public class StaticValueResolver<T> implements ValueResolver<T> {
 
   private final T value;
+  private final boolean content;
 
   public StaticValueResolver(T value) {
+    this(value, false);
+  }
+
+  public StaticValueResolver(T value, boolean content) {
     this.value = value;
+    this.content = content;
   }
 
   /**
@@ -35,5 +41,10 @@ public class StaticValueResolver<T> implements ValueResolver<T> {
   @Override
   public boolean isDynamic() {
     return false;
+  }
+
+  @Override
+  public boolean isContent() {
+    return content;
   }
 }

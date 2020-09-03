@@ -81,6 +81,11 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
     return false;
   }
 
+  @Override
+  public boolean isContent() {
+    return false;
+  }
+
   private static final class LazyInitializerChainDecorator implements MessageProcessorChain {
 
     private final MessageProcessorChain delegate;
