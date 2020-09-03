@@ -1,29 +1,36 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test-components"
+      xmlns:test-components="http://www.mulesoft.org/schema/mule/test-components"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
           http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd">
 
-    <test:queue-config name="queueConfig">
-        <test:connection />
-    </test:queue-config>
+    <test-components:queue-config name="queueConfig">
+        <test-components:connection />
+    </test-components:queue-config>
 
     <flow name="enqueueFlow">
-        <test:skeleton-source />
+        <test-components:skeleton-source />
 
         <logger level="WARN" />
 
-        <!--<set-payload value="The payload" />-->
+        <set-payload value="The payload" />
 
-        <!--<test:queue-push config-ref="queueConfig"/>-->
+        <test-components:queue-push config-ref="queueConfig"/>
 
-        <!--<test:queue-push config-ref="queueConfig">-->
-            <!--<test:content>The content</test:content>-->
-        <!--</test:queue-push>-->
+        <test-components:queue-push config-ref="queueConfig">
+            <test-components:content>The content</test-components:content>
+        </test-components:queue-push>
     </flow>
 
+    <test-components:lifecycle-tracker-config name="rootConfig">
+        <!--<test-components:lifecycle-tracker-config name="nestedConfig"/>-->
+    </test-components:lifecycle-tracker-config>
+
     <flow name="lifecycleFlow">
-        <test:check />
+        <set-variable variableName="someBool" value="true"/>
+        <test-components:lifecycle-tracker name="first"/>
+        <test-components:lifecycle-tracker name="second"/>
+        <test-components:lifecycle-tracker-check name="check"/>
         <logger level="WARN" />
     </flow>
 

@@ -6,9 +6,19 @@
  */
 package org.mule.tests.internal;
 
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+
+/**
+ * This class is only used to declare the operations, actual behavior is at
+ * {@link org.mule.tests.api.LifecycleTrackerEnricher.LifecycleTrackerComponentExecutorDecorator#execute(ExecutionContext, CompletableComponentExecutor.ExecutorCallback)}
+ */
 public class LifecycleTrackerOperations {
 
-    public void check() {
+    public void lifecycleTrackerCheck(String name) {
+    }
+
+    public void lifecycleTracker(String name) {
     }
 
 }

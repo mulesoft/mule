@@ -6,12 +6,25 @@
  */
 package org.mule.tests.internal;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 
-@Configuration(name = "lifecycleConfig")
+@Configuration(name = "lifecycleTrackerConfig")
 @Operations(LifecycleTrackerOperations.class)
-public class LifecycleTrackerConfiguration {
+public class LifecycleTrackerConfiguration extends AbstractLifecycleTracker {
 
+    @RefName
+    private String configName;
+
+    public LifecycleTrackerConfiguration() {
+        super(false);
+    }
+
+    @Override
+    protected void onInit(MuleContext muleContext) throws InitialisationException {
+        addTrackingDataToRegistry(configName);
+    }
 }
