@@ -88,7 +88,7 @@ public class StackableType {
 
   public static class Builder<T> {
 
-    private Type type;
+    private final Type type;
     private ExpressionBasedResolverFactory<T> expressionBasedResolverFactory;
     private StaticResolverFactory staticResolverFactory;
     private DelegateResolverFactory delegateResolverFactory;
@@ -126,7 +126,7 @@ public class StackableType {
   @FunctionalInterface
   public interface ExpressionBasedResolverFactory<T> {
 
-    ValueResolver<T> getResolver(String value, Class<T> expectedType);
+    ValueResolver<T> getResolver(String value, Class<T> expectedType, boolean content);
   }
 
   /**

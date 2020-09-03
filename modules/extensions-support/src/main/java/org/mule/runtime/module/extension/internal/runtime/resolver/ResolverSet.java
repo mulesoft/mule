@@ -10,17 +10,17 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * A {@link ValueResolver} which is based on associating a set of keys -&gt; {@link ValueResolver} pairs. The result of evaluating
@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisable {
 
-  private Map<String, ValueResolver<?>> resolvers = new LinkedHashMap<>();
+  private final Map<String, ValueResolver<?>> resolvers = new LinkedHashMap<>();
   private boolean dynamic = false;
   private final MuleContext muleContext;
 
@@ -94,6 +94,11 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     return dynamic;
   }
 
+  @Override
+  public boolean isContent() {
+    return false;
+  }
+
   /**
    * Evaluates all the added {@link ValueResolver}s and returns the results into a {@link ResolverSetResult}
    *
@@ -140,5 +145,4 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   ResolverSetResult.Builder getResolverSetBuilder() {
     return ResolverSetResult.newBuilder();
   }
-
 }

@@ -98,8 +98,8 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
     this.streamingManager = streamingManager;
     this.component = component;
     this.muleContext = muleContext;
-    executor =
-        new GeneratedMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source);
+    executor = new GeneratedMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source,
+                                                      componentDecoratorFactory);
     try {
       initialiseIfNeeded(executor, true, muleContext);
     } catch (InitialisationException e) {

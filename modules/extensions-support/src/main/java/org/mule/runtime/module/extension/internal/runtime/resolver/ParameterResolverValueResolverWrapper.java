@@ -35,7 +35,7 @@ public class ParameterResolverValueResolverWrapper<T>
 
   private ValueResolver<T> resolver;
   private MuleContext muleContext;
-  private Reference<Function<ValueResolvingContext, ParameterResolver>> parameterResolverSupplier = new Reference<>();
+  private final Reference<Function<ValueResolvingContext, ParameterResolver>> parameterResolverSupplier = new Reference<>();
 
   public ParameterResolverValueResolverWrapper(ValueResolver resolver) {
     this.resolver = resolver;
@@ -86,6 +86,11 @@ public class ParameterResolverValueResolverWrapper<T>
   @Override
   public boolean isDynamic() {
     return resolver.isDynamic();
+  }
+
+  @Override
+  public boolean isContent() {
+    return resolver.isContent();
   }
 
   @Override

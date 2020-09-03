@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
  */
 public final class TypedValueValueResolverWrapper<T> implements ValueResolver<TypedValue<T>>, Initialisable, MuleContextAware {
 
-  private ValueResolver resolver;
+  private final ValueResolver resolver;
 
   MuleContext muleContext;
 
@@ -56,6 +56,11 @@ public final class TypedValueValueResolverWrapper<T> implements ValueResolver<Ty
   @Override
   public boolean isDynamic() {
     return resolver.isDynamic();
+  }
+
+  @Override
+  public boolean isContent() {
+    return resolver.isContent();
   }
 
   @Override

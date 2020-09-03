@@ -19,7 +19,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
  */
 public class ConfigurationValueResolver<T> implements ValueResolver<T> {
 
-  private ConfigurationProvider configurationProvider;
+  private final ConfigurationProvider configurationProvider;
 
   public ConfigurationValueResolver(ConfigurationProvider configurationProvider) {
     this.configurationProvider = configurationProvider;
@@ -34,5 +34,10 @@ public class ConfigurationValueResolver<T> implements ValueResolver<T> {
   @Override
   public boolean isDynamic() {
     return configurationProvider.isDynamic();
+  }
+
+  @Override
+  public boolean isContent() {
+    return false;
   }
 }

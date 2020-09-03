@@ -39,6 +39,11 @@ public class StaticConnectionProviderResolver<C> implements ConnectionProviderVa
   }
 
   @Override
+  public boolean isContent() {
+    return false;
+  }
+
+  @Override
   public Optional<ResolverSet> getResolverSet() {
     return Optional.empty();
   }
