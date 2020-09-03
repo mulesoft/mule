@@ -254,7 +254,7 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
 
     private SslContextFactory createSslContextFactory()
     {
-        SslContextFactory sslContextFactory = new SslContextFactory();
+        SslContextFactory sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setProtocol(getSslType());
 
         if (tls.getKeyStore() != null)
