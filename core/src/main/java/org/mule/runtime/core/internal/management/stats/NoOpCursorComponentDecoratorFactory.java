@@ -28,6 +28,11 @@ public class NoOpCursorComponentDecoratorFactory implements CursorComponentDecor
   }
 
   @Override
+  public <T> Collection<T> decorateInput(Collection<T> decorated, String correlationId) {
+    return decorated;
+  }
+
+  @Override
   public <T> Iterator<T> decorateInput(Iterator<T> decorated, String correlationId) {
     return decorated;
   }

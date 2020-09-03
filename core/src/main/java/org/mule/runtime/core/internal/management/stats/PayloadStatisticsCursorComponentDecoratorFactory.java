@@ -17,6 +17,8 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.collections.iterators.AbstractIteratorDecorator;
 
@@ -32,6 +34,21 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
   public void incrementInvocationCount(String correlationId) {
     if (payloadStatistics.isEnabled()) {
       payloadStatistics.incrementInvocationCount();
+    }
+  }
+
+  @Override
+  public <T> Collection<T> decorateInput(Collection<T> decorated, String correlationId) {
+    if (payloadStatistics.isEnabled()) {
+      if (decorated instanceof List) {
+        return new PayloadStatisticsList((List) decorated, payloadStatistics::addInputObjectCount);
+      } else if (decorated instanceof Set) {
+        return new PayloadStatisticsSet((Set) decorated, payloadStatistics::addInputObjectCount);
+      } else {
+        return new PayloadStatisticsCollection(decorated, payloadStatistics::addInputObjectCount);
+      }
+    } else {
+      return NO_OP_INSTANCE.decorateInput(decorated, correlationId);
     }
   }
 
