@@ -21,12 +21,12 @@ import java.util.function.Function;
  *
  * @since 4.4.0
  */
-final class TransformedMessageIterator implements Iterator<Message>, HasSize {
+public class TransformingIterator<T> implements Iterator<T>, HasSize {
 
-  private final Iterator<Object> delegate;
-  private final Function<Object, Message> transformer;
+  protected final Iterator<?> delegate;
+  private final Function<Object, T> transformer;
 
-  TransformedMessageIterator(Iterator<Object> delegate, Function<Object, Message> transformer) {
+  public TransformingIterator(Iterator<?> delegate, Function<Object, T> transformer) {
     this.delegate = delegate;
     this.transformer = transformer;
   }
@@ -37,12 +37,8 @@ final class TransformedMessageIterator implements Iterator<Message>, HasSize {
   }
 
   @Override
-  public Message next() {
+  public T next() {
     Object value = delegate.next();
-    if (value instanceof Message) {
-      return (Message) value;
-    }
-
     return transformer.apply(value);
   }
 
@@ -57,12 +53,7 @@ final class TransformedMessageIterator implements Iterator<Message>, HasSize {
   }
 
   @Override
-  public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(value -> {
-      if (!(value instanceof Message)) {
-        value = transformer.apply(value);
-      }
-      action.accept((Message) value);
-    });
+  public void forEachRemaining(Consumer<? super T> action) {
+    delegate.forEachRemaining(value -> action.accept(transformer.apply(value)));
   }
 }

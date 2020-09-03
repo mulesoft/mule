@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.internal.util.message;
 
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -17,22 +14,22 @@ import java.util.ListIterator;
 import java.util.function.Function;
 
 /**
- * Specialization of {@link TransformedMessageCollection} for collections that implement the {@link List}
+ * Specialization of {@link TransformingMessageCollection} for collections that implement the {@link List}
  * interface
  *
  * @since 4.4.0
  */
-public final class TransformedMessageList extends TransformedMessageCollection implements List<Message> {
+public class TransformingList<T> extends TransformingCollection<T> implements List<T> {
 
   private final List<Object> delegate;
 
-  public TransformedMessageList(List<Object> delegate, Function<Object, Message> transformer) {
-    super(delegate, transformer);
+  public TransformingList(List<Object> delegate, Function<Object, T> transformer, Class<T> targetType) {
+    super(delegate, targetType, transformer);
     this.delegate = delegate;
   }
 
   @Override
-  public void add(int index, Message element) {
+  public void add(int index, T element) {
     writeLock.lock();
     try {
       delegate.add(index, element);
@@ -42,7 +39,7 @@ public final class TransformedMessageList extends TransformedMessageCollection i
   }
 
   @Override
-  public boolean addAll(int index, Collection<? extends Message> c) {
+  public boolean addAll(int index, Collection<? extends T> c) {
     writeLock.lock();
     try {
       return delegate.addAll(index, c);
@@ -56,8 +53,20 @@ public final class TransformedMessageList extends TransformedMessageCollection i
     readLock.lock();
     try {
       int i = delegate.indexOf(o);
-      if (i == -1 && o instanceof Message) {
-        i = delegate.indexOf(Result.builder((Message) o).build());
+
+      if (i == -1 && isTargetInstance(o)) {
+        readLock.unlock();
+        writeLock.lock();
+        try {
+          i = delegate.indexOf(o);
+          if (i == -1) {
+            transformAll();
+          }
+        } finally {
+          readLock.lock();
+          writeLock.unlock();
+        }
+        i = delegate.indexOf(o);
       }
 
       return i;
@@ -71,8 +80,19 @@ public final class TransformedMessageList extends TransformedMessageCollection i
     readLock.lock();
     try {
       int i = delegate.lastIndexOf(o);
-      if (i == -1 && o instanceof Message) {
-        i = delegate.lastIndexOf(Result.builder((Message) o).build());
+      if (i == -1 && isTargetInstance(o)) {
+        readLock.unlock();
+        writeLock.lock();
+        try {
+          i = delegate.lastIndexOf(o);
+          if (i == -1) {
+            transformAll();
+          }
+        } finally {
+          readLock.lock();
+          writeLock.unlock();
+        }
+        i = delegate.lastIndexOf(o);
       }
 
       return i;
@@ -82,7 +102,7 @@ public final class TransformedMessageList extends TransformedMessageCollection i
   }
 
   @Override
-  public void sort(Comparator<? super Message> c) {
+  public void sort(Comparator<? super T> c) {
     writeLock.lock();
     try {
       delegate.sort((o1, o2) -> c.compare(transformer.apply(o1), transformer.apply(o2)));
@@ -92,24 +112,24 @@ public final class TransformedMessageList extends TransformedMessageCollection i
   }
 
   @Override
-  public Message get(int index) {
+  public T get(int index) {
     readLock.lock();
     try {
       Object value = delegate.get(index);
-      if (value instanceof Message) {
-        return (Message) value;
+      if (isTargetInstance(value)) {
+        return (T) value;
       }
       readLock.unlock();
       writeLock.lock();
       try {
         Object update = delegate.get(index);
-        if (update instanceof Message) {
-          return (Message) update;
+        if (isTargetInstance(update)) {
+          return (T) update;
         }
         update = transformer.apply(update);
         delegate.set(index, update);
 
-        return (Message) update;
+        return (T) update;
       } finally {
         readLock.lock();
         writeLock.unlock();
@@ -120,10 +140,10 @@ public final class TransformedMessageList extends TransformedMessageCollection i
   }
 
   @Override
-  public Message set(int index, Message message) {
+  public T set(int index, T item) {
     writeLock.lock();
     try {
-      Object previous = delegate.set(index, message);
+      Object previous = delegate.set(index, item);
       return previous != null ? transformer.apply(previous) : null;
     } finally {
       writeLock.unlock();
@@ -131,7 +151,7 @@ public final class TransformedMessageList extends TransformedMessageCollection i
   }
 
   @Override
-  public Message remove(int index) {
+  public T remove(int index) {
     writeLock.lock();
     try {
       Object previous = delegate.remove(index);
@@ -142,28 +162,36 @@ public final class TransformedMessageList extends TransformedMessageCollection i
   }
 
   @Override
-  public Iterator<Message> iterator() {
+  public Iterator<T> iterator() {
     return listIterator();
   }
 
   @Override
-  public ListIterator<Message> listIterator() {
-    return new TransformedMessageListIterator(this);
+  public ListIterator<T> listIterator() {
+    return new TransformingListIterator(this);
   }
 
   @Override
-  public ListIterator<Message> listIterator(int index) {
-    return new TransformedMessageListIterator(this);
+  public ListIterator<T> listIterator(int index) {
+    return new TransformingListIterator(this);
   }
 
   @Override
-  public List<Message> subList(int fromIndex, int toIndex) {
+  public List<T> subList(int fromIndex, int toIndex) {
     readLock.lock();
     try {
       List results = delegate.subList(fromIndex, toIndex);
-      return new TransformedMessageList(results, transformer);
+      return new TransformingList(results, transformer, targetType);
     } finally {
       readLock.unlock();
+    }
+  }
+
+  @Override
+  protected void transformAll() {
+    for (int i = 0; i < delegate.size(); i++) {
+      Object value = delegate.get(i);
+      delegate.set(i, transformer.apply(value));
     }
   }
 }

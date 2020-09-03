@@ -21,18 +21,18 @@ import java.util.function.Function;
  *
  * @since 4.4.0
  */
-final class TransformedMessageListIterator implements ListIterator<Message> {
+public final class TransformingListIterator<T> implements ListIterator<T> {
 
-  private final List<Message> delegate;
+  private final List<T> delegate;
   private final int size;
   private int index;
   private int lastIndex = 0;
 
-  TransformedMessageListIterator(List<Message> delegate) {
+  public TransformingListIterator(List<T> delegate) {
     this(delegate, 0);
   }
 
-  TransformedMessageListIterator(List<Message> delegate, int startIndex) {
+  TransformingListIterator(List<T> delegate, int startIndex) {
     this.delegate = delegate;
     index = startIndex;
     size = delegate.size();
@@ -44,7 +44,7 @@ final class TransformedMessageListIterator implements ListIterator<Message> {
   }
 
   @Override
-  public Message next() {
+  public T next() {
     lastIndex = index++;
     return delegate.get(lastIndex);
   }
@@ -55,7 +55,7 @@ final class TransformedMessageListIterator implements ListIterator<Message> {
   }
 
   @Override
-  public Message previous() {
+  public T previous() {
     if (index == 0) {
       throw new NoSuchElementException();
     }
@@ -80,12 +80,12 @@ final class TransformedMessageListIterator implements ListIterator<Message> {
   }
 
   @Override
-  public void set(Message message) {
-    delegate.set(lastIndex, message);
+  public void set(T item) {
+    delegate.set(lastIndex, item);
   }
 
   @Override
-  public void add(Message message) {
-    delegate.add(index, message);
+  public void add(T item) {
+    delegate.add(index, item);
   }
 }

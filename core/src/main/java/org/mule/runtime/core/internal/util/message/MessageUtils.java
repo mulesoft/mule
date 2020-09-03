@@ -200,9 +200,8 @@ public final class MessageUtils {
       results = new ArrayList<>(results);
     }
 
-    return new TransformedMessageList((List) results,
-                                      value -> toMessage((Result) value, cursorProviderFactory, eventContext,
-                                                         originatingLocation));
+    return new TransformingMessageList((List) results,
+                                       resultTransformer(cursorProviderFactory, eventContext, originatingLocation));
   }
 
   /**
@@ -221,9 +220,9 @@ public final class MessageUtils {
 
     Function<Object, Message> transformer = resultTransformer(cursorProviderFactory, eventContext, originatingLocation);
     if (results instanceof StreamingIterator) {
-      return new TransformedMessageStreamingIterator((StreamingIterator) results, transformer);
+      return new TransformingStreamingIterator((StreamingIterator) results, transformer);
     } else {
-      return new TransformedMessageIterator((Iterator) results, transformer);
+      return new TransformingIterator<>(results, transformer);
     }
   }
 
@@ -399,8 +398,8 @@ public final class MessageUtils {
       results = new ArrayList<>(results);
     }
 
-    return new TransformedMessageList((List) results,
-                                      legacyResultTransformer(cursorProviderFactory, eventContext, originatingLocation));
+    return new TransformingMessageList((List) results,
+                                       legacyResultTransformer(cursorProviderFactory, eventContext, originatingLocation));
   }
 
   /**
@@ -434,7 +433,8 @@ public final class MessageUtils {
   private static Function<Object, Message> resultTransformer(CursorProviderFactory cursorProviderFactory,
                                                              BaseEventContext eventContext,
                                                              ComponentLocation originatingLocation) {
-    return value -> toMessage((Result) value, cursorProviderFactory, eventContext, originatingLocation);
+
+    return value -> toMessage(SdkResultAdapter.from(value), cursorProviderFactory, eventContext, originatingLocation);
   }
 
   /**
@@ -454,10 +454,10 @@ public final class MessageUtils {
 
     Function<Object, Message> transformer = legacyResultTransformer(cursorProviderFactory, eventContext, originatingLocation);
     if (results instanceof StreamingIterator) {
-      return new TransformedMessageStreamingIterator((StreamingIterator<org.mule.runtime.extension.api.runtime.operation.Result>) results,
-                                                     transformer);
+      return new TransformingStreamingIterator((StreamingIterator<org.mule.runtime.extension.api.runtime.operation.Result>) results,
+                                               transformer);
     } else {
-      return new TransformedMessageIterator((Iterator) results, transformer);
+      return new TransformingIterator<>(results, transformer);
     }
   }
 

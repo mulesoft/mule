@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.util.message;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -23,30 +22,28 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * Decorates a {@link Collection} with items of random types and uses a {@link Function} 
+ * Decorates a {@link Collection} with items of random types and uses a {@link Function}
  * to guarantee that those items always surfaced in the form of a {@link Message}
- *
+ * <p>
  * This allows to avoid preemptive transformations of an entire collection.
  *
  * @since 4.4.0
  */
-abstract class TransformedMessageCollection implements Collection<Message> {
+public abstract class TransformingCollection<T> implements Collection<T> {
 
-  private final Collection<Object> delegate;
-  protected final Function<Object, Message> transformer;
+  private Collection<Object> delegate;
+  protected final Class<T> targetType;
+  protected final Function<Object, T> transformer;
   protected final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
   protected final Lock readLock = readWriteLock.readLock();
   protected final Lock writeLock = readWriteLock.writeLock();
 
-  public TransformedMessageCollection(Collection<Object> delegate, Function<Object, Message> transformer) {
+  public TransformingCollection(Collection<Object> delegate, Class<T> targetType, Function<Object, T> transformer) {
     this.delegate = delegate;
-    this.transformer = value -> {
-      if (value instanceof Message) {
-        return (Message) value;
-      } else {
-        return transformer.apply(value);
-      }
-    };
+    this.targetType = targetType;
+    this.transformer = value -> isTargetInstance(value)
+        ? (T) value
+        : transformer.apply(value);
   }
 
   @Override
@@ -74,18 +71,28 @@ abstract class TransformedMessageCollection implements Collection<Message> {
     readLock.lock();
     try {
       boolean contains = delegate.contains(o);
-      if (!contains && o instanceof Message) {
-        contains = delegate.contains(Result.builder((Message) o));
+      if (!contains && isTargetInstance(o)) {
+        readLock.unlock();
+        writeLock.lock();
+        try {
+          contains = delegate.contains(o);
+          if (!contains) {
+            transformAll();
+          }
+        } finally {
+          readLock.lock();
+          writeLock.unlock();
+        }
       }
-      return contains;
+      return delegate.contains(o);
     } finally {
       readLock.unlock();
     }
   }
 
   @Override
-  public Iterator<Message> iterator() {
-    return new TransformedMessageIterator(delegate.iterator(), transformer);
+  public Iterator<T> iterator() {
+    return new TransformingIterator<>(delegate.iterator(), transformer);
   }
 
   @Override
@@ -115,10 +122,10 @@ abstract class TransformedMessageCollection implements Collection<Message> {
   }
 
   @Override
-  public boolean add(Message message) {
+  public boolean add(T o) {
     writeLock.lock();
     try {
-      return delegate.add(message);
+      return delegate.add(o);
     } finally {
       writeLock.unlock();
     }
@@ -147,10 +154,10 @@ abstract class TransformedMessageCollection implements Collection<Message> {
     }
   }
 
-  protected Collection<?> toResults(Collection<?> messages) {
-    return messages.stream()
+  protected <T> Collection<T> transformedCopy(Collection<?> items) {
+    return (Collection<T>) items.stream()
         .map(o -> {
-          if (o instanceof Message) {
+          if (isTargetInstance(o)) {
             return o;
           } else {
             return transformer.apply(o);
@@ -159,7 +166,7 @@ abstract class TransformedMessageCollection implements Collection<Message> {
   }
 
   @Override
-  public boolean addAll(Collection<? extends Message> c) {
+  public boolean addAll(Collection<? extends T> c) {
     writeLock.lock();
     try {
       return delegate.addAll(c);
@@ -193,13 +200,13 @@ abstract class TransformedMessageCollection implements Collection<Message> {
   }
 
   @Override
-  public boolean removeIf(Predicate<? super Message> filter) {
+  public boolean removeIf(Predicate<? super T> filter) {
     return delegate.removeIf(result -> filter.test(transformer.apply(result)));
   }
 
   @Override
   public boolean retainAll(Collection<?> c) {
-    return delegate.retainAll(toResults(c));
+    return delegate.retainAll(transformedCopy(c));
   }
 
   @Override
@@ -233,23 +240,31 @@ abstract class TransformedMessageCollection implements Collection<Message> {
   }
 
   @Override
-  public Spliterator<Message> spliterator() {
+  public Spliterator<T> spliterator() {
     return delegate.stream().map(result -> transformer.apply(result)).collect(toList())
         .spliterator();
   }
 
   @Override
-  public Stream<Message> stream() {
+  public Stream<T> stream() {
     return delegate.stream().map(result -> transformer.apply(result));
   }
 
   @Override
-  public Stream<Message> parallelStream() {
+  public Stream<T> parallelStream() {
     return delegate.parallelStream().map(result -> transformer.apply(result));
   }
 
   @Override
-  public void forEach(Consumer<? super Message> action) {
+  public void forEach(Consumer<? super T> action) {
     stream().forEach(action);
+  }
+
+  protected boolean isTargetInstance(Object o) {
+    return targetType.isInstance(o);
+  }
+
+  protected void transformAll() {
+    delegate = transformedCopy(delegate);
   }
 }

@@ -78,6 +78,7 @@ import org.mule.runtime.core.internal.processor.interceptor.CompletableIntercept
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceSuccessCallbackAdapter;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.internal.util.message.SdkResultAdapter;
+import org.mule.runtime.core.internal.util.message.TransformingLegacyResultAdapterCollection;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -529,9 +530,10 @@ public class FlowProcessMediator implements Initialisable {
 
       Message eventMessage;
       if (resultValue instanceof Collection && adapter.isCollection()) {
+        Collection<Result> resultCollection = new TransformingLegacyResultAdapterCollection((Collection) resultValue);
         eventMessage = toMessage(Result.<Collection<Message>, TypedValue<?>>builder()
             .output(messageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
-                .decorateOutputResultCollection((Collection<Result>) resultValue, adapter.getCorrelationId().orElse("")),
+                .decorateOutputResultCollection(resultCollection, adapter.getCorrelationId().orElse("")),
                                                                              adapter.getPayloadMediaTypeResolver()),
                                       adapter.getCursorProviderFactory(),
                                       ((BaseEventContext) eventCtx).getRootContext(),
