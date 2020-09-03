@@ -194,5 +194,6 @@ public class TransformingList<T> extends TransformingCollection<T> implements Li
       Object value = delegate.get(i);
       delegate.set(i, transformer.apply(value));
     }
+    transformAllInvoked = true;
   }
 }

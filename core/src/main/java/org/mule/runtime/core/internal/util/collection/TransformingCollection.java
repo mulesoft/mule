@@ -35,6 +35,7 @@ public abstract class TransformingCollection<T> implements Collection<T> {
   protected final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
   protected final Lock readLock = readWriteLock.readLock();
   protected final Lock writeLock = readWriteLock.writeLock();
+  protected boolean transformAllInvoked = false;
 
   public TransformingCollection(Collection<Object> delegate, Class<T> targetType, Function<Object, T> transformer) {
     this.delegate = delegate;
@@ -69,7 +70,9 @@ public abstract class TransformingCollection<T> implements Collection<T> {
     readLock.lock();
     try {
       boolean contains = delegate.contains(o);
-      if (!contains && isTargetInstance(o)) {
+      if (transformAllInvoked) {
+        return contains;
+      } else if (!contains && isTargetInstance(o)) {
         readLock.unlock();
         writeLock.lock();
         try {
@@ -90,14 +93,14 @@ public abstract class TransformingCollection<T> implements Collection<T> {
 
   @Override
   public Iterator<T> iterator() {
-    return new TransformingIterator<>(delegate.iterator(), transformer);
+    return transformAllInvoked ? (Iterator<T>) delegate.iterator() : new TransformingIterator<>(delegate.iterator(), transformer);
   }
 
   @Override
   public Object[] toArray() {
     readLock.lock();
     try {
-      return transformArray(delegate.toArray());
+      return transformAllInvoked ? delegate.toArray() : transformArray(delegate.toArray());
     } finally {
       readLock.unlock();
     }
@@ -107,7 +110,7 @@ public abstract class TransformingCollection<T> implements Collection<T> {
   public <T> T[] toArray(T[] a) {
     readLock.lock();
     try {
-      return transformArray(delegate.toArray(a));
+      return transformAllInvoked ? delegate.toArray(a) : transformArray(delegate.toArray(a));
     } finally {
       readLock.unlock();
     }
@@ -153,14 +156,7 @@ public abstract class TransformingCollection<T> implements Collection<T> {
   }
 
   protected <T> Collection<T> transformedCopy(Collection<?> items) {
-    return (Collection<T>) items.stream()
-        .map(o -> {
-          if (isTargetInstance(o)) {
-            return o;
-          } else {
-            return transformer.apply(o);
-          }
-        }).collect(toList());
+    return (Collection<T>) items.stream().map(transformer::apply).collect(toList());
   }
 
   @Override
@@ -239,18 +235,29 @@ public abstract class TransformingCollection<T> implements Collection<T> {
 
   @Override
   public Spliterator<T> spliterator() {
-    return delegate.stream().map(result -> transformer.apply(result)).collect(toList())
-        .spliterator();
+    if (transformAllInvoked) {
+      return (Spliterator<T>) delegate.spliterator();
+    } else {
+      return stream().collect(toList()).spliterator();
+    }
   }
 
   @Override
   public Stream<T> stream() {
-    return delegate.stream().map(result -> transformer.apply(result));
+    if (transformAllInvoked) {
+      return (Stream<T>) delegate.stream();
+    } else {
+      return delegate.stream().map(transformer::apply);
+    }
   }
 
   @Override
   public Stream<T> parallelStream() {
-    return delegate.parallelStream().map(result -> transformer.apply(result));
+    if (transformAllInvoked) {
+      return (Stream<T>) delegate.parallelStream();
+    } else {
+      return delegate.parallelStream().map(transformer::apply);
+    }
   }
 
   @Override
@@ -264,5 +271,6 @@ public abstract class TransformingCollection<T> implements Collection<T> {
 
   protected void transformAll() {
     delegate = transformedCopy(delegate);
+    transformAllInvoked = true;
   }
 }
