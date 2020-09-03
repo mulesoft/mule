@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
@@ -51,7 +50,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SpringXmlConfigurationBuilder extends AbstractResourceConfigurationBuilder
     implements ParentMuleContextAwareConfigurationBuilder {
 
-  private ArtifactDeclaration artifactDeclaration = new ArtifactDeclaration();
+  private ArtifactDeclaration artifactDeclaration;
   private boolean enableLazyInit = false;
   private boolean disableXmlValidations = false;
 
