@@ -71,6 +71,11 @@ public class WSConsumerConfig implements MuleContextAware
     /**
      * Creates an outbound endpoint for the service address.
      */
+    public MessageProcessor createOutboundMessageProcessor() throws MuleException
+    {
+        return createOutboundMessageProcessor(null);
+    }
+
     public MessageProcessor createOutboundMessageProcessor(MessageProcessor messageProcessor) throws MuleException
     {
         Preconditions.checkState(StringUtils.isNotEmpty(serviceAddress), "No serviceAddress provided in WS consumer config");
