@@ -94,7 +94,7 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     protected void enableHttpsServer(Server server)
     {
-        SslContextFactory sslContextFactory = new SslContextFactory();
+        SslContextFactory sslContextFactory = new SslContextFactory.Server();
 
         try
         {
