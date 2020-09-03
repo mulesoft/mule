@@ -128,7 +128,7 @@ public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase 
      */
     private Server createTlsServer(String disabledCipherSuite, String disabledProtocol) throws Exception
     {
-        SslContextFactory sslContextFactory = new SslContextFactory();
+        SslContextFactory sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("serverKeystore", getClass()));
         sslContextFactory.setKeyStorePassword("mulepassword");
         sslContextFactory.setKeyManagerPassword("mulepassword");
