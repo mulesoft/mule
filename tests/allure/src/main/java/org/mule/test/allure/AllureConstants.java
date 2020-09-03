@@ -104,6 +104,12 @@ public interface AllureConstants {
 
     }
 
+    interface ArtifactDeclarationStory {
+
+      String ARTIFACT_DECLARATION = "Artifact Declaration";
+
+    }
+
   }
 
   interface EmailFeature {

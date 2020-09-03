@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Comparator.comparing;
@@ -297,7 +298,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
             }
           });
 
-      List<ConfigFile> configFiles = processXmlConfiguration(new XmlParsingConfiguration() {
+      // Only parse XML if artifactDeclaration is null
+      List<ConfigFile> configFiles = artifactDeclaration == null ? processXmlConfiguration(new XmlParsingConfiguration() {
 
         @Override
         public ParsingPropertyResolver getParsingPropertyResolver() {
@@ -334,7 +336,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           return XmlNamespaceInfoProviderSupplier.createFromExtensionModels(getExtensions(), of(cl -> serviceRegistry
               .lookupProviders(XmlNamespaceInfoProvider.class, cl).stream().collect(toList())));
         }
-      });
+      }) : emptyList();
 
       ArtifactConfig artifactConfig = new ArtifactConfig.Builder()
           .setApplicationName(getArtifactName())
