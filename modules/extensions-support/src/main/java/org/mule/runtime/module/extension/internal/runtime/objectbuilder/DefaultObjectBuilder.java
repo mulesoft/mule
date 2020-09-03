@@ -15,6 +15,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
+import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
@@ -120,7 +121,9 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
     T object = createInstance(prototypeClass);
 
     final CursorComponentDecoratorFactory componentDecoratorFactory =
-        (CursorComponentDecoratorFactory) context.getProperty("componentDecoratorFactory");
+        context != null
+            ? (CursorComponentDecoratorFactory) context.getProperty(COMPONENT_DECORATOR_FACTORY_KEY)
+            : null;
 
     for (Map.Entry<FieldSetter, ValueResolver<Object>> entry : resolvers.entrySet()) {
       final Object resolvedValue = resolveValue(entry.getValue(), context);

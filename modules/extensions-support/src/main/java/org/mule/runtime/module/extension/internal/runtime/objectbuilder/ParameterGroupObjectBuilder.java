@@ -69,7 +69,15 @@ public class ParameterGroupObjectBuilder<T> {
         .withExpressionManager(expressionManager)
         .withConfig(executionContext.getConfiguration()).build()) {
       return doBuild(executionContext::hasParameter, executionContext::getParameter, context,
-                     ((ExecutionContextAdapter) executionContext).getComponentDecoratorFactory());
+                     resolveCursorComponentDecoratorFactory(executionContext));
+    }
+  }
+
+  private CursorComponentDecoratorFactory resolveCursorComponentDecoratorFactory(EventedExecutionContext executionContext) {
+    if (executionContext instanceof ExecutionContextAdapter) {
+      return ((ExecutionContextAdapter) executionContext).getComponentDecoratorFactory();
+    } else {
+      return null;
     }
   }
 

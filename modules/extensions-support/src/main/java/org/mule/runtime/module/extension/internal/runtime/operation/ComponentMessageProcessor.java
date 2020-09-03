@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -153,7 +154,6 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -187,6 +187,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
   private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
+  public static final String COMPONENT_DECORATOR_FACTORY_KEY = "componentDecoratorFactory";
 
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
@@ -866,7 +867,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       final CompletableComponentExecutorFactory<T> operationExecutorFactory = getOperationExecutorFactory(componentModel);
 
       try {
-        BeanUtils.setProperty(operationExecutorFactory, "componentDecoratorFactory", componentDecoratorFactory);
+        setProperty(operationExecutorFactory, COMPONENT_DECORATOR_FACTORY_KEY, componentDecoratorFactory);
       } catch (IllegalAccessException | InvocationTargetException e) {
         throw new MuleRuntimeException(e);
       }
@@ -1165,7 +1166,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
-        .withProperty("componentDecoratorFactory", componentDecoratorFactory)
+        .withProperty(COMPONENT_DECORATOR_FACTORY_KEY, componentDecoratorFactory)
         .withConfig(configuration).build()) {
       return resolverSet.resolve(context).asMap();
     }

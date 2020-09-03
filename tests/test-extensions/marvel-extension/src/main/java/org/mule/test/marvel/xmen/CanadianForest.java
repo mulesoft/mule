@@ -22,6 +22,9 @@ public class CanadianForest {
   @Content
   private TypedValue<Object> river;
 
+  @Parameter
+  private List<String> friends;
+
   public CanadianForest() {
     super();
   }
@@ -32,5 +35,9 @@ public class CanadianForest {
 
   public TypedValue<Object> getRiver() {
     return river;
+  }
+
+  public List<String> getFriends() {
+    return friends;
   }
 }

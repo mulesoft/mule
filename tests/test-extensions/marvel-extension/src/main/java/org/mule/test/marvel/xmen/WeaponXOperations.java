@@ -60,6 +60,9 @@ public class WeaponXOperations {
       // He pets them, what did you expect wolverine to do?
     }
     toByteArray((InputStream) forest.getRiver().getValue());
+    for (String friends : forest.getFriends()) {
+      // some people to share some drinks with
+    }
   }
 
   public void gambitChargeItems(@Content @Optional(defaultValue = "#[payload]") TypedValue<Iterator> items) {
