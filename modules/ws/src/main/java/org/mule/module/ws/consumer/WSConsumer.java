@@ -146,7 +146,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         chainBuilder.chain(createSoapHeadersPropertiesRemoverMessageProcessor());
 
-        chainBuilder.chain(config.createOutboundMessageProcessor());
+        chainBuilder.chain(config.createOutboundMessageProcessor(this));
 
         return chainBuilder.build();
     }
