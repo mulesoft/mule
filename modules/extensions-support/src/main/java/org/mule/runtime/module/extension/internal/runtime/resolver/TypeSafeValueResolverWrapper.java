@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -32,7 +33,7 @@ import javax.inject.Inject;
 public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initialisable {
 
   private final Class<T> expectedType;
-  private ValueResolver valueResolverDelegate;
+  private final ValueResolver valueResolverDelegate;
   private Resolver<T> resolver;
 
   @Inject
@@ -54,6 +55,11 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   @Override
   public boolean isDynamic() {
     return valueResolverDelegate.isDynamic();
+  }
+
+  @Override
+  public boolean isContent() {
+    return valueResolverDelegate.isContent();
   }
 
   @Override

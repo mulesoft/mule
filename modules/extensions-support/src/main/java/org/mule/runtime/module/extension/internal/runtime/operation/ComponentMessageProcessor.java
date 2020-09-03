@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -136,6 +137,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -185,6 +187,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
   private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
+  public static final String COMPONENT_DECORATOR_FACTORY_KEY = "componentDecoratorFactory";
 
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
@@ -581,7 +584,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       returnDelegate = createReturnDelegate();
       valueReturnDelegate = getValueReturnDelegate();
       initialiseIfNeeded(resolverSet, muleContext);
-      componentExecutor = createComponentExecutor();
+      componentExecutor = createComponentExecutor(componentDecoratorFactory);
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
 
@@ -797,7 +800,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return delegate;
   }
 
-  private CompletableComponentExecutor<T> createComponentExecutor() throws InitialisationException {
+  private CompletableComponentExecutor<T> createComponentExecutor(CursorComponentDecoratorFactory componentDecoratorFactory)
+      throws InitialisationException {
     Map<String, Object> params = new HashMap<>();
 
     LazyValue<ValueResolvingContext> resolvingContext =
@@ -860,7 +864,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
       }
 
-      return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
+      final CompletableComponentExecutorFactory<T> operationExecutorFactory = getOperationExecutorFactory(componentModel);
+
+      try {
+        setProperty(operationExecutorFactory, COMPONENT_DECORATOR_FACTORY_KEY, componentDecoratorFactory);
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        throw new MuleRuntimeException(e);
+      }
+
+      return operationExecutorFactory
+          .createExecutor(componentModel, params);
     } finally {
       resolvingContext.ifComputed(ValueResolvingContext::close);
     }
@@ -1153,6 +1166,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
+        .withProperty(COMPONENT_DECORATOR_FACTORY_KEY, componentDecoratorFactory)
         .withConfig(configuration).build()) {
       return resolverSet.resolve(context).asMap();
     }

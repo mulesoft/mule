@@ -339,7 +339,8 @@ public abstract class ExtensionDefinitionParser {
                                                                            parameter.getExpressionSupport(),
                                                                            parameter.isRequired(),
                                                                            parameter.getModelProperties(),
-                                                                           acceptsReferences(parameter)));
+                                                                           acceptsReferences(parameter),
+                                                                           true));
 
             return true;
           }
@@ -580,7 +581,7 @@ public abstract class ExtensionDefinitionParser {
           parseFromTextExpression(fieldName, fieldDsl.get(),
                                   () -> value -> valueResolverFactory.of(fieldName, type, value, defaultValue,
                                                                          expressionSupport, false, emptySet(),
-                                                                         false));
+                                                                         false, isContent));
 
           return true;
         }
@@ -778,7 +779,8 @@ public abstract class ExtensionDefinitionParser {
                                                                      parameterModel.getExpressionSupport(),
                                                                      parameterModel.isRequired(),
                                                                      parameterModel.getModelProperties(),
-                                                                     acceptsReferences(parameterModel)));
+                                                                     acceptsReferences(parameterModel),
+                                                                     true));
     } else {
       parseObjectParameter(parameterModel.getName(), parameterModel.getName(), (ObjectType) parameterModel.getType(),
                            parameterModel.getDefaultValue(), parameterModel.getExpressionSupport(), parameterModel.isRequired(),

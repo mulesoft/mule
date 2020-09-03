@@ -9,14 +9,15 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 
 import java.util.Optional;
@@ -62,6 +63,11 @@ public class ConnectionProviderResolver<C> extends AbstractComponent
     return valueResolver.isDynamic();
   }
 
+  @Override
+  public boolean isContent() {
+    return false;
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -88,4 +94,5 @@ public class ConnectionProviderResolver<C> extends AbstractComponent
   public void start() throws MuleException {
     startIfNeeded(objectBuilder);
   }
+
 }

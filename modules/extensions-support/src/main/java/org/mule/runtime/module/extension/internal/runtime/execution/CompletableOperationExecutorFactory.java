@@ -14,6 +14,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
@@ -37,6 +38,8 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
 
   private final Class<T> implementationClass;
   private final Method operationMethod;
+
+  private CursorComponentDecoratorFactory componentDecoratorFactory;
 
   public CompletableOperationExecutorFactory(Class<T> implementationClass, Method operationMethod) {
     checkArgument(implementationClass != null, "implementationClass cannot be null");
@@ -65,9 +68,14 @@ public final class CompletableOperationExecutorFactory<T, M extends ComponentMod
     }
 
     if (isNonBlocking(operationModel)) {
-      return new NonBlockingCompletableMethodOperationExecutor<>(operationModel, operationMethod, delegate);
+      return new NonBlockingCompletableMethodOperationExecutor<>(operationModel, operationMethod, delegate,
+                                                                 componentDecoratorFactory);
     }
 
-    return new CompletableMethodOperationExecutor<>(operationModel, operationMethod, delegate);
+    return new CompletableMethodOperationExecutor<>(operationModel, operationMethod, delegate, componentDecoratorFactory);
+  }
+
+  public void setComponentDecoratorFactory(CursorComponentDecoratorFactory componentDecoratorFactory) {
+    this.componentDecoratorFactory = componentDecoratorFactory;
   }
 }
