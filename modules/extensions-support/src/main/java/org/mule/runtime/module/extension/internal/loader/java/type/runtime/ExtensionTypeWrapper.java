@@ -7,10 +7,11 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
-
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -23,8 +24,11 @@ import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTypeElement;
 
+import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
 /**
@@ -37,7 +41,11 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
   private LazyValue<Extension> extensionAnnotation = new LazyValue<>(() -> getAnnotation(Extension.class).get());
 
   public ExtensionTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
-    super(aClass, typeLoader);
+    super(aClass, newCachedClassTypeLoader(typeLoader));
+  }
+
+  private static ClassTypeLoader newCachedClassTypeLoader(ClassTypeLoader classTypeLoader) {
+    return new CachedClassTypeLoader(classTypeLoader);
   }
 
   /**
@@ -93,4 +101,35 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
   public String getName() {
     return extensionAnnotation.get().name();
   }
+
+  private static class CachedClassTypeLoader implements ClassTypeLoader {
+
+    private ClassTypeLoader classTypeLoader;
+
+    private Map<Type, MetadataType> typeMetadataTypeMap = new WeakHashMap<>();
+    private Map<String, Optional<MetadataType>> typeIdentifierMetadataTypeMap = new WeakHashMap<>();
+
+    public CachedClassTypeLoader(ClassTypeLoader classTypeLoader) {
+      requireNonNull(classTypeLoader, "classTypeLoader cannot be null");
+
+      this.classTypeLoader = classTypeLoader;
+    }
+
+    @Override
+    public MetadataType load(Type type) {
+      return typeMetadataTypeMap.computeIfAbsent(type, k -> classTypeLoader.load(type));
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+      return classTypeLoader.getClassLoader();
+    }
+
+    @Override
+    public Optional<MetadataType> load(String typeIdentifier) {
+      return typeIdentifierMetadataTypeMap.computeIfAbsent(typeIdentifier, k -> classTypeLoader.load(k));
+    }
+
+  }
+
 }
