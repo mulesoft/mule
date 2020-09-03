@@ -11174,6 +11174,54 @@
               "name": "river",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.util.List",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.util.Collection"
+                    ],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
+                    "isMap": false
+                  }
+                },
+                "item": {
+                  "type": "String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "allowedStereotypeModels": [],
+              "name": "friends",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -11280,7 +11328,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 4,
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
@@ -11457,6 +11505,54 @@
               "name": "river",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.util.List",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.util.Collection"
+                    ],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
+                    "isMap": false
+                  }
+                },
+                "item": {
+                  "type": "String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "allowedStereotypeModels": [],
+              "name": "friends",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -11563,7 +11659,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 4,
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],

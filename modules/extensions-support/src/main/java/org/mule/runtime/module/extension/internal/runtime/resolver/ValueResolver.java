@@ -39,8 +39,5 @@ public interface ValueResolver<T> {
    *
    * @since 4.4, 4.3.1
    */
-  // default boolean isContent() {
-  // return false;
-  // }
   boolean isContent();
 }

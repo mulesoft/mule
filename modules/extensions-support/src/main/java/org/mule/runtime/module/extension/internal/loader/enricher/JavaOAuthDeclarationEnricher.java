@@ -225,12 +225,8 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
     }
   }
 
-
-  // TODO Rever this!
   public static final class JavaOAuthCompletableComponentExecutorFactory
       implements CompletableComponentExecutorFactory<ComponentModel> {
-
-    private CursorComponentDecoratorFactory componentDecoratorFactory;
 
     @Override
     public CompletableComponentExecutor<ComponentModel> createExecutor(ComponentModel componentModel,
@@ -239,7 +235,7 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
     }
 
     public void setComponentDecoratorFactory(CursorComponentDecoratorFactory componentDecoratorFactory) {
-      this.componentDecoratorFactory = componentDecoratorFactory;
+      // Nothing to do, this executor will not consume the payload so no metrics need to be calculated for this
     }
   }
 

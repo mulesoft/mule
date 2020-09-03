@@ -585,7 +585,19 @@
                   <xs:sequence minOccurs="1">
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="bears"></xs:element>
                     <xs:element type="xs:string" minOccurs="1" maxOccurs="1" name="river"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="friends">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="friend">
+                            <xs:complexType>
+                              <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
                   </xs:sequence>
+                  <xs:attribute type="mule:expressionList" use="optional" name="friends"></xs:attribute>
                 </xs:extension>
               </xs:complexContent>
             </xs:complexType>
@@ -601,7 +613,19 @@
         <xs:sequence minOccurs="1" maxOccurs="1">
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="bears"></xs:element>
           <xs:element type="xs:string" minOccurs="1" maxOccurs="1" name="river"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="friends">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="friend">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:expressionList" use="optional" name="friends"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

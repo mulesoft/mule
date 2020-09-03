@@ -49,8 +49,6 @@ public class ComponentExecutorCompletableAdapterFactory<T extends ComponentModel
 
   private final ComponentExecutorFactory<T> delegate;
 
-  private CursorComponentDecoratorFactory componentDecoratorFactory;
-
   public ComponentExecutorCompletableAdapterFactory(ComponentExecutorFactory<T> delegate) {
     this.delegate = delegate;
   }
@@ -114,6 +112,6 @@ public class ComponentExecutorCompletableAdapterFactory<T extends ComponentModel
   }
 
   public void setComponentDecoratorFactory(CursorComponentDecoratorFactory componentDecoratorFactory) {
-    this.componentDecoratorFactory = componentDecoratorFactory;
+    // Do not calculate statistics for legacy mode operations
   }
 }

@@ -35,6 +35,7 @@ public final class SoapOperationExecutorFactory implements CompletableComponentE
   }
 
   public void setComponentDecoratorFactory(CursorComponentDecoratorFactory componentDecoratorFactory) {
+    // TODO MULE-18727 Get payload statistics for soap inputs
     this.componentDecoratorFactory = componentDecoratorFactory;
   }
 }
