@@ -6,12 +6,14 @@
  */
 package org.mule.test.module.extension;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.core.Is.is;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.INVOLVED_PEOPLE;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closeEmptyOperationCalls;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closePagingProviderCalls;
@@ -21,24 +23,42 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
+import org.mule.test.runner.RunnerDelegateTo;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mock;
 
+@RunnerDelegateTo(Parameterized.class)
 public class PagedOperationExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final String SAUL_NEW_NUMBER = "123-12-3";
 
+  @Parameters(name = "enableStatistics: {0}")
+  public static Collection<String> data() {
+    return asList("false", "true");
+  }
+
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
+  @Rule
+  public SystemProperty withStatistics;
+
   @Mock
   private ConnectionManager connectionManager;
+
+  public PagedOperationExecutionTestCase(String enableStatistics) {
+    this.withStatistics = new SystemProperty(MULE_ENABLE_STATISTICS, enableStatistics);
+  }
 
   @Override
   protected String getConfigFile() {
