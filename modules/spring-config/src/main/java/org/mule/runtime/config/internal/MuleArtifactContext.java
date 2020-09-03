@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Comparator.comparing;
@@ -48,6 +47,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -297,8 +297,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
             }
           });
 
-      // Only parse XML if artifactDeclaration is empty
-      List<ConfigFile> configFiles = artifactDeclaration != null ? processXmlConfiguration(new XmlParsingConfiguration() {
+      List<ConfigFile> configFiles = processXmlConfiguration(new XmlParsingConfiguration() {
 
         @Override
         public ParsingPropertyResolver getParsingPropertyResolver() {
@@ -335,7 +334,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           return XmlNamespaceInfoProviderSupplier.createFromExtensionModels(getExtensions(), of(cl -> serviceRegistry
               .lookupProviders(XmlNamespaceInfoProvider.class, cl).stream().collect(toList())));
         }
-      }) : emptyList();
+      });
 
       ArtifactConfig artifactConfig = new ArtifactConfig.Builder()
           .setApplicationName(getArtifactName())
