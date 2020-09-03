@@ -4,19 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util.message;
+package org.mule.runtime.core.internal.util.collection;
 
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 
 import java.io.IOException;
 import java.util.function.Function;
 
 /**
- * Decorates an {@link StreamingIterator} of elements of random types using a {@link Function} which guarantees
- * that the items are always surfaced as a {@link Message}
- *
- * This allows to avoid preemptive transformations of an entire dataset
+ * Specialization of {@link TransformingIterator} for iterators that implement the {@link StreamingIterator} interface.
+ * Said interface is implemented by this class as well.
  *
  * @since 4.4.0
  */

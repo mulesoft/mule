@@ -4,35 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util.message;
-
-import org.mule.runtime.api.message.Message;
+package org.mule.runtime.core.internal.util.collection;
 
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
-import java.util.function.Function;
 
 /**
- * Decorates an {@link ListIterator} of elements of random types using a {@link Function} which guarantees
- * that the items are always surfaced as a {@link Message}
- *
- * This allows to avoid preemptive transformations of an entire dataset
+ * Adapts a {@link List} into a {@link ListIterator}
  *
  * @since 4.4.0
  */
-public final class TransformingListIterator<T> implements ListIterator<T> {
+public final class ListIteratorAdapter<T> implements ListIterator<T> {
 
   private final List<T> delegate;
   private final int size;
   private int index;
   private int lastIndex = 0;
 
-  public TransformingListIterator(List<T> delegate) {
+  public ListIteratorAdapter(List<T> delegate) {
     this(delegate, 0);
   }
 
-  TransformingListIterator(List<T> delegate, int startIndex) {
+  ListIteratorAdapter(List<T> delegate, int startIndex) {
     this.delegate = delegate;
     index = startIndex;
     size = delegate.size();

@@ -4,11 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util.message;
+package org.mule.runtime.core.internal.util.collection;
 
 import static java.util.stream.Collectors.toList;
-
-import org.mule.runtime.api.message.Message;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -23,9 +21,9 @@ import java.util.stream.Stream;
 
 /**
  * Decorates a {@link Collection} with items of random types and uses a {@link Function}
- * to guarantee that those items always surfaced in the form of a {@link Message}
+ * to guarantee that, when exposed, those items have been transformed.
  * <p>
- * This allows to avoid preemptive transformations of an entire collection.
+ * This allows to lazily transform the items of the collection without making a full copy of the collection
  *
  * @since 4.4.0
  */

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util.message;
+package org.mule.runtime.core.internal.util.collection;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -14,9 +14,10 @@ import java.util.ListIterator;
 import java.util.function.Function;
 
 /**
- * Specialization of {@link TransformingMessageCollection} for collections that implement the {@link List}
- * interface
+ * Specialization of {@link TransformingCollection} for collections that implement the {@link List}
+ * interface.
  *
+ * @param <T> the generic type of the transformed collection's item
  * @since 4.4.0
  */
 public class TransformingList<T> extends TransformingCollection<T> implements List<T> {
@@ -168,12 +169,12 @@ public class TransformingList<T> extends TransformingCollection<T> implements Li
 
   @Override
   public ListIterator<T> listIterator() {
-    return new TransformingListIterator(this);
+    return new ListIteratorAdapter(this);
   }
 
   @Override
   public ListIterator<T> listIterator(int index) {
-    return new TransformingListIterator(this);
+    return new ListIteratorAdapter(this);
   }
 
   @Override

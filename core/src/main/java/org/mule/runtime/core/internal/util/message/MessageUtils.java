@@ -20,6 +20,8 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
+import org.mule.runtime.core.internal.util.collection.TransformingIterator;
+import org.mule.runtime.core.internal.util.collection.TransformingStreamingIterator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.sdk.api.runtime.operation.Result;
 

@@ -4,9 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util.message;
+package org.mule.runtime.core.internal.util.collection;
 
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.streaming.HasSize;
 
 import java.util.Iterator;
@@ -14,10 +13,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Decorates an {@link Iterator} of elements of random types using a {@link Function} which guarantees that the
- * items are always surfaced as a {@link Message}
- *
- * This allows to avoid preemptive transformations of an entire dataset
+ * Decorates an {@link Iterator} with items of random types and uses a {@link Function}
+ * to guarantee that, when exposed, those items have been transformed.
+ * <p>
+ * This allows to lazily transform the iterated items without the need to fully consuming the stream and generate a new iterator
  *
  * @since 4.4.0
  */

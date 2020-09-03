@@ -14,6 +14,7 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.util.collection.TransformingIterator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.size.SmallTest;

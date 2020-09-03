@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.util.message;
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.internal.util.collection.TransformingList;
 
 import java.util.List;
 import java.util.function.Function;
