@@ -131,6 +131,11 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValu
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.runtime.result.PayloadTargetReturnDelegate;
+import org.mule.runtime.module.extension.internal.runtime.result.ReturnDelegate;
+import org.mule.runtime.module.extension.internal.runtime.result.TargetReturnDelegate;
+import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
+import org.mule.runtime.module.extension.internal.runtime.result.VoidReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;

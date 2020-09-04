@@ -24,6 +24,7 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -35,6 +36,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
@@ -69,6 +71,7 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFac
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.util.TemplateParser;
+import org.mule.runtime.extension.api.data.sample.ComponentSampleDataProvider;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -78,6 +81,7 @@ import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
+import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderMediator;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
@@ -86,6 +90,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValu
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
+import org.mule.sdk.api.data.sample.SampleDataException;
 
 import java.util.List;
 import java.util.Optional;
@@ -107,7 +112,7 @@ import org.slf4j.Logger;
  */
 public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractComponent
     implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
-    Lifecycle {
+        ComponentSampleDataProvider, Lifecycle {
 
   private final static Logger LOGGER = getLogger(ExtensionComponent.class);
 
@@ -124,6 +129,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   protected CursorProviderFactory cursorProviderFactory;
   private ValueProviderMediator<T> valueProviderMediator;
+  private SampleDataProviderMediator sampleDataProviderMediator;
 
   protected MuleContext muleContext;
 
@@ -427,6 +433,32 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Message getSampleData() throws SampleDataException {
+    try {
+      return runWithValueProvidersContext(context -> withContextClassLoader(classLoader, () ->
+        getSampleDataProviderMediator().getSampleData(getParameterValueResolver(),
+                (CheckedSupplier<Object>) () -> context.getConnection().orElse(null),
+                (CheckedSupplier<Object>) () -> context.getConfig().orElse(null))
+      ));
+    } catch (MuleRuntimeException e) {
+        Throwable rootException = getRootException(e);
+        if (rootException instanceof SampleDataException) {
+          throw (SampleDataException) rootException;
+        } else {
+          throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
+                  SampleDataException.UNKNOWN, e);
+        }
+
+    } catch (Exception e) {
+      throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
+              SampleDataException.UNKNOWN, e);
+    }
+  }
+
   protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer)
       throws MetadataResolvingException, ConnectionException {
     MetadataContext context = null;
@@ -615,12 +647,30 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     if (valueProviderMediator == null) {
       synchronized (this) {
         if (valueProviderMediator == null) {
-          this.valueProviderMediator = new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
+          valueProviderMediator = new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
         }
       }
     }
 
     return valueProviderMediator;
+  }
+
+  private SampleDataProviderMediator getSampleDataProviderMediator() {
+    if (sampleDataProviderMediator == null) {
+      synchronized (this) {
+        if (sampleDataProviderMediator == null) {
+          sampleDataProviderMediator = new SampleDataProviderMediator(
+                  extensionModel,
+                  componentModel,
+                  this,
+                  () -> muleContext,
+                  () -> reflectionCache,
+                  () -> streamingManager);
+        }
+      }
+    }
+
+    return sampleDataProviderMediator;
   }
 
   protected abstract ParameterValueResolver getParameterValueResolver();

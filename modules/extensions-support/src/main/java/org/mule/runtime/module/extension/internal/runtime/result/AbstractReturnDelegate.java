@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation;
+package org.mule.runtime.module.extension.internal.runtime.result;
 
 import static org.apache.commons.io.IOUtils.EOF;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
@@ -74,7 +74,7 @@ import org.apache.commons.io.input.ProxyInputStream;
  *
  * @since 4.0
  */
-abstract class AbstractReturnDelegate implements ReturnDelegate {
+public abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   protected final MuleContext muleContext;
   private boolean returnsListOfMessages = false;
@@ -205,8 +205,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   private Collection<Result> toLazyMessageCollection(Collection<?> values,
                                                      ExecutionContextAdapter operationContext,
                                                      CoreEvent event) {
-    return new TransformingCollection<>((Collection<Object>) values,
-                                        toResult(operationContext, event));
+    return new TransformingCollection<>((Collection<Object>) values, toResult(operationContext, event));
   }
 
   private Function<Object, Result> toResult(ExecutionContextAdapter operationContext, CoreEvent event) {

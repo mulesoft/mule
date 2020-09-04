@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation;
+package org.mule.runtime.module.extension.internal.runtime.result;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -21,9 +21,9 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
  *
  * @since 3.7.0
  */
-final class VoidReturnDelegate implements ReturnDelegate {
+public final class VoidReturnDelegate implements ReturnDelegate {
 
-  static final ReturnDelegate INSTANCE = new VoidReturnDelegate();
+  public static final ReturnDelegate INSTANCE = new VoidReturnDelegate();
 
   private VoidReturnDelegate() {}
 

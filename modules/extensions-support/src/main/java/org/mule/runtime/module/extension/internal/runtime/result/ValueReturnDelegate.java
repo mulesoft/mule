@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation;
+package org.mule.runtime.module.extension.internal.runtime.result;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -21,13 +21,15 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
  *
  * @since 4.0
  */
-final class ValueReturnDelegate extends AbstractReturnDelegate {
+public final class ValueReturnDelegate extends AbstractReturnDelegate {
 
   /**
    * {@inheritDoc}
    */
-  ValueReturnDelegate(ComponentModel componentModel, CursorComponentDecoratorFactory componentDecoratorFactory,
-                      CursorProviderFactory cursorProviderFactory, MuleContext muleContext) {
+  public ValueReturnDelegate(ComponentModel componentModel,
+                             CursorComponentDecoratorFactory componentDecoratorFactory,
+                             CursorProviderFactory cursorProviderFactory,
+                             MuleContext muleContext) {
     super(componentModel, componentDecoratorFactory, cursorProviderFactory, muleContext);
   }
 

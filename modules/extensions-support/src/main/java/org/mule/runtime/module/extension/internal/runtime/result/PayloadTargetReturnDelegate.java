@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation;
+package org.mule.runtime.module.extension.internal.runtime.result;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -21,7 +21,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
  *
  * @since 4.3.0
  */
-final class PayloadTargetReturnDelegate extends AbstractReturnDelegate {
+public final class PayloadTargetReturnDelegate extends AbstractReturnDelegate {
 
   private final String target;
 
@@ -30,7 +30,7 @@ final class PayloadTargetReturnDelegate extends AbstractReturnDelegate {
    *
    * @param target the name of the variable in which the output message will be set
    */
-  PayloadTargetReturnDelegate(String target,
+  public PayloadTargetReturnDelegate(String target,
                               ComponentModel componentModel,
                               CursorComponentDecoratorFactory componentDecoratorFactory,
                               CursorProviderFactory cursorProviderFactory,

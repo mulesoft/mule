@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation;
+package org.mule.runtime.module.extension.internal.runtime.result;
 
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.message.Message.of;
@@ -27,7 +27,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
  *
  * @since 4.0
  */
-final class TargetReturnDelegate extends AbstractReturnDelegate {
+public final class TargetReturnDelegate extends AbstractReturnDelegate {
 
   private final ExpressionManager expressionManager;
 
@@ -39,7 +39,7 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
    *
    * @param target the name of the variable in which the output message will be set
    */
-  TargetReturnDelegate(String target,
+  public TargetReturnDelegate(String target,
                        String targetValue,
                        ComponentModel componentModel,
                        ExpressionManager expressionManager,

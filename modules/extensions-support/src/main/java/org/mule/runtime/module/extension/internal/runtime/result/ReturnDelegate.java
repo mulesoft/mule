@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation;
+package org.mule.runtime.module.extension.internal.runtime.result;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -16,7 +16,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
  *
  * @since 4.0
  */
-interface ReturnDelegate {
+public interface ReturnDelegate {
 
   /**
    * Adapts the {@code value} into an {@link CoreEvent}

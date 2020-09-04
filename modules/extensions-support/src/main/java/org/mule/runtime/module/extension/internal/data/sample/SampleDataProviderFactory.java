@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.data.sample;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.setValueIntoField;
+import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILURE;
 import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.sdk.api.data.sample.SampleDataException.UNKNOWN;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -75,7 +76,12 @@ public class SampleDataProviderFactory {
       injectValueProviderFields(resolver);
 
       if (factoryModelProperty.usesConnection()) {
-        Object connection = connectionSupplier.get();
+        Object connection;
+        try {
+          connection = connectionSupplier.get();
+        } catch (Exception e) {
+          throw new SampleDataException("Failed to establish connection: " + e.getMessage(), CONNECTION_FAILURE, e);
+        }
         if (connection == null) {
           throw new SampleDataException("The value provider requires a connection and none was provided", MISSING_REQUIRED_PARAMETERS);
         }
