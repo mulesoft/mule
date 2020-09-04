@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.util.message;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.core.internal.util.collection.TransformingIterator.from;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
@@ -64,8 +65,7 @@ public class TransformingMessageIteratorByLegacyResultTestCase {
     CursorProviderFactory cursorProviderFactory = mock(CursorProviderFactory.class);
     BaseEventContext eventCtx = mock(BaseEventContext.class);
 
-    return new TransformingIterator<>(list.iterator(),
-                                      value -> toMessage((Result) value, cursorProviderFactory, eventCtx, from("logger")));
+    return from(list.iterator(), value -> toMessage((Result) value, cursorProviderFactory, eventCtx, from("logger")));
   }
 
   private static Result<Object, Object> resultOf(int output) {
