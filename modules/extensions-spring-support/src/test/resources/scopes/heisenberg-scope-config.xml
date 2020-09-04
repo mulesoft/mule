@@ -78,7 +78,7 @@
 
     <flow name="failWithConnectivityErrorFromOtherExtension">
         <heisenberg:tap-phones>
-            <petstore:fail petNames="#[{'name' : 'Pino'}]" />
+            <petstore:fail-connection config-ref="config" />
         </heisenberg:tap-phones>
     </flow>
 

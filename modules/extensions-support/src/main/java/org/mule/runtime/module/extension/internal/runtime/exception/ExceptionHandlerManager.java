@@ -16,6 +16,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
@@ -79,14 +80,12 @@ public final class ExceptionHandlerManager {
    * in the stacktrace wrapping the real failure.
    */
   public Throwable handleThrowable(Throwable e) {
-    Optional<ConnectionException> connectionException = extractConnectionException(e);
-    //    if (connectionException.isPresent()) {
-    //      return resolveConnectionException(connectionException.get());
-    if (connectionException.isPresent() && !(e instanceof ModuleException)) {
-      return connectionException.get();
-    } else {
-      return e instanceof SdkMethodInvocationException ? e.getCause() : e;
-    }
+    //    Optional<ConnectionException> connectionException = extractConnectionException(e);
+    //    if (connectionException.isPresent() && !(e instanceof ModuleException) && !(e instanceof MessagingException)) {
+    //      return connectionException.get();
+    //    } else {
+    return e instanceof SdkMethodInvocationException ? e.getCause() : e;
+    //    }
   }
 
   private Throwable resolveConnectionException(ConnectionException connectionException) {
