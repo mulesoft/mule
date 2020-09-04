@@ -10,6 +10,9 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
+import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.CONNECTIVITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.RETRY_EXHAUSTED;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -24,13 +27,11 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.SingleExtensionImportTypesStrategy;
-import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.Optional;
@@ -50,9 +51,9 @@ import java.util.Set;
  */
 class ExtensionErrorsRegistrant {
 
-  public static final String MULE = Errors.CORE_NAMESPACE_NAME;
   private final ErrorTypeRepository errorTypeRepository;
   private final ErrorTypeLocator errorTypeLocator;
+  private final SingleErrorModelMatcher connectivityErrorModelMatcher = new SingleErrorModelMatcher(CONNECTIVITY);
 
   ExtensionErrorsRegistrant(ErrorTypeRepository errorTypeRepository, ErrorTypeLocator errorTypeLocator) {
     this.errorTypeRepository = errorTypeRepository;
@@ -72,30 +73,31 @@ class ExtensionErrorsRegistrant {
     DslSyntaxResolver syntaxResolver = DslSyntaxResolver.getDefault(extensionModel, new SingleExtensionImportTypesStrategy());
 
     ErrorModel connectivityErrorModel = newError(CONNECTIVITY_ERROR_IDENTIFIER, errorExtensionNamespace)
-        .withParent(newError(CONNECTIVITY_ERROR_IDENTIFIER, MULE).build()).build();
+        .withParent(newError(CONNECTIVITY).build()).build();
 
     ErrorModel retryExhaustedError = newError(RETRY_EXHAUSTED_ERROR_IDENTIFIER, errorExtensionNamespace)
-        .withParent(newError(RETRY_EXHAUSTED_ERROR_IDENTIFIER, MULE).build()).build();
+        .withParent(newError(RETRY_EXHAUSTED).build()).build();
 
-    errorTypes.forEach(errorModel -> getErrorType(errorModel, extensionModel));
+    errorTypes.forEach(errorModel -> getOrCreateErrorType(errorModel, extensionModel));
 
     ExtensionWalker extensionWalker = new IdempotentExtensionWalker() {
 
       @Override
       protected void onOperation(OperationModel model) {
-        registerErrors(model);
+        mapConnectivityExceptions(model);
       }
 
       @Override
       protected void onConstruct(ConstructModel model) {
-        registerErrors(model);
+        mapConnectivityExceptions(model);
       }
 
-      private void registerErrors(ComponentModel model) {
+      private void mapConnectivityExceptions(ComponentModel model) {
         if (!errorTypes.isEmpty() && containsConnectivityErrorModel(model)) {
           ExceptionMapper.Builder builder = ExceptionMapper.builder();
-          builder.addExceptionMapping(ConnectionException.class, getErrorType(connectivityErrorModel, extensionModel));
-          builder.addExceptionMapping(RetryPolicyExhaustedException.class, getErrorType(retryExhaustedError, extensionModel));
+          builder.addExceptionMapping(ConnectionException.class, getOrCreateErrorType(connectivityErrorModel, extensionModel));
+          builder.addExceptionMapping(RetryPolicyExhaustedException.class,
+                                      getOrCreateErrorType(retryExhaustedError, extensionModel));
           String elementName = syntaxResolver.resolve(model).getElementName();
           errorTypeLocator.addComponentExceptionMapper(createIdentifier(elementName, extensionNamespace),
                                                        builder.build());
@@ -103,15 +105,16 @@ class ExtensionErrorsRegistrant {
       }
 
       // Esto es asi porque no se puede garantizar solamente con el ConnectivityModelProperty (como se hace en otros lugares de este modulo)
-      // Ejemplo: operacion insert del db connector
+      // Contraejemplo: operacion insert del db connector no se podria mapear si no es por este medio.
       private boolean containsConnectivityErrorModel(ComponentModel model) {
-        return model.getErrorModels().stream().anyMatch(errorModel -> errorModel.getType().equals("CONNECTIVITY"));
+        return model.getErrorModels().stream().anyMatch(connectivityErrorModelMatcher::match);
       }
+
     };
     extensionWalker.walk(extensionModel);
   }
 
-  private ErrorType getErrorType(ErrorModel errorModel, ExtensionModel extensionModel) {
+  private ErrorType getOrCreateErrorType(ErrorModel errorModel, ExtensionModel extensionModel) {
     ComponentIdentifier identifier = createIdentifier(errorModel.getType(), errorModel.getNamespace());
     Optional<ErrorType> optionalError = errorTypeRepository.getErrorType(identifier);
     return optionalError.orElseGet(() -> createErrorType(errorModel, identifier, extensionModel));
@@ -120,13 +123,14 @@ class ExtensionErrorsRegistrant {
   private ErrorType createErrorType(ErrorModel errorModel, ComponentIdentifier identifier, ExtensionModel extensionModel) {
     final ErrorType errorType;
 
-    if (identifier.getNamespace().equals(MULE)) {
+    if (identifier.getNamespace().equals(CORE_NAMESPACE_NAME)) {
       throw new MuleRuntimeException(createStaticMessage(format("The extension [%s] tried to register the [%s] error with [%s] namespace, which is not allowed.",
-                                                                extensionModel.getName(), identifier, MULE)));
+                                                                extensionModel.getName(), identifier, CORE_NAMESPACE_NAME)));
     }
 
     if (errorModel.getParent().isPresent()) {
-      errorType = errorTypeRepository.addErrorType(identifier, getErrorType(errorModel.getParent().get(), extensionModel));
+      errorType =
+          errorTypeRepository.addErrorType(identifier, getOrCreateErrorType(errorModel.getParent().get(), extensionModel));
     } else {
       errorType = errorTypeRepository.addErrorType(identifier, null);
     }
@@ -135,5 +139,23 @@ class ExtensionErrorsRegistrant {
 
   private static ComponentIdentifier createIdentifier(String name, String namespace) {
     return builder().name(name).namespace(namespace).build();
+  }
+
+  private static class SingleErrorModelMatcher {
+
+    private final ComponentIdentifier coreErrorType;
+
+    public SingleErrorModelMatcher(ComponentIdentifier coreErrorType) {
+      this.coreErrorType = coreErrorType;
+    }
+
+    public boolean match(ErrorModel errorModel) {
+      return this.coreErrorType.equals(createIdentifier(errorModel.getType(), errorModel.getNamespace())) || isChild(errorModel);
+    }
+
+    private boolean isChild(ErrorModel errorModel) {
+      ErrorModel parentErrorType = errorModel.getParent().orElse(null);
+      return parentErrorType != null && this.match(parentErrorType);
+    }
   }
 }
