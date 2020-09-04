@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static java.util.function.UnaryOperator.identity;
-import static org.mule.runtime.core.api.management.stats.InputDecoratorVisitor.builder;
-import static org.mule.runtime.core.api.management.stats.StatisticsUtils.visitable;
+import static org.mule.runtime.core.internal.management.stats.InputDecoratorVisitor.builder;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
+import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.visitable;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
