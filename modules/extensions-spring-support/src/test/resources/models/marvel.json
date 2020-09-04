@@ -12292,6 +12292,77 @@
     {
       "hasResponse": false,
       "runsOnPrimaryNodeOnly": false,
+      "successCallback": {
+        "parameterGroupModels": [
+          {
+            "parameters": [
+              {
+                "type": {
+                  "format": "java",
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "classname": "java.lang.Object",
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    },
+                    "typeAlias": {
+                      "value": "Object"
+                    }
+                  },
+                  "fields": []
+                },
+                "hasDynamicType": false,
+                "required": false,
+                "isConfigOverride": false,
+                "isComponentId": false,
+                "expressionSupport": "SUPPORTED",
+                "defaultValue": "#[payload]",
+                "role": "PRIMARY_CONTENT",
+                "dslConfiguration": {
+                  "allowsInlineDefinition": true,
+                  "allowsReferences": false,
+                  "allowTopLevelDefinition": false
+                },
+                "layoutModel": {
+                  "password": false,
+                  "text": false,
+                  "query": false,
+                  "order": 4
+                },
+                "allowedStereotypeModels": [],
+                "name": "body",
+                "displayModel": {
+                  "summary": "The body of the Message"
+                },
+                "description": "",
+                "modelProperties": {}
+              }
+            ],
+            "exclusiveParametersModels": [],
+            "layoutModel": {
+              "password": false,
+              "text": false,
+              "query": false
+            },
+            "showInDsl": true,
+            "name": "Response",
+            "description": "",
+            "modelProperties": {}
+          }
+        ],
+        "name": "onSuccess",
+        "description": "",
+        "modelProperties": {}
+      },
       "output": {
         "type": {
           "format": "java",
@@ -12433,7 +12504,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4,
+                "order": 5,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],

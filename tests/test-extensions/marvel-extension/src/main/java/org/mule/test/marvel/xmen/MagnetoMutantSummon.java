@@ -9,6 +9,7 @@ package org.mule.test.marvel.xmen;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -39,8 +40,11 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
   @OnSuccess
   public void onSuccess(@ParameterGroup(name = "Response", showInDsl = true) MutantUnitedResponse mutantResponse,
                         CorrelationInfo correlationInfo,
-                        SourceCallbackContext callbackContext) {
-    // Nothing to do
+                        SourceCallbackContext callbackContext)
+      throws IOException {
+    if (mutantResponse.getBody().getValue() instanceof InputStream) {
+      ((InputStream) mutantResponse.getBody().getValue()).read();
+    }
   }
 
   @Override

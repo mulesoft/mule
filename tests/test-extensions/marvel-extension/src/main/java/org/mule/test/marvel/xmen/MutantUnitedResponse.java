@@ -21,4 +21,8 @@ public class MutantUnitedResponse {
   @Summary("The body of the Message")
   private TypedValue<Object> body;
 
+  public TypedValue<Object> getBody() {
+    return body;
+  }
+
 }
