@@ -6,12 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.api.management.stats.InputDecoratorVisitor.builder;
-import static org.mule.runtime.core.api.management.stats.StatisticsUtils.visitable;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
-
-import javax.inject.Inject;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -19,7 +14,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
+
+import javax.inject.Inject;
 
 /**
  * A {@link ValueResolver} implementation and extension of {@link TypeSafeExpressionValueResolver } which evaluates expressions
@@ -51,11 +47,6 @@ public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolve
 
   @Override
   public TypedValue<T> resolve(ValueResolvingContext context) throws MuleException {
-    return resolve(context, NO_OP_INSTANCE);
-  }
-
-  @Override
-  public TypedValue<T> resolve(ValueResolvingContext context, CursorComponentDecoratorFactory factory) throws MuleException {
     TypedValue<T> typedValue = resolveTypedValue(context);
     if (!isInstance(expectedClass, typedValue.getValue())) {
       DataType expectedDataType =
@@ -63,19 +54,10 @@ public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolve
               .type(expectedClass)
               .mediaType(typedValue.getDataType().getMediaType())
               .build();
-      typedValue =
-          new TypedValue<>(typeSafeTransformer.<T>transform(typedValue.getValue(), typedValue.getDataType(), expectedDataType),
-                           expectedDataType);
+      return new TypedValue<>(typeSafeTransformer.<T>transform(typedValue.getValue(), typedValue.getDataType(), expectedDataType),
+                              expectedDataType);
     }
-    return new TypedValue<>(decorateValue(typedValue.getValue(), context.getEvent().getCorrelationId(), factory),
-                            typedValue.getDataType());
-  }
-
-  private T decorateValue(Object decorated, String correlationId, CursorComponentDecoratorFactory factory) {
-    return (T) visitable(decorated)
-        .map(visitable -> visitable.accept(builder()
-            .withFactory(factory).withCorrelationId(correlationId).decorateCollections(false).build()))
-        .orElse(decorated);
+    return typedValue;
   }
 
   public void setTransformationService(TransformationService transformationService) {

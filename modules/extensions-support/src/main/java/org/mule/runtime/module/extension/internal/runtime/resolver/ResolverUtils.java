@@ -12,7 +12,6 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
@@ -29,7 +28,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 
 import java.util.Optional;
@@ -89,12 +87,11 @@ public class ResolverUtils {
     return null;
   }
 
-  public static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext,
-                                         CursorComponentDecoratorFactory factory)
+  public static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext)
       throws MuleException {
-    T resolve = valueResolver.resolve(resolvingContext, factory);
+    T resolve = valueResolver.resolve(resolvingContext);
     if (resolve instanceof ValueResolver) {
-      resolve = resolveRecursively((ValueResolver<T>) resolve, resolvingContext, factory);
+      resolve = resolveRecursively((ValueResolver<T>) resolve, resolvingContext);
     }
     return resolve;
   }
@@ -105,13 +102,13 @@ public class ResolverUtils {
    * the given {@code T} type.
    *
    * @param resolver the {@link ValueResolver} to execute
-   * @param context the {@link ValueResolvingContext} to pass on the {@code resolver}
+   * @param context  the {@link ValueResolvingContext} to pass on the {@code resolver}
    * @return the resolved value
    * @throws MuleException
    */
   public static <T> T resolveValue(ValueResolver<T> resolver, ValueResolvingContext context)
       throws MuleException {
-    T value = resolveRecursively(resolver, context, NO_OP_INSTANCE);
+    T value = resolveRecursively(resolver, context);
     if (context == null || context.resolveCursors()) {
       return (T) resolveCursor(value);
     } else {

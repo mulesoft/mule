@@ -9,15 +9,12 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 import java.util.LinkedHashMap;
@@ -51,7 +48,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   /**
    * Links the given {@link ValueResolver} to the given identifying {@code key}.
    *
-   * @param key a non-blank {@code key}
+   * @param key      a non-blank {@code key}
    * @param resolver a not {@code null} {@link ValueResolver}
    * @return this resolver set to allow chaining
    * @throws IllegalStateException if the {@code key} was already associated to a {@code resolver}
@@ -77,7 +74,8 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    * @param resolvers a not {@code null} {@link Map} of {@code key}-{@link ValueResolver}
    * @return this resolver set to allow chaining
    * @throws IllegalStateException if any of the {@code key}s were already associated to a {@code resolver}
-   * @throws IllegalArgumentException if either {@code key} is empty or {@code resolver} is {@code null}, on any of the entries.
+   * @throws IllegalArgumentException if either {@code key} is empty or {@code resolver} is {@code null},
+   * on any of the entries.
    * @see ResolverSet#add(String, ValueResolver)
    */
   public ResolverSet addAll(Map<String, ValueResolver<?>> resolvers) {
@@ -110,23 +108,18 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    */
   @Override
   public ResolverSetResult resolve(ValueResolvingContext context) throws MuleException {
-    return resolve(context, NO_OP_INSTANCE);
-  }
-
-  @Override
-  public ResolverSetResult resolve(ValueResolvingContext context, CursorComponentDecoratorFactory factory) throws MuleException {
     ResolverSetResult.Builder builder = getResolverSetBuilder();
 
     for (Map.Entry<String, ValueResolver<?>> entry : resolvers.entrySet()) {
-      builder.add(entry.getKey(), resolveRecursively(entry.getValue(), context, factory));
+      builder.add(entry.getKey(), resolveRecursively(entry.getValue(), context));
     }
 
     return builder.build();
   }
 
   /**
-   * Creates a new instance of {@link ResolverSet} containing all the resolvers of both {@code this} {@link ResolverSet} and the
-   * given {@code resolverSet}
+   * Creates a new instance of {@link ResolverSet} containing all the resolvers
+   * of both {@code this} {@link ResolverSet} and the given {@code resolverSet}
    *
    * @param resolverSet a {@link ResolverSet} to merge with {@code this} {@link ResolverSet}
    * @return a new instance of {@link ResolverSet} containing all the resolvers.
