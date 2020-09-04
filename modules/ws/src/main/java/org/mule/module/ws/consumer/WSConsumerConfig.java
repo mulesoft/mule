@@ -9,10 +9,13 @@ package org.mule.module.ws.consumer;
 
 import static javax.wsdl.WSDLException.OTHER_ERROR;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
 import static org.mule.api.config.MuleProperties.MULE_USE_CONNECTOR_TO_RETRIEVE_WSDL;
 import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -79,6 +82,11 @@ public class WSConsumerConfig implements MuleContextAware
      */
     public MessageProcessor createOutboundMessageProcessor() throws MuleException
     {
+        return createOutboundMessageProcessor(null);
+    }
+
+    public MessageProcessor createOutboundMessageProcessor(MessageProcessor messageProcessor) throws MuleException
+    {
         Preconditions.checkState(StringUtils.isNotEmpty(serviceAddress), "No serviceAddress provided in WS consumer config");
 
         if (connectorConfig != null && connector != null)
@@ -88,7 +96,7 @@ public class WSConsumerConfig implements MuleContextAware
 
         if (useHttpModule())
         {
-            return createHttpRequester();
+            return createHttpRequester(messageProcessor);
         }
         else
         {
@@ -136,8 +144,10 @@ public class WSConsumerConfig implements MuleContextAware
         return muleContext.getEndpointFactory().getOutboundEndpoint(builder);
     }
 
-    private MessageProcessor createHttpRequester() throws MuleException
+    private MessageProcessor createHttpRequester(MessageProcessor messageProcessor) throws MuleException
     {
+        final MessageProcessor callerMessageProcessor = messageProcessor;
+
         return new MessageProcessor()
         {
             private HttpRequestOptions requestOptions;
@@ -147,7 +157,16 @@ public class WSConsumerConfig implements MuleContextAware
             {
                 ConnectorOperationLocator connectorOperationLocator = muleContext.getRegistry().get(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR);
                 MessageProcessor messageProcessor = connectorOperationLocator.locateConnectorOperation(serviceAddress, getRequestOptions(), REQUEST_RESPONSE);
-                return messageProcessor.process(event);
+
+                try
+                {
+                    return messageProcessor.process(event);
+                }
+                catch (MessagingException e)
+                {
+                    e.getInfo().remove(INFO_LOCATION_KEY);
+                    throw new MessagingException(event, e, callerMessageProcessor);
+                }
             }
 
             private HttpRequestOptions getRequestOptions()
