@@ -533,8 +533,9 @@ public class FlowProcessMediator implements Initialisable {
             .mediaType(result.getMediaType().orElse(ANY))
             .build());
       } else {
-        eventMessage = toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(),
-                                 ((BaseEventContext) eventCtx).getRootContext(), source.getLocation());
+        eventMessage = toMessage(result, adapter.getMediaType(), componentDecoratorFactory, adapter.getCursorProviderFactory(),
+                                 ((BaseEventContext) eventCtx).getRootContext(), source.getLocation(),
+                                 adapter.getCorrelationId().orElse(null));
       }
 
       return eventMessage;
