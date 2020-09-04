@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.util.mediatype;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.operation.Result;
 
 import java.nio.charset.Charset;
 

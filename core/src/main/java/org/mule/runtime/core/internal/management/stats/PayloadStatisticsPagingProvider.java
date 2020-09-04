@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.management.stats;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.runtime.streaming.PagingProvider;
 
 import java.util.List;
 import java.util.Optional;

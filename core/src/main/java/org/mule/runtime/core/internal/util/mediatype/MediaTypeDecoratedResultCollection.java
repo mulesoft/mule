@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.internal.util.mediatype;
 
-import org.mule.runtime.extension.api.runtime.operation.Result;
+
+import static java.util.stream.Collectors.toList;
+
+import org.mule.sdk.api.runtime.operation.Result;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -14,8 +17,6 @@ import java.util.Spliterator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * {@code Collection<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
@@ -26,8 +27,8 @@ import static java.util.stream.Collectors.toList;
  */
 public class MediaTypeDecoratedResultCollection implements Collection<Result> {
 
-  private Collection<Result> delegate;
-  protected PayloadMediaTypeResolver payloadMediaTypeResolver;
+  private final Collection<Result> delegate;
+  protected final PayloadMediaTypeResolver payloadMediaTypeResolver;
 
   public MediaTypeDecoratedResultCollection(Collection<Result> delegate, PayloadMediaTypeResolver payloadMediaTypeResolver) {
     this.delegate = delegate;
@@ -133,5 +134,4 @@ public class MediaTypeDecoratedResultCollection implements Collection<Result> {
   public Stream<Result> parallelStream() {
     return delegate.parallelStream().map(payloadMediaTypeResolver::resolve);
   }
-
 }

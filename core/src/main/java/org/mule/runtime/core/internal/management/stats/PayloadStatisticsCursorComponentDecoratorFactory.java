@@ -11,8 +11,8 @@ import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponen
 
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.streaming.PagingProvider;
 
 import java.io.InputStream;
 import java.util.Collection;

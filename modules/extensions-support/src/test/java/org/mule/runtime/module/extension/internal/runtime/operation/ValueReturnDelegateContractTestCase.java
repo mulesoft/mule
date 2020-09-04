@@ -49,7 +49,7 @@ import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamPro
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
-import org.mule.runtime.core.internal.util.message.ResultsToMessageList;
+import org.mule.runtime.core.internal.util.message.TransformingMessageList;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -231,7 +231,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     CoreEvent result = delegate.asReturnValue(resultList, operationContext);
 
     Message message = getOutputMessage(result);
-    Message message1 = ((ResultsToMessageList) message.getPayload().getValue()).get(0);
+    Message message1 = ((TransformingMessageList) message.getPayload().getValue()).get(0);
 
     ManagedCursorStreamProvider actual = (ManagedCursorStreamProvider) message1.getPayload().getValue();
     InputStream resultingStream = actual.openCursor();

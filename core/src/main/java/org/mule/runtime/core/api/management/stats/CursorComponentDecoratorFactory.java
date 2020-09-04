@@ -7,8 +7,8 @@
 package org.mule.runtime.core.api.management.stats;
 
 import org.mule.runtime.api.streaming.Cursor;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.streaming.PagingProvider;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -86,7 +86,7 @@ public interface CursorComponentDecoratorFactory {
    * If statistics are enabled, decorates the provided {@link Iterator} for counting the iterated objects.
    * <p>
    * This method must only be used for iterators that are not backed by a {@link PagingProvider}. In that case, use
-   * {@link #decorateOutput(PagingProvider)} instead.
+   * {@link #decorateOutput(PagingProvider, String)} instead.
    * <p>
    * Ref: {@link PayloadStatistics#getOutputObjectCount()}.
    *

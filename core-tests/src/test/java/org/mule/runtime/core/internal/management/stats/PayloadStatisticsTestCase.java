@@ -24,8 +24,8 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingSto
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.streaming.PagingProvider;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.ByteArrayInputStream;
@@ -38,12 +38,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(STREAMING)
 @Story(STATISTICS)
@@ -675,5 +674,4 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     assertThat(statistics.getInputByteCount(), is(0L));
     assertThat(statistics.getInputObjectCount(), is(0L));
   }
-
 }

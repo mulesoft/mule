@@ -4,36 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util.message;
-
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.extension.api.runtime.operation.Result;
+package org.mule.runtime.core.internal.util.collection;
 
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 /**
- * Wraps an {@link ListIterator} of {@link Result} instances and exposes
- * its contents as {@link Message} instances.
+ * Adapts a {@link List} into a {@link ListIterator}
  *
- * This allows to avoid preemptive transformations of an entire collection
- * of {@link Result} to {@link Message}
- *
- * @since 4.0
+ * @since 4.4.0
  */
-final class ResultToMessageListIterator implements ListIterator<Message> {
+public final class ListIteratorAdapter<T> implements ListIterator<T> {
 
-  private final List<Message> delegate;
+  private final List<T> delegate;
   private final int size;
   private int index;
   private int lastIndex = 0;
 
-  ResultToMessageListIterator(List<Message> delegate) {
+  public ListIteratorAdapter(List<T> delegate) {
     this(delegate, 0);
   }
 
-  ResultToMessageListIterator(List<Message> delegate, int startIndex) {
+  ListIteratorAdapter(List<T> delegate, int startIndex) {
     this.delegate = delegate;
     index = startIndex;
     size = delegate.size();
@@ -45,7 +38,7 @@ final class ResultToMessageListIterator implements ListIterator<Message> {
   }
 
   @Override
-  public Message next() {
+  public T next() {
     lastIndex = index++;
     return delegate.get(lastIndex);
   }
@@ -56,7 +49,7 @@ final class ResultToMessageListIterator implements ListIterator<Message> {
   }
 
   @Override
-  public Message previous() {
+  public T previous() {
     if (index == 0) {
       throw new NoSuchElementException();
     }
@@ -81,12 +74,12 @@ final class ResultToMessageListIterator implements ListIterator<Message> {
   }
 
   @Override
-  public void set(Message message) {
-    delegate.set(lastIndex, message);
+  public void set(T item) {
+    delegate.set(lastIndex, item);
   }
 
   @Override
-  public void add(Message message) {
-    delegate.add(index, message);
+  public void add(T item) {
+    delegate.add(index, item);
   }
 }

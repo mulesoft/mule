@@ -9,28 +9,32 @@ package org.mule.runtime.core.internal.util.message;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.core.internal.util.collection.TransformingIterator.from;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.util.collection.TransformingIterator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.tck.size.SmallTest;
-
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
 @SmallTest
-public class ResultToMessageIteratorTestCase {
+public class TransformingMessageIteratorBySdkResultTestCase {
 
   @Test
   public void iteratesOverAllElements() {
-    ResultToMessageIterator resultToMessageIterator = createResultToMessageIterator();
+    TransformingIterator<Message> transformingMessageIterator = createResultToMessageIterator();
     List<Integer> outputList = new ArrayList<>();
 
-    while (resultToMessageIterator.hasNext()) {
-      outputList.add((Integer) resultToMessageIterator.next().getPayload().getValue());
+    while (transformingMessageIterator.hasNext()) {
+      outputList.add((Integer) transformingMessageIterator.next().getPayload().getValue());
     }
 
     assertOutput(outputList);
@@ -38,10 +42,10 @@ public class ResultToMessageIteratorTestCase {
 
   @Test
   public void forEachRemainingIteratesOverAllElements() {
-    ResultToMessageIterator resultToMessageIterator = createResultToMessageIterator();
+    TransformingIterator<Message> transformingMessageIterator = createResultToMessageIterator();
     List<Integer> outputList = new ArrayList<>();
 
-    resultToMessageIterator.forEachRemaining(m -> outputList.add((Integer) m.getPayload().getValue()));
+    transformingMessageIterator.forEachRemaining(m -> outputList.add((Integer) m.getPayload().getValue()));
 
     assertOutput(outputList);
   }
@@ -50,7 +54,7 @@ public class ResultToMessageIteratorTestCase {
     assertThat(outputList, hasItems(1, 2, 3, 4, 5));
   }
 
-  private ResultToMessageIterator createResultToMessageIterator() {
+  private TransformingIterator<Message> createResultToMessageIterator() {
     List<Object> list = new ArrayList<>();
     list.add(resultOf(1));
     list.add(resultOf(2));
@@ -61,7 +65,7 @@ public class ResultToMessageIteratorTestCase {
     CursorProviderFactory cursorProviderFactory = mock(CursorProviderFactory.class);
     BaseEventContext eventCtx = mock(BaseEventContext.class);
 
-    return new ResultToMessageIterator(list.iterator(), cursorProviderFactory, eventCtx, from("logger"));
+    return from(list.iterator(), value -> toMessage((Result) value, cursorProviderFactory, eventCtx, from("logger")));
   }
 
   private static Result<Object, Object> resultOf(int output) {

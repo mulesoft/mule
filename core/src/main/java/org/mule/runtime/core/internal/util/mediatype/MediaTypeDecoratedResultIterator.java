@@ -7,7 +7,8 @@
 package org.mule.runtime.core.internal.util.mediatype;
 
 import org.mule.runtime.api.streaming.HasSize;
-import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.core.internal.util.message.SdkResultAdapter;
+import org.mule.sdk.api.runtime.operation.Result;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -36,7 +37,7 @@ public class MediaTypeDecoratedResultIterator implements Iterator<Result>, HasSi
 
   @Override
   public Result next() {
-    return payloadMediaTypeResolver.resolve(delegate.next());
+    return payloadMediaTypeResolver.resolve(SdkResultAdapter.from(delegate.next()));
   }
 
   @Override

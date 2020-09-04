@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.util.mediatype;
 
 import org.mule.runtime.api.streaming.HasSize;
-import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.operation.Result;
 
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
