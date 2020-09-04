@@ -24,8 +24,27 @@ public class TransformingList<T> extends TransformingCollection<T> implements Li
 
   private final List<Object> delegate;
 
+  /**
+   * Creates a new instance in which the given {@code transform} will be applied to all items
+   *
+   * @param delegate the decorated list
+   * @param transformer the transformer
+   */
+  public TransformingList(List<Object> delegate, Function<Object, T> transformer) {
+    super(delegate, transformer);
+    this.delegate = delegate;
+  }
+
+  /**
+   * Creates a new instance in which the given {@code transform} will <b>ONLY</b> be applied to
+   * items which are not instances of the {@code targetType}
+   *
+   * @param delegate the decorated list
+   * @param transformer the transformer
+   * @param targetType the expected type of the transformed instances.
+   */
   public TransformingList(List<Object> delegate, Function<Object, T> transformer, Class<T> targetType) {
-    super(delegate, targetType, transformer);
+    super(delegate, transformer, targetType);
     this.delegate = delegate;
   }
 

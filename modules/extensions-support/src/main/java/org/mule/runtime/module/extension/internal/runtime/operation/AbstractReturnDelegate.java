@@ -36,6 +36,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.util.StreamingUtils;
+import org.mule.runtime.core.internal.util.collection.TransformingCollection;
+import org.mule.runtime.core.internal.util.collection.TransformingIterator;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultIterator;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
@@ -51,11 +53,11 @@ import org.mule.sdk.api.runtime.operation.Result;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.apache.commons.io.input.ClosedInputStream;
 import org.apache.commons.io.input.ProxyInputStream;
@@ -87,11 +89,11 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   /**
    * Creates a new instance
    *
-   * @param componentModel the component which produces the return value
+   * @param componentModel            the component which produces the return value
    * @param componentDecoratorFactory
-   * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be
-   *        {@code null}
-   * @param muleContext the {@link MuleContext} of the owning application
+   * @param cursorProviderFactory     the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be
+   *                                  {@code null}
+   * @param muleContext               the {@link MuleContext} of the owning application
    */
   protected AbstractReturnDelegate(ComponentModel componentModel,
                                    CursorComponentDecoratorFactory componentDecoratorFactory,
@@ -138,7 +140,6 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
     ComponentLocation originatingLocation = operationContext.getComponent().getLocation();
 
-
     if (value instanceof Result) {
       Result resultValue = (Result) value;
       if (resultValue.getOutput() instanceof InputStream) {
@@ -161,7 +162,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
                                                                                        contextEncodingParam,
                                                                                        contextMimeTypeParam);
       if (value instanceof Collection && returnsListOfMessages) {
-        value = toLazyMessageCollection((Collection) value, operationContext, cursorProviderFactory, event);
+        value = toLazyMessageCollection((Collection) value, operationContext, event);
         value = messageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
             .decorateOutputResultCollection((Collection<Result>) value, event.getCorrelationId()),
                                                                          payloadMediaTypeResolver),
@@ -169,8 +170,9 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
                                   originatingLocation);
       } else if (value instanceof Iterator) {
         if (returnsListOfMessages) {
+          Iterator<Result> iterator = TransformingIterator.from((Iterator<Object>) value, toResult(operationContext, event));
           value = messageIterator(new MediaTypeDecoratedResultIterator(componentDecoratorFactory
-              .decorateOutputResultIterator((Iterator<Result>) value, event.getCorrelationId()),
+              .decorateOutputResultIterator(iterator, event.getCorrelationId()),
                                                                        payloadMediaTypeResolver),
                                   cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
                                   originatingLocation);
@@ -200,12 +202,15 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   }
 
 
-  private Collection<Object> toLazyMessageCollection(Collection<?> values,
+  private Collection<Result> toLazyMessageCollection(Collection<?> values,
                                                      ExecutionContextAdapter operationContext,
-                                                     CursorProviderFactory cursorProviderFactory,
                                                      CoreEvent event) {
-    Collection<Object> lazyMessageCollection = new ArrayList<>();
-    values.forEach(value -> {
+    return new TransformingCollection<>((Collection<Object>) values,
+                                        toResult(operationContext, event));
+  }
+
+  private Function<Object, Result> toResult(ExecutionContextAdapter operationContext, CoreEvent event) {
+    Function<Object, Result> transformer = value -> {
       Result result;
       if (value instanceof Result) {
         result = (Result) value;
@@ -226,9 +231,9 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
               .build();
         }
       }
-      lazyMessageCollection.add(result);
-    });
-    return lazyMessageCollection;
+      return result;
+    };
+    return transformer;
   }
 
   private MediaType getContextMimeType(Map<String, Object> params) {
@@ -262,7 +267,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
    * If provided, mimeType and encoding configured as operation parameters will take precedence over what comes with the message's
    * {@link DataType}.
    *
-   * @param value the operation's value
+   * @param value           the operation's value
    * @param contextMimeType the mimeType specified in the operation
    * @param contextEncoding the encoding specified in the operation
    * @return the resolved {@link MediaType}

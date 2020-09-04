@@ -19,9 +19,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.internal.util.collection.TransformingIterator;
-import org.mule.runtime.core.internal.util.collection.TransformingStreamingIterator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.sdk.api.runtime.operation.Result;
 
@@ -220,12 +218,7 @@ public final class MessageUtils {
                                                   BaseEventContext eventContext,
                                                   ComponentLocation originatingLocation) {
 
-    Function<Object, Message> transformer = resultTransformer(cursorProviderFactory, eventContext, originatingLocation);
-    if (results instanceof StreamingIterator) {
-      return new TransformingStreamingIterator((StreamingIterator) results, transformer);
-    } else {
-      return new TransformingIterator<>(results, transformer);
-    }
+    return TransformingIterator.from(results, resultTransformer(cursorProviderFactory, eventContext, originatingLocation));
   }
 
   /**
@@ -454,13 +447,7 @@ public final class MessageUtils {
                                                     BaseEventContext eventContext,
                                                     ComponentLocation originatingLocation) {
 
-    Function<Object, Message> transformer = legacyResultTransformer(cursorProviderFactory, eventContext, originatingLocation);
-    if (results instanceof StreamingIterator) {
-      return new TransformingStreamingIterator((StreamingIterator<org.mule.runtime.extension.api.runtime.operation.Result>) results,
-                                               transformer);
-    } else {
-      return new TransformingIterator<>(results, transformer);
-    }
+    return TransformingIterator.from(results, legacyResultTransformer(cursorProviderFactory, eventContext, originatingLocation));
   }
 
   private static Message toMessage(Result<?, ?> result, DataType dataType, Object value) {

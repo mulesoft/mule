@@ -21,6 +21,6 @@ import java.util.Collection;
 public class TransformingLegacyResultAdapterCollection extends TransformingCollection<Result> {
 
   public TransformingLegacyResultAdapterCollection(Collection<Object> delegate) {
-    super(delegate, Result.class, SdkResultAdapter::from);
+    super(delegate, SdkResultAdapter::from, Result.class);
   }
 }

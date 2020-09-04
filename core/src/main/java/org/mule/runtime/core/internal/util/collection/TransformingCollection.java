@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  *
  * @since 4.4.0
  */
-public abstract class TransformingCollection<T> implements Collection<T> {
+public class TransformingCollection<T> implements Collection<T> {
 
   private Collection<Object> delegate;
   protected final Class<T> targetType;
@@ -37,12 +37,34 @@ public abstract class TransformingCollection<T> implements Collection<T> {
   protected final Lock writeLock = readWriteLock.writeLock();
   protected boolean transformAllInvoked = false;
 
-  public TransformingCollection(Collection<Object> delegate, Class<T> targetType, Function<Object, T> transformer) {
+  /**
+   * Creates a new instance in which the given {@code transform} will be applied to all items
+   *
+   * @param delegate the decorated collection
+   * @param transformer the transformer
+   */
+  public TransformingCollection(Collection<Object> delegate, Function<Object, T> transformer) {
+    this(delegate, transformer, null);
+  }
+
+  /**
+   * Creates a new instance in which the given {@code transform} will <b>ONLY</b> be applied to
+   * items which are not instances of the {@code targetType}
+   *
+   * @param delegate the decorated collection
+   * @param transformer the transformer
+   * @param targetType the expected type of the transformed instances.
+   */
+  public TransformingCollection(Collection<Object> delegate, Function<Object, T> transformer, Class<T> targetType) {
     this.delegate = delegate;
     this.targetType = targetType;
-    this.transformer = value -> isTargetInstance(value)
-        ? (T) value
-        : transformer.apply(value);
+    if (targetType != null) {
+      this.transformer = value -> isTargetInstance(value)
+          ? (T) value
+          : transformer.apply(value);
+    } else {
+      this.transformer = transformer;
+    }
   }
 
   @Override
@@ -93,7 +115,7 @@ public abstract class TransformingCollection<T> implements Collection<T> {
 
   @Override
   public Iterator<T> iterator() {
-    return transformAllInvoked ? (Iterator<T>) delegate.iterator() : new TransformingIterator<>(delegate.iterator(), transformer);
+    return transformAllInvoked ? (Iterator<T>) delegate.iterator() : TransformingIterator.from(delegate.iterator(), transformer);
   }
 
   @Override
@@ -266,7 +288,7 @@ public abstract class TransformingCollection<T> implements Collection<T> {
   }
 
   protected boolean isTargetInstance(Object o) {
-    return targetType.isInstance(o);
+    return targetType != null ? targetType.isInstance(o) : false;
   }
 
   protected void transformAll() {
