@@ -18,6 +18,8 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.util.collection.TransformingIterator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -95,6 +97,42 @@ public final class MessageUtils {
                                   ComponentLocation originatingLocation) {
     return toMessage(result, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
                      originatingLocation);
+  }
+
+  /**
+   * Transforms the given {@code result} into a {@link Message}.
+   *
+   * @param result a {@link Result} object
+   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
+   * @param componentDecoratorFactory the factory for payload decorators to accumulate {@link PayloadStatistics}.
+   * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
+   *        {@link Iterator}), will create a {@link CursorProvider}
+   * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
+   * @param correlationId id of the event to be propagated to the {@link CursorComponentDecoratorFactory}.
+   *
+   * @return a {@link Message}
+   * @since 4.4, 4.3.1
+   */
+  public static Message toMessage(Result<?, ?> result,
+                                  MediaType mediaType,
+                                  CursorComponentDecoratorFactory componentDecoratorFactory,
+                                  CursorProviderFactory cursorProviderFactory,
+                                  BaseEventContext eventContext,
+                                  ComponentLocation originatingLocation,
+                                  String correlationId) {
+    final Object output;
+    if (result.getOutput() instanceof InputStream) {
+      output = componentDecoratorFactory.decorateOutput((InputStream) result.getOutput(), correlationId);
+    } else if (result.getOutput() instanceof Collection) {
+      output = componentDecoratorFactory.decorateOutputResultCollection((Collection) result.getOutput(), correlationId);
+    } else if (result.getOutput() instanceof Iterator) {
+      output = componentDecoratorFactory.decorateOutput((Iterator) result.getOutput(), correlationId);
+    } else {
+      output = result.getOutput();
+    }
+
+    Object value = streamingContent(output, cursorProviderFactory, eventContext, originatingLocation);
+    return toMessage(result, builder().fromObject(value).mediaType(mediaType).build(), value);
   }
 
   /**
