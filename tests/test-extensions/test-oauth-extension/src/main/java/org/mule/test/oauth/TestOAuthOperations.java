@@ -9,14 +9,19 @@ package org.mule.test.oauth;
 import static java.util.Arrays.asList;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.annotation.metadata.TypeResolver;
+import org.mule.test.oauth.metadata.OAuthMetadataResolver;
 
 import java.util.List;
 
@@ -86,5 +91,16 @@ public class TestOAuthOperations {
       throw new AccessTokenExpiredException();
     }
     return connection;
+  }
+
+  @OutputResolver(output = OAuthMetadataResolver.class)
+  public String metadataOperation(@MetadataKeyId String metadataKey, Object inputParameter,
+                                  @Connection TestOAuthConnection connection) {
+    return "Operation Result";
+  }
+
+  public String valuesOperation(@OfValues(OAuthValuesProvider.class) String parameter,
+                                @Connection TestOAuthConnection connection) {
+    return "Operation Result";
   }
 }

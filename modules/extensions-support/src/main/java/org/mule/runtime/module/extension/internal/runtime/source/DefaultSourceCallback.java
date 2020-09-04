@@ -189,7 +189,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private NotificationDispatcher notificationDispatcher;
   private SingleResourceTransactionFactoryManager transactionFactoryManager;
   private ExtensionMessageSource messageSource;
-  private ExceptionCallback<ConnectionException> exceptionCallback;
+  private ExceptionCallback<ConnectionException>  exceptionCallback;
   private MessageProcessingManager messageProcessingManager;
   private MessageProcessContext messageProcessContext;
   private SourceCompletionHandlerFactory completionHandlerFactory;

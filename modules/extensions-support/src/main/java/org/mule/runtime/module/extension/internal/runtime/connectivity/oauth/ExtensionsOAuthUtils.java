@@ -26,6 +26,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
@@ -52,6 +53,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 
@@ -193,6 +196,32 @@ public final class ExtensionsOAuthUtils {
     } catch (Exception e) {
       return failure("Could not obtain an access token", e);
     }
+  }
+
+  public static boolean refreshTokenIfNecessary(ConnectionProvider connectionProvider, Throwable e) {
+    return false;
+  }
+
+  public static <T> T getWithTokenRefreshIfNecessary(ConnectionProvider connectionProvider, CheckedSupplier<T> supplier) throws Throwable {
+    try {
+      return supplier.getChecked();
+    } catch (Throwable e) {
+      if(refreshTokenIfNecessary(connectionProvider, e)) {
+        return supplier.getChecked();
+      }
+      throw e;
+    }
+  }
+
+  public static <T> T getWithTokenRefreshIfNecessary(ConnectionProvider connectionProvider,
+                                                     Supplier<T> supplier, Function<T,
+                                                     Optional<Throwable>> errorFunction) {
+    T result = supplier.get();
+    Optional<Throwable> error = errorFunction.apply(result);
+    if(error.isPresent() && refreshTokenIfNecessary(connectionProvider, error.get())){
+      result = supplier.get();
+    }
+    return result;
   }
 
   public static boolean refreshTokenIfNecessary(ExecutionContextAdapter<OperationModel> operationContext, Throwable e) {
