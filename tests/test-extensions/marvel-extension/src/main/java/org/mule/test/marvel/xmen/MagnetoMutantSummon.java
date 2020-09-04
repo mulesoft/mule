@@ -12,10 +12,14 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 @MediaType(TEXT_PLAIN)
 public class MagnetoMutantSummon extends Source<InputStream, Void> {
@@ -30,6 +34,13 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
         .output(new ByteArrayInputStream("We are the future. ... You have lived in the shadows of shame and fear for too long!"
             .getBytes()))
         .build();
+  }
+
+  @OnSuccess
+  public void onSuccess(@ParameterGroup(name = "Response", showInDsl = true) MutantUnitedResponse mutantResponse,
+                        CorrelationInfo correlationInfo,
+                        SourceCallbackContext callbackContext) {
+    // Nothing to do
   }
 
   @Override

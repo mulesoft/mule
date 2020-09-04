@@ -13,6 +13,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.management.stats.InputDecoratorVisitor.builder;
+import static org.mule.runtime.core.api.management.stats.StatisticsUtils.visitable;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
@@ -28,6 +30,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.api.management.stats.InputDecoratorVisitor;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -77,7 +80,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
    * Adds a property which value is to be obtained from a {@link ValueResolver}
    *
    * @param propertyName the name of the property in which the value is to be assigned
-   * @param resolver     a {@link ValueResolver} used to provide the actual value
+   * @param resolver a {@link ValueResolver} used to provide the actual value
    * @return this builder
    * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
    */
@@ -94,7 +97,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
   /**
    * Adds a property which value is to be obtained from a {@link ValueResolver}
    *
-   * @param field    the property in which the value is to be assigned
+   * @param field the property in which the value is to be assigned
    * @param resolver a {@link ValueResolver} used to provide the actual value
    * @return this builder
    * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
@@ -131,21 +134,12 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
                          context == null || context.resolveCursors()
                              ? resolveCursor(resolvedValue,
                                              entry.getValue().isContent() && componentDecoratorFactory != null ? v -> {
-                                               if (v instanceof InputStream) {
-                                                 return componentDecoratorFactory.decorateInput((InputStream) v,
-                                                                                                context.getEvent()
-                                                                                                    .getCorrelationId());
-                                               } else if (v instanceof Collection) {
-                                                 return componentDecoratorFactory.decorateInput((Collection) v,
-                                                                                                context.getEvent()
-                                                                                                    .getCorrelationId());
-                                               } else if (v instanceof Iterator) {
-                                                 return componentDecoratorFactory.decorateInput((Iterator) v,
-                                                                                                context.getEvent()
-                                                                                                    .getCorrelationId());
-                                               } else {
-                                                 return v;
-                                               }
+                                               return visitable(v)
+                                                   .map(visitable -> visitable
+                                                       .accept(builder()
+                                                           .withFactory(componentDecoratorFactory)
+                                                           .withCorrelationId(context.getEvent().getCorrelationId()).build()))
+                                                   .orElse(v);
                                              } : identity())
                              : resolvedValue);
     }

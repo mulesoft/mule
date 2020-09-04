@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static java.util.function.UnaryOperator.identity;
+import static org.mule.runtime.core.api.management.stats.InputDecoratorVisitor.builder;
+import static org.mule.runtime.core.api.management.stats.StatisticsUtils.visitable;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
@@ -113,15 +115,10 @@ public class ParameterGroupObjectBuilder<T> {
             .apply(name)), context);
         Object value = context == null || context.resolveCursors()
             ? resolveCursor(resolvedValue, isContent ? v -> {
-              if (v instanceof InputStream) {
-                return componentDecoratorFactory.decorateInput((InputStream) v, context.getEvent().getCorrelationId());
-              } else if (v instanceof Collection) {
-                return componentDecoratorFactory.decorateInput((Collection) v, context.getEvent().getCorrelationId());
-              } else if (v instanceof Iterator) {
-                return componentDecoratorFactory.decorateInput((Iterator) v, context.getEvent().getCorrelationId());
-              } else {
-                return v;
-              }
+              return visitable(v).map(visitable -> visitable
+                  .accept(builder()
+                      .withFactory(componentDecoratorFactory).withCorrelationId(context.getEvent().getCorrelationId()).build()))
+                  .orElse(v);
             } : identity())
             : resolvedValue;
         field.set(object, value);

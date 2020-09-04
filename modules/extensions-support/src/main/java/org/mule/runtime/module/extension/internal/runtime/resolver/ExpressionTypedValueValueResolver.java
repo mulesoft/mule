@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.core.api.management.stats.InputDecoratorVisitor.builder;
+import static org.mule.runtime.core.api.management.stats.StatisticsUtils.visitable;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
-
-import java.io.InputStream;
-import java.util.Iterator;
 
 import javax.inject.Inject;
 
@@ -73,17 +72,10 @@ public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolve
   }
 
   private T decorateValue(Object decorated, String correlationId, CursorComponentDecoratorFactory factory) {
-    Object decoratedOutput;
-
-    if (decorated instanceof InputStream) {
-      decoratedOutput = factory.decorateInput((InputStream) decorated, correlationId);
-    } else if (decorated instanceof Iterator) {
-      decoratedOutput = factory.decorateInput((Iterator) decorated, correlationId);
-    } else {
-      decoratedOutput = decorated;
-    }
-
-    return (T) decoratedOutput;
+    return (T) visitable(decorated)
+        .map(visitable -> visitable.accept(builder()
+            .withFactory(factory).withCorrelationId(correlationId).decorateCollections(false).build()))
+        .orElse(decorated);
   }
 
   public void setTransformationService(TransformationService transformationService) {

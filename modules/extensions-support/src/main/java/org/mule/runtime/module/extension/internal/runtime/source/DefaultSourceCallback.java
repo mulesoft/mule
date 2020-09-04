@@ -12,6 +12,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.management.stats.StatisticsUtils.visitable;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
@@ -27,6 +28,8 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
+import org.mule.runtime.core.api.management.stats.OutputDecoratorVisitor;
+import org.mule.runtime.core.api.management.stats.StatisticsUtils;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -252,48 +255,29 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
                                                                                      encodingParam,
                                                                                      mimeTypeInitParam);
 
-    T resultValue = result.getOutput();
-
-    Result<?, ?> decoratedResult = result;
-
-    if (resultValue instanceof InputStream) {
-      decoratedResult = decorateInputStream(result, context);
-    } else if (resultValue instanceof Iterator) {
-      decoratedResult = decorateIterator(result, context);
-    }
-
     SourceResultAdapter resultAdapter =
-        new SourceResultAdapter(decoratedResult, cursorProviderFactory, mediaType, returnsListOfMessages,
+        new SourceResultAdapter(getDecoratedResultBuilder(result, context).build(), cursorProviderFactory, mediaType,
+                                returnsListOfMessages,
                                 context.getCorrelationId(), payloadMediaTypeResolver);
 
     executeFlow(context, messageProcessContext, resultAdapter);
     contextAdapter.dispatched();
   }
 
-  private Result<InputStream, A> decorateInputStream(Result<T, A> result, SourceCallbackContext context) {
-    InputStream resultValue = (InputStream) result.getOutput();
+  private Result.Builder<T, A> getDecoratedResultBuilder(Result<T, A> result, SourceCallbackContext context) {
+    T decoratedResult = (T) visitable(result.getOutput())
+        .map(v -> v
+            .accept(new OutputDecoratorVisitor(messageProcessContext.getComponentDecoratorFactory(),
+                                               context.getCorrelationId().orElse(""))))
+        .orElse(result.getOutput());
 
-    Result.Builder<InputStream, A> builder = Result.<InputStream, A>builder();
+
+    Result.Builder<T, A> builder = Result.<T, A>builder();
     result.getAttributes().ifPresent(attrs -> builder.attributes(attrs));
     builder
-        .output(messageProcessContext.getComponentDecoratorFactory().decorateOutput((InputStream) resultValue,
-                                                                                    context.getCorrelationId()
-                                                                                        .orElse("")))
+        .output(decoratedResult)
         .mediaType(result.getMediaType().orElse(ANY));
-    return builder.build();
-  }
-
-  private Result<Iterator, A> decorateIterator(Result<T, A> result, SourceCallbackContext context) {
-    Iterator resultValue = (Iterator) result.getOutput();
-
-    Result.Builder<Iterator, A> builder = Result.<Iterator, A>builder();
-    result.getAttributes().ifPresent(attrs -> builder.attributes(attrs));
-    builder
-        .output(messageProcessContext.getComponentDecoratorFactory().decorateOutput((Iterator) resultValue,
-                                                                                    context.getCorrelationId()
-                                                                                        .orElse("")))
-        .mediaType(result.getMediaType().orElse(ANY));
-    return builder.build();
+    return builder;
   }
 
   private void validateNotifications(SourceCallbackContextAdapter contextAdapter) {

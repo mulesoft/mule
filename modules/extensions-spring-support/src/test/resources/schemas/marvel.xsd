@@ -497,7 +497,17 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
-          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="response">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
         </xs:sequence>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
@@ -557,6 +567,16 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GambitChargeItemsType" substitutionGroup="mule:abstract-operator" name="gambit-charge-items"></xs:element>
+  <xs:complexType name="GambitChargeItemsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="items"></xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ReadObjectStreamType" substitutionGroup="mule:abstract-operator" name="read-object-stream"></xs:element>
   <xs:complexType name="ReadObjectStreamType">
     <xs:complexContent>
@@ -602,6 +622,72 @@
             <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WolverineChillOutType" substitutionGroup="mule:abstract-operator" name="wolverine-chill-out"></xs:element>
+  <xs:complexType name="WolverineChillOutType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="1" maxOccurs="1" name="forest">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence minOccurs="1">
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="bears"></xs:element>
+                    <xs:element type="xs:string" minOccurs="1" maxOccurs="1" name="river"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="friends">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="friend">
+                            <xs:complexType>
+                              <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute type="mule:expressionList" use="optional" name="friends"></xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WolverineChillOutQuickType" substitutionGroup="mule:abstract-operator" name="wolverine-chill-out-quick"></xs:element>
+  <xs:complexType name="WolverineChillOutQuickType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="1" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="bears"></xs:element>
+          <xs:element type="xs:string" minOccurs="1" maxOccurs="1" name="river"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="friends">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="friend">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionList" use="optional" name="friends"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WolverineShredType" substitutionGroup="mule:abstract-operator" name="wolverine-shred"></xs:element>
+  <xs:complexType name="WolverineShredType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="enemies"></xs:element>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

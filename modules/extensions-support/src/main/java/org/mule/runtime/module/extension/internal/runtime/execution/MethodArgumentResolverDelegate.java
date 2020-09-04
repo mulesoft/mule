@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 import static java.lang.System.arraycopy;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
+import static org.mule.runtime.core.api.management.stats.InputDecoratorVisitor.builder;
+import static org.mule.runtime.core.api.management.stats.StatisticsUtils.visitable;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
@@ -31,6 +33,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.api.management.stats.InputDecoratorVisitor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -414,15 +417,10 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     @Override
     protected Object decorate(Object value, String eventCorrelationId) {
       return resolveCursor((TypedValue) value, v -> {
-        if (v instanceof InputStream) {
-          return componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
-        } else if (v instanceof Collection) {
-          return componentDecoratorFactory.decorateInput((Collection) v, eventCorrelationId);
-        } else if (v instanceof Iterator) {
-          return componentDecoratorFactory.decorateInput((Iterator) v, eventCorrelationId);
-        } else {
-          return v;
-        }
+        return visitable(v)
+            .map(visitable -> visitable.accept(builder()
+                .withFactory(componentDecoratorFactory).withCorrelationId(eventCorrelationId).build()))
+            .orElse(v);
       });
     }
   }
@@ -441,13 +439,10 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     protected Object decorate(Object value, String eventCorrelationId) {
       Object v = ((TypedValue) value).getValue();
 
-      if (v instanceof InputStream) {
-        v = componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
-      } else if (v instanceof Collection) {
-        v = componentDecoratorFactory.decorateInput((Collection) v, eventCorrelationId);
-      } else if (v instanceof Iterator) {
-        v = componentDecoratorFactory.decorateInput((Iterator) v, eventCorrelationId);
-      }
+      v = visitable(v)
+          .map(visitable -> visitable.accept(builder()
+              .withFactory(componentDecoratorFactory).withCorrelationId(eventCorrelationId).build()))
+          .orElse(v);
 
       if (v != ((TypedValue) value).getValue()) {
         return new TypedValue<>(v, DataType.builder()
@@ -473,15 +468,10 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     @Override
     protected Object decorate(Object value, String eventCorrelationId) {
       final Object resolved = resolveCursor(value);
-      if (resolved instanceof InputStream) {
-        return componentDecoratorFactory.decorateInput((InputStream) resolved, eventCorrelationId);
-      } else if (resolved instanceof Collection) {
-        return componentDecoratorFactory.decorateInput((Collection) resolved, eventCorrelationId);
-      } else if (resolved instanceof Iterator) {
-        return componentDecoratorFactory.decorateInput((Iterator) resolved, eventCorrelationId);
-      } else {
-        return resolved;
-      }
+      return visitable(resolved)
+          .map(visitable -> visitable.accept(builder()
+              .withFactory(componentDecoratorFactory).withCorrelationId(eventCorrelationId).build()))
+          .orElse(resolved);
     }
   }
 
