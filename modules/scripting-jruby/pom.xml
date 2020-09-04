@@ -64,6 +64,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.headius</groupId>
+            <artifactId>backport9</artifactId>
+            <version>1.8</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.github.jnr</groupId>
             <artifactId>jnr-netdb</artifactId>
             <version>1.1.6</version>
