@@ -21,12 +21,10 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
-import org.mule.sdk.api.annotation.Ignore;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 import org.junit.Before;
 import org.junit.Test;
