@@ -20,7 +20,6 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -411,7 +410,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public Set<Value> getValues(String parameterName) throws ValueResolvingException {
     try {
-      return runWithValueProvidersContext(context -> withContextClassLoader(classLoader,
+      return runWithResolvingContext(context -> withContextClassLoader(classLoader,
                                                                             () -> getValueProviderMediator()
                                                                                 .getValues(parameterName,
                                                                                            getParameterValueResolver(),
@@ -439,7 +438,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public Message getSampleData() throws SampleDataException {
     try {
-      return runWithValueProvidersContext(context -> withContextClassLoader(classLoader, () ->
+      return runWithResolvingContext(context -> withContextClassLoader(classLoader, () ->
         getSampleDataProviderMediator().getSampleData(getParameterValueResolver(),
                 (CheckedSupplier<Object>) () -> context.getConnection().orElse(null),
                 (CheckedSupplier<Object>) () -> context.getConfig().orElse(null))
@@ -503,11 +502,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                             this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
   }
 
-  private <R> R runWithValueProvidersContext(Function<ExtensionResolvingContext, R> valueProviderFunction) {
+  private <R> R runWithResolvingContext(Function<ExtensionResolvingContext, R> function) {
     ExtensionResolvingContext context = getResolvingContext();
     R result;
     try {
-      result = valueProviderFunction.apply(context);
+      result = function.apply(context);
     } finally {
       context.dispose();
     }
@@ -518,7 +517,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       throws MetadataResolvingException {
     CoreEvent fakeEvent = null;
     try {
-      fakeEvent = getInitialiserEvent(muleContext);
+      fakeEvent = getNullEvent(muleContext);
 
       Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
 
@@ -547,7 +546,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return new ExtensionResolvingContext(() -> {
       CoreEvent fakeEvent = null;
       try {
-        fakeEvent = getInitialiserEvent(muleContext);
+        fakeEvent = getNullEvent(muleContext);
         return getConfiguration(fakeEvent);
       } finally {
         if (fakeEvent != null) {
