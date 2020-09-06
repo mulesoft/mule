@@ -21,6 +21,7 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.sdk.api.annotation.Ignore;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
@@ -80,15 +81,6 @@ public class ExceptionHandlerManagerTestCase {
     assertThat(throwable, is(not(sameInstance(connectionException))));
     assertThat(throwable, is(instanceOf(HeisenbergException.class)));
     assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
-  }
-
-  @Test
-  public void handleConnectionException() {
-    ConnectionException rootCause = new ConnectionException(ERROR_MESSAGE, new Exception());
-    Throwable throwable = manager.handleThrowable(new Throwable(new RuntimeException(new ExecutionException(rootCause))));
-    assertThat(throwable, is(instanceOf(ConnectionException.class)));
-    assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
-    assertThat(throwable, is(sameInstance(rootCause)));
   }
 
   @Test
