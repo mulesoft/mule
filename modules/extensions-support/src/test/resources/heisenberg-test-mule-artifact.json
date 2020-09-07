@@ -14,8 +14,8 @@
       "privilegedExportedPackages": [],
       "privilegedArtifactIds": [],
       "exportedPackages": [
-        "org.mule.test.heisenberg.extension.model.types",
         "org.mule.test.heisenberg.extension.exception",
+        "org.mule.test.heisenberg.extension.model.types",
         "org.mule.test.heisenberg.extension",
         "org.mule.test.heisenberg.extension.model.drugs",
         "org.mule.test.heisenberg.extension.model"
