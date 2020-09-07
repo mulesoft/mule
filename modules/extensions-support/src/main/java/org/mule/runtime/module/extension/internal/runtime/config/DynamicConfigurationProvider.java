@@ -7,7 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -37,6 +39,8 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
+import org.mule.runtime.extension.api.runtime.config.ExpirableConfigurationProvider;
 import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
@@ -68,13 +72,14 @@ import com.github.benmanes.caffeine.cache.Caffeine;
  * @since 4.0.0
  */
 public final class DynamicConfigurationProvider extends LifecycleAwareConfigurationProvider
-    implements ConfigurationParameterValueProvider {
+    implements ExpirableConfigurationProvider, ConfigurationParameterValueProvider {
 
   private static final Logger LOGGER = getLogger(DynamicConfigurationProvider.class);
 
   private final ConfigurationInstanceFactory configurationInstanceFactory;
   private final ResolverSet resolverSet;
   private final ConnectionProviderValueResolver connectionProviderResolver;
+  private final ExpirationPolicy expirationPolicy;
 
   private final com.github.benmanes.caffeine.cache.LoadingCache<ResolverResultAndEvent, ConfigurationInstance> cache;
   private final ReflectionCache reflectionCache;
@@ -110,15 +115,13 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     this.expressionManager = expressionManager;
     this.resolverSet = resolverSet;
     this.connectionProviderResolver = connectionProviderResolver;
+    this.expirationPolicy = expirationPolicy;
     this.extensionManager = muleContext.getExtensionManager();
 
     cache = Caffeine.newBuilder().expireAfterAccess(expirationPolicy.getMaxIdleTime(), expirationPolicy.getTimeUnit())
-        .removalListener((key, value, cause) -> {
-          extensionManager
-              .disposeConfiguration(((ResolverResultAndEvent) key).getResolverSetResult().toString(),
-                                    (ConfigurationInstance) value);
-          unRegisterConfiguration((ConfigurationInstance) value);
-        })
+        .removalListener((key, value, cause) -> extensionManager
+            .disposeConfiguration(((ResolverResultAndEvent) key).getResolverSetResult().toString(),
+                                  (ConfigurationInstance) value))
         .build(key -> createConfiguration(key.getResolverSetResult(), key.getEvent()));
   }
 
@@ -211,6 +214,21 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   }
 
   @Override
+  public List<ConfigurationInstance> getExpired() {
+    return cache.asMap().entrySet().stream().filter(entry -> isExpired(entry.getValue())).map(entry -> {
+      cache.invalidate(entry.getKey());
+      unRegisterConfiguration(entry.getValue());
+      return entry.getValue();
+    }).collect(toImmutableList());
+  }
+
+  private boolean isExpired(ConfigurationInstance configuration) {
+    ConfigurationStats stats = configuration.getStatistics();
+    return stats.getRunningSources() == 0 && stats.getInflightOperations() == 0
+        && expirationPolicy.isExpired(stats.getLastUsedMillis(), MILLISECONDS);
+  }
+
+  @Override
   protected void doInitialise() {
     try {
       initialiseIfNeeded(resolverSet, muleContext);
@@ -281,14 +299,6 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     return this.connectionProviderResolver.getObjectBuilder()
         .filter(ob -> ob instanceof ConnectionProviderObjectBuilder)
         .map(ob -> ((ConnectionProviderObjectBuilder) ob).providerModel);
-  }
-
-  List<ConfigurationInstance> getConfigurationInstances() {
-    return configurationInstances;
-  }
-
-  void cleanUpCache() {
-    this.cache.cleanUp();
   }
 
   private static class ResolverResultAndEvent {
