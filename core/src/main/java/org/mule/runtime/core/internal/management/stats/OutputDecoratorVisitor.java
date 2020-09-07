@@ -78,15 +78,11 @@ public class OutputDecoratorVisitor implements Visitor {
   public static class Builder {
 
     private boolean decorateCollections = true;
-
     private boolean decorateIterators = true;
-
     private boolean decorateInputStreams = true;
-
     private boolean decorateCursorProviders = true;
 
     private CursorComponentDecoratorFactory factory;
-
     private String correlationId;
 
     private Builder() {}
