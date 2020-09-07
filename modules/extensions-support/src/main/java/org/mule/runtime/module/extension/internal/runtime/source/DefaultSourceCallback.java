@@ -265,17 +265,10 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   }
 
   private Result.Builder<T, A> getDecoratedResultBuilder(Result<T, A> result, SourceCallbackContext context) {
-    T decoratedResult = (T) visitable(result.getOutput())
-        .map(v -> v
-            .accept(new OutputDecoratorVisitor(messageProcessContext.getComponentDecoratorFactory(),
-                                               context.getCorrelationId().orElse(""))))
-        .orElse(result.getOutput());
-
-
     Result.Builder<T, A> builder = Result.<T, A>builder();
     result.getAttributes().ifPresent(attrs -> builder.attributes(attrs));
     builder
-        .output(decoratedResult)
+        .output(result.getOutput())
         .mediaType(result.getMediaType().orElse(ANY));
     return builder;
   }

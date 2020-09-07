@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 
 /**
@@ -26,17 +27,20 @@ public class InputDecoratorVisitor implements Visitor {
   private boolean decorateInputStreams = true;
   private boolean decorateIterators = true;
   private boolean decorateCollections = true;
+  private boolean decorateCursorProviders = true;
 
   private InputDecoratorVisitor(CursorComponentDecoratorFactory decoratorFactory,
                                 String correlationId,
                                 boolean decorateInputStreams,
                                 boolean decorateIterators,
-                                boolean decorateCollections) {
+                                boolean decorateCollections,
+                                boolean decorateCursorProviders) {
     this.decoratorFactory = decoratorFactory;
     this.correlationId = correlationId;
     this.decorateInputStreams = decorateInputStreams;
     this.decorateIterators = decorateIterators;
     this.decorateCollections = decorateCollections;
+    this.decorateCursorProviders = decorateCursorProviders;
   }
 
   @Override
@@ -51,7 +55,7 @@ public class InputDecoratorVisitor implements Visitor {
   @Override
   public Iterator visitIterator(VisitableIterator visitable) {
     if (decorateIterators) {
-      return decoratorFactory.decorateInput(visitable, correlationId);
+      return decoratorFactory.decorateInput(visitable.getDelegate(), correlationId);
     } else {
       return visitable.getDelegate();
     }
@@ -60,7 +64,7 @@ public class InputDecoratorVisitor implements Visitor {
   @Override
   public Collection visitCollection(VisitableCollection visitable) {
     if (decorateCollections) {
-      return decoratorFactory.decorateInput(visitable, correlationId);
+      return decoratorFactory.decorateInput(visitable.getDelegate(), correlationId);
     } else {
       return visitable.getDelegate();
     }
@@ -82,6 +86,16 @@ public class InputDecoratorVisitor implements Visitor {
     return visitableSet.getDelegate();
   }
 
+
+  @Override
+  public CursorStreamProvider visitCursorStreamProvider(VisitableCursorStreamProvider cursorStreamProvider) {
+    if (decorateCursorProviders) {
+      return new InputDecoratedCursorStreamProvider(cursorStreamProvider.getDelegate(), decoratorFactory, correlationId);
+    }
+
+    return cursorStreamProvider.getDelegate();
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -93,6 +107,8 @@ public class InputDecoratorVisitor implements Visitor {
     private boolean decorateIterators = true;
 
     private boolean decorateInputStreams = true;
+
+    private boolean decorateCursorProviders = true;
 
     private CursorComponentDecoratorFactory factory;
 
@@ -115,6 +131,11 @@ public class InputDecoratorVisitor implements Visitor {
       return this;
     }
 
+    public Builder decorateCursorProviders(boolean decorateCursorProviders) {
+      this.decorateCursorProviders = decorateCursorProviders;
+      return this;
+    }
+
     public Builder withFactory(CursorComponentDecoratorFactory factory) {
       this.factory = factory;
       return this;
@@ -126,7 +147,8 @@ public class InputDecoratorVisitor implements Visitor {
     }
 
     public InputDecoratorVisitor build() {
-      return new InputDecoratorVisitor(factory, correlationId, decorateInputStreams, decorateIterators, decorateCollections);
+      return new InputDecoratorVisitor(factory, correlationId, decorateInputStreams, decorateIterators, decorateCollections,
+                                       decorateCursorProviders);
     }
 
   }

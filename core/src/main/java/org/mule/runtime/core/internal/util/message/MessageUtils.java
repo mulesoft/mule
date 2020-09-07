@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.util.message;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
+import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.visitable;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.management.stats.OutputDecoratorVisitor;
 import org.mule.runtime.core.internal.util.collection.TransformingIterator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.sdk.api.runtime.operation.Result;
@@ -120,16 +122,12 @@ public final class MessageUtils {
                                   BaseEventContext eventContext,
                                   ComponentLocation originatingLocation,
                                   String correlationId) {
-    final Object output;
-    if (result.getOutput() instanceof InputStream) {
-      output = componentDecoratorFactory.decorateOutput((InputStream) result.getOutput(), correlationId);
-    } else if (result.getOutput() instanceof Collection) {
-      output = componentDecoratorFactory.decorateOutputResultCollection((Collection) result.getOutput(), correlationId);
-    } else if (result.getOutput() instanceof Iterator) {
-      output = componentDecoratorFactory.decorateOutput((Iterator) result.getOutput(), correlationId);
-    } else {
-      output = result.getOutput();
-    }
+    final Object output = visitable(result.getOutput())
+        .map(v -> v
+            .accept(OutputDecoratorVisitor.builder().withFactory(componentDecoratorFactory)
+                .withCorrelationId(correlationId)
+                .decorateCursorProviders(false).build()))
+        .orElse(result.getOutput());
 
     Object value = streamingContent(output, cursorProviderFactory, eventContext, originatingLocation);
     return toMessage(result, builder().fromObject(value).mediaType(mediaType).build(), value);

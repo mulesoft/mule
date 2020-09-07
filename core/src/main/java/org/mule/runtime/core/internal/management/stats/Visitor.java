@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+
 /**
  * Visitor that returns an instance as a result of an operation on the visited element.
  */
@@ -46,4 +48,10 @@ public interface Visitor {
    * @return result of the set which has been visited
    */
   Set visitSet(VisitableSet visitableSet);
+
+  /**
+   * @param visitable a visitable set
+   * @return result of the cursor provider which has been visited
+   */
+  CursorStreamProvider visitCursorStreamProvider(VisitableCursorStreamProvider visitableCursorStreamProvider);
 }

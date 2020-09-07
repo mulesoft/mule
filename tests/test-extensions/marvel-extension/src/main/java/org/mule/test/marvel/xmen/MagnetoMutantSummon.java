@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -43,8 +44,13 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
                         SourceCallbackContext callbackContext)
       throws IOException {
     if (mutantResponse.getBody().getValue() instanceof InputStream) {
-      ((InputStream) mutantResponse.getBody().getValue()).read();
+      ((InputStream) mutantResponse.getBody().getValue()).read(new byte[1024]);
     }
+
+    if (mutantResponse.getBody().getValue() instanceof CursorStreamProvider) {
+      ((CursorStreamProvider) mutantResponse.getBody().getValue()).openCursor().read(new byte[1024]);
+    }
+
   }
 
   @Override

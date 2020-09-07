@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+
 public class StatisticsUtils {
 
   /**
@@ -38,6 +40,10 @@ public class StatisticsUtils {
 
     if (source instanceof Collection) {
       return of(new VisitableCollection((Collection) source));
+    }
+
+    if (source instanceof CursorStreamProvider) {
+      return of(new VisitableCursorStreamProvider((CursorStreamProvider) source));
     }
 
     return empty();

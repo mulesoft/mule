@@ -19,33 +19,31 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveTypedValue;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.UnaryOperator;
+
+import javax.inject.Inject;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.internal.management.stats.InputDecoratorVisitor;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 /**
  * Default implementation of {@link ObjectBuilder} which creates instances through a provided {@link Class}.
@@ -130,18 +128,23 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
 
     for (Map.Entry<FieldSetter, ValueResolver<Object>> entry : resolvers.entrySet()) {
       final Object resolvedValue = resolveValue(entry.getValue(), context);
+      UnaryOperator decorateOperation = v -> {
+        return visitable(v)
+            .map(visitable -> visitable
+                .accept(builder()
+                    .withFactory(componentDecoratorFactory)
+                    .withCorrelationId(context.getEvent().getCorrelationId()).build()))
+            .orElse(v);
+      };
+
       entry.getKey().set(object,
                          context == null || context.resolveCursors()
                              ? resolveCursor(resolvedValue,
-                                             entry.getValue().isContent() && componentDecoratorFactory != null ? v -> {
-                                               return visitable(v)
-                                                   .map(visitable -> visitable
-                                                       .accept(builder()
-                                                           .withFactory(componentDecoratorFactory)
-                                                           .withCorrelationId(context.getEvent().getCorrelationId()).build()))
-                                                   .orElse(v);
-                                             } : identity())
-                             : resolvedValue);
+                                             entry.getValue().isContent() && componentDecoratorFactory != null ? decorateOperation
+                                                 : identity())
+                             : entry.getValue().isContent() && componentDecoratorFactory != null
+                                 ? resolveTypedValue(resolvedValue, decorateOperation)
+                                 : resolvedValue);
     }
 
     injectFields(object, name, encoding, reflectionCache);
