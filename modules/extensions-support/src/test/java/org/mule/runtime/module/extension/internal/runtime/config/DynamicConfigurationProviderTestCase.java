@@ -45,7 +45,6 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -123,8 +122,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     when(connectionProviderResolver.getResolverSet()).thenReturn(empty());
     when(connectionProviderResolver.resolve(any())).thenReturn(null);
-
-    muleContext.setExtensionManager(new DefaultExtensionManager());
     provider = new DynamicConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
                                                 connectionProviderResolver, expirationPolicy, new ReflectionCache(),
                                                 expressionManager, muleContext);
@@ -250,14 +247,11 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     List<ConfigurationInstance> expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(false));
 
-    probe(() -> {
-      assertThat(instance.getStop(), is(1));
-      assertThat(instance.getDispose(), is(1));
-      return true;
-    });
-
     provider.stop();
     provider.dispose();
+
+    assertThat(instance.getStop(), is(0));
+    assertThat(instance.getDispose(), is(0));
   }
 
   @Test
