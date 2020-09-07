@@ -80,7 +80,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                   ErrorTypeRepository typeRepository,
                                   ResultTransformer resultTransformer) {
     this.interceptorChain = interceptorChain;
-    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
+    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.resultTransformer = resultTransformer;
     extensionClassLoader = getClassLoader(extensionModel);
