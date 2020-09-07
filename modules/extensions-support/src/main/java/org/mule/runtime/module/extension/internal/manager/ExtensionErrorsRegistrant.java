@@ -104,8 +104,6 @@ class ExtensionErrorsRegistrant {
         }
       }
 
-      // Esto es asi porque no se puede garantizar solamente con el ConnectivityModelProperty (como se hace en otros lugares de este modulo)
-      // Contraejemplo: operacion insert del db connector no se podria mapear si no es por este medio.
       private boolean containsConnectivityErrorModel(ComponentModel model) {
         return model.getErrorModels().stream().anyMatch(connectivityErrorModelMatcher::match);
       }
