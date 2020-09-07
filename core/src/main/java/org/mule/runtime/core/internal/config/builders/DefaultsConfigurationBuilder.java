@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.config.builders;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
+import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;

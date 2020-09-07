@@ -9,8 +9,8 @@ package org.mule.runtime.core.internal.value;
 import static java.lang.String.format;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
-import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.deleteLastPartFromLocation;
-import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.isConnection;
+import static org.mule.runtime.core.internal.util.LocationUtils.deleteLastPartFromLocation;
+import static org.mule.runtime.core.internal.util.LocationUtils.isConnection;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.NOT_VALUE_PROVIDER_ENABLED;
 

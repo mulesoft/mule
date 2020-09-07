@@ -9,7 +9,7 @@ package org.mule.runtime.config.internal;
 import static java.lang.reflect.Proxy.getInvocationHandler;
 import static java.lang.reflect.Proxy.isProxyClass;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
-import static org.mule.runtime.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
+import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;

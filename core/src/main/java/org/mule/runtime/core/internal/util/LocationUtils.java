@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.value;
+package org.mule.runtime.core.internal.util;
 
 import static org.mule.runtime.api.component.location.Location.CONNECTION;
+
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.value.ValueProviderService;
 
 import java.util.List;
 
 /**
- * Utility class for {@link ValueProviderService} implementations
+ * Utility class for handling {@link Location} instances
  *
- * @since 4.0
+ * @since 4.4.0
  */
-public class MuleValueProviderServiceUtility {
+public class LocationUtils {
 
   /**
    * Utility method that given a {@link Location} creates a new one but ignoring the last part of it.
