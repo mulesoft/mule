@@ -401,6 +401,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
           .withExpressionManager(expressionManager)
           .withConfig(configurationInstance)
           .withProperty(COMPONENT_DECORATOR_FACTORY_KEY, cursorDecoratorFactory.componentDecoratorFactory(component))
+          .resolveCursors(false)
           .build();
     }
   }
