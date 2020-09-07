@@ -4,27 +4,28 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.management.stats;
+package org.mule.runtime.core.internal.management.stats.visitor;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
- * A collection that can be visit to be decorated.
+ * A list that can be visit to be decorated.
  *
  * @since 4.4, 4.3.1
  */
-public class VisitableCollection implements Visitable<Collection>, Collection {
+public class VisitableSet implements Visitable<Set>, Set {
 
-  private final Collection delegate;
+  private final Set delegate;
 
-  public VisitableCollection(Collection delegate) {
+  public VisitableSet(Set delegate) {
     this.delegate = delegate;
   }
 
   @Override
-  public Collection accept(Visitor visitor) {
-    return visitor.visitCollection(this);
+  public Set accept(Visitor visitor) {
+    return visitor.visitSet(this);
   }
 
   @Override
@@ -78,13 +79,13 @@ public class VisitableCollection implements Visitable<Collection>, Collection {
   }
 
   @Override
-  public boolean removeAll(Collection c) {
-    return delegate.removeAll(c);
+  public boolean retainAll(Collection c) {
+    return delegate.retainAll(c);
   }
 
   @Override
-  public boolean retainAll(Collection c) {
-    return delegate.retainAll(c);
+  public boolean removeAll(Collection c) {
+    return delegate.removeAll(c);
   }
 
   @Override
@@ -93,7 +94,7 @@ public class VisitableCollection implements Visitable<Collection>, Collection {
   }
 
   @Override
-  public Collection getDelegate() {
+  public Set getDelegate() {
     return delegate;
   }
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.management.stats;
+package org.mule.runtime.core.internal.management.stats.visitor;
 
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -24,19 +24,17 @@ public class VisitableCursorStreamProvider implements Visitable<CursorStreamProv
 
   @Override
   public CursorStream openCursor() {
-    return null;
+    return delegate.openCursor();
   }
 
   @Override
   public void close() {
     delegate.close();
-
   }
 
   @Override
   public void releaseResources() {
     delegate.releaseResources();
-
   }
 
   @Override

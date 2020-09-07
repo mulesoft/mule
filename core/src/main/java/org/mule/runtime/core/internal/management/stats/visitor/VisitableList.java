@@ -4,28 +4,35 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.management.stats;
+package org.mule.runtime.core.internal.management.stats.visitor;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * A list that can be visit to be decorated.
  *
  * @since 4.4, 4.3.1
  */
-public class VisitableSet implements Visitable<Set>, Set {
+public class VisitableList implements Visitable<List>, List {
 
-  private final Set delegate;
+  private final List delegate;
 
-  public VisitableSet(Set delegate) {
+  public VisitableList(List delegate) {
     this.delegate = delegate;
   }
 
   @Override
-  public Set accept(Visitor visitor) {
-    return visitor.visitSet(this);
+  public List accept(Visitor visitor) {
+    return visitor.visitList(this);
+  }
+
+
+  @Override
+  public List getDelegate() {
+    return delegate;
   }
 
   @Override
@@ -79,8 +86,8 @@ public class VisitableSet implements Visitable<Set>, Set {
   }
 
   @Override
-  public boolean retainAll(Collection c) {
-    return delegate.retainAll(c);
+  public boolean addAll(int index, Collection c) {
+    return delegate.addAll(index, c);
   }
 
   @Override
@@ -89,13 +96,58 @@ public class VisitableSet implements Visitable<Set>, Set {
   }
 
   @Override
+  public boolean retainAll(Collection c) {
+    return delegate.retainAll(c);
+  }
+
+  @Override
   public void clear() {
     delegate.clear();
   }
 
   @Override
-  public Set getDelegate() {
-    return delegate;
+  public Object get(int index) {
+    return delegate.get(index);
+  }
+
+  @Override
+  public Object set(int index, Object element) {
+    return delegate.set(index, element);
+  }
+
+  @Override
+  public void add(int index, Object element) {
+    delegate.add(index, element);
+  }
+
+  @Override
+  public Object remove(int index) {
+    return delegate.remove(index);
+  }
+
+  @Override
+  public int indexOf(Object o) {
+    return delegate.indexOf(o);
+  }
+
+  @Override
+  public int lastIndexOf(Object o) {
+    return delegate.lastIndexOf(o);
+  }
+
+  @Override
+  public ListIterator listIterator() {
+    return delegate.listIterator();
+  }
+
+  @Override
+  public ListIterator listIterator(int index) {
+    return delegate.listIterator();
+  }
+
+  @Override
+  public List subList(int fromIndex, int toIndex) {
+    return delegate.subList(fromIndex, toIndex);
   }
 
 }

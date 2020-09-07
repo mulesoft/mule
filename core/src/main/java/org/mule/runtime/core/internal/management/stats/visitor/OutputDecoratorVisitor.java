@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.management.stats;
+package org.mule.runtime.core.internal.management.stats.visitor;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -14,13 +14,14 @@ import java.util.Set;
 
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor.Builder;
 
 /**
- * Visitor that returns a decorator for input statistics.
+ * Visitor that returns a decorator for output statistics.
  * 
  * @since 4.4, 4.3.1
  */
-public class InputDecoratorVisitor implements Visitor {
+public class OutputDecoratorVisitor implements Visitor {
 
   private final CursorComponentDecoratorFactory decoratorFactory;
   private final String correlationId;
@@ -29,12 +30,9 @@ public class InputDecoratorVisitor implements Visitor {
   private boolean decorateCollections = true;
   private boolean decorateCursorProviders = true;
 
-  private InputDecoratorVisitor(CursorComponentDecoratorFactory decoratorFactory,
-                                String correlationId,
-                                boolean decorateInputStreams,
-                                boolean decorateIterators,
-                                boolean decorateCollections,
-                                boolean decorateCursorProviders) {
+  private OutputDecoratorVisitor(CursorComponentDecoratorFactory decoratorFactory, String correlationId,
+                                 boolean decorateInputStreams, boolean decorateIterators, boolean decorateCollections,
+                                 boolean decorateCursorProviders) {
     this.decoratorFactory = decoratorFactory;
     this.correlationId = correlationId;
     this.decorateInputStreams = decorateInputStreams;
@@ -45,55 +43,32 @@ public class InputDecoratorVisitor implements Visitor {
 
   @Override
   public InputStream visitInputStream(VisitableInputStream visitable) {
-    if (decorateInputStreams) {
-      return decoratorFactory.decorateInput(visitable, correlationId);
-    } else {
-      return visitable.getDelegate();
-    }
+    return decoratorFactory.decorateOutput(visitable.getDelegate(), correlationId);
   }
 
   @Override
   public Iterator visitIterator(VisitableIterator visitable) {
-    if (decorateIterators) {
-      return decoratorFactory.decorateInput(visitable.getDelegate(), correlationId);
-    } else {
-      return visitable.getDelegate();
-    }
+    return decoratorFactory.decorateOutput(visitable.getDelegate(), correlationId);
   }
 
   @Override
   public Collection visitCollection(VisitableCollection visitable) {
-    if (decorateCollections) {
-      return decoratorFactory.decorateInput(visitable.getDelegate(), correlationId);
-    } else {
-      return visitable.getDelegate();
-    }
+    return decoratorFactory.decorateOutputResultCollection(visitable.getDelegate(), correlationId);
   }
 
   @Override
   public List visitList(VisitableList visitableList) {
-    if (decorateCollections) {
-      return (List) decoratorFactory.decorateInput(visitableList, correlationId);
-    }
-    return visitableList.getDelegate();
+    return visitableList;
   }
 
   @Override
   public Set visitSet(VisitableSet visitableSet) {
-    if (decorateCollections) {
-      return (Set) decoratorFactory.decorateInput(visitableSet, correlationId);
-    }
-    return visitableSet.getDelegate();
+    return visitableSet;
   }
 
-
   @Override
-  public CursorStreamProvider visitCursorStreamProvider(VisitableCursorStreamProvider cursorStreamProvider) {
-    if (decorateCursorProviders) {
-      return new InputDecoratedCursorStreamProvider(cursorStreamProvider.getDelegate(), decoratorFactory, correlationId);
-    }
-
-    return cursorStreamProvider.getDelegate();
+  public CursorStreamProvider visitCursorStreamProvider(VisitableCursorStreamProvider visitableCursorStreamProvider) {
+    return visitableCursorStreamProvider;
   }
 
   public static Builder builder() {
@@ -142,9 +117,9 @@ public class InputDecoratorVisitor implements Visitor {
       return this;
     }
 
-    public InputDecoratorVisitor build() {
-      return new InputDecoratorVisitor(factory, correlationId, decorateInputStreams, decorateIterators, decorateCollections,
-                                       decorateCursorProviders);
+    public OutputDecoratorVisitor build() {
+      return new OutputDecoratorVisitor(factory, correlationId, decorateInputStreams, decorateIterators, decorateCollections,
+                                        decorateCursorProviders);
     }
 
   }

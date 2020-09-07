@@ -16,6 +16,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.internal.management.stats.visitor.Visitable;
+import org.mule.runtime.core.internal.management.stats.visitor.VisitableCollection;
+import org.mule.runtime.core.internal.management.stats.visitor.VisitableCursorStreamProvider;
+import org.mule.runtime.core.internal.management.stats.visitor.VisitableInputStream;
+import org.mule.runtime.core.internal.management.stats.visitor.VisitableIterator;
+import org.mule.runtime.core.internal.management.stats.visitor.VisitableList;
 
 public class StatisticsUtils {
 

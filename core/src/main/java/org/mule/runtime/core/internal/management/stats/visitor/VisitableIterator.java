@@ -4,16 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.management.stats;
+package org.mule.runtime.core.internal.management.stats.visitor;
 
 import java.util.Iterator;
+
+import org.mule.runtime.api.streaming.HasSize;
 
 /**
  * An iterator that can be visit to decorate.
  *
  * @since 4.4, 4.3.1
  */
-public class VisitableIterator implements Iterator, Visitable<Iterator> {
+public class VisitableIterator implements Iterator, Visitable<Iterator>, HasSize {
 
   private final Iterator delegate;
 
@@ -39,6 +41,11 @@ public class VisitableIterator implements Iterator, Visitable<Iterator> {
   @Override
   public Iterator getDelegate() {
     return delegate;
+  }
+
+  @Override
+  public int getSize() {
+    return delegate.
   }
 
 }

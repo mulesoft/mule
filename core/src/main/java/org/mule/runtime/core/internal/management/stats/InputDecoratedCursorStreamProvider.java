@@ -36,13 +36,11 @@ public class InputDecoratedCursorStreamProvider implements CursorStreamProvider 
   @Override
   public void close() {
     delegate.close();
-
   }
 
   @Override
   public void releaseResources() {
     delegate.releaseResources();
-
   }
 
   @Override

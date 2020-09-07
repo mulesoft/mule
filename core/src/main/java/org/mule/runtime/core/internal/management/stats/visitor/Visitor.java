@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.management.stats;
+package org.mule.runtime.core.internal.management.stats.visitor;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -17,7 +17,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 /**
  * Visitor that returns an instance as a result of an operation on the visited element.
  */
-public interface Visitor {
+public interface Visitor<T> {
 
   /**
    * @param visitable a visitable inputstream
@@ -29,25 +29,25 @@ public interface Visitor {
    * @param visitable a visitable iterator
    * @return result of the iterator which has been visited
    */
-  Iterator visitIterator(VisitableIterator visible);
+  Iterator<T> visitIterator(VisitableIterator visible);
 
   /**
    * @param visitable a visitable collection
    * @return result of the collection which has been visited
    */
-  Collection visitCollection(VisitableCollection visitable);
+  Collection<T> visitCollection(VisitableCollection visitable);
 
   /**
    * @param visitable a visitable list
    * @return result of the list which has been visited
    */
-  List visitList(VisitableList visitableList);
+  List<T> visitList(VisitableList visitableList);
 
   /**
    * @param visitable a visitable set
    * @return result of the set which has been visited
    */
-  Set visitSet(VisitableSet visitableSet);
+  Set<T> visitSet(VisitableSet visitableSet);
 
   /**
    * @param visitable a visitable set

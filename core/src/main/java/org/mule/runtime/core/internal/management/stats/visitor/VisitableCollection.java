@@ -4,35 +4,27 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.management.stats;
+package org.mule.runtime.core.internal.management.stats.visitor;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 /**
- * A list that can be visit to be decorated.
+ * A collection that can be visit to be decorated.
  *
  * @since 4.4, 4.3.1
  */
-public class VisitableList implements Visitable<List>, List {
+public class VisitableCollection implements Visitable<Collection>, Collection {
 
-  private final List delegate;
+  private final Collection delegate;
 
-  public VisitableList(List delegate) {
+  public VisitableCollection(Collection delegate) {
     this.delegate = delegate;
   }
 
   @Override
-  public List accept(Visitor visitor) {
-    return visitor.visitList(this);
-  }
-
-
-  @Override
-  public List getDelegate() {
-    return delegate;
+  public Collection accept(Visitor visitor) {
+    return visitor.visitCollection(this);
   }
 
   @Override
@@ -86,11 +78,6 @@ public class VisitableList implements Visitable<List>, List {
   }
 
   @Override
-  public boolean addAll(int index, Collection c) {
-    return delegate.addAll(index, c);
-  }
-
-  @Override
   public boolean removeAll(Collection c) {
     return delegate.removeAll(c);
   }
@@ -106,48 +93,8 @@ public class VisitableList implements Visitable<List>, List {
   }
 
   @Override
-  public Object get(int index) {
-    return delegate.get(index);
-  }
-
-  @Override
-  public Object set(int index, Object element) {
-    return delegate.set(index, element);
-  }
-
-  @Override
-  public void add(int index, Object element) {
-    delegate.add(index, element);
-  }
-
-  @Override
-  public Object remove(int index) {
-    return delegate.remove(index);
-  }
-
-  @Override
-  public int indexOf(Object o) {
-    return delegate.indexOf(o);
-  }
-
-  @Override
-  public int lastIndexOf(Object o) {
-    return delegate.lastIndexOf(o);
-  }
-
-  @Override
-  public ListIterator listIterator() {
-    return delegate.listIterator();
-  }
-
-  @Override
-  public ListIterator listIterator(int index) {
-    return delegate.listIterator();
-  }
-
-  @Override
-  public List subList(int fromIndex, int toIndex) {
-    return delegate.subList(fromIndex, toIndex);
+  public Collection getDelegate() {
+    return delegate;
   }
 
 }

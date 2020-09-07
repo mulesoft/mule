@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.internal.management.stats.OutputDecoratorVisitor;
+import org.mule.runtime.core.internal.management.stats.visitor.OutputDecoratorVisitor;
 import org.mule.runtime.core.internal.util.collection.TransformingIterator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.sdk.api.runtime.operation.Result;
