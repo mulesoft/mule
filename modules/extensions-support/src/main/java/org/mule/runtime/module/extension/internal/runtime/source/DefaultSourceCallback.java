@@ -256,21 +256,12 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
                                                                                      mimeTypeInitParam);
 
     SourceResultAdapter resultAdapter =
-        new SourceResultAdapter(getDecoratedResultBuilder(result, context).build(), cursorProviderFactory, mediaType,
+        new SourceResultAdapter(result, cursorProviderFactory, mediaType,
                                 returnsListOfMessages,
                                 context.getCorrelationId(), payloadMediaTypeResolver);
 
     executeFlow(context, messageProcessContext, resultAdapter);
     contextAdapter.dispatched();
-  }
-
-  private Result.Builder<T, A> getDecoratedResultBuilder(Result<T, A> result, SourceCallbackContext context) {
-    Result.Builder<T, A> builder = Result.<T, A>builder();
-    result.getAttributes().ifPresent(attrs -> builder.attributes(attrs));
-    builder
-        .output(result.getOutput())
-        .mediaType(result.getMediaType().orElse(ANY));
-    return builder;
   }
 
   private void validateNotifications(SourceCallbackContextAdapter contextAdapter) {
