@@ -98,7 +98,7 @@ public class ResolverUtils {
    * @return operator for decoration
    */
   public static UnaryOperator decorateOperation(String eventCorrelationId,
-                                                  CursorComponentDecoratorFactory componentDecoratorFactory) {
+                                                CursorComponentDecoratorFactory componentDecoratorFactory) {
     return v -> visitable(v)
         .map(visitable -> visitable.accept(builder()
             .withFactory(componentDecoratorFactory).withCorrelationId(eventCorrelationId).build()))
