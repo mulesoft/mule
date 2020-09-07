@@ -46,12 +46,12 @@ public class OutputDecoratorVisitor<T> implements Visitor<T> {
   }
 
   @Override
-  public List<T> visitList(VisitableList visitableList) {
+  public List<T> visitList(VisitableList<T> visitableList) {
     return visitableList;
   }
 
   @Override
-  public Set<T> visitSet(VisitableSet visitableSet) {
+  public Set<T> visitSet(VisitableSet<T> visitableSet) {
     return visitableSet;
   }
 

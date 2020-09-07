@@ -25,76 +25,42 @@ public class InputDecoratorVisitor<T> implements Visitor<T> {
 
   private final CursorComponentDecoratorFactory decoratorFactory;
   private final String correlationId;
-  private boolean decorateInputStreams = true;
-  private boolean decorateIterators = true;
-  private boolean decorateCollections = true;
-  private boolean decorateCursorProviders = true;
 
   private InputDecoratorVisitor(CursorComponentDecoratorFactory decoratorFactory,
-                                String correlationId,
-                                boolean decorateInputStreams,
-                                boolean decorateIterators,
-                                boolean decorateCollections,
-                                boolean decorateCursorProviders) {
+                                String correlationId) {
     this.decoratorFactory = decoratorFactory;
     this.correlationId = correlationId;
-    this.decorateInputStreams = decorateInputStreams;
-    this.decorateIterators = decorateIterators;
-    this.decorateCollections = decorateCollections;
-    this.decorateCursorProviders = decorateCursorProviders;
   }
 
   @Override
   public InputStream visitInputStream(VisitableInputStream visitable) {
-    if (decorateInputStreams) {
-      return decoratorFactory.decorateInput(visitable, correlationId);
-    } else {
-      return visitable.getDelegate();
-    }
+    return decoratorFactory.decorateInput(visitable, correlationId);
   }
 
   @Override
-  public Iterator<T> visitIterator(VisitableIterator visitable) {
-    if (decorateIterators) {
-      return decoratorFactory.decorateInput(visitable.getDelegate(), correlationId);
-    } else {
-      return visitable.getDelegate();
-    }
+  public Iterator<T> visitIterator(VisitableIterator<T> visitable) {
+    return decoratorFactory.decorateInput(visitable.getDelegate(), correlationId);
   }
 
   @Override
-  public Collection<T> visitCollection(VisitableCollection visitable) {
-    if (decorateCollections) {
-      return decoratorFactory.decorateInput(visitable.getDelegate(), correlationId);
-    } else {
-      return visitable.getDelegate();
-    }
+  public Collection<T> visitCollection(VisitableCollection<T> visitable) {
+    return decoratorFactory.decorateInput(visitable.getDelegate(), correlationId);
   }
 
   @Override
-  public List<T> visitList(VisitableList visitableList) {
-    if (decorateCollections) {
-      return (List) decoratorFactory.decorateInput(visitableList, correlationId);
-    }
-    return visitableList.getDelegate();
+  public List<T> visitList(VisitableList<T> visitableList) {
+    return (List<T>) decoratorFactory.decorateInput(visitableList, correlationId);
   }
 
   @Override
-  public Set<T> visitSet(VisitableSet visitableSet) {
-    if (decorateCollections) {
-      return (Set) decoratorFactory.decorateInput(visitableSet, correlationId);
-    }
-    return visitableSet.getDelegate();
+  public Set<T> visitSet(VisitableSet<T> visitableSet) {
+    return (Set<T>) decoratorFactory.decorateInput(visitableSet, correlationId);
   }
 
 
   @Override
   public CursorStreamProvider visitCursorStreamProvider(VisitableCursorStreamProvider cursorStreamProvider) {
-    if (decorateCursorProviders) {
-      return new InputDecoratedCursorStreamProvider(cursorStreamProvider.getDelegate(), decoratorFactory, correlationId);
-    }
-
-    return cursorStreamProvider.getDelegate();
+    return new InputDecoratedCursorStreamProvider(cursorStreamProvider.getDelegate(), decoratorFactory, correlationId);
   }
 
   public static Builder builder() {
@@ -103,35 +69,10 @@ public class InputDecoratorVisitor<T> implements Visitor<T> {
 
   public static class Builder {
 
-    private boolean decorateCollections = true;
-    private boolean decorateIterators = true;
-    private boolean decorateInputStreams = true;
-    private boolean decorateCursorProviders = true;
-
     private CursorComponentDecoratorFactory factory;
     private String correlationId;
 
     private Builder() {}
-
-    public Builder decorateCollections(boolean decorateCollections) {
-      this.decorateCollections = decorateCollections;
-      return this;
-    }
-
-    public Builder decorateIterators(boolean decorateIterators) {
-      this.decorateIterators = decorateIterators;
-      return this;
-    }
-
-    public Builder decorateInputStreams(boolean decorateInputStreams) {
-      this.decorateInputStreams = decorateInputStreams;
-      return this;
-    }
-
-    public Builder decorateCursorProviders(boolean decorateCursorProviders) {
-      this.decorateCursorProviders = decorateCursorProviders;
-      return this;
-    }
 
     public Builder withFactory(CursorComponentDecoratorFactory factory) {
       this.factory = factory;
@@ -144,8 +85,7 @@ public class InputDecoratorVisitor<T> implements Visitor<T> {
     }
 
     public InputDecoratorVisitor build() {
-      return new InputDecoratorVisitor(factory, correlationId, decorateInputStreams, decorateIterators, decorateCollections,
-                                       decorateCursorProviders);
+      return new InputDecoratorVisitor(factory, correlationId);
     }
 
   }
