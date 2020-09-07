@@ -35,13 +35,6 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   public void expireDynamicConfig() throws Exception {
     HeisenbergExtension config = invokeDynamicConfig("dynamic", "heisenberg", "Walt");
 
-    try {
-      assertExpired(config, 5000, 1000);
-    } catch (AssertionError e) {
-      //force cache cleanUp
-      HeisenbergExtension anotherConfig = invokeDynamicConfig("dynamic", "heisenberg", "Walt");
-    }
-
     assertExpired(config, 5000, 1000);
     assertInitialised(config);
   }
@@ -52,11 +45,10 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
         invokeDynamicConfig("dynamicWithCustomExpiration", "heisenbergWithCustomExpiration", "Walter Jr.");
 
     try {
-      assertExpired(config, 5000, 1000);
+      assertExpired(config, 1500, 100);
+      throw new IllegalStateException("Config should not have been expired");
     } catch (AssertionError e) {
-      //force cache cleanUp
-      HeisenbergExtension anotherConfig =
-          invokeDynamicConfig("dynamicWithCustomExpiration", "heisenbergWithCustomExpiration", "Walter Jr.");
+      //all good
     }
 
     assertExpired(config, 5000, 1000);
