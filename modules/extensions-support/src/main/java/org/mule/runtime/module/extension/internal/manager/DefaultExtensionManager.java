@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConfigurationForComponent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
-import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 
@@ -30,7 +29,6 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.time.Time;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -86,7 +84,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   private MuleContext muleContext;
   private ExtensionRegistry extensionRegistry;
-  private ConfigurationExpirationMonitor configurationExpirationMonitor;
   private ExtensionErrorsRegistrant extensionErrorsRegistrant;
 
   private ExtensionActivator extensionActivator;
@@ -99,26 +96,23 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   }
 
   /**
-   * Starts the {@link #configurationExpirationMonitor}
+   * Starts the {@link #extensionActivator}
    *
    * @throws MuleException if it fails to start
    */
   @Override
   public void start() throws MuleException {
-    configurationExpirationMonitor = newConfigurationExpirationMonitor();
-    configurationExpirationMonitor.beginMonitoring();
     extensionActivator.start();
   }
 
   /**
-   * Stops the {@link #configurationExpirationMonitor}
+   * Stops the {@link #extensionActivator}
    *
    * @throws MuleException if it fails to stop
    */
   @Override
   public void stop() throws MuleException {
     extensionActivator.stop();
-    configurationExpirationMonitor.stopMonitoring();
   }
 
   /**
@@ -264,12 +258,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     return extensionRegistry.getExtension(extensionName);
   }
 
-  private ConfigurationExpirationMonitor newConfigurationExpirationMonitor() {
-    Time freq = getConfigurationExpirationFrequency();
-    return newBuilder(extensionRegistry, muleContext).runEvery(freq.getTime(), freq.getUnit())
-        .onExpired(this::disposeConfiguration).build();
-  }
-
   @Override
   public void disposeConfiguration(String key, ConfigurationInstance configuration) {
     try {
@@ -280,10 +268,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                           configuration.getClass().getName()),
                    e);
     }
-  }
-
-  private Time getConfigurationExpirationFrequency() {
-    return muleContext.getConfiguration().getDynamicConfigExpiration().getFrequency();
   }
 
   @Override

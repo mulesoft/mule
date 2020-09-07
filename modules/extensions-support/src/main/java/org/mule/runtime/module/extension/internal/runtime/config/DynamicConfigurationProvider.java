@@ -35,6 +35,7 @@ import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -54,10 +55,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
+
+import org.slf4j.Logger;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import org.slf4j.Logger;
 
 /**
  * A {@link ConfigurationProvider} which continuously evaluates the same {@link ResolverSet} and then uses the resulting
@@ -83,6 +84,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   private final com.github.benmanes.caffeine.cache.LoadingCache<ResolverResultAndEvent, ConfigurationInstance> cache;
   private final ReflectionCache reflectionCache;
   private final ExpressionManager expressionManager;
+  private final ExtensionManager extensionManager;
 
   /**
    * Creates a new instance
@@ -114,9 +116,13 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     this.resolverSet = resolverSet;
     this.connectionProviderResolver = connectionProviderResolver;
     this.expirationPolicy = expirationPolicy;
+    this.extensionManager = muleContext.getExtensionManager();
 
-    cache = Caffeine.newBuilder().build(key -> createConfiguration(key.getResolverSetResult(), key.getEvent()));
-
+    cache = Caffeine.newBuilder().expireAfterAccess(expirationPolicy.getMaxIdleTime(), expirationPolicy.getTimeUnit())
+        .removalListener((key, value, cause) -> extensionManager
+            .disposeConfiguration(((ResolverResultAndEvent) key).getResolverSetResult().toString(),
+                                  (ConfigurationInstance) value))
+        .build(key -> createConfiguration(key.getResolverSetResult(), key.getEvent()));
   }
 
   /**
@@ -143,17 +149,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult,
                                                  CoreEvent event) {
-    ConfigurationInstance configuration = cache.get(new ResolverResultAndEvent(resolverSetResult, event));
-    if (configuration != null) {
-      updateUsageStatistic(configuration);
-      return configuration;
-    }
-    throw new IllegalStateException("A null config was created");
-  }
-
-  private void updateUsageStatistic(ConfigurationInstance configuration) {
-    MutableConfigurationStats stats = (MutableConfigurationStats) configuration.getStatistics();
-    stats.updateLastUsed();
+    return cache.get(new ResolverResultAndEvent(resolverSetResult, event));
   }
 
   private ConfigurationInstance createConfiguration(Pair<ResolverSetResult, ResolverSetResult> values, CoreEvent event)
@@ -219,8 +215,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   @Override
   public List<ConfigurationInstance> getExpired() {
-    ConcurrentMap<ResolverResultAndEvent, ConfigurationInstance> entries = cache.asMap();
-    return entries.entrySet().stream().filter(entry -> isExpired(entry.getValue())).map(entry -> {
+    return cache.asMap().entrySet().stream().filter(entry -> isExpired(entry.getValue())).map(entry -> {
       cache.invalidate(entry.getKey());
       unRegisterConfiguration(entry.getValue());
       return entry.getValue();
