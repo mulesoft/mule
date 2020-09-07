@@ -12,6 +12,8 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.visitable;
+import static org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor.builder;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
@@ -28,6 +30,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 
 import java.util.Optional;
@@ -85,6 +88,21 @@ public class ResolverUtils {
       return new StaticValueResolver<>(defaultValue);
     }
     return null;
+  }
+
+  /**
+   * Generates an operation for value decoration
+   * 
+   * @param eventCorrelationId the correlationId of the context involed
+   * @param componentDecoratorFactory the component decorator factory
+   * @return operator for decoration
+   */
+  public static UnaryOperator decorateOperation(String eventCorrelationId,
+                                                  CursorComponentDecoratorFactory componentDecoratorFactory) {
+    return v -> visitable(v)
+        .map(visitable -> visitable.accept(builder()
+            .withFactory(componentDecoratorFactory).withCorrelationId(eventCorrelationId).build()))
+        .orElse(v);
   }
 
   public static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext)

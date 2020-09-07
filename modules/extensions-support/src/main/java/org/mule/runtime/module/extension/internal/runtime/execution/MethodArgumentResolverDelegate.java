@@ -14,6 +14,7 @@ import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.vi
 import static org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor.builder;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.decorateOperation;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 
@@ -77,6 +78,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgu
 import org.mule.runtime.module.extension.internal.runtime.resolver.NotificationHandlerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RetryPolicyTemplateArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RouterCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SecurityContextHandlerArgumentResolver;
@@ -100,6 +102,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import javax.inject.Inject;
 
@@ -416,13 +419,9 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     protected Object decorate(Object value, String eventCorrelationId) {
-      return resolveCursor((TypedValue) value, v -> {
-        return visitable(v)
-            .map(visitable -> visitable.accept(builder()
-                .withFactory(componentDecoratorFactory).withCorrelationId(eventCorrelationId).build()))
-            .orElse(v);
-      });
+      return resolveCursor((TypedValue) value, decorateOperation(eventCorrelationId, componentDecoratorFactory));
     }
+
   }
 
   private static class TypedValueArgumentResolverDecorator extends ArgumentResolverDecorator {
@@ -439,10 +438,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     protected Object decorate(Object value, String eventCorrelationId) {
       Object v = ((TypedValue) value).getValue();
 
-      v = visitable(v)
-          .map(visitable -> visitable.accept(builder()
-              .withFactory(componentDecoratorFactory).withCorrelationId(eventCorrelationId).build()))
-          .orElse(v);
+      v = decorateOperation(eventCorrelationId, componentDecoratorFactory).apply(v);
 
       if (v != ((TypedValue) value).getValue()) {
         return new TypedValue<>(v, DataType.builder()
@@ -467,11 +463,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     protected Object decorate(Object value, String eventCorrelationId) {
-      final Object resolved = resolveCursor(value);
-      return visitable(resolved)
-          .map(visitable -> visitable.accept(builder()
-              .withFactory(componentDecoratorFactory).withCorrelationId(eventCorrelationId).build()))
-          .orElse(resolved);
+      return decorateOperation(eventCorrelationId, componentDecoratorFactory).apply(resolveCursor(value));
     }
   }
 

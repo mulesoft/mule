@@ -18,6 +18,7 @@ import static org.mule.runtime.core.internal.management.stats.visitor.InputDecor
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.decorateOperation;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveTypedValue;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
@@ -40,6 +41,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
@@ -128,12 +130,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
 
     for (Map.Entry<FieldSetter, ValueResolver<Object>> entry : resolvers.entrySet()) {
       final Object resolvedValue = resolveValue(entry.getValue(), context);
-      UnaryOperator decorateOperation = v -> visitable(v)
-          .map(visitable -> visitable
-              .accept(builder()
-                  .withFactory(componentDecoratorFactory)
-                  .withCorrelationId(context.getEvent().getCorrelationId()).build()))
-          .orElse(v);
+      UnaryOperator decorateOperation = decorateOperation(context.getEvent().getCorrelationId(), componentDecoratorFactory);
 
       entry.getKey().set(object,
                          context == null || context.resolveCursors()
