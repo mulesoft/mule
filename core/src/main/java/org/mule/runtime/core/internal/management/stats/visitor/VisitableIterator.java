@@ -15,11 +15,11 @@ import org.mule.runtime.api.streaming.HasSize;
  *
  * @since 4.4, 4.3.1
  */
-public class VisitableIterator implements Iterator, Visitable<Iterator>, HasSize {
+public class VisitableIterator<T> implements Iterator<T>, Visitable<Iterator<T>>, HasSize {
 
-  private final Iterator delegate;
+  private final Iterator<T> delegate;
 
-  public VisitableIterator(Iterator delegate) {
+  public VisitableIterator(Iterator<T> delegate) {
     this.delegate = delegate;
   }
 
@@ -29,23 +29,23 @@ public class VisitableIterator implements Iterator, Visitable<Iterator>, HasSize
   }
 
   @Override
-  public Object next() {
+  public T next() {
     return delegate.next();
   }
 
   @Override
-  public Iterator accept(Visitor visitor) {
+  public Iterator<T> accept(Visitor visitor) {
     return visitor.visitIterator(this);
   }
 
   @Override
-  public Iterator getDelegate() {
+  public Iterator<T> getDelegate() {
     return delegate;
   }
 
   @Override
   public int getSize() {
-    return delegate.
+    return delegate instanceof HasSize ? ((HasSize) delegate).getSize() : 0;
   }
 
 }

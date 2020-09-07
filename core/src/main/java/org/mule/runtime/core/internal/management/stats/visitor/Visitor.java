@@ -29,25 +29,25 @@ public interface Visitor<T> {
    * @param visitable a visitable iterator
    * @return result of the iterator which has been visited
    */
-  Iterator<T> visitIterator(VisitableIterator visible);
+  Iterator<T> visitIterator(VisitableIterator<T> visible);
 
   /**
    * @param visitable a visitable collection
    * @return result of the collection which has been visited
    */
-  Collection<T> visitCollection(VisitableCollection visitable);
+  Collection<T> visitCollection(VisitableCollection<T> visitable);
 
   /**
    * @param visitable a visitable list
    * @return result of the list which has been visited
    */
-  List<T> visitList(VisitableList visitableList);
+  List<T> visitList(VisitableList<T> visitableList);
 
   /**
    * @param visitable a visitable set
    * @return result of the set which has been visited
    */
-  Set<T> visitSet(VisitableSet visitableSet);
+  Set<T> visitSet(VisitableSet<T> visitableSet);
 
   /**
    * @param visitable a visitable set

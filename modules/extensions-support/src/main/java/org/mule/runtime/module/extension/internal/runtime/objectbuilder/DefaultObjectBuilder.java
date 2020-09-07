@@ -13,8 +13,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.management.stats.InputDecoratorVisitor.builder;
 import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.visitable;
+import static org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor.builder;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
@@ -128,14 +128,12 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
 
     for (Map.Entry<FieldSetter, ValueResolver<Object>> entry : resolvers.entrySet()) {
       final Object resolvedValue = resolveValue(entry.getValue(), context);
-      UnaryOperator decorateOperation = v -> {
-        return visitable(v)
-            .map(visitable -> visitable
-                .accept(builder()
-                    .withFactory(componentDecoratorFactory)
-                    .withCorrelationId(context.getEvent().getCorrelationId()).build()))
-            .orElse(v);
-      };
+      UnaryOperator decorateOperation = v -> visitable(v)
+          .map(visitable -> visitable
+              .accept(builder()
+                  .withFactory(componentDecoratorFactory)
+                  .withCorrelationId(context.getEvent().getCorrelationId()).build()))
+          .orElse(v);
 
       entry.getKey().set(object,
                          context == null || context.resolveCursors()

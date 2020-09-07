@@ -15,16 +15,16 @@ import java.util.Set;
  *
  * @since 4.4, 4.3.1
  */
-public class VisitableSet implements Visitable<Set>, Set {
+public class VisitableSet<T> implements Visitable<Set<T>>, Set<T> {
 
-  private final Set delegate;
+  private final Set<T> delegate;
 
-  public VisitableSet(Set delegate) {
+  public VisitableSet(Set<T> delegate) {
     this.delegate = delegate;
   }
 
   @Override
-  public Set accept(Visitor visitor) {
+  public Set<T> accept(Visitor visitor) {
     return visitor.visitSet(this);
   }
 
@@ -44,7 +44,7 @@ public class VisitableSet implements Visitable<Set>, Set {
   }
 
   @Override
-  public Iterator iterator() {
+  public Iterator<T> iterator() {
     return delegate.iterator();
   }
 
@@ -54,12 +54,12 @@ public class VisitableSet implements Visitable<Set>, Set {
   }
 
   @Override
-  public Object[] toArray(Object[] a) {
+  public <T> T[] toArray(T[] a) {
     return delegate.toArray(a);
   }
 
   @Override
-  public boolean add(Object e) {
+  public boolean add(T e) {
     return delegate.add(e);
   }
 
@@ -69,22 +69,22 @@ public class VisitableSet implements Visitable<Set>, Set {
   }
 
   @Override
-  public boolean containsAll(Collection c) {
+  public boolean containsAll(Collection<?> c) {
     return delegate.containsAll(c);
   }
 
   @Override
-  public boolean addAll(Collection c) {
+  public boolean addAll(Collection<? extends T> c) {
     return delegate.addAll(c);
   }
 
   @Override
-  public boolean retainAll(Collection c) {
+  public boolean retainAll(Collection<?> c) {
     return delegate.retainAll(c);
   }
 
   @Override
-  public boolean removeAll(Collection c) {
+  public boolean removeAll(Collection<?> c) {
     return delegate.removeAll(c);
   }
 
@@ -94,7 +94,7 @@ public class VisitableSet implements Visitable<Set>, Set {
   }
 
   @Override
-  public Set getDelegate() {
+  public Set<T> getDelegate() {
     return delegate;
   }
 

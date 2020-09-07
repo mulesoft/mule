@@ -14,16 +14,16 @@ import java.util.Iterator;
  *
  * @since 4.4, 4.3.1
  */
-public class VisitableCollection implements Visitable<Collection>, Collection {
+public class VisitableCollection<T> implements Visitable<Collection<T>>, Collection<T> {
 
-  private final Collection delegate;
+  private final Collection<T> delegate;
 
-  public VisitableCollection(Collection delegate) {
+  public VisitableCollection(Collection<T> delegate) {
     this.delegate = delegate;
   }
 
   @Override
-  public Collection accept(Visitor visitor) {
+  public Collection<T> accept(Visitor visitor) {
     return visitor.visitCollection(this);
   }
 
@@ -43,7 +43,7 @@ public class VisitableCollection implements Visitable<Collection>, Collection {
   }
 
   @Override
-  public Iterator iterator() {
+  public Iterator<T> iterator() {
     return delegate.iterator();
   }
 
@@ -53,12 +53,12 @@ public class VisitableCollection implements Visitable<Collection>, Collection {
   }
 
   @Override
-  public Object[] toArray(Object[] a) {
+  public <T> T[] toArray(T[] a) {
     return delegate.toArray(a);
   }
 
   @Override
-  public boolean add(Object e) {
+  public boolean add(T e) {
     return delegate.add(e);
   }
 
@@ -68,22 +68,22 @@ public class VisitableCollection implements Visitable<Collection>, Collection {
   }
 
   @Override
-  public boolean containsAll(Collection c) {
+  public boolean containsAll(Collection<?> c) {
     return delegate.containsAll(c);
   }
 
   @Override
-  public boolean addAll(Collection c) {
+  public boolean addAll(Collection<? extends T> c) {
     return delegate.addAll(c);
   }
 
   @Override
-  public boolean removeAll(Collection c) {
+  public boolean removeAll(Collection<?> c) {
     return delegate.removeAll(c);
   }
 
   @Override
-  public boolean retainAll(Collection c) {
+  public boolean retainAll(Collection<?> c) {
     return delegate.retainAll(c);
   }
 
@@ -93,8 +93,10 @@ public class VisitableCollection implements Visitable<Collection>, Collection {
   }
 
   @Override
-  public Collection getDelegate() {
+  public Collection<T> getDelegate() {
     return delegate;
   }
+
+
 
 }

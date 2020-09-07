@@ -126,7 +126,7 @@ public final class MessageUtils {
         .map(v -> v
             .accept(OutputDecoratorVisitor.builder().withFactory(componentDecoratorFactory)
                 .withCorrelationId(correlationId)
-                .decorateCursorProviders(false).build()))
+                .build()))
         .orElse(result.getOutput());
 
     Object value = streamingContent(output, cursorProviderFactory, eventContext, originatingLocation);

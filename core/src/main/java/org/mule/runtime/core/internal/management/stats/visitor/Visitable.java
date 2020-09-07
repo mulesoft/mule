@@ -21,7 +21,7 @@ public interface Visitable<T> {
    * @param visitor visitor which also transforms the visitee.
    * @return the transformation.
    */
-  T accept(Visitor visitor);
+  T accept(Visitor<T> visitor);
 
   /**
    * @return delegate

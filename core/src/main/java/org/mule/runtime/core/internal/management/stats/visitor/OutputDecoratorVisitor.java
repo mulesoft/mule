@@ -14,31 +14,20 @@ import java.util.Set;
 
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor.Builder;
 
 /**
  * Visitor that returns a decorator for output statistics.
  * 
  * @since 4.4, 4.3.1
  */
-public class OutputDecoratorVisitor implements Visitor {
+public class OutputDecoratorVisitor<T> implements Visitor<T> {
 
   private final CursorComponentDecoratorFactory decoratorFactory;
   private final String correlationId;
-  private boolean decorateInputStreams = true;
-  private boolean decorateIterators = true;
-  private boolean decorateCollections = true;
-  private boolean decorateCursorProviders = true;
 
-  private OutputDecoratorVisitor(CursorComponentDecoratorFactory decoratorFactory, String correlationId,
-                                 boolean decorateInputStreams, boolean decorateIterators, boolean decorateCollections,
-                                 boolean decorateCursorProviders) {
+  private OutputDecoratorVisitor(CursorComponentDecoratorFactory decoratorFactory, String correlationId) {
     this.decoratorFactory = decoratorFactory;
     this.correlationId = correlationId;
-    this.decorateInputStreams = decorateInputStreams;
-    this.decorateIterators = decorateIterators;
-    this.decorateCollections = decorateCollections;
-    this.decorateCursorProviders = decorateCursorProviders;
   }
 
   @Override
@@ -47,22 +36,22 @@ public class OutputDecoratorVisitor implements Visitor {
   }
 
   @Override
-  public Iterator visitIterator(VisitableIterator visitable) {
+  public Iterator<T> visitIterator(VisitableIterator<T> visitable) {
     return decoratorFactory.decorateOutput(visitable.getDelegate(), correlationId);
   }
 
   @Override
-  public Collection visitCollection(VisitableCollection visitable) {
+  public Collection<T> visitCollection(VisitableCollection visitable) {
     return decoratorFactory.decorateOutputResultCollection(visitable.getDelegate(), correlationId);
   }
 
   @Override
-  public List visitList(VisitableList visitableList) {
+  public List<T> visitList(VisitableList visitableList) {
     return visitableList;
   }
 
   @Override
-  public Set visitSet(VisitableSet visitableSet) {
+  public Set<T> visitSet(VisitableSet visitableSet) {
     return visitableSet;
   }
 
@@ -77,35 +66,11 @@ public class OutputDecoratorVisitor implements Visitor {
 
   public static class Builder {
 
-    private boolean decorateCollections = true;
-    private boolean decorateIterators = true;
-    private boolean decorateInputStreams = true;
-    private boolean decorateCursorProviders = true;
 
     private CursorComponentDecoratorFactory factory;
     private String correlationId;
 
     private Builder() {}
-
-    public Builder decorateCollections(boolean decorateCollections) {
-      this.decorateCollections = decorateCollections;
-      return this;
-    }
-
-    public Builder decorateIterators(boolean decorateIterators) {
-      this.decorateIterators = decorateIterators;
-      return this;
-    }
-
-    public Builder decorateInputStreams(boolean decorateInputStreams) {
-      this.decorateInputStreams = decorateInputStreams;
-      return this;
-    }
-
-    public Builder decorateCursorProviders(boolean decorateCursorProviders) {
-      this.decorateCursorProviders = decorateCursorProviders;
-      return this;
-    }
 
     public Builder withFactory(CursorComponentDecoratorFactory factory) {
       this.factory = factory;
@@ -118,8 +83,7 @@ public class OutputDecoratorVisitor implements Visitor {
     }
 
     public OutputDecoratorVisitor build() {
-      return new OutputDecoratorVisitor(factory, correlationId, decorateInputStreams, decorateIterators, decorateCollections,
-                                        decorateCursorProviders);
+      return new OutputDecoratorVisitor(factory, correlationId);
     }
 
   }

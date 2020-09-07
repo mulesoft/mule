@@ -16,23 +16,17 @@ import java.util.ListIterator;
  *
  * @since 4.4, 4.3.1
  */
-public class VisitableList implements Visitable<List>, List {
+public class VisitableList<T> implements Visitable<List<T>>, List<T> {
 
-  private final List delegate;
+  private final List<T> delegate;
 
-  public VisitableList(List delegate) {
+  public VisitableList(List<T> delegate) {
     this.delegate = delegate;
   }
 
   @Override
-  public List accept(Visitor visitor) {
+  public List<T> accept(Visitor visitor) {
     return visitor.visitList(this);
-  }
-
-
-  @Override
-  public List getDelegate() {
-    return delegate;
   }
 
   @Override
@@ -51,7 +45,7 @@ public class VisitableList implements Visitable<List>, List {
   }
 
   @Override
-  public Iterator iterator() {
+  public Iterator<T> iterator() {
     return delegate.iterator();
   }
 
@@ -61,12 +55,12 @@ public class VisitableList implements Visitable<List>, List {
   }
 
   @Override
-  public Object[] toArray(Object[] a) {
+  public <T> T[] toArray(T[] a) {
     return delegate.toArray(a);
   }
 
   @Override
-  public boolean add(Object e) {
+  public boolean add(T e) {
     return delegate.add(e);
   }
 
@@ -76,27 +70,27 @@ public class VisitableList implements Visitable<List>, List {
   }
 
   @Override
-  public boolean containsAll(Collection c) {
+  public boolean containsAll(Collection<?> c) {
     return delegate.containsAll(c);
   }
 
   @Override
-  public boolean addAll(Collection c) {
+  public boolean addAll(Collection<? extends T> c) {
     return delegate.addAll(c);
   }
 
   @Override
-  public boolean addAll(int index, Collection c) {
+  public boolean addAll(int index, Collection<? extends T> c) {
     return delegate.addAll(index, c);
   }
 
   @Override
-  public boolean removeAll(Collection c) {
+  public boolean removeAll(Collection<?> c) {
     return delegate.removeAll(c);
   }
 
   @Override
-  public boolean retainAll(Collection c) {
+  public boolean retainAll(Collection<?> c) {
     return delegate.retainAll(c);
   }
 
@@ -106,22 +100,22 @@ public class VisitableList implements Visitable<List>, List {
   }
 
   @Override
-  public Object get(int index) {
+  public T get(int index) {
     return delegate.get(index);
   }
 
   @Override
-  public Object set(int index, Object element) {
+  public T set(int index, T element) {
     return delegate.set(index, element);
   }
 
   @Override
-  public void add(int index, Object element) {
+  public void add(int index, T element) {
     delegate.add(index, element);
   }
 
   @Override
-  public Object remove(int index) {
+  public T remove(int index) {
     return delegate.remove(index);
   }
 
@@ -136,18 +130,24 @@ public class VisitableList implements Visitable<List>, List {
   }
 
   @Override
-  public ListIterator listIterator() {
+  public ListIterator<T> listIterator() {
     return delegate.listIterator();
   }
 
   @Override
-  public ListIterator listIterator(int index) {
-    return delegate.listIterator();
+  public ListIterator<T> listIterator(int index) {
+    return delegate.listIterator(index);
   }
 
   @Override
-  public List subList(int fromIndex, int toIndex) {
+  public List<T> subList(int fromIndex, int toIndex) {
     return delegate.subList(fromIndex, toIndex);
   }
+
+  @Override
+  public List<T> getDelegate() {
+    return delegate;
+  }
+
 
 }
