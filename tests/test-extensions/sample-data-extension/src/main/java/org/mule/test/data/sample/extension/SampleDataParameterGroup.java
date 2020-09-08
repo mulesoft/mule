@@ -6,8 +6,8 @@
  */
 package org.mule.test.data.sample.extension;
 
-import org.mule.sdk.api.annotation.param.Optional;
-import org.mule.sdk.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 public class SampleDataParameterGroup {
 

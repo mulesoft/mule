@@ -31,9 +31,14 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
    */
   default List<ExtensionParameter> getParameters() {
     return getAnnotatedFields(Parameter.class,
+                              org.mule.sdk.api.annotation.param.Parameter.class,
                               OAuthParameter.class,
+                              org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter.class,
                               ParameterGroup.class,
+                              org.mule.sdk.api.annotation.param.ParameterGroup.class,
                               Connection.class,
+                              org.mule.sdk.api.annotation.param.Connection.class,
+                              org.mule.sdk.api.annotation.param.Config.class,
                               Config.class)
                                   .stream()
                                   .distinct()

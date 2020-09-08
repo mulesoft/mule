@@ -15,7 +15,6 @@ import static org.mule.sdk.api.data.sample.SampleDataException.UNKNOWN;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
@@ -31,7 +30,7 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 
 /**
- * Provides instances of the {@link ValueProvider}
+ * Provides instances of {@link SampleDataProvider}
  *
  * @since 4.0
  */
@@ -126,7 +125,7 @@ public class SampleDataProviderFactory {
     }
 
     if (!missingParameters.isEmpty()) {
-      throw new SampleDataException("Unable to retrieve values. There are missing required parameters for the resolution: "
+      throw new SampleDataException("Unable to retrieve Sample Data. There are missing required parameters for the resolution: "
           + missingParameters, MISSING_REQUIRED_PARAMETERS);
     }
   }

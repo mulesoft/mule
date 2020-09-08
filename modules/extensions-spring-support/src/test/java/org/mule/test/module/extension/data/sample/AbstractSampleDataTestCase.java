@@ -32,12 +32,12 @@ public abstract class AbstractSampleDataTestCase extends MuleArtifactFunctionalT
 
   @Override
   public boolean enableLazyInit() {
-    return true;
+    return false;
   }
 
   @Override
   public boolean disableXmlValidations() {
-    return true;
+    return false;
   }
 
   @Override

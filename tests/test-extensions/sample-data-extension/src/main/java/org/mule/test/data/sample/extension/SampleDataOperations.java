@@ -8,6 +8,7 @@ package org.mule.test.data.sample.extension;
 
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
+import static org.mule.test.data.sample.extension.SampleDataExtension.NULL_VALUE;
 
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -17,6 +18,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.test.data.sample.extension.config.SampleDataConfig;
+import org.mule.test.data.sample.extension.resolver.ComplexActingParameterSampleDataProvider;
 import org.mule.test.data.sample.extension.resolver.ConfigAwareTestSampleDataProvider;
 import org.mule.test.data.sample.extension.resolver.ConnectedTestSampleDataProvider;
 import org.mule.test.data.sample.extension.resolver.GroupTestSampleDataProvider;
@@ -30,7 +32,7 @@ public class SampleDataOperations {
     return Result.<String, String>builder()
         .output(payload)
         .mediaType(APPLICATION_JSON)
-        .attributes(attributes)
+        .attributes(attributes != null ? attributes : NULL_VALUE)
         .attributesMediaType(APPLICATION_XML)
         .build();
   }
@@ -74,11 +76,16 @@ public class SampleDataOperations {
   @SampleData(ParameterizedTestSampleDataProvider.class)
   public Result<String, String> aliasedGroup(@Connection SampleDataConnection connection,
                                              @ParameterGroup(name = "group") SampleDataAliasedParameterGroup group) {
-    return useConnection(connection, group.getAliasedPayload(), group.getAliasedPayload());
+    return useConnection(connection, group.getPayload(), group.getAttributes());
   }
 
   @SampleData(MuleContextAwareSampleDataProvider.class)
   public Result<String, String> muleContextAwareSampleData(String payload, String attributes) {
     return connectionLess(payload, attributes);
+  }
+
+  @SampleData(ComplexActingParameterSampleDataProvider.class)
+  public Result<String, String> complexActingParameter(ComplexActingParameter complex) {
+    return connectionLess(complex.getPayload(), complex.getAttributes());
   }
 }

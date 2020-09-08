@@ -6,26 +6,27 @@
  */
 package org.mule.test.data.sample.extension;
 
-import org.mule.sdk.api.annotation.Alias;
-import org.mule.sdk.api.annotation.param.Optional;
-import org.mule.sdk.api.annotation.param.Parameter;
+
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 public class SampleDataAliasedParameterGroup {
 
   @Parameter
-  @Alias("payload")
-  private String aliasedPayload;
+  @Alias("aliasedPayload")
+  private String payload;
 
   @Parameter
   @Optional
-  @Alias("attributes")
-  private String aliasedAttributes;
+  @Alias("aliasedAttributes")
+  private String attributes;
 
-  public String getAliasedPayload() {
-    return aliasedPayload;
+  public String getPayload() {
+    return payload;
   }
 
-  public String getAliasedAttributes() {
-    return aliasedAttributes;
+  public String getAttributes() {
+    return attributes;
   }
 }

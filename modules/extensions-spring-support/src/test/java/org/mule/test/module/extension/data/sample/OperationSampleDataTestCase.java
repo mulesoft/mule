@@ -6,7 +6,13 @@
  */
 package org.mule.test.module.extension.data.sample;
 
+import static org.junit.rules.ExpectedException.none;
+
+import org.mule.sdk.api.data.sample.SampleDataException;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
 
@@ -14,6 +20,9 @@ public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
   private static final String EXPECTED_ATTRIBUTES = "my attributes";
   private static final String CONF_PREFIX = "from-conf-";
   private static final String NULL_VALUE = "<<null>>";
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Override
   protected String getConfigFile() {
@@ -62,17 +71,27 @@ public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
 
   @Test
   public void missingActingParameter() throws Exception {
+    expectedException.expect(SampleDataException.class);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
     assertMessage(getSample("missingActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void missingActingParameterInGroup() throws Exception {
+    expectedException.expect(SampleDataException.class);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
     assertMessage(getSample("missingActingParameterInGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
-
 
   @Test
   public void muleContextAwareSampleData() throws Exception {
     assertMessage(getSample("muleContextAwareSampleData"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void complexActingParameter() throws Exception {
+    assertMessage(getSample("complexActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 }

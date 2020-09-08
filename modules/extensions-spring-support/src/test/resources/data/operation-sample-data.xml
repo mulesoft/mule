@@ -10,7 +10,7 @@
     </sample-data:config>
 
     <flow name="connectionLess">
-        <sample-data:connection-less payload="my payload" attributes="my attributes" config-ref="config"/>
+        <sample-data:connection-less payload="my payload" attributes="my attributes" />
     </flow>
 
     <flow name="useConnection">
@@ -40,7 +40,7 @@
     </flow>
 
     <flow name="aliasedGroup">
-        <sample-data:aliased-group payload="my payload" attributes="my attributes"/>
+        <sample-data:aliased-group aliasedPayload="my payload" aliasedAttributes="my attributes" config-ref="config"/>
     </flow>
 
     <flow name="missingActingParameter">
@@ -52,7 +52,12 @@
     </flow>
 
     <flow name="muleContextAwareSampleData">
-        <sample-data:mule-context-aware-sample-data payload="my payload" attributes="my attributes" config-ref="config"/>
+        <sample-data:mule-context-aware-sample-data payload="my payload" attributes="my attributes" />
     </flow>
 
+    <flow name="complexActingParameter">
+        <sample-data:complex-acting-parameter>
+            <sample-data:complex payload="my payload" attributes="my attributes" />
+        </sample-data:complex-acting-parameter>
+    </flow>
 </mule>
