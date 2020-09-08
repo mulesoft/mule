@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.management.stats;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.sdk.api.runtime.operation.Result;
@@ -142,6 +143,15 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
       return decorateOutput((Iterator) decorated, correlationId);
     } else {
       return decorated;
+    }
+  }
+
+  @Override
+  public CursorStream decorateInput(CursorStream decorated, String correlationId) {
+    if (payloadStatistics.isEnabled()) {
+      return new PayloadStatisticsCursorStream(decorated, payloadStatistics::addInputByteCount);
+    } else {
+      return NO_OP_INSTANCE.decorateInput(decorated, correlationId);
     }
   }
 

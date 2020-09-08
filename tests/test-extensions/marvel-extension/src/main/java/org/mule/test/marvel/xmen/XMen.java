@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.annotation.Sources;
 
 @Configuration(name = XMen.CONFIG_NAME)
 @Operations(WeaponXOperations.class)
-@Sources(CerebroDetectNewMutants.class)
+@Sources({CerebroDetectNewMutants.class, MagnetoMutantSummon.class, MagnetoBrotherhood.class})
 public class XMen {
 
   public static final String CONFIG_NAME = "x-men";

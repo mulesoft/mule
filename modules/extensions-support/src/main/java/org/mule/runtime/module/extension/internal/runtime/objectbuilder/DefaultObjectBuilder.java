@@ -13,15 +13,24 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInputOperation;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveTypedValue;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.UnaryOperator;
+
+import javax.inject.Inject;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -34,15 +43,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 /**
  * Default implementation of {@link ObjectBuilder} which creates instances through a provided {@link Class}.
@@ -77,7 +77,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
    * Adds a property which value is to be obtained from a {@link ValueResolver}
    *
    * @param propertyName the name of the property in which the value is to be assigned
-   * @param resolver     a {@link ValueResolver} used to provide the actual value
+   * @param resolver a {@link ValueResolver} used to provide the actual value
    * @return this builder
    * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
    */
@@ -94,7 +94,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
   /**
    * Adds a property which value is to be obtained from a {@link ValueResolver}
    *
-   * @param field    the property in which the value is to be assigned
+   * @param field the property in which the value is to be assigned
    * @param resolver a {@link ValueResolver} used to provide the actual value
    * @return this builder
    * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
@@ -127,27 +127,19 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
 
     for (Map.Entry<FieldSetter, ValueResolver<Object>> entry : resolvers.entrySet()) {
       final Object resolvedValue = resolveValue(entry.getValue(), context);
+
       entry.getKey().set(object,
                          context == null || context.resolveCursors()
                              ? resolveCursor(resolvedValue,
-                                             entry.getValue().isContent() && componentDecoratorFactory != null ? v -> {
-                                               if (v instanceof InputStream) {
-                                                 return componentDecoratorFactory.decorateInput((InputStream) v,
-                                                                                                context.getEvent()
-                                                                                                    .getCorrelationId());
-                                               } else if (v instanceof Collection) {
-                                                 return componentDecoratorFactory.decorateInput((Collection) v,
-                                                                                                context.getEvent()
-                                                                                                    .getCorrelationId());
-                                               } else if (v instanceof Iterator) {
-                                                 return componentDecoratorFactory.decorateInput((Iterator) v,
-                                                                                                context.getEvent()
-                                                                                                    .getCorrelationId());
-                                               } else {
-                                                 return v;
-                                               }
-                                             } : identity())
-                             : resolvedValue);
+                                             entry.getValue().isContent() && componentDecoratorFactory != null
+                                                 ? decorateInputOperation(context.getEvent().getCorrelationId(),
+                                                                          componentDecoratorFactory)
+                                                 : identity())
+                             : entry.getValue().isContent() && componentDecoratorFactory != null
+                                 ? resolveTypedValue(resolvedValue,
+                                                     decorateInputOperation(context.getEvent().getCorrelationId(),
+                                                                            componentDecoratorFactory))
+                                 : resolvedValue);
     }
 
     injectFields(object, name, encoding, reflectionCache);

@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static java.util.function.UnaryOperator.identity;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInputOperation;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
@@ -112,17 +113,11 @@ public class ParameterGroupObjectBuilder<T> {
         Object resolvedValue = resolveValue(new StaticValueResolver<>(parameters
             .apply(name)), context);
         Object value = context == null || context.resolveCursors()
-            ? resolveCursor(resolvedValue, isContent ? v -> {
-              if (v instanceof InputStream) {
-                return componentDecoratorFactory.decorateInput((InputStream) v, context.getEvent().getCorrelationId());
-              } else if (v instanceof Collection) {
-                return componentDecoratorFactory.decorateInput((Collection) v, context.getEvent().getCorrelationId());
-              } else if (v instanceof Iterator) {
-                return componentDecoratorFactory.decorateInput((Iterator) v, context.getEvent().getCorrelationId());
-              } else {
-                return v;
-              }
-            } : identity())
+            ? resolveCursor(resolvedValue,
+                            isContent
+                                ? decorateInputOperation(context.getEvent().getCorrelationId(),
+                                                         componentDecoratorFactory)
+                                : identity())
             : resolvedValue;
         field.set(object, value);
       }

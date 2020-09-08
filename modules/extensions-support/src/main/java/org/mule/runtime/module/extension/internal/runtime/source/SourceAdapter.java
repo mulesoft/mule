@@ -23,6 +23,7 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.F
 import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.NONE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
+import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -73,6 +74,7 @@ import org.mule.runtime.extension.internal.property.TransactionalTypeModelProper
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ReactiveReconnectionCallback;
+import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -398,6 +400,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
       return ValueResolvingContext.builder(event)
           .withExpressionManager(expressionManager)
           .withConfig(configurationInstance)
+          .withProperty(COMPONENT_DECORATOR_FACTORY_KEY, cursorDecoratorFactory.componentDecoratorFactory(component))
           .resolveCursors(false)
           .build();
     }
