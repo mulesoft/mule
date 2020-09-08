@@ -231,8 +231,9 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(schedulerModel.getOutputAttributes().hasDynamicType(), is(false));
 
     final List<ParameterModel> paramModels = schedulerModel.getAllParameterModels();
-    assertThat(paramModels, hasSize(1));
+    assertThat(paramModels, hasSize(2));
     assertSchedulingStrategy(paramModels.get(0));
+    assertSchedulingDisallowConcurrentExecution(paramModels.get(1));
   }
 
   @Test
@@ -825,5 +826,14 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(paramModel.isRequired(), is(true));
     assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
                is(SchedulingStrategy.class.getName()));
+  }
+
+  private void assertSchedulingDisallowConcurrentExecution(ParameterModel paramModel) {
+    assertThat(paramModel.getName(), is("disallowConcurrentExecution"));
+    assertThat(paramModel.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(paramModel.getType(), instanceOf(DefaultBooleanType.class));
+    assertThat(paramModel.isRequired(), is(false));
+    assertThat(paramModel.getDefaultValue(), is(false));
+    assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(), is(Boolean.class.getName()));
   }
 }
