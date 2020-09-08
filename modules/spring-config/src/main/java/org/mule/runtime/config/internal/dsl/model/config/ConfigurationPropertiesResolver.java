@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.config.internal.dsl.model.config;
 
-public interface ConfigurationPropertiesResolver {
+import java.util.function.UnaryOperator;
+
+public interface ConfigurationPropertiesResolver extends UnaryOperator<String> {
 
   /**
    * Resolves a value by searching and replacing placeholders on it.
@@ -24,5 +26,15 @@ public interface ConfigurationPropertiesResolver {
    * @return the resolved value.
    */
   Object resolvePlaceholderKeyValue(final String placeholderKey);
+
+  @Override
+  default public String apply(String t) {
+    try {
+      final Object resolved = resolveValue(t);
+      return resolved == null ? null : resolved.toString();
+    } catch (PropertyNotFoundException e) {
+      return t;
+    }
+  }
 
 }

@@ -232,6 +232,9 @@ public class ApplicationModel implements ArtifactAst {
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration, astBuilder);
     this.originalAst = astBuilder.build();
 
+    this.originalAst
+        .updatePropertiesResolver(configurationProperties.getConfigurationPropertiesResolver());
+
     this.ast = originalAst;
     indexComponentModels(originalAst);
 
@@ -587,8 +590,7 @@ public class ApplicationModel implements ArtifactAst {
   }
 
   private void convertConfigFileToComponentModel(ArtifactConfig artifactConfig, ArtifactAstBuilder astBuilder) {
-    ComponentModelReader componentModelReader =
-        new ComponentModelReader(configurationProperties.getConfigurationPropertiesResolver());
+    ComponentModelReader componentModelReader = new ComponentModelReader();
 
     List<ConfigFile> configFiles = artifactConfig.getConfigFiles();
     configFiles.stream()

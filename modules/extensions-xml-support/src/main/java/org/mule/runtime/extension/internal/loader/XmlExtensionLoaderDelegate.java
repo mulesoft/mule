@@ -65,6 +65,7 @@ import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.builder.ArtifactAstBuilder;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
@@ -407,19 +408,20 @@ public final class XmlExtensionLoaderDelegate {
       throw new IllegalArgumentException(format("There was an issue trying to read the stream of '%s'", resource.getFile()));
     }
     final ConfigLine configLine = parseModule.get();
-    final ConfigurationPropertiesResolver externalPropertiesResolver = getConfigurationPropertiesResolver(configLine);
-    final ComponentModelReader componentModelReader = new ComponentModelReader(externalPropertiesResolver);
+    final ComponentModelReader componentModelReader = new ComponentModelReader();
 
     final ArtifactAstBuilder artifactAstBuilder = ArtifactAstBuilder.builder(extensions);
     componentModelReader.extractComponentDefinitionModel(configLine, modulePath, artifactAstBuilder.addTopLevelComponent());
-    return artifactAstBuilder.build().topLevelComponentsStream().findAny().get();
+    final ArtifactAst ast = artifactAstBuilder.build();
+    ast.updatePropertiesResolver(getConfigurationPropertiesResolver(ast));
+    return ast.topLevelComponentsStream().findAny().get();
   }
 
-  private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ConfigLine configLine) {
+  private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ArtifactAst ast) {
     // <mule:global-property ... /> properties reader
     final ConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(of(new XmlExtensionConfigurationPropertiesResolver()),
-                                                   createProviderFromGlobalProperties(configLine, modulePath));
+                                                   createProviderFromGlobalProperties(ast, modulePath));
     // system properties, such as "file.separator" properties reader
     final ConfigurationPropertiesResolver systemPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
@@ -433,19 +435,22 @@ public final class XmlExtensionLoaderDelegate {
                                                       externalPropertiesConfigurationProvider);
   }
 
-  private ConfigurationPropertiesProvider createProviderFromGlobalProperties(ConfigLine moduleLine, String modulePath) {
+  private ConfigurationPropertiesProvider createProviderFromGlobalProperties(ArtifactAst ast, String modulePath) {
     final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
-    moduleLine.getChildren().stream()
-        .filter(configLine -> GLOBAL_PROPERTY.equals(configLine.getIdentifier()))
-        .forEach(configLine -> {
-          final String key = configLine.getConfigAttributes().get("name").getValue();
-          final String rawValue = configLine.getConfigAttributes().get("value").getValue();
+
+    // Root element is the mule:module
+    ast.topLevelComponentsStream()
+        .flatMap(comp -> comp.directChildrenStream())
+        .filter(comp -> GLOBAL_PROPERTY.equals(comp.getIdentifier().getName()))
+        .forEach(comp -> {
+          final String key = comp.getRawParameterValue("name").get();
+          final String rawValue = comp.getRawParameterValue("value").get();
           globalProperties.put(key,
                                new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
-                                                                       modulePath, configLine.getLineNumber()),
+                                                                       modulePath, comp.getMetadata().getStartLine().orElse(-1)),
                                                                 key, rawValue));
-
         });
+
     return new GlobalPropertyConfigurationPropertiesProvider(globalProperties);
   }
 

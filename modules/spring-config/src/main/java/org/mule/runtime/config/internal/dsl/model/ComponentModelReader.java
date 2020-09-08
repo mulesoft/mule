@@ -16,7 +16,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.dsl.api.xml.parser.SimpleConfigAttribute;
 import org.mule.runtime.internal.dsl.DslConstants;
@@ -32,12 +31,6 @@ import javax.xml.namespace.QName;
  * It also replaces the values of the attributes by using the {@link Properties} object parametrized in its constructor.
  */
 public class ComponentModelReader {
-
-  private final ConfigurationPropertiesResolver configurationPropertiesResolver;
-
-  public ComponentModelReader(ConfigurationPropertiesResolver configurationPropertiesResolver) {
-    this.configurationPropertiesResolver = configurationPropertiesResolver;
-  }
 
   public void extractComponentDefinitionModel(ConfigLine configLine, String configFileName,
                                               ComponentAstBuilder componentAstBuilder) {
@@ -75,21 +68,16 @@ public class ComponentModelReader {
         .build())
         .withMetadata(metadataBuilder.build());
 
-    componentAstBuilder.withRawParameter(BODY_RAW_PARAM_NAME, resolveValueIfIsPlaceHolder(configLine.getTextContent()));
+    componentAstBuilder.withRawParameter(BODY_RAW_PARAM_NAME, configLine.getTextContent());
 
     for (SimpleConfigAttribute simpleConfigAttribute : configLine.getConfigAttributes().values()) {
       componentAstBuilder.withRawParameter(simpleConfigAttribute.getName(),
-                                           resolveValueIfIsPlaceHolder(simpleConfigAttribute.getValue()));
+                                           simpleConfigAttribute.getValue());
     }
 
     configLine.getChildren().stream()
         .forEach(childConfigLine -> extractComponentDefinitionModel(childConfigLine, configFileName,
                                                                     componentAstBuilder.addChildComponent()));
-  }
-
-  private String resolveValueIfIsPlaceHolder(String value) {
-    Object resolvedValue = configurationPropertiesResolver.resolveValue(value);
-    return resolvedValue instanceof String ? (String) resolvedValue : (resolvedValue != null ? resolvedValue.toString() : null);
   }
 
 }
