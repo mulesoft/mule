@@ -79,6 +79,34 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
   }
 
   @Test
+  public void verifyEnablingAndDisablingStats() throws IOException {
+    getStatistics().setEnabled(false);
+    consumeInputStream();
+
+    final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
+    verifyNoStatistics(statistics);
+
+    getStatistics().enablePayloadStatistics(true);
+
+    consumeInputStream();
+
+    // verify stats change
+    assertThat(statistics.getInputByteCount(), is(1L));
+    assertThat(statistics.getInputObjectCount(), is(0L));
+    assertThat(statistics.getOutputByteCount(), is(0L));
+    assertThat(statistics.getOutputObjectCount(), is(0L));
+
+    getStatistics().enablePayloadStatistics(false);
+    consumeInputStream();
+
+    // verify stats do not change
+    assertThat(statistics.getInputByteCount(), is(1L));
+    assertThat(statistics.getInputObjectCount(), is(0L));
+    assertThat(statistics.getOutputByteCount(), is(0L));
+    assertThat(statistics.getOutputObjectCount(), is(0L));
+  }
+
+  @Test
   public void decorateInputStreamNotMixesComponents() throws IOException {
     final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1)
         .decorateInput(new ByteArrayInputStream("Hello World".getBytes(UTF_8)), CORR_ID);
@@ -673,5 +701,11 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
 
     assertThat(statistics.getInputByteCount(), is(0L));
     assertThat(statistics.getInputObjectCount(), is(0L));
+  }
+
+  private void consumeInputStream() throws IOException {
+    InputStream decorated = new ByteArrayInputStream("Hello World".getBytes(UTF_8));
+    InputStream decorator = decoratorFactory.componentDecoratorFactory(component1).decorateInput(decorated, CORR_ID);
+    decorator.read();
   }
 }
