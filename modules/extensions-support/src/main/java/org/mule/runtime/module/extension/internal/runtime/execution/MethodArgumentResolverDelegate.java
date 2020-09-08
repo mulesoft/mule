@@ -10,6 +10,9 @@ import static java.lang.System.arraycopy;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
+import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.visitable;
+import static org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor.builder;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInputOperation;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
@@ -32,6 +35,8 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor;
+import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -74,6 +79,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgu
 import org.mule.runtime.module.extension.internal.runtime.resolver.NotificationHandlerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RetryPolicyTemplateArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RouterCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SecurityContextHandlerArgumentResolver;
@@ -97,6 +103,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import javax.inject.Inject;
 
@@ -413,18 +420,9 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     protected Object decorate(Object value, String eventCorrelationId) {
-      return resolveCursor((TypedValue) value, v -> {
-        if (v instanceof InputStream) {
-          return componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
-        } else if (v instanceof Collection) {
-          return componentDecoratorFactory.decorateInput((Collection) v, eventCorrelationId);
-        } else if (v instanceof Iterator) {
-          return componentDecoratorFactory.decorateInput((Iterator) v, eventCorrelationId);
-        } else {
-          return v;
-        }
-      });
+      return resolveCursor((TypedValue) value, decorateInputOperation(eventCorrelationId, componentDecoratorFactory));
     }
+
   }
 
   private static class TypedValueArgumentResolverDecorator extends ArgumentResolverDecorator {
@@ -441,13 +439,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     protected Object decorate(Object value, String eventCorrelationId) {
       Object v = ((TypedValue) value).getValue();
 
-      if (v instanceof InputStream) {
-        v = componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
-      } else if (v instanceof Collection) {
-        v = componentDecoratorFactory.decorateInput((Collection) v, eventCorrelationId);
-      } else if (v instanceof Iterator) {
-        v = componentDecoratorFactory.decorateInput((Iterator) v, eventCorrelationId);
-      }
+      v = decorateInputOperation(eventCorrelationId, componentDecoratorFactory).apply(v);
 
       if (v != ((TypedValue) value).getValue()) {
         return new TypedValue<>(v, DataType.builder()
@@ -472,16 +464,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     protected Object decorate(Object value, String eventCorrelationId) {
-      final Object resolved = resolveCursor(value);
-      if (resolved instanceof InputStream) {
-        return componentDecoratorFactory.decorateInput((InputStream) resolved, eventCorrelationId);
-      } else if (resolved instanceof Collection) {
-        return componentDecoratorFactory.decorateInput((Collection) resolved, eventCorrelationId);
-      } else if (resolved instanceof Iterator) {
-        return componentDecoratorFactory.decorateInput((Iterator) resolved, eventCorrelationId);
-      } else {
-        return resolved;
-      }
+      return decorateInputOperation(eventCorrelationId, componentDecoratorFactory).apply(resolveCursor(value));
     }
   }
 
