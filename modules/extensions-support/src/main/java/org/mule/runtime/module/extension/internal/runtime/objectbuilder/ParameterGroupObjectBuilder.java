@@ -12,6 +12,7 @@ import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.vi
 import static org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor.builder;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.decorateOperation;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
@@ -28,6 +29,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecution
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -114,11 +116,11 @@ public class ParameterGroupObjectBuilder<T> {
         Object resolvedValue = resolveValue(new StaticValueResolver<>(parameters
             .apply(name)), context);
         Object value = context == null || context.resolveCursors()
-            ? resolveCursor(resolvedValue, isContent ? v -> visitable(v).map(visitable -> visitable
-                .accept(builder()
-                    .withFactory(componentDecoratorFactory).withCorrelationId(context.getEvent().getCorrelationId()).build()))
-                .orElse(v)
-                : identity())
+            ? resolveCursor(resolvedValue,
+                            isContent
+                                ? decorateOperation(context.getEvent().getCorrelationId(),
+                                                    componentDecoratorFactory)
+                                : identity())
             : resolvedValue;
         field.set(object, value);
       }
