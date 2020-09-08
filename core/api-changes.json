@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.management.stats.AllStatistics::enablePayloadStatistics(boolean)",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "enablePayloadStatistics",
+          "elementKind": "method",
+          "justification": "Needed for disabling new payload stats"
+        },
+        {
           "code": "java.field.addedStaticField",
           "new": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY",
           "package": "org.mule.runtime.core.api.config",
