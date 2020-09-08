@@ -57,7 +57,6 @@ public class InputDecoratorVisitor<T> implements Visitor<T> {
     return (Set<T>) decoratorFactory.decorateInput(visitableSet, correlationId);
   }
 
-
   @Override
   public CursorStreamProvider visitCursorStreamProvider(VisitableCursorStreamProvider cursorStreamProvider) {
     return new InputDecoratedCursorStreamProvider(cursorStreamProvider.getDelegate(), decoratorFactory, correlationId);
