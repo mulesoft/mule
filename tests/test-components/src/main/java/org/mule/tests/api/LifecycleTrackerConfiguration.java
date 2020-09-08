@@ -15,16 +15,14 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.tests.internal.BaseLifecycleTracker;
 import org.mule.tests.internal.LifecycleTrackerOperations;
-import org.mule.tests.internal.LifecycleTrackerScope;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Configuration(name = "lifecycleTrackerConfig")
-@Operations({LifecycleTrackerOperations.class, LifecycleTrackerScope.class})
+@Operations({LifecycleTrackerOperations.class})
 @Sources(LifecycleTrackerSource.class)
-public class LifecycleTrackerConfiguration extends BaseLifecycleTracker
-{
+public class LifecycleTrackerConfiguration extends BaseLifecycleTracker {
 
     @RefName
     private String configName;
