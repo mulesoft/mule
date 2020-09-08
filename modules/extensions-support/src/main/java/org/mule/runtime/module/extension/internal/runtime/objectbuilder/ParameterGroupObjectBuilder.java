@@ -8,11 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static java.util.function.UnaryOperator.identity;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
-import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.visitable;
-import static org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor.builder;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInputOperation;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.decorateOperation;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
@@ -29,7 +27,6 @@ import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecution
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -118,8 +115,8 @@ public class ParameterGroupObjectBuilder<T> {
         Object value = context == null || context.resolveCursors()
             ? resolveCursor(resolvedValue,
                             isContent
-                                ? decorateOperation(context.getEvent().getCorrelationId(),
-                                                    componentDecoratorFactory)
+                                ? decorateInputOperation(context.getEvent().getCorrelationId(),
+                                                         componentDecoratorFactory)
                                 : identity())
             : resolvedValue;
         field.set(object, value);

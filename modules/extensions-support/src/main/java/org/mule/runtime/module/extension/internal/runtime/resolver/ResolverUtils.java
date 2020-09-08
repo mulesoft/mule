@@ -93,26 +93,6 @@ public class ResolverUtils {
     return null;
   }
 
-  /**
-   * Generates an operation for value input decoration
-   * 
-   * @param eventCorrelationId the correlationId of the context involed
-   * @param componentDecoratorFactory the component decorator factory
-   * @return operator for decoration
-   */
-  public static UnaryOperator decorateOperation(String eventCorrelationId,
-                                                     CursorComponentDecoratorFactory componentDecoratorFactory) {
-    return decorateOperation(eventCorrelationId, componentDecoratorFactory, InputDecoratorVisitor.builder()
-        .withFactory(componentDecoratorFactory).withCorrelationId(eventCorrelationId).build());
-  }
-
-  private static UnaryOperator decorateOperation(String eventCorrelationId,
-                                                 CursorComponentDecoratorFactory componentDecoratorFactory, Visitor visitor) {
-    return v -> visitable(v)
-        .map(visitable -> visitable.accept(visitor))
-        .orElse(v);
-  }
-
   public static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext)
       throws MuleException {
     T resolve = valueResolver.resolve(resolvingContext);

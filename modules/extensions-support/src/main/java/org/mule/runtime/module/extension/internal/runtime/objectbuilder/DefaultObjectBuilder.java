@@ -13,12 +13,10 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.visitable;
-import static org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor.builder;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInputOperation;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.decorateOperation;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveTypedValue;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
@@ -41,7 +39,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
@@ -130,7 +127,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
 
     for (Map.Entry<FieldSetter, ValueResolver<Object>> entry : resolvers.entrySet()) {
       final Object resolvedValue = resolveValue(entry.getValue(), context);
-      UnaryOperator decorateOperation = decorateOperation(context.getEvent().getCorrelationId(), componentDecoratorFactory);
+      UnaryOperator decorateOperation = decorateInputOperation(context.getEvent().getCorrelationId(), componentDecoratorFactory);
 
       entry.getKey().set(object,
                          context == null || context.resolveCursors()
