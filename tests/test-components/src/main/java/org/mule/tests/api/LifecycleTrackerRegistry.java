@@ -6,19 +6,18 @@
  */
 package org.mule.tests.api;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LifecycleTrackerRegistry {
 
-  private final Map<String, Collection<String>> phasesByTracker = new ConcurrentHashMap<>();
+  private final Map<String, LifecycleTracker> trackers = new ConcurrentHashMap<>();
 
-  public Collection<String> get(String trackerName) {
-    return phasesByTracker.get(trackerName);
+  public LifecycleTracker get(String trackerName) {
+    return trackers.get(trackerName);
   }
 
-  public void add(String trackerName, Collection<String> phases) {
-    phasesByTracker.put(trackerName, phases);
+  public void add(String trackerName, LifecycleTracker tracker) {
+    trackers.put(trackerName, tracker);
   }
 }

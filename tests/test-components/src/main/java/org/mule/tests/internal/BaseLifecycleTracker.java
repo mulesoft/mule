@@ -16,6 +16,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.tests.api.LifecycleTracker;
 import org.mule.tests.api.LifecycleTrackerRegistry;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public abstract class AbstractLifecycleTracker implements Lifecycle, MuleContextAware {
+public class BaseLifecycleTracker implements Lifecycle, MuleContextAware, LifecycleTracker {
 
     @Inject
     private LifecycleTrackerRegistry registry;
@@ -33,7 +34,7 @@ public abstract class AbstractLifecycleTracker implements Lifecycle, MuleContext
     private MuleContext muleContext = null;
     private final List<String> alreadyCalledPhases = new ArrayList<>();
 
-    public AbstractLifecycleTracker(boolean shouldCheck) {
+    public BaseLifecycleTracker(boolean shouldCheck) {
         this.shouldCheck = shouldCheck;
     }
 
@@ -49,8 +50,20 @@ public abstract class AbstractLifecycleTracker implements Lifecycle, MuleContext
     protected void onDispose() {
     }
 
+    protected void onSetMuleContext(MuleContext muleContext) {
+    }
+
+    public void addTrackingDataToRegistry(String trackerName, LifecycleTrackerRegistry registry) {
+        registry.add(trackerName, this);
+    }
+
     protected void addTrackingDataToRegistry(String trackerName) {
-        registry.add(trackerName, alreadyCalledPhases);
+        addTrackingDataToRegistry(trackerName, registry);
+    }
+
+    @Override
+    public List<String> getCalledPhases() {
+        return alreadyCalledPhases;
     }
 
     private void trackPhase(String phase) {
@@ -87,7 +100,8 @@ public abstract class AbstractLifecycleTracker implements Lifecycle, MuleContext
     @Override
     public void setMuleContext(MuleContext context) {
         if (muleContext == null) {
-            alreadyCalledPhases.add("setMuleContext");
+            trackPhase("setMuleContext");
+            onSetMuleContext(muleContext);
         }
         muleContext = context;
     }

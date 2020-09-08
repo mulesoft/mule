@@ -27,11 +27,18 @@
     </test-components:lifecycle-tracker-config>
 
     <flow name="lifecycleFlow">
+        <test-components:lifecycle-tracker-source name="src"/>
+
         <set-variable variableName="someBool" value="true"/>
         <test-components:lifecycle-tracker name="first"/>
         <test-components:lifecycle-tracker name="second"/>
         <test-components:lifecycle-tracker-check name="check"/>
         <logger level="WARN" />
-    </flow>
+    </flow>         
 
+    <flow name="flowWithScope">
+        <test-components:lifecycle-tracker-scope name="scope">
+            <test-components:lifecycle-tracker name="nestedTracker"/>
+        </test-components:lifecycle-tracker-scope >
+    </flow>
 </mule>

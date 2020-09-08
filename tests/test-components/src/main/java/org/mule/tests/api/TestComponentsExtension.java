@@ -18,7 +18,6 @@ import org.mule.tests.api.pojos.MyPojo;
 import org.mule.tests.api.pojos.ParameterCollectionParser;
 import org.mule.tests.api.pojos.SameChildTypeContainer;
 import org.mule.tests.api.pojos.TextPojo;
-import org.mule.tests.internal.LifecycleTrackerConfiguration;
 import org.mule.tests.internal.QueueConfiguration;
 import org.mule.tests.internal.SkeletonSource;
 

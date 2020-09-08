@@ -22,7 +22,7 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
-import org.mule.tests.internal.AbstractLifecycleTracker;
+import org.mule.tests.internal.BaseLifecycleTracker;
 
 import java.util.Optional;
 
@@ -53,7 +53,7 @@ public class LifecycleTrackerEnricher implements DeclarationEnricher {
         };
     }
 
-    private static class LifecycleTrackerComponentExecutorDecorator extends AbstractLifecycleTracker implements CompletableComponentExecutor<ComponentModel> {
+    private static class LifecycleTrackerComponentExecutorDecorator extends BaseLifecycleTracker implements CompletableComponentExecutor<ComponentModel> {
 
         private static final Logger LOGGER = getLogger(LifecycleTrackerComponentExecutorDecorator.class);
 

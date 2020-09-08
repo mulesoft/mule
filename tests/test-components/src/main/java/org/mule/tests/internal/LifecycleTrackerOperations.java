@@ -6,8 +6,12 @@
  */
 package org.mule.tests.internal;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 
 /**
  * This class is only used to declare the operations, actual behavior is at
@@ -21,4 +25,10 @@ public class LifecycleTrackerOperations {
     public void lifecycleTracker(String name) {
     }
 
+    @MediaType(value = ANY)
+    public void lifecycleTrackerScope(String name,
+                                      Chain operations,
+                                      CompletionCallback<Object, Object> callback) {
+        operations.process(callback::success, (error, previous) -> callback.error(error));
+    }
 }
