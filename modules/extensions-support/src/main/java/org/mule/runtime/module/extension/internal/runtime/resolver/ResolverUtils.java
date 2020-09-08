@@ -12,6 +12,8 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.visitable;
+import static org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor.builder;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
@@ -28,6 +30,10 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor;
+import org.mule.runtime.core.internal.management.stats.visitor.OutputDecoratorVisitor;
+import org.mule.runtime.core.internal.management.stats.visitor.Visitor;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 
 import java.util.Optional;
@@ -134,7 +140,18 @@ public class ResolverUtils {
     if (value instanceof CursorProvider) {
       return valueMapper.apply(((CursorProvider) value).openCursor());
 
-    } else if (value instanceof TypedValue) {
+    }
+
+    return resolveTypedValue(value, valueMapper);
+  }
+
+  /**
+   * Obtains the value of a {@link TypedValue} if appropriate.
+   *
+   * @return the given {@code value} from a typedValue.
+   */
+  public static Object resolveTypedValue(Object value, UnaryOperator valueMapper) {
+    if (value instanceof TypedValue) {
       return resolveCursor((TypedValue) value, valueMapper);
     }
 
@@ -176,7 +193,8 @@ public class ResolverUtils {
       if (stackedTypesModelProperty.isPresent()) {
         resolver = stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(expression,
                                                                                                              getType(type));
-        //TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be removed once implemented
+        // TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos
+        // The following "IFs" should be removed once implemented
       } else if (isTypedValue.getAsBoolean()) {
         ExpressionTypedValueValueResolver<Object> valueResolver =
             new ExpressionTypedValueValueResolver<>(expression, getType(type));
