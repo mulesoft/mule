@@ -50,7 +50,6 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
     if (mutantResponse.getBody().getValue() instanceof CursorStreamProvider) {
       ((CursorStreamProvider) mutantResponse.getBody().getValue()).openCursor().read(new byte[1024]);
     }
-
   }
 
   @Override
