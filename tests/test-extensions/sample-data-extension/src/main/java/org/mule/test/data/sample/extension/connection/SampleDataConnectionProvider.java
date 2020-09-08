@@ -6,11 +6,12 @@
  */
 package org.mule.test.data.sample.extension.connection;
 
-import static org.mule.sdk.api.connectivity.ConnectionValidationResult.success;
+
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.sdk.api.connectivity.ConnectionProvider;
-import org.mule.sdk.api.connectivity.ConnectionValidationResult;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.test.data.sample.extension.SampleDataConnection;
 
 public class SampleDataConnectionProvider implements ConnectionProvider<SampleDataConnection> {

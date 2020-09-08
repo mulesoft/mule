@@ -73,7 +73,7 @@ public class ValueProviderFactory {
         Object connection = connectionSupplier.get();
         if (connection == null) {
           throw new ValueResolvingException("The value provider requires a connection and none was provided",
-                  MISSING_REQUIRED_PARAMETERS);
+                                            MISSING_REQUIRED_PARAMETERS);
         }
         setValueIntoField(resolver, connectionSupplier.get(), connectionField);
       }
@@ -82,7 +82,7 @@ public class ValueProviderFactory {
         Object config = configurationSupplier.get();
         if (config == null) {
           throw new ValueResolvingException("The value provider requires a configuration and none was provided",
-                  MISSING_REQUIRED_PARAMETERS);
+                                            MISSING_REQUIRED_PARAMETERS);
         }
         setValueIntoField(resolver, configurationSupplier.get(), configField);
       }
@@ -116,7 +116,7 @@ public class ValueProviderFactory {
 
     if (!missingParameters.isEmpty()) {
       throw new ValueResolvingException("Unable to retrieve values. There are missing required parameters for the resolution: "
-              + missingParameters, MISSING_REQUIRED_PARAMETERS);
+          + missingParameters, MISSING_REQUIRED_PARAMETERS);
     }
   }
 }

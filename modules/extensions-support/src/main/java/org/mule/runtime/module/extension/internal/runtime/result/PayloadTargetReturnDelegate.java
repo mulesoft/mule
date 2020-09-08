@@ -31,10 +31,10 @@ public final class PayloadTargetReturnDelegate extends AbstractReturnDelegate {
    * @param target the name of the variable in which the output message will be set
    */
   public PayloadTargetReturnDelegate(String target,
-                              ComponentModel componentModel,
-                              CursorComponentDecoratorFactory componentDecoratorFactory,
-                              CursorProviderFactory cursorProviderFactory,
-                              MuleContext muleContext) {
+                                     ComponentModel componentModel,
+                                     CursorComponentDecoratorFactory componentDecoratorFactory,
+                                     CursorProviderFactory cursorProviderFactory,
+                                     MuleContext muleContext) {
     super(componentModel, componentDecoratorFactory, cursorProviderFactory, muleContext);
     this.target = target;
   }

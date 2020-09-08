@@ -86,16 +86,17 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
     Map<String, String> parameterNames = getContainerParameterNames(allParameters);
 
     Class<? extends SampleDataProvider> resolverClass = annotation.value();
-    SampleDataProviderFactoryModelPropertyBuilder propertyBuilder = new SampleDataProviderFactoryModelPropertyBuilder(resolverClass);
+    SampleDataProviderFactoryModelPropertyBuilder propertyBuilder =
+        new SampleDataProviderFactoryModelPropertyBuilder(resolverClass);
 
     ParameterizableTypeWrapper resolverClassWrapper =
-            new ParameterizableTypeWrapper(resolverClass, new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
+        new ParameterizableTypeWrapper(resolverClass, new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
 
     List<ExtensionParameter> resolverParameters = resolverClassWrapper.getParametersAnnotatedWith(Parameter.class);
     resolverParameters.addAll(resolverClassWrapper.getParametersAnnotatedWith(org.mule.sdk.api.annotation.param.Parameter.class));
 
     resolverParameters.forEach(param -> propertyBuilder
-            .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired()));
+        .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired()));
 
     Reference<Boolean> requiresConfiguration = new Reference<>(false);
     Reference<Boolean> requiresConnection = new Reference<>(false);
@@ -106,10 +107,10 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
     declaration.addModelProperty(propertyBuilder.build());
 
     return new SampleDataProviderModel(
-            getRequiredParametersAliases(resolverParameters, parameterNames),
-            getSampleDataProviderId(resolverClass),
-            requiresConfiguration.get(),
-            requiresConnection.get());
+                                       getRequiredParametersAliases(resolverParameters, parameterNames),
+                                       getSampleDataProviderId(resolverClass),
+                                       requiresConfiguration.get(),
+                                       requiresConnection.get());
   }
 
   /**
@@ -124,7 +125,7 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
   private Optional<Field> enrichWithConnection(SampleDataProviderFactoryModelPropertyBuilder modelPropertyBuilder,
                                                ParameterizableTypeWrapper parameterizableComponent) {
     List<FieldElement> connectionFields = parameterizableComponent.getAnnotatedFields(Connection.class,
-            org.mule.sdk.api.annotation.param.Connection.class);
+                                                                                      org.mule.sdk.api.annotation.param.Connection.class);
     if (!connectionFields.isEmpty()) {
       Field field = connectionFields.get(0).getField().get();
       modelPropertyBuilder.withConnection(field);
@@ -145,7 +146,7 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
   private Optional<Field> enrichWithConfiguration(SampleDataProviderFactoryModelPropertyBuilder modelPropertyBuilder,
                                                   ParameterizableTypeWrapper parameterizableComponent) {
     List<FieldElement> configFields = parameterizableComponent.getAnnotatedFields(Config.class,
-            org.mule.sdk.api.annotation.param.Config.class);
+                                                                                  org.mule.sdk.api.annotation.param.Config.class);
     if (!configFields.isEmpty()) {
       Field field = configFields.get(0).getField().get();
       modelPropertyBuilder.withConfig(field);
@@ -157,9 +158,9 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
   private List<String> getRequiredParametersAliases(List<ExtensionParameter> parameterDeclarations,
                                                     Map<String, String> parameterNames) {
     return parameterDeclarations.stream()
-            .filter(ExtensionParameter::isRequired)
-            .map(param -> parameterNames.getOrDefault(param.getName(), param.getName()))
-            .collect(toList());
+        .filter(ExtensionParameter::isRequired)
+        .map(param -> parameterNames.getOrDefault(param.getName(), param.getName()))
+        .collect(toList());
   }
 
   private Map<String, String> getContainerParameterNames(List<ParameterDeclaration> allParameters) {

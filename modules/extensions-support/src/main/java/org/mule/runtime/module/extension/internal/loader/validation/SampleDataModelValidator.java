@@ -77,9 +77,9 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
                              ProblemsReporter problemsReporter,
                              Delegate delegate,
                              ReflectionCache reflectionCache) {
-    model.getModelProperty(SampleDataProviderFactoryModelProperty.class).ifPresent(modelProperty ->
-            validateResolver(model, modelHasConfig, modelProperty, problemsReporter, reflectionCache,
-                    delegate));
+    model.getModelProperty(SampleDataProviderFactoryModelProperty.class)
+        .ifPresent(modelProperty -> validateResolver(model, modelHasConfig, modelProperty, problemsReporter, reflectionCache,
+                                                     delegate));
   }
 
   private void validateResolver(ConnectableComponentModel model,
@@ -95,11 +95,11 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
       throw new IllegalStateException(format("Component %s should have an associated SampleDataProviderModel.", model.getName()));
     } else {
       delegate.addInfo(
-              new SampleDataProviderInfo(providerModel.get(), model, providerClass.getName()));
+                       new SampleDataProviderInfo(providerModel.get(), model, providerClass.getName()));
     }
 
     Map<String, MetadataType> allParameters =
-            model.getAllParameterModels().stream().collect(toMap(IntrospectionUtils::getImplementingName, ParameterModel::getType));
+        model.getAllParameterModels().stream().collect(toMap(IntrospectionUtils::getImplementingName, ParameterModel::getType));
     String modelName = getModelName(model);
     String modelTypeName = getComponentModelTypeName(model);
 
@@ -111,36 +111,36 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
 
       if (!allParameters.containsKey(parameterInfo.getParameterName())) {
         problemsReporter.addError(new Problem(model,
-                format("The SampleDataProvider [%s] declares a parameter '%s' which doesn't exist in the %s '%s'",
-                        providerName, parameterInfo.getParameterName(), modelTypeName, modelName)));
+                                              format("The SampleDataProvider [%s] declares a parameter '%s' which doesn't exist in the %s '%s'",
+                                                     providerName, parameterInfo.getParameterName(), modelTypeName, modelName)));
       } else {
         MetadataType metadataType = allParameters.get(parameterInfo.getParameterName());
         Class<?> expectedType = getType(metadataType)
-                .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
-                        parameterInfo.getParameterName())));
+            .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
+                                                                parameterInfo.getParameterName())));
         Class<?> gotType = getType(parameterInfo.getType())
-                .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
-                        parameterInfo.getParameterName())));
+            .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
+                                                                parameterInfo.getParameterName())));
 
         if (!expectedType.equals(gotType)) {
           problemsReporter.addError(new Problem(model,
-                  format("The SampleDataProvider [%s] defines a parameter '%s' of type '%s' but in the %s '%s' is of type '%s'",
-                          providerName, parameterInfo.getParameterName(), gotType, modelTypeName,
-                          modelName, expectedType)));
+                                                format("The SampleDataProvider [%s] defines a parameter '%s' of type '%s' but in the %s '%s' is of type '%s'",
+                                                       providerName, parameterInfo.getParameterName(), gotType, modelTypeName,
+                                                       modelName, expectedType)));
         }
       }
     }
 
     if (modelProperty.usesConnection() && !model.requiresConnection()) {
       problemsReporter.addError(new Problem(model,
-              format("The SampleDataProvider [%s] defines that it requires a connection, but is used in the %s '%s' which is connection less",
-                      providerName, modelTypeName, modelName)));
+                                            format("The SampleDataProvider [%s] defines that it requires a connection, but is used in the %s '%s' which is connection less",
+                                                   providerName, modelTypeName, modelName)));
     }
 
     if (modelProperty.usesConfig() && !modelHasConfig) {
       problemsReporter.addError(new Problem(model,
-              format("The SampleDataProvider [%s] defines that it requires a config, but is used in the %s '%s' which is config less",
-                      providerName, modelTypeName, modelName)));
+                                            format("The SampleDataProvider [%s] defines that it requires a config, but is used in the %s '%s' which is config less",
+                                                   providerName, modelTypeName, modelName)));
     }
   }
 
@@ -197,9 +197,9 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
           String firstImpl = implementationIds.get(0);
           SampleDataProviderInfo sampleDataProviderInfo = implInfo.get(firstImpl);
           problemsReporter.addError(new Problem(sampleDataProviderInfo.getOwnerModel(),
-                  format("The following SampleDataProvider implementations [%s] use the same id [%s]. "
-                                  + "SampleDataProvider ids must be unique.",
-                          join(", ", implementationIds), providerId)));
+                                                format("The following SampleDataProvider implementations [%s] use the same id [%s]. "
+                                                    + "SampleDataProvider ids must be unique.",
+                                                       join(", ", implementationIds), providerId)));
         }
       });
     }

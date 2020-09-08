@@ -6,6 +6,8 @@
  */
 package org.mule.test.data.sample.extension.resolver;
 
+import static org.mule.test.data.sample.extension.SampleDataExtension.adaptLegacy;
+
 import org.mule.sdk.api.annotation.param.Parameter;
 import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.sdk.api.runtime.operation.Result;
@@ -21,6 +23,6 @@ public class ParameterizedTestSampleDataProvider extends TestSampleDataProvider 
 
   @Override
   public Result<String, String> getSample() throws SampleDataException {
-    return new SampleDataOperations().connectionLess(payload, attributes);
+    return adaptLegacy(new SampleDataOperations().connectionLess(payload, attributes));
   }
 }

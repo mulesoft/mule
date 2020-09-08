@@ -31,8 +31,8 @@ public class SampleDataUtils {
       provider = instantiateClass(providerClass);
     } catch (Exception e) {
       throw new IllegalStateException(format("There was an error creating an instance of %s to retrieve the Id of the provider",
-              providerClass.getName()),
-              e);
+                                             providerClass.getName()),
+                                      e);
     }
     return provider.getId();
   }

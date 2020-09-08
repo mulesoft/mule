@@ -24,14 +24,14 @@ public class MuleSampleDataService implements SampleDataService {
 
   @Inject
   private ConfigurationComponentLocator componentLocator;
-  
+
   @Override
   public Message getSampleData(Location location) throws SampleDataException {
     boolean isConnection = isConnection(location);
 
     Location realLocation = isConnection
-            ? deleteLastPartFromLocation(location)
-            : location;
+        ? deleteLastPartFromLocation(location)
+        : location;
 
     Object component = findComponent(realLocation);
 
@@ -40,14 +40,14 @@ public class MuleSampleDataService implements SampleDataService {
     }
 
     throw new SampleDataException(format("The found element in the Location [%s] is not capable of provide Values",
-            location),
-            NOT_SUPPORTED);
+                                         location),
+                                  NOT_SUPPORTED);
   }
 
   private Object findComponent(Location location) throws SampleDataException {
     return componentLocator.find(location)
-            .orElseThrow(() -> new SampleDataException(format("Invalid location [%s]. No element found in the given location.",
-                    location),
-                    SampleDataException.INVALID_LOCATION));
+        .orElseThrow(() -> new SampleDataException(format("Invalid location [%s]. No element found in the given location.",
+                                                          location),
+                                                   SampleDataException.INVALID_LOCATION));
   }
 }

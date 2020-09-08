@@ -111,7 +111,7 @@ import org.slf4j.Logger;
  */
 public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractComponent
     implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
-        ComponentSampleDataProvider, Lifecycle {
+    ComponentSampleDataProvider, Lifecycle {
 
   private final static Logger LOGGER = getLogger(ExtensionComponent.class);
 
@@ -411,13 +411,13 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   public Set<Value> getValues(String parameterName) throws ValueResolvingException {
     try {
       return runWithResolvingContext(context -> withContextClassLoader(classLoader,
-                                                                            () -> getValueProviderMediator()
-                                                                                .getValues(parameterName,
-                                                                                           getParameterValueResolver(),
-                                                                                           (CheckedSupplier<Object>) () -> context
-                                                                                               .getConnection().orElse(null),
-                                                                                           (CheckedSupplier<Object>) () -> context
-                                                                                               .getConfig().orElse(null))));
+                                                                       () -> getValueProviderMediator()
+                                                                           .getValues(parameterName,
+                                                                                      getParameterValueResolver(),
+                                                                                      (CheckedSupplier<Object>) () -> context
+                                                                                          .getConnection().orElse(null),
+                                                                                      (CheckedSupplier<Object>) () -> context
+                                                                                          .getConfig().orElse(null))));
     } catch (MuleRuntimeException e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof ValueResolvingException) {
@@ -438,23 +438,22 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public Message getSampleData() throws SampleDataException {
     try {
-      return runWithResolvingContext(context -> withContextClassLoader(classLoader, () ->
-        getSampleDataProviderMediator().getSampleData(getParameterValueResolver(),
-                (CheckedSupplier<Object>) () -> context.getConnection().orElse(null),
-                (CheckedSupplier<Object>) () -> context.getConfig().orElse(null))
-      ));
+      return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getSampleDataProviderMediator()
+          .getSampleData(getParameterValueResolver(),
+                         (CheckedSupplier<Object>) () -> context.getConnection().orElse(null),
+                         (CheckedSupplier<Object>) () -> context.getConfig().orElse(null))));
     } catch (MuleRuntimeException e) {
-        Throwable rootException = getRootException(e);
-        if (rootException instanceof SampleDataException) {
-          throw (SampleDataException) rootException;
-        } else {
-          throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
-                  SampleDataException.UNKNOWN, e);
-        }
+      Throwable rootException = getRootException(e);
+      if (rootException instanceof SampleDataException) {
+        throw (SampleDataException) rootException;
+      } else {
+        throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
+                                      SampleDataException.UNKNOWN, e);
+      }
 
     } catch (Exception e) {
       throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
-              SampleDataException.UNKNOWN, e);
+                                    SampleDataException.UNKNOWN, e);
     }
   }
 
@@ -659,12 +658,12 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       synchronized (this) {
         if (sampleDataProviderMediator == null) {
           sampleDataProviderMediator = new SampleDataProviderMediator(
-                  extensionModel,
-                  componentModel,
-                  this,
-                  () -> muleContext,
-                  () -> reflectionCache,
-                  () -> streamingManager);
+                                                                      extensionModel,
+                                                                      componentModel,
+                                                                      this,
+                                                                      () -> muleContext,
+                                                                      () -> reflectionCache,
+                                                                      () -> streamingManager);
         }
       }
     }

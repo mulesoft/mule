@@ -95,9 +95,9 @@ public final class SampleDataProviderFactoryModelProperty implements ModelProper
    */
   public List<String> getRequiredParameters() {
     return injectableParameters
-            .stream()
-            .map(InjectableParameterInfo::getParameterName)
-            .collect(toList());
+        .stream()
+        .map(InjectableParameterInfo::getParameterName)
+        .collect(toList());
   }
 
   /**
@@ -127,14 +127,14 @@ public final class SampleDataProviderFactoryModelProperty implements ModelProper
                                                  ReflectionCache reflectionCache,
                                                  MuleContext muleContext) {
     return new SampleDataProviderFactory(
-            this,
-            parameterValueResolver,
-            connectionSupplier,
-            configurationSupplier,
-            connectionField,
-            configField,
-            reflectionCache,
-            muleContext);
+                                         this,
+                                         parameterValueResolver,
+                                         connectionSupplier,
+                                         configurationSupplier,
+                                         connectionField,
+                                         configField,
+                                         reflectionCache,
+                                         muleContext);
   }
 
   /**
@@ -171,10 +171,10 @@ public final class SampleDataProviderFactoryModelProperty implements ModelProper
 
     public SampleDataProviderFactoryModelProperty build() {
       return new SampleDataProviderFactoryModelProperty(
-              sampleDataProvider,
-              injectableParameters,
-              connectionField,
-              configField);
+                                                        sampleDataProvider,
+                                                        injectableParameters,
+                                                        connectionField,
+                                                        configField);
     }
   }
 }

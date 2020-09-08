@@ -107,20 +107,21 @@ public class SampleDataProviderMediator {
    */
   public Message getSampleData(ParameterValueResolver parameterValueResolver,
                                Supplier<Object> connectionSupplier,
-                               Supplier<Object> configurationSupplier) throws SampleDataException {
+                               Supplier<Object> configurationSupplier)
+      throws SampleDataException {
     if (sampleDataProperty == null) {
       throw new SampleDataException(
-              format("Component '%s' does not support Sample Data resolution", componentModel.getName()),
-              NOT_SUPPORTED);
+                                    format("Component '%s' does not support Sample Data resolution", componentModel.getName()),
+                                    NOT_SUPPORTED);
     }
 
     try {
       SampleDataProviderFactory factory = sampleDataProperty.createFactory(
-              parameterValueResolver,
-              connectionSupplier,
-              configurationSupplier,
-              reflectionCache.get(),
-              muleContext.get());
+                                                                           parameterValueResolver,
+                                                                           connectionSupplier,
+                                                                           configurationSupplier,
+                                                                           reflectionCache.get(),
+                                                                           muleContext.get());
 
       SampleDataProvider provider = factory.createSampleDataProvider();
       Result result = provider.getSample();
@@ -130,24 +131,24 @@ public class SampleDataProviderMediator {
       throw e;
     } catch (Exception e) {
       throw new SampleDataException(format("An error occurred trying to obtain Sample Data for component '%s'. Cause: %s",
-              componentModel.getName(), e.getMessage()),
-              UNKNOWN, e);
+                                           componentModel.getName(), e.getMessage()),
+                                    UNKNOWN, e);
     }
   }
 
   private ExecutionContextAdapter createExecutionContext(Supplier<Object> configurationSupplier) {
     return new DefaultExecutionContext(extensionModel,
-            ofNullable(configurationSupplier.get()),
-            emptyMap(),
-            componentModel,
-            getNullEvent(muleContext.get()),
-            cursorProviderFactory,
-            NO_OP_INSTANCE,
-            streamingManager.get(),
-            component,
-            new NoRetryPolicyTemplate(),
-            IMMEDIATE_SCHEDULER,
-            empty(),
-            muleContext.get());
+                                       ofNullable(configurationSupplier.get()),
+                                       emptyMap(),
+                                       componentModel,
+                                       getNullEvent(muleContext.get()),
+                                       cursorProviderFactory,
+                                       NO_OP_INSTANCE,
+                                       streamingManager.get(),
+                                       component,
+                                       new NoRetryPolicyTemplate(),
+                                       IMMEDIATE_SCHEDULER,
+                                       empty(),
+                                       muleContext.get());
   }
 }

@@ -7,8 +7,8 @@
 package org.mule.test.data.sample.extension.source;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.sdk.api.runtime.source.Source;
-import org.mule.sdk.api.runtime.source.SourceCallback;
+import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 public abstract class AbstractSource extends Source<String, String> {
 

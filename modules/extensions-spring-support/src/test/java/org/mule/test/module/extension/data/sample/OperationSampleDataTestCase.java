@@ -6,20 +6,6 @@
  */
 package org.mule.test.module.extension.data.sample;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
-import static org.mule.tck.junit4.matcher.ValueMatcher.valueWithId;
-import static org.mule.test.values.extension.resolver.WithErrorValueProvider.ERROR_MESSAGE;
-
-import org.mule.runtime.api.value.ResolvingFailure;
-import org.mule.runtime.api.value.Value;
-import org.mule.runtime.api.value.ValueResult;
-import org.mule.tck.junit4.matcher.ValueMatcher;
-
-import java.util.Set;
-
 import org.junit.Test;
 
 public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
@@ -31,7 +17,7 @@ public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "data/sample/operation-values.xml";
+    return "data/operation-sample-data.xml";
   }
 
   @Test
@@ -69,41 +55,24 @@ public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
     assertMessage(getSample("showInDslParameterGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
-
   @Test
-  public void singleOptionsWithRequiredParameterWithAlias() throws Exception {
-    Set<Value> channels = getValues("singleValuesWithRequiredParameterWithAlias", "channels");
-    assertThat(channels, hasSize(1));
-    assertThat(channels, hasValues("requiredString:dummyValue"));
+  public void aliasedGroup() throws Exception {
+    assertMessage(getSample("aliasedGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
-  public void resolverGetsMuleContextInjection() throws Exception {
-    Set<Value> values = getValues("resolverGetsMuleContextInjection", "channel");
-    assertThat(values, hasSize(1));
-    assertThat(values, hasValues("INJECTED!!!"));
+  public void missingActingParameter() throws Exception {
+    assertMessage(getSample("missingActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
-  public void optionsInsideShowInDslGroup() throws Exception {
-    Set<Value> values = getValues("valuesInsideShowInDslGroup", "values");
-    assertThat(values, hasSize(1));
-    assertThat(values, hasValues("anyParameter:someValue"));
+  public void missingActingParameterInGroup() throws Exception {
+    assertMessage(getSample("missingActingParameterInGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
-  @Test
-  public void optionsInsideShowInDslDynamicGroup() throws Exception {
-    Set<Value> values = getValues("valuesInsideShowInDslDynamicGroup", "values");
-    assertThat(values, hasSize(1));
-    assertThat(values, hasValues("anyParameter:someValue"));
-  }
 
   @Test
-  public void userErrorWhenResolvingValues() throws Exception {
-    ValueResult result = getValueResult("withErrorValueProvider", "values");
-    assertThat(result.getFailure().isPresent(), is(true));
-    ResolvingFailure resolvingFailure = result.getFailure().get();
-    assertThat(resolvingFailure.getFailureCode(), is("CUSTOM_ERROR"));
-    assertThat(resolvingFailure.getMessage(), is(ERROR_MESSAGE));
+  public void muleContextAwareSampleData() throws Exception {
+    assertMessage(getSample("muleContextAwareSampleData"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 }

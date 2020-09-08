@@ -9,13 +9,13 @@ package org.mule.test.data.sample.extension;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 
+import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
-import org.mule.sdk.api.annotation.param.Config;
-import org.mule.sdk.api.annotation.param.Connection;
-import org.mule.sdk.api.annotation.param.Optional;
-import org.mule.sdk.api.annotation.param.ParameterGroup;
-import org.mule.sdk.api.runtime.operation.Result;
-import org.mule.sdk.api.runtime.process.CompletionCallback;
 import org.mule.test.data.sample.extension.config.SampleDataConfig;
 import org.mule.test.data.sample.extension.resolver.ConfigAwareTestSampleDataProvider;
 import org.mule.test.data.sample.extension.resolver.ConnectedTestSampleDataProvider;
@@ -28,11 +28,11 @@ public class SampleDataOperations {
   @SampleData(ParameterizedTestSampleDataProvider.class)
   public Result<String, String> connectionLess(String payload, String attributes) {
     return Result.<String, String>builder()
-            .output(payload)
-            .mediaType(APPLICATION_JSON)
-            .attributes(attributes)
-            .attributesMediaType(APPLICATION_XML)
-            .build();
+        .output(payload)
+        .mediaType(APPLICATION_JSON)
+        .attributes(attributes)
+        .attributesMediaType(APPLICATION_XML)
+        .build();
   }
 
   @SampleData(ConnectedTestSampleDataProvider.class)
@@ -66,7 +66,8 @@ public class SampleDataOperations {
 
   @SampleData(GroupTestSampleDataProvider.class)
   public Result<String, String> showInDslParameterGroup(@Connection SampleDataConnection connection,
-                                                        @ParameterGroup(name = "group", showInDsl = true) SampleDataParameterGroup group) {
+                                                        @ParameterGroup(name = "group",
+                                                            showInDsl = true) SampleDataParameterGroup group) {
     return parameterGroup(connection, group);
   }
 

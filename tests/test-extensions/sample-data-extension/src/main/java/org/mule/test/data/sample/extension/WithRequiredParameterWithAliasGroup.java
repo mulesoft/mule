@@ -4,12 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.values.extension;
+package org.mule.test.data.sample.extension;
 
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.test.values.extension.resolver.WithRequiredParameterWithAliasValueProvider;
 
 public class WithRequiredParameterWithAliasGroup {
 
@@ -18,6 +16,5 @@ public class WithRequiredParameterWithAliasGroup {
   String requiredString;
 
   @Parameter
-  @OfValues(WithRequiredParameterWithAliasValueProvider.class)
   String channels;
 }

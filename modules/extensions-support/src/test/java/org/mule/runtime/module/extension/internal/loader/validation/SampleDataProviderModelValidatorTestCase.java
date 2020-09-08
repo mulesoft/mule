@@ -198,7 +198,7 @@ public class SampleDataProviderModelValidatorTestCase {
 
     validate();
     assertProblems(format("The following SampleDataProvider implementations [%s, %s] use the same id [%s]. SampleDataProvider ids must be unique.",
-            ConfigAwareSampleDataProvider.class.getName(), ConnectedSampleDataProvider.class.getName(), id));
+                          ConfigAwareSampleDataProvider.class.getName(), ConnectedSampleDataProvider.class.getName(), id));
   }
 
   @Test

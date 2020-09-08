@@ -83,7 +83,8 @@ public class SampleDataProviderFactory {
           throw new SampleDataException("Failed to establish connection: " + e.getMessage(), CONNECTION_FAILURE, e);
         }
         if (connection == null) {
-          throw new SampleDataException("The value provider requires a connection and none was provided", MISSING_REQUIRED_PARAMETERS);
+          throw new SampleDataException("The value provider requires a connection and none was provided",
+                                        MISSING_REQUIRED_PARAMETERS);
         }
         setValueIntoField(resolver, connectionSupplier.get(), connectionField);
       }
@@ -91,7 +92,8 @@ public class SampleDataProviderFactory {
       if (factoryModelProperty.usesConfig()) {
         Object config = configurationSupplier.get();
         if (config == null) {
-          throw new SampleDataException("The value provider requires a configuration and none was provided", MISSING_REQUIRED_PARAMETERS);
+          throw new SampleDataException("The value provider requires a configuration and none was provided",
+                                        MISSING_REQUIRED_PARAMETERS);
         }
         setValueIntoField(resolver, configurationSupplier.get(), configField);
       }
@@ -125,7 +127,7 @@ public class SampleDataProviderFactory {
 
     if (!missingParameters.isEmpty()) {
       throw new SampleDataException("Unable to retrieve values. There are missing required parameters for the resolution: "
-              + missingParameters, MISSING_REQUIRED_PARAMETERS);
+          + missingParameters, MISSING_REQUIRED_PARAMETERS);
     }
   }
 }
