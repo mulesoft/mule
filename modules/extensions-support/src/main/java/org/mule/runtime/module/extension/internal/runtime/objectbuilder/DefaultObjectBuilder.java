@@ -127,16 +127,14 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
 
     for (Map.Entry<FieldSetter, ValueResolver<Object>> entry : resolvers.entrySet()) {
       final Object resolvedValue = resolveValue(entry.getValue(), context);
-      UnaryOperator decorateOperation = decorateInputOperation(context.getEvent().getCorrelationId(), componentDecoratorFactory);
-
       entry.getKey().set(object,
                          context == null || context.resolveCursors()
                              ? resolveCursor(resolvedValue,
-                                             entry.getValue().isContent() && componentDecoratorFactory != null ? decorateOperation
+                                             entry.getValue().isContent() && componentDecoratorFactory != null
+                                                 ? decorateInputOperation(context.getEvent().getCorrelationId(),
+                                                                          componentDecoratorFactory)
                                                  : identity())
-                             : entry.getValue().isContent() && componentDecoratorFactory != null
-                                 ? resolveTypedValue(resolvedValue, decorateOperation)
-                                 : resolvedValue);
+                             : resolvedValue);
     }
 
     injectFields(object, name, encoding, reflectionCache);

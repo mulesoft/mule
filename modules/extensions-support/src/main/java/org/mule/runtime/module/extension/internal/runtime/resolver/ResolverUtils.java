@@ -103,11 +103,12 @@ public class ResolverUtils {
   }
 
   /**
-   * Executes the {@code resolver} using the given {@code context}, applying all the required resolution rules that may apply for
+   * Executes the {@code resolver} using the given {@code context},
+   * applying all the required resolution rules that may apply for
    * the given {@code T} type.
    *
    * @param resolver the {@link ValueResolver} to execute
-   * @param context the {@link ValueResolvingContext} to pass on the {@code resolver}
+   * @param context  the {@link ValueResolvingContext} to pass on the {@code resolver}
    * @return the resolved value
    * @throws MuleException
    */
@@ -192,8 +193,8 @@ public class ResolverUtils {
       if (stackedTypesModelProperty.isPresent()) {
         resolver = stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(expression,
                                                                                                              getType(type));
-        // TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be
-        // removed once implemented
+        // TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos
+        // The following "IFs" should be removed once implemented
       } else if (isTypedValue.getAsBoolean()) {
         ExpressionTypedValueValueResolver<Object> valueResolver =
             new ExpressionTypedValueValueResolver<>(expression, getType(type));

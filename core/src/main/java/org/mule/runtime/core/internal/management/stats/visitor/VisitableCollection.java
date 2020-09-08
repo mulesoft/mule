@@ -97,6 +97,4 @@ public class VisitableCollection<T> implements Visitable<Collection<T>>, Collect
     return delegate;
   }
 
-
-
 }

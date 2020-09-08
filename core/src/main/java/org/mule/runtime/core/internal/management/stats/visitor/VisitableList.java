@@ -149,5 +149,4 @@ public class VisitableList<T> implements Visitable<List<T>>, List<T> {
     return delegate;
   }
 
-
 }

@@ -66,7 +66,6 @@ public class OutputDecoratorVisitor<T> implements Visitor<T> {
 
   public static class Builder {
 
-
     private CursorComponentDecoratorFactory factory;
     private String correlationId;
 
