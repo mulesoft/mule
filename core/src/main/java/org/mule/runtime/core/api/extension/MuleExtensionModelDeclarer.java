@@ -213,6 +213,12 @@ class MuleExtensionModelDeclarer {
         .ofType(baseSchedulingStrategy)
         .withExpressionSupport(NOT_SUPPORTED);
 
+    scheduler.onDefaultParameterGroup()
+        .withOptionalParameter("disallowConcurrentExecution")
+        .ofType(typeLoader.load(Boolean.class))
+        .defaultingTo(false)
+        .withExpressionSupport(NOT_SUPPORTED);
+
     MetadataType fixedFrequencyScheduler = typeLoader.load(FixedFrequencyScheduler.class);
     MetadataType cronScheduler = typeLoader.load(CronScheduler.class);
     extensionDeclarer.withSubType(baseSchedulingStrategy, fixedFrequencyScheduler);

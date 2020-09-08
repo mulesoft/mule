@@ -515,7 +515,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(DefaultSchedulerMessageSource.class))
         .withObjectFactoryType(SchedulingMessageSourceFactoryBean.class)
         .withSetterParameterDefinition("disallowConcurrentExecution",
-                                       fromSimpleParameter("disallowConcurrentExecution").withDefaultValue(true).build())
+                                       fromSimpleParameter("disallowConcurrentExecution").withDefaultValue(false).build())
         .withSetterParameterDefinition("scheduler", fromChildConfiguration(PeriodicScheduler.class)
             .withWrapperIdentifier(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER).build())
         .build());
