@@ -6,7 +6,7 @@
  */
 package org.mule.test.module.extension.data.sample;
 
-import org.mule.sdk.api.data.sample.SampleDataException;
+import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
 
 import org.junit.Test;
 
@@ -54,7 +54,7 @@ public class SourcesSampleDataTestCase extends AbstractSampleDataTestCase {
 
   @Test
   public void missingActingParameter() throws Exception {
-    expectedException.expect(SampleDataException.class);
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
     expectedException
         .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
     assertMessage(getSourceSample("missingActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
@@ -62,7 +62,7 @@ public class SourcesSampleDataTestCase extends AbstractSampleDataTestCase {
 
   @Test
   public void missingActingParameterInGroup() throws Exception {
-    expectedException.expect(SampleDataException.class);
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
     expectedException
         .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
     assertMessage(getSourceSample("missingActingParameterInGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);

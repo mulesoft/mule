@@ -6,10 +6,16 @@
  */
 package org.mule.test.module.extension.data.sample;
 
-import org.mule.sdk.api.data.sample.SampleDataException;
+import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
+import static org.mule.test.allure.AllureConstants.SampleData.SAMPLE_DATA;
+import static org.mule.test.allure.AllureConstants.SampleData.SampleDataStory.RESOLVE_BY_LOCATION;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
+@Feature(SAMPLE_DATA)
+@Story(RESOLVE_BY_LOCATION)
 public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
 
   @Override
@@ -59,7 +65,7 @@ public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
 
   @Test
   public void missingActingParameter() throws Exception {
-    expectedException.expect(SampleDataException.class);
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
     expectedException
         .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
     assertMessage(getOperationSample("missingActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
@@ -67,7 +73,7 @@ public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
 
   @Test
   public void missingActingParameterInGroup() throws Exception {
-    expectedException.expect(SampleDataException.class);
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
     expectedException
         .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
     assertMessage(getOperationSample("missingActingParameterInGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);

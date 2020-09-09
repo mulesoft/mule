@@ -24,6 +24,9 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
@@ -72,5 +75,25 @@ public abstract class AbstractSampleDataTestCase extends MuleArtifactFunctionalT
   protected Message getSourceSample(String flowName) throws SampleDataException {
     Location location = Location.builder().globalName(flowName).addSourcePart().build();
     return sampleDataService.getSampleData(location);
+  }
+
+  protected void expectSampleDataException(String failureCode) {
+    expectedException.expect(SampleDataException.class);
+    expectedException.expect(exceptionMatcher(failureCode));
+  }
+
+  private Matcher<SampleDataException> exceptionMatcher(String failureCode) {
+    return new BaseMatcher<SampleDataException>() {
+
+      @Override
+      public boolean matches(Object o) {
+        return ((SampleDataException) o).getFailureCode().equals(failureCode);
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("Unexpected exception code");
+      }
+    };
   }
 }

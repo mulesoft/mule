@@ -9,7 +9,9 @@ package org.mule.runtime.core.internal.data.sample;
 import static java.lang.String.format;
 import static org.mule.runtime.core.internal.util.LocationUtils.deleteLastPartFromLocation;
 import static org.mule.runtime.core.internal.util.LocationUtils.isConnection;
+import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_LOCATION;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
+import static org.mule.sdk.api.data.sample.SampleDataException.NO_DATA_AVAILABLE;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
@@ -20,11 +22,19 @@ import org.mule.sdk.api.data.sample.SampleDataException;
 
 import javax.inject.Inject;
 
+/**
+ * Default implementation of {@link SampleDataService}
+ *
+ * @since 4.4.0
+ */
 public class MuleSampleDataService implements SampleDataService {
 
   @Inject
   private ConfigurationComponentLocator componentLocator;
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Message getSampleData(Location location) throws SampleDataException {
     boolean isConnection = isConnection(location);
@@ -36,18 +46,26 @@ public class MuleSampleDataService implements SampleDataService {
     Object component = findComponent(realLocation);
 
     if (component instanceof ComponentSampleDataProvider) {
-      return ((ComponentSampleDataProvider) component).getSampleData();
+      Message message = ((ComponentSampleDataProvider) component).getSampleData();
+      if (message == null) {
+        throw new SampleDataException(format("No Sample Data available for Element at Location [%s]", location),
+                                      NO_DATA_AVAILABLE);
+      }
+
+      return message;
     }
 
-    throw new SampleDataException(format("The found element in the Location [%s] is not capable of provide Values",
-                                         location),
+    throw new SampleDataException(format("Element at Location [%s] is not capable of providing Sample Data", location),
                                   NOT_SUPPORTED);
   }
 
   private Object findComponent(Location location) throws SampleDataException {
     return componentLocator.find(location)
-        .orElseThrow(() -> new SampleDataException(format("Invalid location [%s]. No element found in the given location.",
-                                                          location),
-                                                   SampleDataException.INVALID_LOCATION));
+        .orElseThrow(() -> new SampleDataException(format("Invalid location [%s]. No element found at location.", location),
+                                                   INVALID_LOCATION));
+  }
+
+  public void setComponentLocator(ConfigurationComponentLocator componentLocator) {
+    this.componentLocator = componentLocator;
   }
 }
