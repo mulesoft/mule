@@ -4,22 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.data.sample.extension.resolver;
+package org.mule.test.data.sample.extension.provider;
 
 import static org.mule.test.data.sample.extension.SampleDataExtension.adaptLegacy;
 
-import org.mule.sdk.api.annotation.param.Connection;
+import org.mule.sdk.api.annotation.param.Parameter;
 import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.sdk.api.runtime.operation.Result;
-import org.mule.test.data.sample.extension.SampleDataConnection;
+import org.mule.test.data.sample.extension.SampleDataOperations;
 
-public class ConnectedTestSampleDataProvider extends ParameterizedTestSampleDataProvider {
+public class ParameterizedTestSampleDataProvider extends TestSampleDataProvider {
 
-  @Connection
-  protected SampleDataConnection connection;
+  @Parameter
+  protected String payload;
+
+  @Parameter
+  protected String attributes;
 
   @Override
   public Result<String, String> getSample() throws SampleDataException {
-    return adaptLegacy(connection.getResult(payload, attributes));
+    return adaptLegacy(new SampleDataOperations().connectionLess(payload, attributes));
   }
 }

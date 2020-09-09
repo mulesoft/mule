@@ -6,83 +6,75 @@
  */
 package org.mule.test.module.extension.data.sample;
 
+import org.mule.sdk.api.data.sample.SampleDataException;
+
+import org.junit.Test;
+
 public class SourcesSampleDataTestCase extends AbstractSampleDataTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "values/sources-values.xml";
+    return "data/sample/source-sample-data.xml";
   }
 
-  /*
   @Test
-  public void singleValues() throws Exception {
-    Set<Value> channels = getValuesFromSource("simple-source", "channel");
-    assertThat(channels, hasSize(3));
-    assertThat(channels, hasValues("channel1", "channel2", "channel3"));
+  public void connectionLess() throws Exception {
+    assertMessage(getSourceSample("connectionLess"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
-  
+
   @Test
-  public void singleValuesEnabledParameterWithConnection() throws Exception {
-    Set<Value> channels = getValuesFromSource("source-with-connection", "channel");
-    assertThat(channels, hasSize(3));
-    assertThat(channels, hasValues("connection1", "connection2", "connection3"));
+  public void useConnection() throws Exception {
+    assertMessage(getSourceSample("useConnection"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
-  
+
   @Test
-  public void singleValuesEnabledParameterWithConfiguration() throws Exception {
-    Set<Value> channels = getValuesFromSource("source-with-configuration", "channel");
-    assertThat(channels, hasSize(3));
-    assertThat(channels, hasValues("config1", "config2", "config3"));
+  public void useConfig() throws Exception {
+    assertMessage(getSourceSample("useConfig"), CONF_PREFIX + EXPECTED_PAYLOAD, CONF_PREFIX + EXPECTED_ATTRIBUTES);
   }
-  
+
   @Test
-  public void singleValuesEnabledParameterWithRequiredParameters() throws Exception {
-    Set<Value> channels = getValuesFromSource("source-with-values-with-required-parameters", "channels");
-    assertThat(channels, hasSize(4));
-    assertThat(channels, hasValues("requiredInteger:2", "requiredBoolean:false", "strings:[1, 2]", "requiredString:aString"));
+  public void parameterGroup() throws Exception {
+    assertMessage(getSourceSample("parameterGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
-  
+
   @Test
-  public void singleValuesEnabledParameterInsideParameterGroup() throws Exception {
-    Set<Value> channels = getValuesFromSource("source-with-values-with-required-parameter-inside-param-group", "channels");
-    assertThat(channels, hasSize(3));
-    assertThat(channels, hasValues("channel1", "channel2", "channel3"));
+  public void parameterGroupWithOptional() throws Exception {
+    assertMessage(getSourceSample("parameterGroupWithOptional"), EXPECTED_PAYLOAD, NULL_VALUE);
   }
-  
+
   @Test
-  public void multiLevelValue() throws Exception {
-    Set<Value> values = getValuesFromSource("source-with-multi-level-value", "values");
-    ValueMatcher americaValue = valueWithId("America")
-        .withDisplayName("America")
-        .withPartName("continent")
-        .withChilds(valueWithId("Argentina")
-            .withDisplayName("Argentina")
-            .withPartName("country")
-            .withChilds(valueWithId("Buenos Aires")
-                .withDisplayName("Buenos Aires")
-                .withPartName("city")));
-  
-    assertThat(values, hasValues(americaValue));
+  public void showInDslParameterGroup() throws Exception {
+    assertMessage(getSourceSample("showInDslParameterGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
-  
+
   @Test
-  public void singleValuesWithRequiredParameterWithAlias() throws Exception {
-    Set<Value> channels = getValuesFromSource("source-with-required-parameter-with-alias", "channels");
-    assertThat(channels, hasSize(1));
-    assertThat(channels, hasValues("requiredString:dummyValue"));
+  public void aliasedGroup() throws Exception {
+    assertMessage(getSourceSample("aliasedGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
-  
+
   @Test
-  public void optionsInsideShowInDslGroup() throws Exception {
-    Set<Value> values = getValuesFromSource("source-with-required-parameter-inside-show-in-dsl-group", "values");
-    assertThat(values, hasSize(1));
-    assertThat(values, hasValues("anyParameter:someValue"));
+  public void missingActingParameter() throws Exception {
+    expectedException.expect(SampleDataException.class);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getSourceSample("missingActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
-  
+
   @Test
-  public void sourcesMustNotStartWhenResolvingValue() throws Exception {
-    Set<Value> hasBeenStarted = getValuesFromSource("source-must-not-start", "hasBeenStarted");
-    assertThat(hasBeenStarted, hasValues("FALSE"));
+  public void missingActingParameterInGroup() throws Exception {
+    expectedException.expect(SampleDataException.class);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getSourceSample("missingActingParameterInGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
-  */
+
+  @Test
+  public void muleContextAwareSampleData() throws Exception {
+    assertMessage(getSourceSample("muleContextAwareSampleData"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void complexActingParameter() throws Exception {
+    assertMessage(getSourceSample("complexActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+  }
 }

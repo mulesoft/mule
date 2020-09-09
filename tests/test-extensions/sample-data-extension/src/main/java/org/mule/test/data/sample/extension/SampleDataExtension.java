@@ -6,18 +6,31 @@
  */
 package org.mule.test.data.sample.extension;
 
-import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.sdk.api.runtime.operation.Result;
-import org.mule.test.data.sample.extension.config.SampleDataConfig;
-import org.mule.test.data.sample.extension.source.SimpleSource;
+import org.mule.test.data.sample.extension.connection.SampleDataConnectionProvider;
+import org.mule.test.data.sample.extension.source.AliasedParameterGroupListener;
+import org.mule.test.data.sample.extension.source.ComplexParameterGroupListener;
+import org.mule.test.data.sample.extension.source.ConfigTestSampleDataListener;
+import org.mule.test.data.sample.extension.source.ConnectedTestSampleDataListener;
+import org.mule.test.data.sample.extension.source.MuleContextAwareTestSampleDataListener;
+import org.mule.test.data.sample.extension.source.ParameterGroupListener;
+import org.mule.test.data.sample.extension.source.ShowInDslParameterGroupListener;
+import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListener;
 
 @Extension(name = "SampleData")
-@Configurations(SampleDataConfig.class)
-@Sources({SimpleSource.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/sample-data", prefix = "sample-data")
+@ConnectionProviders(SampleDataConnectionProvider.class)
+@Operations(SampleDataOperations.class)
+@Sources({SimpleTestSampleDataListener.class, ConnectedTestSampleDataListener.class, ConfigTestSampleDataListener.class,
+    ParameterGroupListener.class, ShowInDslParameterGroupListener.class, AliasedParameterGroupListener.class,
+    ComplexParameterGroupListener.class, MuleContextAwareTestSampleDataListener.class
+})
 public class SampleDataExtension {
 
   public static final String NULL_VALUE = "<<null>>";
@@ -29,5 +42,12 @@ public class SampleDataExtension {
         .attributes(result.getAttributes().orElse(null))
         .attributesMediaType(result.getAttributesMediaType().orElse(null))
         .build();
+  }
+
+  @Parameter
+  private String prefix;
+
+  public String getPrefix() {
+    return prefix;
   }
 }

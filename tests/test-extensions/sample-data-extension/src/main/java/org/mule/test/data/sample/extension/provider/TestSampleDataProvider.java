@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.data.sample.extension.resolver;
+package org.mule.test.data.sample.extension.provider;
 
 import org.mule.sdk.api.data.sample.SampleDataProvider;
 

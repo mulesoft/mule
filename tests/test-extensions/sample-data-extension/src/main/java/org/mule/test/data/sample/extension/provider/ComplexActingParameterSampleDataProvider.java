@@ -4,27 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.data.sample.extension.resolver;
+package org.mule.test.data.sample.extension.provider;
 
 import static org.mule.test.data.sample.extension.SampleDataExtension.adaptLegacy;
 
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.sdk.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.test.data.sample.extension.ComplexActingParameter;
 import org.mule.test.data.sample.extension.SampleDataOperations;
 
-public class GroupTestSampleDataProvider extends TestSampleDataProvider {
+public class ComplexActingParameterSampleDataProvider extends TestSampleDataProvider {
 
   @Parameter
-  private String groupParameter;
-
-  @Parameter
-  @Optional
-  private String optionalParameter;
+  private ComplexActingParameter complex;
 
   @Override
   public Result<String, String> getSample() throws SampleDataException {
-    return adaptLegacy(new SampleDataOperations().connectionLess(groupParameter, optionalParameter));
+    return adaptLegacy(new SampleDataOperations().complexActingParameter(complex));
   }
 }

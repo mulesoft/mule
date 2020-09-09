@@ -17,13 +17,12 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
-import org.mule.test.data.sample.extension.config.SampleDataConfig;
-import org.mule.test.data.sample.extension.resolver.ComplexActingParameterSampleDataProvider;
-import org.mule.test.data.sample.extension.resolver.ConfigAwareTestSampleDataProvider;
-import org.mule.test.data.sample.extension.resolver.ConnectedTestSampleDataProvider;
-import org.mule.test.data.sample.extension.resolver.GroupTestSampleDataProvider;
-import org.mule.test.data.sample.extension.resolver.MuleContextAwareSampleDataProvider;
-import org.mule.test.data.sample.extension.resolver.ParameterizedTestSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.ComplexActingParameterSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.ConfigAwareTestSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.ConnectedTestSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.GroupTestSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.MuleContextAwareSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.ParameterizedTestSampleDataProvider;
 
 public class SampleDataOperations {
 
@@ -45,7 +44,7 @@ public class SampleDataOperations {
   }
 
   @SampleData(ConfigAwareTestSampleDataProvider.class)
-  public Result<String, String> useConfig(@Config SampleDataConfig config,
+  public Result<String, String> useConfig(@Config SampleDataExtension config,
                                           @Connection SampleDataConnection connection,
                                           String payload,
                                           String attributes) {
