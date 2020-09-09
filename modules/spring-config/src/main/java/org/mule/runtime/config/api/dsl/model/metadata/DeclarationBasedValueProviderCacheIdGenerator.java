@@ -25,8 +25,8 @@ public class DeclarationBasedValueProviderCacheIdGenerator implements ValueProvi
                                                        ComponentLocator<ElementDeclaration> locator) {
     this.elementModelFactory = DslElementModelFactory.getDefault(context);
     this.delegate = new DslElementBasedValueProviderCacheIdGenerator(
-                                                                     l -> locator.get(l)
-                                                                         .map(e -> elementModelFactory.create(e).orElse(null)));
+            l -> locator.get(l)
+                    .map(e -> elementModelFactory.create(e).orElse(null)));
   }
 
   @Override
@@ -34,4 +34,17 @@ public class DeclarationBasedValueProviderCacheIdGenerator implements ValueProvi
     checkArgument(containerComponent != null, "Cannot generate a Cache Key for a 'null' component");
     return elementModelFactory.create(containerComponent).flatMap(dsl -> delegate.getIdForResolvedValues(dsl, parameterName));
   }
+
+  //This method was added so that it can be called by reflection and we can keep the logic on how
+  //the ValueProviderCacheId is generated for configs and connections in one place, without changing the
+  //ValueProviderCacheIdGenerator API.
+  //I could not come with a better solution that does not involve refactoring of the whole API. Having
+  //said that, we have encountered multiple scenarios where we are needing more information than the
+  //currently provided by the ValueProviderCacheId (Hierarchical info for example). Meaning that we should
+  //consider refactoring this in the future to make things simpler. MULE-18743
+  private Optional<ValueProviderCacheId> getIdForDependency(ElementDeclaration elementDeclaration) {
+    return elementModelFactory.create(elementDeclaration).flatMap(delegate::resolveIdForInjectedElement);
+  }
+
+
 }
