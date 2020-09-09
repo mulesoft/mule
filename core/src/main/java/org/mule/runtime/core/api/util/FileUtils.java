@@ -10,6 +10,7 @@ import static java.lang.System.getProperty;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.copy;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -203,7 +204,7 @@ public class FileUtils {
       if (resource.startsWith("file:/")) {
         resource = resource.substring(6);
 
-        if (!resource.startsWith(File.separator)) {
+        if (!IS_OS_WINDOWS && !resource.startsWith(File.separator)) {
           resource = File.separator + resource;
         }
       }
