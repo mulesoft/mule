@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
-import static java.lang.Boolean.TRUE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
@@ -22,6 +20,7 @@ import java.io.InputStream;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -41,28 +40,30 @@ public class PayloadStatisticsDisabledTestCase extends AbstractPayloadStatistics
 
   @Test
   public void decorateInputStreamDisabled() throws IOException {
-    final InputStream decorated = new ByteArrayInputStream("Hello World".getBytes(UTF_8));
-    final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1).decorateInput(decorated, CORR_ID);
-
-    assertThat(decorated, sameInstance(decorator));
-
-    final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
-
-    final DefaultFlowConstructStatistics defaultFlowConstrutStatistics =
-        new DefaultFlowConstructStatistics("flowType", "flowName");
     final AllStatistics allStatistics = muleContext.getStatistics();
-    allStatistics.add(defaultFlowConstrutStatistics);
+    // By default the payload stats are disabled by system property
+    verifyStatisticsOnDecoratedStream(component1, 0L, false);
 
+    // Enable stats and verify that they are computed for same component
+    allStatistics.enablePayloadStatistics(true);
+    verifyStatisticsOnDecoratedStream(component1, 1L, true);
 
-    assertThat(statistics.getInputByteCount(), is(0L));
+    // Add a new component to stats and verify that the stats are computed
+    verifyStatisticsOnDecoratedStream(component2, 1L, true);
 
+    // Verify that the stats are not computed when disabled
+    allStatistics.enablePayloadStatistics(false);
+    verifyStatisticsOnDecoratedStream(component2, 1L, false);
+  }
+
+  private void verifyStatisticsOnDecoratedStream(Component component, Long expectedInputByteCount, boolean expectedStatsEnabled)
+      throws IOException {
+    final InputStream decorated = new ByteArrayInputStream("Hello World".getBytes(UTF_8));
+    final InputStream decorator = decoratorFactory.componentDecoratorFactory(component).decorateInput(decorated, CORR_ID);
+    final PayloadStatistics statistics = muleContext.getStatistics().getPayloadStatistics(component.getLocation().getLocation());
     decorator.read();
-
-    verifyNoStatistics(statistics);
-
-    assertThat(allStatistics.getApplicationStatistics().isEnabled(), is(TRUE));
-    assertThat(defaultFlowConstrutStatistics.isEnabled(), is(TRUE));
-    assertThat(statistics.isEnabled(), is(Boolean.FALSE));
+    assertThat(statistics.getInputByteCount(), is(expectedInputByteCount));
+    assertThat(statistics.isEnabled(), is(expectedStatsEnabled));
   }
 
 }
