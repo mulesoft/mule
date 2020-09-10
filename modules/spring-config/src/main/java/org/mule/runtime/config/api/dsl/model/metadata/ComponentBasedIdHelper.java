@@ -102,9 +102,15 @@ public class ComponentBasedIdHelper {
     }
 
     private void hashForList(Collection<ComponentAst> collection) {
-      collection.forEach(c -> c.getParameter("value").getValue().reduce(leftFunction, rightFunction));
+      collection.forEach(c -> {
+        ComponentParameterAst parameterAst = c.getParameter("value");
+        if (parameterAst == null) {
+          rightFunction.apply(c);
+        } else {
+          parameterAst.getValue().reduce(leftFunction, rightFunction);
+        }
+      });
     }
-
   }
 
 }
