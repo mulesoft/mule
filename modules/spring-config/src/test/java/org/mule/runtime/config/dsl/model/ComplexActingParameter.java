@@ -13,13 +13,14 @@ public class ComplexActingParameter {
 
   private int intParam;
   private String stringParam;
+
   private InnerPojo innerPojoParam;
 
   private List<String> listParam;
   private Map<String, String> mapParam;
 
   private List<InnerPojo> complexListParam;
-  //private Map<String, InnerPojo> complexMapParam;
+  private Map<String, InnerPojo> complexMapParam;
 
   public int getIntParam() {
     return intParam;
@@ -45,7 +46,7 @@ public class ComplexActingParameter {
     return complexListParam;
   }
 
-  //public Map<String, InnerPojo> getComplexMapParam() {
-  //  return complexMapParam;
-  //}
+  public Map<String, InnerPojo> getComplexMapParam() {
+    return complexMapParam;
+  }
 }

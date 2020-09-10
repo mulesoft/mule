@@ -16,6 +16,8 @@ public class InnerPojo {
   private List<String> listParam;
   private Map<String, String> mapParam;
 
+  public InnerPojo() {}
+
   public InnerPojo(int intParam, String stringParam, List<String> listParam, Map<String, String> mapParam) {
     this.intParam = intParam;
     this.stringParam = stringParam;
