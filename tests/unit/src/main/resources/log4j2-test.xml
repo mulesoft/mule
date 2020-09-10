@@ -23,7 +23,10 @@
 
         <!-- Event drop log -->
         <AsyncLogger name="org.mule.runtime.core.internal.context" level="DEBUG"/>
+        <!-- Event drop log -->
+        <AsyncLogger name="org.mule.test.some.extension" level="INFO"/>
 
+        org.mule.test.some.extension
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>
         </AsyncRoot>
