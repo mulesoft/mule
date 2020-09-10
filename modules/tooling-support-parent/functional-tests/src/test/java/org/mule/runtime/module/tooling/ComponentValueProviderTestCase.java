@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.INVA
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.ACTING_PARAMETER_NAME;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.actingParameterGroupOPDeclaration;
+import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.actingParameterGroupOPWithAliasDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.actingParameterOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.complexActingParameterOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.complexParameterValue;
@@ -92,6 +93,16 @@ public class ComponentValueProviderTestCase extends DeclarationSessionTestCase {
     final List<String> listValue = asList("one", "two", "three");
     ComponentElementDeclaration elementDeclaration =
         actingParameterGroupOPDeclaration(CONFIG_NAME, stringValue, intValue, listValue);
+    validateValuesSuccess(session, elementDeclaration, PROVIDED_PARAMETER_NAME, "stringValue-0-one-two-three");
+  }
+
+  @Test
+  public void actingParameterGroupWithAlias() {
+    final String stringValue = "stringValue";
+    final int intValue = 0;
+    final List<String> listValue = asList("one", "two", "three");
+    ComponentElementDeclaration elementDeclaration =
+        actingParameterGroupOPWithAliasDeclaration(CONFIG_NAME, stringValue, intValue, listValue);
     validateValuesSuccess(session, elementDeclaration, PROVIDED_PARAMETER_NAME, "stringValue-0-one-two-three");
   }
 

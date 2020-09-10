@@ -12,6 +12,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tooling.extensions.metadata.api.parameters.ActingParameterGroup;
+import org.mule.tooling.extensions.metadata.api.parameters.ActingParameterGroupWithAlias;
 import org.mule.tooling.extensions.metadata.api.parameters.ComplexActingParameter;
 import org.mule.tooling.extensions.metadata.api.parameters.LocationKey;
 import org.mule.tooling.extensions.metadata.internal.config.SimpleConfiguration;
@@ -19,9 +20,10 @@ import org.mule.tooling.extensions.metadata.internal.connection.TstExtensionClie
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessConnectionLessMetadataResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.ConfigLessMetadataResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelPartialTypeKeysOutputTypeResolver;
-import org.mule.tooling.extensions.metadata.internal.metadata.RequiresConfigurationOutputTypeKeyResolver;
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelTypeKeysOutputTypeResolver;
+import org.mule.tooling.extensions.metadata.internal.metadata.RequiresConfigurationOutputTypeKeyResolver;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterGroupVP;
+import org.mule.tooling.extensions.metadata.internal.value.ActingParameterGroupVPWithAlias;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;
 import org.mule.tooling.extensions.metadata.internal.value.ComplexActingParameterVP;
 import org.mule.tooling.extensions.metadata.internal.value.ConfigLessConnectionLessNoActingParamVP;
@@ -107,6 +109,14 @@ public class SimpleOperations {
                                                      @Optional @OfValues(ActingParameterGroupVP.class) String providedParameter) {
     return null;
   }
+
+  public Result<Void, Object> actingParameterGroupWithAliasOP(@Config SimpleConfiguration configuration,
+                                                              @Connection TstExtensionClient client,
+                                                              @ParameterGroup(name = "Acting") ActingParameterGroupWithAlias actingParameterGroup,
+                                                              @Optional @OfValues(ActingParameterGroupVPWithAlias.class) String providedParameter) {
+    return null;
+  }
+
 
   public Result<Void, Object> nestedVPsOperation(@Config SimpleConfiguration configuration,
                                                  @Connection TstExtensionClient client,
