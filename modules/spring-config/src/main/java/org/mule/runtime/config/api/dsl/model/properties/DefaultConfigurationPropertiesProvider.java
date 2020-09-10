@@ -11,6 +11,15 @@ import static java.lang.String.join;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
+import org.mule.runtime.core.api.exception.ResourceNotFoundException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,16 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-
-import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
-import org.mule.runtime.core.api.exception.ResourceNotFoundException;
 
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.parser.ParserException;
@@ -68,10 +67,9 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
 
   @Override
   public String getDescription() {
-    ComponentLocation location = (ComponentLocation) getAnnotation(LOCATION_KEY);
     return format("<configuration-properties file=\"%s\"> - file: %s, line number: %s", fileLocation,
-                  location.getFileName().orElse(UNKNOWN),
-                  location.getLineInFile().map(String::valueOf).orElse("unknown"));
+                  getLocation().getFileName().orElse(UNKNOWN),
+                  getLocation().getLine().orElse(-1));
 
   }
 

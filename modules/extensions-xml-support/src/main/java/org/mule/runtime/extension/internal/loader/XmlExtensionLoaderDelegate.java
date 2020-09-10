@@ -32,7 +32,7 @@ import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyCompone
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
-import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
+import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.createProviderFromGlobalProperties;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
@@ -70,17 +70,13 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.builder.ArtifactAstBuilder;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
@@ -417,11 +413,12 @@ public final class XmlExtensionLoaderDelegate {
     return ast.topLevelComponentsStream().findAny().get();
   }
 
+  // TODO
   private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ArtifactAst ast) {
     // <mule:global-property ... /> properties reader
     final ConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(of(new XmlExtensionConfigurationPropertiesResolver()),
-                                                   createProviderFromGlobalProperties(ast, modulePath));
+                                                   createProviderFromGlobalProperties(ast));
     // system properties, such as "file.separator" properties reader
     final ConfigurationPropertiesResolver systemPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
@@ -433,25 +430,6 @@ public final class XmlExtensionLoaderDelegate {
                                                 description);
     return new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
                                                       externalPropertiesConfigurationProvider);
-  }
-
-  private ConfigurationPropertiesProvider createProviderFromGlobalProperties(ArtifactAst ast, String modulePath) {
-    final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
-
-    // Root element is the mule:module
-    ast.topLevelComponentsStream()
-        .flatMap(comp -> comp.directChildrenStream())
-        .filter(comp -> GLOBAL_PROPERTY.equals(comp.getIdentifier().getName()))
-        .forEach(comp -> {
-          final String key = comp.getRawParameterValue("name").get();
-          final String rawValue = comp.getRawParameterValue("value").get();
-          globalProperties.put(key,
-                               new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
-                                                                       modulePath, comp.getMetadata().getStartLine().orElse(-1)),
-                                                                key, rawValue));
-        });
-
-    return new GlobalPropertyConfigurationPropertiesProvider(globalProperties);
   }
 
   private void loadModuleExtension(ExtensionDeclarer declarer, URL resource, Document moduleDocument,

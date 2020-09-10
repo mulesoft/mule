@@ -6,10 +6,16 @@
  */
 package org.mule.runtime.config.api.dsl.model.properties;
 
+import static org.mule.runtime.config.internal.dsl.model.properties.ConfigurationPropertiesProviderFactoryUtils.resolveConfigurationParameters;
+
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParameters;
+
+import java.util.function.UnaryOperator;
 
 /**
  * Builds the provider for a custom configuration properties element.
@@ -33,4 +39,22 @@ public interface ConfigurationPropertiesProviderFactory {
    */
   ConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters,
                                                  ResourceProvider externalResourceProvider);
+
+  /**
+   * Builds a properties provider for the provided {@code providerElementDeclaration}.
+   *
+   * @param providerElementDeclaration the configuration parameters, after resolving property placeholders
+   * @param localResolver the resolver of property placeholders found in the provided declaration
+   * @param externalResourceProvider the resource provider for locating files (such as .properties and .yaml)
+   * @return the properties provider
+   */
+  default ConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
+                                                         UnaryOperator<String> localResolver,
+                                                         ResourceProvider externalResourceProvider) {
+    DefaultConfigurationParameters.Builder configurationParametersBuilder = DefaultConfigurationParameters.builder();
+    ConfigurationParameters configurationParameters =
+        resolveConfigurationParameters(configurationParametersBuilder, providerElementDeclaration, localResolver);
+
+    return createProvider(configurationParameters, externalResourceProvider);
+  }
 }

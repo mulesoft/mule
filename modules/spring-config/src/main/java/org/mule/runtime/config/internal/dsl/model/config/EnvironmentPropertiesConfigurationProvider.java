@@ -28,7 +28,7 @@ import java.util.function.Supplier;
  */
 public class EnvironmentPropertiesConfigurationProvider implements ConfigurationPropertiesProvider {
 
-  private Map<String, ConfigurationProperty> configurationAttributes = new HashMap<>();
+  private final Map<String, ConfigurationProperty> configurationAttributes = new HashMap<>();
 
   /**
    * Creates an {@link EnvironmentPropertiesConfigurationProvider} with the default configuration.
@@ -39,8 +39,8 @@ public class EnvironmentPropertiesConfigurationProvider implements Configuration
 
   /**
    * Used for testing only.
-   * 
-   * @param environmentVariablesSupplier supplier for environment varialbes.
+   *
+   * @param environmentVariablesSupplier supplier for environment variables.
    */
   EnvironmentPropertiesConfigurationProvider(Supplier<Map<String, String>> environmentVariablesSupplier) {
     Map<String, String> environmentVariables = environmentVariablesSupplier.get();
