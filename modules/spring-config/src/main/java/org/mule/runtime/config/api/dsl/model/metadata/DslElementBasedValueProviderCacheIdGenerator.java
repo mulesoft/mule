@@ -147,7 +147,7 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
   }
 
 
-  private Optional<ValueProviderCacheId> resolveIdForInjectedElement(DslElementModel<?> injectedElement) {
+  Optional<ValueProviderCacheId> resolveIdForInjectedElement(DslElementModel<?> injectedElement) {
     if (!(injectedElement.getModel() instanceof EnrichableModel)) {
       return empty();
     }

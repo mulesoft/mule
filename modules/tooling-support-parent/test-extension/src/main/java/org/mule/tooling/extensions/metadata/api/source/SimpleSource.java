@@ -31,6 +31,7 @@ import org.mule.tooling.extensions.metadata.api.parameters.LocationKey;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;
 import org.mule.tooling.extensions.metadata.internal.value.ConfigLessConnectionLessNoActingParamVP;
 import org.mule.tooling.extensions.metadata.internal.value.ConfigLessNoActingParamVP;
+import org.mule.tooling.extensions.metadata.internal.value.ConnectionLessNoActingParamVP;
 
 @Alias("simple")
 @MediaType(value = "text/plain")
@@ -51,6 +52,10 @@ public class SimpleSource extends Source<String, StringAttributes> {
   @Parameter
   @OfValues(ConfigLessConnectionLessNoActingParamVP.class)
   public String independentParam;
+
+  @Parameter
+  @OfValues(ConnectionLessNoActingParamVP.class)
+  public String configDependantParam;
 
   @Parameter
   @OfValues(ConfigLessNoActingParamVP.class)

@@ -7,6 +7,7 @@
 package org.mule.runtime.config.api.dsl.model.metadata;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
@@ -16,6 +17,7 @@ import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 
 import java.util.Optional;
 
+@NoExtend
 public class DeclarationBasedValueProviderCacheIdGenerator implements ValueProviderCacheIdGenerator<ElementDeclaration> {
 
   private final DslElementModelFactory elementModelFactory;
@@ -34,4 +36,11 @@ public class DeclarationBasedValueProviderCacheIdGenerator implements ValueProvi
     checkArgument(containerComponent != null, "Cannot generate a Cache Key for a 'null' component");
     return elementModelFactory.create(containerComponent).flatMap(dsl -> delegate.getIdForResolvedValues(dsl, parameterName));
   }
+
+  //Consider refactoring this in the future to make things simpler. MULE-18743
+  protected Optional<ValueProviderCacheId> getIdForDependency(ElementDeclaration elementDeclaration) {
+    return elementModelFactory.create(elementDeclaration).flatMap(delegate::resolveIdForInjectedElement);
+  }
+
+
 }
