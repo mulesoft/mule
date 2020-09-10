@@ -21,6 +21,9 @@
         <AsyncLogger name="org.mule" level="WARN"/>
         <AsyncLogger name="com.mulesoft" level="WARN"/>
 
+        <!-- Event drop log -->
+        <AsyncLogger name="org.mule.runtime.core.internal.context" level="DEBUG"/>
+
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>
         </AsyncRoot>
