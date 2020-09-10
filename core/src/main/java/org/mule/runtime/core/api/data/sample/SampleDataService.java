@@ -9,7 +9,12 @@ package org.mule.runtime.core.api.data.sample;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.sdk.api.data.sample.SampleDataException;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Provides the capability of obtaining sample data for any component in a Mule app which supports providing sample data.
@@ -31,4 +36,10 @@ public interface SampleDataService {
    * @return a sample output {@link Message}
    */
   Message getSampleData(Location location) throws SampleDataException;
+
+  Message getSampleData(String extensionName,
+                        String componentName,
+                        Map<String, Object> parameters,
+                        Supplier<Optional<ConfigurationInstance>> configurationInstanceSupplier)
+      throws SampleDataException;
 }

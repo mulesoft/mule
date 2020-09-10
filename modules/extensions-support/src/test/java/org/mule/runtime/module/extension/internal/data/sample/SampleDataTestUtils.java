@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util.data.sample;
+package org.mule.runtime.module.extension.internal.data.sample;
 
 import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.sdk.api.data.sample.SampleDataProvider;
@@ -20,8 +20,7 @@ import org.hamcrest.Matcher;
  */
 public final class SampleDataTestUtils {
 
-  private SampleDataTestUtils() {
-  }
+  private SampleDataTestUtils() {}
 
   /**
    * Creaes a matcher that tests that a {@link SampleDataException} has the given {@code failureCode}

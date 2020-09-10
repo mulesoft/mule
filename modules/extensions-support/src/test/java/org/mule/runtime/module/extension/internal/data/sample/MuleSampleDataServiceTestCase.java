@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.data.sample;
+package org.mule.runtime.module.extension.internal.data.sample;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -15,7 +15,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.util.data.sample.SampleDataTestUtils.exceptionMatcher;
+import static org.mule.runtime.module.extension.internal.data.sample.SampleDataTestUtils.exceptionMatcher;
 import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_LOCATION;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
 import static org.mule.sdk.api.data.sample.SampleDataException.NO_DATA_AVAILABLE;

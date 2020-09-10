@@ -25,9 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * {@link ParameterValueResolver} implementation for Object based components, like {@link Source sources}, configurations
  * and {@link ConnectionProvider connection providers}
@@ -35,8 +32,6 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 public class ObjectBasedParameterValueResolver implements ParameterValueResolver {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ObjectBasedParameterValueResolver.class);
 
   private final Object object;
   private final ParameterizedModel parameterizedModel;

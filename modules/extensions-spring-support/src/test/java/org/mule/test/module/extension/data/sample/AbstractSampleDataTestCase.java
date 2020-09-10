@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.data.sample;
 
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -13,20 +14,26 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
+import static org.mule.runtime.module.extension.internal.data.sample.SampleDataTestUtils.exceptionMatcher;
+import static org.mule.test.data.sample.extension.SampleDataExtension.EXTENSION_NAME;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
+import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
@@ -42,6 +49,9 @@ public abstract class AbstractSampleDataTestCase extends MuleArtifactFunctionalT
   @Named(SAMPLE_DATA_SERVICE_KEY)
   private SampleDataService sampleDataService;
 
+  @Inject
+  private ExtensionManager extensionManager;
+
   @Rule
   public ExpectedException expectedException = none();
 
@@ -52,7 +62,7 @@ public abstract class AbstractSampleDataTestCase extends MuleArtifactFunctionalT
 
   @Override
   public boolean disableXmlValidations() {
-    return false;
+    return true;
   }
 
   @Override
@@ -67,33 +77,38 @@ public abstract class AbstractSampleDataTestCase extends MuleArtifactFunctionalT
     assertThat(message.getAttributes().getDataType().getMediaType().matches(APPLICATION_XML), is(true));
   }
 
-  protected Message getOperationSample(String flowName) throws SampleDataException {
+  protected Message getOperationSampleByLocation(String flowName) throws SampleDataException {
     Location location = Location.builder().globalName(flowName).addProcessorsPart().addIndexPart(0).build();
     return sampleDataService.getSampleData(location);
   }
 
-  protected Message getSourceSample(String flowName) throws SampleDataException {
+  protected Message getSourceSampleByLocation(String flowName) throws SampleDataException {
     Location location = Location.builder().globalName(flowName).addSourcePart().build();
     return sampleDataService.getSampleData(location);
+  }
+
+  protected Message getSampleByComponentName(String componentName,
+                                             Map<String, Object> parameters,
+                                             String configName)
+      throws SampleDataException {
+    return sampleDataService.getSampleData(
+                                           EXTENSION_NAME,
+                                           componentName,
+                                           parameters,
+                                           getConfigurationSupplier(configName));
+  }
+
+  private Supplier<Optional<ConfigurationInstance>> getConfigurationSupplier(String configName) {
+    if (configName == null) {
+      return Optional::empty;
+    }
+
+    return (CheckedSupplier<Optional<ConfigurationInstance>>) () -> of(extensionManager.getConfiguration(configName,
+                                                                                                         testEvent()));
   }
 
   protected void expectSampleDataException(String failureCode) {
     expectedException.expect(SampleDataException.class);
     expectedException.expect(exceptionMatcher(failureCode));
-  }
-
-  private Matcher<SampleDataException> exceptionMatcher(String failureCode) {
-    return new BaseMatcher<SampleDataException>() {
-
-      @Override
-      public boolean matches(Object o) {
-        return ((SampleDataException) o).getFailureCode().equals(failureCode);
-      }
-
-      @Override
-      public void describeTo(Description description) {
-        description.appendText("Unexpected exception code");
-      }
-    };
   }
 }

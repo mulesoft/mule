@@ -23,7 +23,7 @@ import org.mule.test.data.sample.extension.source.ParameterGroupListener;
 import org.mule.test.data.sample.extension.source.ShowInDslParameterGroupListener;
 import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListener;
 
-@Extension(name = "SampleData")
+@Extension(name = SampleDataExtension.EXTENSION_NAME)
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/sample-data", prefix = "sample-data")
 @ConnectionProviders(SampleDataConnectionProvider.class)
 @Operations(SampleDataOperations.class)
@@ -34,6 +34,7 @@ import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListener;
 public class SampleDataExtension {
 
   public static final String NULL_VALUE = "<<null>>";
+  public static final String EXTENSION_NAME = "SampleData";
 
   public static <T, A> Result<T, A> adaptLegacy(org.mule.runtime.extension.api.runtime.operation.Result<T, A> result) {
     return Result.<T, A>builder()

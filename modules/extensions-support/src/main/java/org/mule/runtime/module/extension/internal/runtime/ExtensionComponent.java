@@ -661,9 +661,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                       extensionModel,
                                                                       componentModel,
                                                                       this,
-                                                                      () -> muleContext,
-                                                                      () -> reflectionCache,
-                                                                      () -> streamingManager);
+                                                                      muleContext,
+                                                                      reflectionCache,
+                                                                      streamingManager);
         }
       }
     }

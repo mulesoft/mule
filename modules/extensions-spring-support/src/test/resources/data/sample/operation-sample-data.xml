@@ -47,10 +47,6 @@
         <sample-data:use-connection payload="my payload" config-ref="config"/>
     </flow>
 
-    <flow name="missingActingParameterInGroup">
-        <sample-data:use-connection payload="my payload" config-ref="config"/>
-    </flow>
-
     <flow name="muleContextAwareSampleData">
         <sample-data:mule-context-aware-sample-data payload="my payload" attributes="my attributes" />
     </flow>

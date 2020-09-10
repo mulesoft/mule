@@ -22,14 +22,11 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.NullCursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.extension.api.values.ValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
@@ -41,7 +38,6 @@ import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.sdk.api.data.sample.SampleDataProvider;
 import org.mule.sdk.api.runtime.operation.Result;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 public class SampleDataProviderMediator {
@@ -49,10 +45,9 @@ public class SampleDataProviderMediator {
   private final ExtensionModel extensionModel;
   private final ComponentModel componentModel;
   private final Component component;
-  private final Supplier<MuleContext> muleContext;
-  private final Supplier<ReflectionCache> reflectionCache;
-  private final Supplier<Object> nullSupplier = () -> null;
-  private final Supplier<StreamingManager> streamingManager;
+  private final MuleContext muleContext;
+  private final ReflectionCache reflectionCache;
+  private final StreamingManager streamingManager;
   private final SampleDataProviderFactoryModelProperty sampleDataProperty;
   private final ReturnDelegate returnDelegate;
   private final CursorProviderFactory cursorProviderFactory = new NullCursorProviderFactory();
@@ -66,9 +61,9 @@ public class SampleDataProviderMediator {
   public SampleDataProviderMediator(ExtensionModel extensionModel,
                                     ComponentModel componentModel,
                                     Component component,
-                                    Supplier<MuleContext> muleContext,
-                                    Supplier<ReflectionCache> reflectionCache,
-                                    Supplier<StreamingManager> streamingManager) {
+                                    MuleContext muleContext,
+                                    ReflectionCache reflectionCache,
+                                    StreamingManager streamingManager) {
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
     this.component = component;
@@ -76,33 +71,19 @@ public class SampleDataProviderMediator {
     this.reflectionCache = reflectionCache;
     this.streamingManager = streamingManager;
     sampleDataProperty = componentModel.getModelProperty(SampleDataProviderFactoryModelProperty.class).orElse(null);
-    returnDelegate = new ValueReturnDelegate(componentModel, NO_OP_INSTANCE, cursorProviderFactory, muleContext.get());
+    returnDelegate = new ValueReturnDelegate(componentModel, NO_OP_INSTANCE, cursorProviderFactory, muleContext);
   }
 
   /**
-   * Given the name of a parameter or parameter group, and if the parameter supports it, this will try to resolve
-   * the {@link Value values} for the parameter.
+   * Resolves the sample data
    *
-   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires
-   *                               the value of parameters from the same parameter container.
-   * @return a {@link Set} of {@link Value} correspondent to the given parameter
-   * @throws ValueResolvingException if an error occurs resolving {@link Value values}
-   */
-  public Message getSampleData(ParameterValueResolver parameterValueResolver) throws SampleDataException {
-    return getSampleData(parameterValueResolver, nullSupplier, nullSupplier);
-  }
-
-  /**
-   * Given the name of a parameter or parameter group, and if the parameter supports it, this will try to resolve
-   * the {@link Value values} for the parameter.
-   *
-   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires
+   * @param parameterValueResolver parameter resolver required if the associated {@link SampleDataProvider} requires
    *                               the value of parameters from the same parameter container.
    * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
-   *                               {@link ValueProvider}
+   *                               {@link SampleDataProvider}
    * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
-   *                               {@link ValueProvider}
-   * @return a {@link Set} of {@link Value} correspondent to the given parameter
+   *                               {@link SampleDataProvider}
+   * @return a {@link Message} carrying the sample data
    * @throws SampleDataException if an error occurs resolving the sample data
    */
   public Message getSampleData(ParameterValueResolver parameterValueResolver,
@@ -120,8 +101,8 @@ public class SampleDataProviderMediator {
                                                                            parameterValueResolver,
                                                                            connectionSupplier,
                                                                            configurationSupplier,
-                                                                           reflectionCache.get(),
-                                                                           muleContext.get());
+                                                                           reflectionCache,
+                                                                           muleContext);
 
       SampleDataProvider provider = factory.createSampleDataProvider();
       Result result = provider.getSample();
@@ -141,14 +122,14 @@ public class SampleDataProviderMediator {
                                        ofNullable(configurationSupplier.get()),
                                        emptyMap(),
                                        componentModel,
-                                       getNullEvent(muleContext.get()),
+                                       getNullEvent(muleContext),
                                        cursorProviderFactory,
                                        NO_OP_INSTANCE,
-                                       streamingManager.get(),
+                                       streamingManager,
                                        component,
                                        new NoRetryPolicyTemplate(),
                                        IMMEDIATE_SCHEDULER,
                                        empty(),
-                                       muleContext.get());
+                                       muleContext);
   }
 }

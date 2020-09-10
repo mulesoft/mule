@@ -16,7 +16,7 @@ import org.junit.Test;
 
 @Feature(SAMPLE_DATA)
 @Story(RESOLVE_BY_LOCATION)
-public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
+public class OperationSampleDataByOperationTestCase extends AbstractSampleDataTestCase {
 
   @Override
   protected String getConfigFile() {
@@ -25,42 +25,42 @@ public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
 
   @Test
   public void connectionLess() throws Exception {
-    assertMessage(getOperationSample("connectionLess"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getOperationSampleByLocation("connectionLess"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void useConnection() throws Exception {
-    assertMessage(getOperationSample("useConnection"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getOperationSampleByLocation("useConnection"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void nonBlocking() throws Exception {
-    assertMessage(getOperationSample("nonBlocking"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getOperationSampleByLocation("nonBlocking"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void useConfig() throws Exception {
-    assertMessage(getOperationSample("useConfig"), CONF_PREFIX + EXPECTED_PAYLOAD, CONF_PREFIX + EXPECTED_ATTRIBUTES);
+    assertMessage(getOperationSampleByLocation("useConfig"), CONF_PREFIX + EXPECTED_PAYLOAD, CONF_PREFIX + EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void parameterGroup() throws Exception {
-    assertMessage(getOperationSample("parameterGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getOperationSampleByLocation("parameterGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void parameterGroupWithOptional() throws Exception {
-    assertMessage(getOperationSample("parameterGroupWithOptional"), EXPECTED_PAYLOAD, NULL_VALUE);
+    assertMessage(getOperationSampleByLocation("parameterGroupWithOptional"), EXPECTED_PAYLOAD, NULL_VALUE);
   }
 
   @Test
   public void showInDslParameterGroup() throws Exception {
-    assertMessage(getOperationSample("showInDslParameterGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getOperationSampleByLocation("showInDslParameterGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void aliasedGroup() throws Exception {
-    assertMessage(getOperationSample("aliasedGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getOperationSampleByLocation("aliasedGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
@@ -68,24 +68,16 @@ public class OperationSampleDataTestCase extends AbstractSampleDataTestCase {
     expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
     expectedException
         .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
-    assertMessage(getOperationSample("missingActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
-  }
-
-  @Test
-  public void missingActingParameterInGroup() throws Exception {
-    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
-    expectedException
-        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
-    assertMessage(getOperationSample("missingActingParameterInGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getOperationSampleByLocation("missingActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void muleContextAwareSampleData() throws Exception {
-    assertMessage(getOperationSample("muleContextAwareSampleData"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getOperationSampleByLocation("muleContextAwareSampleData"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void complexActingParameter() throws Exception {
-    assertMessage(getOperationSample("complexActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getOperationSampleByLocation("complexActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 }

@@ -18,4 +18,12 @@ public class ComplexActingParameter {
   public String getAttributes() {
     return attributes;
   }
+
+  public void setPayload(String payload) {
+    this.payload = payload;
+  }
+
+  public void setAttributes(String attributes) {
+    this.attributes = attributes;
+  }
 }

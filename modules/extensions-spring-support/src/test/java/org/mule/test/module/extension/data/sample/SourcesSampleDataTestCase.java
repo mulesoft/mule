@@ -19,37 +19,37 @@ public class SourcesSampleDataTestCase extends AbstractSampleDataTestCase {
 
   @Test
   public void connectionLess() throws Exception {
-    assertMessage(getSourceSample("connectionLess"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getSourceSampleByLocation("connectionLess"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void useConnection() throws Exception {
-    assertMessage(getSourceSample("useConnection"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getSourceSampleByLocation("useConnection"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void useConfig() throws Exception {
-    assertMessage(getSourceSample("useConfig"), CONF_PREFIX + EXPECTED_PAYLOAD, CONF_PREFIX + EXPECTED_ATTRIBUTES);
+    assertMessage(getSourceSampleByLocation("useConfig"), CONF_PREFIX + EXPECTED_PAYLOAD, CONF_PREFIX + EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void parameterGroup() throws Exception {
-    assertMessage(getSourceSample("parameterGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getSourceSampleByLocation("parameterGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void parameterGroupWithOptional() throws Exception {
-    assertMessage(getSourceSample("parameterGroupWithOptional"), EXPECTED_PAYLOAD, NULL_VALUE);
+    assertMessage(getSourceSampleByLocation("parameterGroupWithOptional"), EXPECTED_PAYLOAD, NULL_VALUE);
   }
 
   @Test
   public void showInDslParameterGroup() throws Exception {
-    assertMessage(getSourceSample("showInDslParameterGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getSourceSampleByLocation("showInDslParameterGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void aliasedGroup() throws Exception {
-    assertMessage(getSourceSample("aliasedGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getSourceSampleByLocation("aliasedGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
@@ -57,7 +57,7 @@ public class SourcesSampleDataTestCase extends AbstractSampleDataTestCase {
     expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
     expectedException
         .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
-    assertMessage(getSourceSample("missingActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getSourceSampleByLocation("missingActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
@@ -65,16 +65,16 @@ public class SourcesSampleDataTestCase extends AbstractSampleDataTestCase {
     expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
     expectedException
         .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
-    assertMessage(getSourceSample("missingActingParameterInGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getSourceSampleByLocation("missingActingParameterInGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void muleContextAwareSampleData() throws Exception {
-    assertMessage(getSourceSample("muleContextAwareSampleData"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getSourceSampleByLocation("muleContextAwareSampleData"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void complexActingParameter() throws Exception {
-    assertMessage(getSourceSample("complexActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertMessage(getSourceSampleByLocation("complexActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 }
