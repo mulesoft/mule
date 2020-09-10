@@ -8,10 +8,12 @@ package org.mule.test.data.sample.extension;
 
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.data.sample.extension.SampleDataExtension.NULL_VALUE;
 
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -27,6 +29,7 @@ import org.mule.test.data.sample.extension.provider.ParameterizedTestSampleDataP
 public class SampleDataOperations {
 
   @SampleData(ParameterizedTestSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
   public Result<String, String> connectionLess(String payload, String attributes) {
     return Result.<String, String>builder()
         .output(payload)
@@ -37,6 +40,7 @@ public class SampleDataOperations {
   }
 
   @SampleData(ConnectedTestSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
   public Result<String, String> useConnection(@Connection SampleDataConnection connection,
                                               String payload,
                                               @Optional String attributes) {
@@ -44,6 +48,7 @@ public class SampleDataOperations {
   }
 
   @SampleData(ConfigAwareTestSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
   public Result<String, String> useConfig(@Config SampleDataExtension config,
                                           @Connection SampleDataConnection connection,
                                           String payload,
@@ -52,6 +57,7 @@ public class SampleDataOperations {
   }
 
   @SampleData(ConnectedTestSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
   public void nonBlocking(@Connection SampleDataConnection connection,
                           String payload,
                           String attributes,
@@ -60,12 +66,14 @@ public class SampleDataOperations {
   }
 
   @SampleData(GroupTestSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
   public Result<String, String> parameterGroup(@Connection SampleDataConnection connection,
                                                @ParameterGroup(name = "group") SampleDataParameterGroup group) {
     return useConnection(connection, group.getGroupParameter(), group.getOptionalParameter());
   }
 
   @SampleData(GroupTestSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
   public Result<String, String> showInDslParameterGroup(@Connection SampleDataConnection connection,
                                                         @ParameterGroup(name = "group",
                                                             showInDsl = true) SampleDataParameterGroup group) {
@@ -73,17 +81,20 @@ public class SampleDataOperations {
   }
 
   @SampleData(ParameterizedTestSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
   public Result<String, String> aliasedGroup(@Connection SampleDataConnection connection,
                                              @ParameterGroup(name = "group") SampleDataAliasedParameterGroup group) {
     return useConnection(connection, group.getPayload(), group.getAttributes());
   }
 
   @SampleData(MuleContextAwareSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
   public Result<String, String> muleContextAwareSampleData(String payload, String attributes) {
     return connectionLess(payload, attributes);
   }
 
   @SampleData(ComplexActingParameterSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
   public Result<String, String> complexActingParameter(ComplexActingParameter complex) {
     return connectionLess(complex.getPayload(), complex.getAttributes());
   }

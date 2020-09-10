@@ -6,14 +6,10 @@
  */
 package org.mule.test.data.sample.extension.source;
 
-import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
-
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
-@MediaType(TEXT_PLAIN)
 public abstract class TestSampleDataListener extends Source<String, String> {
 
   @Override
