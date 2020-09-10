@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.util.LocationUtils.deleteLastPartFromLocation;
 import static org.mule.runtime.core.internal.util.LocationUtils.isConnection;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_LOCATION;
 import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_TARGET_EXTENSION;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
@@ -97,21 +98,21 @@ public class MuleSampleDataService implements SampleDataService {
     checkArgument(!isBlank(componentName), "componentName cannot be blank");
     checkArgument(parameters != null, "parameters cannot be null");
 
-    Optional<ExtensionModel> extensionModel = extensionManager.getExtension(extensionName);
-    if (!extensionModel.isPresent()) {
+    ExtensionModel extensionModel = extensionManager.getExtension(extensionName).orElse(null);
+    if (extensionModel == null) {
       throw new SampleDataException(format("Extension '%s' was not found", extensionName), INVALID_TARGET_EXTENSION);
     }
 
-    Optional<ComponentModel> componentModel = extensionModel.get().findComponentModel(componentName);
-    if (!componentModel.isPresent()) {
+    ComponentModel componentModel = extensionModel.findComponentModel(componentName).orElse(null);
+    if (componentModel == null) {
       throw new SampleDataException(format("Extension '%s' does not contain any component called '%s''",
                                            extensionName, componentName),
                                     INVALID_TARGET_EXTENSION);
     }
 
     SampleDataProviderMediator mediator = new SampleDataProviderMediator(
-                                                                         extensionModel.get(),
-                                                                         componentModel.get(),
+                                                                         extensionModel,
+                                                                         componentModel,
                                                                          new ResolvingComponent(extensionName, componentName),
                                                                          muleContext,
                                                                          new ReflectionCache(),
@@ -119,12 +120,23 @@ public class MuleSampleDataService implements SampleDataService {
 
     ExtensionResolvingContext ctx = new ExtensionResolvingContext(configurationInstanceSupplier, connectionManager);
     try {
-      return mediator.getSampleData(StaticParameterValueResolver.from(parameters),
+      return mediator.getSampleData(StaticParameterValueResolver.from(replaceParameterAliases(parameters, componentModel)),
                                     (CheckedSupplier<Object>) () -> ctx.getConnection().orElse(null),
                                     (CheckedSupplier<Object>) () -> ctx.getConfig().orElse(null));
     } finally {
       ctx.dispose();
     }
+  }
+
+  private Map<String, Object> replaceParameterAliases(Map<String, Object> parameters, ComponentModel model) {
+    model.getAllParameterModels().forEach(param -> {
+      String paramName = param.getName();
+      if (parameters.containsKey(paramName)) {
+        parameters.put(getImplementingName(param), parameters.remove(paramName));
+      }
+    });
+
+    return parameters;
   }
 
   private Object findComponent(Location location) throws SampleDataException {

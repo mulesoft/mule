@@ -17,6 +17,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.data.sample.SampleDataException;
@@ -111,7 +112,7 @@ public class SampleDataProviderFactory {
       String parameterName = injectableParam.getParameterName();
       try {
         parameterValue = parameterValueResolver.getParameterValue(parameterName);
-      } catch (org.mule.runtime.module.extension.internal.runtime.ValueResolvingException ignored) {
+      } catch (ValueResolvingException ignored) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("An error occurred while resolving parameter " + parameterName, ignored);
         }
