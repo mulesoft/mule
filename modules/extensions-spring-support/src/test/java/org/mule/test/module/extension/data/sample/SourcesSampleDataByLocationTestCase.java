@@ -7,14 +7,25 @@
 package org.mule.test.module.extension.data.sample;
 
 import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
+import static org.mule.test.allure.AllureConstants.SampleData.SAMPLE_DATA;
+import static org.mule.test.allure.AllureConstants.SampleData.SampleDataStory.RESOLVE_THROUGH_TOOLING_API;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
-public class SourcesSampleDataTestCase extends AbstractSampleDataTestCase {
+@Feature(SAMPLE_DATA)
+@Story(RESOLVE_THROUGH_TOOLING_API)
+public class SourcesSampleDataByLocationTestCase extends AbstractSampleDataTestCase {
 
   @Override
   protected String getConfigFile() {
     return "data/sample/source-sample-data.xml";
+  }
+
+  @Override
+  public boolean enableLazyInit() {
+    return true;
   }
 
   @Test

@@ -356,7 +356,7 @@ public interface AllureConstants {
 
       String RESOLVE_BY_LOCATION = "Resolve by location";
 
-      String RESOLVE_THROUGH_TOOLING_APY = "Resolve through Tooling API";
+      String RESOLVE_THROUGH_TOOLING_API = "Resolve through Tooling API";
     }
   }
 

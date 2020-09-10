@@ -27,6 +27,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -54,11 +55,6 @@ public abstract class AbstractSampleDataTestCase extends MuleArtifactFunctionalT
 
   @Rule
   public ExpectedException expectedException = none();
-
-  @Override
-  public boolean enableLazyInit() {
-    return false;
-  }
 
   @Override
   public boolean disableXmlValidations() {
@@ -110,5 +106,21 @@ public abstract class AbstractSampleDataTestCase extends MuleArtifactFunctionalT
   protected void expectSampleDataException(String failureCode) {
     expectedException.expect(SampleDataException.class);
     expectedException.expect(exceptionMatcher(failureCode));
+  }
+
+  protected Map<String, Object> getDefaultParameters() {
+    Map<String, Object> params = new HashMap<>();
+    params.put("payload", "my payload");
+    params.put("attributes", "my attributes");
+
+    return params;
+  }
+
+  protected Map<String, Object> getGroupParameters() {
+    Map<String, Object> params = new HashMap<>();
+    params.put("groupParameter", "my payload");
+    params.put("optionalParameter", "my attributes");
+
+    return params;
   }
 }

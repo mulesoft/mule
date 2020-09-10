@@ -16,11 +16,16 @@ import org.junit.Test;
 
 @Feature(SAMPLE_DATA)
 @Story(RESOLVE_BY_LOCATION)
-public class OperationSampleDataByOperationTestCase extends AbstractSampleDataTestCase {
+public class OperationSampleDataByLocationTestCase extends AbstractSampleDataTestCase {
 
   @Override
   protected String getConfigFile() {
     return "data/sample/operation-sample-data.xml";
+  }
+
+  @Override
+  public boolean enableLazyInit() {
+    return true;
   }
 
   @Test
