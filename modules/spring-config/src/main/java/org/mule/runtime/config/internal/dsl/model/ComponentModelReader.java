@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.dsl.model;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
@@ -76,9 +75,7 @@ public class ComponentModelReader {
         .build())
         .withMetadata(metadataBuilder.build());
 
-    if (isNotBlank(configLine.getTextContent())) {
-      componentAstBuilder.withRawParameter(BODY_RAW_PARAM_NAME, resolveValueIfIsPlaceHolder(configLine.getTextContent()));
-    }
+    componentAstBuilder.withRawParameter(BODY_RAW_PARAM_NAME, resolveValueIfIsPlaceHolder(configLine.getTextContent()));
 
     for (SimpleConfigAttribute simpleConfigAttribute : configLine.getConfigAttributes().values()) {
       componentAstBuilder.withRawParameter(simpleConfigAttribute.getName(),
