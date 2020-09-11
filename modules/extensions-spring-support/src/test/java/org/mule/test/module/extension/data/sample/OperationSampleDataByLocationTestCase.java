@@ -23,11 +23,6 @@ public class OperationSampleDataByLocationTestCase extends AbstractSampleDataTes
     return "data/sample/operation-sample-data.xml";
   }
 
-  @Override
-  public boolean enableLazyInit() {
-    return true;
-  }
-
   @Test
   public void connectionLess() throws Exception {
     assertMessage(getOperationSampleByLocation("connectionLess"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);

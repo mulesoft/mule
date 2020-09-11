@@ -23,11 +23,6 @@ public class SourcesSampleDataByLocationTestCase extends AbstractSampleDataTestC
     return "data/sample/source-sample-data.xml";
   }
 
-  @Override
-  public boolean enableLazyInit() {
-    return true;
-  }
-
   @Test
   public void connectionLess() throws Exception {
     assertMessage(getSourceSampleByLocation("connectionLess"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
