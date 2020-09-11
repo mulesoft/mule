@@ -103,11 +103,12 @@ public class ResolverUtils {
   }
 
   /**
-   * Executes the {@code resolver} using the given {@code context}, applying all the required resolution rules that may apply for
+   * Executes the {@code resolver} using the given {@code context},
+   * applying all the required resolution rules that may apply for
    * the given {@code T} type.
    *
    * @param resolver the {@link ValueResolver} to execute
-   * @param context the {@link ValueResolvingContext} to pass on the {@code resolver}
+   * @param context  the {@link ValueResolvingContext} to pass on the {@code resolver}
    * @return the resolved value
    * @throws MuleException
    */
