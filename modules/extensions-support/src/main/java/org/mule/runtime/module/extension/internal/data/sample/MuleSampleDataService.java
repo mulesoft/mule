@@ -9,8 +9,6 @@ package org.mule.runtime.module.extension.internal.data.sample;
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.core.internal.util.LocationUtils.deleteLastPartFromLocation;
-import static org.mule.runtime.core.internal.util.LocationUtils.isConnection;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_LOCATION;
 import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_TARGET_EXTENSION;
@@ -62,13 +60,7 @@ public class MuleSampleDataService implements SampleDataService {
    */
   @Override
   public Message getSampleData(Location location) throws SampleDataException {
-    boolean isConnection = isConnection(location);
-
-    Location realLocation = isConnection
-        ? deleteLastPartFromLocation(location)
-        : location;
-
-    Object component = findComponent(realLocation);
+    Object component = findComponent(location);
 
     if (component instanceof ComponentSampleDataProvider) {
       Message message = ((ComponentSampleDataProvider) component).getSampleData();

@@ -73,7 +73,7 @@ public class SampleDataProviderFactory {
       SampleDataProvider<T, A> resolver = instantiateClass(providerClass);
       initialiseIfNeeded(resolver, true, muleContext);
 
-      injectValueProviderFields(resolver);
+      injectProviderFields(resolver);
 
       if (factoryModelProperty.usesConnection()) {
         Object connection;
@@ -105,7 +105,7 @@ public class SampleDataProviderFactory {
     }
   }
 
-  private void injectValueProviderFields(SampleDataProvider resolver) throws SampleDataException {
+  private void injectProviderFields(SampleDataProvider resolver) throws SampleDataException {
     List<String> missingParameters = new ArrayList<>();
     for (InjectableParameterInfo injectableParam : factoryModelProperty.getInjectableParameters()) {
       Object parameterValue = null;

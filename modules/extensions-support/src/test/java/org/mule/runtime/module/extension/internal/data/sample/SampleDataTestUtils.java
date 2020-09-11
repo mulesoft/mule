@@ -23,7 +23,7 @@ public final class SampleDataTestUtils {
   private SampleDataTestUtils() {}
 
   /**
-   * Creaes a matcher that tests that a {@link SampleDataException} has the given {@code failureCode}
+   * Creates a matcher that tests that a {@link SampleDataException} has the given {@code failureCode}
    *
    * @param failureCode the expected failure code
    * @return a {@link Matcher}
