@@ -49,6 +49,7 @@ public class TestExtensionDeclarationUtils {
   public static final String PARAMETER_VALUE_PROVIDER_OP_ELEMENT_NAME = "parameterValueProviderWithConfig";
   public static final String COMPLEX_ACTING_PARAMETER_OP_ELEMENT_NAME = "complexActingParameterOP";
   public static final String ACTING_PARAMETER_GROUP_OP_ELEMENT_NAME = "actingParameterGroupOP";
+  public static final String ACTING_PARAMETER_GROUP_WITH_ALIAS_OP_ELEMENT_NAME = "actingParameterGroupWithAliasOP";
   public static final String NESTED_PARAMETERS_OP_ELEMENT_NAME = "nestedVPsOperation";
   public static final String MULTIPLE_NESTED_PARAMETERS_OP_ELEMENT_NAME = "multipleNestedVPsOperation";
 
@@ -244,6 +245,24 @@ public class TestExtensionDeclarationUtils {
             .withParameterGroup(newParameterGroup(ACTING_PARAMETER_GROUP_NAME)
                                         .withParameter("stringParam", stringValue)
                                         .withParameter("intParam", ParameterSimpleValue.of(String.valueOf(intValue), NUMBER))
+                                        .withParameter("listParams", listBuilder.build())
+                                        .getDeclaration())
+            .getDeclaration();
+
+  }
+
+  public static OperationElementDeclaration actingParameterGroupOPWithAliasDeclaration(String configName,
+                                                                              String stringValue,
+                                                                              int intValue,
+                                                                              List<String> listValue) {
+    final ParameterListValue.Builder listBuilder = ParameterListValue.builder();
+    listValue.forEach(listBuilder::withValue);
+    return TEST_EXTENSION_DECLARER
+            .newOperation(ACTING_PARAMETER_GROUP_WITH_ALIAS_OP_ELEMENT_NAME)
+            .withConfig(configName)
+            .withParameterGroup(newParameterGroup(ACTING_PARAMETER_GROUP_NAME)
+                                        .withParameter("stringParam", stringValue)
+                                        .withParameter("integerParam", ParameterSimpleValue.of(String.valueOf(intValue), NUMBER))
                                         .withParameter("listParams", listBuilder.build())
                                         .getDeclaration())
             .getDeclaration();
