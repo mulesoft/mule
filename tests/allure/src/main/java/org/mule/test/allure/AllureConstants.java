@@ -346,6 +346,20 @@ public interface AllureConstants {
 
   }
 
+  interface SampleData {
+
+    String SAMPLE_DATA = "Sample Data";
+
+    interface SampleDataStory {
+
+      String SAMPLE_DATA_SERVICE = "Sample Data Service";
+
+      String RESOLVE_BY_LOCATION = "Resolve by location";
+
+      String RESOLVE_THROUGH_TOOLING_API = "Resolve through Tooling API";
+    }
+  }
+
   interface IntegrationTestsFeature {
 
     String INTEGRATIONS_TESTS = "Integration Tests";

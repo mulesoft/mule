@@ -20,10 +20,10 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -35,6 +35,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
@@ -69,6 +70,7 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFac
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.util.TemplateParser;
+import org.mule.runtime.extension.api.data.sample.ComponentSampleDataProvider;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -78,6 +80,7 @@ import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
+import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderMediator;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
@@ -86,6 +89,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValu
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
+import org.mule.sdk.api.data.sample.SampleDataException;
 
 import java.util.List;
 import java.util.Optional;
@@ -107,7 +111,7 @@ import org.slf4j.Logger;
  */
 public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractComponent
     implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
-    Lifecycle {
+    ComponentSampleDataProvider, Lifecycle {
 
   private final static Logger LOGGER = getLogger(ExtensionComponent.class);
 
@@ -115,7 +119,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final ExtensionModel extensionModel;
   private final AtomicReference<ConfigurationProvider> configurationProvider = new AtomicReference<>();
   private final MetadataMediator<T> metadataMediator;
-  private final ValueProviderMediator<T> valueProviderMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
 
@@ -124,6 +127,24 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected final T componentModel;
 
   protected CursorProviderFactory cursorProviderFactory;
+
+  /**
+   * Only to be accessed through {@link #getValueProviderMediator()} as this is a lazy value only used
+   * in design time.
+   *
+   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not
+   * running in design time or when the underlying component doesn't support the capability in the first place
+   */
+  private ValueProviderMediator<T> valueProviderMediator;
+
+  /**
+   * Only to be accessed through {@link #getSampleDataProviderMediator()} as this is a lazy value only used
+   * in design time.
+   *
+   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not
+   * running in design time or when the underlying component doesn't support the capability in the first place
+   */
+  private SampleDataProviderMediator sampleDataProviderMediator;
 
   protected MuleContext muleContext;
 
@@ -168,7 +189,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.extensionManager = extensionManager;
     this.cursorProviderFactory = cursorProviderFactory;
     this.metadataMediator = new MetadataMediator<>(componentModel);
-    this.valueProviderMediator = new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
 
@@ -406,14 +426,14 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public Set<Value> getValues(String parameterName) throws ValueResolvingException {
     try {
-      return runWithValueProvidersContext(context -> withContextClassLoader(classLoader,
-                                                                            () -> valueProviderMediator
-                                                                                .getValues(parameterName,
-                                                                                           getParameterValueResolver(),
-                                                                                           (CheckedSupplier<Object>) () -> context
-                                                                                               .getConnection().orElse(null),
-                                                                                           (CheckedSupplier<Object>) () -> context
-                                                                                               .getConfig().orElse(null))));
+      return runWithResolvingContext(context -> withContextClassLoader(classLoader,
+                                                                       () -> getValueProviderMediator()
+                                                                           .getValues(parameterName,
+                                                                                      getParameterValueResolver(),
+                                                                                      (CheckedSupplier<Object>) () -> context
+                                                                                          .getConnection().orElse(null),
+                                                                                      (CheckedSupplier<Object>) () -> context
+                                                                                          .getConfig().orElse(null))));
     } catch (MuleRuntimeException e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof ValueResolvingException) {
@@ -425,6 +445,31 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     } catch (Exception e) {
       throw new ValueResolvingException("An unknown error occurred trying to resolve values. " + e.getCause().getMessage(),
                                         UNKNOWN, e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Message getSampleData() throws SampleDataException {
+    try {
+      return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getSampleDataProviderMediator()
+          .getSampleData(getParameterValueResolver(),
+                         (CheckedSupplier<Object>) () -> context.getConnection().orElse(null),
+                         (CheckedSupplier<Object>) () -> context.getConfig().orElse(null))));
+    } catch (MuleRuntimeException e) {
+      Throwable rootException = getRootException(e);
+      if (rootException instanceof SampleDataException) {
+        throw (SampleDataException) rootException;
+      } else {
+        throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
+                                      SampleDataException.UNKNOWN, e);
+      }
+
+    } catch (Exception e) {
+      throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
+                                    SampleDataException.UNKNOWN, e);
     }
   }
 
@@ -472,11 +517,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                             this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
   }
 
-  private <R> R runWithValueProvidersContext(Function<ExtensionResolvingContext, R> valueProviderFunction) {
+  private <R> R runWithResolvingContext(Function<ExtensionResolvingContext, R> function) {
     ExtensionResolvingContext context = getResolvingContext();
     R result;
     try {
-      result = valueProviderFunction.apply(context);
+      result = function.apply(context);
     } finally {
       context.dispose();
     }
@@ -487,7 +532,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       throws MetadataResolvingException {
     CoreEvent fakeEvent = null;
     try {
-      fakeEvent = getInitialiserEvent(muleContext);
+      fakeEvent = getNullEvent(muleContext);
 
       Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
 
@@ -516,7 +561,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return new ExtensionResolvingContext(() -> {
       CoreEvent fakeEvent = null;
       try {
-        fakeEvent = getInitialiserEvent(muleContext);
+        fakeEvent = getNullEvent(muleContext);
         return getConfiguration(fakeEvent);
       } finally {
         if (fakeEvent != null) {
@@ -610,6 +655,36 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
 
     this.cacheIdGenerator = cacheIdGeneratorFactory.create(context, configLocator);
+  }
+
+  private ValueProviderMediator getValueProviderMediator() {
+    if (valueProviderMediator == null) {
+      synchronized (this) {
+        if (valueProviderMediator == null) {
+          valueProviderMediator = new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
+        }
+      }
+    }
+
+    return valueProviderMediator;
+  }
+
+  private SampleDataProviderMediator getSampleDataProviderMediator() {
+    if (sampleDataProviderMediator == null) {
+      synchronized (this) {
+        if (sampleDataProviderMediator == null) {
+          sampleDataProviderMediator = new SampleDataProviderMediator(
+                                                                      extensionModel,
+                                                                      componentModel,
+                                                                      this,
+                                                                      muleContext,
+                                                                      reflectionCache,
+                                                                      streamingManager);
+        }
+      }
+    }
+
+    return sampleDataProviderMediator;
   }
 
   protected abstract ParameterValueResolver getParameterValueResolver();

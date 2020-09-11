@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sample-data="http://www.mulesoft.org/schema/mule/sample-data"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/sample-data http://www.mulesoft.org/schema/mule/sample-data/current/mule-sample-data.xsd">
+
+    <sample-data:config name="config" prefix="from-conf-">
+        <sample-data:connection/>
+    </sample-data:config>
+
+    <flow name="connectionLess">
+        <sample-data:connection-less payload="my payload" attributes="my attributes" />
+    </flow>
+
+    <flow name="useConnection">
+        <sample-data:use-connection payload="my payload" attributes="my attributes" config-ref="config"/>
+    </flow>
+
+    <flow name="useConfig">
+        <sample-data:use-config payload="my payload" attributes="my attributes" config-ref="config"/>
+    </flow>
+
+    <flow name="nonBlocking">
+        <sample-data:non-blocking payload="my payload" attributes="my attributes" config-ref="config"/>
+    </flow>
+
+    <flow name="parameterGroup">
+        <sample-data:parameter-group groupParameter="my payload" optionalParameter="my attributes" config-ref="config"/>
+    </flow>
+
+    <flow name="parameterGroupWithOptional">
+        <sample-data:parameter-group groupParameter="my payload" config-ref="config"/>
+    </flow>
+
+    <flow name="showInDslParameterGroup">
+        <sample-data:show-in-dsl-parameter-group config-ref="config">
+            <sample-data:group groupParameter="my payload" optionalParameter="my attributes"/>
+        </sample-data:show-in-dsl-parameter-group>
+    </flow>
+
+    <flow name="aliasedGroup">
+        <sample-data:aliased-group aliasedPayload="my payload" aliasedAttributes="my attributes" config-ref="config"/>
+    </flow>
+
+    <flow name="missingActingParameter">
+        <sample-data:use-connection payload="my payload" config-ref="config"/>
+    </flow>
+
+    <flow name="muleContextAwareSampleData">
+        <sample-data:mule-context-aware-sample-data payload="my payload" attributes="my attributes" />
+    </flow>
+
+    <flow name="complexActingParameter">
+        <sample-data:complex-acting-parameter>
+            <sample-data:complex payload="my payload" attributes="my attributes" />
+        </sample-data:complex-acting-parameter>
+    </flow>
+</mule>

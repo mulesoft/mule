@@ -38,10 +38,10 @@ import java.util.function.Supplier;
  */
 public final class ValueProviderMediator<T extends ParameterizedModel & EnrichableModel> {
 
-  private T containerModel;
-  private Supplier<MuleContext> muleContext;
-  private Supplier<ReflectionCache> reflectionCache;
-  private Supplier<Object> NULL_SUPPLIER = () -> null;
+  private final T containerModel;
+  private final Supplier<MuleContext> muleContext;
+  private final Supplier<ReflectionCache> reflectionCache;
+  private final Supplier<Object> nullSupplier = () -> null;
 
   /**
    * Creates a new instance of the mediator
@@ -67,7 +67,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    */
   public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver)
       throws ValueResolvingException {
-    return getValues(parameterName, parameterValueResolver, NULL_SUPPLIER, NULL_SUPPLIER);
+    return getValues(parameterName, parameterValueResolver, nullSupplier, nullSupplier);
   }
 
   /**

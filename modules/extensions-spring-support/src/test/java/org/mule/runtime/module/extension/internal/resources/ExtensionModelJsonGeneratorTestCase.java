@@ -37,6 +37,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclara
 import org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.data.sample.extension.SampleDataExtension;
 import org.mule.test.function.extension.WeaveFunctionExtension;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
@@ -107,6 +108,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
                         newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth.json"),
                         newTestUnit(javaLoader, WeaveFunctionExtension.class, "test-fn.json"),
                         newTestUnit(javaLoader, ValuesExtension.class, "values.json"),
+                        newTestUnit(javaLoader, SampleDataExtension.class, "sample-data.json"),
                         newTestUnit(javaLoader, ImplicitConfigExtension.class, "implicit-config.json"),
                         newTestUnit(javaLoader, NonImplicitConfigExtension.class, "non-implicit-config.json"),
                         newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.json"));
