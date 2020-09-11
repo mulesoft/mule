@@ -755,8 +755,6 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     assertThat(decorated, instanceOf(CursorStream.class));
   }
 
-
-
   private void consumeInputStream() throws IOException {
     InputStream decorated = new ByteArrayInputStream("Hello World".getBytes(UTF_8));
     InputStream decorator = decoratorFactory.componentDecoratorFactory(component1).decorateInput(decorated, CORR_ID);
