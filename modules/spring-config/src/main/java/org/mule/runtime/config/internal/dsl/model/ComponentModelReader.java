@@ -75,8 +75,7 @@ public class ComponentModelReader {
         .build())
         .withMetadata(metadataBuilder.build());
 
-    final String resolvedText = resolveValueIfIsPlaceHolder(configLine.getTextContent());
-    componentAstBuilder.withRawParameter(BODY_RAW_PARAM_NAME, resolvedText);
+    componentAstBuilder.withRawParameter(BODY_RAW_PARAM_NAME, resolveValueIfIsPlaceHolder(configLine.getTextContent()));
 
     for (SimpleConfigAttribute simpleConfigAttribute : configLine.getConfigAttributes().values()) {
       componentAstBuilder.withRawParameter(simpleConfigAttribute.getName(),
