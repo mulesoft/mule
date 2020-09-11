@@ -17,6 +17,7 @@ import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateI
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.mapTypeValue;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
@@ -130,10 +131,14 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
                          context == null || context.resolveCursors()
                              ? resolveCursor(resolvedValue,
                                              entry.getValue().isContent() && componentDecoratorFactory != null
-                                                 ? v -> decorateInputOperation(context.getEvent().getCorrelationId(),
-                                                                               componentDecoratorFactory)
+                                                 ? decorateInputOperation(context.getEvent().getCorrelationId(),
+                                                                          componentDecoratorFactory)
                                                  : identity())
-                             : resolvedValue);
+                             : entry.getValue().isContent() && componentDecoratorFactory != null
+                                 ? mapTypeValue(resolvedValue,
+                                                decorateInputOperation(context.getEvent().getCorrelationId(),
+                                                                       componentDecoratorFactory))
+                                 : resolvedValue);
     }
 
     injectFields(object, name, encoding, reflectionCache);
