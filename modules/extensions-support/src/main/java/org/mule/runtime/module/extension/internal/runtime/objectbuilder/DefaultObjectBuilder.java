@@ -17,8 +17,8 @@ import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateI
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.mapTypeValue;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveTypedValue;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
@@ -28,7 +28,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.UnaryOperator;
 
 import javax.inject.Inject;
 
@@ -136,9 +135,9 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
                                                                           componentDecoratorFactory)
                                                  : identity())
                              : entry.getValue().isContent() && componentDecoratorFactory != null
-                                 ? resolveTypedValue(resolvedValue,
-                                                     decorateInputOperation(context.getEvent().getCorrelationId(),
-                                                                            componentDecoratorFactory))
+                                 ? mapTypeValue(resolvedValue,
+                                                decorateInputOperation(context.getEvent().getCorrelationId(),
+                                                                       componentDecoratorFactory))
                                  : resolvedValue);
     }
 

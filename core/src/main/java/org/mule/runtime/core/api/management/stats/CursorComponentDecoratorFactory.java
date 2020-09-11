@@ -123,6 +123,18 @@ public interface CursorComponentDecoratorFactory {
   InputStream decorateOutput(InputStream decorated, String correlationId);
 
   /**
+   * If statistics are enabled, decorates the provided {@link CursorStream} for counting the streamed bytes.
+   * <p>
+   * Ref: {@link PayloadStatistics#getOutputByteCount()}.
+   *
+   * @param decorated the {@link CursorStream} to decorate.
+   * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
+   *        measured volume to a specific execution.
+   * @return the decorated {@link CursorStream}.
+   */
+  CursorStream decorateOutput(CursorStream decorated, String correlationId);
+
+  /**
    * If statistics are enabled, decorates the provided {@link Collection} for counting its objects and, if applicable, its
    * elements for counting its objects or streamed bytes.
    * <p>
