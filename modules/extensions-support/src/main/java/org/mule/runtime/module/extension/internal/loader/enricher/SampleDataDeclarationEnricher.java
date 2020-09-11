@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.data.sample.SampleDataUtils.getSampleDataProviderId;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.data.sample.SampleDataProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -22,12 +23,10 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
@@ -45,9 +44,11 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * {@link DeclarationEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for Source,
- * Operation, Configuration and Connection Provider Parameters and ParameterGroups annotated with {@link OfValues}.
- * If a parameter or parameter group is annotated, this one will have a related {@link ValueProvider}
+ * {@link DeclarationEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for sources and
+ * operations annotated with {@link SampleData}.
+ *
+ * Detected components are enriched with a {@link SampleDataProviderModel} and the necessary {@link ModelProperty} for the
+ * component being executed.
  *
  * @since 4.4.0
  */

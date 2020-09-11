@@ -40,6 +40,12 @@ import org.mule.sdk.api.runtime.operation.Result;
 
 import java.util.function.Supplier;
 
+/**
+ * Coordinates all the moving parts necessary to provision and execute a {@link SampleDataProvider},
+ * handling possible errors and transforming the output into a {@link Message}
+ *
+ * @since 4.4.0SampleDataDeclarationEnricher
+ */
 public class SampleDataProviderMediator {
 
   private final ExtensionModel extensionModel;

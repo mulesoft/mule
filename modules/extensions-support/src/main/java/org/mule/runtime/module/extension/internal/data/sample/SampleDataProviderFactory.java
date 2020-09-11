@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 /**
  * Provides instances of {@link SampleDataProvider}
  *
- * @since 4.0
+ * @since 4.4.0
  */
 public class SampleDataProviderFactory {
 

@@ -11,6 +11,7 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.sdk.api.data.sample.SampleDataException;
+import org.mule.sdk.api.data.sample.SampleDataProvider;
 
 import java.util.Map;
 import java.util.Optional;
@@ -34,9 +35,21 @@ public interface SampleDataService {
    *
    * @param location The {@link Location} of the target component
    * @return a sample output {@link Message}
+   * @throws SampleDataException if the resolution fails
    */
   Message getSampleData(Location location) throws SampleDataException;
 
+  /**
+   * Returns a sample output {@link Message} for a specific component referenced by its
+   * {@code extensionName} and {@code componentName}.
+   *
+   * @param extensionName                 the name of the extension in which the component is defined
+   * @param componentName                 the name of the component that supplies the sample
+   * @param parameters                    the parameters supplied to the underlying {@link SampleDataProvider}
+   * @param configurationInstanceSupplier supplies the config for underlying {@link SampleDataProvider} which requires connectivity or config
+   * @return @return a sample output {@link Message}
+   * @throws SampleDataException if the resolution fails
+   */
   Message getSampleData(String extensionName,
                         String componentName,
                         Map<String, Object> parameters,

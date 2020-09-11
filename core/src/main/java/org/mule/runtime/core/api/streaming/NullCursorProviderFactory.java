@@ -10,6 +10,11 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 
+/**
+ * {@link CursorProviderFactory} which never generates a {@link CursorProviderFactory}
+ *
+ * @since 4.4.0
+ */
 public class NullCursorProviderFactory implements CursorProviderFactory {
 
   @Override
