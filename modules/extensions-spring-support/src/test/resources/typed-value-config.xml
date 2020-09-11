@@ -125,7 +125,7 @@
         <set-payload value="&quot;string&quot;" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-operation-pojo-with-nullsafe-and-content >
             <typed-value:param weight="#[5]">
-                <typed-value:description></typed-value:description>
+                <typed-value:description><![CDATA[]]></typed-value:description>
                 <typed-value:brand-name><![CDATA[]]></typed-value:brand-name>
             </typed-value:param>
         </typed-value:typed-value-operation-pojo-with-nullsafe-and-content>

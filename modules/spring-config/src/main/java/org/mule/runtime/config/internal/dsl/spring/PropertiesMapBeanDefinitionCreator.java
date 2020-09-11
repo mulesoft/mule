@@ -20,6 +20,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -40,7 +41,8 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
         managedMap = createManagedMapFromEntries(componentModel);
       } else {
         managedMap = new ManagedMap<>();
-        ComponentAst parentComponentModel = createBeanDefinitionRequest.getParentComponentModel();
+        final List<ComponentAst> hierarchy = createBeanDefinitionRequest.getComponentModelHierarchy();
+        ComponentAst parentComponentModel = hierarchy.isEmpty() ? null : hierarchy.get(hierarchy.size() - 1);
         parentComponentModel.directChildrenStream()
             .filter(childComponentModel -> childComponentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
             .forEach(childComponentModel -> processAndAddMapProperty(childComponentModel, managedMap));
