@@ -155,4 +155,13 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
     }
   }
 
+  @Override
+  public CursorStream decorateOutput(CursorStream decorated, String correlationId) {
+    if (payloadStatistics.isEnabled()) {
+      return new PayloadStatisticsCursorStream(decorated, payloadStatistics::addOutputByteCount);
+    } else {
+      return NO_OP_INSTANCE.decorateInput(decorated, correlationId);
+    }
+  }
+
 }

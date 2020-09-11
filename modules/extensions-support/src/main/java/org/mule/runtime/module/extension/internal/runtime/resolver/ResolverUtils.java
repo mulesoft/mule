@@ -158,6 +158,19 @@ public class ResolverUtils {
     return valueMapper.apply(value);
   }
 
+  /**
+   * Applies the valueMapper to the value of a {@link TypedValue} if appropriate
+   *
+   * @return the given {@code value} from a typedValue.
+   */
+  public static Object mapTypeValue(Object value, UnaryOperator valueMapper) {
+    if (value instanceof TypedValue) {
+      return typedValue((TypedValue<?>) value, valueMapper, ((TypedValue<?>) value).getValue());
+    }
+
+    return valueMapper.apply(value);
+  }
+
   public static Object resolveCursor(TypedValue<?> typedValue) {
     return resolveCursor(typedValue, identity());
   }
@@ -167,10 +180,7 @@ public class ResolverUtils {
 
     if (objectValue instanceof CursorProvider) {
       Cursor cursor = ((CursorProvider) objectValue).openCursor();
-      return new TypedValue<>(valueMapper.apply(cursor), DataType.builder()
-          .type(cursor.getClass())
-          .mediaType(typedValue.getDataType().getMediaType())
-          .build(), typedValue.getByteLength());
+      return typedValue(typedValue, valueMapper, cursor);
     } else {
       final Object mappedValue = valueMapper.apply(objectValue);
 
@@ -180,6 +190,13 @@ public class ResolverUtils {
         return new TypedValue<>(mappedValue, typedValue.getDataType(), typedValue.getByteLength());
       }
     }
+  }
+
+  private static Object typedValue(TypedValue<?> typedValue, UnaryOperator valueMapper, Object value) {
+    return new TypedValue<>(valueMapper.apply(value), DataType.builder()
+        .type(value.getClass())
+        .mediaType(typedValue.getDataType().getMediaType())
+        .build(), typedValue.getByteLength());
   }
 
   private static ValueResolver<?> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,
