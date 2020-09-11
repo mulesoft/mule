@@ -38,7 +38,7 @@ public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTes
   }
 
   @Test
-  @FlakyTest(times = 150)
+  @FlakyTest(times = 1500)
   public void byteArrayToInputStreamTransformationIsSuccessful() {
     check(POLL_TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> EventRecorder.countCapturedEvents() == EXPECTED_EVENT_COUNT);
   }
