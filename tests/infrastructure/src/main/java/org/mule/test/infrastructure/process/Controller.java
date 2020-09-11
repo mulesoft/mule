@@ -15,17 +15,25 @@ import static java.util.Arrays.asList;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
+import static org.mule.test.infrastructure.maven.MavenTestUtils.installMavenArtifact;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_EE_SERVICE_NAME;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_SERVICE_NAME;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.infrastructure.client.deployment.DeploymentClient;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +41,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -47,8 +56,14 @@ public class Controller {
   private static final String DOMAIN_BUNDLE_DEPLOY_ERROR = "Error deploying domain bundle %s.";
   private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule Runtime.";
   private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
+  private static final BundleDescriptor managementDeploymentDescriptor = new BundleDescriptor.Builder().setGroupId("test")
+      .setArtifactId("management-deployment").setVersion("1.0.0").setClassifier("mule-server-plugin").build();
+  private static final String DEPLOYMENT_SERVER_SOCKET_PORT_PROPERTY = "mule.test.deployment.server.socket.port";
+  private static final String DEPLOYMENT_SERVER_SOCKET_PORT = new DynamicPort("DEPLOYMENT_SERVER_SOCKET_PORT").getValue();
+
   private static final int IS_RUNNING_STATUS_CODE = 0;
   private static final Pattern pattern = compile("wrapper\\.java\\.additional\\.(\\d*)=");
+  private static final Logger LOGGER = getLogger(Controller.class);
 
   private final AbstractOSController osSpecificController;
 
@@ -58,6 +73,8 @@ public class Controller {
   protected File libsDir;
   protected File internalRepository;
   protected Path wrapperConf;
+  private File managementDeploymentArtifact;
+  private DeploymentClient deploymentClient;
 
   public Controller(AbstractOSController osSpecificController, String muleHome) {
     this.osSpecificController = osSpecificController;
@@ -74,8 +91,31 @@ public class Controller {
   }
 
   public void start(String... args) {
-    checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(args);
-    osSpecificController.start(args);
+    // Setup management deployment
+    List<String> argsList = new ArrayList<>(asList(args));
+    argsList.add(format("-M-D%s=%s", DEPLOYMENT_SERVER_SOCKET_PORT_PROPERTY, DEPLOYMENT_SERVER_SOCKET_PORT));
+    managementDeploymentArtifact = installMavenArtifact("management-deployment", managementDeploymentDescriptor);
+    addServerPlugin(managementDeploymentArtifact);
+
+    String[] arguments = argsList.toArray(new String[0]);
+    checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(arguments);
+    osSpecificController.start(arguments);
+    startDeploymentClient();
+  }
+
+  private void startDeploymentClient() {
+    try {
+      this.deploymentClient = new DeploymentClient(parseInt(DEPLOYMENT_SERVER_SOCKET_PORT));
+      this.deploymentClient.start();
+    } catch (Exception e) {
+      LOGGER.warn("Failed to start deployment client");
+    }
+  }
+
+  private void stopDeploymentClient() {
+    if (deploymentClient != null) {
+      deploymentClient.stop();
+    }
   }
 
   protected void checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(String... args) {
@@ -87,6 +127,7 @@ public class Controller {
   }
 
   public int stop(String... args) {
+    stopDeploymentClient();
     int error = osSpecificController.stop(args);
     verify(error == 0, "The mule instance couldn't be stopped");
     deleteAnchors();
@@ -102,7 +143,9 @@ public class Controller {
   }
 
   public void restart(String... args) {
+    stopDeploymentClient();
     osSpecificController.restart(args);
+    startDeploymentClient();
   }
 
   protected void verify(boolean condition, String message, Object... args) {
@@ -233,7 +276,21 @@ public class Controller {
   }
 
   protected boolean isDeployed(String appName) {
-    return new File(appsDir, appName + ANCHOR_SUFFIX).exists();
+    return new File(appsDir, appName + ANCHOR_SUFFIX).exists() && isDeployedArtifact(appName, false);
+  }
+
+  protected boolean isDeployedArtifact(String artifactName, boolean domain) {
+    boolean isDeployed = false;
+    try {
+      if (domain) {
+        isDeployed = deploymentClient.isDomainDeployed(artifactName);
+      } else {
+        isDeployed = deploymentClient.isDeployed(artifactName);
+      }
+    } catch (IOException e) {
+      LOGGER.warn(format("Deployment client fails request %s deployment status to %s", domain ? "domain" : "app", artifactName));
+    }
+    return isDeployed;
   }
 
   protected boolean wasRemoved(String appName) {
@@ -241,7 +298,7 @@ public class Controller {
   }
 
   protected boolean isDomainDeployed(String domainName) {
-    return new File(domainsDir, domainName + ANCHOR_SUFFIX).exists();
+    return new File(domainsDir, domainName + ANCHOR_SUFFIX).exists() && isDeployedArtifact(domainName, true);
   }
 
   /**
@@ -307,6 +364,24 @@ public class Controller {
       copyFile(log4jFile, currentRuntimeLog4jConfigFile, false);
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  public void addServerPlugin(File serverPluginZip) {
+    try {
+      copyFileToDirectory(serverPluginZip, serverPluginsDir);
+    } catch (IOException e) {
+      throw new MuleControllerException("Could not copy serverPlugin [" + serverPluginZip.getName() + "] to [" + serverPluginsDir
+          + "]", e);
+    }
+  }
+
+  public void removeServerPlugin(File serverPluginZip) {
+    final boolean fileDeleted = deleteQuietly(new File(serverPluginsDir, serverPluginZip.getName()));
+    final boolean folderDeleted = deleteQuietly(new File(serverPluginsDir, getBaseName(serverPluginZip.getName())));
+    if (!(fileDeleted || folderDeleted)) {
+      throw new MuleControllerException("Could not remove serverPlugin [" + getBaseName(serverPluginZip.getName()) + "] from ["
+          + serverPluginsDir + "]");
     }
   }
 }
