@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.tests</groupId>
+        <artifactId>mule-tests</artifactId>
+        <version>4.4.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>deployment-notifier-plugin</artifactId>
+    <packaging>mule-server-plugin</packaging>
+
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <mule.server.plugin.maven.plugin.version>${mule.extensions.maven.plugin.version}</mule.server.plugin.maven.plugin.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.mulesoft.mule.runtime.modules</groupId>
+            <artifactId>mule-module-plugin-ee</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.mule.runtime.plugins</groupId>
+                <artifactId>mule-server-plugin-maven-plugin</artifactId>
+                <version>${mule.server.plugin.maven.plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serviceProviderClassName>org.mule.test.plugin.DeploymentNotifierPlugin</serviceProviderClassName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
