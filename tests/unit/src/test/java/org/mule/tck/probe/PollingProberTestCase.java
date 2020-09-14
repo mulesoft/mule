@@ -47,7 +47,7 @@ public class PollingProberTestCase extends AbstractMuleTestCase {
     prober.check(new JUnitAdapter(new ProbeWhichBecomesTrueAfterNTries(5, true)));
   }
 
-  private class ProbeWhichBecomesTrueAfterNTries implements Probe {
+  private static class ProbeWhichBecomesTrueAfterNTries implements Probe {
 
     private int currentTries = 0;
     private int failingTries;
