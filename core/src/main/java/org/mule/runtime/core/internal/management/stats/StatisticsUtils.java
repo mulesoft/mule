@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.internal.management.stats.visitor.Visitable;
 import org.mule.runtime.core.internal.management.stats.visitor.VisitableCollection;
@@ -32,27 +33,21 @@ public class StatisticsUtils {
    * @return a visitable wrapper of source. Empty if not a visitable class.
    */
   public static Optional<Visitable> visitable(Object source) {
-    if (source instanceof InputStream) {
+    if (source instanceof CursorStream) {
+      return of(new VisitableCursorStream((CursorStream) source));
+    } else if (source instanceof InputStream) {
       return of(new VisitableInputStream((InputStream) source));
-    }
-
-    if (source instanceof Iterator) {
+    } else if (source instanceof Iterator) {
       return of(new VisitableIterator((Iterator) source));
-    }
-
-    if (source instanceof List) {
+    } else if (source instanceof List) {
       return of(new VisitableList((List) source));
-    }
-
-    if (source instanceof Collection) {
+    } else if (source instanceof Collection) {
       return of(new VisitableCollection((Collection) source));
-    }
-
-    if (source instanceof CursorStreamProvider) {
+    } else if (source instanceof CursorStreamProvider) {
       return of(new VisitableCursorStreamProvider((CursorStreamProvider) source));
+    } else {
+      return empty();
     }
-
-    return empty();
   }
 
 }

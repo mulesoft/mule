@@ -12,8 +12,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.internal.management.stats.VisitableCursorStream;
 
 /**
  * Visitor that returns a decorator for output statistics.
@@ -47,17 +49,23 @@ public class OutputDecoratorVisitor<T> implements Visitor<T> {
 
   @Override
   public List<T> visitList(VisitableList<T> visitableList) {
-    return visitableList;
+    return visitableList.getDelegate();
   }
 
   @Override
   public Set<T> visitSet(VisitableSet<T> visitableSet) {
-    return visitableSet;
+    return visitableSet.getDelegate();
   }
 
   @Override
   public CursorStreamProvider visitCursorStreamProvider(VisitableCursorStreamProvider visitableCursorStreamProvider) {
-    return visitableCursorStreamProvider;
+    return visitableCursorStreamProvider.getDelegate();
+  }
+
+  @Override
+  public CursorStream visitCursorStream(VisitableCursorStream visitableCursorStream) {
+    return decoratorFactory.decorateOutput(visitableCursorStream.getDelegate(), correlationId);
+
   }
 
   public static Builder builder() {

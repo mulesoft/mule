@@ -73,4 +73,9 @@ public class NoOpCursorComponentDecoratorFactory implements CursorComponentDecor
   public CursorStream decorateInput(CursorStream decorated, String correlationId) {
     return decorated;
   }
+
+  @Override
+  public CursorStream decorateOutput(CursorStream decorated, String correlationId) {
+    return decorated;
+  }
 }

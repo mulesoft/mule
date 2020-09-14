@@ -12,9 +12,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.internal.management.stats.InputDecoratedCursorStreamProvider;
+import org.mule.runtime.core.internal.management.stats.VisitableCursorStream;
 
 /**
  * Visitor that returns a decorator for input statistics.
@@ -34,7 +36,7 @@ public class InputDecoratorVisitor<T> implements Visitor<T> {
 
   @Override
   public InputStream visitInputStream(VisitableInputStream visitable) {
-    return decoratorFactory.decorateInput(visitable, correlationId);
+    return decoratorFactory.decorateInput(visitable.getDelegate(), correlationId);
   }
 
   @Override
@@ -49,17 +51,22 @@ public class InputDecoratorVisitor<T> implements Visitor<T> {
 
   @Override
   public List<T> visitList(VisitableList<T> visitableList) {
-    return (List<T>) decoratorFactory.decorateInput(visitableList, correlationId);
+    return (List<T>) decoratorFactory.decorateInput(visitableList.getDelegate(), correlationId);
   }
 
   @Override
   public Set<T> visitSet(VisitableSet<T> visitableSet) {
-    return (Set<T>) decoratorFactory.decorateInput(visitableSet, correlationId);
+    return (Set<T>) decoratorFactory.decorateInput(visitableSet.getDelegate(), correlationId);
   }
 
   @Override
   public CursorStreamProvider visitCursorStreamProvider(VisitableCursorStreamProvider cursorStreamProvider) {
     return new InputDecoratedCursorStreamProvider(cursorStreamProvider.getDelegate(), decoratorFactory, correlationId);
+  }
+
+  @Override
+  public CursorStream visitCursorStream(VisitableCursorStream visitableCursorStream) {
+    return decoratorFactory.decorateInput(visitableCursorStream.getDelegate(), correlationId);
   }
 
   public static Builder builder() {
