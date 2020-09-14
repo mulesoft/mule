@@ -9,6 +9,7 @@ package org.mule.test.infrastructure.process;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.util.Arrays.asList;
@@ -20,17 +21,16 @@ import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
-import static org.mule.test.infrastructure.maven.MavenTestUtils.installMavenArtifact;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_EE_SERVICE_NAME;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_SERVICE_NAME;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.infrastructure.client.deployment.DeploymentClient;
 import org.slf4j.Logger;
@@ -56,8 +56,9 @@ public class Controller {
   private static final String DOMAIN_BUNDLE_DEPLOY_ERROR = "Error deploying domain bundle %s.";
   private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule Runtime.";
   private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
-  private static final BundleDescriptor managementDeploymentDescriptor = new BundleDescriptor.Builder().setGroupId("test")
-      .setArtifactId("management-deployment").setVersion("1.0.0").setClassifier("mule-server-plugin").build();
+  // Deployment plugin
+  private static final String DEPLOYMENT_NOTIFIER_PLUGIN_PROPERTY = "mule.deployment.notifier.plugin";
+  private static final String DEPLOYMENT_NOTIFIER_PLUGIN_JAR = getProperty(DEPLOYMENT_NOTIFIER_PLUGIN_PROPERTY);
   private static final String DEPLOYMENT_SERVER_SOCKET_PORT_PROPERTY = "mule.test.deployment.server.socket.port";
   private static final String DEPLOYMENT_SERVER_SOCKET_PORT = new DynamicPort("DEPLOYMENT_SERVER_SOCKET_PORT").getValue();
 
@@ -73,7 +74,7 @@ public class Controller {
   protected File libsDir;
   protected File internalRepository;
   protected Path wrapperConf;
-  private File managementDeploymentArtifact;
+  private File deploymentNotifierArtifact;
   private DeploymentClient deploymentClient;
 
   public Controller(AbstractOSController osSpecificController, String muleHome) {
@@ -84,6 +85,11 @@ public class Controller {
     this.libsDir = new File(muleHome + "/lib/user");
     this.internalRepository = new File(muleHome, "repository");
     this.wrapperConf = Paths.get(muleHome + "/conf/wrapper.conf");
+    if (isEmpty(DEPLOYMENT_NOTIFIER_PLUGIN_JAR)) {
+      LOGGER.error("You must configure the location for Deployment notifier plugin in the system property: "
+          + DEPLOYMENT_NOTIFIER_PLUGIN_PROPERTY);
+    }
+    deploymentNotifierArtifact = new File(DEPLOYMENT_NOTIFIER_PLUGIN_JAR);
   }
 
   public String getMuleBin() {
@@ -94,8 +100,7 @@ public class Controller {
     // Setup management deployment
     List<String> argsList = new ArrayList<>(asList(args));
     argsList.add(format("-M-D%s=%s", DEPLOYMENT_SERVER_SOCKET_PORT_PROPERTY, DEPLOYMENT_SERVER_SOCKET_PORT));
-    managementDeploymentArtifact = installMavenArtifact("management-deployment", managementDeploymentDescriptor);
-    addServerPlugin(managementDeploymentArtifact);
+    addServerPlugin(deploymentNotifierArtifact);
 
     String[] arguments = argsList.toArray(new String[0]);
     checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(arguments);
