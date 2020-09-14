@@ -38,8 +38,10 @@ public class ResponseStreamingCompletionHandler
     private final HttpResponsePacket httpResponsePacket;
     private final InputStream inputStream;
     private final ResponseStatusCallback responseStatusCallback;
-
+    private final ClassLoader loggerClassLoader;
     private volatile boolean isDone;
+
+    public static final String MULE_CLASSLOADER = "MULE_CLASSLOADER";
 
     public ResponseStreamingCompletionHandler(final FilterChainContext ctx,
                                               final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
@@ -51,6 +53,7 @@ public class ResponseStreamingCompletionHandler
         inputStream = ((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream();
         memoryManager = ctx.getConnection().getTransport().getMemoryManager();
         this.responseStatusCallback = responseStatusCallback;
+        loggerClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
     @Override
@@ -81,6 +84,7 @@ public class ResponseStreamingCompletionHandler
             content = httpResponsePacket.httpContentBuilder().content(buffer).build();
         }
 
+        ctx.getConnection().getAttributes().setAttribute(MULE_CLASSLOADER, loggerClassLoader);
         ctx.write(content, this);
     }
 
