@@ -38,13 +38,13 @@ public class PollingProberTestCase extends AbstractMuleTestCase {
 
   @Test
   public void jUnitProbeBecomesTrueAfterFiveTries() {
-    prober.check(new JUnitProbeWhichBecomesTrueAfterNTries(5, false));
+    prober.check(new JUnitAdapter(new ProbeWhichBecomesTrueAfterNTries(5, false)));
   }
 
 
   @Test
   public void jUnitProbeAssertsTrueAfterFiveTries() {
-    prober.check(new JUnitProbeWhichBecomesTrueAfterNTries(5, true));
+    prober.check(new JUnitAdapter(new ProbeWhichBecomesTrueAfterNTries(5, true)));
   }
 
   private class ProbeWhichBecomesTrueAfterNTries implements Probe {
@@ -76,32 +76,22 @@ public class PollingProberTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private class JUnitProbeWhichBecomesTrueAfterNTries extends JUnitProbe {
+  private static class JUnitAdapter extends JUnitProbe {
 
-    private int currentTries = 0;
-    private int failingTries;
-    private boolean isAssertion;
+    private final ProbeWhichBecomesTrueAfterNTries delegate;
 
-    private JUnitProbeWhichBecomesTrueAfterNTries(int failingTries, boolean isAssertion) {
-      this.failingTries = failingTries;
-      this.isAssertion = isAssertion;
+    private JUnitAdapter(ProbeWhichBecomesTrueAfterNTries delegate) {
+      this.delegate = delegate;
     }
 
     @Override
     public boolean test() {
-      currentTries += 1;
-
-      if (isAssertion) {
-        assertThat(currentTries, greaterThan(failingTries));
-        return true;
-      } else {
-        return currentTries >= failingTries;
-      }
+      return delegate.isSatisfied();
     }
 
     @Override
     public String describeFailure() {
-      return format("You need to call the probe %d times before it becomes true", failingTries);
+      return delegate.describeFailure();
     }
   }
 }
