@@ -1,0 +1,14 @@
+{
+  "name": "deployment-notifier-plugin",
+  "minMuleVersion": "4.0.0",
+  "requiredProduct": "MULE_EE",
+  "pluginClassName": "org.mule.test.plugin.DeploymentNotifierPlugin",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {}
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}
