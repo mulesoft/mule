@@ -1678,9 +1678,15 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
    * @param file      file to update
    */
   protected void updateFileModifiedTime(long timestamp, File file) {
-    do {
-      file.setLastModified(currentTimeMillis());
-    } while (file.lastModified() == timestamp);
+    ReentrantLock deploymentLock = deploymentService.getLock();
+    deploymentLock.lock();
+    try {
+      do {
+        file.setLastModified(currentTimeMillis());
+      } while (file.lastModified() <= timestamp);
+    } finally {
+      deploymentLock.unlock();
+    }
   }
 
   protected void resetUndeployLatch() {
