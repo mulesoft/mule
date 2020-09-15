@@ -79,12 +79,13 @@ public class PollingProber implements Prober {
 
   @Override
   public void check(Probe probe) {
-    if (!poll(probe)) {
+    Probe jUnitProbe = JUnitProbeWrapper.wrap(probe);
+    if (!poll(jUnitProbe)) {
       LOGGER.error("test timed out. Maybe due to a deadlock?");
       if (LOGGER.isTraceEnabled()) {
         logThreadDump();
       }
-      throw new AssertionError(probe.describeFailure());
+      throw new AssertionError(jUnitProbe.describeFailure());
     }
   }
 
@@ -107,6 +108,34 @@ public class PollingProber implements Prober {
       Thread.sleep(duration);
     } catch (InterruptedException e) {
       throw new IllegalStateException("unexpected interrupt", e);
+    }
+  }
+
+  private static class JUnitProbeWrapper extends JUnitProbe {
+
+    static JUnitProbe wrap(Probe probe) {
+      if (probe instanceof JUnitProbe) {
+        return (JUnitProbe) probe;
+      } else {
+        return new JUnitProbeWrapper(probe);
+      }
+    }
+
+    private Probe probe;
+
+    private JUnitProbeWrapper(Probe probe) {
+      super();
+      this.probe = probe;
+    }
+
+    @Override
+    protected boolean test() throws Exception {
+      return probe.isSatisfied();
+    }
+
+    @Override
+    public String describeFailure() {
+      return probe.describeFailure();
     }
   }
 }
