@@ -14,9 +14,13 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
+import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.CONTEXT_FACTORY;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.apache.logging.log4j.core.util.Cancellable;
 import org.apache.logging.log4j.core.util.ShutdownCallbackRegistry;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -35,6 +39,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
+@Feature(LOGGING)
+@Story(CONTEXT_FACTORY)
 public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String LOG_CONFIGURATION_FACTORY_PROPERTY = "log4j.configurationFactory";
