@@ -27,6 +27,7 @@ import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,9 +54,9 @@ public class MetadataKeyDeclarationResolver {
   }
 
   public MetadataKeyResult resolveKeyResult() {
-    List<ParameterModel> keyPartModels = getMetadataKeyParts(componentModel);
+    List<MetadataKeyInfo> keyPartModelsInfo = getMetadataKeyPartsInfo(componentModel);
 
-    if (keyPartModels.isEmpty()) {
+    if (keyPartModelsInfo.isEmpty()) {
       return new MetadataKeyResult(MetadataKeyBuilder.newKey(NullMetadataKey.ID).build());
     }
 
@@ -63,10 +64,10 @@ public class MetadataKeyDeclarationResolver {
     MetadataKeyBuilder metadataKeyBuilder = null;
     Map<String, String> keyPartValues =
         getMetadataKeyPartsValuesFromComponentDeclaration(componentElementDeclaration, componentModel);
-    for (ParameterModel parameterModel : keyPartModels) {
+    for (MetadataKeyInfo keyInfo : keyPartModelsInfo) {
       String id;
-      if (keyPartValues.containsKey(parameterModel.getName())) {
-        id = keyPartValues.get(parameterModel.getName());
+      if (keyPartValues.containsKey(keyInfo.parameterModel.getName())) {
+        id = keyPartValues.get(keyInfo.parameterModel.getName());
       } else {
         // It is only supported to defined parts in order
         break;
@@ -74,10 +75,11 @@ public class MetadataKeyDeclarationResolver {
 
       if (id != null) {
         if (metadataKeyBuilder == null) {
-          metadataKeyBuilder = MetadataKeyBuilder.newKey(id).withPartName(parameterModel.getName());
+          metadataKeyBuilder = MetadataKeyBuilder.newKey(id).withPartName(keyInfo.parameterModel.getName());
           rootMetadataKeyBuilder = metadataKeyBuilder;
         } else {
-          MetadataKeyBuilder metadataKeyChildBuilder = MetadataKeyBuilder.newKey(id).withPartName(parameterModel.getName());
+          MetadataKeyBuilder metadataKeyChildBuilder =
+              MetadataKeyBuilder.newKey(id).withPartName(keyInfo.parameterModel.getName());
           metadataKeyBuilder.withChild(metadataKeyChildBuilder);
           metadataKeyBuilder = metadataKeyChildBuilder;
         }
@@ -85,14 +87,22 @@ public class MetadataKeyDeclarationResolver {
     }
 
     //TODO MULE-18680 remove `keyPartModels.size() > 1` once bug is fixed to accept optionals in multi-level keys
-    List<String> missingParts = keyPartModels.stream()
-        .filter(pm -> (keyPartModels.size() > 1 || pm.isRequired()) && !keyPartValues.containsKey(pm.getName()))
-        .map(NamedObject::getName).collect(toList());
+    List<MetadataKeyInfo> missingPartsInfo = keyPartModelsInfo.stream()
+        .filter(ki -> (keyPartModelsInfo.size() > 1 || ki.parameterModel.isRequired())
+            && !keyPartValues.containsKey(ki.parameterModel.getName()))
+        .collect(toList());
     String partialMessage = null;
     MetadataKey metadataKey = MetadataKeyBuilder.newKey(NullMetadataKey.ID).build();
-    if (!missingParts.isEmpty()) {
-      partialMessage = format("The given MetadataKey does not provide all the required levels. Missing levels: %s",
-                              missingParts);
+    if (!missingPartsInfo.isEmpty()) {
+      MetadataKeyInfo firstKeyPartInfo = missingPartsInfo.get(0);
+      if (missingPartsInfo.size() == 1 && firstKeyPartInfo.level == 1 && firstKeyPartInfo.totalLevels == 1) {
+        //Single level key
+        partialMessage = format("Missing MetadataKey: %s", firstKeyPartInfo.parameterModel.getName());
+      } else {
+        //Multi Level key
+        partialMessage = format("The given MetadataKey does not provide all the required levels. Missing levels: %s",
+                                missingPartsInfo.stream().map(ki -> ki.parameterModel.getName()).collect(toList()));
+      }
     }
     if (metadataKeyBuilder != null) {
       metadataKey = rootMetadataKeyBuilder.build();
@@ -100,11 +110,23 @@ public class MetadataKeyDeclarationResolver {
     return new MetadataKeyResult(metadataKey, partialMessage);
   }
 
-  private List<ParameterModel> getMetadataKeyParts(ComponentModel componentModel) {
-    return componentModel.getAllParameterModels().stream()
-        .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
-        .sorted(comparingInt(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder()))
-        .collect(toList());
+  private List<MetadataKeyInfo> getMetadataKeyPartsInfo(ComponentModel componentModel) {
+    List<MetadataKeyInfo> metadataKeyPartsInfo = new LinkedList<>();
+    componentModel
+        .getParameterGroupModels()
+        .forEach(
+                 pg -> {
+                   List<ParameterModel> keysInGroup = pg.getParameterModels()
+                       .stream()
+                       .filter(pm -> pm.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+                       .sorted(comparingInt(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder()))
+                       .collect(toList());
+                   keysInGroup.forEach(k -> metadataKeyPartsInfo.add(new MetadataKeyInfo(k,
+                                                                                         k.getModelProperty(MetadataKeyPartModelProperty.class)
+                                                                                             .get().getOrder(),
+                                                                                         keysInGroup.size())));
+                 });
+    return metadataKeyPartsInfo;
   }
 
   private Map<String, String> getMetadataKeyPartsValuesFromComponentDeclaration(ComponentElementDeclaration componentElementDeclaration,
@@ -134,6 +156,20 @@ public class MetadataKeyDeclarationResolver {
     }
 
     return parametersMap;
+  }
+
+  private static class MetadataKeyInfo {
+
+    private int level;
+    private int totalLevels;
+    private ParameterModel parameterModel;
+
+    private MetadataKeyInfo(ParameterModel parameterModel, int level, int totalLevels) {
+      this.parameterModel = parameterModel;
+      this.level = level;
+      this.totalLevels = totalLevels;
+    }
+
   }
 
 }

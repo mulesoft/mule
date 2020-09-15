@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONENT;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_PAYLOAD;
@@ -99,6 +100,7 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
         session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(false));
     assertThat(containerTypeMetadataResult.getFailures(), hasSize(1));
+    assertThat(containerTypeMetadataResult.getFailures().get(0).getFailureCode(), is(INVALID_METADATA_KEY));
     assertThat(containerTypeMetadataResult.getFailures().get(0).getMessage(), containsString("Missing levels: [city]"));
   }
 
@@ -110,6 +112,7 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
         session.resolveComponentMetadata(operationElementDeclaration);
     assertThat(containerTypeMetadataResult.isSuccess(), is(false));
     assertThat(containerTypeMetadataResult.getFailures(), hasSize(1));
+    assertThat(containerTypeMetadataResult.getFailures().get(0).getFailureCode(), is(INVALID_METADATA_KEY));
     assertThat(containerTypeMetadataResult.getFailures().get(0).getMessage(),
                containsString("Missing levels: [continent, country, city]"));
   }
@@ -133,7 +136,8 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(COMPONENT));
-    assertThat(metadataTypes.getFailures().get(0).getMessage(), containsString("Missing levels: [metadataKey]"));
+    assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(INVALID_METADATA_KEY));
+    assertThat(metadataTypes.getFailures().get(0).getMessage(), containsString("Missing MetadataKey: metadataKey"));
   }
 
   @Test
@@ -144,6 +148,7 @@ public class MetadataTypesTestCase extends DeclarationSessionTestCase {
     assertThat(metadataTypes.isSuccess(), is(false));
     assertThat(metadataTypes.getFailures(), hasSize(1));
     assertThat(metadataTypes.getFailures().get(0).getFailingComponent(), is(OUTPUT_PAYLOAD));
+    assertThat(metadataTypes.getFailures().get(0).getFailureCode(), is(INVALID_METADATA_KEY));
     assertThat(metadataTypes.getFailures().get(0).getReason(), containsString("MetadataResolvingException: Unknown key:"));
   }
 

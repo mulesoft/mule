@@ -2,7 +2,6 @@ package org.mule.runtime.module.tooling;
 
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.NUMBER;
-import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
@@ -35,6 +34,7 @@ public class TestExtensionDeclarationUtils {
   public static final String CONTINENT_PARAMETER_NAME = "continent";
   public static final String COUNTRY_PARAMETER_NAME = "country";
   public static final String CITY_PARAMETER_NAME = "city";
+  public static final String LOCATION_KEY_GROUP_NAME = "LocationKey";
   public static final String ACTING_PARAMETER_GROUP_NAME = "Acting";
   public static final String TYPE_PARAMETER_NAME = "type";
 
@@ -312,7 +312,7 @@ public class TestExtensionDeclarationUtils {
                                           .withParameter(ACTING_PARAMETER_NAME, actingParameter)
                                           .getDeclaration());
     }
-    setLocationParameterGroup(continentParameter, countryParameter, cityParameter, sourceElementDeclarer, "LocationKey");
+    setLocationParameterGroup(continentParameter, countryParameter, cityParameter, sourceElementDeclarer, LOCATION_KEY_GROUP_NAME);
     return sourceElementDeclarer.getDeclaration();
   }
 
@@ -320,7 +320,7 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, null, elementDeclarer, "LocationKey");
+    setLocationParameterGroup(continent, country, null, elementDeclarer, LOCATION_KEY_GROUP_NAME);
     return elementDeclarer.getDeclaration();
   }
 
@@ -332,7 +332,7 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, city, elementDeclarer, "LocationKey");
+    setLocationParameterGroup(continent, country, city, elementDeclarer, LOCATION_KEY_GROUP_NAME);
     return elementDeclarer.getDeclaration();
   }
 
@@ -367,7 +367,7 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, city, elementDeclarer, "LocationKey");
+    setLocationParameterGroup(continent, country, city, elementDeclarer, LOCATION_KEY_GROUP_NAME);
     return elementDeclarer.getDeclaration();
   }
 
