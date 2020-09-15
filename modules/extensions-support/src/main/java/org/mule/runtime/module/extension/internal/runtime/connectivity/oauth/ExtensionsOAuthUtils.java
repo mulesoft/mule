@@ -95,9 +95,12 @@ public final class ExtensionsOAuthUtils {
 
   public static OAuthConnectionProviderWrapper getOAuthConnectionProvider(ExecutionContextAdapter operationContext) {
     ConfigurationInstance config = ((ConfigurationInstance) operationContext.getConfiguration().get());
-    ConnectionProvider provider =
-        unwrapProviderWrapper(config.getConnectionProvider().get(), OAuthConnectionProviderWrapper.class);
-    return provider instanceof OAuthConnectionProviderWrapper ? (OAuthConnectionProviderWrapper) provider : null;
+    return getOAuthConnectionProvider(config.getConnectionProvider().get());
+  }
+
+  public static OAuthConnectionProviderWrapper getOAuthConnectionProvider(ConnectionProvider provider) {
+    ConnectionProvider oauthProvider = unwrapProviderWrapper(provider, OAuthConnectionProviderWrapper.class);
+    return provider instanceof OAuthConnectionProviderWrapper ? (OAuthConnectionProviderWrapper) oauthProvider : null;
   }
 
   /**
@@ -198,27 +201,33 @@ public final class ExtensionsOAuthUtils {
     }
   }
 
-  public static boolean refreshTokenIfNecessary(ConnectionProvider connectionProvider, Throwable e) {
-    return false;
-  }
-
-  public static <T> T getWithTokenRefreshIfNecessary(ConnectionProvider connectionProvider, CheckedSupplier<T> supplier) throws Throwable {
+  public static <T> T getWithTokenRefreshIfNecessary(ConnectionProvider connectionProvider, CheckedSupplier<T> supplier)
+      throws Exception {
     try {
       return supplier.getChecked();
     } catch (Throwable e) {
-      if(refreshTokenIfNecessary(connectionProvider, e)) {
-        return supplier.getChecked();
+      if (refreshTokenIfNecessary(connectionProvider, e)) {
+        try {
+          return supplier.getChecked();
+        } catch (Exception exception) {
+          throw exception;
+        } catch (Throwable throwable) {
+          return supplier.handleException(throwable);
+        }
       }
-      throw e;
+      if (e instanceof Exception) {
+        throw (Exception) e;
+      } else {
+        return supplier.handleException(e);
+      }
     }
   }
 
   public static <T> T getWithTokenRefreshIfNecessary(ConnectionProvider connectionProvider,
-                                                     Supplier<T> supplier, Function<T,
-                                                     Optional<Throwable>> errorFunction) {
+                                                     Supplier<T> supplier, Function<T, Optional<Throwable>> errorFunction) {
     T result = supplier.get();
     Optional<Throwable> error = errorFunction.apply(result);
-    if(error.isPresent() && refreshTokenIfNecessary(connectionProvider, error.get())){
+    if (error.isPresent() && refreshTokenIfNecessary(connectionProvider, error.get())) {
       result = supplier.get();
     }
     return result;
@@ -291,6 +300,68 @@ public final class ExtensionsOAuthUtils {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Access Token successfully refreshed {} on config '{}'",
                    forResourceOwner(resourceOwnerId), operationContext.getConfiguration().get().getName());
+    }
+
+    return true;
+  }
+
+  public static boolean refreshTokenIfNecessary(ConnectionProvider connectionProvider, Throwable e) {
+    AccessTokenExpiredException expiredException = getTokenExpirationException(e);
+    if (expiredException == null) {
+      return false;
+    }
+
+    OAuthConnectionProviderWrapper oauthConnectionProvider = getOAuthConnectionProvider(connectionProvider);
+    if (connectionProvider == null) {
+      return false;
+    }
+
+    Reference<Optional<String>> resourceOwnerIdReference = new Reference<>(empty());
+    oauthConnectionProvider.getGrantType().accept(new OAuthGrantTypeVisitor() {
+
+      @Override
+      public void visit(AuthorizationCodeGrantType grantType) {
+        AuthorizationCodeConnectionProviderWrapper cp = (AuthorizationCodeConnectionProviderWrapper) connectionProvider;
+        String rsId = cp.getResourceOwnerId();
+        resourceOwnerIdReference.set(of(rsId));
+
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("AccessToken for resourceOwner '{}' expired at operation '{}:{}' using config '{}'. "
+              + "Will attempt to refresh token and retry operation");
+        }
+      }
+
+      @Override
+      public void visit(ClientCredentialsGrantType grantType) {
+        logTokenExpiration();
+      }
+
+      @Override
+      public void visit(PlatformManagedOAuthGrantType grantType) {
+        logTokenExpiration();
+      }
+
+      private void logTokenExpiration() {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("AccessToken expired at operation '{}:{}' using config '{}'. "
+              + "Will attempt to refresh token and retry operation");
+        }
+      }
+    });
+
+    Optional<String> resourceOwnerId = resourceOwnerIdReference.get();
+
+    try {
+      oauthConnectionProvider.refreshToken(resourceOwnerId.orElse(""));
+    } catch (Exception refreshException) {
+      throw new MuleRuntimeException(createStaticMessage(format(
+                                                                "AccessToken %s expired at operation '%s:%s' using config '%s'. Refresh token "
+                                                                    + "workflow was attempted but failed with the following exception"),
+                                                         refreshException));
+    }
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Access Token successfully refreshed {} on config '{}'",
+                   forResourceOwner(resourceOwnerId));
     }
 
     return true;

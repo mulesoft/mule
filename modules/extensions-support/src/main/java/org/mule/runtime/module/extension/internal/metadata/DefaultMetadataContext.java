@@ -24,7 +24,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class DefaultMetadataContext extends ExtensionResolvingContext implements MetadataContext {
+public class DefaultMetadataContext extends ExtensionResolvingContext implements ConnectionProviderAwareMetadataContext {
 
   private final MetadataCache cache;
   private final ClassTypeLoader classTypeLoader;

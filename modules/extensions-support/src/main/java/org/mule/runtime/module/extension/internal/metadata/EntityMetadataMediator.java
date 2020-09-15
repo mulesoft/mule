@@ -10,6 +10,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADA
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getWithTokenRefreshIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -50,7 +51,10 @@ public class EntityMetadataMediator {
   public MetadataResult<MetadataKeysContainer> getEntityKeys(MetadataContext context) {
     try {
       QueryEntityResolver queryEntityResolver = resolverFactory.getQueryEntityResolver();
-      Set<MetadataKey> entityKeys = queryEntityResolver.getEntityKeys(context);
+      Set<MetadataKey> entityKeys = context instanceof ConnectionProviderAwareMetadataContext
+          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider().get(),
+                                           () -> queryEntityResolver.getEntityKeys(context))
+          : queryEntityResolver.getEntityKeys(context);
       final MetadataKeysContainerBuilder keyBuilder = MetadataKeysContainerBuilder.getInstance();
       if (entityKeys.stream().anyMatch(key -> key.getChilds().size() > 0)) {
         return failure(newFailure()
@@ -66,7 +70,11 @@ public class EntityMetadataMediator {
 
   public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataContext context, MetadataKey entityKey) {
     try {
-      MetadataType entityMetadata = resolverFactory.getQueryEntityResolver().getEntityMetadata(context, entityKey.getId());
+      MetadataType entityMetadata = context instanceof ConnectionProviderAwareMetadataContext
+          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider().get(),
+                                           () -> resolverFactory.getQueryEntityResolver().getEntityMetadata(context,
+                                                                                                            entityKey.getId()))
+          : resolverFactory.getQueryEntityResolver().getEntityMetadata(context, entityKey.getId());
       return success(TypeMetadataDescriptor.builder().withType(entityMetadata).build());
     } catch (Exception e) {
       return failure(newFailure(e).onEntity());
