@@ -34,26 +34,20 @@ import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
 public class HttpMessageLoggerTestCase {
 
 
-    private Connection connection;
-    private Buffer buffer;
-    private AttributeHolder attributeHolder;
+    private Connection connection = mock(Connection.class);
+    private Buffer buffer = mock(Buffer.class);
+    private AttributeHolder attributeHolder = mock(AttributeHolder.class);
     private ClassLoader classLoader;
-    private Logger logger;
+    private Logger logger = mock(Logger.class);;
     private HttpMessageLogger httpMessageLogger;
 
     @Before
     public void setup()
     {
         mockStatic(LoggerFactory.class);
-        logger = mock(Logger.class);
-        connection = mock(Connection.class);
-        buffer = mock(Buffer.class);
-        attributeHolder = mock(AttributeHolder.class);
-
         when(LoggerFactory.getLogger(HttpMessageLogger.class)).thenReturn(logger);
         doNothing().when(logger).debug(anyString());
         when(connection.getAttributes()).thenReturn(attributeHolder);
-
     }
 
     @Test

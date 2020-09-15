@@ -124,6 +124,7 @@ public class ResponseStreamingCompletionHandler
     {
         close();
         responseStatusCallback.responseSendSuccessfully();
+        ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
         ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
         resume();
     }
@@ -135,6 +136,7 @@ public class ResponseStreamingCompletionHandler
     public void cancelled()
     {
         super.cancelled();
+        ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
         close();
         responseStatusCallback.responseSendFailure(new DefaultMuleException(createStaticMessage("HTTP response sending task was cancelled")));
         resume();
@@ -149,6 +151,7 @@ public class ResponseStreamingCompletionHandler
     public void failed(Throwable throwable)
     {
         super.failed(throwable);
+        ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
         close();
         resume();
     }
