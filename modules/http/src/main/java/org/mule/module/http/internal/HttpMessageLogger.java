@@ -12,6 +12,9 @@ import org.glassfish.grizzly.http.HttpProbe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.lang.Thread.currentThread;
+import static org.mule.module.http.internal.listener.grizzly.ResponseStreamingCompletionHandler.MULE_CLASSLOADER;
+
 /**
  * Logger for plain HTTP request and response.
  */
@@ -35,20 +38,53 @@ public class HttpMessageLogger extends HttpProbe.Adapter
     @Override
     public void onDataReceivedEvent(Connection connection, Buffer buffer)
     {
-        logBuffer(buffer);
+        logBuffer(buffer, getClassLoader(connection));
     }
 
     @Override
     public void onDataSentEvent(Connection connection, Buffer buffer)
     {
-        logBuffer(buffer);
+        logBuffer(buffer, getClassLoader(connection));
     }
 
-    private void logBuffer(Buffer buffer)
+    private void logBuffer(Buffer buffer, ClassLoader classLoader)
     {
-        if (logger.isDebugEnabled())
+        Thread currentThread = currentThread();
+        ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+        boolean isClassLoaderNull = classLoader == null;
+        try
         {
-            logger.debug(loggerType.name() + "\n" + buffer.toStringContent());
+            if (!isClassLoaderNull)
+            {
+                setContextClassLoader(currentThread, originalClassLoader, classLoader);
+            }
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(loggerType.name() + "\n" + buffer.toStringContent());
+            }
+            if (!isClassLoaderNull)
+            {
+                setContextClassLoader(currentThread, classLoader, originalClassLoader);
+            }
+        } catch (Exception e)
+        {
+            if (!isClassLoaderNull)
+            {
+                setContextClassLoader(currentThread, classLoader, originalClassLoader);
+            }
+            throw (e);
+        }
+    }
+
+    private ClassLoader getClassLoader(Connection connection)
+    {
+        return (connection.getAttributes() != null) ?
+                (ClassLoader) connection.getAttributes().getAttribute(MULE_CLASSLOADER) : null;
+    }
+
+    private void setContextClassLoader(Thread thread, ClassLoader currentClassLoader, ClassLoader newClassLoader) {
+        if (currentClassLoader != newClassLoader && newClassLoader != null) {
+            thread.setContextClassLoader(newClassLoader);
         }
     }
 
