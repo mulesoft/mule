@@ -96,7 +96,7 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("MULE-18742")
-  @Description("If any shutdown callback is cancelled while the log is disposing everything should works")
+  @Description("If any shutdown callback is cancelled while the log is disposing everything should work")
   public void cancelWhileDisposing() {
     ArtifactAwareContextSelector contextSelector = mock(ArtifactAwareContextSelector.class);
     MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector);
