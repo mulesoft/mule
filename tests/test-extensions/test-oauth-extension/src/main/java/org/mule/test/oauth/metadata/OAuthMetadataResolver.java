@@ -20,7 +20,7 @@ public class OAuthMetadataResolver implements OutputTypeResolver {
 
   @Override
   public String getResolverName() {
-    return "OAuth Resolver with no refresh";
+    return "OAuth Resolver with no refresh needed";
   }
 
   @Override

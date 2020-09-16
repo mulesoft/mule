@@ -63,13 +63,11 @@ public abstract class AbstractConfigurationProviderTestCase<T> extends AbstractM
     spyInjector(muleContext);
   }
 
-  @Ignore
   @Test
   public void getName() {
     assertThat(provider.getName(), is(CONFIG_NAME));
   }
 
-  @Ignore
   @Test
   public void getConfigurationModel() {
     assertThat(provider.getConfigurationModel(), is(CoreMatchers.sameInstance(configurationModel)));

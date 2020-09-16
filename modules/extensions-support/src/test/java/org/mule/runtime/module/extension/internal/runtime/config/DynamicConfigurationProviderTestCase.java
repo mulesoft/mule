@@ -59,7 +59,6 @@ import java.util.HashMap;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -157,7 +156,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     return provider.lifecycleManager.getState().isValidTransition(phaseName);
   }
 
-  @Ignore
   @Test
   public void resolveCached() throws Exception {
     final int count = 10;
@@ -170,7 +168,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     verify(resolverSet, times(count)).resolve(ctx);
   }
 
-  @Ignore
   @Test
   public void resolveCachedWithProviderParams() throws Exception {
     ResolverSet providerResolverSet = mock(ResolverSet.class);
@@ -191,7 +188,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
         .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
   }
 
-  @Ignore
   @Test
   public void resolveProviderParamsDifferentInstance() throws Exception {
     HeisenbergExtension config = (HeisenbergExtension) provider.get(event).getValue();
@@ -212,7 +208,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
         .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
   }
 
-  @Ignore
   @Test
   public void resolveDifferentInstances() throws Exception {
     HeisenbergExtension instance1 = (HeisenbergExtension) provider.get(event).getValue();
@@ -231,13 +226,11 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
                containsInAnyOrder(instance1, instance2));
 
     probe(getProbeMillis(), DEFAULT_POLLING_INTERVAL, () -> {
-      System.out.println("Pase por aca");
       provider.cleanUpCache();
       return provider.getConfigurationInstances().isEmpty();
     });
   }
 
-  @Ignore
   @Test
   public void configurationInstanceIsRemovedFromLifecycleTrackingAfterExpired() throws Exception {
     HeisenbergExtension instance = (HeisenbergExtension) provider.get(event).getValue();
@@ -276,7 +269,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     return evictionMillis + 1000;
   }
 
-  @Ignore
   @Test
   public void configurationInstanceFollowsLifecycleTrackingWhenNotExpired() throws Exception {
     HeisenbergExtension instance = (HeisenbergExtension) provider.get(event).getValue();
@@ -304,13 +296,11 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     return (HeisenbergExtension) provider.get(event).getValue();
   }
 
-  @Ignore
   @Test
   public void resolveDynamicConfigWithEquivalentEvent() throws Exception {
     assertSameInstancesResolved();
   }
 
-  @Ignore
   @Test
   public void resolveDynamicConfigWithDifferentEvent() throws Exception {
     Object config1 = provider.get(event);
@@ -322,7 +312,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     assertThat(config1, is(not(sameInstance(config2))));
   }
 
-  @Ignore
   @Test
   public void configFailsOnInitialize() throws Exception {
     final Lifecycle connProvider = mock(Lifecycle.class, withSettings().extraInterfaces(ConnectionProvider.class));
@@ -343,7 +332,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     }
   }
 
-  @Ignore
   @Test
   public void configFailsOnStart() throws Exception {
     final Lifecycle connProvider = mock(Lifecycle.class, withSettings().extraInterfaces(ConnectionProvider.class));
