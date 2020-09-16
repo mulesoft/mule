@@ -84,7 +84,6 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
-import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleException;
@@ -1514,15 +1513,22 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   /**
-   * Updates a file's last modified time to be greater than the original timestamp
+   * Updates a file's last modified time to be greater than the original timestamp.
+   * It locks the deployment lock in order to prevent the directory watcher to redeploy the artifact multiple times.
    *
    * @param timestamp time value in milliseconds of the original file's last modified time
    * @param file file to update
    */
   protected void updateFileModifiedTime(long timestamp, File file) {
-    do {
-      file.setLastModified(currentTimeMillis());
-    } while (file.lastModified() == timestamp);
+    ReentrantLock deploymentLock = deploymentService.getLock();
+    deploymentLock.lock();
+    try {
+      do {
+        file.setLastModified(currentTimeMillis());
+      } while (file.lastModified() <= timestamp);
+    } finally {
+      deploymentLock.unlock();
+    }
   }
 
   protected void resetUndeployLatch() {

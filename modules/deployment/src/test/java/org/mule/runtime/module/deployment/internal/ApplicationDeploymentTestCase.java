@@ -648,7 +648,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  @Ignore("MULE-17582")
   public void redeploysBrokenExplodedAppAfterStartup() throws Exception {
     startDeployment();
 
