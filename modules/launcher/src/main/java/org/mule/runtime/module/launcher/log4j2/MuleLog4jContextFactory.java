@@ -119,7 +119,7 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
 
     @Override
     public void dispose() {
-      for (Runnable hook : hooks) {
+      for (Runnable hook : new ArrayList<>(hooks)) {
         executorService.submit(hook);
       }
       try {
