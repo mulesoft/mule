@@ -223,16 +223,6 @@ public final class ExtensionsOAuthUtils {
     }
   }
 
-  public static <T> T getWithTokenRefreshIfNecessary(ConnectionProvider connectionProvider,
-                                                     Supplier<T> supplier, Function<T, Optional<Throwable>> errorFunction) {
-    T result = supplier.get();
-    Optional<Throwable> error = errorFunction.apply(result);
-    if (error.isPresent() && refreshTokenIfNecessary(connectionProvider, error.get())) {
-      result = supplier.get();
-    }
-    return result;
-  }
-
   public static boolean refreshTokenIfNecessary(ExecutionContextAdapter<OperationModel> operationContext, Throwable e) {
     AccessTokenExpiredException expiredException = getTokenExpirationException(e);
     if (expiredException == null) {

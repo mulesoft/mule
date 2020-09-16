@@ -7,12 +7,14 @@
 package org.mule.test.oauth;
 
 import static java.util.Arrays.asList;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Query;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
@@ -99,6 +101,7 @@ public class TestOAuthOperations {
   }
 
   @OutputResolver(output = RefreshedOAuthMetadataResolver.class)
+  @MediaType(TEXT_PLAIN)
   public String metadataOperation(@MetadataKeyId(RefreshedOAuthMetadataResolver.class) String metadataKey,
                                   @TypeResolver(RefreshedOAuthMetadataResolver.class) Object inputParameter,
                                   @Connection TestOAuthConnection connection) {
@@ -106,6 +109,7 @@ public class TestOAuthOperations {
   }
 
   @OutputResolver(attributes = RefreshedOAuthMetadataResolver.class, output = OAuthMetadataResolver.class)
+  @MediaType(TEXT_PLAIN)
   public Result<String, String> anotherMetadataOperation(@MetadataKeyId(RefreshedOAuthMetadataResolver.class) String metadataKey,
                                                          @TypeResolver(RefreshedOAuthMetadataResolver.class) Object inputParameter,
                                                          @Connection TestOAuthConnection connection) {
@@ -115,10 +119,12 @@ public class TestOAuthOperations {
   @Query(translator = QueryTranslator.class,
       entityResolver = RefreshedOAuthMetadataResolver.class,
       nativeOutputResolver = RefreshedOAuthMetadataResolver.class)
+  @MediaType(TEXT_PLAIN)
   public String entitiesMetadataOperation(@MetadataKeyId String key, @Connection TestOAuthConnection connection) {
     return "Operation Result";
   }
 
+  @MediaType(TEXT_PLAIN)
   public String valuesOperation(@OfValues(OAuthValuesProvider.class) String parameter,
                                 @Connection TestOAuthConnection connection) {
     return "Operation Result";
