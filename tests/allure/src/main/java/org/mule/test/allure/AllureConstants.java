@@ -534,6 +534,7 @@ public interface AllureConstants {
 
       String ERROR_REPORTING = "Error Reporting";
       String FLOW_STACK = "Flow Stack";
+      String CONTEXT_FACTORY = "Log Context Factory";
 
     }
 
