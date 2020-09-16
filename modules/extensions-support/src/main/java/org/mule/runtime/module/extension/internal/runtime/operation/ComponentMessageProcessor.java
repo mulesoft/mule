@@ -762,9 +762,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
     OperationExecutionParams oep = from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
 
-    final Scheduler currentScheduler = (Scheduler) ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
-        .orElse(IMMEDIATE_SCHEDULER);
-
     ExecutionContextAdapter<T> operationContext = oep.getExecutionContextAdapter();
 
     executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext,
