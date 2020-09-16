@@ -33,7 +33,6 @@
         <module>http-resource-service</module>
         <module>core-functional-tests</module>
         <module>test-components</module>
-        <module>deployment-notifier-plugin</module>
     </modules>
 
     <build>
