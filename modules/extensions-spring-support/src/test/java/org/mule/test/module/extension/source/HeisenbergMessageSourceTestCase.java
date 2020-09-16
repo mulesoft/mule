@@ -30,10 +30,10 @@ import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.CORE_POOL_SIZE_ERROR_MESSAGE;
+import static org.mule.test.heisenberg.extension.HeisenbergSource.resetHeisenbergSource;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_BODY;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
-import static org.mule.test.heisenberg.extension.HeisenbergSource.resetHeisenbergSource;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 
@@ -287,7 +287,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
     Map<String, Object> configParameters = configurationState.getConfigParameters();
 
-    assertThat(configParameters.size(), is(13));
+    assertThat(configParameters.size(), is(14));
     assertParameter(configParameters, "monthlyIncomes", hasSize(2));
     assertParameter(configParameters, "cancer", is(true));
     assertParameter(configParameters, "money", equalTo(new BigDecimal("0")));
@@ -312,6 +312,13 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public void configNameInjected() throws Exception {
     startFlow("source");
     assertThat(HeisenbergSource.configName, is("heisenberg"));
+  }
+
+  @Test
+  public void sameChildInBothCallbacks() throws Exception {
+    startFlow("sameChildInBothCallbacks");
+
+    assertSourceCompleted();
   }
 
   private void assertParameter(Map<String, Object> parameters, String propertyName, Matcher matcher) {

@@ -388,7 +388,7 @@ class ComponentAstBasedElementModelFactory {
     Map<String, String> parameters = configuration.getParameters()
         .stream()
         .filter(p -> p.getRawValue() != null)
-        .collect(toMap(p -> p.getModel().getName(), p -> p.getRawValue()));
+        .collect(toMap(p -> p.getModel().getName(), p -> p.getRawValue(), (u, v) -> u));
 
     model.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)
