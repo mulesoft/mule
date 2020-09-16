@@ -466,7 +466,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
         setOperationExecutionParams(location, event, configuration, parameters, operationEvent, callback, ctx);
 
-        prepareAndExecuteOperation(event, () -> callback, ctx);
+        prepareAndExecuteOperation(event, () -> callback);
       };
 
       ExecutorCallback effectiveCallback =
@@ -627,7 +627,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
                 return from(propagateCompletion(from(publisher), emitter.flux(),
                                                 pub -> from(pub)
-                                                    .doOnNext(innerEventDispatcher(ctx, emitter))
+                                                    .doOnNext(innerEventDispatcher(emitter))
                                                     .map(e -> Either.empty()),
                                                 () -> emitter.complete(), e -> emitter.error(e)))
                                                     .map(result -> result.reduce(me -> {
@@ -636,8 +636,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               });
         }
 
-        private Consumer<? super CoreEvent> innerEventDispatcher(Context ctx,
-                                                                 final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter) {
+        private Consumer<? super CoreEvent> innerEventDispatcher(final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter) {
           return event -> prepareAndExecuteOperation(event,
                                                      // The callback must be listened to within the
                                                      // processingStrategy's onProcessor, so that any thread
@@ -660,8 +659,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                          // way consistent with our expected error handling.
                                                          emitter.next(left(new EventProcessingException(event, e, false)));
                                                        }
-                                                     },
-                                                     ctx);
+                                                     });
         }
 
         @Override
@@ -759,11 +757,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
 
-  private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
+  private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier) {
     OperationExecutionParams oep = from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
-
-    final Scheduler currentScheduler = (Scheduler) ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
-        .orElse(IMMEDIATE_SCHEDULER);
 
     ExecutionContextAdapter<T> operationContext = oep.getExecutionContextAdapter();
 
