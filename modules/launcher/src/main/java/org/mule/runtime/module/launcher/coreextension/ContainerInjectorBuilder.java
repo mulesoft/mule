@@ -9,7 +9,6 @@ package org.mule.runtime.module.launcher.coreextension;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.MuleCoreExtension;
@@ -56,6 +55,10 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
 
       for (Service service : serviceRepository.getServices()) {
         registerObject(service.getName(), service);
+        if (!isEmpty(service.getContractName())) {
+          // Just to avoid breaking backward compatibility we still set each contract with the service.getName()
+          registerObject(service.getContractName(), service);
+        }
       }
 
       registerObject(ServiceRepository.class.getName(), serviceRepository);
