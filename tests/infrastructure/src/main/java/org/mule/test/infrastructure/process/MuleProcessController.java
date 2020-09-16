@@ -145,14 +145,6 @@ public class MuleProcessController {
     getController().useLog4jConfigFile(log4jFile);
   }
 
-  public void addServerPlugin(File serverPluginZip) {
-    getController().addServerPlugin(serverPluginZip);
-  }
-
-  public void removeServerPlugin(File serverPluginZip) {
-    getController().removeServerPlugin(serverPluginZip);
-  }
-
   protected Controller getController() {
     return controller;
   }
