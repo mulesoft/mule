@@ -14,6 +14,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
 import org.mule.tests.api.pojos.DependencyInjectionObject;
 import org.mule.tests.api.pojos.ElementWithAttributeAndChild;
+import org.mule.tests.api.pojos.LifecycleObject;
 import org.mule.tests.api.pojos.MyPojo;
 import org.mule.tests.api.pojos.ParameterCollectionParser;
 import org.mule.tests.api.pojos.SameChildTypeContainer;
@@ -31,7 +32,7 @@ import org.mule.tests.internal.SkeletonSource;
 @DeclarationEnrichers(LifecycleTrackerEnricher.class)
 @Configurations(value = {QueueConfiguration.class, LifecycleTrackerConfiguration.class})
 @Export(classes = {TestQueueManager.class, ParameterCollectionParser.class, ElementWithAttributeAndChild.class,
-    TextPojo.class, MyPojo.class,
-    SameChildTypeContainer.class, DependencyInjectionObject.class})
+        TextPojo.class, MyPojo.class, SameChildTypeContainer.class, DependencyInjectionObject.class,
+        LifecycleObject.class})
 public class TestComponentsExtension {
 }

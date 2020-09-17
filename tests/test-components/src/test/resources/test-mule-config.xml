@@ -4,6 +4,8 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
           http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd">
 
+    <test-components:lifecycle-object name="global" />
+
     <test-components:queue-config name="queueConfig">
         <test-components:connection />
     </test-components:queue-config>
