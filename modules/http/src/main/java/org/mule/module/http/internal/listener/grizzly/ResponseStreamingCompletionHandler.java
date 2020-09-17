@@ -38,8 +38,10 @@ public class ResponseStreamingCompletionHandler
     private final HttpResponsePacket httpResponsePacket;
     private final InputStream inputStream;
     private final ResponseStatusCallback responseStatusCallback;
-
+    private final ClassLoader loggerClassLoader;
     private volatile boolean isDone;
+
+    public static final String MULE_CLASSLOADER = "MULE_CLASSLOADER";
 
     public ResponseStreamingCompletionHandler(final FilterChainContext ctx,
                                               final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
@@ -51,6 +53,7 @@ public class ResponseStreamingCompletionHandler
         inputStream = ((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream();
         memoryManager = ctx.getConnection().getTransport().getMemoryManager();
         this.responseStatusCallback = responseStatusCallback;
+        loggerClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
     @Override
@@ -81,6 +84,7 @@ public class ResponseStreamingCompletionHandler
             content = httpResponsePacket.httpContentBuilder().content(buffer).build();
         }
 
+        ctx.getConnection().getAttributes().setAttribute(MULE_CLASSLOADER, loggerClassLoader);
         ctx.write(content, this);
     }
 
@@ -120,6 +124,7 @@ public class ResponseStreamingCompletionHandler
     {
         close();
         responseStatusCallback.responseSendSuccessfully();
+        ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
         ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
         resume();
     }
@@ -131,6 +136,7 @@ public class ResponseStreamingCompletionHandler
     public void cancelled()
     {
         super.cancelled();
+        ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
         close();
         responseStatusCallback.responseSendFailure(new DefaultMuleException(createStaticMessage("HTTP response sending task was cancelled")));
         resume();
@@ -145,6 +151,7 @@ public class ResponseStreamingCompletionHandler
     public void failed(Throwable throwable)
     {
         super.failed(throwable);
+        ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
         close();
         resume();
     }
