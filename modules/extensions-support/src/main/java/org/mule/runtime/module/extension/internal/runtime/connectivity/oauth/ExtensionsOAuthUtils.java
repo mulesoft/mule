@@ -260,7 +260,7 @@ public final class ExtensionsOAuthUtils {
 
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("AccessToken for resourceOwner '{}' expired {}. "
-              + "Will attempt to refresh token and retry operation", rsId, refreshContext.map(LazyValue::get).orElse(""));
+              + "Will attempt to refresh token and retry", rsId, refreshContext.map(LazyValue::get).orElse(""));
         }
       }
 
@@ -277,7 +277,7 @@ public final class ExtensionsOAuthUtils {
       private void logTokenExpiration() {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("AccessToken expired {}. "
-              + "Will attempt to refresh token and retry operation", refreshContext.map(LazyValue::get).orElse(""));
+              + "Will attempt to refresh token and retry", refreshContext.map(LazyValue::get).orElse(""));
         }
       }
     });
