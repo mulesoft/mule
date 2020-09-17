@@ -60,6 +60,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.qameta.allure.Issue;
+
 public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   public static final int TIMEOUT_MILLIS = 30000;
@@ -315,6 +317,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  @Issue("MULE-18759")
   public void sameChildInBothCallbacks() throws Exception {
     startFlow("sameChildInBothCallbacks");
 
