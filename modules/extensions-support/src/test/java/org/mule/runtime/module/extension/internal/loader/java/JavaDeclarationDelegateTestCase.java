@@ -229,7 +229,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     ConfigurationDeclaration configuration = extensionDeclaration.getConfigurations().get(1);
     assertThat(configuration, is(notNullValue()));
     assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-    assertThat(configuration.getAllParameters(), hasSize(32));
+    assertThat(configuration.getAllParameters(), hasSize(33));
     assertParameter(configuration.getAllParameters(), "extendedProperty", "", STRING_TYPE, true, SUPPORTED,
                     null);
   }
@@ -392,7 +392,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
     List<ParameterDeclaration> parameters = conf.getAllParameters();
-    assertThat(parameters, hasSize(31));
+    assertThat(parameters, hasSize(32));
 
     assertParameter(parameters, "myName", "", STRING_TYPE, false, SUPPORTED, HEISENBERG);
     assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
@@ -457,6 +457,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertParameter(parameters, "healthProgressions", "",
                     TYPE_BUILDER.arrayType().of(TYPE_LOADER.load(HealthStatus.class)).build(), false,
                     SUPPORTED, null);
+    assertParameter(parameters, "description", "", toMetadataType(String.class), false, SUPPORTED, "(description)");
   }
 
   private NumberTypeBuilder longTypeBuilder() {
@@ -778,7 +779,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(source.getName(), is(sourceName));
 
     List<ParameterDeclaration> parameters = source.getAllParameters();
-    assertThat(parameters, hasSize(31));
+    assertThat(parameters, hasSize(33));
 
     assertParameter(parameters, SOURCE_PARAMETER, "", INT_TYPE, true, NOT_SUPPORTED, null);
     assertParameter(parameters, SOURCE_CALLBACK_PARAMETER, "", toMetadataType(Long.class), false, SUPPORTED, "#[payload]");
