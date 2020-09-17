@@ -2065,11 +2065,14 @@
                                             <message>No Snapshots Allowed in Deps!</message>
                                             <excludes>
                                                 <exclude>org.mule.weave:*</exclude>
+                                                <exclude>org.mule.runtime:mule-dwb-api</exclude>
                                                 <exclude>org.mule.services:*</exclude>
                                                 <exclude>org.mule.tools.maven:mule-classloader-model</exclude>
 
                                                 <exclude>org.raml:raml-parser-2</exclude>
                                                 <exclude>org.raml:yagi</exclude>
+
+                                                <exclude>org.mule.tests:test-components</exclude>
                                             </excludes>
                                         </requireReleaseDeps>
                                     </rules>
