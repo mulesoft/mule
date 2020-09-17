@@ -54,11 +54,11 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
     if (serviceRepository != null) {
 
       for (Service service : serviceRepository.getServices()) {
+        String name = service.getName();
         if (!isEmpty(service.getContractName())) {
-          registerObject(service.getContractName(), service);
-        } else {
-          registerObject(service.getName(), service);
+          name += " - " + service.getContractName();
         }
+        registerObject(name, service);
       }
 
       registerObject(ServiceRepository.class.getName(), serviceRepository);
