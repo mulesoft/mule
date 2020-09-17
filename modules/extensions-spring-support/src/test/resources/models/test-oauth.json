@@ -816,7 +816,7 @@
             "typeResolversInformation": {
               "category": "OAuth Category",
               "outputResolver": {
-                "resolverName": "OAuth Resolver with no refresh",
+                "resolverName": "OAuth Resolver with no refresh needed",
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
@@ -8098,7 +8098,7 @@
             "typeResolversInformation": {
               "category": "OAuth Category",
               "outputResolver": {
-                "resolverName": "OAuth Resolver with no refresh",
+                "resolverName": "OAuth Resolver with no refresh needed",
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
@@ -14007,7 +14007,7 @@
             "typeResolversInformation": {
               "category": "OAuth Category",
               "outputResolver": {
-                "resolverName": "OAuth Resolver with no refresh",
+                "resolverName": "OAuth Resolver with no refresh needed",
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
@@ -20769,7 +20769,7 @@
             "typeResolversInformation": {
               "category": "OAuth Category",
               "outputResolver": {
-                "resolverName": "OAuth Resolver with no refresh",
+                "resolverName": "OAuth Resolver with no refresh needed",
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },

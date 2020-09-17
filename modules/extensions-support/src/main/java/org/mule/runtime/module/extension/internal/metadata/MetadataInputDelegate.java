@@ -125,7 +125,8 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     try {
       boolean allowsNullType = !parameter.isRequired() && (parameter.getDefaultValue() == null);
       MetadataType metadata = context instanceof ConnectionProviderAwareMetadataContext
-          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider().get(),
+          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider()
+              .orElse(null),
                                            () -> resolverFactory.getInputResolver(parameter.getName()).getInputMetadata(context,
                                                                                                                         key))
           : resolverFactory.getInputResolver(parameter.getName()).getInputMetadata(context, key);

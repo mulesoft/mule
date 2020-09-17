@@ -130,7 +130,8 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     }
     try {
       MetadataType metadata = context instanceof ConnectionProviderAwareMetadataContext
-          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider().get(),
+          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider()
+              .orElse(null),
                                            () -> resolverFactory.getOutputResolver().getOutputType(context, key))
           : resolverFactory.getOutputResolver().getOutputType(context, key);
       if (isMetadataResolvedCorrectly(metadata, true)) {
@@ -167,7 +168,8 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
                                                                        Function<MetadataType, Boolean> metadataValidator) {
     try {
       MetadataType metadata = context instanceof ConnectionProviderAwareMetadataContext
-          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider().get(),
+          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider()
+              .orElse(null),
                                            () -> resolverFactory.getOutputAttributesResolver().getAttributesType(context, key))
           : resolverFactory.getOutputAttributesResolver().getAttributesType(context, key);
       if (metadataValidator.apply(metadata)) {

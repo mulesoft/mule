@@ -52,7 +52,8 @@ public class EntityMetadataMediator {
     try {
       QueryEntityResolver queryEntityResolver = resolverFactory.getQueryEntityResolver();
       Set<MetadataKey> entityKeys = context instanceof ConnectionProviderAwareMetadataContext
-          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider().get(),
+          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider()
+              .orElse(null),
                                            () -> queryEntityResolver.getEntityKeys(context))
           : queryEntityResolver.getEntityKeys(context);
       final MetadataKeysContainerBuilder keyBuilder = MetadataKeysContainerBuilder.getInstance();
@@ -71,7 +72,8 @@ public class EntityMetadataMediator {
   public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataContext context, MetadataKey entityKey) {
     try {
       MetadataType entityMetadata = context instanceof ConnectionProviderAwareMetadataContext
-          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider().get(),
+          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider()
+              .orElse(null),
                                            () -> resolverFactory.getQueryEntityResolver().getEntityMetadata(context,
                                                                                                             entityKey.getId()))
           : resolverFactory.getQueryEntityResolver().getEntityMetadata(context, entityKey.getId());

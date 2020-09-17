@@ -89,7 +89,8 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
       Set<MetadataKey> metadataKeys;
 
       metadataKeys = context instanceof ConnectionProviderAwareMetadataContext
-          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider().get(),
+          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider()
+              .orElse(null),
                                            () -> getMetadataKeys(context, keyResolver, partialKey, reflectionCache, partsByOrder))
           : getMetadataKeys(context, keyResolver, partialKey, reflectionCache, partsByOrder);
 

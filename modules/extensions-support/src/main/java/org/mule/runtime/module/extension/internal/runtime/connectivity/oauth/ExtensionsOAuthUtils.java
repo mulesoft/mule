@@ -99,7 +99,7 @@ public final class ExtensionsOAuthUtils {
 
   public static OAuthConnectionProviderWrapper getOAuthConnectionProvider(ConnectionProvider provider) {
     ConnectionProvider oauthProvider = unwrapProviderWrapper(provider, OAuthConnectionProviderWrapper.class);
-    return provider instanceof OAuthConnectionProviderWrapper ? (OAuthConnectionProviderWrapper) oauthProvider : null;
+    return oauthProvider instanceof OAuthConnectionProviderWrapper ? (OAuthConnectionProviderWrapper) oauthProvider : null;
   }
 
   /**
