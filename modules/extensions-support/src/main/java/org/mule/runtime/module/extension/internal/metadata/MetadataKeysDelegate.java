@@ -86,9 +86,7 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
 
     try {
       final Map<Integer, ParameterModel> partsByOrder = getPartOrderMapping(keyParts);
-      Set<MetadataKey> metadataKeys;
-
-      metadataKeys = context instanceof ConnectionProviderAwareMetadataContext
+      Set<MetadataKey> metadataKeys = context instanceof ConnectionProviderAwareMetadataContext
           ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider()
               .orElse(null),
                                            () -> getMetadataKeys(context, keyResolver, partialKey, reflectionCache, partsByOrder))
