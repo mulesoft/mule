@@ -16,7 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Configuration(name = "auth-code")
-@ConnectionProviders({TestOAuthConnectionProvider.class, ScopelessOAuthConnectionProvider.class})
+@ConnectionProviders({TestOAuthConnectionProvider.class, ScopelessOAuthConnectionProvider.class,
+    TestOAuthRefreshValidationConnectionProvider.class})
 @Operations({TestOAuthOperations.class, CallbackOperations.class})
 public class AuthCodeConfig {
 

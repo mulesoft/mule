@@ -255,7 +255,7 @@ public final class ExtensionsOAuthUtils {
     return refreshTokenIfNecessary(connectionProvider, e, empty(), empty());
   }
 
-  public static boolean refreshTokenIfNecessary(ConnectionProvider connectionProvider, Throwable e,
+  private static boolean refreshTokenIfNecessary(ConnectionProvider connectionProvider, Throwable e,
                                                 Optional<LazyValue<String>> refreshContext,
                                                 Optional<LazyValue<String>> configName) {
     AccessTokenExpiredException expiredException = getTokenExpirationException(e);
