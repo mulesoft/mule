@@ -13,6 +13,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
+import static org.mule.runtime.module.extension.internal.metadata.MetadataResolverUtils.resolveWithOAuthRefresh;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -84,12 +85,9 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
 
     try {
       final Map<Integer, ParameterModel> partsByOrder = getPartOrderMapping(keyParts);
-      Set<MetadataKey> metadataKeys;
-      if (keyResolver instanceof PartialTypeKeysResolver && hasInitialLevel(partialKey, partsByOrder, reflectionCache)) {
-        metadataKeys = singleton(((PartialTypeKeysResolver) keyResolver).resolveChilds(context, partialKey));
-      } else {
-        metadataKeys = keyResolver.getKeys(context);
-      }
+      Set<MetadataKey> metadataKeys =
+          resolveWithOAuthRefresh(context,
+                                  () -> getMetadataKeys(context, keyResolver, partialKey, reflectionCache, partsByOrder));
 
       final Set<MetadataKey> enrichedMetadataKeys = metadataKeys.stream()
           .map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partsByOrder))
@@ -100,6 +98,16 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
 
     } catch (Exception e) {
       return failure(newFailure(e).onKeys());
+    }
+  }
+
+  private Set<MetadataKey> getMetadataKeys(MetadataContext context, TypeKeysResolver keyResolver, Object partialKey,
+                                           ReflectionCache reflectionCache, Map<Integer, ParameterModel> partsByOrder)
+      throws Exception {
+    if (keyResolver instanceof PartialTypeKeysResolver && hasInitialLevel(partialKey, partsByOrder, reflectionCache)) {
+      return singleton(((PartialTypeKeysResolver) keyResolver).resolveChilds(context, partialKey));
+    } else {
+      return keyResolver.getKeys(context);
     }
   }
 

@@ -11,8 +11,10 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.withRefreshToken;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.cloneAndEnrichValue;
 
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -87,6 +89,28 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
   public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver,
                               Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier)
       throws ValueResolvingException {
+    return getValues(parameterName, parameterValueResolver, connectionSupplier, configurationSupplier, null);
+  }
+
+  /**
+   * Given the name of a parameter or parameter group, and if the parameter supports it, this will try to resolve
+   * the {@link Value values} for the parameter.
+   *
+   * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
+   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires
+   *                               the value of parameters from the same parameter container.
+   * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
+   *                               {@link ValueProvider}
+   * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
+   *                               {@link ValueProvider}
+   * @param connectionProvider     the connection provider in charge of providing the connection given by the connection supplier.
+   * @return a {@link Set} of {@link Value} correspondent to the given parameter
+   * @throws ValueResolvingException if an error occurs resolving {@link Value values}
+   */
+  public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver,
+                              Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier,
+                              ConnectionProvider connectionProvider)
+      throws ValueResolvingException {
     List<ParameterModel> parameters = getParameters(parameterName);
 
     if (parameters.isEmpty()) {
@@ -104,7 +128,9 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
                                                            INVALID_VALUE_RESOLVER_NAME));
 
     try {
-      return resolveValues(parameters, factoryModelProperty, parameterValueResolver, connectionSupplier, configurationSupplier);
+      return withRefreshToken(connectionProvider,
+                              () -> resolveValues(parameters, factoryModelProperty, parameterValueResolver,
+                                                  connectionSupplier, configurationSupplier));
     } catch (ValueResolvingException e) {
       throw e;
     } catch (Exception e) {
