@@ -89,6 +89,12 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     doNotExpireDynamicConfigWithCustomExpirationUsedBySource();
   }
 
+  @Test
+  public void doNotExpireConfigUsedByPagedOperation() throws Exception {
+    flowRunner("dynamicWithShortExpirationForPagedOperation").withPayload("Walter Blanco").run()
+        .getMessage();
+  }
+
   private void assertInitialised(HeisenbergExtension config) {
     assertThat(config.getInitialise(), is(1));
     assertThat(config.getStart(), is(1));
