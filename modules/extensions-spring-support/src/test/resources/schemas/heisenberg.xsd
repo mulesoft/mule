@@ -480,6 +480,7 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="inline-barber-preferences">
               <xs:complexType>
                 <xs:complexContent>
@@ -553,6 +554,7 @@
               </xs:sequence>
             </xs:complexType>
           </xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
         <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
@@ -702,6 +704,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                   <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
@@ -737,6 +740,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                   <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
@@ -865,6 +869,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                   <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
@@ -900,6 +905,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                   <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
@@ -1025,6 +1031,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                   <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
@@ -1060,6 +1067,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                   <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
@@ -1181,6 +1189,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                   <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
@@ -1216,6 +1225,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                   <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
@@ -1930,6 +1940,7 @@
               </xs:sequence>
             </xs:complexType>
           </xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="greeting"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
@@ -2524,6 +2535,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                   <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>

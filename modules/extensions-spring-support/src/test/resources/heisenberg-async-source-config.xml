@@ -222,4 +222,21 @@
         <set-payload value="#[null.a!]"/>
     </flow>
 
+    <flow name="sameChildInBothCallbacks" initialState="stopped">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
+            <redelivery-policy maxRedeliveryCount="10" useSecureHash="true"/>
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info age="27" knownAddresses="#[[]]">
+                <heisenberg:description>Look! It's a Heisenberg!</heisenberg:description>
+            </heisenberg:success-info>
+            <heisenberg:error-info knownAddresses="#[[]]">
+                <heisenberg:description>#[null.a!]</heisenberg:description>
+            </heisenberg:error-info>
+        </heisenberg:listen-payments>
+
+        <set-payload value="#[100]"/>
+    </flow>
+
 </mule>

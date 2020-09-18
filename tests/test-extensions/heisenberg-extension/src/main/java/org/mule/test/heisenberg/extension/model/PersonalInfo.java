@@ -10,12 +10,14 @@ import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
+
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Text;
 
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -60,6 +62,11 @@ public class PersonalInfo {
   @Parameter
   @Placement(order = 7)
   private List<String> knownAddresses;
+
+  @Parameter
+  @Text
+  @Optional(defaultValue = "(description)")
+  private String description;
 
   public List<String> getKnownAddresses() {
     return knownAddresses;
@@ -118,6 +125,14 @@ public class PersonalInfo {
 
   public void setDateOfGraduation(Calendar dateOfGraduation) {
     this.dateOfGraduation = dateOfGraduation;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   @Override
