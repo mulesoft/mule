@@ -13,8 +13,17 @@ import static java.lang.System.getProperty;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.regex.Matcher.quoteReplacement;
+import static org.apache.maven.shared.invoker.InvokerLogger.INFO;
 
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
@@ -24,14 +33,6 @@ import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.InvokerLogger;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.maven.shared.invoker.SystemOutLogger;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
 
 /**
  * Provides Maven related utilities for testing purposes
@@ -57,6 +58,15 @@ public class MavenTestUtils {
   private static final List<String> CLEAN_GOALS = singletonList("clean");
 
   private static final File MAVEN_SETTINGS = new File(getProperty("settings.file"));
+
+  private static final Invoker INVOKER;
+
+  static {
+    INVOKER = new DefaultInvoker();
+    INVOKER.setLocalRepositoryDirectory(getMavenLocalRepository());
+    INVOKER.setLogger(LOGGER);
+    LOGGER.setThreshold(INFO);
+  }
 
   private MavenTestUtils() {}
 
@@ -125,15 +135,12 @@ public class MavenTestUtils {
   }
 
   private static void runMavenGoal(List<String> goals, String baseDirectory, Properties props) {
-    Invoker invoker = new DefaultInvoker();
-    invoker.setLocalRepositoryDirectory(getMavenLocalRepository());
-    invoker.setLogger(LOGGER);
-    LOGGER.setThreshold(3);
     InvocationRequest request = new DefaultInvocationRequest();
     request.setGoals(goals);
     request.setBatchMode(true);
     request.setProperties(props);
-
+    // avoid JVM optimizations for short-lived jvms running maven builds
+    request.setMavenOpts("-XX:+TieredCompilation -XX:TieredStopAtLevel=1");
     File mavenArtifactsAndBaseDirectory;
     File baseDirFile = new File(baseDirectory);
     if (baseDirFile.isAbsolute()) {
@@ -149,7 +156,7 @@ public class MavenTestUtils {
     request.setShowErrors(true);
     request.setUserSettingsFile(MAVEN_SETTINGS);
     try {
-      InvocationResult result = invoker.execute(request);
+      InvocationResult result = INVOKER.execute(request);
       if (result.getExitCode() != 0) {
         LOGGER.error("Error while running Maven invoker", result.getExecutionException());
         throw new RuntimeException("Error while running Maven invoker", result.getExecutionException());

@@ -94,6 +94,12 @@ public interface AllureConstants {
 
   }
 
+  interface PackagerFeature {
+
+    String PACKAGER = "Packager";
+
+  }
+
   interface DeploymentConfiguration {
 
     String DEPLOYMENT_CONFIGURATION = "Deployment Configuration";
