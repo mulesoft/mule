@@ -154,7 +154,12 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       updateUsageStatistic(configuration);
       return configuration;
     } catch (MuleRuntimeException e) {
-      throw new Exception(e.getCause());
+      throw e;
+    } catch (RuntimeException e) {
+      if (e.getCause() instanceof MuleException) {
+        throw (MuleException) e.getCause();
+      }
+      throw e;
     } finally {
       cacheReadLock.unlock();
     }
@@ -186,7 +191,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       registerConfiguration(configuration);
       return configuration;
     } catch (MuleException e) {
-      throw new MuleRuntimeException(e);
+      throw new RuntimeException(e);
     }
   }
 
