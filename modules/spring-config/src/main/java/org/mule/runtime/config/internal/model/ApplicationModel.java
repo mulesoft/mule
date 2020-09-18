@@ -196,6 +196,7 @@ public class ApplicationModel implements ArtifactAst {
                           Map<String, String> deploymentProperties,
                           Optional<ConfigurationProperties> parentConfigurationProperties,
                           ResourceProvider externalResourceProvider) {
+    // this basic resolver is needed to resolve the properties used in names to properly generate the structure of the AST.
     final PropertiesResolverConfigurationProperties baseConfigurationAttributeResolver =
         createConfigurationAttributeResolver(parentConfigurationProperties,
                                              deploymentProperties, externalResourceProvider);
