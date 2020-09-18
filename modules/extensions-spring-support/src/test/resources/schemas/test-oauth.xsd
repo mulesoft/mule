@@ -235,6 +235,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+<<<<<<< HEAD
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="with-params-connection">
     <xs:complexType>
       <xs:complexContent>
@@ -346,6 +347,35 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+=======
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="AnotherMetadataOperationType" substitutionGroup="mule:abstract-operator" name="another-metadata-operation"></xs:element>
+  <xs:complexType name="AnotherMetadataOperationType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="metadataKey"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="inputParameter"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+>>>>>>> b117151e5c1 (MULE-18644: ValueProvider, Metadata fails due token is expired with OAuth Authorization Code Grant (#9429))
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="CaptureCallbackPayloadsType" substitutionGroup="mule:abstract-operator" name="capture-callback-payloads"></xs:element>
   <xs:complexType name="CaptureCallbackPayloadsType">
     <xs:complexContent>
@@ -356,6 +386,32 @@
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EntitiesMetadataOperationType" substitutionGroup="mule:abstract-operator" name="entities-metadata-operation"></xs:element>
+  <xs:complexType name="EntitiesMetadataOperationType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="key"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -411,14 +467,24 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+<<<<<<< HEAD
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetStreamContentWithFlackyConnectionType" substitutionGroup="mule:abstract-operator" name="get-stream-content-with-flacky-connection"></xs:element>
   <xs:complexType name="GetStreamContentWithFlackyConnectionType">
+=======
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MetadataOperationType" substitutionGroup="mule:abstract-operator" name="metadata-operation"></xs:element>
+  <xs:complexType name="MetadataOperationType">
+>>>>>>> b117151e5c1 (MULE-18644: ValueProvider, Metadata fails due token is expired with OAuth Authorization Code Grant (#9429))
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
+<<<<<<< HEAD
         <xs:attribute type="xs:string" use="required" name="content"></xs:attribute>
+=======
+        <xs:attribute type="mule:expressionString" use="required" name="metadataKey"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="inputParameter"></xs:attribute>
+>>>>>>> b117151e5c1 (MULE-18644: ValueProvider, Metadata fails due token is expired with OAuth Authorization Code Grant (#9429))
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
@@ -501,6 +567,32 @@
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ValuesOperationType" substitutionGroup="mule:abstract-operator" name="values-operation"></xs:element>
+  <xs:complexType name="ValuesOperationType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameter"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>

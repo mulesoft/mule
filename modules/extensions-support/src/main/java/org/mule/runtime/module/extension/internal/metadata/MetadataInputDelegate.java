@@ -15,6 +15,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYP
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+import static org.mule.runtime.module.extension.internal.metadata.MetadataResolverUtils.resolveWithOAuthRefresh;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -123,7 +124,9 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
   private MetadataResult<MetadataType> getParameterMetadata(ParameterModel parameter, MetadataContext context, Object key) {
     try {
       boolean allowsNullType = !parameter.isRequired() && (parameter.getDefaultValue() == null);
-      MetadataType metadata = resolverFactory.getInputResolver(parameter.getName()).getInputMetadata(context, key);
+      MetadataType metadata =
+          resolveWithOAuthRefresh(context,
+                                  () -> resolverFactory.getInputResolver(parameter.getName()).getInputMetadata(context, key));
       if (isMetadataResolvedCorrectly(metadata, allowsNullType)) {
         return success(adaptToListIfNecessary(metadata, parameter, context));
       }

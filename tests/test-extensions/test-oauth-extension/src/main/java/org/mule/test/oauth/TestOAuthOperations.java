@@ -7,20 +7,31 @@
 package org.mule.test.oauth;
 
 import static java.util.Arrays.asList;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Query;
+import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
+import org.mule.runtime.extension.api.dsql.QueryTranslator;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.runtime.extension.api.metadata.NullQueryMetadataResolver;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.test.oauth.metadata.OAuthMetadataResolver;
+import org.mule.test.oauth.metadata.RefreshedOAuthMetadataResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -94,6 +105,7 @@ public class TestOAuthOperations {
     return connection;
   }
 
+
   @MediaType(ANY)
   public InputStream getStream(String content) {
     return new ByteArrayInputStream(content.getBytes());
@@ -107,5 +119,35 @@ public class TestOAuthOperations {
     }
 
     return result;
+  }
+
+  @OutputResolver(output = RefreshedOAuthMetadataResolver.class)
+  @MediaType(TEXT_PLAIN)
+  public String metadataOperation(@MetadataKeyId(RefreshedOAuthMetadataResolver.class) String metadataKey,
+                                  @TypeResolver(RefreshedOAuthMetadataResolver.class) Object inputParameter,
+                                  @Connection TestOAuthConnection connection) {
+    return "Operation Result";
+  }
+
+  @OutputResolver(attributes = RefreshedOAuthMetadataResolver.class, output = OAuthMetadataResolver.class)
+  @MediaType(TEXT_PLAIN)
+  public Result<String, String> anotherMetadataOperation(@MetadataKeyId(RefreshedOAuthMetadataResolver.class) String metadataKey,
+                                                         @TypeResolver(RefreshedOAuthMetadataResolver.class) Object inputParameter,
+                                                         @Connection TestOAuthConnection connection) {
+    return Result.<String, String>builder().output("Operation Result").attributes("Operation Attributes").build();
+  }
+
+  @Query(translator = QueryTranslator.class,
+      entityResolver = RefreshedOAuthMetadataResolver.class,
+      nativeOutputResolver = RefreshedOAuthMetadataResolver.class)
+  @MediaType(TEXT_PLAIN)
+  public String entitiesMetadataOperation(@MetadataKeyId String key, @Connection TestOAuthConnection connection) {
+    return "Operation Result";
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public String valuesOperation(@OfValues(OAuthValuesProvider.class) String parameter,
+                                @Connection TestOAuthConnection connection) {
+    return "Operation Result";
   }
 }
