@@ -13,6 +13,7 @@ import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.conf
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.configLessOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.multiLevelOPDeclaration;
 import static org.mule.runtime.module.tooling.TestExtensionDeclarationUtils.sourceDeclaration;
+import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.sampledata.SampleDataFailure;
@@ -52,7 +53,7 @@ public class SampleDataTestCase extends DeclarationSessionTestCase {
     String message = "The sample data provider requires a connection and none was provided";
     String reason =
         "org.mule.sdk.api.data.sample.SampleDataException: The sample data provider requires a connection and none was provided\n";
-    assertSampleDataFailure(elementDeclaration, message, reason, "UNKNOWN");
+    assertSampleDataFailure(elementDeclaration, message, reason, MISSING_REQUIRED_PARAMETERS);
   }
 
   @Test
@@ -69,7 +70,7 @@ public class SampleDataTestCase extends DeclarationSessionTestCase {
     String message =
         "Unable to retrieve Sample Data. There are missing required parameters for the resolution: [actingParameter]";
     String reason = "org.mule.sdk.api.data.sample.SampleDataException: " + message + "\n";
-    assertSampleDataFailure(elementDeclaration, message, reason, "UNKNOWN");
+    assertSampleDataFailure(elementDeclaration, message, reason, MISSING_REQUIRED_PARAMETERS);
   }
 
   @Test

@@ -82,6 +82,7 @@ public interface DeclarationSession {
 
   /**
    * Exposes the application Expression Manager.
+   * TODO remove once the agent allows injecting the expression language factory service (CMTS-70)
    */
   ExpressionManager getExpressionManager();
 

@@ -9,11 +9,11 @@ package org.mule.runtime.module.tooling.internal.artifact.sampledata;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.sampledata.SampleDataFailure.Builder.newFailure;
 import static org.mule.runtime.api.sampledata.SampleDataResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -92,6 +92,8 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
       } finally {
         context.dispose();
       }
+    } catch (SampleDataException e) {
+      return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
     } catch (Exception e) {
       return resultFrom(newFailure(e).build());
     }
@@ -111,7 +113,7 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
           && !optionalConfigurationInstance.isPresent()) {
         throw new SampleDataException(format("The sample data provider requires a configuration but the one referenced by element declaration with name: '%s' is not present",
                                              optionalConfigRef.get()),
-                                      COMPONENT_NOT_FOUND.getName());
+                                      MISSING_REQUIRED_PARAMETERS);
       }
     }
 
