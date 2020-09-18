@@ -17,24 +17,12 @@ import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveConfigName;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveSimpleValue;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.sourceElementNameFromSimpleValue;
-import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-
-import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.StringType;
-import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.metadata.types.AttributesMetadataResolutionTypeInformation;
 import org.mule.runtime.config.api.dsl.model.metadata.types.InputMetadataResolutionTypeInformation;
@@ -44,11 +32,10 @@ import org.mule.runtime.config.api.dsl.model.metadata.types.OutputMetadataResolu
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
-import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -267,8 +254,8 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
                                                             boolean resolveAllKeys) {
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
-    boolean isPartialFetching = componentModel.getModelProperty(MetadataResolverFactoryModelProperty.class)
-        .map(mp -> mp.getMetadataResolverFactory().getKeyResolver()).map(kr -> kr instanceof PartialTypeKeysResolver)
+    boolean isPartialFetching = componentModel.getModelProperty(TypeResolversInformationModelProperty.class)
+        .map(mp -> mp.isPartialTypeKeyResolver())
         .orElse(false);
 
     if (isPartialFetching || resolveAllKeys) {

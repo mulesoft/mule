@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isASTMode;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
@@ -26,6 +25,7 @@ import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.util.collection.Collectors;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
@@ -202,7 +202,9 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                                                attributesResolver,
                                                                                keysResolver,
                                                                                requiresConnection,
-                                                                               requiresConnection));
+                                                                               requiresConnection,
+                                                                               metadataScope
+                                                                                   .getKeysResolver() instanceof PartialTypeKeysResolver));
       }
     }
 
