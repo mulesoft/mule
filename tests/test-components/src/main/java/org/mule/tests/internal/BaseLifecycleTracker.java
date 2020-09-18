@@ -24,6 +24,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+/**
+ * Base implementation of {@link LifecycleTracker}
+ */
 public class BaseLifecycleTracker implements Lifecycle, MuleContextAware, LifecycleTracker {
 
   @Inject

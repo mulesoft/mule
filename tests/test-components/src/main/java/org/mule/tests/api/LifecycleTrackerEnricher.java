@@ -33,7 +33,9 @@ public class LifecycleTrackerEnricher implements DeclarationEnricher {
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     extensionLoadingContext.getExtensionDeclarer().getDeclaration().getOperations().forEach(operation -> {
+      // Check the operation name as the enricher is called for the whole extension and we only want to override the lifecycleTracker operations.
       if (operation.getName().contains("lifecycleTracker")) {
+        // Only the lifecycleTrackerCheck must check that the invoked phase isn't already invoked.
         boolean shouldCheckPhase = operation.getName().contains("Check");
         CompletableComponentExecutorFactory executorFactory = getExecutorFactory(operation, shouldCheckPhase);
         operation.addModelProperty(new CompletableComponentExecutorModelProperty(executorFactory));
@@ -44,13 +46,10 @@ public class LifecycleTrackerEnricher implements DeclarationEnricher {
   private CompletableComponentExecutorFactory getExecutorFactory(OperationDeclaration operation, boolean shouldCheckPhase) {
     Optional<CompletableComponentExecutorModelProperty> executorModelProperty =
         operation.getModelProperty(CompletableComponentExecutorModelProperty.class);
-    CompletableComponentExecutorFactory<ComponentModel> oldFactory =
-        executorModelProperty.map(CompletableComponentExecutorModelProperty::getExecutorFactory).orElse(null);
+    Optional<CompletableComponentExecutorFactory> oldFactory =
+        executorModelProperty.map(CompletableComponentExecutorModelProperty::getExecutorFactory);
     return (componentModel, map) -> {
-      CompletableComponentExecutor<ComponentModel> delegateExecutor = null;
-      if (oldFactory != null) {
-        delegateExecutor = oldFactory.createExecutor(componentModel, map);
-      }
+      CompletableComponentExecutor delegateExecutor = oldFactory.map(f -> f.createExecutor(componentModel, map)).orElse(null);
       return new LifecycleTrackerComponentExecutorDecorator(delegateExecutor, shouldCheckPhase);
     };
   }

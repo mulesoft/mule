@@ -69,8 +69,6 @@ public class LifecycleObject extends BaseLifecycleTracker {
     failIfNeeded(Disposable.PHASE_NAME);
   }
 
-
-
   private void failIfNeeded(String phase) {
     if (failurePhase != null && failurePhase.equalsIgnoreCase(phase)) {
       throw new RuntimeException("generated failure");
