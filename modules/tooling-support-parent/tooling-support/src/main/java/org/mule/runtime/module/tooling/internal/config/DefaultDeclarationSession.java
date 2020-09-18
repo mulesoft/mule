@@ -15,6 +15,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
+
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -22,11 +23,14 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataTypesDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.sampledata.SampleDataFailure;
+import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.AbstractArtifactAgnosticService;
@@ -162,6 +166,27 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
 
           .onComponent());
     }
+  }
+
+  @Override
+  public SampleDataResult getSampleData(ComponentElementDeclaration component) {
+    try {
+      return withInternalDeclarationSession("getSampleData()", session -> session.getSampleData(component));
+    } catch (NoClassDefFoundError | Exception e) {
+      LOGGER.error(format("Unknown error while retrieving sample data on component: '%s:%s'", component.getDeclaringExtension(),
+                          component.getName()),
+                   e);
+      return SampleDataResult.resultFrom(SampleDataFailure.Builder.newFailure(e)
+          .withMessage(format("Unknown error while resolving sample data on component: '%s'. %s", component.getName(),
+                              getRootCauseMessage(e)))
+          .withReason(getStackTrace(e))
+          .build());
+    }
+  }
+
+  @Override
+  public ExpressionManager getExpressionManager() {
+    return withInternalDeclarationSession("getExpressionManager", DeclarationSession::getExpressionManager);
   }
 
   @Override

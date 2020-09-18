@@ -24,10 +24,12 @@ import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.tooling.extensions.metadata.internal.config.SimpleConfiguration;
 import org.mule.tooling.extensions.metadata.internal.connection.TstExtensionClient;
 import org.mule.tooling.extensions.metadata.internal.metadata.MultiLevelPartialTypeKeysOutputTypeResolver;
 import org.mule.tooling.extensions.metadata.api.parameters.LocationKey;
+import org.mule.tooling.extensions.metadata.internal.sampledata.SourceSampleDataProvider;
 import org.mule.tooling.extensions.metadata.internal.value.ActingParameterVP;
 import org.mule.tooling.extensions.metadata.internal.value.ConfigLessConnectionLessNoActingParamVP;
 import org.mule.tooling.extensions.metadata.internal.value.ConfigLessNoActingParamVP;
@@ -38,6 +40,7 @@ import org.mule.tooling.extensions.metadata.internal.value.ConnectionLessNoActin
 @MetadataScope(keysResolver = MultiLevelPartialTypeKeysOutputTypeResolver.class,
         outputResolver = MultiLevelPartialTypeKeysOutputTypeResolver.class,
 attributesResolver = MultiLevelPartialTypeKeysOutputTypeResolver.class)
+@SampleData(SourceSampleDataProvider.class)
 public class SimpleSource extends Source<String, StringAttributes> {
 
   @Config

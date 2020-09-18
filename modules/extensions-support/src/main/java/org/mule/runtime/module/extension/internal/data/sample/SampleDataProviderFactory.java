@@ -83,7 +83,7 @@ public class SampleDataProviderFactory {
           throw new SampleDataException("Failed to establish connection: " + e.getMessage(), CONNECTION_FAILURE, e);
         }
         if (connection == null) {
-          throw new SampleDataException("The value provider requires a connection and none was provided",
+          throw new SampleDataException("The sample data provider requires a connection and none was provided",
                                         MISSING_REQUIRED_PARAMETERS);
         }
         setValueIntoField(resolver, connectionSupplier.get(), connectionField);
@@ -92,7 +92,7 @@ public class SampleDataProviderFactory {
       if (factoryModelProperty.usesConfig()) {
         Object config = configurationSupplier.get();
         if (config == null) {
-          throw new SampleDataException("The value provider requires a configuration and none was provided",
+          throw new SampleDataException("The sample data provider requires a configuration and none was provided",
                                         MISSING_REQUIRED_PARAMETERS);
         }
         setValueIntoField(resolver, configurationSupplier.get(), configField);
@@ -101,7 +101,7 @@ public class SampleDataProviderFactory {
     } catch (SampleDataException e) {
       throw e;
     } catch (Exception e) {
-      throw new SampleDataException("An error occurred trying to create a ValueProvider", UNKNOWN, e);
+      throw new SampleDataException("An error occurred trying to create a SampleDataProvider", UNKNOWN, e);
     }
   }
 
