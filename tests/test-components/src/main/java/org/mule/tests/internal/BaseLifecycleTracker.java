@@ -26,83 +26,78 @@ import javax.inject.Inject;
 
 public class BaseLifecycleTracker implements Lifecycle, MuleContextAware, LifecycleTracker {
 
-    @Inject
-    private LifecycleTrackerRegistry registry;
+  @Inject
+  private LifecycleTrackerRegistry registry;
 
-    private final boolean shouldCheck;
+  private final boolean shouldCheck;
 
-    private MuleContext muleContext = null;
-    private final List<String> alreadyCalledPhases = new ArrayList<>();
+  private MuleContext muleContext = null;
+  private final List<String> alreadyCalledPhases = new ArrayList<>();
 
-    public BaseLifecycleTracker(boolean shouldCheck) {
-        this.shouldCheck = shouldCheck;
+  public BaseLifecycleTracker(boolean shouldCheck) {
+    this.shouldCheck = shouldCheck;
+  }
+
+  protected void onInit(MuleContext muleContext) throws InitialisationException {}
+
+  protected void onStart() throws MuleException {}
+
+  protected void onStop() throws MuleException {}
+
+  protected void onDispose() {}
+
+  protected void onSetMuleContext(MuleContext muleContext) {}
+
+  public void addTrackingDataToRegistry(String trackerName, LifecycleTrackerRegistry registry) {
+    registry.add(trackerName, this);
+  }
+
+  protected void addTrackingDataToRegistry(String trackerName) {
+    addTrackingDataToRegistry(trackerName, registry);
+  }
+
+  @Override
+  public List<String> getCalledPhases() {
+    return alreadyCalledPhases;
+  }
+
+  private void trackPhase(String phase) {
+    if (shouldCheck && alreadyCalledPhases.contains(phase)) {
+      throw new IllegalStateException(format("Invalid phase transition: %s -> %s", alreadyCalledPhases.toString(), phase));
     }
+    alreadyCalledPhases.add(phase);
+  }
 
-    protected void onInit(MuleContext muleContext) throws InitialisationException {
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    trackPhase(Initialisable.PHASE_NAME);
+    onInit(muleContext);
+  }
 
-    protected void onStart() throws MuleException {
-    }
+  @Override
+  public void start() throws MuleException {
+    trackPhase(Startable.PHASE_NAME);
+    onStart();
+  }
 
-    protected void onStop() throws MuleException {
-    }
+  @Override
+  public void stop() throws MuleException {
+    trackPhase(Stoppable.PHASE_NAME);
+    onStop();
+  }
 
-    protected void onDispose() {
-    }
+  @Override
+  public void dispose() {
+    trackPhase(Disposable.PHASE_NAME);
+    onDispose();
+  }
 
-    protected void onSetMuleContext(MuleContext muleContext) {
+  @Override
+  public void setMuleContext(MuleContext context) {
+    if (muleContext == null) {
+      trackPhase("setMuleContext");
+      onSetMuleContext(muleContext);
     }
-
-    public void addTrackingDataToRegistry(String trackerName, LifecycleTrackerRegistry registry) {
-        registry.add(trackerName, this);
-    }
-
-    protected void addTrackingDataToRegistry(String trackerName) {
-        addTrackingDataToRegistry(trackerName, registry);
-    }
-
-    @Override
-    public List<String> getCalledPhases() {
-        return alreadyCalledPhases;
-    }
-
-    private void trackPhase(String phase) {
-        if (shouldCheck && alreadyCalledPhases.contains(phase)) {
-            throw new IllegalStateException(format("Invalid phase transition: %s -> %s", alreadyCalledPhases.toString(), phase));
-        }
-        alreadyCalledPhases.add(phase);
-    }
-
-    @Override
-    public void initialise() throws InitialisationException {
-        trackPhase(Initialisable.PHASE_NAME);
-        onInit(muleContext);
-    }
-
-    @Override
-    public void start() throws MuleException {
-        trackPhase(Startable.PHASE_NAME);
-        onStart();
-    }
-
-    @Override
-    public void stop() throws MuleException {
-        trackPhase(Stoppable.PHASE_NAME);
-        onStop();
-    }
-
-    @Override
-    public void dispose() {
-        trackPhase(Disposable.PHASE_NAME);
-        onDispose();
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context) {
-        if (muleContext == null) {
-            trackPhase("setMuleContext");
-            onSetMuleContext(muleContext);
-        }
-        muleContext = context;
-    }
+    muleContext = context;
+  }
 }

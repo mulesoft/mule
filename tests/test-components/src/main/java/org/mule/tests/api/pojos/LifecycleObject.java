@@ -25,59 +25,59 @@ import javax.inject.Inject;
 @TypeDsl(allowTopLevelDefinition = true)
 public class LifecycleObject extends BaseLifecycleTracker {
 
-    @Inject
-    private LifecycleTrackerRegistry registry;
+  @Inject
+  private LifecycleTrackerRegistry registry;
 
-    @RefName
-    private String name;
+  @RefName
+  private String name;
 
-    @Optional
-    @Parameter
-    private String failurePhase;
+  @Optional
+  @Parameter
+  private String failurePhase;
 
-    @Optional
-    @Parameter
-    private String otherLifecycleObject;
+  @Optional
+  @Parameter
+  private String otherLifecycleObject;
 
-    public LifecycleObject() {
-        super(false);
+  public LifecycleObject() {
+    super(false);
+  }
+
+  @Override
+  protected void onSetMuleContext(MuleContext muleContext) {
+    addTrackingDataToRegistry(name);
+    failIfNeeded("setMuleContext");
+  }
+
+  @Override
+  protected void onInit(MuleContext muleContext) throws InitialisationException {
+    failIfNeeded(Initialisable.PHASE_NAME);
+  }
+
+  @Override
+  protected void onStart() throws MuleException {
+    failIfNeeded(Startable.PHASE_NAME);
+  }
+
+  @Override
+  protected void onStop() throws MuleException {
+    failIfNeeded(Stoppable.PHASE_NAME);
+  }
+
+  @Override
+  protected void onDispose() {
+    failIfNeeded(Disposable.PHASE_NAME);
+  }
+
+
+
+  private void failIfNeeded(String phase) {
+    if (failurePhase != null && failurePhase.equalsIgnoreCase(phase)) {
+      throw new RuntimeException("generated failure");
     }
+  }
 
-    @Override
-    protected void onSetMuleContext(MuleContext muleContext) {
-        addTrackingDataToRegistry(name);
-        failIfNeeded("setMuleContext");
-    }
-
-    @Override
-    protected void onInit(MuleContext muleContext) throws InitialisationException {
-        failIfNeeded(Initialisable.PHASE_NAME);
-    }
-
-    @Override
-    protected void onStart() throws MuleException {
-        failIfNeeded(Startable.PHASE_NAME);
-    }
-
-    @Override
-    protected void onStop() throws MuleException {
-        failIfNeeded(Stoppable.PHASE_NAME);
-    }
-
-    @Override
-    protected void onDispose() {
-        failIfNeeded(Disposable.PHASE_NAME);
-    }
-
-
-
-    private void failIfNeeded(String phase) {
-        if (failurePhase != null && failurePhase.equalsIgnoreCase(phase)) {
-            throw new RuntimeException("generated failure");
-        }
-    }
-
-    public LifecycleObject getOtherLifecycleObject() {
-        return (LifecycleObject) registry.get(otherLifecycleObject);
-    }
+  public LifecycleObject getOtherLifecycleObject() {
+    return (LifecycleObject) registry.get(otherLifecycleObject);
+  }
 }

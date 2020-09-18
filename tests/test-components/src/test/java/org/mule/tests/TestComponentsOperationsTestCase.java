@@ -28,7 +28,7 @@ public class TestComponentsOperationsTestCase extends MuleArtifactFunctionalTest
   @Test
   public void executeEnqueueFlow() throws Exception {
     String payloadValue = ((String) flowRunner("enqueueFlow").withAttributes(singletonMap("someAttribute", "TheValue"))
-            .run().getMessage().getPayload().getValue());
+        .run().getMessage().getPayload().getValue());
     assertThat(payloadValue, is("The payload"));
   }
 

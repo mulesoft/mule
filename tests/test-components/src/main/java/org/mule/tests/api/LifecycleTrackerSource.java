@@ -25,46 +25,46 @@ import javax.inject.Inject;
 @MediaType(TEXT_PLAIN)
 public class LifecycleTrackerSource extends Source<String, Serializable> implements LifecycleTracker {
 
-    @Inject
-    private LifecycleTrackerRegistry registry;
+  @Inject
+  private LifecycleTrackerRegistry registry;
 
-    private BaseLifecycleTracker delegate = new BaseLifecycleTracker(false);
+  private BaseLifecycleTracker delegate = new BaseLifecycleTracker(false);
 
-    @Parameter
-    private String name;
+  @Parameter
+  private String name;
 
-    @Override
-    public void onStart(SourceCallback sourceCallback) throws MuleException {
-        delegate.start();
+  @Override
+  public void onStart(SourceCallback sourceCallback) throws MuleException {
+    delegate.start();
+  }
+
+  @Override
+  public void onStop() {
+    try {
+      delegate.stop();
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(e);
     }
+  }
 
-    @Override
-    public void onStop() {
-        try {
-            delegate.stop();
-        } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-        }
-    }
+  @Override
+  public List<String> getCalledPhases() {
+    return delegate.getCalledPhases();
+  }
 
-    @Override
-    public List<String> getCalledPhases() {
-        return delegate.getCalledPhases();
-    }
+  @Override
+  public void dispose() {
+    delegate.dispose();
+  }
 
-    @Override
-    public void dispose() {
-        delegate.dispose();
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    delegate.initialise();
+  }
 
-    @Override
-    public void initialise() throws InitialisationException {
-        delegate.initialise();
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context) {
-        delegate.addTrackingDataToRegistry(name, registry);
-        delegate.setMuleContext(context);
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    delegate.addTrackingDataToRegistry(name, registry);
+    delegate.setMuleContext(context);
+  }
 }

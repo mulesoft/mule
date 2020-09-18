@@ -32,7 +32,7 @@ import org.mule.tests.internal.SkeletonSource;
 @DeclarationEnrichers(LifecycleTrackerEnricher.class)
 @Configurations(value = {QueueConfiguration.class, LifecycleTrackerConfiguration.class})
 @Export(classes = {TestQueueManager.class, ParameterCollectionParser.class, ElementWithAttributeAndChild.class,
-        TextPojo.class, MyPojo.class, SameChildTypeContainer.class, DependencyInjectionObject.class,
-        LifecycleObject.class})
+    TextPojo.class, MyPojo.class, SameChildTypeContainer.class, DependencyInjectionObject.class,
+    LifecycleObject.class})
 public class TestComponentsExtension {
 }

@@ -19,7 +19,52 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <formatterGoal>validate</formatterGoal>
+        <javaFormatter.plugin.version>2.0.1</javaFormatter.plugin.version>
+        <skipVerifications>false</skipVerifications>
     </properties>
+
+    <build>
+        <defaultGoal>install</defaultGoal>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>net.revelc.code.formatter</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                    <version>${javaFormatter.plugin.version}</version>
+                    <configuration>
+                        <compilerCompliance>${javaVersion}</compilerCompliance>
+                        <compilerSource>${javaVersion}</compilerSource>
+                        <compilerTargetPlatform>${javaVersion}</compilerTargetPlatform>
+                        <configFile>${basedir}/${formatterConfigPath}</configFile>
+                        <configJsFile>${basedir}/${formatterConfigPath}</configJsFile>
+                        <aggregator>false</aggregator>
+                        <executionRoot>true</executionRoot>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>apply-format</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>${formatterGoal}</goal>
+                            </goals>
+                            <configuration>
+                                <skipFormatting>${skipVerifications}</skipFormatting>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>

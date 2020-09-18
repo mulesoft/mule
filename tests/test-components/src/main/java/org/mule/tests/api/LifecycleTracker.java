@@ -7,6 +7,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import java.util.List;
 
 public interface LifecycleTracker extends Initialisable, Disposable, MuleContextAware {
-    
-    List<String> getCalledPhases();
+
+  List<String> getCalledPhases();
 }

@@ -19,16 +19,14 @@ import org.mule.runtime.extension.api.runtime.route.Chain;
  */
 public class LifecycleTrackerOperations {
 
-    public void lifecycleTrackerCheck(String name) {
-    }
+  public void lifecycleTrackerCheck(String name) {}
 
-    public void lifecycleTracker(String name) {
-    }
+  public void lifecycleTracker(String name) {}
 
-    @MediaType(value = ANY)
-    public void lifecycleTrackerScope(String name,
-                                      Chain operations,
-                                      CompletionCallback<Object, Object> callback) {
-        operations.process(callback::success, (error, previous) -> callback.error(error));
-    }
+  @MediaType(value = ANY)
+  public void lifecycleTrackerScope(String name,
+                                    Chain operations,
+                                    CompletionCallback<Object, Object> callback) {
+    operations.process(callback::success, (error, previous) -> callback.error(error));
+  }
 }

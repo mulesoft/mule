@@ -30,64 +30,67 @@ import org.slf4j.Logger;
 
 public class LifecycleTrackerEnricher implements DeclarationEnricher {
 
+  @Override
+  public void enrich(ExtensionLoadingContext extensionLoadingContext) {
+    extensionLoadingContext.getExtensionDeclarer().getDeclaration().getOperations().forEach(operation -> {
+      if (operation.getName().contains("lifecycleTracker")) {
+        boolean shouldCheckPhase = operation.getName().contains("Check");
+        CompletableComponentExecutorFactory executorFactory = getExecutorFactory(operation, shouldCheckPhase);
+        operation.addModelProperty(new CompletableComponentExecutorModelProperty(executorFactory));
+      }
+    });
+  }
+
+  private CompletableComponentExecutorFactory getExecutorFactory(OperationDeclaration operation, boolean shouldCheckPhase) {
+    Optional<CompletableComponentExecutorModelProperty> executorModelProperty =
+        operation.getModelProperty(CompletableComponentExecutorModelProperty.class);
+    CompletableComponentExecutorFactory<ComponentModel> oldFactory =
+        executorModelProperty.map(CompletableComponentExecutorModelProperty::getExecutorFactory).orElse(null);
+    return (componentModel, map) -> {
+      CompletableComponentExecutor<ComponentModel> delegateExecutor = null;
+      if (oldFactory != null) {
+        delegateExecutor = oldFactory.createExecutor(componentModel, map);
+      }
+      return new LifecycleTrackerComponentExecutorDecorator(delegateExecutor, shouldCheckPhase);
+    };
+  }
+
+  private static class LifecycleTrackerComponentExecutorDecorator extends BaseLifecycleTracker
+      implements CompletableComponentExecutor<ComponentModel> {
+
+    private static final Logger LOGGER = getLogger(LifecycleTrackerComponentExecutorDecorator.class);
+
+    private final CompletableComponentExecutor<ComponentModel> delegate;
+
+    LifecycleTrackerComponentExecutorDecorator(CompletableComponentExecutor<ComponentModel> delegate, boolean shouldCheck) {
+      super(shouldCheck);
+      this.delegate = delegate;
+    }
+
     @Override
-    public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-        extensionLoadingContext.getExtensionDeclarer().getDeclaration().getOperations().forEach(operation -> {
-            if (operation.getName().contains("lifecycleTracker")) {
-                boolean shouldCheckPhase = operation.getName().contains("Check");
-                CompletableComponentExecutorFactory executorFactory = getExecutorFactory(operation, shouldCheckPhase);
-                operation.addModelProperty(new CompletableComponentExecutorModelProperty(executorFactory));
-            }
-        });
+    public void execute(ExecutionContext<ComponentModel> executionContext, ExecutorCallback executorCallback) {
+      addTrackingDataToRegistry(executionContext.getParameter("name"));
+      delegate.execute(executionContext, executorCallback);
     }
 
-    private CompletableComponentExecutorFactory getExecutorFactory(OperationDeclaration operation, boolean shouldCheckPhase) {
-        Optional<CompletableComponentExecutorModelProperty> executorModelProperty = operation.getModelProperty(CompletableComponentExecutorModelProperty.class);
-        CompletableComponentExecutorFactory<ComponentModel> oldFactory = executorModelProperty.map(CompletableComponentExecutorModelProperty::getExecutorFactory).orElse(null);
-        return (componentModel, map) -> {
-            CompletableComponentExecutor<ComponentModel> delegateExecutor = null;
-            if (oldFactory != null) {
-                delegateExecutor = oldFactory.createExecutor(componentModel, map);
-            }
-            return new LifecycleTrackerComponentExecutorDecorator(delegateExecutor, shouldCheckPhase);
-        };
+    @Override
+    protected void onInit(MuleContext muleContext) throws InitialisationException {
+      initialiseIfNeeded(delegate, muleContext);
     }
 
-    private static class LifecycleTrackerComponentExecutorDecorator extends BaseLifecycleTracker implements CompletableComponentExecutor<ComponentModel> {
-
-        private static final Logger LOGGER = getLogger(LifecycleTrackerComponentExecutorDecorator.class);
-
-        private final CompletableComponentExecutor<ComponentModel> delegate;
-
-        LifecycleTrackerComponentExecutorDecorator(CompletableComponentExecutor<ComponentModel> delegate, boolean shouldCheck) {
-            super(shouldCheck);
-            this.delegate = delegate;
-        }
-
-        @Override
-        public void execute(ExecutionContext<ComponentModel> executionContext, ExecutorCallback executorCallback) {
-            addTrackingDataToRegistry(executionContext.getParameter("name"));
-            delegate.execute(executionContext, executorCallback);
-        }
-
-        @Override
-        protected void onInit(MuleContext muleContext) throws InitialisationException {
-            initialiseIfNeeded(delegate, muleContext);
-        }
-
-        @Override
-        protected void onStart() throws MuleException {
-            startIfNeeded(delegate);
-        }
-
-        @Override
-        protected void onStop() throws MuleException {
-            stopIfNeeded(delegate);
-        }
-
-        @Override
-        protected void onDispose() {
-            disposeIfNeeded(delegate, LOGGER);
-        }
+    @Override
+    protected void onStart() throws MuleException {
+      startIfNeeded(delegate);
     }
+
+    @Override
+    protected void onStop() throws MuleException {
+      stopIfNeeded(delegate);
+    }
+
+    @Override
+    protected void onDispose() {
+      disposeIfNeeded(delegate, LOGGER);
+    }
+  }
 }

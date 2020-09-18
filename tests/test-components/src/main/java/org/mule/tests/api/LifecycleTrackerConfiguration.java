@@ -24,25 +24,25 @@ import java.util.List;
 @Sources(LifecycleTrackerSource.class)
 public class LifecycleTrackerConfiguration extends BaseLifecycleTracker {
 
-    @RefName
-    private String configName;
+  @RefName
+  private String configName;
 
-    private final List<Component> nested = new ArrayList<>();
+  private final List<Component> nested = new ArrayList<>();
 
-    public LifecycleTrackerConfiguration() {
-        super(false);
-    }
+  public LifecycleTrackerConfiguration() {
+    super(false);
+  }
 
-    public List<Component> getNested() {
-        return new ArrayList<>(nested);
-    }
+  public List<Component> getNested() {
+    return new ArrayList<>(nested);
+  }
 
-    public void setNested(List<Component> nested) {
-        this.nested.addAll(nested);
-    }
+  public void setNested(List<Component> nested) {
+    this.nested.addAll(nested);
+  }
 
-    @Override
-    protected void onInit(MuleContext muleContext) throws InitialisationException {
-        addTrackingDataToRegistry(configName);
-    }
+  @Override
+  protected void onInit(MuleContext muleContext) throws InitialisationException {
+    addTrackingDataToRegistry(configName);
+  }
 }
