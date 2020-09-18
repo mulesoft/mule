@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -303,6 +304,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                    exception);
       return;
     }
+
+    refreshTokenIfNecessary(getConfigurationInstance()
+        .flatMap(configurationInstance -> configurationInstance.getConnectionProvider()).orElse(null), exception);
 
     LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Attempting to reconnect...",
                        sourceAdapter.getName(), getLocation().getRootContainerName()),
@@ -695,6 +699,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       }
     });
     return configurationInstanceOptional;
+  }
+
+  protected String getSourceName() {
+    return sourceModel.getName();
   }
 
   @Override
