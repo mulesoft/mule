@@ -11,7 +11,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
-import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getWithTokenRefreshIfNecessary;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.withRefreshToken;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.cloneAndEnrichValue;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -128,9 +128,9 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
                                                            INVALID_VALUE_RESOLVER_NAME));
 
     try {
-      return getWithTokenRefreshIfNecessary(connectionProvider,
-                                            () -> resolveValues(parameters, factoryModelProperty, parameterValueResolver,
-                                                                connectionSupplier, configurationSupplier));
+      return withRefreshToken(connectionProvider,
+                              () -> resolveValues(parameters, factoryModelProperty, parameterValueResolver,
+                                                  connectionSupplier, configurationSupplier));
     } catch (ValueResolvingException e) {
       throw e;
     } catch (Exception e) {

@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * A {@link MetadataContext} which is aware of the {@link ConnectionProvider} used to provide its connection.
  *
- * @since 4.4.0, 4.3.1
+ * @since 4.4.0
  */
 public interface ConnectionProviderAwareMetadataContext extends MetadataContext {
 

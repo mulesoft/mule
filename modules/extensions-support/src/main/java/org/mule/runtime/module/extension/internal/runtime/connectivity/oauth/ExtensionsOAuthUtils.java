@@ -28,6 +28,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
@@ -97,6 +98,13 @@ public final class ExtensionsOAuthUtils {
     return getOAuthConnectionProvider(config.getConnectionProvider().get());
   }
 
+  /**
+   * Unwraps a given connection provider if necessary to get a {@link OAuthConnectionProviderWrapper}.
+   *
+   * @param provider connection provider to unwrap
+   * @since 4.4.0
+   * @return
+   */
   public static OAuthConnectionProviderWrapper getOAuthConnectionProvider(ConnectionProvider provider) {
     ConnectionProvider oauthProvider = unwrapProviderWrapper(provider, OAuthConnectionProviderWrapper.class);
     return oauthProvider instanceof OAuthConnectionProviderWrapper ? (OAuthConnectionProviderWrapper) oauthProvider : null;
@@ -200,7 +208,18 @@ public final class ExtensionsOAuthUtils {
     }
   }
 
-  public static <T> T getWithTokenRefreshIfNecessary(ConnectionProvider connectionProvider, CheckedSupplier<T> supplier)
+  /**
+   * Gets the value provided by a {@link CheckedSupplier}, if that fails and the reason is that a token refresh is needed,
+   * the refresh is performed and the supplier is prompted to provide the value one more time.
+   *
+   * @param connectionProvider  the provider that created a connection used in the supplier to provide a value.
+   * @param supplier            a supplier that depends on an oauth based connection to provide a value.
+   * @param <T>                 the type of the value to be provided
+   * @return                    the value the supplier gives
+   * @throws Exception
+   * @since 4.4.0
+   */
+  public static <T> T withRefreshToken(ConnectionProvider connectionProvider, CheckedSupplier<T> supplier)
       throws Exception {
     try {
       return supplier.getChecked();

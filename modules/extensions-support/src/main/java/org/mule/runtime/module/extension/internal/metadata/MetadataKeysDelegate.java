@@ -13,7 +13,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
-import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getWithTokenRefreshIfNecessary;
+import static org.mule.runtime.module.extension.internal.metadata.MetadataResolverUtils.resolveWithOAuthRefresh;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -27,7 +27,6 @@ import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
@@ -86,11 +85,9 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
 
     try {
       final Map<Integer, ParameterModel> partsByOrder = getPartOrderMapping(keyParts);
-      Set<MetadataKey> metadataKeys = context instanceof ConnectionProviderAwareMetadataContext
-          ? getWithTokenRefreshIfNecessary(((ConnectionProviderAwareMetadataContext) context).getConnectionProvider()
-              .orElse(null),
-                                           () -> getMetadataKeys(context, keyResolver, partialKey, reflectionCache, partsByOrder))
-          : getMetadataKeys(context, keyResolver, partialKey, reflectionCache, partsByOrder);
+      Set<MetadataKey> metadataKeys =
+          resolveWithOAuthRefresh(context,
+                                  () -> getMetadataKeys(context, keyResolver, partialKey, reflectionCache, partsByOrder));
 
       final Set<MetadataKey> enrichedMetadataKeys = metadataKeys.stream()
           .map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partsByOrder))
