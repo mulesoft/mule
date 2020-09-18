@@ -196,7 +196,11 @@ public class ApplicationModel implements ArtifactAst {
                           Map<String, String> deploymentProperties,
                           Optional<ConfigurationProperties> parentConfigurationProperties,
                           ResourceProvider externalResourceProvider) {
-    final ArtifactAstBuilder astBuilder = ArtifactAstBuilder.builder(extensionModels);
+    final PropertiesResolverConfigurationProperties baseConfigurationAttributeResolver =
+        createConfigurationAttributeResolver(parentConfigurationProperties,
+                                             deploymentProperties, externalResourceProvider);
+    final ArtifactAstBuilder astBuilder =
+        ArtifactAstBuilder.builder(extensionModels, baseConfigurationAttributeResolver.getConfigurationPropertiesResolver());
 
     convertConfigFileToComponentModel(artifactConfig, astBuilder);
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration, astBuilder);

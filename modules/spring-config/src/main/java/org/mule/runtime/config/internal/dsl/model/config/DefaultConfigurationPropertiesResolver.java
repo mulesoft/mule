@@ -8,11 +8,12 @@ package org.mule.runtime.config.internal.dsl.model.config;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static java.util.Optional.empty;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -23,12 +24,12 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import java.util.Optional;
 
 import org.slf4j.Logger;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * Resolves attribute placeholders.
@@ -45,14 +46,14 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
   public static final String PLACEHOLDER_SUFFIX = "}";
   private final Optional<ConfigurationPropertiesResolver> parentResolver;
   private final ConfigurationPropertiesProvider configurationPropertiesProvider;
-  private Cache<String, Object> resolutionCache = CacheBuilder.<String, String>newBuilder().build();
+  private final Cache<String, Object> resolutionCache = CacheBuilder.<String, String>newBuilder().build();
   private boolean initialized = false;
   private Optional<ConfigurationPropertiesResolver> rootResolver = empty();
 
   public DefaultConfigurationPropertiesResolver(Optional<ConfigurationPropertiesResolver> parentResolver,
                                                 ConfigurationPropertiesProvider configurationPropertiesProvider) {
     this.parentResolver = parentResolver;
-    this.configurationPropertiesProvider = configurationPropertiesProvider;
+    this.configurationPropertiesProvider = requireNonNull(configurationPropertiesProvider);
   }
 
   private boolean shouldResolvePlaceholder(String value, int prefixIndex) {
@@ -94,6 +95,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
    * @return if the input value is null, then the result will be null. If the value doesn't have placeholders, then the same value
    *         will be returned. Otherwise placeholders will be resolved.
    */
+  @Override
   public Object resolveValue(String value) {
     if (value == null) {
       return value;
@@ -133,10 +135,11 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
 
   /**
    * Resolves the possible value of a placeholder key.
-   * 
+   *
    * @param placeholderKey the placeholder key which value needs to be resolved.
    * @return the resolved value.
    */
+  @Override
   public Object resolvePlaceholderKeyValue(final String placeholderKey) {
     Optional<ConfigurationProperty> foundValueOptional =
         configurationPropertiesProvider.getConfigurationProperty(placeholderKey);

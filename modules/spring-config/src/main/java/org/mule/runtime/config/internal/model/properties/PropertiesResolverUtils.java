@@ -160,6 +160,90 @@ public class PropertiesResolverUtils {
     }
   }
 
+  public static PropertiesResolverConfigurationProperties createConfigurationAttributeResolver(Optional<ConfigurationProperties> parentConfigurationProperties,
+                                                                                               Map<String, String> deploymentProperties,
+                                                                                               ResourceProvider externalResourceProvider) {
+    ConfigurationPropertiesProvider deploymentPropertiesConfigurationProperties = null;
+    if (!deploymentProperties.isEmpty()) {
+      deploymentPropertiesConfigurationProperties =
+          new MapConfigurationPropertiesProvider(deploymentProperties, "Deployment properties");
+    }
+
+    EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
+        new EnvironmentPropertiesConfigurationProvider();
+
+    DefaultConfigurationPropertiesResolver environmentPropertiesConfigurationPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(empty(), environmentPropertiesConfigurationProvider);
+
+    DefaultConfigurationPropertiesResolver parentLocalResolver;
+    if (deploymentPropertiesConfigurationProperties != null) {
+      parentLocalResolver = new DefaultConfigurationPropertiesResolver(of(environmentPropertiesConfigurationPropertiesResolver),
+                                                                       deploymentPropertiesConfigurationProperties);
+    } else {
+      parentLocalResolver = environmentPropertiesConfigurationPropertiesResolver;
+    }
+
+    DefaultConfigurationPropertiesResolver localResolver =
+        new DefaultConfigurationPropertiesResolver(of(parentLocalResolver),
+                                                   environmentPropertiesConfigurationProvider);
+    localResolver.setRootResolver(parentLocalResolver);
+
+    FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
+        new FileConfigurationPropertiesProvider(externalResourceProvider, "External files");
+
+    Optional<ConfigurationPropertiesResolver> parentConfigurationPropertiesResolver = of(localResolver);
+    if (parentConfigurationProperties.isPresent()) {
+      parentConfigurationPropertiesResolver =
+          of(new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
+
+            @Override
+            public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+              return parentConfigurationProperties.get().resolveProperty(configurationAttributeKey)
+                  .map(value -> new DefaultConfigurationProperty(parentConfigurationProperties, configurationAttributeKey,
+                                                                 value));
+            }
+
+            @Override
+            public String getDescription() {
+              return "Domain properties";
+            }
+          }));
+    }
+
+    Optional<CompositeConfigurationPropertiesProvider> configurationAttributesProvider = empty();
+
+    DefaultConfigurationPropertiesResolver systemPropertiesResolver;
+    if (configurationAttributesProvider.isPresent()) {
+      DefaultConfigurationPropertiesResolver configurationPropertiesResolver =
+          new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
+                                                     configurationAttributesProvider.get());
+      systemPropertiesResolver = new DefaultConfigurationPropertiesResolver(of(configurationPropertiesResolver),
+                                                                            environmentPropertiesConfigurationProvider);
+    } else {
+      systemPropertiesResolver = new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
+                                                                            environmentPropertiesConfigurationProvider);
+    }
+
+    DefaultConfigurationPropertiesResolver externalPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(deploymentPropertiesConfigurationProperties != null
+            // deployment properties provider has to go as parent here so we can reference
+            // them from external files
+            ? of(new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
+                                                            deploymentPropertiesConfigurationProperties))
+            : of(systemPropertiesResolver),
+                                                   externalPropertiesConfigurationProvider);
+    if (deploymentPropertiesConfigurationProperties == null) {
+      externalPropertiesResolver.setAsRootResolver();
+      return new PropertiesResolverConfigurationProperties(externalPropertiesResolver);
+    } else {
+      // finally the first configuration properties resolver should be deployment properties as they have precedence over the rest
+      DefaultConfigurationPropertiesResolver deploymentPropertiesResolver =
+          new DefaultConfigurationPropertiesResolver(of(externalPropertiesResolver), deploymentPropertiesConfigurationProperties);
+      deploymentPropertiesResolver.setAsRootResolver();
+      return new PropertiesResolverConfigurationProperties(deploymentPropertiesResolver);
+    }
+  }
+
   public static ConfigurationPropertiesProvider createProviderFromGlobalProperties(ArtifactAst artifactAst) {
     final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
 
