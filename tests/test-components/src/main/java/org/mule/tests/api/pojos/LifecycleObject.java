@@ -35,6 +35,10 @@ public class LifecycleObject extends BaseLifecycleTracker {
     @Parameter
     private String failurePhase;
 
+    @Optional
+    @Parameter
+    private String otherLifecycleObject;
+
     public LifecycleObject() {
         super(false);
     }
@@ -65,9 +69,15 @@ public class LifecycleObject extends BaseLifecycleTracker {
         failIfNeeded(Disposable.PHASE_NAME);
     }
 
+
+
     private void failIfNeeded(String phase) {
         if (failurePhase != null && failurePhase.equalsIgnoreCase(phase)) {
             throw new RuntimeException("generated failure");
         }
+    }
+
+    public LifecycleObject getOtherLifecycleObject() {
+        return (LifecycleObject) registry.get(otherLifecycleObject);
     }
 }
