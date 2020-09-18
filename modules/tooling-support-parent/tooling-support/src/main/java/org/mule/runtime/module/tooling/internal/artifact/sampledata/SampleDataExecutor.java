@@ -24,13 +24,10 @@ import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
-import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService.ResolvingComponent;
-import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderMediator;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
@@ -43,13 +40,13 @@ import java.util.Optional;
 public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
   private final ConnectionManager connectionManager;
-  private final StreamingManager streamingManager;
+  private final SampleDataService sampleDataService;
 
   public SampleDataExecutor(MuleContext muleContext, ConnectionManager connectionManager, ExpressionManager expressionManager,
-                            StreamingManager streamingManager, ReflectionCache reflectionCache, ArtifactHelper artifactHelper) {
+                            SampleDataService sampleDataService, ReflectionCache reflectionCache, ArtifactHelper artifactHelper) {
     super(muleContext, expressionManager, reflectionCache, artifactHelper);
     this.connectionManager = connectionManager;
-    this.streamingManager = streamingManager;
+    this.sampleDataService = sampleDataService;
   }
 
   public SampleDataResult getSampleData(ComponentModel componentModel, ComponentElementDeclaration componentElementDeclaration) {
@@ -64,18 +61,8 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
       ExtensionModel extensionModel = artifactHelper.getExtensionModel(componentElementDeclaration);
       String extensionName = extensionModel.getName();
 
-      SampleDataProviderMediator mediator = new SampleDataProviderMediator(
-                                                                           extensionModel,
-                                                                           componentModel,
-                                                                           new ResolvingComponent(extensionName, componentName),
-                                                                           muleContext,
-                                                                           new ReflectionCache(),
-                                                                           streamingManager);
-
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(componentModel, componentElementDeclaration);
-
-      ParameterValueResolver parameterValueResolver = parameterValueResolver(componentElementDeclaration, componentModel);
 
       LoggingResolvingContext context =
           new LoggingResolvingContext(new ExtensionResolvingContext(() -> optionalConfigurationInstance,
@@ -83,9 +70,11 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
       try {
-        return resultFrom(withContextClassLoader(extensionClassLoader, () -> mediator.getSampleData(parameterValueResolver,
-                                                                                                    connectionSupplier(context),
-                                                                                                    configSupplier(context)),
+        return resultFrom(withContextClassLoader(extensionClassLoader, () -> sampleDataService.getSampleData(extensionName,
+                                                                                                             componentName,
+                                                                                                             parametersMap(componentElementDeclaration,
+                                                                                                                           componentModel),
+                                                                                                             () -> optionalConfigurationInstance),
                                                  SampleDataException.class, e -> {
                                                    throw new ExecutorExceptionWrapper(e);
                                                  }));

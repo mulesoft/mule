@@ -33,15 +33,15 @@ import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.artifact.metadata.MetadataComponentExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.metadata.MetadataKeysExecutor;
-import org.mule.runtime.module.tooling.internal.artifact.value.ValueProviderExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.sampledata.SampleDataExecutor;
+import org.mule.runtime.module.tooling.internal.artifact.value.ValueProviderExecutor;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
@@ -69,7 +69,7 @@ public class InternalDeclarationSession implements DeclarationSession {
   private ExpressionManager expressionManager;
 
   @Inject
-  private StreamingManager streamingManager;
+  private SampleDataService sampleDataService;
 
   private final LazyValue<ArtifactHelper> artifactHelperLazyValue;
   private final LazyValue<ValueProviderExecutor> valueProviderExecutorLazyValue;
@@ -88,7 +88,7 @@ public class InternalDeclarationSession implements DeclarationSession {
     this.metadataComponentExecutorLazyValue =
         new LazyValue<>(() -> new MetadataComponentExecutor(connectionManager, reflectionCache, artifactHelper()));
     this.sampleDataExecutorLazyValue =
-        new LazyValue<>(() -> new SampleDataExecutor(muleContext, connectionManager, expressionManager, streamingManager,
+        new LazyValue<>(() -> new SampleDataExecutor(muleContext, connectionManager, expressionManager, sampleDataService,
                                                      reflectionCache, artifactHelper()));
   }
 

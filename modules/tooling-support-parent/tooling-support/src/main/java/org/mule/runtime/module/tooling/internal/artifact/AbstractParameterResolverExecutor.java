@@ -22,18 +22,15 @@ import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBasedParameterResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.runtime.module.tooling.internal.artifact.context.LoggingResolvingContext;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class AbstractParameterResolverExecutor {
 
@@ -52,6 +49,26 @@ public class AbstractParameterResolverExecutor {
 
   protected ParameterValueResolver parameterValueResolver(ParameterizedElementDeclaration parameterizedElementDeclaration,
                                                           ParameterizedModel parameterizedModel) {
+    Map<String, Object> parametersMap = parametersMap(parameterizedElementDeclaration, parameterizedModel);
+
+    try {
+      final ResolverSet resolverSet =
+          ParametersResolver.fromValues(parametersMap,
+                                        muleContext,
+                                        // Required parameters should not invalidate the resolution of resolving ValueProviders
+                                        true,
+                                        reflectionCache,
+                                        expressionManager,
+                                        parameterizedModel.getName())
+              .getParametersAsResolverSet(parameterizedModel, muleContext);
+      return new ResolverSetBasedParameterResolver(resolverSet, parameterizedModel, reflectionCache, expressionManager);
+    } catch (ConfigurationException e) {
+      throw new MuleRuntimeException(createStaticMessage("Error resolving parameters values from declaration"), e);
+    }
+  }
+
+  protected Map<String, Object> parametersMap(ParameterizedElementDeclaration parameterizedElementDeclaration,
+                                              ParameterizedModel parameterizedModel) {
     Map<String, Object> parametersMap = new HashMap<>();
 
     Map<String, ParameterGroupModel> parameterGroups =
@@ -75,29 +92,7 @@ public class AbstractParameterResolverExecutor {
                                        artifactHelper.getParameterClass(parameterModel, parameterizedElementDeclaration)));
       }
     }
-
-    try {
-      final ResolverSet resolverSet =
-          ParametersResolver.fromValues(parametersMap,
-                                        muleContext,
-                                        // Required parameters should not invalidate the resolution of resolving ValueProviders
-                                        true,
-                                        reflectionCache,
-                                        expressionManager,
-                                        parameterizedModel.getName())
-              .getParametersAsResolverSet(parameterizedModel, muleContext);
-      return new ResolverSetBasedParameterResolver(resolverSet, parameterizedModel, reflectionCache, expressionManager);
-    } catch (ConfigurationException e) {
-      throw new MuleRuntimeException(createStaticMessage("Error resolving parameters values from declaration"), e);
-    }
-  }
-
-  protected Supplier<Object> connectionSupplier(LoggingResolvingContext context) {
-    return (CheckedSupplier<Object>) () -> context.getConnection().orElse(null);
-  }
-
-  protected Supplier<Object> configSupplier(LoggingResolvingContext context) {
-    return (CheckedSupplier<Object>) () -> context.getConfig().orElse(null);
+    return parametersMap;
   }
 
 }

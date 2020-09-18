@@ -162,7 +162,7 @@ public class MuleSampleDataService implements SampleDataService {
     this.connectionManager = connectionManager;
   }
 
-  public static class ResolvingComponent extends AbstractComponent {
+  private class ResolvingComponent extends AbstractComponent {
 
     private final ComponentLocation location;
 

@@ -23,6 +23,7 @@ import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
@@ -35,6 +36,7 @@ import org.mule.runtime.module.tooling.internal.artifact.context.LoggingResolvin
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
 
@@ -79,6 +81,14 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
     } catch (Exception e) {
       return resultFrom(newFailure(e).build());
     }
+  }
+
+  private Supplier<Object> connectionSupplier(LoggingResolvingContext context) {
+    return (CheckedSupplier<Object>) () -> context.getConnection().orElse(null);
+  }
+
+  private Supplier<Object> configSupplier(LoggingResolvingContext context) {
+    return (CheckedSupplier<Object>) () -> context.getConfig().orElse(null);
   }
 
   private Optional<ConfigurationInstance> getConfigurationInstance(ParameterizedModel parameterizedModel,
