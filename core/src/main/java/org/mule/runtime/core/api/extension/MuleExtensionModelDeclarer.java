@@ -176,6 +176,7 @@ class MuleExtensionModelDeclarer {
 
     // misc
     declareNotifications(extensionDeclarer);
+    declareGlobalProperties(extensionDeclarer, typeLoader);
 
     return extensionDeclarer;
   }
@@ -1001,4 +1002,23 @@ class MuleExtensionModelDeclarer {
         .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
   }
 
+  private void declareGlobalProperties(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    final ConstructDeclarer globalPropDeclarer = extensionDeclarer.withConstruct("globalProperty")
+        .allowingTopLevelDefinition()
+        .describedAs("A global property is a named string. It can be inserted in most attribute values using standard (${key}) property placeholders.");
+
+    globalPropDeclarer
+        .onDefaultParameterGroup()
+        .withRequiredParameter("name")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The name of the property. This is used inside property placeholders.");
+
+    globalPropDeclarer
+        .onDefaultParameterGroup()
+        .withRequiredParameter("value")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The value of the property. This replaces each occurence of a property placeholder.");
+  }
 }

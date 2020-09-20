@@ -12,7 +12,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 
 /**
  * Builds the provider for the configuration-properties element.
@@ -34,7 +33,7 @@ public final class DefaultConfigurationPropertiesProviderFactory implements Conf
 
   @Override
   public ConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters,
-                                                        ResourceProvider externalResourceProvider) {
+                                                        org.mule.runtime.config.api.dsl.model.ResourceProvider externalResourceProvider) {
 
     String file = parameters.getStringParameter("file");
     Preconditions.checkArgument(file != null, "Required attribute 'file' of 'configuration-properties' not found");

@@ -332,8 +332,8 @@ class ComponentConfigurationBuilder<T> {
           .map(pm -> componentModel.getParameters().stream()
               .filter(param -> !componentBuildingDefinition.getIgnoredConfigurationParameters()
                   .contains(param.getModel().getName()))
-              .filter(param -> param.getRawValue() != null)
-              .collect(toMap(param -> param.getModel().getName(), ComponentParameterAst::getRawValue)))
+              .filter(param -> param.getResolvedRawValue() != null)
+              .collect(toMap(param -> param.getModel().getName(), ComponentParameterAst::getResolvedRawValue)))
           .orElse(null);
     }
 

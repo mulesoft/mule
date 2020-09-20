@@ -7,18 +7,16 @@
 package org.mule.runtime.extension.internal.loader.validator;
 
 import static java.lang.String.format;
+import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.loadProviderFactories;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 
-import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * {@link ExtensionModelValidator} which applies to {@link ExtensionModel}s which are XML based, as those that contain usages of
@@ -35,23 +33,14 @@ public class ForbiddenConfigurationPropertiesValidator implements ExtensionModel
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
     extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).ifPresent(modelProperty -> {
-      final Set<ComponentIdentifier> configurationPropertiesCollection = getConfigurationPropertiesIdentifiers();
+      final Set<ComponentIdentifier> configurationPropertiesCollection = loadProviderFactories().keySet();
       modelProperty.getGlobalElements().forEach(globalElementComponentModel -> {
         if (configurationPropertiesCollection.contains(globalElementComponentModel.getIdentifier())) {
-          problemsReporter.addError(new Problem(extensionModel, format(
-                                                                       CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE,
+          problemsReporter.addError(new Problem(extensionModel, format(CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE,
                                                                        globalElementComponentModel.getIdentifier())));
         }
       });
     });
-  }
-
-  private Set<ComponentIdentifier> getConfigurationPropertiesIdentifiers() {
-    final ServiceLoader<ConfigurationPropertiesProviderFactory> providerFactories =
-        ServiceLoader.load(ConfigurationPropertiesProviderFactory.class);
-    return StreamSupport.stream(providerFactories.spliterator(), false)
-        .map(ConfigurationPropertiesProviderFactory::getSupportedComponentIdentifier)
-        .collect(Collectors.toSet());
   }
 
 }

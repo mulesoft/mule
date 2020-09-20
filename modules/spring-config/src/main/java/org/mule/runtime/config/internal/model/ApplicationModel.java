@@ -56,7 +56,6 @@ import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
@@ -66,6 +65,7 @@ import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.extension.api.error.ErrorMapping;
+import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;

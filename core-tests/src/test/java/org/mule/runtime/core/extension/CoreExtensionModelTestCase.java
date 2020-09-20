@@ -137,7 +137,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
     assertThat(coreExtensionModel.getOperationModels(), hasSize(8));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(19));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(20));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -719,6 +719,23 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(mimeType.getType(), is(instanceOf(StringType.class)));
   }
 
+  @Test
+  public void globalProperty() {
+    ConstructModel setVariable = coreExtensionModel.getConstructModel("globalProperty").get();
+
+    ParameterModel name = setVariable.getAllParameterModels().get(0);
+    ParameterModel value = setVariable.getAllParameterModels().get(1);
+
+    assertThat(name.getName(), is("name"));
+    assertThat(name.isComponentId(), is(false));
+    assertThat(name.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(name.getType(), is(instanceOf(StringType.class)));
+
+    assertThat(value.getName(), is("value"));
+    assertThat(value.isComponentId(), is(false));
+    assertThat(value.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(value.getType(), is(instanceOf(StringType.class)));
+  }
 
   void verifyOnError(NestedRouteModel route) {
     List<ParameterModel> allParameterModels = route.getAllParameterModels();

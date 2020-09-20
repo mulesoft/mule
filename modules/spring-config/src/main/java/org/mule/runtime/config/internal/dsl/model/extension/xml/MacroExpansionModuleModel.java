@@ -361,8 +361,8 @@ public class MacroExpansionModuleModel {
 
     Map<String, String> propertiesMap = extractProperties(configRefName);
     Map<String, String> parametersMap = operationRefModel.getParameters().stream()
-        .filter(paramAst -> paramAst.getRawValue() != null)
-        .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getRawValue()));
+        .filter(paramAst -> paramAst.getResolvedRawValue() != null)
+        .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getResolvedRawValue()));
 
     final Map<String, String> literalParameters = getLiteralParameters(propertiesMap, parametersMap);
 
@@ -466,8 +466,8 @@ public class MacroExpansionModuleModel {
           // as configParameter != null, a ConfigurationModel must exist
           final ConfigurationModel configurationModel = getConfigurationModel().get();
           configRefComponentModel.getParameters().stream()
-              .filter(paramAst -> paramAst.getRawValue() != null)
-              .forEach(paramAst -> valuesMap.put(paramAst.getModel().getName(), paramAst.getRawValue()));
+              .filter(paramAst -> paramAst.getResolvedRawValue() != null)
+              .forEach(paramAst -> valuesMap.put(paramAst.getModel().getName(), paramAst.getResolvedRawValue()));
           valuesMap.putAll(extractConnectionProperties(configRefComponentModel, configurationModel));
         });
     return valuesMap;
@@ -490,9 +490,9 @@ public class MacroExpansionModuleModel {
                 .equals(componentModel.getIdentifier().getName()))
             .findFirst()
             .map(connectionComponentModel -> connectionComponentModel.getParameters().stream()
-                .filter(paramAst -> paramAst.getRawValue() != null)
+                .filter(paramAst -> paramAst.getResolvedRawValue() != null)
                 .collect(toMap(paramAst -> paramAst.getModel().getName(),
-                               paramAst -> paramAst.getRawValue()))))
+                               paramAst -> paramAst.getResolvedRawValue()))))
         .orElse(emptyMap());
   }
 

@@ -126,7 +126,15 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
 
       @Override
       public String getRawValue() {
-        final String originalRawValue = originalParameter.getRawValue();
+        return macroExpandedRawValue(originalParameter.getRawValue());
+      }
+
+      @Override
+      public String getResolvedRawValue() {
+        return macroExpandedRawValue(originalParameter.getResolvedRawValue());
+      }
+
+      private String macroExpandedRawValue(final String originalRawValue) {
         if (originalRawValue != null) {
           if (moduleGlobalElementsNames.contains(originalRawValue)) {
             return originalRawValue.concat("-").concat(defaultGlobalElementSuffix);

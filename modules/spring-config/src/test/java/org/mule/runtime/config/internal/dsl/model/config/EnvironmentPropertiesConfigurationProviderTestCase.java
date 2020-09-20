@@ -9,11 +9,12 @@ package org.mule.runtime.config.internal.dsl.model.config;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import com.google.common.collect.ImmutableMap;
-
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
 
 public class EnvironmentPropertiesConfigurationProviderTestCase extends AbstractMuleTestCase {
 
@@ -25,7 +26,7 @@ public class EnvironmentPropertiesConfigurationProviderTestCase extends Abstract
     EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
         new EnvironmentPropertiesConfigurationProvider(() -> ImmutableMap.<String, String>builder()
             .put(variableKey, variableValue).build());
-    assertThat(environmentPropertiesConfigurationProvider.getConfigurationProperty(variableKey).get().getRawValue(),
+    assertThat(environmentPropertiesConfigurationProvider.provide(variableKey).get().getValue(),
                is(variableValue));
   }
 
@@ -36,7 +37,7 @@ public class EnvironmentPropertiesConfigurationProviderTestCase extends Abstract
     testWithSystemProperty(propertyKey, propertyValue, () -> {
       EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
           new EnvironmentPropertiesConfigurationProvider();
-      assertThat(environmentPropertiesConfigurationProvider.getConfigurationProperty(propertyKey).get().getRawValue(),
+      assertThat(environmentPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
                  is(propertyValue));
 
     });
@@ -51,7 +52,7 @@ public class EnvironmentPropertiesConfigurationProviderTestCase extends Abstract
       EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
           new EnvironmentPropertiesConfigurationProvider(() -> ImmutableMap.<String, String>builder()
               .put(key, keyVariableValue).build());
-      assertThat(environmentPropertiesConfigurationProvider.getConfigurationProperty(key).get().getRawValue(),
+      assertThat(environmentPropertiesConfigurationProvider.provide(key).get().getValue(),
                  is(keyPropertyValue));
     });
   }

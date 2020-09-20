@@ -234,6 +234,7 @@
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.4.0-SNAPSHOT</muleDslApiVersion>
         <muleAstVersion>1.0.0-SNAPSHOT</muleAstVersion>
+        <mulePropertiesApiVersion>1.0.0-SNAPSHOT</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.4.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.4.0-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.6.0-SNAPSHOT</muleMavenClientApi>
@@ -1044,6 +1045,11 @@
                 <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-artifact-ast-dependency-graph</artifactId>
                 <version>${muleAstVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-properties-api</artifactId>
+                <version>${mulePropertiesApiVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.runtime</groupId>

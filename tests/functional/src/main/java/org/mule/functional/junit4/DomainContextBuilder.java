@@ -7,8 +7,8 @@
 package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
+import static org.mule.functional.junit4.FunctionalTestCase.extensionManagerWithMuleExtModelBuilder;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -16,14 +16,11 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.internal.policy.NullPolicyProvider;
 import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
-import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +32,7 @@ public class DomainContextBuilder {
 
   private TestServicesConfigurationBuilder testServicesConfigBuilder;
 
-  private MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(DOMAIN);
+  private final MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(DOMAIN);
 
   public DomainContextBuilder setContextId(String contextId) {
     this.contextId = contextId;
@@ -50,7 +47,7 @@ public class DomainContextBuilder {
   public MuleContext build() throws Exception {
     List<ConfigurationBuilder> builders = new ArrayList<>(3);
     ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
-    builders.add(new MockExtensionManagerConfigurationBuilder());
+    builders.add(extensionManagerWithMuleExtModelBuilder());
     builders.add(new TestPolicyProviderConfigurationBuilder());
     builders.add(cfgBuilder);
     testServicesConfigBuilder = new TestServicesConfigurationBuilder();

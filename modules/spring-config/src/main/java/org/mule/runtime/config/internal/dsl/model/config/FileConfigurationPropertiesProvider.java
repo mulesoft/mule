@@ -9,15 +9,15 @@ package org.mule.runtime.config.internal.dsl.model.config;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import org.mule.runtime.core.api.exception.ResourceNotFoundException;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
+import org.mule.runtime.properties.api.ResourceProvider;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
-
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
-import org.mule.runtime.core.api.exception.ResourceNotFoundException;
-import org.mule.runtime.core.api.util.IOUtils;
 
 /**
  * File based properties provider, using an external resource provider.
@@ -25,8 +25,8 @@ import org.mule.runtime.core.api.util.IOUtils;
 public class FileConfigurationPropertiesProvider implements ConfigurationPropertiesProvider {
 
   private final static String FILE_PREFIX = "file::";
-  private ResourceProvider resourceProvider;
-  private String description;
+  private final ResourceProvider resourceProvider;
+  private final String description;
 
   public FileConfigurationPropertiesProvider(ResourceProvider resourceProvider, String description) {
     this.resourceProvider = resourceProvider;
@@ -34,7 +34,7 @@ public class FileConfigurationPropertiesProvider implements ConfigurationPropert
   }
 
   @Override
-  public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+  public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
     if (configurationAttributeKey.startsWith(FILE_PREFIX)) {
       String path = configurationAttributeKey.substring(FILE_PREFIX.length());
       try (InputStream is = resourceProvider.getResourceAsStream(path)) {

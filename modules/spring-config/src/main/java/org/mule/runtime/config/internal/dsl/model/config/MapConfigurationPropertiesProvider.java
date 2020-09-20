@@ -9,8 +9,8 @@ package org.mule.runtime.config.internal.dsl.model.config;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class MapConfigurationPropertiesProvider implements ConfigurationProperti
   }
 
   @Override
-  public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+  public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
     String value = properties.get(configurationAttributeKey);
     if (value == null) {
       return empty();

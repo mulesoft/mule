@@ -6,26 +6,29 @@
  */
 package org.mule.runtime.config.dsl.model.internal.config;
 
-import static org.hamcrest.core.Is.is;
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.COMPONENT_CONFIGURATION_YAML_STORY;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
+import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
+import org.mule.runtime.properties.internal.ConfigurationPropertiesException;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.yaml.snakeyaml.parser.ParserException;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(CONFIGURATION_PROPERTIES)
 @Story(COMPONENT_CONFIGURATION_YAML_STORY)
@@ -39,7 +42,7 @@ public class YamlConfigurationPropertiesComponentTestCase {
 
   @Before
   public void setUp() {
-    externalResourceProvider = new ClassLoaderResourceProvider(Thread.currentThread().getContextClassLoader());
+    externalResourceProvider = new ClassLoaderResourceProvider(currentThread().getContextClassLoader());
   }
 
   @Description("Validates the values obtained for the different types in the properties")
@@ -47,14 +50,14 @@ public class YamlConfigurationPropertiesComponentTestCase {
   public void validConfig() throws InitialisationException {
     configurationComponent = new DefaultConfigurationPropertiesProvider("properties.yaml", externalResourceProvider);
     configurationComponent.initialise();
-    assertThat(configurationComponent.getConfigurationProperty("number").get().getRawValue(), is("34843"));
-    assertThat(configurationComponent.getConfigurationProperty("float").get().getRawValue(), is("2392.00"));
-    assertThat(configurationComponent.getConfigurationProperty("date").get().getRawValue(), is("2001-01-23"));
-    assertThat(configurationComponent.getConfigurationProperty("lines").get().getRawValue(), is("458 Walkman Dr.\nSuite #292\n"));
-    assertThat(configurationComponent.getConfigurationProperty("list").get().getRawValue(), is("one,two,three"));
-    assertThat(configurationComponent.getConfigurationProperty("complex.prop0").get().getRawValue(), is("value0"));
-    assertThat(configurationComponent.getConfigurationProperty("complex.complex2.prop1").get().getRawValue(), is("value1"));
-    assertThat(configurationComponent.getConfigurationProperty("complex.complex2.prop2").get().getRawValue(), is("value2"));
+    assertThat(configurationComponent.provide("number").get().getValue(), is("34843"));
+    assertThat(configurationComponent.provide("float").get().getValue(), is("2392.00"));
+    assertThat(configurationComponent.provide("date").get().getValue(), is("2001-01-23"));
+    assertThat(configurationComponent.provide("lines").get().getValue(), is("458 Walkman Dr.\nSuite #292\n"));
+    assertThat(configurationComponent.provide("list").get().getValue(), is("one,two,three"));
+    assertThat(configurationComponent.provide("complex.prop0").get().getValue(), is("value0"));
+    assertThat(configurationComponent.provide("complex.complex2.prop1").get().getValue(), is("value1"));
+    assertThat(configurationComponent.provide("complex.complex2.prop2").get().getValue(), is("value2"));
   }
 
   @Description("Validates that a list of complex objects is not valid")
@@ -84,7 +87,7 @@ public class YamlConfigurationPropertiesComponentTestCase {
     configurationComponent =
         new DefaultConfigurationPropertiesProvider("properties-utf16.yaml", "UTF-16", externalResourceProvider);
     configurationComponent.initialise();
-    assertThat(configurationComponent.getConfigurationProperty("number").get().getRawValue(), is("34843"));
+    assertThat(configurationComponent.provide("number").get().getValue(), is("34843"));
   }
 
 

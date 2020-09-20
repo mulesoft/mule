@@ -8,24 +8,25 @@ package org.mule.runtime.config.internal.dsl.model.config;
 
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class GlobalPropertyConfigurationPropertiesProvider implements ConfigurationPropertiesProvider {
 
-  private Map<String, ConfigurationProperty> globalPropertiesConfigurationAttributes;
+  private final Supplier<Map<String, ConfigurationProperty>> globalPropertiesConfigurationAttributes;
 
-  public GlobalPropertyConfigurationPropertiesProvider(Map<String, ConfigurationProperty> properties) {
+  public GlobalPropertyConfigurationPropertiesProvider(Supplier<Map<String, ConfigurationProperty>> properties) {
     this.globalPropertiesConfigurationAttributes = properties;
   }
 
 
   @Override
-  public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
-    return ofNullable(globalPropertiesConfigurationAttributes.get(configurationAttributeKey));
+  public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
+    return ofNullable(globalPropertiesConfigurationAttributes.get().get(configurationAttributeKey));
   }
 
   @Override

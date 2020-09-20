@@ -20,7 +20,7 @@ public final class ConfigurationPropertiesProviderFactoryUtils {
 
     component.getParameters()
         .forEach(param -> configurationParametersBuilder
-            .withSimpleParameter(param.getModel().getName(), localResolver.apply(param.getRawValue())));
+            .withSimpleParameter(param.getModel().getName(), localResolver.apply(param.getResolvedRawValue())));
 
     component
         .directChildrenStream()

@@ -32,7 +32,7 @@ import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyCompone
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
-import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.createProviderFromGlobalProperties;
+import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
@@ -64,6 +64,7 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -75,8 +76,10 @@ import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
@@ -102,6 +105,8 @@ import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurati
 import org.mule.runtime.extension.internal.loader.validator.property.InvalidTestConnectionMarkerModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -413,7 +418,6 @@ public final class XmlExtensionLoaderDelegate {
     return ast.topLevelComponentsStream().findAny().get();
   }
 
-  // TODO
   private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ArtifactAst ast) {
     // <mule:global-property ... /> properties reader
     final ConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
@@ -430,6 +434,28 @@ public final class XmlExtensionLoaderDelegate {
                                                 description);
     return new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
                                                       externalPropertiesConfigurationProvider);
+  }
+
+  private ConfigurationPropertiesProvider createProviderFromGlobalProperties(ArtifactAst ast) {
+    return new GlobalPropertyConfigurationPropertiesProvider(new LazyValue<>(() -> {
+      final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
+
+      // Root element is the mule:module
+      ast.topLevelComponentsStream()
+          .flatMap(comp -> comp.directChildrenStream())
+          .filter(comp -> GLOBAL_PROPERTY.equals(comp.getIdentifier().getName()))
+          .forEach(comp -> {
+            final String key = comp.getParameter("name").getResolvedRawValue();
+            final String rawValue = comp.getParameter("value").getRawValue();
+            globalProperties.put(key,
+                                 new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
+                                                                         comp.getMetadata().getFileName().orElse("(n/a)"),
+                                                                         comp.getMetadata().getStartLine().orElse(-1)),
+                                                                  key, rawValue));
+          });
+
+      return globalProperties;
+    }));
   }
 
   private void loadModuleExtension(ExtensionDeclarer declarer, URL resource, Document moduleDocument,

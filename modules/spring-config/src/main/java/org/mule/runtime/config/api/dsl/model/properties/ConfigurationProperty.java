@@ -6,22 +6,15 @@
  */
 package org.mule.runtime.config.api.dsl.model.properties;
 
-import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.api.component.Component;
-
 /**
  * Represents a configuration attribute.
  *
  * @since 4.1
+ *
+ * @deprecated since 4.4, use org.mule.runtime.properties.api.ConfigurationProperty instead.
  */
-@NoImplement
-public interface ConfigurationProperty {
-
-  /**
-   * @return the source of this configuration attribute. For instance, it may be an {@link Component} if it's source was defined
-   *         in the artifact configuration or it may be the deployment properties configured at deployment time.
-   */
-  Object getSource();
+@Deprecated
+public interface ConfigurationProperty extends org.mule.runtime.properties.api.ConfigurationProperty {
 
   /**
    * @return the plain configuration value without resolution. A configuration value may contain reference to other configuration
@@ -29,9 +22,8 @@ public interface ConfigurationProperty {
    */
   Object getRawValue();
 
-  /**
-   * @return the key of the configuration attribute to reference it.
-   */
-  String getKey();
-
+  @Override
+  default String getValue() {
+    return getRawValue().toString();
+  }
 }

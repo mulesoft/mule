@@ -21,8 +21,8 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.util.Optional;
 
@@ -141,13 +141,13 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
    */
   @Override
   public Object resolvePlaceholderKeyValue(final String placeholderKey) {
-    Optional<ConfigurationProperty> foundValueOptional =
-        configurationPropertiesProvider.getConfigurationProperty(placeholderKey);
+    Optional<? extends ConfigurationProperty> foundValueOptional =
+        configurationPropertiesProvider.provide(placeholderKey);
     // verify that the provided value is not the same as the placeholder key searched for. If that's the case jump to parent.
     if (foundValueOptional.isPresent()
-        && !foundValueOptional.get().getRawValue().equals(PLACEHOLDER_PREFIX + placeholderKey + PLACEHOLDER_SUFFIX)) {
-      if (foundValueOptional.get().getRawValue() instanceof String) {
-        return replaceAllPlaceholders((String) foundValueOptional.get().getRawValue());
+        && !foundValueOptional.get().getValue().equals(PLACEHOLDER_PREFIX + placeholderKey + PLACEHOLDER_SUFFIX)) {
+      if (foundValueOptional.get().getValue() instanceof String) {
+        return replaceAllPlaceholders(foundValueOptional.get().getValue());
       } else {
         return foundValueOptional.get();
       }

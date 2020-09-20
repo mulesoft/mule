@@ -8,8 +8,8 @@ package org.mule.runtime.config.internal.dsl.model.config;
 
 import static java.lang.System.getProperties;
 
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +63,7 @@ public class EnvironmentPropertiesConfigurationProvider implements Configuration
   }
 
   @Override
-  public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+  public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
     return Optional.ofNullable(configurationAttributes.get(configurationAttributeKey));
   }
 

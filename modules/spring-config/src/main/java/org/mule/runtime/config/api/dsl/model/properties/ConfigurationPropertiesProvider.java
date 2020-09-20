@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.config.api.dsl.model.properties;
 
-import org.mule.api.annotation.NoImplement;
-
 import java.util.Optional;
 
 /**
@@ -18,9 +16,11 @@ import java.util.Optional;
  * vault implementation of this interface which will probably lookup for values from a remote entity.
  *
  * @since 4.0
+ *
+ * @deprecated since 4.4, use org.mule.runtime.properties.api.ConfigurationPropertiesProvider instead.
  */
-@NoImplement
-public interface ConfigurationPropertiesProvider {
+@Deprecated
+public interface ConfigurationPropertiesProvider extends org.mule.runtime.properties.api.ConfigurationPropertiesProvider {
 
   /**
    * @param configurationAttributeKey the key of the configuration attribute.
@@ -28,9 +28,15 @@ public interface ConfigurationPropertiesProvider {
    */
   Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey);
 
+  @Override
+  default Optional<? extends org.mule.runtime.properties.api.ConfigurationProperty> provide(String configurationAttributeKey) {
+    return getConfigurationProperty(configurationAttributeKey);
+  }
+
   /**
    * @return a meaningful description of the provider. This is used for error reporting.
    */
+  @Override
   String getDescription();
 
 }

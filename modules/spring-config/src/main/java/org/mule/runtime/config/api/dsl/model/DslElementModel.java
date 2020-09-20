@@ -230,8 +230,8 @@ public class DslElementModel<T> {
       element.getModel(ParameterizedModel.class)
           .ifPresent(pm -> element.getParameters()
               .stream()
-              .filter(param -> param.getRawValue() != null)
-              .forEach(param -> builder.withParameter(param.getModel().getName(), param.getRawValue())));
+              .filter(param -> param.getResolvedRawValue() != null)
+              .forEach(param -> builder.withParameter(param.getModel().getName(), param.getResolvedRawValue())));
 
       element.directChildrenStream().forEach(i -> builder.withNestedComponent(from(i)));
       element.getMetadata().getParserAttributes().forEach(builder::withProperty);

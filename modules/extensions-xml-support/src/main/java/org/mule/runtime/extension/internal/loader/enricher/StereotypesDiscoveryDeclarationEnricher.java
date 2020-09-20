@@ -158,7 +158,7 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
       }
 
       return componentModel.getParameters().stream()
-          .filter(paramAst -> expectedPropertyReference.equals(paramAst.getRawValue()))
+          .filter(paramAst -> expectedPropertyReference.equals(paramAst.getResolvedRawValue()))
           .map(paramAst -> paramAst.getModel().getName())
           .map(attributeName -> findStereotypes(componentModel.getIdentifier(), attributeName))
           .flatMap(Collection::stream)

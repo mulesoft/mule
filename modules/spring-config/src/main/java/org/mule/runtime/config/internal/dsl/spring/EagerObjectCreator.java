@@ -72,8 +72,8 @@ class EagerObjectCreator extends BeanDefinitionCreator {
           public void onUndefinedSimpleParameters() {
             Map<String, String> parameters = componentModel.getModel(ParameterizedModel.class)
                 .map(pm -> componentModel.getParameters().stream()
-                    .filter(param -> param.getRawValue() != null)
-                    .collect(toMap(param -> param.getModel().getName(), ComponentParameterAst::getRawValue)))
+                    .filter(param -> param.getResolvedRawValue() != null)
+                    .collect(toMap(param -> param.getModel().getName(), ComponentParameterAst::getResolvedRawValue)))
                 .orElse(null);
 
             String attributeName = setterAttributeDefinition.getAttributeName();

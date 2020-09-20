@@ -14,8 +14,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 public class CompositeConfigurationPropertiesProvider implements ConfigurationPropertiesProvider, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(CompositeConfigurationPropertiesProvider.class);
-  private List<ConfigurationPropertiesProvider> configurationPropertiesProviders;
+  private final List<ConfigurationPropertiesProvider> configurationPropertiesProviders;
   private boolean initialized = false;
   private boolean disposed = false;
 
@@ -54,10 +54,10 @@ public class CompositeConfigurationPropertiesProvider implements ConfigurationPr
   }
 
   @Override
-  public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+  public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
     for (ConfigurationPropertiesProvider configurationPropertiesProvider : configurationPropertiesProviders) {
-      Optional<ConfigurationProperty> configurationAttribute =
-          configurationPropertiesProvider.getConfigurationProperty(configurationAttributeKey);
+      Optional<? extends ConfigurationProperty> configurationAttribute =
+          configurationPropertiesProvider.provide(configurationAttributeKey);
       if (configurationAttribute.isPresent()) {
         return configurationAttribute;
       }

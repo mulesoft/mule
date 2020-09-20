@@ -54,9 +54,9 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
       String value = null;
 
       if (paramInOwner != null) {
-        value = paramInOwner.getRawValue();
+        value = paramInOwner.getResolvedRawValue();
       } else if (valueParame != null) {
-        value = valueParame.getRawValue();
+        value = valueParame.getResolvedRawValue();
       }
 
       if (value == null) {

@@ -25,6 +25,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPE
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.loadProviderFactories;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
@@ -39,7 +40,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -123,11 +122,7 @@ public class BeanDefinitionFactory {
   }
 
   private void registerConfigurationPropertyProviders() {
-    ServiceLoader<ConfigurationPropertiesProviderFactory> providerFactories =
-        java.util.ServiceLoader.load(ConfigurationPropertiesProviderFactory.class);
-    providerFactories.forEach(service -> {
-      ignoredMuleExtensionComponentIdentifiers.add(service.getSupportedComponentIdentifier());
-    });
+    ignoredMuleExtensionComponentIdentifiers.addAll(loadProviderFactories().keySet());
   }
 
   public boolean isComponentIgnored(ComponentIdentifier identifier) {
@@ -180,8 +175,9 @@ public class BeanDefinitionFactory {
                                 componentModel.getModel(ParameterizedModel.class)
                                     .map(pm -> {
                                       componentModel.getParameters().stream()
-                                          .filter(param -> param.getRawValue() != null)
-                                          .forEach(param -> rawParams.put(param.getModel().getName(), param.getRawValue()));
+                                          .filter(param -> param.getResolvedRawValue() != null)
+                                          .forEach(param -> rawParams.put(param.getModel().getName(),
+                                                                          param.getResolvedRawValue()));
 
                                       return rawParams;
                                     })

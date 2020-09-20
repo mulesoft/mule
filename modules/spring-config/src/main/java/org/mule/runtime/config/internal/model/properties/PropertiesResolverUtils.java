@@ -20,11 +20,8 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
@@ -34,6 +31,10 @@ import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationProper
 import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
+import org.mule.runtime.properties.api.ConfigurationProperty;
+import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +95,7 @@ public class PropertiesResolverUtils {
           of(new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
 
             @Override
-            public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+            public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
               return parentConfigurationProperties.get().resolveProperty(configurationAttributeKey)
                   .map(value -> new DefaultConfigurationProperty(parentConfigurationProperties, configurationAttributeKey,
                                                                  value));
@@ -197,7 +198,7 @@ public class PropertiesResolverUtils {
           of(new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
 
             @Override
-            public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+            public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
               return parentConfigurationProperties.get().resolveProperty(configurationAttributeKey)
                   .map(value -> new DefaultConfigurationProperty(parentConfigurationProperties, configurationAttributeKey,
                                                                  value));
@@ -245,37 +246,30 @@ public class PropertiesResolverUtils {
   }
 
   public static ConfigurationPropertiesProvider createProviderFromGlobalProperties(ArtifactAst artifactAst) {
-    final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
+    return new GlobalPropertyConfigurationPropertiesProvider(new LazyValue<>(() -> {
+      final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
 
-    artifactAst.topLevelComponentsStream()
-        .filter(comp -> GLOBAL_PROPERTY.equals(comp.getIdentifier().getName()))
-        .forEach(comp -> {
-          final String key = comp.getRawParameterValue("name").get();
-          final String rawValue = comp.getRawParameterValue("value").get();
-          globalProperties.put(key,
-                               new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
-                                                                       comp.getMetadata().getFileName().orElse("(n/a)"),
-                                                                       comp.getMetadata().getStartLine().orElse(-1)),
-                                                                key, rawValue));
-        });
+      artifactAst.topLevelComponentsStream()
+          .filter(comp -> GLOBAL_PROPERTY.equals(comp.getIdentifier().getName()))
+          .forEach(comp -> {
+            final String key = comp.getParameter("name").getResolvedRawValue();
+            final String rawValue = comp.getParameter("value").getRawValue();
+            globalProperties.put(key,
+                                 new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
+                                                                         comp.getMetadata().getFileName().orElse("(n/a)"),
+                                                                         comp.getMetadata().getStartLine().orElse(-1)),
+                                                                  key, rawValue));
+          });
 
-    return new GlobalPropertyConfigurationPropertiesProvider(globalProperties);
+      return globalProperties;
+    }));
   }
 
   private static List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactAst artifactAst,
                                                                                                          ResourceProvider externalResourceProvider,
                                                                                                          ConfigurationPropertiesResolver localResolver) {
 
-    Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap = new HashMap<>();
-    ServiceLoader<ConfigurationPropertiesProviderFactory> providerFactories = load(ConfigurationPropertiesProviderFactory.class);
-    providerFactories.forEach(service -> {
-      ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
-      if (providerFactoriesMap.containsKey(componentIdentifier)) {
-        throw new MuleRuntimeException(createStaticMessage("Multiple configuration providers for component: "
-            + componentIdentifier));
-      }
-      providerFactoriesMap.put(componentIdentifier, service);
-    });
+    Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap = loadProviderFactories();
 
     return artifactAst.topLevelComponentsStream()
         .filter(comp -> providerFactoriesMap.containsKey(comp.getIdentifier()))
@@ -291,5 +285,31 @@ public class PropertiesResolverUtils {
         .collect(toList());
   }
 
+  public static Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> loadProviderFactories() {
+    Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap = new HashMap<>();
+
+    ServiceLoader<ConfigurationPropertiesProviderFactory> providerFactories = load(ConfigurationPropertiesProviderFactory.class);
+    providerFactories.forEach(service -> {
+      ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
+      if (providerFactoriesMap.containsKey(componentIdentifier)) {
+        throw new MuleRuntimeException(createStaticMessage("Multiple configuration providers for component: "
+            + componentIdentifier));
+      }
+      providerFactoriesMap.put(componentIdentifier, service);
+    });
+
+    ServiceLoader<org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory> providerFactoriesOld =
+        load(org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory.class);
+    providerFactoriesOld.forEach(service -> {
+      ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
+      if (providerFactoriesMap.containsKey(componentIdentifier)) {
+        throw new MuleRuntimeException(createStaticMessage("Multiple configuration providers for component: "
+            + componentIdentifier));
+      }
+      providerFactoriesMap.put(componentIdentifier, service);
+    });
+
+    return providerFactoriesMap;
+  }
 
 }
