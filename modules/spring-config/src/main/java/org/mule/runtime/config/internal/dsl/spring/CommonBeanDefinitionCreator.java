@@ -22,6 +22,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -38,6 +39,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.ServiceConfigurationError;
 
 import javax.xml.namespace.QName;
@@ -177,7 +179,24 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
                                                final CreateBeanDefinitionRequest request,
                                                ComponentBuildingDefinition componentBuildingDefinition,
                                                final BeanDefinitionBuilder beanDefinitionBuilder) {
-    final ComponentAst componentModel = request.getComponentModel();
+    ComponentAst ownerComponent = null;
+    if (!request.getComponentModel().getModel(ParameterizedModel.class).isPresent()) {
+      // TODO same as in SimpleType...
+      ParameterizedModel ownerComponentModel = null;
+      int ownerIndex = 0;
+      for (int i = request.getComponentModelHierarchy().size() - 1; i >= 0; --i) {
+        final ComponentAst possibleOwner = request.getComponentModelHierarchy().get(i);
+        final Optional<ParameterizedModel> model = possibleOwner.getModel(ParameterizedModel.class);
+        if (model.isPresent()) {
+          ownerComponent = possibleOwner;
+          ownerComponentModel = model.get();
+          ownerIndex = i;
+          break;
+        }
+      }
+    }
+
+    final ComponentAst componentModel = ownerComponent != null ? ownerComponent : request.getComponentModel();
 
     processObjectConstructionParameters(springComponentModels, componentModel, componentBuildingDefinition,
                                         new BeanDefinitionBuilderHelper(beanDefinitionBuilder));

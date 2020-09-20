@@ -309,14 +309,15 @@ class ComponentConfigurationBuilder<T> {
     @Override
     public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {
       if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(parameterName)) {
-        Object parameterValue = componentModel.getRawParameterValue(parameterName)
-            .map(v -> (Object) v)
-            .orElse(defaultValue);
+        final ComponentParameterAst param = componentModel.getParameter(parameterName);
+        if (param != null) {
+          Object parameterValue = param.getResolvedRawValue();
 
-        if (parameterValue != null) {
-          parameterValue = typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue;
+          if (parameterValue != null) {
+            parameterValue = typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue;
+          }
+          this.value = parameterValue;
         }
-        this.value = parameterValue;
       }
     }
 
