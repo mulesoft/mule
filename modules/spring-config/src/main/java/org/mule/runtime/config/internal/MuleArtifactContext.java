@@ -49,6 +49,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 
+import com.sun.org.apache.xerces.internal.xni.grammars.XMLGrammarPool;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -85,6 +86,7 @@ import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
+import org.mule.runtime.config.internal.xni.parser.RuntimeXmlGrammarPoolManager;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -335,6 +337,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         public List<XmlNamespaceInfoProvider> getXmlNamespaceInfoProvider() {
           return XmlNamespaceInfoProviderSupplier.createFromExtensionModels(getExtensions(), of(cl -> serviceRegistry
               .lookupProviders(XmlNamespaceInfoProvider.class, cl).stream().collect(toList())));
+        }
+
+        @Override
+        public XMLGrammarPool getXMLGrammarPool() {
+          return RuntimeXmlGrammarPoolManager.getGrammarPool();
         }
       }) : emptyList();
 

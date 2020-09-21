@@ -12,6 +12,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.config.internal.util.EntityResolverUtils.resolveSystemIdForCompatibility;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -46,11 +47,6 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModuleDelegatingEntityResolver.class);
 
-  private static final String CORE_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
-  private static final String CORE_CURRENT_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core.xsd";
-  private static final String CORE_DEPRECATED_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd";
-  private static final String COMPATIBILITY_XSD =
-      "http://www.mulesoft.org/schema/mule/compatibility/current/mule-compatibility.xsd";
   private static final String TEST_XSD = "http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd";
   private static final int MAX_RESOLUTION_FAILURE_THRESHOLD = 10;
 
@@ -128,24 +124,20 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
   }
 
   private String overrideSystemIdForCompatibility(String publicId, String systemId) throws SAXException, IOException {
-    if (systemId.equals(CORE_XSD)) {
-      Boolean useDeprecated = canResolveEntity(publicId, CORE_DEPRECATED_XSD);
-      Boolean usingCompatibility = canResolveEntity(publicId, COMPATIBILITY_XSD);
-      boolean runningTests = isRunningTests();
-
-      if (useDeprecated && (usingCompatibility || runningTests)) {
-        return CORE_DEPRECATED_XSD;
-      } else {
-        return CORE_CURRENT_XSD;
-      }
-    } else if (systemId.equals(TEST_XSD)) {
+    if (systemId.equals(TEST_XSD)) {
       boolean runningTests = isRunningTests();
       if (!runningTests && generateFromExtensions(publicId, systemId) == null) {
         String message = "Internal runtime mule-test.xsd can't be used in real applications";
         throw new MuleRuntimeException(createStaticMessage(message));
       }
-    } else if (systemId.contains("spring")) {
-      systemId = systemId.replace("-current.xsd", ".xsd");
+    } else {
+      systemId = resolveSystemIdForCompatibility(publicId, systemId, isRunningTests(), (pId, sId) -> {
+        try {
+          return canResolveEntity(pId, sId);
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      });
     }
 
     return systemId;
