@@ -12,6 +12,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.dsl.internal.util.SchemaMappingsUtils.resolveSystemId;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -45,9 +46,6 @@ import org.xml.sax.SAXException;
 public class ModuleDelegatingEntityResolver implements EntityResolver {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModuleDelegatingEntityResolver.class);
-
-  private static final String CORE_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
-  private static final String CORE_CURRENT_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core.xsd";
   private static final int MAX_RESOLUTION_FAILURE_THRESHOLD = 10;
 
   private final Set<ExtensionModel> extensions;
@@ -98,7 +96,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
                           systemId));
     }
 
-    systemId = overrideSystemIdForCompatibility(publicId, systemId);
+    systemId = resolveSystemId(systemId);
 
     InputSource inputSource;
     inputSource = muleEntityResolver.resolveEntity(publicId, systemId);
@@ -119,33 +117,6 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
       }
     }
     return inputSource;
-  }
-
-  private String overrideSystemIdForCompatibility(String publicId, String systemId) throws SAXException, IOException {
-    if (systemId.equals(CORE_XSD)) {
-      return CORE_CURRENT_XSD;
-    } else if (systemId.contains("spring")) {
-      // This is to support importing Spring xsd's from custom xsd's. Compatibility module does such thing.
-      return systemId.replace("-current.xsd", ".xsd");
-    } else {
-      return systemId;
-    }
-  }
-
-  protected boolean canResolveEntity(String publicId, String systemId) throws SAXException, IOException {
-    final InputSource resolvedEntity = muleEntityResolver.resolveEntity(publicId, systemId);
-    try {
-      return resolvedEntity != null;
-    } finally {
-      if (resolvedEntity != null) {
-        if (resolvedEntity.getByteStream() != null) {
-          resolvedEntity.getByteStream().close();
-        }
-        if (resolvedEntity.getCharacterStream() != null) {
-          resolvedEntity.getCharacterStream().close();
-        }
-      }
-    }
   }
 
   private InputSource generateFromExtensions(String publicId, String systemId) {

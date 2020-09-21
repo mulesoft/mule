@@ -42,6 +42,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor.processXmlConfiguration;
+import static org.mule.runtime.dsl.internal.xni.parser.DefaultXmlGrammarPoolManager.getGrammarPool;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -49,6 +50,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 
+import com.sun.org.apache.xerces.internal.xni.grammars.XMLGrammarPool;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -335,6 +337,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         public List<XmlNamespaceInfoProvider> getXmlNamespaceInfoProvider() {
           return XmlNamespaceInfoProviderSupplier.createFromExtensionModels(getExtensions(), of(cl -> serviceRegistry
               .lookupProviders(XmlNamespaceInfoProvider.class, cl).stream().collect(toList())));
+        }
+
+        @Override
+        public XMLGrammarPool getXMLGrammarPool() {
+          return getGrammarPool().orElse(null);
         }
       }) : emptyList();
 
