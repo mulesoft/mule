@@ -355,9 +355,55 @@
     </xs:complexType>
   </xs:element>
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 996ab0835d7 (MULE-18643: TestConnection fails due token is expired with OAuth Authorization Code Grant (#9444))
+=======
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ListenerType" substitutionGroup="mule:abstract-message-source" name="listener"></xs:element>
+  <xs:complexType name="ListenerType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PollerType" substitutionGroup="mule:abstract-message-source" name="poller"></xs:element>
+  <xs:complexType name="PollerType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="1" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element minOccurs="1" maxOccurs="1" ref="mule:scheduling-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+>>>>>>> 78e76e71f41 (MULE-18465: PollingSource refresh token does not work with OAuth Authorization Code Grant (#9445))
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="AnotherMetadataOperationType" substitutionGroup="mule:abstract-operator" name="another-metadata-operation"></xs:element>
   <xs:complexType name="AnotherMetadataOperationType">
     <xs:complexContent>
