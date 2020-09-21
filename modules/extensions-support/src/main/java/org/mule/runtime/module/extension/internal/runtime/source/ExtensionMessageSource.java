@@ -701,10 +701,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     return configurationInstanceOptional;
   }
 
-  protected String getSourceName() {
-    return sourceModel.getName();
-  }
-
   @Override
   public String toString() {
     return this.getClass().getSimpleName() + ": " + Objects.toString(sourceAdapter);
