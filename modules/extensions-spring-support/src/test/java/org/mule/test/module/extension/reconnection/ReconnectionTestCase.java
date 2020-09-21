@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
 import static org.mule.tck.probe.PollingProber.check;
+import static org.mule.tck.probe.PollingProber.checkNot;
 
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
@@ -82,6 +83,23 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
         return capturedEvents.stream()
             .map(event -> (ReconnectableConnection) event.getMessage().getPayload().getValue())
             .filter(c -> c.getReconnectionAttempts() >= 3)
+            .findAny()
+            .isPresent();
+      }
+    });
+  }
+
+  @Test
+  public void doNotStartSourceTwiceAfterExceptionOnReconnection() throws Exception {
+    ((Startable) getFlowConstruct("otherReconnectForever")).start();
+    check(5000, 1000, () -> !capturedEvents.isEmpty());
+    switchOtherFail();
+
+    checkNot(30000, 1000, () -> {
+      synchronized (capturedEvents) {
+        return capturedEvents.stream()
+            .map(event -> (Integer) event.getMessage().getPayload().getValue())
+            .filter(startedSources -> startedSources > 1)
             .findAny()
             .isPresent();
       }
@@ -214,6 +232,10 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private void switchConnection() throws Exception {
     flowRunner("switchConnection").run();
+  }
+
+  private void switchOtherFail() throws Exception {
+    flowRunner("switchOtherFail").run();
   }
 
   private <T> CursorIterator<T> getCursor(String flowName, Integer failOn, MuleErrors errorType) throws Exception {

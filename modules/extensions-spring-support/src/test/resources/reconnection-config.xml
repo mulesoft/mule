@@ -23,8 +23,19 @@
         <test:processor class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
     </flow>
 
+    <flow name="otherReconnectForever" initialState="stopped">
+        <reconnection:other-reconnection-source config-ref="reconnection_Config">
+            <reconnect-forever frequency="2000" />
+        </reconnection:other-reconnection-source>
+        <test:processor class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
+    </flow>
+
     <flow name="switchConnection">
         <reconnection:switch-connection />
+    </flow>
+
+    <flow name="switchOtherFail">
+        <reconnection:switch-other-fail />
     </flow>
 
     <flow name="pagedOperation">
