@@ -295,8 +295,8 @@ public final class ExtensionsOAuthUtils {
         String rsId = cp.getResourceOwnerId();
         resourceOwnerIdReference.set(of(rsId));
 
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("AccessToken for resourceOwner '{}' expired {}. "
+        if (LOGGER.isInfoEnabled()) {
+          LOGGER.info("AccessToken for resourceOwner '{}' expired {}. "
               + "Will attempt to refresh token and retry", rsId, refreshContext.map(LazyValue::get).orElse(""));
         }
       }
@@ -312,8 +312,8 @@ public final class ExtensionsOAuthUtils {
       }
 
       private void logTokenExpiration() {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("AccessToken expired {}. "
+        if (LOGGER.isInfoEnabled()) {
+          LOGGER.info("AccessToken expired {}. "
               + "Will attempt to refresh token and retry", refreshContext.map(LazyValue::get).orElse(""));
         }
       }
@@ -324,16 +324,17 @@ public final class ExtensionsOAuthUtils {
     try {
       oauthConnectionProvider.refreshToken(resourceOwnerId.orElse(""));
     } catch (Exception refreshException) {
-      throw new MuleRuntimeException(createStaticMessage(format(
-                                                                "AccessToken %s expired %s. Refresh token "
-                                                                    + "workflow was attempted but failed with the following exception",
-                                                                forResourceOwner(resourceOwnerId),
-                                                                refreshContext.map(LazyValue::get).orElse("")),
-                                                         refreshException));
+      String errorMessage = format(
+                                   "AccessToken %s expired %s. Refresh token "
+                                       + "workflow was attempted but failed with the following exception",
+                                   forResourceOwner(resourceOwnerId),
+                                   refreshContext.map(LazyValue::get).orElse(""));
+      LOGGER.error(errorMessage, refreshException);
+      throw new MuleRuntimeException(createStaticMessage(errorMessage), refreshException);
     }
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Access Token successfully refreshed {} on config '{}'",
-                   forResourceOwner(resourceOwnerId), configName.map(LazyValue::get).orElse(""));
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("Access Token successfully refreshed {} on config '{}'",
+                  forResourceOwner(resourceOwnerId), configName.map(LazyValue::get).orElse(""));
     }
 
     return true;
