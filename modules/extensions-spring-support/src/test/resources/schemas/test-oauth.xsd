@@ -236,7 +236,11 @@
     </xs:complexType>
   </xs:element>
 <<<<<<< HEAD
+<<<<<<< HEAD
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="with-params-connection">
+=======
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="validated-connection">
+>>>>>>> 996ab0835d7 (MULE-18643: TestConnection fails due token is expired with OAuth Authorization Code Grant (#9444))
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractConnectionProviderType">
@@ -339,15 +343,21 @@
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
           <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
+<<<<<<< HEAD
           <xs:attribute type="xs:string" use="required" name="withAlias"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="defaultPlacement"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="queryParam"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="header"></xs:attribute>
+=======
+>>>>>>> 996ab0835d7 (MULE-18643: TestConnection fails due token is expired with OAuth Authorization Code Grant (#9444))
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 996ab0835d7 (MULE-18643: TestConnection fails due token is expired with OAuth Authorization Code Grant (#9444))
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="AnotherMetadataOperationType" substitutionGroup="mule:abstract-operator" name="another-metadata-operation"></xs:element>
   <xs:complexType name="AnotherMetadataOperationType">
     <xs:complexContent>

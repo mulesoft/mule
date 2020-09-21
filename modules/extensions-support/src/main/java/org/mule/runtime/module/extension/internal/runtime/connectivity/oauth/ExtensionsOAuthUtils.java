@@ -28,7 +28,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
@@ -241,6 +240,15 @@ public final class ExtensionsOAuthUtils {
     }
   }
 
+  /**
+   *  Performs a token refresh if the underlying {@link ConnectionProvider} of the given {@link ExecutionContextAdapter}
+   *  knows how do it and the given {@link Throwable} signals a refresh is needed by either being an
+   *  {@link AccessTokenExpiredException} or by one appearing in the chain of causes.
+   *
+   * @param operationContext  connection provider that may be able to perform a token refresh.
+   * @param e                   throwable that may signal that a token refresh is needed.
+   * @return if a token refresh was successfully performed or not.
+   */
   public static boolean refreshTokenIfNecessary(ExecutionContextAdapter<OperationModel> operationContext, Throwable e) {
     OAuthConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);
     return refreshTokenIfNecessary(connectionProvider, e,
@@ -251,13 +259,23 @@ public final class ExtensionsOAuthUtils {
                                    of(new LazyValue<>(() -> operationContext.getConfiguration().get().getName())));
   }
 
+  /**
+   *  Performs a token refresh if the given {@link ConnectionProvider} knows how do it and the given {@link Throwable}
+   *  signals a refresh is needed by either being an {@link AccessTokenExpiredException} or by one appearing in the
+   *  chain of causes.
+   *
+   * @param connectionProvider  connection provider that may be able to perform a token refresh.
+   * @param e                   throwable that may signal that a token refresh is needed.
+   * @return if a token refresh was successfully performed or not.
+   * @since 4.4.0
+   */
   public static boolean refreshTokenIfNecessary(ConnectionProvider connectionProvider, Throwable e) {
     return refreshTokenIfNecessary(connectionProvider, e, empty(), empty());
   }
 
-  public static boolean refreshTokenIfNecessary(ConnectionProvider connectionProvider, Throwable e,
-                                                Optional<LazyValue<String>> refreshContext,
-                                                Optional<LazyValue<String>> configName) {
+  private static boolean refreshTokenIfNecessary(ConnectionProvider connectionProvider, Throwable e,
+                                                 Optional<LazyValue<String>> refreshContext,
+                                                 Optional<LazyValue<String>> configName) {
     AccessTokenExpiredException expiredException = getTokenExpirationException(e);
     if (expiredException == null) {
       return false;

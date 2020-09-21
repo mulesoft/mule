@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateOAuthConnection;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -39,7 +40,11 @@ public abstract class BaseOAuthConnectionProviderWrapper<C> extends Reconnectabl
 
   @Override
   public ConnectionValidationResult validate(C connection) {
-    return validateOAuthConnection(getDelegate(), connection, getContext());
+    ConnectionValidationResult connectionValidationResult = validateOAuthConnection(getDelegate(), connection, getContext());
+    if (!connectionValidationResult.isValid() && refreshTokenIfNecessary(this, connectionValidationResult.getException())) {
+      return validateOAuthConnection(getDelegate(), connection, getContext());
+    }
+    return connectionValidationResult;
   }
 
   @Override
