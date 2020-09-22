@@ -203,14 +203,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(boolean restarting, RestartContext restartContext) throws MuleException {
+  private void startSource(boolean restarting, RestartContext restartContext, CompletionCallback completionCallback)
+      throws MuleException {
     try {
+      RetryCallback retryCallback = createRetryCallback(restarting, restartContext, completionCallback);
       // When restarting, async must be forced
       if (restarting && !retryPolicyTemplate.isAsync()) {
-        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(new StartSourceCallback(restarting, restartContext),
-                                                                   retryScheduler);
+        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(retryCallback, retryScheduler);
       } else {
-        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), retryScheduler);
+        retryPolicyTemplate.execute(retryCallback, retryScheduler);
       }
     } catch (Throwable e) {
       if (e instanceof MuleException) {
@@ -222,7 +223,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void startSource() throws MuleException {
-    startSource(false, null);
+    startSource(false, null, null);
+  }
+
+  private RetryCallback createRetryCallback(boolean restarting, RestartContext restartContext,
+                                            CompletionCallback completionCallback) {
+    RetryCallback retryCallback = new StartSourceCallback(restarting, restartContext);
+    if (completionCallback != null) {
+      retryCallback = new WithCompletionCallback(retryCallback, completionCallback);
+    }
+    return retryCallback;
   }
 
   private RetryPolicyTemplate createRetryPolicyTemplate(RetryPolicyTemplate customTemplate) {
@@ -317,8 +327,18 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .orElseGet(() -> create(sink -> {
           try {
             exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
-            restart();
-            sink.success();
+            restart(new CompletionCallback() {
+
+              @Override
+              public void success() {
+                sink.success();
+              }
+
+              @Override
+              public void error(Throwable throwable) {
+                sink.error(throwable);
+              }
+            });
           } catch (Exception e) {
             sink.error(e);
           }
@@ -345,12 +365,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     shutdown();
   }
 
-  private void restart() throws MuleException {
+  private void restart(CompletionCallback completionCallback) throws MuleException {
     synchronized (started) {
       if (started.get()) {
         RestartContext restartContext = stopSource(true);
         disposeSource();
-        startSource(true, restartContext);
+        startSource(true, restartContext, completionCallback);
       } else {
         LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", getLocation().getRootContainerName(),
                            getLocation().getRootContainerName()));
@@ -579,6 +599,45 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     public Object getWorkOwner() {
       return ExtensionMessageSource.this;
     }
+  }
+
+  private class WithCompletionCallback implements RetryCallback {
+
+    private final CompletionCallback completionCallback;
+    private final RetryCallback delegate;
+
+    WithCompletionCallback(RetryCallback delegate, CompletionCallback completionCallback) {
+      this.delegate = delegate;
+      this.completionCallback = completionCallback;
+    }
+
+    @Override
+    public void doWork(RetryContext context) throws Exception {
+      try {
+        delegate.doWork(context);
+        this.completionCallback.success();
+      } catch (Exception ex) {
+        this.completionCallback.error(ex);
+        throw ex;
+      }
+    }
+
+    @Override
+    public String getWorkDescription() {
+      return delegate.getWorkDescription();
+    }
+
+    @Override
+    public Object getWorkOwner() {
+      return delegate.getWorkOwner();
+    }
+  }
+
+  private interface CompletionCallback {
+
+    void success();
+
+    void error(Throwable throwable);
   }
 
   @Override
