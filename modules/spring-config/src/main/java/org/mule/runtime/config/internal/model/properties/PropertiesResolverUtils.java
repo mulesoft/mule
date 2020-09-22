@@ -52,6 +52,7 @@ public class PropertiesResolverUtils {
     // Nothing to do
   }
 
+  // TODO MULE-18786 refactor this
   public static PropertiesResolverConfigurationProperties createConfigurationAttributeResolver(ArtifactAst artifactAst,
                                                                                                Optional<ConfigurationProperties> parentConfigurationProperties,
                                                                                                Map<String, String> deploymentProperties,
@@ -161,6 +162,7 @@ public class PropertiesResolverUtils {
     }
   }
 
+  // TODO MULE-18786 refactor this
   public static PropertiesResolverConfigurationProperties createConfigurationAttributeResolver(Optional<ConfigurationProperties> parentConfigurationProperties,
                                                                                                Map<String, String> deploymentProperties,
                                                                                                ResourceProvider externalResourceProvider) {
