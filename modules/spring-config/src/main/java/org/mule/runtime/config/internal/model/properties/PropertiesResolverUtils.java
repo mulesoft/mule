@@ -43,8 +43,8 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 
 /**
+ * Provides a common set of utilities for handling property resolvers for Mule artifacts.
  *
- * @since 4.4
  */
 public class PropertiesResolverUtils {
 

@@ -181,10 +181,6 @@
             <groupId>io.projectreactor.addons</groupId>
             <artifactId>reactor-extra</artifactId>
         </dependency>
-<!--         <dependency> -->
-<!--             <groupId>org.yaml</groupId> -->
-<!--             <artifactId>snakeyaml</artifactId> -->
-<!--         </dependency> -->
 
         <dependency>
             <groupId>cglib</groupId>
