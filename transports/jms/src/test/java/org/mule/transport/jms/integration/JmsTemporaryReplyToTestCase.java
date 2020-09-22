@@ -43,14 +43,6 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
     }
 
     @Test
-    public void testReplyEnabledSyncTimeout() throws Exception
-    {
-        MuleMessage response = runFlow("JMSService1SyncTimeoutFixed", TEST_MESSAGE).getMessage();
-        verify("JMSService1SyncTimeoutFixed");
-        assertNullPayloadResponse(response);
-    }
-
-    @Test
     public void testReplyEnabledNonBlocking() throws Exception
     {
         MuleMessage response = runFlowNonBlocking("JMSService1NonBlockingFixed", TEST_MESSAGE).getMessage();
@@ -72,14 +64,6 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
         MuleMessage response = runFlow("JMSService1Sync", TEST_MESSAGE).getMessage();
         verify("JMSService1Sync");
         assertEchoResponse(response);
-    }
-
-    @Test
-    public void testTemporaryReplyEnabledSyncTimeout() throws Exception
-    {
-        MuleMessage response = runFlow("JMSService1SyncTimeout", TEST_MESSAGE).getMessage();
-        verify("JMSService1SyncTimeout");
-        assertNullPayloadResponse(response);
     }
 
     @Test
