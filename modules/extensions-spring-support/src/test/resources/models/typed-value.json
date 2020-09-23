@@ -1745,7 +1745,8 @@
             "resolverName": "OUTPUT_PAYLOAD",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"
@@ -2606,7 +2607,8 @@
             "resolverName": "OUTPUT_PAYLOAD",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"

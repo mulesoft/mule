@@ -1175,7 +1175,8 @@
                 "resolverName": "AppleTypesResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -4473,7 +4474,8 @@
                 "resolverName": "OUTPUT_PAYLOAD",
                 "requiresConnection": false,
                 "requiresConfiguration": false
-              }
+              },
+              "partialTypeKeyResolver": false
             }
           },
           "kind": "source"
@@ -5115,7 +5117,8 @@
                 "resolverName": "HarvestAppleKeyResolver",
                 "requiresConnection": false,
                 "requiresConfiguration": false
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -7429,7 +7432,8 @@
                 "resolverName": "OUTPUT_PAYLOAD",
                 "requiresConnection": false,
                 "requiresConfiguration": false
-              }
+              },
+              "partialTypeKeyResolver": false
             }
           },
           "kind": "operation"
@@ -10406,7 +10410,8 @@
                 "resolverName": "OUTPUT_PAYLOAD",
                 "requiresConnection": false,
                 "requiresConfiguration": false
-              }
+              },
+              "partialTypeKeyResolver": false
             }
           },
           "kind": "source"
@@ -14225,7 +14230,8 @@
             "resolverName": "OUTPUT_PAYLOAD",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"
@@ -15581,7 +15587,8 @@
             "resolverName": "OUTPUT_PAYLOAD",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"
@@ -15940,7 +15947,8 @@
             "resolverName": "OUTPUT_PAYLOAD",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"

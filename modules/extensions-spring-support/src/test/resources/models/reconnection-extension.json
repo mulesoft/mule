@@ -783,7 +783,8 @@
                 "resolverName": "OUTPUT_PAYLOAD",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             }
           },
           "kind": "operation"

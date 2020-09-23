@@ -878,6 +878,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "inputParameter": {
                   "resolverName": "Metadata resolver",
@@ -1813,7 +1814,8 @@
                 "resolverName": "QUERY_OUTPUT_RESOLVER-Metadata resolver-Metadata resolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             }
           },
           "kind": "operation"
@@ -3504,6 +3506,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "inputParameter": {
                   "resolverName": "Metadata resolver",
@@ -10098,6 +10101,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "inputParameter": {
                   "resolverName": "Metadata resolver",
@@ -10697,7 +10701,8 @@
                 "resolverName": "QUERY_OUTPUT_RESOLVER-Metadata resolver-Metadata resolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             }
           },
           "kind": "operation"
@@ -12388,6 +12393,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "inputParameter": {
                   "resolverName": "Metadata resolver",
@@ -16085,6 +16091,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "inputParameter": {
                   "resolverName": "Metadata resolver",
@@ -16684,7 +16691,8 @@
                 "resolverName": "QUERY_OUTPUT_RESOLVER-Metadata resolver-Metadata resolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             }
           },
           "kind": "operation"
@@ -18375,6 +18383,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "inputParameter": {
                   "resolverName": "Metadata resolver",
@@ -22925,6 +22934,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "inputParameter": {
                   "resolverName": "Metadata resolver",
@@ -23524,7 +23534,8 @@
                 "resolverName": "QUERY_OUTPUT_RESOLVER-Metadata resolver-Metadata resolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             }
           },
           "kind": "operation"
@@ -25215,6 +25226,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "inputParameter": {
                   "resolverName": "Metadata resolver",
