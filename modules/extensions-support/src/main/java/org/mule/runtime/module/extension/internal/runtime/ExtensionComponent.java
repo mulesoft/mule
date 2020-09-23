@@ -459,7 +459,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getSampleDataProviderMediator()
           .getSampleData(getParameterValueResolver(),
                          (CheckedSupplier<Object>) () -> context.getConnection().orElse(null),
-                         (CheckedSupplier<Object>) () -> context.getConfig().orElse(null))));
+                         (CheckedSupplier<Object>) () -> context.getConfig().orElse(null),
+                         context.getConnectionProvider().orElse(null))));
     } catch (MuleRuntimeException e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof SampleDataException) {

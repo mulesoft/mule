@@ -27,6 +27,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.metadata.NullQueryMetadataResolver;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.test.oauth.metadata.OAuthMetadataResolver;
 import org.mule.test.oauth.metadata.RefreshedOAuthMetadataResolver;
 
@@ -128,5 +129,11 @@ public class TestOAuthOperations {
   public String valuesOperation(@OfValues(OAuthValuesProvider.class) String parameter,
                                 @Connection TestOAuthConnection connection) {
     return "Operation Result";
+  }
+
+  @MediaType(TEXT_PLAIN)
+  @SampleData(RefreshedOAuthSampleDataProvider.class)
+  public Result<String, String> sampleDataOperation(@Connection TestOAuthConnection connection) {
+    return Result.<String, String>builder().output("Operation Result").attributes("Operation Attributes").build();
   }
 }

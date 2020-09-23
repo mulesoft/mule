@@ -10,10 +10,11 @@ import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 
-@Extension(name = "Test OAuth Extension")
+@Extension(name = TestOAuthExtension.TEST_OAUTH_EXTENSION_NAME)
 @Configurations({AuthCodeConfig.class, ClientCredentialsConfig.class, MixedConfig.class, WithPooledProviderConfig.class})
 @Xml(prefix = "test-oauth")
 public class TestOAuthExtension {
 
+  public static final String TEST_OAUTH_EXTENSION_NAME = "Test OAuth Extension";
 
 }

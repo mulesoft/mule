@@ -114,7 +114,8 @@ public class MuleSampleDataService implements SampleDataService {
     try {
       return mediator.getSampleData(StaticParameterValueResolver.from(replaceParameterAliases(parameters, componentModel)),
                                     (CheckedSupplier<Object>) () -> ctx.getConnection().orElse(null),
-                                    (CheckedSupplier<Object>) () -> ctx.getConfig().orElse(null));
+                                    (CheckedSupplier<Object>) () -> ctx.getConfig().orElse(null),
+                                    ctx.getConnectionProvider().orElse(null));
     } finally {
       ctx.dispose();
     }
