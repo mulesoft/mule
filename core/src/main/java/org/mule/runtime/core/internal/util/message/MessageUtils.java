@@ -269,7 +269,7 @@ public final class MessageUtils {
    * Decorates input value.
    * 
    * @param v value to be decorated
-   * @param eventCorrelationId the correlationId of the context involed
+   * @param eventCorrelationId the correlationId of the context involved
    * @param componentDecoratorFactory the component decorator factory
    * 
    * @return decorated value
