@@ -12,12 +12,14 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.visitable;
-import static org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor.builder;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
+
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
+import java.util.function.UnaryOperator;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
@@ -30,15 +32,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor;
-import org.mule.runtime.core.internal.management.stats.visitor.OutputDecoratorVisitor;
-import org.mule.runtime.core.internal.management.stats.visitor.Visitor;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
-
-import java.util.Optional;
-import java.util.function.BooleanSupplier;
-import java.util.function.UnaryOperator;
 
 /**
  * Utility class to share common behaviour between resolvers
@@ -103,12 +97,11 @@ public class ResolverUtils {
   }
 
   /**
-   * Executes the {@code resolver} using the given {@code context},
-   * applying all the required resolution rules that may apply for
+   * Executes the {@code resolver} using the given {@code context}, applying all the required resolution rules that may apply for
    * the given {@code T} type.
    *
    * @param resolver the {@link ValueResolver} to execute
-   * @param context  the {@link ValueResolvingContext} to pass on the {@code resolver}
+   * @param context the {@link ValueResolvingContext} to pass on the {@code resolver}
    * @return the resolved value
    * @throws MuleException
    */
