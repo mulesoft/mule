@@ -7,12 +7,13 @@
 package org.mule.runtime.config.internal.model.properties;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.ServiceLoader.load;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 
@@ -31,6 +32,7 @@ import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationProper
 import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
+import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.properties.api.ConfigurationProperty;
@@ -41,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
+
+import javax.xml.namespace.QName;
 
 /**
  * Provides a common set of utilities for handling property resolvers for Mule artifacts.
@@ -279,8 +283,15 @@ public class PropertiesResolverUtils {
           ConfigurationPropertiesProvider provider = providerFactoriesMap.get(comp.getIdentifier())
               .createProvider(comp, localResolver, externalResourceProvider);
           if (provider instanceof Component) {
-            Component providerComponent = (Component) provider;
-            providerComponent.setAnnotations(singletonMap(LOCATION_KEY, comp.getLocation()));
+            final Map<QName, Object> annotations = new HashMap<>();
+            annotations.put(LOCATION_KEY, comp.getLocation());
+            annotations.put(ANNOTATION_NAME, comp.getIdentifier());
+            annotations.put(SOURCE_ELEMENT_ANNOTATION_KEY,
+                            comp.getMetadata().getSourceCode()
+                                .map(LocationExecutionContextProvider::maskPasswords)
+                                .orElse(null));
+
+            ((Component) provider).setAnnotations(annotations);
           }
           return provider;
         })

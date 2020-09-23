@@ -4,20 +4,20 @@
   "extensionModelLoaderDescriptor": {
     "id": "crafted",
     "attributes": {
-      "type": "org.mule.test.crafted.config.properties.extension.TestConfigPropertiesExtensionLoadingDelegate",
+      "type": "org.mule.test.crafted.config.properties.deprecated.extension.TestConfigPropertiesExtensionLoadingDelegate",
       "version": "4.0.0"
     }
   },
-  "name": "crafted-config-properties",
+  "name": "crafted-config-properties-deprecated",
   "minMuleVersion": "4.0.0",
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",
     "attributes": {
       "exportedPackages": [
-        "org.mule.test.crafted.config.properties.extension"
+        "org.mule.test.crafted.config.properties.deprecated.extension"
       ],
       "exportedResources": [
-        "META-INF/services/org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory"
+        "META-INF/services/org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory"
       ]
     }
   },

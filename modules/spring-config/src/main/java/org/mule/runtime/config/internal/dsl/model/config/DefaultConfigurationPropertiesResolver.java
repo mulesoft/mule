@@ -216,4 +216,11 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
   public void setAsRootResolver() {
     propagateRootResolver(this);
   }
+
+
+  @Override
+  public String apply(String t) {
+    final Object resolved = resolveValue(t);
+    return resolved == null ? null : resolved.toString();
+  }
 }

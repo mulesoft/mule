@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.dsl.model.config;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver.PLACEHOLDER_PREFIX;
 import static org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver.PLACEHOLDER_SUFFIX;
@@ -15,28 +16,29 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.util.Pair;
 
-import com.google.common.collect.ImmutableList;
-
-import java.util.Collections;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Exception thrown when a key could not be resolved.
- * 
+ *
  * @since 4.0
  */
 public class PropertyNotFoundException extends MuleRuntimeException {
 
-  private List<Pair<String, String>> unresolvedKeys;
+  private static final long serialVersionUID = -3570854244058568638L;
+
+  private final List<Pair<String, String>> unresolvedKeys;
 
   /**
    * Creates a new instance. This constructor must be used when the resolver has no parent and was not able to resolve a key
-   * 
+   *
    * @param resolverKeyPair the resolver descriptor and the key that was not able to resolve.
    */
   public PropertyNotFoundException(Pair<String, String> resolverKeyPair) {
     super(createFailureException(resolverKeyPair));
-    unresolvedKeys = Collections.singletonList(resolverKeyPair);
+    unresolvedKeys = singletonList(resolverKeyPair);
   }
 
   private static I18nMessage createFailureException(Pair<String, String> resolverKeyPair) {

@@ -9,21 +9,21 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>test-config-properties-extension</artifactId>
+    <artifactId>test-config-properties-extension-deprecated</artifactId>
 
-    <name>Mule Test Config Properties Extension</name>
-    <description>A Mule extension for testing Configuration Properties provider</description>
+    <name>Mule Test Config Properties Extension (deprecated)</name>
+    <description>A Mule extension for testing deprecated Configuration Properties provider</description>
 
     <properties>
-        <testExtensionModelLoaderId>crafted-config-properties</testExtensionModelLoaderId>
+        <testExtensionModelLoaderId>crafted-config-properties-deprecated</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-properties-api</artifactId>
-            <version>${mulePropertiesApiVersion}</version>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
