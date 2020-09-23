@@ -22,7 +22,7 @@ import org.junit.Test;
 
 public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTestCase {
 
-  private static final int POLL_TIMEOUT_MILLIS = 5000;
+  private static final int POLL_TIMEOUT_MILLIS = 8000;
   private static final int POLL_DELAY_MILLIS = 1000;
   private static final int EXPECTED_EVENT_COUNT = 1;
 
@@ -32,7 +32,6 @@ public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTes
   }
 
   @Test
-  @Ignore("MULE-18519")
   public void byteArrayToInputStreamTransformationIsSuccessful() {
     check(POLL_TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> EventRecorder.countCapturedEvents() == EXPECTED_EVENT_COUNT);
   }
