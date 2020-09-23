@@ -50,7 +50,7 @@ public class OtherReconnectionSource extends Source<Integer, Void> {
     this.scheduler = schedulerService.ioScheduler();
 
     if (ReconnectableConnectionProvider.otherFail) {
-      delay(500L);
+      delay(10000L);
       sourceCallback.onConnectionException(new ConnectionException(new RuntimeException(), connection));
       ReconnectableConnectionProvider.otherFail = !ReconnectableConnectionProvider.otherFail;
       throw new RuntimeException("Fail starting source");
