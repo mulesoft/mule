@@ -21,10 +21,6 @@
         <AsyncLogger name="org.mule" level="WARN"/>
         <AsyncLogger name="com.mulesoft" level="WARN"/>
 
-        <!-- Temporary MULE-18519 entries -->
-        <AsyncLogger name="org.mule.runtime.core.internal.context" level="DEBUG"/>
-        <AsyncLogger name="org.mule.test.some.extension" level="INFO"/>
-
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>
         </AsyncRoot>

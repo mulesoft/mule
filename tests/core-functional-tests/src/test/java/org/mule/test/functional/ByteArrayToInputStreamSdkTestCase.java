@@ -8,8 +8,6 @@ package org.mule.test.functional;
 
 
 import static org.mule.tck.probe.PollingProber.check;
-
-import org.junit.runner.RunWith;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -21,11 +19,7 @@ import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
-import org.mule.tck.junit4.FlakyTest;
-import org.mule.test.runner.RunnerDelegateTo;
 
-@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final int POLL_TIMEOUT_MILLIS = 5000;
@@ -38,7 +32,7 @@ public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTes
   }
 
   @Test
-  @FlakyTest(times = 1500)
+  @Ignore("MULE-18519")
   public void byteArrayToInputStreamTransformationIsSuccessful() {
     check(POLL_TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> EventRecorder.countCapturedEvents() == EXPECTED_EVENT_COUNT);
   }
