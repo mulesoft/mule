@@ -89,6 +89,7 @@ public class PropertiesResolverUtils {
                                                    environmentPropertiesConfigurationProvider);
     localResolver.setRootResolver(parentLocalResolver);
 
+    artifactAst.updatePropertiesResolver(localResolver);
     List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
         getConfigurationPropertiesProvidersFromComponents(artifactAst, externalResourceProvider, localResolver);
     FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
