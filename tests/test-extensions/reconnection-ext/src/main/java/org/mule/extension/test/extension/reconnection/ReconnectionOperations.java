@@ -9,7 +9,6 @@ package org.mule.extension.test.extension.reconnection;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.fail;
-import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.otherFail;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 
 import org.mule.extension.test.extension.reconnection.metadata.RetryPolicyOutputResolver;
@@ -40,8 +39,8 @@ public class ReconnectionOperations {
     fail = !fail;
   }
 
-  public void switchOtherFail() {
-    otherFail = !otherFail;
+  public void makeSourceFail() {
+    FallibleReconnectableSource.fail = true;
   }
 
   @OutputResolver(output = RetryPolicyOutputResolver.class)
