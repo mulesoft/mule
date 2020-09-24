@@ -95,11 +95,11 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     check(5000, 1000, () -> !capturedEvents.isEmpty());
     switchOtherFail();
 
-    checkNot(30000, 1000, () -> {
+    checkNot(5000, 1000, () -> {
       synchronized (capturedEvents) {
         return capturedEvents.stream()
             .map(event -> (Integer) event.getMessage().getPayload().getValue())
-            .filter(startedSources -> startedSources > 1)
+            .filter(simultaneouslyStartedSources -> simultaneouslyStartedSources > 1)
             .findAny()
             .isPresent();
       }

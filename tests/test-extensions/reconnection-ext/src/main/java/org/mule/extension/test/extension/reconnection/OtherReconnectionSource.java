@@ -41,7 +41,6 @@ public class OtherReconnectionSource extends Source<Integer, Void> {
   @Override
   public void onStart(SourceCallback<Integer, Void> sourceCallback) throws MuleException {
     countStartedSources.accumulateAndGet(1, Integer::sum);
-    delay(1000L);
     doStart(sourceCallback);
   }
 
@@ -50,7 +49,7 @@ public class OtherReconnectionSource extends Source<Integer, Void> {
     this.scheduler = schedulerService.ioScheduler();
 
     if (ReconnectableConnectionProvider.otherFail) {
-      delay(10000L);
+      delay(1000L);
       sourceCallback.onConnectionException(new ConnectionException(new RuntimeException(), connection));
       ReconnectableConnectionProvider.otherFail = !ReconnectableConnectionProvider.otherFail;
       throw new RuntimeException("Fail starting source");
@@ -68,7 +67,6 @@ public class OtherReconnectionSource extends Source<Integer, Void> {
   @Override
   public void onStop() {
     countStartedSources.accumulateAndGet(-1, Integer::sum);
-    delay(1000L);
     if (this.scheduler != null) {
       if (scheduleWithFixedDelay.get() != null) {
         scheduleWithFixedDelay.get().cancel(true);
