@@ -11,12 +11,14 @@ import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.test.classloading.api.ClassLoadingHelper;
 
 @Extension(name = "ClassLoading")
 @Xml(prefix = "classloading")
 @ConnectionProviders({CLPoolingConnectionProvider.class, CLCachedConnectionProvider.class, CLNoneConnectionProvider.class})
 @Configurations(CLConfiguration.class)
+@MetadataScope(keysResolver = CLKeysResolver.class)
 @Export(classes = ClassLoadingHelper.class)
 public class ClassLoadingExtension {
 
