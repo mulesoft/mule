@@ -13,7 +13,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInputOperation;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInput;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
@@ -25,8 +25,11 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -34,8 +37,11 @@ import javax.inject.Inject;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.internal.management.stats.InputDecoratedCursorStreamProvider;
+import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -131,13 +137,15 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
                          context == null || context.resolveCursors()
                              ? resolveCursor(resolvedValue,
                                              entry.getValue().isContent() && componentDecoratorFactory != null
-                                                 ? decorateInputOperation(context.getEvent().getCorrelationId(),
-                                                                          componentDecoratorFactory)
+                                                 ? v -> decorateInput(v, context.getEvent()
+                                                     .getCorrelationId(),
+                                                                      componentDecoratorFactory)
                                                  : identity())
                              : entry.getValue().isContent() && componentDecoratorFactory != null
                                  ? mapTypeValue(resolvedValue,
-                                                decorateInputOperation(context.getEvent().getCorrelationId(),
-                                                                       componentDecoratorFactory))
+                                                v -> decorateInput(v, context.getEvent()
+                                                    .getCorrelationId(),
+                                                                   componentDecoratorFactory))
                                  : resolvedValue);
     }
 
