@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.internal.xni.parser;
 
-import static org.mule.runtime.config.internal.util.EntityResolverUtils.resolveSystemIdForCompatibility;
-import static org.mule.runtime.config.internal.util.SchemaMappingsLoaderUtils.getSchemaMappings;
+import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.getSchemaMappings;
+import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.resolveSystemId;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.sun.org.apache.xerces.internal.xni.XMLResourceIdentifier;
@@ -43,7 +43,7 @@ public class DefaultXmlEntityResolver implements XMLEntityResolver {
     String systemId = resourceIdentifier.getExpandedSystemId();
     if (publicId == null && systemId == null)
       return null;
-    systemId = resolveSystemIdForCompatibility(publicId, systemId, (pId, sId) -> schemaMappings.containsKey(pId));
+    systemId = resolveSystemId(publicId, systemId, (pId, sId) -> schemaMappings.containsKey(pId));
     return resolveEntity(publicId, systemId);
   }
 

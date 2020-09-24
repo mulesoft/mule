@@ -4,12 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.xni.parser.factories;
+package org.mule.runtime.config.internal.factories.xni;
 
+import org.mule.runtime.config.api.factories.xni.XmlSchemaProviderFactory;
+import org.mule.runtime.config.api.xni.parser.XmlSchemaProvider;
 import org.mule.runtime.config.internal.xni.parser.DefaultXmlSchemaProvider;
-import org.mule.runtime.config.internal.xni.parser.XmlSchemaProvider;
 
 /**
+ * Default implementation of {@link XmlSchemaProviderFactory} which will return the {@link DefaultXmlSchemaProvider}
+ * instance.
  *
  * @since 4.4.0
  */

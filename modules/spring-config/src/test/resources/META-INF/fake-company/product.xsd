@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.mulesoft.org/schema/mule/fake-product"
+            xmlns="http://www.mulesoft.org/schema/mule/fake-product"
+            elementFormDefault="unqualified">
+    <xsd:complexType name="ProductType">
+        <xsd:sequence>
+            <xsd:element name="Type" type="xsd:string"/>
+            <xsd:element name="Version" type="xsd:integer"/>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

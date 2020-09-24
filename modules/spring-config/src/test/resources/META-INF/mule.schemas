@@ -1,0 +1,4 @@
+http\://www.mulesoft.org/schema/mule/fake-company/current/company.xsd=META-INF/fake-company/company.xsd
+http\://www.mulesoft.org/schema/mule/fake-person/current/person.xsd=META-INF/fake-company/person.xsd
+http\://www.mulesoft.org/schema/mule/fake-product/current/product.xsd=META-INF/fake-company/product.xsd
+http\://www.mulesoft.org/schema/mule/core/current/mule-invalid-target.xsd=META-INF/mule-unexisting-target.xsd

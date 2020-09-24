@@ -18,12 +18,14 @@ import com.sun.org.apache.xerces.internal.xni.grammars.XMLGrammarPool;
 import com.sun.org.apache.xerces.internal.xni.parser.XMLEntityResolver;
 import com.sun.org.apache.xerces.internal.xni.parser.XMLInputSource;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.config.api.xni.parser.XmlGathererErrorHandler;
+import org.mule.runtime.config.api.xni.parser.XmlSchemaProvider;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 
 /**
- * Provides a way of creating {@link RuntimeXmlGrammarPool} instances.
+ * Default implementation of {@link XmlGrammarPoolBuilder} provides a way of creating {@link RuntimeXmlGrammarPool} instances.
  *
  * @since 4.4.0
  */
@@ -54,7 +56,7 @@ public class DefaultXmlGrammarPoolBuilder implements XmlGrammarPoolBuilder {
     XMLGrammarPool pool;
     try {
       pool = initializeCoreGrammarPool();
-    } catch (IOException e) {
+    } catch (Throwable e) {
       LOGGER.warn("Unable to create grammar pool. Using empty XMLGrammarPool", e);
       pool = createEmptyXMLGrammarPool();
     }

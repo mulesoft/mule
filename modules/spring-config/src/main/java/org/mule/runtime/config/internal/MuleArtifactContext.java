@@ -31,6 +31,7 @@ import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqu
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getExtensionModelsComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getRuntimeComponentBuildingDefinitionProvider;
+import static org.mule.runtime.config.internal.xni.parser.DefaultXmlGrammarPoolManager.getGrammarPool;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
@@ -86,7 +87,6 @@ import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
-import org.mule.runtime.config.internal.xni.parser.RuntimeXmlGrammarPoolManager;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -341,7 +341,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
         @Override
         public XMLGrammarPool getXMLGrammarPool() {
-          return RuntimeXmlGrammarPoolManager.getGrammarPool();
+          return getGrammarPool();
         }
       }) : emptyList();
 

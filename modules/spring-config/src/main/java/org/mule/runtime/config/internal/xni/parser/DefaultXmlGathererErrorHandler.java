@@ -11,6 +11,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import com.sun.org.apache.xerces.internal.xni.XNIException;
 import com.sun.org.apache.xerces.internal.xni.parser.XMLParseException;
+import org.mule.runtime.config.api.xni.parser.XmlGathererErrorHandler;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;

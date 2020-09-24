@@ -9,21 +9,22 @@ package org.mule.runtime.config.internal.xni.parser;
 import static org.mule.runtime.config.internal.xni.parser.XmlGrammarPoolBuilder.builder;
 
 import com.sun.org.apache.xerces.internal.xni.grammars.XMLGrammarPool;
-import org.mule.runtime.config.internal.xni.parser.factories.XmlEntityResolverFactory;
-import org.mule.runtime.config.internal.xni.parser.factories.XmlGathererErrorHandlerFactory;
-import org.mule.runtime.config.internal.xni.parser.factories.XmlSchemaProviderFactory;
+import org.mule.runtime.config.api.factories.xni.XmlEntityResolverFactory;
+import org.mule.runtime.config.api.factories.xni.XmlGathererErrorHandlerFactory;
+import org.mule.runtime.config.api.factories.xni.XmlSchemaProviderFactory;
 
 /**
+ * This class manages {@link XMLGrammarPool} preloaded with mule schemas.
  *
  * @since 4.4.0
  */
-public class RuntimeXmlGrammarPoolManager {
+public class DefaultXmlGrammarPoolManager {
 
   private static XMLGrammarPool XML_GRAMMAR_POOL =
       builder(XmlSchemaProviderFactory.getDefault().create(), XmlGathererErrorHandlerFactory.getDefault().create(),
               XmlEntityResolverFactory.getDefault().create()).build();
 
-  private RuntimeXmlGrammarPoolManager() {}
+  private DefaultXmlGrammarPoolManager() {}
 
   public static XMLGrammarPool getGrammarPool() {
     return XML_GRAMMAR_POOL;

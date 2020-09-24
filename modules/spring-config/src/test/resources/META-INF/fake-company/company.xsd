@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.mulesoft.org/schema/mule/fake-company"
+            xmlns="http://www.mulesoft.org/schema/mule/fake-company"
+            elementFormDefault="unqualified"
+            xmlns:person="http://www.mulesoft.org/schema/mule/fake-person"
+            xmlns:product="http://www.mulesoft.org/schema/mule/fake-product">
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/fake-person" schemaLocation="http://www.mulesoft.org/schema/mule/fake-person/current/person.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/fake-product" schemaLocation="http://www.mulesoft.org/schema/mule/fake-product/current/product.xsd"/>
+
+    <xsd:element name="Company">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="Person" type="person:PersonType" maxOccurs="unbounded"/>
+                <xsd:element name="Product" type="product:ProductType" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

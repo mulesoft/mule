@@ -8,10 +8,11 @@ package org.mule.runtime.config.internal.xni.parser;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.config.internal.util.SchemaMappingsLoaderUtils.getSchemaMappings;
+import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.getSchemaMappings;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.sun.org.apache.xerces.internal.xni.parser.XMLInputSource;
+import org.mule.runtime.config.api.xni.parser.XmlSchemaProvider;
 import org.slf4j.Logger;
 
 import java.io.InputStream;
@@ -20,21 +21,20 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Runtime implementation of {@link XmlSchemaProvider}
+ * Default implementation of {@link XmlSchemaProvider}
  *
  * @since 4.4.0
  */
 public class DefaultXmlSchemaProvider implements XmlSchemaProvider {
 
-  private static final Logger LOGGER = getLogger(org.mule.runtime.dsl.internal.xni.parser.XmlSchemaProvider.class);
+  private static final Logger LOGGER = getLogger(XmlSchemaProvider.class);
 
-  private static final String CUSTOM_SCHEMA_MAPPINGS_LOCATION = "META-INF/mule.schemas";
+  private static final String MULE_SCHEMA_MAPPINGS_LOCATION = "META-INF/mule.schemas";
 
   private final Map<String, String> muleSchemaMappings;
 
   public DefaultXmlSchemaProvider() {
-    this.muleSchemaMappings = getSchemaMappings(CUSTOM_SCHEMA_MAPPINGS_LOCATION,
-                                                org.mule.runtime.dsl.internal.xni.parser.XmlSchemaProvider.class::getClassLoader);
+    this.muleSchemaMappings = getSchemaMappings(MULE_SCHEMA_MAPPINGS_LOCATION, DefaultXmlSchemaProvider.class::getClassLoader);
   }
 
   public List<XMLInputSource> getSchemas() {
@@ -42,13 +42,12 @@ public class DefaultXmlSchemaProvider implements XmlSchemaProvider {
         .map(entry -> {
           String systemId = entry.getKey();
           String resourceLocation = entry.getValue();
-          com.sun.org.apache.xerces.internal.xni.parser.XMLInputSource xis = null;
-          InputStream is = org.mule.runtime.dsl.internal.xni.parser.XmlSchemaProvider.class.getClassLoader()
-              .getResourceAsStream(resourceLocation);
+          XMLInputSource xis = null;
+          InputStream is = DefaultXmlSchemaProvider.class.getClassLoader().getResourceAsStream(resourceLocation);
           if (is == null) {
             LOGGER.debug("Couldn't find XML schema [" + systemId + "]: " + resourceLocation);
           } else {
-            xis = new com.sun.org.apache.xerces.internal.xni.parser.XMLInputSource(null, entry.getKey(), null);
+            xis = new XMLInputSource(null, entry.getKey(), null);
             xis.setByteStream(is);
           }
           return ofNullable(xis);

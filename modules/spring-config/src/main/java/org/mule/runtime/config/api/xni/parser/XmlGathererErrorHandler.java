@@ -4,10 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.xni.parser;
+package org.mule.runtime.config.api.xni.parser;
 
 import com.sun.org.apache.xerces.internal.xni.parser.XMLErrorHandler;
 import com.sun.org.apache.xerces.internal.xni.parser.XMLParseException;
+import org.mule.api.annotation.NoImplement;
+
 import java.util.List;
 
 /**
@@ -16,6 +18,7 @@ import java.util.List;
  *
  * @since 4.4.0
  */
+@NoImplement
 public interface XmlGathererErrorHandler extends XMLErrorHandler {
 
   /**
