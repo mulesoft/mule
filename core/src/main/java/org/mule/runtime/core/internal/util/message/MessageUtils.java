@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.util.message;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
-import static org.mule.runtime.core.internal.management.stats.StatisticsUtils.visitable;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
@@ -18,13 +17,13 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.internal.management.stats.visitor.InputDecoratorVisitor;
-import org.mule.runtime.core.internal.management.stats.visitor.OutputDecoratorVisitor;
-import org.mule.runtime.core.internal.management.stats.visitor.Visitor;
+import org.mule.runtime.core.internal.management.stats.InputDecoratedCursorStreamProvider;
 import org.mule.runtime.core.internal.util.collection.TransformingIterator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.sdk.api.runtime.operation.Result;
@@ -37,7 +36,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 
 /**
  * Utility methods for handling {@link Message messages}
@@ -125,9 +123,18 @@ public final class MessageUtils {
                                   BaseEventContext eventContext,
                                   ComponentLocation originatingLocation,
                                   String correlationId) {
-    Object value = streamingContent(decorateOutputOperation(correlationId, componentDecoratorFactory).apply(result.getOutput()),
-                                    cursorProviderFactory,
-                                    eventContext, originatingLocation);
+    final Object output;
+    if (result.getOutput() instanceof InputStream) {
+      output = componentDecoratorFactory.decorateOutput((InputStream) result.getOutput(), correlationId);
+    } else if (result.getOutput() instanceof Collection) {
+      output = componentDecoratorFactory.decorateOutputResultCollection((Collection) result.getOutput(), correlationId);
+    } else if (result.getOutput() instanceof Iterator) {
+      output = componentDecoratorFactory.decorateOutput((Iterator) result.getOutput(), correlationId);
+    } else {
+      output = result.getOutput();
+    }
+
+    Object value = streamingContent(output, cursorProviderFactory, eventContext, originatingLocation);
     return toMessage(result, builder().fromObject(value).mediaType(mediaType).build(), value);
   }
 
@@ -503,35 +510,28 @@ public final class MessageUtils {
   }
 
   /**
-   * Generates an operation for value input decoration
+   * Decorates input value.
    * 
-   * @param eventCorrelationId the correlationId of the context involed
+   * @param v value to be decorated
+   * @param eventCorrelationId the correlationId of the context involved
    * @param componentDecoratorFactory the component decorator factory
-   * @return operator for decoration
-   */
-  public static UnaryOperator decorateInputOperation(String eventCorrelationId,
-                                                     CursorComponentDecoratorFactory componentDecoratorFactory) {
-    return decorateOperation(eventCorrelationId, componentDecoratorFactory, InputDecoratorVisitor.builder()
-        .withFactory(componentDecoratorFactory).withCorrelationId(eventCorrelationId).build());
-  }
-
-  /**
-   * Generates an operation for value input decoration
    * 
-   * @param eventCorrelationId the correlationId of the context involed
-   * @param componentDecoratorFactory the component decorator factory
-   * @return operator for decoration
+   * @return decorated value
    */
-  public static UnaryOperator decorateOutputOperation(String eventCorrelationId,
-                                                      CursorComponentDecoratorFactory componentDecoratorFactory) {
-    return decorateOperation(eventCorrelationId, componentDecoratorFactory, OutputDecoratorVisitor.builder()
-        .withFactory(componentDecoratorFactory).withCorrelationId(eventCorrelationId).build());
-  }
-
-  private static UnaryOperator decorateOperation(String eventCorrelationId,
-                                                 CursorComponentDecoratorFactory componentDecoratorFactory, Visitor visitor) {
-    return v -> visitable(v)
-        .map(visitable -> visitable.accept(visitor))
-        .orElse(v);
+  public static Object decorateInput(Object v, String eventCorrelationId,
+                                     CursorComponentDecoratorFactory componentDecoratorFactory) {
+    if (v instanceof InputStream) {
+      return componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
+    } else if (v instanceof Collection) {
+      return componentDecoratorFactory.decorateInput((Collection) v, eventCorrelationId);
+    } else if (v instanceof Iterator) {
+      return componentDecoratorFactory.decorateInput((Iterator) v, eventCorrelationId);
+    } else if (v instanceof CursorStreamProvider) {
+      return new InputDecoratedCursorStreamProvider((CursorStreamProvider) v,
+                                                    componentDecoratorFactory,
+                                                    eventCorrelationId);
+    } else {
+      return v;
+    }
   }
 }
