@@ -153,13 +153,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       configuration = cache.computeIfAbsent(resolverSetResult, (r) -> createConfiguration(r, event));
       updateUsageStatistic(configuration);
       return configuration;
-    } catch (MuleRuntimeException e) {
-      throw e;
-    } catch (RuntimeException e) {
-      if (e.getCause() instanceof MuleException) {
-        throw (MuleException) e.getCause();
-      }
-      throw e;
+    } catch (WrappingException e) {
+      throw e.getWrappedException();
     } finally {
       cacheReadLock.unlock();
     }
@@ -191,7 +186,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       registerConfiguration(configuration);
       return configuration;
     } catch (MuleException e) {
-      throw new RuntimeException(e);
+      throw new WrappingException(e);
     }
   }
 
@@ -323,5 +318,19 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     return this.connectionProviderResolver.getObjectBuilder()
         .filter(ob -> ob instanceof ConnectionProviderObjectBuilder)
         .map(ob -> ((ConnectionProviderObjectBuilder) ob).providerModel);
+  }
+
+  private class WrappingException extends RuntimeException {
+
+    private final Exception wrappedException;
+
+    public WrappingException(Exception e) {
+      super(e);
+      this.wrappedException = e;
+    }
+
+    public Exception getWrappedException() {
+      return wrappedException;
+    }
   }
 }
