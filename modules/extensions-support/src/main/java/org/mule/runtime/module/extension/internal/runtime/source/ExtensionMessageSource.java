@@ -569,7 +569,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
           sourceAdapter.finishRestart(restartContext);
         }
         sourceAdapter.start();
-        reconnecting.set(false);
       } catch (Exception e) {
         try {
           stopSource();
