@@ -410,7 +410,8 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   protected void mockTypeResolversInformationModelProperty(EnrichableModel model, String category, String outputResolverName,
                                                            String attributesResolverName,
                                                            Map<String, String> parameterResolversNames, String keysResolverName) {
-    mockTypeResolversInformationModelProperty(model, category, outputResolverName, attributesResolverName, parameterResolversNames, keysResolverName, false);
+    mockTypeResolversInformationModelProperty(model, category, outputResolverName, attributesResolverName,
+                                              parameterResolversNames, keysResolverName, false);
   }
 
   protected void mockTypeResolversInformationModelProperty(EnrichableModel model, String category, String outputResolverName,
@@ -418,14 +419,14 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
                                                            Map<String, String> parameterResolversNames, String keysResolverName,
                                                            boolean partialTypeKeyResolver) {
     when(model.getModelProperty(TypeResolversInformationModelProperty.class))
-            .thenReturn(of(new TypeResolversInformationModelProperty(category,
-                                                                     parameterResolversNames,
-                                                                     outputResolverName,
-                                                                     attributesResolverName,
-                                                                     keysResolverName,
-                                                                     false,
-                                                                     false,
-                                                                     partialTypeKeyResolver)));
+        .thenReturn(of(new TypeResolversInformationModelProperty(category,
+                                                                 parameterResolversNames,
+                                                                 outputResolverName,
+                                                                 attributesResolverName,
+                                                                 keysResolverName,
+                                                                 false,
+                                                                 false,
+                                                                 partialTypeKeyResolver)));
   }
 
 
