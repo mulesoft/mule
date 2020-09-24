@@ -7,6 +7,8 @@
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd
                http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
+    <object name="collectMediaType" class="org.mule.test.module.extension.ContentTypeHandlingTestCase$MediaTypeCollectorProcessor"/>
+
     <heisenberg:config name="heisenberg"
                        myName="walt"
                        age="50"
@@ -61,8 +63,7 @@
     <flow name="listStringMediaType">
         <heisenberg:get-simple-blacklist config-ref="heisenberg" outputMimeType="application/java"/>
         <foreach>
-            <custom-processor
-                    class="org.mule.test.module.extension.ContentTypeHandlingTestCase$MediaTypeCollectorProcessor"/>
+            <flow-ref name="collectMediaType"/>
         </foreach>
     </flow>
 
@@ -71,8 +72,7 @@
         <heisenberg:get-blacklist config-ref="heisenberg" outputMimeType="application/java; header=false"
                                   outputEncoding="UTF-16"/>
         <foreach>
-            <custom-processor
-                    class="org.mule.test.module.extension.ContentTypeHandlingTestCase$MediaTypeCollectorProcessor"/>
+            <flow-ref name="collectMediaType"/>
         </foreach>
     </flow>
 
@@ -80,8 +80,7 @@
         <heisenberg:get-paged-blacklist config-ref="heisenberg" outputMimeType="application/java; header=false"
                                         outputEncoding="UTF-16"/>
         <foreach>
-            <custom-processor
-                    class="org.mule.test.module.extension.ContentTypeHandlingTestCase$MediaTypeCollectorProcessor"/>
+            <flow-ref name="collectMediaType"/>
         </foreach>
     </flow>
 
@@ -90,25 +89,21 @@
                                                         outputMimeType="application/java; header=false"
                                                         outputEncoding="UTF-16"/>
         <foreach>
-            <custom-processor
-                    class="org.mule.test.module.extension.ContentTypeHandlingTestCase$MediaTypeCollectorProcessor"/>
+            <flow-ref name="collectMediaType"/>
         </foreach>
     </flow>
 
     <flow name="sourceMimeType" initialState="stopped">
         <petstore:pet-source-stream birds="Primate" outputMimeType="pet/plain; header=false" outputEncoding="UTF-16"/>
-        <custom-processor
-                class="org.mule.test.module.extension.ContentTypeHandlingTestCase$MediaTypeCollectorProcessor"/>
+        <flow-ref name="collectMediaType"/>
         <heisenberg:say-my-name config-ref="heisenberg" outputMimeType="dead/json"/>
-        <custom-processor
-                class="org.mule.test.module.extension.ContentTypeHandlingTestCase$MediaTypeCollectorProcessor"/>
+        <flow-ref name="collectMediaType"/>
     </flow>
 
     <flow name="sourceListMimeType" initialState="stopped">
         <petstore:pet-source-list birds="Primate" outputMimeType="pet/plain"/>
         <foreach>
-            <custom-processor
-                    class="org.mule.test.module.extension.ContentTypeHandlingTestCase$MediaTypeCollectorProcessor"/>
+            <flow-ref name="collectMediaType"/>
         </foreach>
     </flow>
 

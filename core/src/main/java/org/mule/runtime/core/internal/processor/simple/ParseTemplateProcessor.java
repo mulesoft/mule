@@ -23,6 +23,7 @@ import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
@@ -32,6 +33,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.inject.Inject;
 
 
 /**
@@ -42,6 +44,9 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
   private static final Boolean KEEP_TYPE_TARGET_AND_TARGET_VAR =
       new Boolean(getProperty(SYSTEM_PROPERTY_PREFIX + "parse.template.keep.target.var.type", "true"));
+
+  @Inject
+  private ExtendedExpressionManager expressionManager;
 
   private String content;
   private MediaType outputMimeType;
@@ -70,7 +75,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
     }
 
     if (targetValue != null) {
-      targetValueExpression = compile(targetValue, muleContext.getExpressionManager());
+      targetValueExpression = compile(targetValue, expressionManager);
     }
   }
 
@@ -124,7 +129,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   public CoreEvent process(CoreEvent event) {
     evaluateCorrectArguments();
 
-    String result = muleContext.getExpressionManager().parseLogTemplate(content, event, getLocation(), NULL_BINDING_CONTEXT);
+    String result = expressionManager.parseLogTemplate(content, event, getLocation(), NULL_BINDING_CONTEXT);
     Message.Builder messageBuilder = Message.builder(event.getMessage()).value(result).nullAttributesValue();
     MediaType configuredMediaType = buildMediaType();
     if (configuredMediaType != null) {
@@ -139,10 +144,10 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
       } else { //typeValue was defined by the user
         if (KEEP_TYPE_TARGET_AND_TARGET_VAR) {
           CoreEvent resultEvent = CoreEvent.builder(event).message(resultMessage).build();
-          return outputToTarget(event, resultEvent, target, targetValueExpression, muleContext.getExpressionManager());
+          return outputToTarget(event, resultEvent, target, targetValueExpression, expressionManager);
         } else {
           return CoreEvent.builder(event).addVariable(target,
-                                                      muleContext.getExpressionManager()
+                                                      expressionManager
                                                           .evaluate(targetValue, CoreEvent.builder(event)
                                                               .message(resultMessage).build()))
               .build();

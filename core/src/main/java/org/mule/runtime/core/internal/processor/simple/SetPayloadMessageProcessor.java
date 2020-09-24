@@ -8,15 +8,19 @@
 package org.mule.runtime.core.internal.processor.simple;
 
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
+import org.mule.runtime.core.privileged.util.AttributeEvaluator;
+
+import javax.inject.Inject;
 
 /**
  * Modifies the payload of a {@link Message} according to the provided value.
@@ -24,6 +28,10 @@ import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
 public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
   private static final TypedValue NULL_TYPED_VALUE = new TypedValue<>(null, OBJECT);
+
+  @Inject
+  private ExtendedExpressionManager expressionManager;
+
   private DataType dataType;
   private String value;
   private AttributeEvaluator valueEvaluator;
@@ -87,6 +95,6 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
   @Override
   public void initialise() throws InitialisationException {
     valueEvaluator = new AttributeEvaluator(value, dataType);
-    valueEvaluator.initialize(muleContext.getExpressionManager());
+    valueEvaluator.initialize(expressionManager);
   }
 }

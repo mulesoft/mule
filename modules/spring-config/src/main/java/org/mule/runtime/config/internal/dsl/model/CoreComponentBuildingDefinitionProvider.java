@@ -29,7 +29,6 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromTextContent;
 import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
-import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT;
@@ -196,7 +195,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String ROUTES = "routes";
   private static final String PROCESSOR = "processor";
   private static final String TRANSFORMER = "transformer";
-  private static final String CUSTOM_PROCESSOR = "custom-processor";
   private static final String CLASS_ATTRIBUTE = "class";
   private static final String SUB_FLOW = "sub-flow";
   private static final String FLOW = "flow";
@@ -307,10 +305,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(TRANSFORMER).withTypeDefinition(fromType(Transformer.class)).build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(CUSTOM_PROCESSOR)
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE)
-            .checkingThatIsClassOrInheritsFrom(MESSAGE_PROCESSOR_CLASS))
-        .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(PROCESSOR_CHAIN)
         .withTypeDefinition(fromType(AnnotatedProcessor.class)).withObjectFactoryType(MessageProcessorChainObjectFactory.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
