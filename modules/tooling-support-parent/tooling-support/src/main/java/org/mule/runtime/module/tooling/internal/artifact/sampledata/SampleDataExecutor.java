@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
-
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -31,7 +30,6 @@ import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
-import org.mule.runtime.module.tooling.internal.artifact.context.LoggingResolvingContext;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import org.mule.sdk.api.data.sample.SampleDataException;
 
@@ -64,9 +62,8 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(componentModel, componentElementDeclaration);
 
-      LoggingResolvingContext context =
-          new LoggingResolvingContext(new ExtensionResolvingContext(() -> optionalConfigurationInstance,
-                                                                    connectionManager));
+      ExtensionResolvingContext context = new ExtensionResolvingContext(() -> optionalConfigurationInstance,
+                                                                        connectionManager);
 
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
       try {
