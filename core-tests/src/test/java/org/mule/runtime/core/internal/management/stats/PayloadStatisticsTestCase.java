@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.management.stats;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -20,8 +19,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInputOperation;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateOutputOperation;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STATISTICS;
 
@@ -34,16 +31,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.function.UnaryOperator;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
-import org.mule.runtime.core.internal.streaming.bytes.ByteArrayCursorStream;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -708,51 +701,6 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
 
     assertThat(statistics.getInputByteCount(), is(0L));
     assertThat(statistics.getInputObjectCount(), is(0L));
-  }
-
-  @Test
-  public void decorateInputCursorStreamReturnsCursorStreamStatsEnabled() {
-    verifyDecoratedCursorStreamIsCursorStream(true, decorateInputOperation(CORR_ID,
-                                                                           decoratorFactory
-                                                                               .componentDecoratorFactory(component1)));
-  }
-
-  @Test
-  public void decorateInputCursorStreamReturnsCursorStreamStatsDisabled() {
-    verifyDecoratedCursorStreamIsCursorStream(false,
-                                              decorateInputOperation(CORR_ID,
-                                                                     decoratorFactory.componentDecoratorFactory(component1)));
-  }
-
-  @Test
-  public void decorateOuputCursorStreamReturnsCursorStreamStatsEnabled() {
-    verifyDecoratedCursorStreamIsCursorStream(true, decorateInputOperation(CORR_ID,
-                                                                           decoratorFactory
-                                                                               .componentDecoratorFactory(component1)));
-  }
-
-  @Test
-  public void decorateOutputCursorStreamReturnsCursorStreamStatsDisabled() {
-    verifyDecoratedCursorStreamIsCursorStream(false,
-                                              decorateOutputOperation(CORR_ID,
-                                                                      decoratorFactory
-                                                                          .componentDecoratorFactory(component1)));
-  }
-
-  @Test
-  public void decorateOutputCursorStreamReturnsCursorStreamStatsEnabled() {
-    verifyDecoratedCursorStreamIsCursorStream(true,
-                                              decorateOutputOperation(CORR_ID,
-                                                                      decoratorFactory
-                                                                          .componentDecoratorFactory(component1)));
-  }
-
-  private void verifyDecoratedCursorStreamIsCursorStream(boolean statEnabled, UnaryOperator decorationOperator) {
-    getStatistics().setEnabled(statEnabled);
-    InputStream cursorStream = new ByteArrayCursorStream(mock(CursorStreamProvider.class), "Stream".getBytes(UTF_8));
-    InputStream decorated = (InputStream) decorationOperator.apply(cursorStream);
-
-    assertThat(decorated, instanceOf(CursorStream.class));
   }
 
   private void consumeInputStream() throws IOException {
