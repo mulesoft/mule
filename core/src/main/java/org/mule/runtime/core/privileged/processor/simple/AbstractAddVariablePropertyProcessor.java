@@ -19,6 +19,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -37,6 +38,8 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAddVariablePropertyProcessor.class);
 
+  private ExtendedExpressionManager expressionManager;
+
   private AttributeEvaluator identifierEvaluator;
   private String value;
   private AttributeEvaluator valueEvaluator;
@@ -46,9 +49,9 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
 
   @Override
   public void initialise() throws InitialisationException {
-    identifierEvaluator.initialize(muleContext.getExpressionManager());
+    identifierEvaluator.initialize(expressionManager);
     valueEvaluator = new AttributeEvaluator(value, getReturnDataType());
-    valueEvaluator.initialize(muleContext.getExpressionManager());
+    valueEvaluator.initialize(expressionManager);
   }
 
   @Override
@@ -143,5 +146,10 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   @Inject
   public void setStreamingManager(StreamingManager streamingManager) {
     this.streamingManager = streamingManager;
+  }
+
+  @Inject
+  public void setExpressionManager(ExtendedExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
   }
 }

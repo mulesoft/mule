@@ -166,19 +166,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-processor" type="customMessageProcessorType" substitutionGroup="abstract-message-processor"/>
-
-    <xsd:complexType name="customMessageProcessorType">
-        <xsd:complexContent>
-            <xsd:extension base="topLevelProcessorType">
-                <xsd:sequence>
-                    <xsd:group ref="propertiesGroup"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="processor-chain" type="messageProcessorChainType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>

@@ -37,7 +37,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
   @Before
   public void setUp() throws Exception {
     setPayloadMessageProcessor = new SetPayloadMessageProcessor();
-    setPayloadMessageProcessor.setMuleContext(muleContext);
+    setPayloadMessageProcessor.setExpressionManager(muleContext.getExpressionManager());
   }
 
   @Test

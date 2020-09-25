@@ -5,6 +5,8 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
+    <object name="processList" class="org.mule.test.module.extension.source.ListOfMessagesSourceTestCase$ListProcessor" />
+
     <heisenberg:config name="heisenberg"
                        myName="Heisenberg"
                        age="50"
@@ -14,7 +16,7 @@
                        money="0"
                        initialHealth="CANCER"
                        finalHealth="CANCER"
-                       enemies="#[mel:[]]">
+                       enemies="#[[]]">
         <heisenberg:monthly-incomes>
             <heisenberg:monthly-income value="12000"/>
             <heisenberg:monthly-income value="500"/>
@@ -26,7 +28,7 @@
 
     <flow name="source">
         <heisenberg:dea-radio />
-        <custom-processor class="org.mule.test.module.extension.source.ListOfMessagesSourceTestCase$ListProcessor" />
+        <flow-ref name="processList"/>
     </flow>
 
 </mule>

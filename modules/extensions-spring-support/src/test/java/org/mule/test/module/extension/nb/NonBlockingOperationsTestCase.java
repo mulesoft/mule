@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.api.exception.ExpectedError.none;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.marvel.ironman.IronManOperations.FLIGHT_PLAN;
 import static org.mule.test.marvel.model.MissileProofVillain.MISSILE_PROOF;
 import static org.mule.test.marvel.model.Villain.KABOOM;
@@ -28,7 +29,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.tck.probe.PollingProber;
 import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.model.MissileProofVillain;
 import org.mule.test.marvel.model.Villain;
@@ -95,7 +95,7 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
     final String payload = "take me to the avengers tower";
     Event event = flowRunner("computeFlightPlan").withPayload(payload).run();
     assertThat(event.getMessage().getPayload().getValue().toString(), equalTo(payload));
-    new PollingProber().probe(1000, 1000, () -> FLIGHT_PLAN.equals(ironMan.getFlightPlan()));
+    probe(1000, 1000, () -> FLIGHT_PLAN.equals(ironMan.getFlightPlan()));
   }
 
   private IronMan getIronMan(String name) throws Exception {
