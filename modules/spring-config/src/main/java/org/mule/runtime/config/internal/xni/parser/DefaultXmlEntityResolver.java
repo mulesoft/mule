@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.xni.parser;
 
+import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.CUSTOM_SCHEMA_MAPPINGS_LOCATION;
 import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.getSchemaMappings;
 import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.resolveSystemId;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -29,12 +30,10 @@ public class DefaultXmlEntityResolver implements XMLEntityResolver {
 
   private static final Logger LOGGER = getLogger(DefaultXmlEntityResolver.class);
 
-  private static final String CUSTOM_SCHEMA_MAPPINGS_LOCATION = "META-INF/mule.schemas";
-
-  private final Map<String, String> schemaMappings;
+  private final Map<String, String> schemas;
 
   public DefaultXmlEntityResolver() {
-    this.schemaMappings = getSchemaMappings(CUSTOM_SCHEMA_MAPPINGS_LOCATION, DefaultXmlEntityResolver.class::getClassLoader);
+    this.schemas = getSchemaMappings(CUSTOM_SCHEMA_MAPPINGS_LOCATION, DefaultXmlEntityResolver.class::getClassLoader);
   }
 
   @Override
@@ -43,12 +42,12 @@ public class DefaultXmlEntityResolver implements XMLEntityResolver {
     String systemId = resourceIdentifier.getExpandedSystemId();
     if (publicId == null && systemId == null)
       return null;
-    systemId = resolveSystemId(publicId, systemId, (pId, sId) -> schemaMappings.containsKey(pId));
+    systemId = resolveSystemId(publicId, systemId, (pId, sId) -> schemas.containsKey(pId));
     return resolveEntity(publicId, systemId);
   }
 
   private XMLInputSource resolveEntity(String publicId, String systemId) {
-    String resourceLocation = schemaMappings.get(systemId);
+    String resourceLocation = schemas.get(systemId);
     if (resourceLocation != null) {
       InputStream is = DefaultXmlEntityResolver.class.getClassLoader().getResourceAsStream(resourceLocation);
       if (is == null) {

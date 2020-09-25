@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.CUSTOM_SCHEMA_MAPPINGS_LOCATION;
 import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.getSchemaMappings;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -24,7 +25,6 @@ import org.xml.sax.InputSource;
  */
 public class MuleCustomEntityResolver implements EntityResolver {
 
-  public static final String CUSTOM_SCHEMA_MAPPINGS_LOCATION = "META-INF/mule.schemas";
   public static final String CUSTOM_SPRING_SCHEMA_MAPPINGS_LOCATION = "META-INF/spring.schemas";
   private static final Logger LOGGER = getLogger(MuleCustomEntityResolver.class);
 

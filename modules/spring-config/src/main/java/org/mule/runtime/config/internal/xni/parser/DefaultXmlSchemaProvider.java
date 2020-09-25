@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.xni.parser;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.CUSTOM_SCHEMA_MAPPINGS_LOCATION;
 import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.getSchemaMappings;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -29,16 +30,19 @@ public class DefaultXmlSchemaProvider implements XmlSchemaProvider {
 
   private static final Logger LOGGER = getLogger(XmlSchemaProvider.class);
 
-  private static final String MULE_SCHEMA_MAPPINGS_LOCATION = "META-INF/mule.schemas";
-
-  private final Map<String, String> muleSchemaMappings;
+  private final Map<String, String> schemas;
 
   public DefaultXmlSchemaProvider() {
-    this.muleSchemaMappings = getSchemaMappings(MULE_SCHEMA_MAPPINGS_LOCATION, DefaultXmlSchemaProvider.class::getClassLoader);
+    this.schemas = getSchemaMappings(CUSTOM_SCHEMA_MAPPINGS_LOCATION, DefaultXmlSchemaProvider.class::getClassLoader);
   }
 
+  public Map<String, String> getSchemasMappings() {
+    return schemas;
+  }
+
+  @Override
   public List<XMLInputSource> getSchemas() {
-    return muleSchemaMappings.entrySet().stream()
+    return schemas.entrySet().stream()
         .map(entry -> {
           String systemId = entry.getKey();
           String resourceLocation = entry.getValue();

@@ -30,13 +30,14 @@ import java.util.function.Supplier;
  */
 public class SchemaMappingsUtils {
 
-  private static final String CORE_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
-  private static final String CORE_CURRENT_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core.xsd";
-  private static final String CORE_DEPRECATED_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd";
-  private static final String COMPATIBILITY_XSD =
-      "http://www.mulesoft.org/schema/mule/compatibility/current/mule-compatibility.xsd";
-
   private static final Logger LOGGER = getLogger(SchemaMappingsUtils.class);
+
+  public static final String CUSTOM_SCHEMA_MAPPINGS_LOCATION = "META-INF/mule.schemas";
+  public static final String CORE_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
+  public static final String CORE_CURRENT_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core.xsd";
+  public static final String CORE_DEPRECATED_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd";
+  public static final String COMPATIBILITY_XSD =
+      "http://www.mulesoft.org/schema/mule/compatibility/current/mule-compatibility.xsd";
 
   private SchemaMappingsUtils() {}
 

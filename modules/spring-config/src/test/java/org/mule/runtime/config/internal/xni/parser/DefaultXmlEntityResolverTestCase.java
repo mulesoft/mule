@@ -36,6 +36,15 @@ public class DefaultXmlEntityResolverTestCase {
   }
 
   @Test
+  public void emptyXSDDescriptionShouldReturnNullSource() throws Exception {
+    XSDDescription resourceIdentifier = new XSDDescription();
+    resourceIdentifier.setPublicId(null);
+    resourceIdentifier.setExpandedSystemId(null);
+    XMLInputSource source = entityResolver.resolveEntity(resourceIdentifier);
+    assertThat(source, is(nullValue()));
+  }
+
+  @Test
   public void invalidSchemaMappingsShouldReturnNullSource() throws Exception {
     XSDDescription resourceIdentifier = new XSDDescription();
     resourceIdentifier.setPublicId(null);

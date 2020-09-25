@@ -8,6 +8,10 @@ package org.mule.runtime.config.internal.util;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.CORE_XSD;
+import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.CORE_CURRENT_XSD;
+import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.CORE_DEPRECATED_XSD;
+import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.COMPATIBILITY_XSD;
 import static org.mule.runtime.config.AllureConstants.DslParsing.DSL_PARSING;
 import static org.mule.runtime.config.AllureConstants.DslParsing.XmlGrammarPool.XML_GRAMMAR_POOL;
 import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.resolveSystemId;
@@ -22,11 +26,6 @@ import org.junit.Test;
 public class SchemaMappingsUtilsTestCase {
 
   private static final String LEGACY_SPRING_XSD = "http://www.springframework.org/schema/beans/spring-beans-current.xsd";
-  private static final String CORE_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
-  private static final String CORE_CURRENT_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core.xsd";
-  private static final String CORE_DEPRECATED_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd";
-  private static final String COMPATIBILITY_XSD =
-      "http://www.mulesoft.org/schema/mule/compatibility/current/mule-compatibility.xsd";
   private static final String UNKNOW_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-unknow.xsd";
 
   @Test
