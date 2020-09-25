@@ -6,9 +6,11 @@
  */
 package org.mule.module.scripting;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.mule.api.MuleEvent;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,6 +22,11 @@ public class JRubyTestCase extends FunctionalTestCase
     {
         return "jruby-config.xml";
     }
+
+    @Rule
+    public SystemProperty jRubyGlobalVar =
+            new SystemProperty("org.jruby.embed.localvariable.behavior", "global");
+
 
     private final String key = "message";
     private final String value = "myMessage";
