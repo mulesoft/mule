@@ -57,20 +57,11 @@ public class NodeWrapper implements Serializable, Node {
   private Object writeReplace() throws ObjectStreamException {
 
     try {
+        // In tests this if is not needed but because the Transformer Implementation changes in the actual standalone
+        // this prevents the CDATA from being transformed into a text node
       if (Node.CDATA_SECTION_NODE == node.getNodeType()) {
         this.nodeAsString = NODE_WRAPPER_ENVELOPE_OPEN_TAG + CDATA_OPEN + node.getNodeValue() + CDATA_CLOSE + NODE_WRAPPER_ENVELOPE_CLOSE_TAG;
         return this;
-      }
-
-      // Remove unwanted whitespaces
-      node.normalize();
-      XPath xpath = XPathFactory.newInstance().newXPath();
-      XPathExpression expr = xpath.compile("//text()[normalize-space()='']");
-      NodeList nodeList = (NodeList) expr.evaluate(node, XPathConstants.NODESET);
-
-      for (int i = 0; i < nodeList.getLength(); ++i) {
-        Node nd = nodeList.item(i);
-        nd.getParentNode().removeChild(nd);
       }
 
       // Create and setup transformer
@@ -79,20 +70,13 @@ public class NodeWrapper implements Serializable, Node {
 
       transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-
       // Turn the node into a string
       StringWriter writer = new StringWriter();
       transformer.transform(new DOMSource(getSerializingNode(node)), new StreamResult(writer));
 
-      String serializedNode = writer.toString();
-
-      this.nodeAsString = NODE_WRAPPER_ENVELOPE_OPEN_TAG + serializedNode + NODE_WRAPPER_ENVELOPE_CLOSE_TAG;
+      this.nodeAsString = NODE_WRAPPER_ENVELOPE_OPEN_TAG + writer.toString() + NODE_WRAPPER_ENVELOPE_CLOSE_TAG;
       return this;
     } catch (TransformerException e) {
-      throw new WriteAbortedException("Error while serializing Dom object", e);
-    } catch (XPathExpressionException e) {
       throw new WriteAbortedException("Error while serializing Dom object", e);
     }
   }
