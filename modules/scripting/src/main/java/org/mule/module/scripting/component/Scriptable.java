@@ -107,6 +107,7 @@ public class Scriptable implements Initialisable, MuleContextAware
     public Scriptable(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+        System.setProperty("org.jruby.embed.localvariable.behavior", "global");
     }
 
     @Override
