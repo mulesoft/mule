@@ -13,6 +13,6 @@
         <some:some-emitting-source message="hello dog!" times="1"/>
         <logger level="ERROR" message="#[payload]"/>
         <some:input-stream-consuming-operation />
-        <processor ref="event-recorder"/>
+        <flow-ref name="event-recorder"/>
     </flow>
 </mule>
