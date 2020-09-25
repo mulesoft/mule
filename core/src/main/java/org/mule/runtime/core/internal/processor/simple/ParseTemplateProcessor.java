@@ -45,7 +45,6 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   private static final Boolean KEEP_TYPE_TARGET_AND_TARGET_VAR =
       new Boolean(getProperty(SYSTEM_PROPERTY_PREFIX + "parse.template.keep.target.var.type", "true"));
 
-  @Inject
   private ExtendedExpressionManager expressionManager;
 
   private String content;
@@ -178,5 +177,10 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
   public void setOutputEncoding(String encoding) {
     this.outputEncoding = forName(encoding);
+  }
+
+  @Inject
+  public void setExpressionManager(ExtendedExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
   }
 }

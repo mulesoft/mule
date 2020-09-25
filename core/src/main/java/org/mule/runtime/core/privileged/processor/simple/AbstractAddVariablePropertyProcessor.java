@@ -38,7 +38,6 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAddVariablePropertyProcessor.class);
 
-  @Inject
   private ExtendedExpressionManager expressionManager;
 
   private AttributeEvaluator identifierEvaluator;
@@ -147,5 +146,10 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   @Inject
   public void setStreamingManager(StreamingManager streamingManager) {
     this.streamingManager = streamingManager;
+  }
+
+  @Inject
+  public void setExpressionManager(ExtendedExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
   }
 }

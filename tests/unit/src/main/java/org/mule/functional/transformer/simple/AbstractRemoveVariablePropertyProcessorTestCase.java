@@ -48,7 +48,7 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     message = of("");
     event = createTestEvent(message);
 
-    removeVariableProcessor.setMuleContext(muleContext);
+    removeVariableProcessor.setExpressionManager(muleContext.getExpressionManager());
   }
 
   protected CoreEvent createTestEvent(final Message message) throws MuleException {

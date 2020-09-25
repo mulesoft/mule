@@ -29,7 +29,6 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
   private static final TypedValue NULL_TYPED_VALUE = new TypedValue<>(null, OBJECT);
 
-  @Inject
   private ExtendedExpressionManager expressionManager;
 
   private DataType dataType;
@@ -96,5 +95,10 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
   public void initialise() throws InitialisationException {
     valueEvaluator = new AttributeEvaluator(value, dataType);
     valueEvaluator.initialize(expressionManager);
+  }
+
+  @Inject
+  public void setExpressionManager(ExtendedExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
   }
 }

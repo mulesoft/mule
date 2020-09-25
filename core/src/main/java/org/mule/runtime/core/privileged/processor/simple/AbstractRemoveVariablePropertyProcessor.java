@@ -29,7 +29,6 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractRemoveVariablePropertyProcessor.class);
 
-  @Inject
   private ExtendedExpressionManager expressionManager;
 
   private AttributeEvaluator identifierEvaluator;
@@ -82,4 +81,9 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
   }
 
   protected abstract String getScopeName();
+
+  @Inject
+  public void setExpressionManager(ExtendedExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
+  }
 }
