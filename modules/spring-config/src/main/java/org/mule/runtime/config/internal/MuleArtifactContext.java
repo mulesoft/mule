@@ -31,7 +31,6 @@ import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqu
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getExtensionModelsComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getRuntimeComponentBuildingDefinitionProvider;
-import static org.mule.runtime.config.internal.xni.parser.DefaultXmlGrammarPoolManager.getGrammarPool;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
@@ -43,6 +42,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor.processXmlConfiguration;
+import static org.mule.runtime.dsl.internal.xni.parser.DefaultXmlGrammarPoolManager.getGrammarPool;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.slf4j.LoggerFactory.getLogger;

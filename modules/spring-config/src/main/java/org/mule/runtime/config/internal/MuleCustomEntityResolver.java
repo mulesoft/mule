@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.internal;
 
-import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.CUSTOM_SCHEMA_MAPPINGS_LOCATION;
-import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.getSchemaMappings;
+import static org.mule.runtime.dsl.internal.util.SchemaMappingsUtils.CUSTOM_SCHEMA_MAPPINGS_LOCATION;
+import static org.mule.runtime.dsl.internal.util.SchemaMappingsUtils.getSchemaMappings;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.InputStream;

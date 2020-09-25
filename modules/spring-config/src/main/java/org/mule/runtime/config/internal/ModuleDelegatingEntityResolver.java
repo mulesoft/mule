@@ -12,7 +12,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.config.internal.util.SchemaMappingsUtils.resolveSystemId;
+import static org.mule.runtime.dsl.internal.util.SchemaMappingsUtils.resolveSystemId;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
