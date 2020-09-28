@@ -19,18 +19,11 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectStreamException;
@@ -38,6 +31,21 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.WriteAbortedException;
 
+import static javax.xml.transform.OutputKeys.ENCODING;
+import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;
+
+/**
+ * Ref: MULE-18799
+ * Issues while serializing DOM java objects caused an OOM error
+ * (See https://bz.apache.org/bugzilla/show_bug.cgi?id=18925 and
+ * https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4152790)
+ * To prevent this writeReplace and readResolve methods are implemented through this wrapper which allows us to control
+ * how these objects are serialized (https://docs.oracle.com/javase/7/docs/api/java/io/Serializable.html).
+ * The transient modifier prevents the actual DOM object from being serialized and instead we use "nodeAsString" to save
+ * and retrieve the information we need. We use writeReplace and javax.xml.transform.Transformer to create the string
+ * representation when serializing, and readResolve and javax.xml.parsers.DocumentBuilderFactory to recreate the node
+ * object when deserializing.
+ */
 public class NodeWrapper implements Serializable, Node {
   public static final String NODE_WRAPPER_ENVELOPE_OPEN_TAG = "<node-wrapper-envelope>";
   public static final String NODE_WRAPPER_ENVELOPE_CLOSE_TAG = "</node-wrapper-envelope>";
@@ -59,16 +67,16 @@ public class NodeWrapper implements Serializable, Node {
     try {
         // In tests this if is not needed but because the Transformer Implementation changes in the actual standalone
         // this prevents the CDATA from being transformed into a text node
-      if (Node.CDATA_SECTION_NODE == node.getNodeType()) {
+      if (CDATA_SECTION_NODE == node.getNodeType()) {
         this.nodeAsString = NODE_WRAPPER_ENVELOPE_OPEN_TAG + CDATA_OPEN + node.getNodeValue() + CDATA_CLOSE + NODE_WRAPPER_ENVELOPE_CLOSE_TAG;
         return this;
       }
 
       // Create and setup transformer
       Transformer transformer = TransformerFactory.newInstance().newTransformer();
-      transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+      transformer.setOutputProperty(ENCODING, "UTF-8");
 
-      transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+      transformer.setOutputProperty(OMIT_XML_DECLARATION, "yes");
 
       // Turn the node into a string
       StringWriter writer = new StringWriter();
@@ -100,7 +108,7 @@ public class NodeWrapper implements Serializable, Node {
 
   private Node getSerializingNode(Node node) {
     switch (node.getNodeType()) {
-      case Node.ATTRIBUTE_NODE:
+      case ATTRIBUTE_NODE:
         return ((Attr) this.node).getOwnerElement();
       default:
         return this.node;
@@ -109,7 +117,7 @@ public class NodeWrapper implements Serializable, Node {
 
   private Node getDeserializingNode(Node node) {
     switch (nodeType) {
-      case Node.ATTRIBUTE_NODE:
+      case ATTRIBUTE_NODE:
         return node.getFirstChild().getAttributes().getNamedItem(this.nodeName);
       default:
         return node.getFirstChild();

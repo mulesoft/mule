@@ -125,6 +125,17 @@ public class NodeWrapperSerializationTestCase extends AbstractObjectSerializerCo
     assertThat(deserialized.getTextContent(), Matchers.containsString("this is a comment"));
   }
 
+  @Test
+  public void testWrappedProcessingInstructionNode() throws Exception {
+    Node node = getNodeByXpath("<?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?><root><elem><sub>Bye</sub><!-- this is a comment --></elem></root>", "//processing-instruction('xml-stylesheet')");
+    byte[] bytes = serializer.serialize(new NodeWrapper(node));
+
+    NodeWrapper deserialized = serializer.deserialize(bytes);
+
+    assertThat(deserialized.getNodeName(), Matchers.containsString("xml-stylesheet"));
+    assertThat(deserialized.getTextContent(), Matchers.containsString("type=\"text/xsl\" href=\"style.xsl\""));
+  }
+
   private Node findNodeByXPathExpression(NodeWrapper nodeWrapper, String expression) throws XPathExpressionException {
     nodeWrapper.normalize();
 
