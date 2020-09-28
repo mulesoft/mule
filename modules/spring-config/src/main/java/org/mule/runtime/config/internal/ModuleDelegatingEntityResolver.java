@@ -13,6 +13,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.internal.util.SchemaMappingsUtils.resolveSystemId;
+import static org.mule.runtime.dsl.internal.util.SchemaMappingsUtils.TEST_XSD;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -47,7 +48,6 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModuleDelegatingEntityResolver.class);
 
-  private static final String TEST_XSD = "http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd";
   private static final int MAX_RESOLUTION_FAILURE_THRESHOLD = 10;
 
   private static Boolean internalIsRunningTests;
@@ -124,23 +124,17 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
   }
 
   private String overrideSystemIdForCompatibility(String publicId, String systemId) throws SAXException, IOException {
-    if (systemId.equals(TEST_XSD)) {
-      boolean runningTests = isRunningTests();
-      if (!runningTests && generateFromExtensions(publicId, systemId) == null) {
-        String message = "Internal runtime mule-test.xsd can't be used in real applications";
-        throw new MuleRuntimeException(createStaticMessage(message));
-      }
-    } else {
-      systemId = resolveSystemId(publicId, systemId, isRunningTests(), (pId, sId) -> {
+    return resolveSystemId(publicId, systemId, isRunningTests(), (pId, sId) -> {
+      if (sId.equals(TEST_XSD)) {
+        return generateFromExtensions(pId, sId) == null;
+      } else {
         try {
           return canResolveEntity(pId, sId);
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
-      });
-    }
-
-    return systemId;
+      }
+    });
   }
 
   protected boolean canResolveEntity(String publicId, String systemId) throws SAXException, IOException {
