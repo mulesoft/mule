@@ -192,7 +192,8 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                e -> e.getValue().get().getResolverName()));
         String outputResolver = metadataScope.getOutputResolver().get().getResolverName();
         String attributesResolver = metadataScope.getAttributesResolver().get().getResolverName();
-        String keysResolver = metadataScope.getKeysResolver().get().getResolverName();
+        TypeKeysResolver typeKeysResolver = metadataScope.getKeysResolver().get();
+        String keysResolver = typeKeysResolver.getResolverName();
 
         // TODO MULE-15638 - Once Metadata API 2.0 is implemented we will know better if the resolver requires or not a connection
         // of config.
@@ -203,8 +204,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                                                keysResolver,
                                                                                requiresConnection,
                                                                                requiresConnection,
-                                                                               metadataScope
-                                                                                   .getKeysResolver() instanceof PartialTypeKeysResolver));
+                                                                               typeKeysResolver instanceof PartialTypeKeysResolver));
       }
     }
 

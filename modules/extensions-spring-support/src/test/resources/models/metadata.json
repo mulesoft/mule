@@ -18134,7 +18134,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
-              "partialTypeKeyResolver": false,
+              "partialTypeKeyResolver": true,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestMultiLevelKeyResolver",
@@ -36737,7 +36737,7 @@
             "requiresConnection": false,
             "requiresConfiguration": false
           },
-          "partialTypeKeyResolver": false
+          "partialTypeKeyResolver": true
         },
         "metadataKeyId": {
           "type": {
