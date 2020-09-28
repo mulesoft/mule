@@ -13,7 +13,6 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -34,7 +33,6 @@ public class FallibleReconnectableSource extends Source<Integer, Void> {
   @Inject
   SchedulerService schedulerService;
 
-  private Latch latch = new Latch();
   private Scheduler scheduler;
   private ScheduledFuture<?> scheduleWithFixedDelay;
 
@@ -51,17 +49,15 @@ public class FallibleReconnectableSource extends Source<Integer, Void> {
     this.scheduler = schedulerService.ioScheduler();
 
     if (fail) {
-      await();
+      delay(300);
       sourceCallback.onConnectionException(new ConnectionException(new RuntimeException(), connection));
       fail = false;
-      latch = new Latch();
       throw new RuntimeException("Fail starting source");
     }
 
     scheduleWithFixedDelay = this.scheduler.scheduleWithFixedDelay(() -> {
       if (fail) {
         sourceCallback.onConnectionException(new ConnectionException(new RuntimeException(), connection));
-        latch.release();
       } else {
         sourceCallback.handle(Result.<Integer, Void>builder().output(countStartedSources.get()).build());
       }
@@ -79,9 +75,9 @@ public class FallibleReconnectableSource extends Source<Integer, Void> {
     }
   }
 
-  private void await() {
+  private void delay(long millis) {
     try {
-      latch.await(5000, MILLISECONDS);
+      Thread.sleep(millis);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
