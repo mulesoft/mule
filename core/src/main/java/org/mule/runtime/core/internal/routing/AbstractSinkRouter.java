@@ -50,14 +50,14 @@ abstract class AbstractSinkRouter {
    *         subscription of the router occurs after all routes and with the general context.
    */
   List<Flux<CoreEvent>> collectPublishers() {
-    List<Flux<CoreEvent>> routes = new ArrayList<>();
+    List<Flux<CoreEvent>> routePublishers = new ArrayList<>();
     for (ExecutableRoute nextRoute : this.routes) {
-      routes.add(nextRoute.getPublisher());
+      routePublishers.add(nextRoute.getPublisher());
     }
 
-    routes.add(subscribeFluxOnPublisherSubscription(phantomRoute.getPublisher(), router));
+    routePublishers.add(subscribeFluxOnPublisherSubscription(phantomRoute.getPublisher(), router));
 
-    return routes;
+    return routePublishers;
   }
 
   /**
