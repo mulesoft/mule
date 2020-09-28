@@ -66,12 +66,16 @@ public class ValueProviderCacheId {
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder
-        .append(sourceElementName)
-        .append(" : ")
+        .append('(')
         .append(value)
-        .append(", attributes: {");
-    this.attributes.forEach((k, v) -> stringBuilder.append(lineSeparator()).append(k).append(" : ").append(value));
-    stringBuilder.append("}");
+        .append(", ")
+        .append(sourceElementName);
+    if (attributes != null && !attributes.isEmpty()) {
+      stringBuilder.append(", attributes: {");
+      this.attributes.forEach((k, v) -> stringBuilder.append(lineSeparator()).append(k).append(" : ").append(value));
+      stringBuilder.append("}");
+    }
+    stringBuilder.append(')');
     return stringBuilder.toString();
   }
 

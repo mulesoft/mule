@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -400,12 +399,23 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   }
 
   @Test
-  public void differentValueProviderNameGetsDifferentHash() throws Exception {
+  public void differentValueProviderNameGetsSameHash() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConnection()).thenReturn(true);
     when(valueProviderModel.requiresConfiguration()).thenReturn(true);
     Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     when(valueProviderModel.getProviderName()).thenReturn("newValueProviderName");
+    Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    checkIdsAreEqual(opId1, opId2);
+  }
+
+  @Test
+  public void differentValueProviderIdGetsDifferentHash() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    when(valueProviderModel.requiresConnection()).thenReturn(true);
+    when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    when(valueProviderModel.getProviderId()).thenReturn("newValueProviderId");
     Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     checkIdsAreDifferent(opId1, opId2);
   }

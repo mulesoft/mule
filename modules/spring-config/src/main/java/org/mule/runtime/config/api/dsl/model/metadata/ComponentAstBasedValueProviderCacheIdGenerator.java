@@ -18,7 +18,6 @@ import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHel
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -34,12 +33,12 @@ import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 
+import com.google.common.base.Objects;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import com.google.common.base.Objects;
 
 /**
  * A {@link ComponentAst} based implementation of a {@link ValueProviderCacheIdGenerator}
@@ -49,6 +48,8 @@ import com.google.common.base.Objects;
 public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProviderCacheIdGenerator<ComponentAst> {
 
   private final ComponentLocator<ComponentAst> locator;
+
+  private static final String VALUE_PROVIDER = "ValueProvider";
 
   public ComponentAstBasedValueProviderCacheIdGenerator(ComponentLocator<ComponentAst> locator) {
     this.locator = locator;
@@ -106,8 +107,9 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
                                                                  Map<String, ParameterModelInformation> parameterModelsInformation) {
     List<ValueProviderCacheId> parts = new LinkedList<>();
 
-    parts.add(resolveValueProviderId(valueProviderModel));
     parts.addAll(resolveActingParameterIds(containerComponent, valueProviderModel, parameterModelsInformation));
+    parts.add(resolveValueProviderId(valueProviderModel));
+    parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
     String id = getSourceElementName(containerComponent);
     return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(id).containing(parts)));
@@ -118,9 +120,10 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
                                                                   Map<String, ParameterModelInformation> parameterModelsInformation) {
     List<ValueProviderCacheId> parts = new LinkedList<>();
 
-    parts.add(resolveValueProviderId(valueProviderModel));
     parts.addAll(resolveActingParameterIds(containerComponent, valueProviderModel, parameterModelsInformation));
     parts.addAll(resolveIdForInjectedElements(containerComponent, valueProviderModel));
+    parts.add(resolveValueProviderId(valueProviderModel));
+    parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
     String id = getSourceElementName(containerComponent);
     return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(id).containing(parts)));
@@ -186,7 +189,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
   }
 
   private ValueProviderCacheId resolveValueProviderId(ValueProviderModel valueProviderModel) {
-    return aValueProviderCacheId(fromElementWithName("valueProvider: " + valueProviderModel.getProviderName())
+    return aValueProviderCacheId(fromElementWithName("providerId: " + valueProviderModel.getProviderId())
         .withHashValueFrom(valueProviderModel.getProviderName()));
   }
 

@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.config.dsl.model;
 
-import static java.lang.System.lineSeparator;
-import static java.util.stream.IntStream.range;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
-import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
@@ -47,23 +43,6 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
     ValueProviderCacheIdGenerator cacheIdGenerator = new ComponentAstBasedValueProviderCacheIdGenerator(locator);
     ComponentAst component = getComponentAst(app, location);
     return cacheIdGenerator.getIdForResolvedValues(component, parameterName);
-  }
-
-  private String collectLog(ValueProviderCacheId valueProviderCacheId, int level) {
-    StringBuilder logId = new StringBuilder();
-    if (level == 0) {
-      logId.append(lineSeparator());
-    }
-    logId.append(valueProviderCacheId.toString());
-    if (!valueProviderCacheId.getParts().isEmpty()) {
-      int newLevel = level + 1;
-      valueProviderCacheId.getParts().forEach(p -> {
-        logId.append(lineSeparator());
-        range(0, newLevel).forEach(i -> logId.append(" "));
-        logId.append("+-").append(collectLog(p, newLevel));
-      });
-    }
-    return logId.toString();
   }
 
   private Optional<ParameterizedElementDeclaration> getParameterElementDeclaration(ArtifactDeclaration artifactDeclaration,
