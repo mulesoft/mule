@@ -65,8 +65,7 @@ public class NodeWrapper implements Serializable, Node {
   private Object writeReplace() throws ObjectStreamException {
 
     try {
-        // In tests this if is not needed but because the Transformer Implementation changes in the actual standalone
-        // this prevents the CDATA from being transformed into a text node
+      // This ensures the CDATA is not transformed into a text node
       if (CDATA_SECTION_NODE == node.getNodeType()) {
         this.nodeAsString = NODE_WRAPPER_ENVELOPE_OPEN_TAG + CDATA_OPEN + node.getNodeValue() + CDATA_CLOSE + NODE_WRAPPER_ENVELOPE_CLOSE_TAG;
         return this;
