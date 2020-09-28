@@ -36,8 +36,8 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OtherReconnectionSourceType" substitutionGroup="mule:abstract-message-source" name="other-reconnection-source"></xs:element>
-  <xs:complexType name="OtherReconnectionSourceType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FallibleReconnectableSourceType" substitutionGroup="mule:abstract-message-source" name="fallible-reconnectable-source"></xs:element>
+  <xs:complexType name="FallibleReconnectableSourceType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
         <xs:sequence minOccurs="0" maxOccurs="1">
@@ -159,16 +159,16 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SwitchConnectionType" substitutionGroup="mule:abstract-operator" name="switch-connection"></xs:element>
-  <xs:complexType name="SwitchConnectionType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MakeSourceFailType" substitutionGroup="mule:abstract-operator" name="make-source-fail"></xs:element>
+  <xs:complexType name="MakeSourceFailType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SwitchOtherFailType" substitutionGroup="mule:abstract-operator" name="switch-other-fail"></xs:element>
-  <xs:complexType name="SwitchOtherFailType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SwitchConnectionType" substitutionGroup="mule:abstract-operator" name="switch-connection"></xs:element>
+  <xs:complexType name="SwitchConnectionType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>

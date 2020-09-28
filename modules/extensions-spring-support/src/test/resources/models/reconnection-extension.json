@@ -2675,7 +2675,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "OTHER_RECONNECTION_SOURCE",
+            "type": "FALLIBLE_RECONNECTABLE_SOURCE",
             "namespace": "RECONNECTION",
             "parent": {
               "type": "SOURCE",
@@ -3120,7 +3120,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "OtherReconnectionSource",
+          "name": "FallibleReconnectableSource",
           "description": "",
           "modelProperties": {},
           "kind": "source"
@@ -3645,6 +3645,179 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
+        "type": "MAKE_SOURCE_FAIL",
+        "namespace": "RECONNECTION",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "RECONNECTION",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "description": {
+                    "value": "Determines that an error thrown by this operation should be mapped to another"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": false
+                  }
+                },
+                "item": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "errorMapping"
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "source"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeMatcher",
+                          "enum": {
+                            "type": "[Ljava.lang.String;",
+                            "values": [
+                              "ANY",
+                              "REDELIVERY_EXHAUSTED",
+                              "TRANSFORMATION",
+                              "EXPRESSION",
+                              "SECURITY",
+                              "CLIENT_SECURITY",
+                              "SERVER_SECURITY",
+                              "ROUTING",
+                              "CONNECTIVITY",
+                              "RETRY_EXHAUSTED",
+                              "TIMEOUT"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "target",
+                        "required": "true"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeDefinition"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Error Mapping"
+              },
+              "allowedStereotypeModels": [],
+              "name": "errorMappings",
+              "description": "Set of error mappings",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "error-mapping",
+                    "prefix": "mule"
+                  }
+                },
+                "sinceMuleVersion": {
+                  "version": "4.4.0"
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 12
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "Error Mappings",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "makeSourceFail",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
         "type": "SWITCH_CONNECTION",
         "namespace": "RECONNECTION",
         "parent": {
@@ -3786,179 +3959,6 @@
         }
       ],
       "name": "switchConnection",
-      "description": "",
-      "modelProperties": {},
-      "kind": "operation"
-    },
-    {
-      "blocking": true,
-      "executionType": "CPU_LITE",
-      "output": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": false,
-      "supportsStreaming": false,
-      "notifications": [],
-      "nestedComponents": [],
-      "errors": [],
-      "stereotype": {
-        "type": "SWITCH_OTHER_FAIL",
-        "namespace": "RECONNECTION",
-        "parent": {
-          "type": "PROCESSOR",
-          "namespace": "RECONNECTION",
-          "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          }
-        }
-      },
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "Array",
-                "annotations": {
-                  "description": {
-                    "value": "Determines that an error thrown by this operation should be mapped to another"
-                  },
-                  "typeDsl": {
-                    "allowInlineDefinition": true,
-                    "allowTopLevelDefinition": false
-                  }
-                },
-                "item": {
-                  "type": "Object",
-                  "annotations": {
-                    "typeId": "errorMapping"
-                  },
-                  "fields": [
-                    {
-                      "key": {
-                        "name": "source"
-                      },
-                      "model": {
-                        "format": {
-                          "id": "text",
-                          "label": "Text",
-                          "validMimeTypes": [
-                            "text/plain"
-                          ]
-                        },
-                        "type": "String",
-                        "annotations": {
-                          "typeId": "errorTypeMatcher",
-                          "enum": {
-                            "type": "[Ljava.lang.String;",
-                            "values": [
-                              "ANY",
-                              "REDELIVERY_EXHAUSTED",
-                              "TRANSFORMATION",
-                              "EXPRESSION",
-                              "SECURITY",
-                              "CLIENT_SECURITY",
-                              "SERVER_SECURITY",
-                              "ROUTING",
-                              "CONNECTIVITY",
-                              "RETRY_EXHAUSTED",
-                              "TIMEOUT"
-                            ]
-                          }
-                        }
-                      }
-                    },
-                    {
-                      "key": {
-                        "name": "target",
-                        "required": "true"
-                      },
-                      "model": {
-                        "format": {
-                          "id": "text",
-                          "label": "Text",
-                          "validMimeTypes": [
-                            "text/plain"
-                          ]
-                        },
-                        "type": "String",
-                        "annotations": {
-                          "typeId": "errorTypeDefinition"
-                        }
-                      }
-                    }
-                  ]
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1,
-                "tabName": "Error Mapping"
-              },
-              "allowedStereotypeModels": [],
-              "name": "errorMappings",
-              "description": "Set of error mappings",
-              "modelProperties": {
-                "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                  "value": {
-                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "error-mapping",
-                    "prefix": "mule"
-                  }
-                },
-                "sinceMuleVersion": {
-                  "version": "4.4.0"
-                },
-                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                  "sequence": 12
-                }
-              }
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "layoutModel": {
-            "password": false,
-            "text": false,
-            "query": false,
-            "order": 1
-          },
-          "showInDsl": false,
-          "name": "Error Mappings",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "switchOtherFail",
       "description": "",
       "modelProperties": {},
       "kind": "operation"
