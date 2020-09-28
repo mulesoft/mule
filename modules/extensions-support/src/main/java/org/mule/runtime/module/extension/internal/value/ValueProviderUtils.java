@@ -12,8 +12,6 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -24,7 +22,6 @@ import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,7 +51,7 @@ public class ValueProviderUtils {
     return cloneAndEnrichValue(value, partOrderMapping, 1);
   }
 
-  static ValueBuilder cloneAndEnrichValue(Value value, List<ParameterModel> parameters) {
+  public static ValueBuilder cloneAndEnrichValue(Value value, List<ParameterModel> parameters) {
     return cloneAndEnrichValue(value, orderParts(parameters), 1);
   }
 

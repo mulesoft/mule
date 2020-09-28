@@ -63,7 +63,7 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     return ifContainsParameter(containerComponent, parameterName)
         .flatMap(ParameterModel::getValueProviderModel)
         .flatMap(valueProviderModel -> resolveParametersInformation(containerComponent)
-                .flatMap(infoMap -> resolveId(containerComponent, valueProviderModel, infoMap)));
+            .flatMap(infoMap -> resolveId(containerComponent, valueProviderModel, infoMap)));
   }
 
   private Optional<ParameterModel> ifContainsParameter(DslElementModel<?> containerComponent, String parameterName) {
