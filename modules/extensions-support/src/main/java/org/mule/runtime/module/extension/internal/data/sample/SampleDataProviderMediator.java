@@ -89,7 +89,7 @@ public class SampleDataProviderMediator {
    *                               the value of parameters from the same parameter container.
    * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
    *                               {@link SampleDataProvider}
-   * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
+   * @param configurationSupplier  supplier of configuration instance related to the container and used, if necessary, by the
    *                               {@link SampleDataProvider}
    * @return a {@link Message} carrying the sample data
    * @throws SampleDataException if an error occurs resolving the sample data
@@ -98,19 +98,20 @@ public class SampleDataProviderMediator {
                                Supplier<Object> connectionSupplier,
                                Supplier<Object> configurationSupplier)
       throws SampleDataException {
-    return getSampleData(parameterValueResolver, connectionSupplier, configurationSupplier, null);
+    return getSampleData(parameterValueResolver, connectionSupplier, configurationSupplier, () -> null);
   }
 
   /**
    * Resolves the sample data
    *
-   * @param parameterValueResolver  parameter resolver required if the associated {@link SampleDataProvider} requires
-   *                                the value of parameters from the same parameter container.
-   * @param connectionSupplier      supplier of connection instances related to the container and used, if necessary,
-   *                                by the {@link SampleDataProvider}
-   * @param configurationSupplier   supplier of connection instances related to the container and used, if necessary,
-   *                                by the  {@link SampleDataProvider}
-   * @param connectionProvider      the connection provider in charge of providing the connection given by the connection supplier.
+   * @param parameterValueResolver       parameter resolver required if the associated {@link SampleDataProvider} requires
+   *                                     the value of parameters from the same parameter container.
+   * @param connectionSupplier           supplier of connection instances related to the container and used, if necessary,
+   *                                     by the {@link SampleDataProvider}
+   * @param configurationSupplier        supplier of configuration instance related to the container and used, if necessary,
+   *                                     by the  {@link SampleDataProvider}
+   * @param connectionProviderSupplier   the connection provider in charge of providing the connection given by the
+   *                                     connection supplier.
    *
    * @return a {@link Message} carrying the sample data
    * @throws SampleDataException if an error occurs resolving the sample data
@@ -118,7 +119,7 @@ public class SampleDataProviderMediator {
   public Message getSampleData(ParameterValueResolver parameterValueResolver,
                                Supplier<Object> connectionSupplier,
                                Supplier<Object> configurationSupplier,
-                               ConnectionProvider connectionProvider)
+                               Supplier<ConnectionProvider> connectionProviderSupplier)
       throws SampleDataException {
     if (sampleDataProperty == null) {
       throw new SampleDataException(
@@ -135,7 +136,7 @@ public class SampleDataProviderMediator {
                                                                            muleContext);
 
       SampleDataProvider provider = factory.createSampleDataProvider();
-      Result result = withRefreshToken(connectionProvider, () -> provider.getSample());
+      Result result = withRefreshToken(connectionProviderSupplier, () -> provider.getSample());
 
       return returnDelegate.asReturnValue(result, createExecutionContext(configurationSupplier)).getMessage();
     } catch (SampleDataException e) {
