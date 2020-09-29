@@ -225,17 +225,13 @@ public class Controller {
   }
 
   public void installLicense(String path) {
-    if (0 != osSpecificController.runSync(null, "--installLicense", path,
-                                          // avoid JVM optimizations for short-lived jvms running license management commands
-                                          "-M-XX:+TieredCompilation", "-M-XX:TieredStopAtLevel=1")) {
+    if (0 != osSpecificController.runSync(null, "--installLicense", path, "-M-client")) {
       throw new MuleControllerException("Could not install license " + path);
     }
   }
 
   public void uninstallLicense() {
-    if (0 != osSpecificController.runSync(null, "--unInstallLicense",
-                                          // avoid JVM optimizations for short-lived jvms running license management commands
-                                          "-M-XX:+TieredCompilation", "-M-XX:TieredStopAtLevel=1")) {
+    if (0 != osSpecificController.runSync(null, "--unInstallLicense", "-M-client")) {
       throw new MuleControllerException("Could not uninstall license");
     }
   }
