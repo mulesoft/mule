@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
@@ -136,14 +137,30 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void failingRoute() throws Exception {
+    final DefaultMuleException expected = new DefaultMuleException("Oops");
+
     MessageProcessorChain mp = newChain(empty(), event -> {
-      throw new DefaultMuleException("Oops");
+      throw expected;
     });
-    choiceRouter.addRoute("wat", mp);
+    choiceRouter.addRoute(payloadZapExpression(), mp);
     initialise();
 
-    thrown.expectCause(instanceOf(ExpressionRuntimeException.class));
-    thrown.expectCause(hasMessage(containsString("evaluating expression: \"wat\"")));
+    thrown.expect(sameInstance(expected));
+    process(choiceRouter, zapEvent());
+  }
+
+  @Test
+  public void failingRouteDefault() throws Exception {
+    final DefaultMuleException expected = new DefaultMuleException("Oops");
+
+    MessageProcessorChain mp = newChain(empty(), event -> {
+      throw expected;
+    });
+    choiceRouter.addRoute(payloadZapExpression(), mp);
+    choiceRouter.setDefaultRoute(newChain(empty(), new TestMessageProcessor("bar")));
+    initialise();
+
+    thrown.expect(sameInstance(expected));
     process(choiceRouter, zapEvent());
   }
 
