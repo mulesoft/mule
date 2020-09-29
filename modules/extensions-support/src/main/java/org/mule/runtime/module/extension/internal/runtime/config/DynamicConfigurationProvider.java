@@ -323,7 +323,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
    * Used to preserve exception throwing behaviour in {@link #getConfiguration} as the method {@link #createConfiguration} can no longer throw
    * checked exception as it is used inside {@link Map#computeIfAbsent}.
    */
-  private class WrappingRuntimeException extends RuntimeException {
+  private static class WrappingRuntimeException extends RuntimeException {
 
     private final Exception wrappedException;
 
