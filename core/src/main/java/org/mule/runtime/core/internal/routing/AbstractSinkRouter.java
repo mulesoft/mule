@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.routing.RoutingException;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
@@ -30,13 +29,20 @@ abstract class AbstractSinkRouter {
 
   private final Flux<CoreEvent> router;
   private final List<ExecutableRoute> routes;
+  private final ExecutableRoute phantomRoute;
 
   protected AbstractSinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
     this.routes = routes.stream().map(ProcessorRoute::toExecutableRoute).collect(toList());
+
+    // This phantomRoute exists so that the subscription/completion mechanism does not interfere with an actual route.
+    this.phantomRoute = new ExecutableRoute(new ProcessorRoute(e -> e));
+
     router = from(publisher)
         .doOnNext(checkedConsumer(this::route))
-        .doOnComplete(() -> this.routes.stream()
-            .forEach(executableRoute -> executableRoute.complete()));
+        .doOnComplete(() -> {
+          this.routes.stream().forEach(ExecutableRoute::complete);
+          phantomRoute.complete();
+        });
   }
 
   /**
@@ -44,18 +50,14 @@ abstract class AbstractSinkRouter {
    *         subscription of the router occurs after all routes and with the general context.
    */
   List<Flux<CoreEvent>> collectPublishers() {
-    List<Flux<CoreEvent>> routes = new ArrayList<>();
-    for (Iterator<ExecutableRoute> routesIterator = this.routes.iterator(); routesIterator.hasNext();) {
-      ExecutableRoute nextRoute = routesIterator.next();
-      if (routesIterator.hasNext()) {
-        routes.add(nextRoute.getPublisher());
-      } else {
-        // If it's the last route, this will be trigger for the whole inbound chain of the router to be subscribed.
-        // Since there's always at least one route, the default one, one route will always be decorated.
-        routes.add(subscribeFluxOnPublisherSubscription(nextRoute.getPublisher(), router));
-      }
+    List<Flux<CoreEvent>> routePublishers = new ArrayList<>();
+    for (ExecutableRoute nextRoute : this.routes) {
+      routePublishers.add(nextRoute.getPublisher());
     }
-    return routes;
+
+    routePublishers.add(subscribeFluxOnPublisherSubscription(phantomRoute.getPublisher(), router));
+
+    return routePublishers;
   }
 
   /**
