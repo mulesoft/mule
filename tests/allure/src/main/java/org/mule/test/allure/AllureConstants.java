@@ -94,6 +94,12 @@ public interface AllureConstants {
 
   }
 
+  interface PackagerFeature {
+
+    String PACKAGER = "Packager";
+
+  }
+
   interface DeploymentConfiguration {
 
     String DEPLOYMENT_CONFIGURATION = "Deployment Configuration";
@@ -346,6 +352,20 @@ public interface AllureConstants {
 
   }
 
+  interface SampleData {
+
+    String SAMPLE_DATA = "Sample Data";
+
+    interface SampleDataStory {
+
+      String SAMPLE_DATA_SERVICE = "Sample Data Service";
+
+      String RESOLVE_BY_LOCATION = "Resolve by location";
+
+      String RESOLVE_THROUGH_TOOLING_API = "Resolve through Tooling API";
+    }
+  }
+
   interface IntegrationTestsFeature {
 
     String INTEGRATIONS_TESTS = "Integration Tests";
@@ -563,6 +583,7 @@ public interface AllureConstants {
 
       String ERROR_REPORTING = "Error Reporting";
       String FLOW_STACK = "Flow Stack";
+      String CONTEXT_FACTORY = "Log Context Factory";
 
     }
 

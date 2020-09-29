@@ -185,7 +185,8 @@ public class HeisenbergSource extends Source<String, Object> {
 
     gatheredMoney += payment;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
-    receivedInlineOnSuccess = successInfo != null && successInfo.getAge() != null && successInfo.getKnownAddresses() != null;
+    receivedInlineOnSuccess = successInfo != null && successInfo.getAge() != null && successInfo.getKnownAddresses() != null
+        && successInfo.getDescription() != null;
     executedOnSuccess = true;
 
     notificationEmitter.fireLazy(BATCH_DELIVERED, () -> payment, fromType(Long.class));
@@ -203,7 +204,8 @@ public class HeisenbergSource extends Source<String, Object> {
                                    NotificationEmitter notificationEmitter) {
     gatheredMoney = -1;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
-    receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG);
+    receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG)
+        && infoError.getDescription() != null;
     executedOnError = true;
     notificationEmitter.fireLazy(BATCH_DELIVERY_FAILED, () -> infoError, DataType.fromType(PersonalInfo.class));
     if (propagateError) {

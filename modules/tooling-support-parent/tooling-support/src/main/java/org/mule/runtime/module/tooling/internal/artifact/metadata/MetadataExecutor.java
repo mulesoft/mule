@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.internal.metadata.cache.DefaultMetadataCache;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
@@ -70,10 +71,10 @@ public abstract class MetadataExecutor {
 
   protected MetadataContext createMetadataContext(Optional<ConfigurationInstance> configurationInstance,
                                                   ClassLoader extensionClassLoader) {
-    return new LoggingMetadataResolvingContext(() -> configurationInstance,
-                                               connectionManager,
-                                               new DefaultMetadataCache(),
-                                               new JavaTypeLoader(extensionClassLoader));
+    return new DefaultMetadataContext(() -> configurationInstance,
+                                      connectionManager,
+                                      new DefaultMetadataCache(),
+                                      new JavaTypeLoader(extensionClassLoader));
   }
 
   protected static <T> T withMetadataContext(MetadataContext metadataContext, Callable<T> callable) {

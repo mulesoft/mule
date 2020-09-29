@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
-import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -30,13 +31,18 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
    */
   default List<ExtensionParameter> getParameters() {
     return getAnnotatedFields(Parameter.class,
+                              org.mule.sdk.api.annotation.param.Parameter.class,
                               OAuthParameter.class,
+                              org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter.class,
                               ParameterGroup.class,
+                              org.mule.sdk.api.annotation.param.ParameterGroup.class,
                               Connection.class,
+                              org.mule.sdk.api.annotation.param.Connection.class,
+                              org.mule.sdk.api.annotation.param.Config.class,
                               Config.class)
                                   .stream()
                                   .distinct()
-                                  .collect(toImmutableList());
+                                  .collect(toList());
   }
 
   /**
@@ -46,7 +52,7 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
     return getAnnotatedFields(ParameterGroup.class)
         .stream()
         .distinct()
-        .collect(toImmutableList());
+        .collect(toList());
   }
 
   /**
@@ -56,6 +62,6 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
     return getParameters().stream()
         .filter(field -> field.getAnnotation(annotationClass).isPresent())
         .distinct()
-        .collect(toImmutableList());
+        .collect(toList());
   }
 }

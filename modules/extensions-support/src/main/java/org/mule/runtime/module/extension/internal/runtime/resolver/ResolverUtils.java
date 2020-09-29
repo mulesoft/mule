@@ -17,6 +17,10 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
+import java.util.function.UnaryOperator;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.runtime.api.exception.MuleException;
@@ -29,10 +33,6 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
-
-import java.util.Optional;
-import java.util.function.BooleanSupplier;
-import java.util.function.UnaryOperator;
 
 /**
  * Utility class to share common behaviour between resolvers
@@ -97,12 +97,11 @@ public class ResolverUtils {
   }
 
   /**
-   * Executes the {@code resolver} using the given {@code context},
-   * applying all the required resolution rules that may apply for
+   * Executes the {@code resolver} using the given {@code context}, applying all the required resolution rules that may apply for
    * the given {@code T} type.
    *
    * @param resolver the {@link ValueResolver} to execute
-   * @param context  the {@link ValueResolvingContext} to pass on the {@code resolver}
+   * @param context the {@link ValueResolvingContext} to pass on the {@code resolver}
    * @return the resolved value
    * @throws MuleException
    */
@@ -134,8 +133,32 @@ public class ResolverUtils {
     if (value instanceof CursorProvider) {
       return valueMapper.apply(((CursorProvider) value).openCursor());
 
-    } else if (value instanceof TypedValue) {
+    }
+
+    return resolveTypedValue(value, valueMapper);
+  }
+
+  /**
+   * Obtains the value of a {@link TypedValue} if appropriate.
+   *
+   * @return the given {@code value} from a typedValue.
+   */
+  public static Object resolveTypedValue(Object value, UnaryOperator valueMapper) {
+    if (value instanceof TypedValue) {
       return resolveCursor((TypedValue) value, valueMapper);
+    }
+
+    return valueMapper.apply(value);
+  }
+
+  /**
+   * Applies the valueMapper to the value of a {@link TypedValue} if appropriate
+   *
+   * @return the given {@code value} from a typedValue.
+   */
+  public static Object mapTypeValue(Object value, UnaryOperator valueMapper) {
+    if (value instanceof TypedValue) {
+      return typedValue((TypedValue<?>) value, valueMapper, ((TypedValue<?>) value).getValue());
     }
 
     return valueMapper.apply(value);
@@ -150,10 +173,7 @@ public class ResolverUtils {
 
     if (objectValue instanceof CursorProvider) {
       Cursor cursor = ((CursorProvider) objectValue).openCursor();
-      return new TypedValue<>(valueMapper.apply(cursor), DataType.builder()
-          .type(cursor.getClass())
-          .mediaType(typedValue.getDataType().getMediaType())
-          .build(), typedValue.getByteLength());
+      return typedValue(typedValue, valueMapper, cursor);
     } else {
       final Object mappedValue = valueMapper.apply(objectValue);
 
@@ -163,6 +183,13 @@ public class ResolverUtils {
         return new TypedValue<>(mappedValue, typedValue.getDataType(), typedValue.getByteLength());
       }
     }
+  }
+
+  private static Object typedValue(TypedValue<?> typedValue, UnaryOperator valueMapper, Object value) {
+    return new TypedValue<>(valueMapper.apply(value), DataType.builder()
+        .type(value.getClass())
+        .mediaType(typedValue.getDataType().getMediaType())
+        .build(), typedValue.getByteLength());
   }
 
   private static ValueResolver<?> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,
@@ -176,7 +203,8 @@ public class ResolverUtils {
       if (stackedTypesModelProperty.isPresent()) {
         resolver = stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(expression,
                                                                                                              getType(type));
-        //TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be removed once implemented
+        // TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos
+        // The following "IFs" should be removed once implemented
       } else if (isTypedValue.getAsBoolean()) {
         ExpressionTypedValueValueResolver<Object> valueResolver =
             new ExpressionTypedValueValueResolver<>(expression, getType(type));

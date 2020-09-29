@@ -46,7 +46,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:listen-payments>
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
     </flow>
 
     <flow name="sourceFailed" initialState="stopped">
@@ -63,7 +63,7 @@
         </heisenberg:listen-payments>
 
         <!--invalid expression results in exception-->
-        <set-payload value="#[mel:new java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[null.a!]"/>
     </flow>
 
     <flow name="sourceFailedOnRuntime" initialState="stopped">
@@ -99,7 +99,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:listen-payments>
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
 
         <error-handler>
             <on-error-propagate type="SOURCE_RESPONSE_GENERATE">
@@ -122,7 +122,7 @@
             <heisenberg:error-info knownAddresses="#[null.a!]"/>
         </heisenberg:listen-payments>
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
     </flow>
 
     <flow name="sourceFailsInsideOnError" initialState="stopped">
@@ -155,7 +155,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:listen-payments>
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
 
         <error-handler>
             <on-error-propagate type="SOURCE_RESPONSE_SEND">
@@ -220,6 +220,23 @@
         </heisenberg:listen-payments>
 
         <set-payload value="#[null.a!]"/>
+    </flow>
+
+    <flow name="sameChildInBothCallbacks" initialState="stopped">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
+            <redelivery-policy maxRedeliveryCount="10" useSecureHash="true"/>
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info age="27" knownAddresses="#[[]]">
+                <heisenberg:description>Look! It's a Heisenberg!</heisenberg:description>
+            </heisenberg:success-info>
+            <heisenberg:error-info knownAddresses="#[[]]">
+                <heisenberg:description>#[null.a!]</heisenberg:description>
+            </heisenberg:error-info>
+        </heisenberg:listen-payments>
+
+        <set-payload value="#[100]"/>
     </flow>
 
 </mule>

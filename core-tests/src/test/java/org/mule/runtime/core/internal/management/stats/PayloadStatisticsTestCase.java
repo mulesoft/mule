@@ -22,12 +22,6 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATIST
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STATISTICS;
 
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.management.stats.PayloadStatistics;
-import org.mule.sdk.api.runtime.operation.Result;
-import org.mule.sdk.api.runtime.streaming.PagingProvider;
-import org.mule.tck.junit4.rule.SystemProperty;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,11 +32,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.management.stats.PayloadStatistics;
+import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.streaming.PagingProvider;
+import org.mule.tck.junit4.rule.SystemProperty;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(STREAMING)
 @Story(STATISTICS)
@@ -76,6 +76,34 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     decorator.read();
 
     verifyNoStatistics(statistics);
+  }
+
+  @Test
+  public void verifyEnablingAndDisablingStats() throws IOException {
+    getStatistics().setEnabled(false);
+    consumeInputStream();
+
+    final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
+    verifyNoStatistics(statistics);
+
+    getStatistics().enablePayloadStatistics(true);
+
+    consumeInputStream();
+
+    // verify stats change
+    assertThat(statistics.getInputByteCount(), is(1L));
+    assertThat(statistics.getInputObjectCount(), is(0L));
+    assertThat(statistics.getOutputByteCount(), is(0L));
+    assertThat(statistics.getOutputObjectCount(), is(0L));
+
+    getStatistics().enablePayloadStatistics(false);
+    consumeInputStream();
+
+    // verify stats do not change
+    assertThat(statistics.getInputByteCount(), is(1L));
+    assertThat(statistics.getInputObjectCount(), is(0L));
+    assertThat(statistics.getOutputByteCount(), is(0L));
+    assertThat(statistics.getOutputObjectCount(), is(0L));
   }
 
   @Test
@@ -673,5 +701,11 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
 
     assertThat(statistics.getInputByteCount(), is(0L));
     assertThat(statistics.getInputObjectCount(), is(0L));
+  }
+
+  private void consumeInputStream() throws IOException {
+    InputStream decorated = new ByteArrayInputStream("Hello World".getBytes(UTF_8));
+    InputStream decorator = decoratorFactory.componentDecoratorFactory(component1).decorateInput(decorated, CORR_ID);
+    decorator.read();
   }
 }

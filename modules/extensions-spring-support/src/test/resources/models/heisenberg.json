@@ -1613,6 +1613,34 @@
               "name": "knownAddresses",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "(description)",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": true,
+                "query": false,
+                "order": 28
+              },
+              "allowedStereotypeModels": [],
+              "name": "description",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -1656,7 +1684,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 28
+                "order": 29
               },
               "allowedStereotypeModels": [],
               "name": "fullyBald",
@@ -1706,7 +1734,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 29
+                "order": 30
               },
               "allowedStereotypeModels": [],
               "name": "beardTrimming",
@@ -1752,7 +1780,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 30
+                "order": 31
               },
               "allowedStereotypeModels": [],
               "name": "worksAtDEA",
@@ -1783,7 +1811,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 31
+                "order": 32
               },
               "allowedStereotypeModels": [],
               "name": "lovesMinerals",
@@ -16690,6 +16718,34 @@
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "(description)",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": true,
+                      "query": false,
+                      "order": 21
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "description",
+                    "description": "",
+                    "modelProperties": {}
                   }
                 ],
                 "exclusiveParametersModels": [],
@@ -16732,7 +16788,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 21
+                      "order": 22
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -16759,7 +16815,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 22
+                      "order": 23
                     },
                     "allowedStereotypeModels": [],
                     "name": "methylamine",
@@ -16790,7 +16846,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 23
+                      "order": 24
                     },
                     "allowedStereotypeModels": [],
                     "name": "propagateError",
@@ -16884,7 +16940,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 24
+                      "order": 25
                     },
                     "allowedStereotypeModels": [
                       {
@@ -17284,6 +17340,34 @@
                     },
                     "allowedStereotypeModels": [],
                     "name": "knownAddresses",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "(description)",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": true,
+                      "query": false,
+                      "order": 26
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "description",
                     "description": "",
                     "modelProperties": {}
                   }
@@ -17697,7 +17781,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25,
+                    "order": 27,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -18850,6 +18934,34 @@
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "(description)",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": true,
+                      "query": false,
+                      "order": 21
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "description",
+                    "description": "",
+                    "modelProperties": {}
                   }
                 ],
                 "exclusiveParametersModels": [],
@@ -18892,7 +19004,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 21
+                      "order": 22
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -18919,7 +19031,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 22
+                      "order": 23
                     },
                     "allowedStereotypeModels": [],
                     "name": "methylamine",
@@ -18950,7 +19062,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 23
+                      "order": 24
                     },
                     "allowedStereotypeModels": [],
                     "name": "propagateError",
@@ -19044,7 +19156,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 24
+                      "order": 25
                     },
                     "allowedStereotypeModels": [
                       {
@@ -19444,6 +19556,34 @@
                     },
                     "allowedStereotypeModels": [],
                     "name": "knownAddresses",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "(description)",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": true,
+                      "query": false,
+                      "order": 26
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "description",
                     "description": "",
                     "modelProperties": {}
                   }
@@ -19866,7 +20006,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25,
+                    "order": 27,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -21069,6 +21209,34 @@
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "(description)",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": true,
+                      "query": false,
+                      "order": 22
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "description",
+                    "description": "",
+                    "modelProperties": {}
                   }
                 ],
                 "exclusiveParametersModels": [],
@@ -21111,7 +21279,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 22
+                      "order": 23
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -21138,7 +21306,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 23
+                      "order": 24
                     },
                     "allowedStereotypeModels": [],
                     "name": "methylamine",
@@ -21169,7 +21337,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 24
+                      "order": 25
                     },
                     "allowedStereotypeModels": [],
                     "name": "propagateError",
@@ -21263,7 +21431,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 25
+                      "order": 26
                     },
                     "allowedStereotypeModels": [
                       {
@@ -21663,6 +21831,34 @@
                     },
                     "allowedStereotypeModels": [],
                     "name": "knownAddresses",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "(description)",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": true,
+                      "query": false,
+                      "order": 27
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "description",
                     "description": "",
                     "modelProperties": {}
                   }
@@ -22111,7 +22307,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26,
+                    "order": 28,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -23264,6 +23460,34 @@
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "(description)",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": true,
+                      "query": false,
+                      "order": 21
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "description",
+                    "description": "",
+                    "modelProperties": {}
                   }
                 ],
                 "exclusiveParametersModels": [],
@@ -23306,7 +23530,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 21
+                      "order": 22
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -23333,7 +23557,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 22
+                      "order": 23
                     },
                     "allowedStereotypeModels": [],
                     "name": "methylamine",
@@ -23364,7 +23588,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 23
+                      "order": 24
                     },
                     "allowedStereotypeModels": [],
                     "name": "propagateError",
@@ -23458,7 +23682,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 24
+                      "order": 25
                     },
                     "allowedStereotypeModels": [
                       {
@@ -23858,6 +24082,34 @@
                     },
                     "allowedStereotypeModels": [],
                     "name": "knownAddresses",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "(description)",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": true,
+                      "query": false,
+                      "order": 26
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "description",
                     "description": "",
                     "modelProperties": {}
                   }
@@ -24275,7 +24527,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25,
+                    "order": 27,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -24914,6 +25166,7 @@
             "dateOfDeath",
             "dateOfGraduation",
             "knownAddresses",
+            "description",
             "fullyBald",
             "beardTrimming",
             "worksAtDEA",
@@ -25328,6 +25581,34 @@
               "name": "knownAddresses",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "(description)",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": true,
+                "query": false,
+                "order": 9
+              },
+              "allowedStereotypeModels": [],
+              "name": "description",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -25364,7 +25645,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 9,
+                "order": 10,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -25396,7 +25677,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 10,
+                "order": 11,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -25512,7 +25793,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 11,
+                "order": 12,
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
@@ -33807,6 +34088,34 @@
               "name": "knownAddresses",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "(description)",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": true,
+                "query": false,
+                "order": 8
+              },
+              "allowedStereotypeModels": [],
+              "name": "description",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -33846,7 +34155,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 8,
+                "order": 9,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -33878,7 +34187,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 9,
+                "order": 10,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -33994,7 +34303,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 10,
+                "order": 11,
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
@@ -48373,6 +48682,27 @@
                       }
                     }
                   }
+                },
+                {
+                  "key": {
+                    "name": "description"
+                  },
+                  "model": {
+                    "type": "String"
+                  },
+                  "annotations": {
+                    "default": "(description)",
+                    "expressionSupport": {
+                      "value": "SUPPORTED"
+                    },
+                    "layout": {
+                      "layoutModel": {
+                        "password": false,
+                        "text": true,
+                        "query": false
+                      }
+                    }
+                  }
                 }
               ]
             }
@@ -49416,6 +49746,27 @@
                       "query": false,
                       "order": 7,
                       "tabName": "General"
+                    }
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "description"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "default": "(description)",
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  },
+                  "layout": {
+                    "layoutModel": {
+                      "password": false,
+                      "text": true,
+                      "query": false
                     }
                   }
                 }
@@ -52250,6 +52601,27 @@
                 "query": false,
                 "order": 7,
                 "tabName": "General"
+              }
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "description"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "default": "(description)",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            },
+            "layout": {
+              "layoutModel": {
+                "password": false,
+                "text": true,
+                "query": false
               }
             }
           }

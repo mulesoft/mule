@@ -2,7 +2,6 @@ package org.mule.runtime.module.tooling;
 
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.NUMBER;
-import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
@@ -33,7 +32,11 @@ public class TestExtensionDeclarationUtils {
   public static final String NOT_ACTING_PARAMETER_NAME = "notActingParameter";
   public static final String METADATA_KEY_PARAMETER_NAME = "metadataKey";
   public static final String CONTINENT_PARAMETER_NAME = "continent";
+  public static final String COUNTRY_PARAMETER_NAME = "country";
+  public static final String CITY_PARAMETER_NAME = "city";
+  public static final String LOCATION_KEY_GROUP_NAME = "LocationKey";
   public static final String ACTING_PARAMETER_GROUP_NAME = "Acting";
+  public static final String TYPE_PARAMETER_NAME = "type";
 
   public static final String SOURCE_ELEMENT_NAME = "simple";
   public static final String INDEPENDENT_SOURCE_PARAMETER_NAME = "independentParam";
@@ -46,10 +49,13 @@ public class TestExtensionDeclarationUtils {
   public static final String PARAMETER_VALUE_PROVIDER_OP_ELEMENT_NAME = "parameterValueProviderWithConfig";
   public static final String COMPLEX_ACTING_PARAMETER_OP_ELEMENT_NAME = "complexActingParameterOP";
   public static final String ACTING_PARAMETER_GROUP_OP_ELEMENT_NAME = "actingParameterGroupOP";
+  public static final String ACTING_PARAMETER_GROUP_WITH_ALIAS_OP_ELEMENT_NAME = "actingParameterGroupWithAliasOP";
   public static final String NESTED_PARAMETERS_OP_ELEMENT_NAME = "nestedVPsOperation";
   public static final String MULTIPLE_NESTED_PARAMETERS_OP_ELEMENT_NAME = "multipleNestedVPsOperation";
 
+
   public static final String CONNECTION_CLIENT_NAME_PARAMETER = "clientName";
+  public static final String CONFIG_DEPENDANT_PARAMETER_NAME = "configDependantParam";
 
   public static final String SOURCE_WITH_MULTI_LEVEL_VALUE = "SourceWithMultiLevelValue";
 
@@ -245,6 +251,24 @@ public class TestExtensionDeclarationUtils {
 
   }
 
+  public static OperationElementDeclaration actingParameterGroupOPWithAliasDeclaration(String configName,
+                                                                              String stringValue,
+                                                                              int intValue,
+                                                                              List<String> listValue) {
+    final ParameterListValue.Builder listBuilder = ParameterListValue.builder();
+    listValue.forEach(listBuilder::withValue);
+    return TEST_EXTENSION_DECLARER
+            .newOperation(ACTING_PARAMETER_GROUP_WITH_ALIAS_OP_ELEMENT_NAME)
+            .withConfig(configName)
+            .withParameterGroup(newParameterGroup(ACTING_PARAMETER_GROUP_NAME)
+                                        .withParameter("stringParam", stringValue)
+                                        .withParameter("integerParam", ParameterSimpleValue.of(String.valueOf(intValue), NUMBER))
+                                        .withParameter("listParams", listBuilder.build())
+                                        .getDeclaration())
+            .getDeclaration();
+
+  }
+
   public static OperationElementDeclaration nestedVPsOPDeclaration(String configName) {
     return TEST_EXTENSION_DECLARER
             .newOperation(NESTED_PARAMETERS_OP_ELEMENT_NAME)
@@ -288,7 +312,7 @@ public class TestExtensionDeclarationUtils {
                                           .withParameter(ACTING_PARAMETER_NAME, actingParameter)
                                           .getDeclaration());
     }
-    setLocationParameterGroup(continentParameter, countryParameter, cityParameter, sourceElementDeclarer, "LocationKey");
+    setLocationParameterGroup(continentParameter, countryParameter, cityParameter, sourceElementDeclarer, LOCATION_KEY_GROUP_NAME);
     return sourceElementDeclarer.getDeclaration();
   }
 
@@ -296,15 +320,19 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, null, elementDeclarer, "LocationKey");
+    setLocationParameterGroup(continent, country, null, elementDeclarer, LOCATION_KEY_GROUP_NAME);
     return elementDeclarer.getDeclaration();
   }
 
   public static OperationElementDeclaration multiLevelOPDeclaration(String configName, String continent, String country) {
+    return multiLevelOPDeclaration(configName, continent, country, null);
+  }
+
+  public static OperationElementDeclaration multiLevelOPDeclaration(String configName, String continent, String country, String city) {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, null, elementDeclarer, "LocationKey");
+    setLocationParameterGroup(continent, country, city, elementDeclarer, LOCATION_KEY_GROUP_NAME);
     return elementDeclarer.getDeclaration();
   }
 
@@ -339,7 +367,7 @@ public class TestExtensionDeclarationUtils {
     OperationElementDeclarer elementDeclarer = TEST_EXTENSION_DECLARER
             .newOperation(MULTI_LEVEL_PARTIAL_TYPE_KEYS_METADATA_KEY_OP_ELEMENT_NAME)
             .withConfig(configName);
-    setLocationParameterGroup(continent, country, city, elementDeclarer, "LocationKey");
+    setLocationParameterGroup(continent, country, city, elementDeclarer, LOCATION_KEY_GROUP_NAME);
     return elementDeclarer.getDeclaration();
   }
 
@@ -355,7 +383,7 @@ public class TestExtensionDeclarationUtils {
     return elementDeclarer.getDeclaration();
   }
 
-  public static ComponentElementDeclaration<?> requiresConfigurationOutputTypeKeyResolverOP(String type) {
+  public static OperationElementDeclaration requiresConfigurationOutputTypeKeyResolverOP(String type) {
     return TEST_EXTENSION_DECLARER
             .newOperation(REQUIRES_CONFIGURATION_OUTPUT_TYPE_RESOLVER_OP_ELEMENT_NAME)
             .withParameterGroup(newParameterGroup().withParameter("type", ParameterSimpleValue.of(type)).getDeclaration())

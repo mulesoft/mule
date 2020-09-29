@@ -10,10 +10,23 @@ import static java.lang.System.arraycopy;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInput;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
+
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import javax.inject.Inject;
 
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -85,20 +98,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArg
 import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.streaming.UnclosableCursorStream;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import javax.inject.Inject;
 
 
 /**
@@ -413,17 +412,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     protected Object decorate(Object value, String eventCorrelationId) {
-      return resolveCursor((TypedValue) value, v -> {
-        if (v instanceof InputStream) {
-          return componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
-        } else if (v instanceof Collection) {
-          return componentDecoratorFactory.decorateInput((Collection) v, eventCorrelationId);
-        } else if (v instanceof Iterator) {
-          return componentDecoratorFactory.decorateInput((Iterator) v, eventCorrelationId);
-        } else {
-          return v;
-        }
-      });
+      return resolveCursor((TypedValue) value,
+                           v -> decorateInput(v, eventCorrelationId, componentDecoratorFactory));
     }
   }
 
@@ -441,13 +431,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     protected Object decorate(Object value, String eventCorrelationId) {
       Object v = ((TypedValue) value).getValue();
 
-      if (v instanceof InputStream) {
-        v = componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
-      } else if (v instanceof Collection) {
-        v = componentDecoratorFactory.decorateInput((Collection) v, eventCorrelationId);
-      } else if (v instanceof Iterator) {
-        v = componentDecoratorFactory.decorateInput((Iterator) v, eventCorrelationId);
-      }
+      v = decorateInput(v, eventCorrelationId, componentDecoratorFactory);
 
       if (v != ((TypedValue) value).getValue()) {
         return new TypedValue<>(v, DataType.builder()
@@ -472,16 +456,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     protected Object decorate(Object value, String eventCorrelationId) {
-      final Object resolved = resolveCursor(value);
-      if (resolved instanceof InputStream) {
-        return componentDecoratorFactory.decorateInput((InputStream) resolved, eventCorrelationId);
-      } else if (resolved instanceof Collection) {
-        return componentDecoratorFactory.decorateInput((Collection) resolved, eventCorrelationId);
-      } else if (resolved instanceof Iterator) {
-        return componentDecoratorFactory.decorateInput((Iterator) resolved, eventCorrelationId);
-      } else {
-        return resolved;
-      }
+      return decorateInput(resolveCursor(value), eventCorrelationId, componentDecoratorFactory);
     }
   }
 

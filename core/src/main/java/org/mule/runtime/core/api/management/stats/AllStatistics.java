@@ -73,7 +73,8 @@ public class AllStatistics {
     }
   }
 
-  private void enablePayloadStatistics(boolean b) {
+  public void enablePayloadStatistics(boolean b) {
+    payloadStatisticsDisabled = !b;
     for (PayloadStatistics statistics : payloadStatistics.values()) {
       statistics.setEnabled(b);
     }

@@ -64,6 +64,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SERIALIZER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
@@ -227,6 +228,12 @@ class MuleExtensionModelDeclarer {
     scheduler.onDefaultParameterGroup()
         .withRequiredParameter("schedulingStrategy")
         .ofType(baseSchedulingStrategy)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    scheduler.onDefaultParameterGroup()
+        .withOptionalParameter("disallowConcurrentExecution")
+        .ofType(typeLoader.load(Boolean.class))
+        .defaultingTo(false)
         .withExpressionSupport(NOT_SUPPORTED);
 
     MetadataType fixedFrequencyScheduler = typeLoader.load(FixedFrequencyScheduler.class);
@@ -939,6 +946,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("defaultObjectSerializer-ref")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
+        .withAllowedStereotypes(singletonList(SERIALIZER))
         .describedAs("An optional reference to an ObjectSerializer to be used as the application's default")
         .withDsl(ParameterDslConfiguration.builder()
             .allowsReferences(true)

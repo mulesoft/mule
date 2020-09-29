@@ -48,6 +48,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.PollingSourceD
 import org.mule.runtime.module.extension.internal.loader.enricher.RedeliveryPolicyDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RequiredForMetadataDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.SampleDataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
@@ -71,6 +72,7 @@ import org.mule.runtime.module.extension.internal.loader.validation.ParameterPlu
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.PojosModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.SampleDataModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.SourceCallbacksModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidator;
 
@@ -102,6 +104,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new ParameterPluralNameModelValidator(),
                                                                                          new OAuthConnectionProviderModelValidator(),
                                                                                          new ValueProviderModelValidator(),
+                                                                                         new SampleDataModelValidator(),
                                                                                          new PrivilegedApiValidator(),
                                                                                          new ComponentLocationModelValidator(),
                                                                                          new InjectedFieldsModelValidator()));
@@ -131,6 +134,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new SubTypesDeclarationEnricher(),
                                                                                                new ExtensionDescriptionsEnricher(),
                                                                                                new ValueProvidersParameterDeclarationEnricher(),
+                                                                                               new SampleDataDeclarationEnricher(),
                                                                                                new ParameterAllowedStereotypesDeclarionEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
                                                                                                new ClusterSupportEnricher(),

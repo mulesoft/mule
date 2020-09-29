@@ -47,6 +47,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -145,7 +146,7 @@ public class BeanDefinitionFactory {
    * @param componentLocator            where the locations of any {@link Component}'s locations must be registered
    */
   public void resolveComponent(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                               ComponentAst parentComponentModel,
+                               List<ComponentAst> componentModelHierarchy,
                                ComponentAst componentModel,
                                BeanDefinitionRegistry registry,
                                SpringConfigurationComponentLocator componentLocator) {
@@ -153,7 +154,7 @@ public class BeanDefinitionFactory {
       return;
     }
 
-    resolveComponentBeanDefinition(springComponentModels, parentComponentModel, componentModel)
+    resolveComponentBeanDefinition(springComponentModels, componentModelHierarchy, componentModel)
         .ifPresent(springComponentModel -> {
           springComponentModels.put(componentModel, springComponentModel);
 
@@ -289,12 +290,12 @@ public class BeanDefinitionFactory {
 
 
   private Optional<SpringComponentModel> resolveComponentBeanDefinition(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                                                        ComponentAst parentComponentModel,
+                                                                        List<ComponentAst> componentModelHierarchy,
                                                                         ComponentAst componentModel) {
     Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
         componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
     if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(componentModel.getIdentifier())) {
-      final CreateBeanDefinitionRequest request = new CreateBeanDefinitionRequest(parentComponentModel, componentModel,
+      final CreateBeanDefinitionRequest request = new CreateBeanDefinitionRequest(componentModelHierarchy, componentModel,
                                                                                   buildingDefinitionOptional.orElse(null));
       request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
       this.componentModelProcessor.processRequest(springComponentModels, request);

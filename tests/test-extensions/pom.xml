@@ -40,6 +40,7 @@
         <module>rick-and-morty-extension</module>
         <module>weave-function-extension</module>
         <module>values-extension</module>
+        <module>sample-data-extension</module>
         <module>substitution-group-extension</module>
         <module>classloading-extension</module>
         <module>resource-extension</module>

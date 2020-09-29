@@ -14,7 +14,6 @@
 
     <modules>
         <module>tooling-support</module>
-        <module>functional-tests</module>
         <module>test-extension</module>
     </modules>
 

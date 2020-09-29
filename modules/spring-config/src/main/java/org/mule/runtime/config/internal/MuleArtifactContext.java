@@ -606,7 +606,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           }
 
           beanDefinitionFactory.resolveComponent(springComponentModels,
-                                                 cm.getSecond().isEmpty() ? null : cm.getSecond().get(cm.getSecond().size() - 1),
+                                                 cm.getSecond(),
                                                  cm.getFirst(), beanFactory, componentLocator);
 
           if (rootComponents.contains(cm.getFirst())) {

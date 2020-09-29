@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.management.stats;
 
 import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.streaming.PagingProvider;
 
@@ -68,6 +69,18 @@ public interface CursorComponentDecoratorFactory {
   InputStream decorateInput(InputStream decorated, String correlationId);
 
   /**
+   * If statistics are enabled, decorates the provided {@link CursorStream}.
+   * <p>
+   * Ref: {@link PayloadStatistics#getInputByteCount()}.
+   *
+   * @param decorated the {@link CursorStream} to decorate.
+   * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
+   *        measured volume to a specific execution.
+   * @return the decorated {@link CursorStream}.
+   */
+  CursorStream decorateInput(CursorStream decorated, String correlationId);
+
+  /**
    * If statistics are enabled, decorates the provided {@link PagingProvider} for counting the received objects.
    * <p>
    * When the result of an operation is obtained through a {@link PagingProvider}, the statistics must account for the load of the
@@ -108,6 +121,18 @@ public interface CursorComponentDecoratorFactory {
    * @return the decorated {@link InputStream}.
    */
   InputStream decorateOutput(InputStream decorated, String correlationId);
+
+  /**
+   * If statistics are enabled, decorates the provided {@link CursorStream} for counting the streamed bytes.
+   * <p>
+   * Ref: {@link PayloadStatistics#getOutputByteCount()}.
+   *
+   * @param decorated the {@link CursorStream} to decorate.
+   * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
+   *        measured volume to a specific execution.
+   * @return the decorated {@link CursorStream}.
+   */
+  CursorStream decorateOutput(CursorStream decorated, String correlationId);
 
   /**
    * If statistics are enabled, decorates the provided {@link Collection} for counting its objects and, if applicable, its

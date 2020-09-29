@@ -189,6 +189,15 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
   }
 
   @Test
+  public void typedValueOnContentOnNullSafeWithEmptyValues() throws Exception {
+    CoreEvent event = flowRunner("typedValueOnContentOnNullSafeWithEmptyValues").run();
+    VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
+    assertTypedValue(value.getDescription(), "", WILDCARD, null);
+    assertTypedValue(value.getBrandName(), "", WILDCARD, null);
+    assertTypedValue(value.getWeight(), 5, WILDCARD, null);
+  }
+
+  @Test
   public void typedValueForObject() throws Exception {
     CoreEvent event = flowRunner("typedValueForObject").keepStreamsOpen().run();
     TypedValue jsonObject = (TypedValue) event.getMessage().getPayload().getValue();

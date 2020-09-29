@@ -12,8 +12,8 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
-import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.deleteLastPartFromLocation;
-import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.isConnection;
+import static org.mule.runtime.core.internal.util.LocationUtils.deleteLastPartFromLocation;
+import static org.mule.runtime.core.internal.util.LocationUtils.isConnection;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 

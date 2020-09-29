@@ -10,28 +10,33 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.WildcardAttributeEvaluator;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMessageProcessor {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractRemoveVariablePropertyProcessor.class);
+
+  private ExtendedExpressionManager expressionManager;
 
   private AttributeEvaluator identifierEvaluator;
   private WildcardAttributeEvaluator wildcardAttributeEvaluator;
 
   @Override
   public void initialise() throws InitialisationException {
-    this.identifierEvaluator.initialize(muleContext.getExpressionManager());
+    this.identifierEvaluator.initialize(expressionManager);
   }
 
   @Override
@@ -76,4 +81,9 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
   }
 
   protected abstract String getScopeName();
+
+  @Inject
+  public void setExpressionManager(ExtendedExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
+  }
 }

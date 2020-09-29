@@ -8,6 +8,7 @@ package org.mule.test.oauth;
 
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
@@ -16,8 +17,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Configuration(name = "auth-code")
-@ConnectionProviders({TestOAuthConnectionProvider.class, ScopelessOAuthConnectionProvider.class})
+@ConnectionProviders({TestOAuthConnectionProvider.class, ScopelessOAuthConnectionProvider.class,
+    TestOAuthRefreshValidationConnectionProvider.class})
 @Operations({TestOAuthOperations.class, CallbackOperations.class})
+@Sources({TestOAuthRefreshPollingSource.class, TestOAuthRefreshSource.class})
 public class AuthCodeConfig {
 
   private List<AuthCodeRequest> capturedAuthCodeRequests = new LinkedList<>();

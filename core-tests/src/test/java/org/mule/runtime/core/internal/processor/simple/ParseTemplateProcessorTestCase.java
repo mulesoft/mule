@@ -27,26 +27,21 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.util.TestFileUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.HashMap;
 
 @SmallTest
 public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
@@ -59,9 +54,8 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
   private ParseTemplateProcessor parseTemplateProcessor;
   private CoreEvent event;
-  private InternalMessage mockMuleMessage = mock(InternalMessage.class);
-  private MuleContext mockMuleContext = mock(MuleContext.class);
-  private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
+  private final InternalMessage mockMuleMessage = mock(InternalMessage.class);
+  private final ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -71,8 +65,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     event = getEventBuilder().message(mockMuleMessage).build();
 
     parseTemplateProcessor = new ParseTemplateProcessor();
-    parseTemplateProcessor.setMuleContext(mockMuleContext);
-    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+    parseTemplateProcessor.setExpressionManager(mockExpressionManager);
   }
 
   @Test
