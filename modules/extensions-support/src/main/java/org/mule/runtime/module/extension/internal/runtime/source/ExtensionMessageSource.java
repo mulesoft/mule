@@ -74,6 +74,7 @@ import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ReactiveReconnectionCallback;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
@@ -195,14 +196,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(boolean restarting, RestartContext restartContext) throws MuleException {
+  private void startSource(boolean restarting, RestartContext restartContext, ReactiveReconnectionCallback reconnectionCallback)
+      throws MuleException {
     try {
+      RetryCallback retryCallback = createRetryCallback(restarting, restartContext, reconnectionCallback);
       // When restarting, async must be forced
       if (restarting && !retryPolicyTemplate.isAsync()) {
-        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(new StartSourceCallback(restarting, restartContext),
-                                                                   retryScheduler);
+        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(retryCallback, retryScheduler);
       } else {
-        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), retryScheduler);
+        retryPolicyTemplate.execute(retryCallback, retryScheduler);
       }
     } catch (Throwable e) {
       if (e instanceof MuleException) {
@@ -214,7 +216,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void startSource() throws MuleException {
-    startSource(false, null);
+    startSource(false, null, null);
+  }
+
+  private RetryCallback createRetryCallback(boolean restarting, RestartContext restartContext,
+                                            ReactiveReconnectionCallback reconnectionCallback) {
+    RetryCallback retryCallback = new StartSourceCallback(restarting, restartContext);
+    if (reconnectionCallback != null) {
+      retryCallback = new WithCompletionCallback(retryCallback, reconnectionCallback);
+    }
+    return retryCallback;
   }
 
   private RetryPolicyTemplate createRetryPolicyTemplate(RetryPolicyTemplate customTemplate) {
@@ -304,8 +315,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .orElseGet(() -> create(sink -> {
           try {
             exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
-            restart();
-            sink.success();
+            restart(new ReactiveReconnectionCallback(sink));
           } catch (Exception e) {
             sink.error(e);
           }
@@ -332,12 +342,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     shutdown();
   }
 
-  private void restart() throws MuleException {
+  private void restart(ReactiveReconnectionCallback reconnectionCallback) throws MuleException {
     synchronized (started) {
       if (started.get()) {
         RestartContext restartContext = stopSource(true);
         disposeSource();
-        startSource(true, restartContext);
+        startSource(true, restartContext, reconnectionCallback);
       } else {
         LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", getLocation().getRootContainerName(),
                            getLocation().getRootContainerName()));
@@ -537,7 +547,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
           sourceAdapter.finishRestart(restartContext);
         }
         sourceAdapter.start();
-        reconnecting.set(false);
       } catch (Exception e) {
         try {
           stopSource();
@@ -566,6 +575,39 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     @Override
     public Object getWorkOwner() {
       return ExtensionMessageSource.this;
+    }
+  }
+
+  private class WithCompletionCallback implements RetryCallback {
+
+    private final ReactiveReconnectionCallback reconnectionCallback;
+    private final RetryCallback delegate;
+
+    WithCompletionCallback(RetryCallback delegate, ReactiveReconnectionCallback reconnectionCallback) {
+      this.delegate = delegate;
+      this.reconnectionCallback = reconnectionCallback;
+    }
+
+    @Override
+    public void doWork(RetryContext context) throws Exception {
+      try {
+        delegate.doWork(context);
+        this.reconnectionCallback.success();
+      } catch (Exception ex) {
+        this.reconnectionCallback
+            .failed(ex instanceof ConnectionException ? (ConnectionException) ex : new ConnectionException(ex));
+        throw ex;
+      }
+    }
+
+    @Override
+    public String getWorkDescription() {
+      return delegate.getWorkDescription();
+    }
+
+    @Override
+    public Object getWorkOwner() {
+      return delegate.getWorkOwner();
     }
   }
 
