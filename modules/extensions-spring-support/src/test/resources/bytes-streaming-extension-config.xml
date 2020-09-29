@@ -68,7 +68,7 @@
                 <repeatable-in-memory-stream initialBufferSize="10" bufferSizeIncrement="5" maxBufferSize="50" bufferUnit="KB" />
             </marvel:to-stream>
             <flow-ref name="readStream" />
-            <object-to-string-transformer />
+            <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
             <error-handler>
                 <on-error-continue type="STREAM_MAXIMUM_SIZE_EXCEEDED">
                     <set-payload value="Too big!" />
@@ -98,7 +98,7 @@
         <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}"
                              listenerId="bytesCaster"/>
         <flow-ref name="assertPayloadIsStreamProvider" />
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
         <flow-ref name="castSpell" />
     </flow>
 
@@ -124,7 +124,7 @@
                              listenerId="bytesCasterInTx"/>
         <try transactionalAction="BEGIN_OR_JOIN">
             <flow-ref name="assertPayloadIsStreamProvider" />
-            <object-to-string-transformer />
+            <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
             <flow-ref name="castSpell" />
         </try>
     </flow>
@@ -135,7 +135,7 @@
             <non-repeatable-stream />
         </marvel:bytes-caster>
         <flow-ref name="assertPayloadIsNotStreamProvider" />
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
         <flow-ref name="castSpell" />
     </flow>
 

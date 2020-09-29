@@ -337,7 +337,6 @@ public class BeanDefinitionFactory {
     EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
     ObjectBeanDefinitionCreator objectBeanDefinitionCreator = new ObjectBeanDefinitionCreator();
     PropertiesMapBeanDefinitionCreator propertiesMapBeanDefinitionCreator = new PropertiesMapBeanDefinitionCreator();
-    ReferenceBeanDefinitionCreator referenceBeanDefinitionCreator = new ReferenceBeanDefinitionCreator();
     SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
@@ -346,8 +345,7 @@ public class BeanDefinitionFactory {
 
     eagerObjectCreator.setNext(objectBeanDefinitionCreator);
     objectBeanDefinitionCreator.setNext(propertiesMapBeanDefinitionCreator);
-    propertiesMapBeanDefinitionCreator.setNext(referenceBeanDefinitionCreator);
-    referenceBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
+    propertiesMapBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
     simpleTypeBeanDefinitionCreator.setNext(collectionBeanDefinitionCreator);
     collectionBeanDefinitionCreator.setNext(mapEntryBeanDefinitionCreator);
     mapEntryBeanDefinitionCreator.setNext(mapBeanDefinitionCreator);

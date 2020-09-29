@@ -111,7 +111,6 @@ import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
-import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.el.mvel.configuration.AliasEntry;
 import org.mule.runtime.core.internal.el.mvel.configuration.ImportEntry;
@@ -147,17 +146,12 @@ import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.internal.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
-import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
-import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
-import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable;
-import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
@@ -194,8 +188,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String ROUTE = "route";
   private static final String ROUTES = "routes";
   private static final String PROCESSOR = "processor";
-  private static final String TRANSFORMER = "transformer";
-  private static final String CLASS_ATTRIBUTE = "class";
   private static final String SUB_FLOW = "sub-flow";
   private static final String FLOW = "flow";
   private static final String FLOW_REF = "flow-ref";
@@ -303,8 +295,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withConstructorParameterDefinition(fromSimpleParameter("value").build())
         .build());
 
-    componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(TRANSFORMER).withTypeDefinition(fromType(Transformer.class)).build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(PROCESSOR_CHAIN)
         .withTypeDefinition(fromType(AnnotatedProcessor.class)).withObjectFactoryType(MessageProcessorChainObjectFactory.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
@@ -708,27 +698,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private List<ComponentBuildingDefinition> getTransformersBuildingDefinitions() {
     List<ComponentBuildingDefinition> transformerComponentBuildingDefinitions = new ArrayList<>();
 
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(ByteArrayToObject.class)
-        .withIdentifier("byte-array-to-object-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(ObjectToByteArray.class)
-        .withIdentifier("object-to-byte-array-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(ObjectToString.class)
-        .withIdentifier("object-to-string-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(ByteArrayToSerializable.class)
-        .withIdentifier("byte-array-to-serializable-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(SerializableToByteArray.class)
-        .withIdentifier("serializable-to-byte-array-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(ObjectToString.class)
-        .withIdentifier("byte-array-to-string-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(ObjectToByteArray.class)
-        .withIdentifier("string-to-byte-array-transformer")
-        .build());
     transformerComponentBuildingDefinitions.add(baseDefinition
         .withIdentifier("parse-template")
         .withTypeDefinition(fromType(ParseTemplateProcessor.class))
