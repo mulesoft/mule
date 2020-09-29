@@ -24,9 +24,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_EE_SERVICE_NAME;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_SERVICE_NAME;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -38,6 +35,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 
 public class Controller {
 
@@ -225,11 +225,19 @@ public class Controller {
   }
 
   public void installLicense(String path) {
-    osSpecificController.runSync(null, "--installLicense", path);
+    if (0 != osSpecificController.runSync(null, "--installLicense", path,
+                                          // avoid JVM optimizations for short-lived jvms running license management commands
+                                          "-M-XX:+TieredCompilation", "-M-XX:TieredStopAtLevel=1")) {
+      throw new MuleControllerException("Could not install license " + path);
+    }
   }
 
   public void uninstallLicense() {
-    osSpecificController.runSync(null, "-unInstallLicense");
+    if (0 != osSpecificController.runSync(null, "--unInstallLicense",
+                                          // avoid JVM optimizations for short-lived jvms running license management commands
+                                          "-M-XX:+TieredCompilation", "-M-XX:TieredStopAtLevel=1")) {
+      throw new MuleControllerException("Could not uninstall license");
+    }
   }
 
   protected boolean isDeployed(String appName) {
