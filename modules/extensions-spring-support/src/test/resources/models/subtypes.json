@@ -1372,7 +1372,8 @@
                 "resolverName": "OUTPUT_PAYLOAD",
                 "requiresConnection": false,
                 "requiresConfiguration": false
-              }
+              },
+              "partialTypeKeyResolver": false
             }
           },
           "kind": "operation"
@@ -1888,7 +1889,8 @@
                 "resolverName": "OUTPUT_PAYLOAD",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             }
           },
           "kind": "operation"
@@ -2596,7 +2598,8 @@
             "resolverName": "OUTPUT_PAYLOAD",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"
@@ -2898,7 +2901,8 @@
             "resolverName": "OUTPUT_PAYLOAD",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"
@@ -3300,7 +3304,8 @@
             "resolverName": "OUTPUT_PAYLOAD",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"
@@ -3602,7 +3607,8 @@
             "resolverName": "OUTPUT_PAYLOAD",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"
@@ -4111,7 +4117,8 @@
             "resolverName": "OUTPUT_PAYLOAD",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"

@@ -31,7 +31,6 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
@@ -62,6 +61,8 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,8 +76,6 @@ import org.junit.Rule;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoRule;
-
-import com.google.common.collect.ImmutableList;
 
 public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
 
@@ -411,6 +410,14 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   protected void mockTypeResolversInformationModelProperty(EnrichableModel model, String category, String outputResolverName,
                                                            String attributesResolverName,
                                                            Map<String, String> parameterResolversNames, String keysResolverName) {
+    mockTypeResolversInformationModelProperty(model, category, outputResolverName, attributesResolverName,
+                                              parameterResolversNames, keysResolverName, false);
+  }
+
+  protected void mockTypeResolversInformationModelProperty(EnrichableModel model, String category, String outputResolverName,
+                                                           String attributesResolverName,
+                                                           Map<String, String> parameterResolversNames, String keysResolverName,
+                                                           boolean partialTypeKeyResolver) {
     when(model.getModelProperty(TypeResolversInformationModelProperty.class))
         .thenReturn(of(new TypeResolversInformationModelProperty(category,
                                                                  parameterResolversNames,
@@ -418,9 +425,9 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
                                                                  attributesResolverName,
                                                                  keysResolverName,
                                                                  false,
-                                                                 false)));
+                                                                 false,
+                                                                 partialTypeKeyResolver)));
   }
-
 
 
   @TypeDsl(allowTopLevelDefinition = true)

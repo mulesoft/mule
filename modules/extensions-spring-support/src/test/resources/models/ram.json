@@ -1307,6 +1307,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "headers": {
                   "resolverName": "InvokeInputHeaders",

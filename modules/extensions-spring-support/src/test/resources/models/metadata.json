@@ -936,6 +936,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "INPUT",
@@ -1636,6 +1637,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestResolverWithCache",
@@ -2338,6 +2340,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestInputAndOutputResolverWithKeyResolver",
@@ -3003,6 +3006,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam",
@@ -3697,6 +3701,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestInputResolverWithKeyResolver",
@@ -4362,6 +4367,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam",
@@ -4880,6 +4886,7 @@
           "modelProperties": {
             "typeResolversInformation": {
               "category": "MetadataExtensionResolver",
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestInputResolverWithoutKeyResolver",
@@ -5577,6 +5584,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestResolverWithCache",
@@ -6108,6 +6116,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestInputAndOutputResolverWithKeyResolver",
@@ -6763,6 +6772,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "INPUT",
@@ -7488,6 +7498,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestMetadataResolverMetadataResolvingFailure",
@@ -8190,6 +8201,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestMetadataResolverRuntimeExceptionFailure",
@@ -10368,7 +10380,8 @@
                 "resolverName": "TestOutputResolverWithKeyResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -11063,7 +11076,8 @@
                 "resolverName": "TestOutputResolverWithKeyResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -11712,7 +11726,8 @@
                 "resolverName": "TestResolverWithCache",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -12452,6 +12467,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "otherPerson": {
                   "resolverName": "TestInputAndOutputResolverWithKeyResolver",
@@ -13157,7 +13173,8 @@
                 "resolverName": "TestOutputResolverWithKeyResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -13814,7 +13831,8 @@
                 "resolverName": "TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             }
           },
           "kind": "operation"
@@ -14450,7 +14468,8 @@
                 "resolverName": "TestOutputResolverWithoutKeyResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -15099,7 +15118,8 @@
                 "resolverName": "TestInputAndOutputResolverWithKeyResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -16609,7 +16629,8 @@
                 "resolverName": "TestOutputResolverWithoutKeyResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -17427,7 +17448,8 @@
                 "resolverName": "TestOutputResolverWithKeyResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -18112,6 +18134,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": true,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestMultiLevelKeyResolver",
@@ -18812,7 +18835,8 @@
                 "resolverName": "TestInputAndOutputResolverWithKeyResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -19497,6 +19521,7 @@
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
+              "partialTypeKeyResolver": false,
               "inputResolvers": {
                 "content": {
                   "resolverName": "TestMultiLevelKeyResolver",
@@ -20392,7 +20417,8 @@
                 "resolverName": "TestInputOutputSourceResolverWithKeyResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -20571,6 +20597,7 @@
             "modelProperties": {
               "typeResolversInformation": {
                 "category": "TestResolvers",
+                "partialTypeKeyResolver": false,
                 "inputResolvers": {
                   "response": {
                     "resolverName": "testInputPersonResolver",
@@ -20749,6 +20776,7 @@
             "modelProperties": {
               "typeResolversInformation": {
                 "category": "TestResolvers",
+                "partialTypeKeyResolver": false,
                 "inputResolvers": {
                   "errorObject": {
                     "resolverName": "INPUT",
@@ -21320,7 +21348,8 @@
                 "resolverName": "TestInputOutputSourceResolverWithKeyResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
-              }
+              },
+              "partialTypeKeyResolver": false
             },
             "metadataKeyId": {
               "type": {
@@ -21585,6 +21614,7 @@
       "modelProperties": {
         "typeResolversInformation": {
           "category": "MetadataExtensionResolver",
+          "partialTypeKeyResolver": false,
           "inputResolvers": {
             "contents": {
               "resolverName": "TestInputResolverWithoutKeyResolver",
@@ -21852,6 +21882,7 @@
       "modelProperties": {
         "typeResolversInformation": {
           "category": "MetadataExtensionResolver",
+          "partialTypeKeyResolver": false,
           "inputResolvers": {
             "mapContent": {
               "resolverName": "TestInputResolverWithoutKeyResolver",
@@ -22088,6 +22119,7 @@
       "modelProperties": {
         "typeResolversInformation": {
           "category": "MetadataExtensionResolver",
+          "partialTypeKeyResolver": false,
           "inputResolvers": {
             "animalContent": {
               "resolverName": "TestInputResolverWithoutKeyResolver",
@@ -24241,7 +24273,8 @@
             "resolverName": "QUERY_OUTPUT_RESOLVER-ENTITY-NativeQueryResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"
@@ -24670,7 +24703,8 @@
             "resolverName": "TestOutputResolverWithoutKeyResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         },
         "metadataKeyId": {
           "type": {
@@ -25073,7 +25107,8 @@
             "resolverName": "TestOutputResolverWithoutKeyResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         },
         "metadataKeyId": {
           "type": {
@@ -30129,7 +30164,8 @@
             "resolverName": "TestOutputAnyTypeResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"
@@ -30455,7 +30491,8 @@
             "resolverName": "TestOutputResolverWithoutKeyResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         },
         "metadataKeyId": {
           "type": {
@@ -30878,6 +30915,7 @@
             "requiresConnection": false,
             "requiresConfiguration": false
           },
+          "partialTypeKeyResolver": false,
           "inputResolvers": {
             "objects": {
               "resolverName": "TestInputResolverWithKeyResolver",
@@ -31479,7 +31517,8 @@
             "resolverName": "TestOutputAttributesResolverWithKeyResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         },
         "metadataKeyId": {
           "type": {
@@ -32277,6 +32316,7 @@
             "requiresConnection": false,
             "requiresConfiguration": false
           },
+          "partialTypeKeyResolver": false,
           "inputResolvers": {
             "content": {
               "resolverName": "TestThreadContextClassLoaderResolver",
@@ -32686,7 +32726,8 @@
             "resolverName": "TestThreadContextClassLoaderResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         },
         "metadataKeyId": {
           "type": {
@@ -33014,7 +33055,8 @@
             "resolverName": "QUERY_OUTPUT_RESOLVER-ENTITY-NativeQueryResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         }
       },
       "kind": "operation"
@@ -36277,7 +36319,8 @@
             "resolverName": "TestMultiLevelKeyResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": false
         },
         "metadataKeyId": {
           "type": {
@@ -36693,7 +36736,8 @@
             "resolverName": "PartialTestMultiLevelKeyResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
-          }
+          },
+          "partialTypeKeyResolver": true
         },
         "metadataKeyId": {
           "type": {
@@ -37701,7 +37745,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "label": "Person",
         "typeId": "http://example.com/example.json",
         "classInformation": {
           "classname": "void",
@@ -37714,7 +37757,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "label": "Person"
       },
       "open": {
         "type": "Any"

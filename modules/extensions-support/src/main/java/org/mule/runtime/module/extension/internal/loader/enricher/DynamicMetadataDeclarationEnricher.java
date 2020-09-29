@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isASTMode;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
@@ -26,6 +25,7 @@ import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.util.collection.Collectors;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
@@ -192,7 +192,8 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                e -> e.getValue().get().getResolverName()));
         String outputResolver = metadataScope.getOutputResolver().get().getResolverName();
         String attributesResolver = metadataScope.getAttributesResolver().get().getResolverName();
-        String keysResolver = metadataScope.getKeysResolver().get().getResolverName();
+        TypeKeysResolver typeKeysResolver = metadataScope.getKeysResolver().get();
+        String keysResolver = typeKeysResolver.getResolverName();
 
         // TODO MULE-15638 - Once Metadata API 2.0 is implemented we will know better if the resolver requires or not a connection
         // of config.
@@ -202,7 +203,8 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                                                attributesResolver,
                                                                                keysResolver,
                                                                                requiresConnection,
-                                                                               requiresConnection));
+                                                                               requiresConnection,
+                                                                               typeKeysResolver instanceof PartialTypeKeysResolver));
       }
     }
 
