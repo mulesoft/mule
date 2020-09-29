@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.mule.serialization.internal.NodeWrapper;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -97,7 +99,8 @@ public class ExpressionSplitter extends AbstractSplitter
             List<MuleMessage> messages = new ArrayList<>(nodeList.getLength());
             for (int i = 0; i < nodeList.getLength(); i++)
             {
-                messages.add(new DefaultMuleMessage(nodeList.item(i), muleContext));
+                Node item = nodeList.item(i);
+                messages.add(new DefaultMuleMessage(new NodeWrapper(item), muleContext));
             }
             return messages;
         }
