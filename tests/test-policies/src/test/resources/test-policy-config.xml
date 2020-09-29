@@ -12,7 +12,7 @@
     <flow name="main" initialState="stopped">
         <some:some-emitting-source message="hello dog!" times="1"/>
         <logger level="ERROR" message="#[payload]"/>
-        <processor ref="disposeListener"/>
+        <flow-ref name="disposeListener"/>
     </flow>
 
     <test-policy:proxy name="policy">

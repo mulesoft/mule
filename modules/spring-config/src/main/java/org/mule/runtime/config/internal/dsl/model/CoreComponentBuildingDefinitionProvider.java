@@ -149,7 +149,6 @@ import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSo
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
@@ -184,10 +183,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String ON_ERROR_PROPAGATE = "on-error-propagate";
   private static final String SET_PAYLOAD = "set-payload";
   private static final String LOGGER = "logger";
-  private static final String PROCESSOR_CHAIN = "processor-chain";
   private static final String ROUTE = "route";
   private static final String ROUTES = "routes";
-  private static final String PROCESSOR = "processor";
   private static final String SUB_FLOW = "sub-flow";
   private static final String FLOW = "flow";
   private static final String FLOW_REF = "flow-ref";
@@ -212,8 +209,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String LOG_EXCEPTION = "logException";
   private static final String RAISE_ERROR = "raise-error";
   private static final String INHERIT_ITERABLE_REPEATABILITY = "inheritIterableRepeatability";
-
-  private static final Class<?> MESSAGE_PROCESSOR_CLASS = Processor.class;
 
   @SuppressWarnings("rawtypes")
   private static ComponentBuildingDefinition.Builder baseDefinition =
@@ -295,10 +290,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withConstructorParameterDefinition(fromSimpleParameter("value").build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(PROCESSOR_CHAIN)
-        .withTypeDefinition(fromType(AnnotatedProcessor.class)).withObjectFactoryType(MessageProcessorChainObjectFactory.class)
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ROUTE)
         .withTypeDefinition(fromType(MessageProcessorChain.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
@@ -333,10 +324,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("targetValue", fromSimpleParameter("targetValue")
             .withDefaultValue("#[payload]")
             .build())
-        .build());
-    componentBuildingDefinitions.add(processorRefBuilder
-        .withIdentifier(PROCESSOR)
-        .withSetterParameterDefinition("name", fromSimpleParameter("ref").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(COLLECT_LIST)
