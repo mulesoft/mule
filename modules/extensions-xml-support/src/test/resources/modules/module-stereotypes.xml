@@ -33,7 +33,7 @@
         </parameters>
         <body>
             <marvel:to-stream config-ref="drStrange" data="#[vars.aData]" />
-            <mule:object-to-string-transformer />
+            <mule:set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
         </body>
         <output type="string"/>
     </operation>

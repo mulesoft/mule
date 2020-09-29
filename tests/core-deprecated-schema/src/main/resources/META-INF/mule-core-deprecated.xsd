@@ -60,27 +60,6 @@
     <!--   Transformer elements                                       -->
     <!--==============================================================-->
 
-    <xsd:element name="transformer" type="refTransformerType" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A reference to a transformer defined elsewhere.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="refTransformerType">
-        <xsd:complexContent>
-            <xsd:extension base="commonTransformerType">
-                <xsd:attribute name="ref" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of the transformer to use.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="byte-array-to-object-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer">
         <xsd:annotation>

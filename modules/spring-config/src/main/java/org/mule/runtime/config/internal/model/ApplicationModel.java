@@ -134,7 +134,6 @@ public class ApplicationModel implements ArtifactAst {
   public static final String NAME_ATTRIBUTE = "name";
   public static final String REFERENCE_ATTRIBUTE = "ref";
   public static final String VALUE_ATTRIBUTE = "value";
-  public static final String TRANSFORMER_REFERENCE_ELEMENT = "transformer";
   public static final String DESCRIPTION_ELEMENT = "description";
   public static final String PROPERTIES_ELEMENT = "properties";
 
@@ -157,8 +156,6 @@ public class ApplicationModel implements ArtifactAst {
       builder().namespace(CORE_PREFIX).name(PROPERTIES_ELEMENT).build();
   public static final ComponentIdentifier ANNOTATIONS_ELEMENT_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ANNOTATIONS_PROPERTY_NAME).build();
-  public static final ComponentIdentifier TRANSFORMER_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(TRANSFORMER_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier DOC_DESCRIPTION_IDENTIFIER =
       builder().namespace(DOC_NAMESPACE).name(DESCRIPTION_ELEMENT).build();
   public static final ComponentIdentifier DESCRIPTION_IDENTIFIER =
@@ -187,9 +184,6 @@ public class ApplicationModel implements ArtifactAst {
               .name("secret-key-encryption-strategy")
               .build())
           .add(builder().namespace(MULE_ROOT_ELEMENT).name("import").build())
-          .add(builder().namespace(MULE_ROOT_ELEMENT)
-              .name("string-to-byte-array-transformer")
-              .build())
           .add(builder().namespace(MULE_ROOT_ELEMENT).name("security-manager").build())
           // TODO MULE-18366 Remove these entries from test namespace
           .add(builder().namespace(TEST_NAMESPACE).name("queue").build())
