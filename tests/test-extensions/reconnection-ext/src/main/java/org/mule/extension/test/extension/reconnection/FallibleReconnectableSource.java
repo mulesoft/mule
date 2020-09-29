@@ -24,6 +24,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
+/**
+ * This class represents a {@link Source} that can fail starting repeatedly and after all reconnect successfully.
+ * Also keeps in track if multiple instances were starting at the same time.
+ */
 public class FallibleReconnectableSource extends Source<Void, Void> {
 
   public static volatile boolean fail = false;
@@ -46,7 +50,11 @@ public class FallibleReconnectableSource extends Source<Void, Void> {
     if (countStartedSources.addAndGet(1) > 1) {
       simultaneouslyStartedSources = true;
     }
-    doStart(sourceCallback);
+    try {
+      doStart(sourceCallback);
+    } finally {
+      countStartedSources.addAndGet(-1);
+    }
   }
 
   private void doStart(SourceCallback<Void, Void> sourceCallback) throws MuleException {
@@ -70,7 +78,6 @@ public class FallibleReconnectableSource extends Source<Void, Void> {
 
   @Override
   public void onStop() {
-    countStartedSources.addAndGet(-1);
     if (!fail) {
       if (this.scheduleWithFixedDelay != null) {
         this.scheduleWithFixedDelay.cancel(true);

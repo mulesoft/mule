@@ -43,6 +43,9 @@ import org.junit.Test;
 
 public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
+  private final static long TIMEOUT = 5000;
+  private final static long POLL_DELAY = 500;
+
   private static List<CoreEvent> capturedEvents;
 
   public static class CaptureProcessor implements Processor {
@@ -95,11 +98,11 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   @Test
   public void doNotStartSourceTwiceAfterExceptionOnReconnection() throws Exception {
     ((Startable) getFlowConstruct("reconnectAfterFailure")).start();
-    check(5000, 1000, () -> !capturedEvents.isEmpty());
+    check(TIMEOUT, POLL_DELAY, () -> !capturedEvents.isEmpty());
     FallibleReconnectableSource.fail = true;
-    checkNot(4000, 500, () -> FallibleReconnectableSource.simultaneouslyStartedSources);
+    checkNot(TIMEOUT, POLL_DELAY, () -> FallibleReconnectableSource.simultaneouslyStartedSources);
     FallibleReconnectableSource.release();
-    checkNot(4000, 500, () -> FallibleReconnectableSource.simultaneouslyStartedSources);
+    checkNot(TIMEOUT, POLL_DELAY, () -> FallibleReconnectableSource.simultaneouslyStartedSources);
   }
 
   @Test
