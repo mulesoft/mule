@@ -58,7 +58,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 
@@ -153,7 +152,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       configuration = cache.computeIfAbsent(resolverSetResult, (r) -> createConfiguration(r, event));
       updateUsageStatistic(configuration);
       return configuration;
-    } catch (WrappingException e) {
+    } catch (WrappingRuntimeException e) {
       throw e.getWrappedException();
     } finally {
       cacheReadLock.unlock();
@@ -186,7 +185,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       registerConfiguration(configuration);
       return configuration;
     } catch (MuleException e) {
-      throw new WrappingException(e);
+      throw new WrappingRuntimeException(e);
     }
   }
 
@@ -320,11 +319,15 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
         .map(ob -> ((ConnectionProviderObjectBuilder) ob).providerModel);
   }
 
-  private class WrappingException extends RuntimeException {
+  /**
+   * Used to preserve exception throwing behaviour in {@link #getConfiguration} as the method {@link #createConfiguration} can no longer throw
+   * checked exception as it is used inside {@link Map#computeIfAbsent}.
+   */
+  private class WrappingRuntimeException extends RuntimeException {
 
     private final Exception wrappedException;
 
-    public WrappingException(Exception e) {
+    public WrappingRuntimeException(Exception e) {
       super(e);
       this.wrappedException = e;
     }
