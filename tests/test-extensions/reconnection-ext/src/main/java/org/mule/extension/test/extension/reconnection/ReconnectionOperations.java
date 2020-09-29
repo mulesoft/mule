@@ -39,10 +39,6 @@ public class ReconnectionOperations {
     fail = !fail;
   }
 
-  public void makeSourceFail() {
-    FallibleReconnectableSource.fail = true;
-  }
-
   @OutputResolver(output = RetryPolicyOutputResolver.class)
   public RetryPolicyTemplate getRetryPolicyTemplate(@Connection ReconnectableConnection connection,
                                                     RetryPolicyTemplate template) {

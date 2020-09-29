@@ -34,10 +34,6 @@
         <reconnection:switch-connection />
     </flow>
 
-    <flow name="makeSourceFail">
-        <reconnection:make-source-fail />
-    </flow>
-
     <flow name="pagedOperation">
         <reconnection:paged-operation failOn="#[payload]" withErrorType="#[vars.errorType]" config-ref="reconnection_Config"/>
     </flow>

@@ -159,14 +159,6 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MakeSourceFailType" substitutionGroup="mule:abstract-operator" name="make-source-fail"></xs:element>
-  <xs:complexType name="MakeSourceFailType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SwitchConnectionType" substitutionGroup="mule:abstract-operator" name="switch-connection"></xs:element>
   <xs:complexType name="SwitchConnectionType">
     <xs:complexContent>

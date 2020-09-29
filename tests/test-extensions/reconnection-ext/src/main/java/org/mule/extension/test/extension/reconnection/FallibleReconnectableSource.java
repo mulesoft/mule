@@ -13,6 +13,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -23,9 +24,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
-public class FallibleReconnectableSource extends Source<Integer, Void> {
+public class FallibleReconnectableSource extends Source<Void, Void> {
 
-  public static volatile boolean fail;
+  public static volatile boolean fail = false;
+  public static volatile boolean simultaneouslyStartedSources = false;
 
   @Connection
   ConnectionProvider<ReconnectableConnection> connectionProvider;
@@ -37,49 +39,57 @@ public class FallibleReconnectableSource extends Source<Integer, Void> {
   private ScheduledFuture<?> scheduleWithFixedDelay;
 
   private static final AtomicInteger countStartedSources = new AtomicInteger(0);
+  private static final Latch latch = new Latch();
 
   @Override
-  public void onStart(SourceCallback<Integer, Void> sourceCallback) throws MuleException {
-    countStartedSources.addAndGet(1);
+  public void onStart(SourceCallback<Void, Void> sourceCallback) throws MuleException {
+    if (countStartedSources.addAndGet(1) > 1) {
+      simultaneouslyStartedSources = true;
+    }
     doStart(sourceCallback);
   }
 
-  private void doStart(SourceCallback<Integer, Void> sourceCallback) throws MuleException {
-    ReconnectableConnection connection = connectionProvider.connect();
-    this.scheduler = schedulerService.ioScheduler();
-
+  private void doStart(SourceCallback<Void, Void> sourceCallback) throws MuleException {
     if (fail) {
-      delay(300);
-      sourceCallback.onConnectionException(new ConnectionException(new RuntimeException(), connection));
+      await();
       fail = false;
       throw new RuntimeException("Fail starting source");
     }
+
+    ReconnectableConnection connection = connectionProvider.connect();
+    this.scheduler = schedulerService.ioScheduler();
 
     scheduleWithFixedDelay = this.scheduler.scheduleWithFixedDelay(() -> {
       if (fail) {
         sourceCallback.onConnectionException(new ConnectionException(new RuntimeException(), connection));
       } else {
-        sourceCallback.handle(Result.<Integer, Void>builder().output(countStartedSources.get()).build());
+        sourceCallback.handle(Result.<Void, Void>builder().build());
       }
-    }, 0, 1000, MILLISECONDS);
+    }, 0, 250, MILLISECONDS);
   }
 
   @Override
   public void onStop() {
     countStartedSources.addAndGet(-1);
-    if (this.scheduleWithFixedDelay != null) {
-      this.scheduleWithFixedDelay.cancel(true);
-    }
-    if (this.scheduler != null) {
-      this.scheduler.stop();
+    if (!fail) {
+      if (this.scheduleWithFixedDelay != null) {
+        this.scheduleWithFixedDelay.cancel(true);
+      }
+      if (this.scheduler != null) {
+        this.scheduler.stop();
+      }
     }
   }
 
-  private void delay(long millis) {
+  private void await() {
     try {
-      Thread.sleep(millis);
+      latch.await();
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static void release() {
+    latch.release();
   }
 }

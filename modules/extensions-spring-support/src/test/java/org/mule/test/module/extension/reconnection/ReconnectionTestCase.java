@@ -96,17 +96,10 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   public void doNotStartSourceTwiceAfterExceptionOnReconnection() throws Exception {
     ((Startable) getFlowConstruct("reconnectAfterFailure")).start();
     check(5000, 1000, () -> !capturedEvents.isEmpty());
-    makeSourceFail();
-
-    checkNot(5000, 1000, () -> {
-      synchronized (capturedEvents) {
-        return capturedEvents.stream()
-            .map(event -> (Integer) event.getMessage().getPayload().getValue())
-            .filter(simultaneouslyStartedSources -> simultaneouslyStartedSources > 1)
-            .findAny()
-            .isPresent();
-      }
-    });
+    FallibleReconnectableSource.fail = true;
+    checkNot(4000, 500, () -> FallibleReconnectableSource.simultaneouslyStartedSources);
+    FallibleReconnectableSource.release();
+    checkNot(4000, 500, () -> FallibleReconnectableSource.simultaneouslyStartedSources);
   }
 
   @Test
@@ -235,10 +228,6 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private void switchConnection() throws Exception {
     flowRunner("switchConnection").run();
-  }
-
-  private void makeSourceFail() throws Exception {
-    flowRunner("makeSourceFail").run();
   }
 
   private <T> CursorIterator<T> getCursor(String flowName, Integer failOn, MuleErrors errorType) throws Exception {
