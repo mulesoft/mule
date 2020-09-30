@@ -153,6 +153,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             @Override
             public void doWork(RetryContext context) throws Exception
             {
+                JmsConnector connector = (JmsConnector) MultiConsumerJmsMessageReceiver.this.connector;
                 try
                 {
                     JmsConnector connector = (JmsConnector) MultiConsumerJmsMessageReceiver.this.connector;
@@ -198,6 +199,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 }
                 catch (Exception e)
                 {
+                    connector.setShouldRetryBrokerConnection(true);
                     throw new Exception("Fail to connect", e);
                 }
             }
