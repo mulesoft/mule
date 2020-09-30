@@ -8,12 +8,10 @@ package org.mule.runtime.config.internal;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,6 +23,7 @@ import org.xml.sax.InputSource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -48,15 +47,14 @@ public class MuleCustomEntityResolverTestCase {
 
   @Test
   @Issue("MULE-18812")
-  @Description("Disable cache over URLConnection should not fail when jar entry is closed")
-  public void cacheOnFalseWhenLoadingSchemasResources() throws Exception {
+  public void loadSchemasResourcesEvenWhenJarFileIsClosed() throws Exception {
     File jarFile = createDummyJar();
     URLClassLoader classLoader = new URLClassLoader(new URL[] {jarFile.toURI().toURL()});
 
     final Latch latch = new Latch();
     MuleCustomEntityResolver entityResolver = new MuleCustomEntityResolver(classLoader);
     InputSource is = entityResolver.resolveEntity(null, MULE_FAKE_CORE);
-    assertThat(is, is(not(nullValue())));
+    assertThat(is, is(notNullValue()));
 
     Thread thread = new Thread(() -> {
       try {
@@ -64,6 +62,35 @@ public class MuleCustomEntityResolverTestCase {
         JarURLConnection urlConnection =
             (JarURLConnection) classLoader.getResource(MULE_FAKE_CORE_XSD_FILE_NAME).openConnection();
         urlConnection.getJarFile().close();
+      } catch (IOException e) {
+        fail("Unexpected exception was caught when trying to close jar file");
+      }
+      latch.release();
+    });
+    thread.start();
+    latch.await(TIMEOUT, MILLISECONDS);
+    assertThat(IOUtils.toString(is.getByteStream()), is(MULE_FAKE_CONTENT));
+  }
+
+  @Test
+  @Issue("MULE-18812")
+  public void loadSchemasResourcesEvenWhenUrlClassLoaderIsClosedWhileInputStreamIsBeingUsed() throws Exception {
+    File jarFile = createDummyJar();
+    URLClassLoader cl = new URLClassLoader(new URL[] {jarFile.toURI().toURL()});
+    URLClassLoader cl2 = new URLClassLoader(new URL[] {jarFile.toURI().toURL()});
+
+    final Latch latch = new Latch();
+    MuleCustomEntityResolver entityResolver = new MuleCustomEntityResolver(cl);
+    InputSource is = entityResolver.resolveEntity(null, MULE_FAKE_CORE);
+    assertThat(is, is(notNullValue()));
+
+    Thread thread = new Thread(() -> {
+      try {
+        // Classloader close
+        InputStream inputStream = cl2.getResourceAsStream(MULE_FAKE_CORE_XSD_FILE_NAME);
+        assertThat(inputStream, is(notNullValue()));
+        assertThat(IOUtils.toString(inputStream), is(MULE_FAKE_CONTENT));
+        cl2.close();
       } catch (IOException e) {
         fail("Unexpected exception was caught when trying to close jar file");
       }
