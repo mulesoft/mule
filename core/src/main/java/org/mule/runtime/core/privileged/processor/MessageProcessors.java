@@ -54,6 +54,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -529,7 +530,20 @@ public class MessageProcessors {
             if (currentStackEntry != null) {
               // For flow-ref to flows, avoid creating a second MessagingException, an instead mutate the thrown on so it has the
               // proper state when is bubbled.
-              ((DefaultFlowCallStack) parentContextEvent.getFlowCallStack()).push(currentStackEntry);
+              DefaultFlowCallStack parentCallStack = (DefaultFlowCallStack) parentContextEvent.getFlowCallStack();
+              List<FlowStackElement> childFlowStacks = eventChildCtx.getFlowCallStack().getElements();
+              Stack<FlowStackElement> remaining = new Stack();
+
+              for (FlowStackElement e : childFlowStacks) {
+                if (parentCallStack.peek().equals(e)) {
+                  break;
+                }
+                remaining.push(e);
+              }
+
+              while (!remaining.isEmpty()) {
+                parentCallStack.push(remaining.pop());
+              }
             }
             error.setProcessedEvent(parentContextEvent);
           }
