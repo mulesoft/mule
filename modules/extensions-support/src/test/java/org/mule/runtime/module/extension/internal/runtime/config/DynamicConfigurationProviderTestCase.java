@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
-import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
@@ -46,7 +45,6 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -56,6 +54,7 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -119,12 +118,10 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(resolverSetResult.asMap()).thenReturn(new HashMap<>());
     visitableMock(operationModel);
 
-    expirationPolicy = new ImmutableExpirationPolicy(5, SECONDS, timeSupplier);
+    expirationPolicy = new ImmutableExpirationPolicy(5, MINUTES, timeSupplier);
 
     when(connectionProviderResolver.getResolverSet()).thenReturn(empty());
     when(connectionProviderResolver.resolve(any())).thenReturn(null);
-
-    muleContext.setExtensionManager(new DefaultExtensionManager());
     provider = new DynamicConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
                                                 connectionProviderResolver, expirationPolicy, new ReflectionCache(),
                                                 expressionManager, muleContext);
@@ -217,64 +214,56 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   }
 
   @Test
-  public void cacheEvictionUnregistersConfigurations() throws Exception {
+  public void getExpired() throws Exception {
     HeisenbergExtension instance1 = (HeisenbergExtension) provider.get(event).getValue();
     HeisenbergExtension instance2 = makeAlternateInstance();
-    final DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
 
-    assertThat(provider.getConfigurationInstances().stream().map(ConfigurationInstance::getValue).collect(toImmutableList()),
-               containsInAnyOrder(instance1, instance2));
+    DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
+    timeSupplier.move(1, MINUTES);
 
-    probe(getProbeMillis(), DEFAULT_POLLING_INTERVAL, () -> {
-      provider.cleanUpCache();
-      return provider.getConfigurationInstances().isEmpty();
-    });
+    List<ConfigurationInstance> expired = provider.getExpired();
+    assertThat(expired.isEmpty(), is(true));
+
+    timeSupplier.move(10, MINUTES);
+
+    expired = provider.getExpired();
+    assertThat(expired.isEmpty(), is(false));
+
+    List<Object> configs = expired.stream().map(ConfigurationInstance::getValue).collect(toImmutableList());
+    assertThat(configs, containsInAnyOrder(instance1, instance2));
   }
 
   @Test
   public void configurationInstanceIsRemovedFromLifecycleTrackingAfterExpired() throws Exception {
     HeisenbergExtension instance = (HeisenbergExtension) provider.get(event).getValue();
+
     DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
+
+    timeSupplier.move(10, MINUTES);
 
     assertThat(instance.getStop(), is(0));
     assertThat(instance.getDispose(), is(0));
-    assertThat(provider.getConfigurationInstances(), not(empty()));
 
-    probe(getProbeMillis(), DEFAULT_POLLING_INTERVAL, () -> {
-      // Perform pending maintenance operations
-      provider.cleanUpCache();
-
-      if (provider.getConfigurationInstances().isEmpty()) {
-        // Instance was evicted by cache policy, so it was stopped and disposed by extension manager
-        assertThat(instance.getStop(), is(1));
-        assertThat(instance.getDispose(), is(1));
-        return true;
-      } else {
-        // The instance wasn't removed yet, so we assert it isn't stopped nor disposed
-        assertThat(instance.getStop(), is(0));
-        assertThat(instance.getDispose(), is(0));
-        return false;
-      }
-    });
+    List<ConfigurationInstance> expired = provider.getExpired();
+    assertThat(expired.isEmpty(), is(false));
 
     provider.stop();
     provider.dispose();
 
-    assertThat(instance.getStop(), is(1));
-    assertThat(instance.getDispose(), is(1));
-  }
-
-  private long getProbeMillis() {
-    long evictionMillis = expirationPolicy.getTimeUnit().toMillis(expirationPolicy.getMaxIdleTime());
-    return evictionMillis + 1000;
+    assertThat(instance.getStop(), is(0));
+    assertThat(instance.getDispose(), is(0));
   }
 
   @Test
-  public void configurationInstanceFollowsLifecycleTrackingWhenNotExpired() throws Exception {
+  public void configurationInstanceFollowsLifecycleTrakingWhenNotExpired() throws Exception {
     HeisenbergExtension instance = (HeisenbergExtension) provider.get(event).getValue();
 
     DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
-    assertThat(provider.getConfigurationInstances(), not(empty()));
+
+    timeSupplier.move(1, MINUTES);
+
+    List<ConfigurationInstance> expired = provider.getExpired();
+    assertThat(expired.isEmpty(), is(true));
 
     assertThat(instance.getStop(), is(0));
     assertThat(instance.getDispose(), is(0));
