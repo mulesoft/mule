@@ -32,7 +32,6 @@
         <module>model</module>
         <module>http-resource-service</module>
         <module>core-functional-tests</module>
-        <module>test-components</module>
     </modules>
 
     <build>

@@ -1667,12 +1667,6 @@
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
-                    <groupId>org.mule.runtime.plugins</groupId>
-                    <artifactId>mule-extensions-maven-plugin</artifactId>
-                    <version>${mule.extensions.maven.plugin.version}</version>
-                    <extensions>true</extensions>
-                </plugin>
-                <plugin>
                     <groupId>io.qameta.allure</groupId>
                     <artifactId>allure-maven</artifactId>
                     <version>${allure.maven.plugin.version}</version>
@@ -2021,7 +2015,6 @@
                                             <message>No Snapshots Allowed in Deps!</message>
                                             <excludes>
                                                 <exclude>org.mule.tests:test-components</exclude>
-                                                <exclude>org.mule.tooling:tooling-support-test-extension</exclude>
                                             </excludes>
                                         </requireReleaseDeps>
                                         <requireReleaseVersion>
