@@ -156,7 +156,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 JmsConnector connector = (JmsConnector) MultiConsumerJmsMessageReceiver.this.connector;
                 try
                 {
-                    JmsConnector connector = (JmsConnector) MultiConsumerJmsMessageReceiver.this.connector;
                     if (connector.shouldRetryBrokerConnection())
                     {
                         MultiConsumerJmsMessageReceiver.this.closeConnectorSilently();
