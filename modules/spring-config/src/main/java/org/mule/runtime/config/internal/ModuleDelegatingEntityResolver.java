@@ -48,13 +48,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
 
   private static final String CORE_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
   private static final String CORE_CURRENT_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core.xsd";
-  private static final String CORE_DEPRECATED_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd";
-  private static final String COMPATIBILITY_XSD =
-      "http://www.mulesoft.org/schema/mule/compatibility/current/mule-compatibility.xsd";
-  private static final String TEST_XSD = "http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd";
   private static final int MAX_RESOLUTION_FAILURE_THRESHOLD = 10;
-
-  private static Boolean internalIsRunningTests;
 
   private final Set<ExtensionModel> extensions;
   private final EntityResolver muleEntityResolver;
@@ -64,7 +58,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
    * Saves already checked entities so that if the resolution fails more than {@link #MAX_RESOLUTION_FAILURE_THRESHOLD}
    * it will raise and exception instead of looping in failure over and over again.
    */
-  private Map<String, AtomicInteger> checkedEntities;
+  private final Map<String, AtomicInteger> checkedEntities;
 
   /**
    * Returns an instance of {@link ModuleDelegatingEntityResolver}
@@ -129,26 +123,13 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
 
   private String overrideSystemIdForCompatibility(String publicId, String systemId) throws SAXException, IOException {
     if (systemId.equals(CORE_XSD)) {
-      Boolean useDeprecated = canResolveEntity(publicId, CORE_DEPRECATED_XSD);
-      Boolean usingCompatibility = canResolveEntity(publicId, COMPATIBILITY_XSD);
-      boolean runningTests = isRunningTests();
-
-      if (useDeprecated && (usingCompatibility || runningTests)) {
-        return CORE_DEPRECATED_XSD;
-      } else {
-        return CORE_CURRENT_XSD;
-      }
-    } else if (systemId.equals(TEST_XSD)) {
-      boolean runningTests = isRunningTests();
-      if (!runningTests && generateFromExtensions(publicId, systemId) == null) {
-        String message = "Internal runtime mule-test.xsd can't be used in real applications";
-        throw new MuleRuntimeException(createStaticMessage(message));
-      }
+      return CORE_CURRENT_XSD;
     } else if (systemId.contains("spring")) {
-      systemId = systemId.replace("-current.xsd", ".xsd");
+      // This is to support importing Spring xsd's from custom xsd's. Compatibility module does such thing.
+      return systemId.replace("-current.xsd", ".xsd");
+    } else {
+      return systemId;
     }
-
-    return systemId;
   }
 
   protected boolean canResolveEntity(String publicId, String systemId) throws SAXException, IOException {
@@ -165,20 +146,6 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
         }
       }
     }
-  }
-
-  private boolean isRunningTests() {
-    if (internalIsRunningTests != null) {
-      return internalIsRunningTests;
-    }
-    for (StackTraceElement element : new Throwable().getStackTrace()) {
-      if (element.getClassName().startsWith("org.junit.runners.")) {
-        internalIsRunningTests = true;
-        return true;
-      }
-    }
-    internalIsRunningTests = false;
-    return false;
   }
 
   private InputSource generateFromExtensions(String publicId, String systemId) {
