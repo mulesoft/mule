@@ -1724,6 +1724,7 @@
 
                             <exclude>**/org/apache/**</exclude>
                             <exclude>**/org/springframework/**</exclude>
+                            <exclude>**/de/odysseus/staxon/**</exclude>
                             <exclude>**/org/glassfish/jersey/**</exclude>
                             <exclude>**/HttpTransactionContext.java</exclude>
                             <exclude>**/HttpConnection.java</exclude>
