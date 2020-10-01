@@ -18,7 +18,7 @@ import org.mule.test.classloading.api.ClassLoadingHelper;
 @Xml(prefix = "classloading")
 @ConnectionProviders({CLPoolingConnectionProvider.class, CLCachedConnectionProvider.class, CLNoneConnectionProvider.class})
 @Configurations(CLConfiguration.class)
-@MetadataScope(keysResolver = CLKeysResolver.class)
+@MetadataScope(keysResolver = CLKeysResolver.class, outputResolver = CLKeysResolver.class)
 @Export(classes = ClassLoadingHelper.class)
 public class ClassLoadingExtension {
 

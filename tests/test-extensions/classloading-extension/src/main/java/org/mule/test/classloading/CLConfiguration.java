@@ -14,7 +14,6 @@ import org.mule.test.classloading.internal.AllOptionalParameterGroup;
 
 @Configuration(name = "config")
 @Operations(CLOperations.class)
-@Sources({CLSource.class})
 public class CLConfiguration {
 
   @ParameterGroup(name = "allOptional", showInDsl = true)
