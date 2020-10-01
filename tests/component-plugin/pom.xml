@@ -65,11 +65,5 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.tests.plugin</groupId>
-            <artifactId>mule-core-deprecated-schema-plugin</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-        </dependency>
     </dependencies>
 </project>
