@@ -44,6 +44,8 @@ public interface ArtifactAgnosticServiceBuilder<T extends ArtifactAgnosticServic
    */
   T addDependency(Dependency dependency);
 
+  T addResource(String resourcePath, byte[] content);
+
   /**
    * Configures the declaration of mule components that represent this artifact.
    *

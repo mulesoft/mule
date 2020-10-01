@@ -6,20 +6,25 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
+import static java.lang.String.format;
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.write;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.addSharedLibraryDependency;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.createDeployablePomFile;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.updateArtifactPom;
 import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
@@ -29,7 +34,9 @@ import org.mule.runtime.module.deployment.impl.internal.application.DeployableMa
 import org.mule.runtime.module.tooling.api.ArtifactAgnosticServiceBuilder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -48,6 +55,8 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
   private ArtifactDeclaration artifactDeclaration;
   private Model model;
   private Map<String, String> artifactProperties = emptyMap();
+
+  private Map<String, byte[]> resources = new HashMap<>();
 
   protected AbstractArtifactAgnosticServiceBuilder(DefaultApplicationFactory defaultApplicationFactory) {
     this.defaultApplicationFactory = defaultApplicationFactory;
@@ -110,6 +119,11 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
     return getThis();
   }
 
+  public T addResource(String resourcePath, byte[] content) {
+    resources.put(resourcePath, content);
+    return getThis();
+  }
+
   private void addMavenModelDependency(org.apache.maven.model.Dependency dependency) {
     if (!MULE_PLUGIN_CLASSIFIER.equals(dependency.getClassifier())) {
       addSharedLibraryDependency(model, dependency);
@@ -123,6 +137,12 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
     return createService(() -> {
       String applicationName = UUID.getUUID() + "-artifact-temp-app";
       File applicationFolder = new File(getExecutionFolder(), applicationName);
+
+      resources.entrySet().stream().forEach(resourceEntry -> {
+        String resourcePath = resourceEntry.getKey();
+        writeResourceToApplication(applicationFolder, resourceEntry, resourcePath);
+      });
+
       Properties deploymentProperties = new Properties();
       deploymentProperties.putAll(forcedDeploymentProperties());
       ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(applicationName, of(deploymentProperties));
@@ -134,14 +154,29 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
       updateArtifactPom(applicationFolder, model);
       MavenClientProvider mavenClientProvider =
           MavenClientProvider.discoverProvider(AbstractArtifactAgnosticServiceBuilder.class.getClassLoader());
+
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(BundleDescriptor.class.getName(), createTempBundleDescriptor());
+      attributes.put(EXPORTED_RESOURCES, new ArrayList<>(resources.keySet()));
+
       applicationDescriptor
           .setClassLoaderModel(new DeployableMavenClassLoaderModelLoader(mavenClientProvider
               .createMavenClient(GlobalConfigLoader.getMavenConfig()))
-                  .load(applicationFolder, singletonMap(BundleDescriptor.class.getName(),
-                                                        createTempBundleDescriptor()),
-                        ArtifactType.APP));
+                  .load(applicationFolder, attributes, APP));
       return defaultApplicationFactory.createArtifact(applicationDescriptor);
     });
+  }
+
+  private void writeResourceToApplication(File applicationFolder, Map.Entry<String, byte[]> resourceEntry, String resourcePath) {
+    try {
+      File resourceFile = new File(applicationFolder, resourcePath);
+      createDirectories(resourceFile.getParentFile().toPath());
+      write(resourceFile.toPath(), resourceEntry.getValue());
+    } catch (IOException e) {
+      throw new MuleRuntimeException(createStaticMessage(format("Error while copying resource: '%s' to application's folder: '%s'",
+                                                                resourcePath, applicationFolder)),
+                                     e);
+    }
   }
 
   protected Map<String, String> forcedDeploymentProperties() {
