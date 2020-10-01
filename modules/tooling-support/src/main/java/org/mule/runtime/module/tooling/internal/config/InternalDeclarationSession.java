@@ -212,11 +212,6 @@ public class InternalDeclarationSession implements DeclarationSession {
     return sampleDataExecutor().getSampleData(optionalComponentModel.get(), componentElementDeclaration);
   }
 
-  @Override
-  public ExpressionManager getExpressionManager() {
-    return expressionManager;
-  }
-
   private String couldNotFindComponentErrorMessage(ElementDeclaration declaration) {
     return format("Could not find component: '%s:%s'", declaration.getDeclaringExtension(), declaration.getName());
   }
