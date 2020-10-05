@@ -16,9 +16,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
 import static org.mule.tck.probe.PollingProber.check;
-import static org.mule.tck.probe.PollingProber.checkNot;
 
-import org.mule.extension.test.extension.reconnection.FallibleReconnectableSource;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -43,9 +41,6 @@ import org.junit.Test;
 
 public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
-  private final static long TIMEOUT = 5000;
-  private final static long POLL_DELAY = 500;
-
   private static List<CoreEvent> capturedEvents;
 
   public static class CaptureProcessor implements Processor {
@@ -68,14 +63,12 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   protected void doSetUp() throws Exception {
     capturedEvents = new LinkedList<>();
     ReconnectableConnectionProvider.fail = false;
-    FallibleReconnectableSource.fail = false;
   }
 
   @Override
   protected void doTearDown() throws Exception {
     capturedEvents = null;
     ReconnectableConnectionProvider.fail = false;
-    FallibleReconnectableSource.fail = false;
   }
 
   @Test
@@ -93,16 +86,6 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
             .isPresent();
       }
     });
-  }
-
-  @Test
-  public void doNotStartSourceTwiceAfterExceptionOnReconnection() throws Exception {
-    ((Startable) getFlowConstruct("reconnectAfterFailure")).start();
-    check(TIMEOUT, POLL_DELAY, () -> !capturedEvents.isEmpty());
-    FallibleReconnectableSource.fail = true;
-    checkNot(TIMEOUT, POLL_DELAY, () -> FallibleReconnectableSource.simultaneouslyStartedSources);
-    FallibleReconnectableSource.release();
-    checkNot(TIMEOUT, POLL_DELAY, () -> FallibleReconnectableSource.simultaneouslyStartedSources);
   }
 
   @Test
