@@ -34,6 +34,7 @@ import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.hamcrest.Matcher;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -193,6 +194,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Override
   @Description("When the ReactorProcessingStrategy is configured any async processing will be returned to CPU_LIGHT thread. "
       + "This helps avoid deadlocks when there are reduced number of threads used by async processor.")
+  @Ignore("MULE-18841")
   public void asyncCpuLightConcurrent() throws Exception {
     super.asyncCpuLightConcurrent();
     assertThat(threads, hasSize(2));
@@ -230,6 +232,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
 
   @Test
   @Description("Notifications are invoked on CPU_LITE thread")
+  @Ignore("MULE-18841")
   public void asyncProcessorNotificationExecutionThreads() throws Exception {
     AtomicReference<Thread> beforeThread = new AtomicReference<>();
     AtomicReference<Thread> afterThread = new AtomicReference<>();
