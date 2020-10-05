@@ -287,7 +287,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
 
           @Override
           public void visitArrayType(ArrayType arrayType) {
-            getHashedGlobal(param.getRawValue()).ifPresent(reference::set);
+            getHashedGlobal(param.getResolvedRawValue()).ifPresent(reference::set);
           }
 
           @Override
@@ -296,7 +296,7 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
                 .map(TypeDslAnnotation::allowsTopLevelDefinition).orElse(false);
 
             if (canBeGlobal) {
-              getHashedGlobal(param.getRawValue()).ifPresent(reference::set);
+              getHashedGlobal(param.getResolvedRawValue()).ifPresent(reference::set);
             }
           }
         });

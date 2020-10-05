@@ -387,8 +387,8 @@ class ComponentAstBasedElementModelFactory {
     Multimap<ComponentIdentifier, ComponentAst> innerComponents = getNestedComponents(configuration);
     Map<String, String> parameters = configuration.getParameters()
         .stream()
-        .filter(p -> p.getRawValue() != null)
-        .collect(toMap(p -> p.getModel().getName(), p -> p.getRawValue(), (u, v) -> u));
+        .filter(p -> p.getResolvedRawValue() != null)
+        .collect(toMap(p -> p.getModel().getName(), p -> p.getResolvedRawValue(), (u, v) -> u));
 
     model.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)

@@ -67,9 +67,6 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -107,6 +104,9 @@ import org.mule.runtime.dsl.api.xml.parser.ParsingPropertyResolver;
 import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
 import org.mule.runtime.dsl.api.xml.parser.XmlParsingConfiguration;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
+import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -267,11 +267,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
             ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
 
             @Override
-            public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+            public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
               final String propertyValue = artifactProperties.get(configurationAttributeKey);
 
               if (propertyValue == null) {
-                return parentProvider.getConfigurationProperty(configurationAttributeKey);
+                return parentProvider.provide(configurationAttributeKey);
               }
               return of(new ConfigurationProperty() {
 
@@ -281,7 +281,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                 }
 
                 @Override
-                public Object getRawValue() {
+                public String getValue() {
                   return propertyValue;
                 }
 

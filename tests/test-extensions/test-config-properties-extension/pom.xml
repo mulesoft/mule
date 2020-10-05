@@ -22,8 +22,8 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
-            <version>${project.version}</version>
+            <artifactId>mule-properties-api</artifactId>
+            <version>${mulePropertiesApiVersion}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

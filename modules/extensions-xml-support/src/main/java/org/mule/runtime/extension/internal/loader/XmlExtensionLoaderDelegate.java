@@ -64,13 +64,13 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.builder.ArtifactAstBuilder;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
@@ -105,6 +105,8 @@ import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurati
 import org.mule.runtime.extension.internal.loader.validator.property.InvalidTestConnectionMarkerModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -407,19 +409,20 @@ public final class XmlExtensionLoaderDelegate {
       throw new IllegalArgumentException(format("There was an issue trying to read the stream of '%s'", resource.getFile()));
     }
     final ConfigLine configLine = parseModule.get();
-    final ConfigurationPropertiesResolver externalPropertiesResolver = getConfigurationPropertiesResolver(configLine);
-    final ComponentModelReader componentModelReader = new ComponentModelReader(externalPropertiesResolver);
+    final ComponentModelReader componentModelReader = new ComponentModelReader();
 
     final ArtifactAstBuilder artifactAstBuilder = ArtifactAstBuilder.builder(extensions);
     componentModelReader.extractComponentDefinitionModel(configLine, modulePath, artifactAstBuilder.addTopLevelComponent());
-    return artifactAstBuilder.build().topLevelComponentsStream().findAny().get();
+    final ArtifactAst ast = artifactAstBuilder.build();
+    ast.updatePropertiesResolver(getConfigurationPropertiesResolver(ast));
+    return ast.topLevelComponentsStream().findAny().get();
   }
 
-  private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ConfigLine configLine) {
+  private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ArtifactAst ast) {
     // <mule:global-property ... /> properties reader
     final ConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(of(new XmlExtensionConfigurationPropertiesResolver()),
-                                                   createProviderFromGlobalProperties(configLine, modulePath));
+                                                   createProviderFromGlobalProperties(ast));
     // system properties, such as "file.separator" properties reader
     final ConfigurationPropertiesResolver systemPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
@@ -433,20 +436,26 @@ public final class XmlExtensionLoaderDelegate {
                                                       externalPropertiesConfigurationProvider);
   }
 
-  private ConfigurationPropertiesProvider createProviderFromGlobalProperties(ConfigLine moduleLine, String modulePath) {
-    final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
-    moduleLine.getChildren().stream()
-        .filter(configLine -> GLOBAL_PROPERTY.equals(configLine.getIdentifier()))
-        .forEach(configLine -> {
-          final String key = configLine.getConfigAttributes().get("name").getValue();
-          final String rawValue = configLine.getConfigAttributes().get("value").getValue();
-          globalProperties.put(key,
-                               new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
-                                                                       modulePath, configLine.getLineNumber()),
-                                                                key, rawValue));
+  private ConfigurationPropertiesProvider createProviderFromGlobalProperties(ArtifactAst ast) {
+    return new GlobalPropertyConfigurationPropertiesProvider(new LazyValue<>(() -> {
+      final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
 
-        });
-    return new GlobalPropertyConfigurationPropertiesProvider(globalProperties);
+      // Root element is the mule:module
+      ast.topLevelComponentsStream()
+          .flatMap(comp -> comp.directChildrenStream())
+          .filter(comp -> GLOBAL_PROPERTY.equals(comp.getIdentifier().getName()))
+          .forEach(comp -> {
+            final String key = comp.getParameter("name").getResolvedRawValue();
+            final String rawValue = comp.getParameter("value").getRawValue();
+            globalProperties.put(key,
+                                 new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
+                                                                         comp.getMetadata().getFileName().orElse("(n/a)"),
+                                                                         comp.getMetadata().getStartLine().orElse(-1)),
+                                                                  key, rawValue));
+          });
+
+      return globalProperties;
+    }));
   }
 
   private void loadModuleExtension(ExtensionDeclarer declarer, URL resource, Document moduleDocument,

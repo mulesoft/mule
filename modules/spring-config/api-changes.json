@@ -1,4 +1,54 @@
 {
+  "4.4.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.annotation.removed",
+          "old": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",
+          "new": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "ConfigurationPropertiesProvider",
+          "elementKind": "interface",
+          "justification": "This is actually how it is being documented to use"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory",
+          "new": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "ConfigurationPropertiesProviderFactory",
+          "elementKind": "interface",
+          "justification": "This is actually how it is being documented to use"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty",
+          "new": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "ConfigurationProperty",
+          "elementKind": "interface",
+          "justification": "This is actually how it is being documented to use"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "class org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider",
+          "new": "class org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProvider",
+          "elementKind": "class",
+          "justification": "This is actually how it is being documented to use"
+        }
+      ]
+    }
+  },
   "4.3.0": {
     "revapi": {
       "ignore": [

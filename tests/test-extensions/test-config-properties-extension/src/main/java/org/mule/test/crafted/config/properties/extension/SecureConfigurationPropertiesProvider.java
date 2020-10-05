@@ -9,13 +9,13 @@ package org.mule.test.crafted.config.properties.extension;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import org.mule.runtime.api.component.location.ComponentLocation;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
-import org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
+import org.mule.runtime.properties.api.DefaultConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.Optional;
 
@@ -68,10 +68,10 @@ public class SecureConfigurationPropertiesProvider extends DefaultConfigurationP
    * @return an Optional with the value of the given key or {@link Optional#empty()} otherwise.
    */
   @Override
-  public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+  public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
     if (configurationAttributeKey.startsWith(SECURE_PREFIX)) {
       String effectiveKey = configurationAttributeKey.substring(SECURE_PREFIX.length());
-      return Optional.ofNullable(configurationAttributes.get(effectiveKey));
+      return super.provide(effectiveKey);
     } else if (configurationAttributeKey.startsWith(LIFECYCLE_PREFIX)) {
       String effectiveKey = configurationAttributeKey.substring(LIFECYCLE_PREFIX.length());
       if ("initialize".equals(effectiveKey) || "dispose".equals(effectiveKey)) {
@@ -83,7 +83,7 @@ public class SecureConfigurationPropertiesProvider extends DefaultConfigurationP
           }
 
           @Override
-          public Object getRawValue() {
+          public String getValue() {
             return "initialize".equals(effectiveKey) ? Integer.toString(initializationCount) : Integer.toString(disposeCount);
           }
 
@@ -97,14 +97,6 @@ public class SecureConfigurationPropertiesProvider extends DefaultConfigurationP
     } else {
       return empty();
     }
-  }
-
-  @Override
-  public String getDescription() {
-    ComponentLocation location = (ComponentLocation) getAnnotation(LOCATION_KEY);
-    return format("<secure-configuration-properties file=\"%s\"> - file: %s, line number: %s", fileLocation,
-                  location.getFileName().orElse(UNKNOWN),
-                  location.getLineInFile().map(String::valueOf).orElse("unknown"));
   }
 
   @Override

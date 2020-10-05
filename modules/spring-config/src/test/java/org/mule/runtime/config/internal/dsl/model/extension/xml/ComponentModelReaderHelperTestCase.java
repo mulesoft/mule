@@ -22,7 +22,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.builder.ArtifactAstBuilder;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
@@ -175,19 +174,7 @@ public class ComponentModelReaderHelperTestCase extends AbstractMuleTestCase {
       throw new IllegalArgumentException("There was an issue trying to read the stream of the test");
     }
     final ConfigLine configLine = parseModule.get();
-    final ConfigurationPropertiesResolver externalPropertiesResolver = new ConfigurationPropertiesResolver() {
-
-      @Override
-      public Object resolveValue(String value) {
-        return value;
-      }
-
-      @Override
-      public Object resolvePlaceholderKeyValue(String placeholderKey) {
-        return placeholderKey;
-      }
-    };
-    final ComponentModelReader componentModelReader = new ComponentModelReader(externalPropertiesResolver);
+    final ComponentModelReader componentModelReader = new ComponentModelReader();
 
     final ArtifactAstBuilder builder = ArtifactAstBuilder.builder(emptySet());
     componentModelReader.extractComponentDefinitionModel(configLine, filename, builder.addTopLevelComponent());

@@ -9,7 +9,17 @@ package org.mule.runtime.config.api.dsl.model.properties;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
+import org.mule.runtime.core.api.exception.ResourceNotFoundException;
+import org.mule.runtime.properties.api.ResourceProvider;
+import org.mule.runtime.properties.internal.ConfigurationPropertiesException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,16 +30,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
-import org.mule.runtime.core.api.exception.ResourceNotFoundException;
-
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.parser.ParserException;
 
@@ -37,10 +37,13 @@ import org.yaml.snakeyaml.parser.ParserException;
  * Artifact attributes configuration. This class represents a single configuration-attributes element from the configuration.
  *
  * @since 4.0
+ *
+ * @deprecated since 4.4, use org.mule.runtime.properties.api.DefaultConfigurationPropertiesProvider instead.
  */
-@NoExtend
-public class DefaultConfigurationPropertiesProvider extends AbstractComponent
-    implements ConfigurationPropertiesProvider, Initialisable {
+@Deprecated
+public class DefaultConfigurationPropertiesProvider
+    extends AbstractComponent
+    implements org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider, Initialisable {
 
   protected static final String PROPERTIES_EXTENSION = ".properties";
   protected static final String YAML_EXTENSION = ".yaml";
@@ -51,19 +54,21 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
   protected String encoding;
   protected ResourceProvider resourceProvider;
 
-  public DefaultConfigurationPropertiesProvider(String fileLocation, String encoding, ResourceProvider resourceProvider) {
+  public DefaultConfigurationPropertiesProvider(String fileLocation, String encoding,
+                                                org.mule.runtime.config.api.dsl.model.ResourceProvider resourceProvider) {
     this.fileLocation = fileLocation;
     this.resourceProvider = resourceProvider;
     this.encoding = encoding;
   }
 
-  public DefaultConfigurationPropertiesProvider(String fileLocation, ResourceProvider resourceProvider) {
+  public DefaultConfigurationPropertiesProvider(String fileLocation,
+                                                org.mule.runtime.config.api.dsl.model.ResourceProvider resourceProvider) {
     this(fileLocation, null, resourceProvider);
   }
 
   @Override
   public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
-    return Optional.ofNullable(configurationAttributes.get(configurationAttributeKey));
+    return ofNullable(configurationAttributes.get(configurationAttributeKey));
   }
 
   @Override
@@ -104,7 +109,7 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
       throw e;
     } catch (Exception e) {
       throw new ConfigurationPropertiesException(createStaticMessage("Couldn't read from file "
-          + fileLocation), this, e);
+          + fileLocation + ": " + e.getMessage()), this, e);
     }
   }
 
@@ -113,8 +118,8 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
       Properties properties = new Properties();
       properties.load(is);
       properties.keySet().stream().map(key -> {
-        Object rawValue = properties.get(key);
-        rawValue = createValue((String) key, (String) rawValue);
+        String rawValue = (String) properties.get(key);
+        rawValue = createValue((String) key, rawValue);
         return new DefaultConfigurationProperty(of(this), (String) key, rawValue);
       }).forEach(configurationAttribute -> {
         configurationAttributes.put(configurationAttribute.getKey(), configurationAttribute);

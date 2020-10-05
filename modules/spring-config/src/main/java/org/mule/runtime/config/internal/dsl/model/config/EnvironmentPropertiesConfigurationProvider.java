@@ -8,8 +8,8 @@ package org.mule.runtime.config.internal.dsl.model.config;
 
 import static java.lang.System.getProperties;
 
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ import java.util.function.Supplier;
  */
 public class EnvironmentPropertiesConfigurationProvider implements ConfigurationPropertiesProvider {
 
-  private Map<String, ConfigurationProperty> configurationAttributes = new HashMap<>();
+  private final Map<String, ConfigurationProperty> configurationAttributes = new HashMap<>();
 
   /**
    * Creates an {@link EnvironmentPropertiesConfigurationProvider} with the default configuration.
@@ -39,8 +39,8 @@ public class EnvironmentPropertiesConfigurationProvider implements Configuration
 
   /**
    * Used for testing only.
-   * 
-   * @param environmentVariablesSupplier supplier for environment varialbes.
+   *
+   * @param environmentVariablesSupplier supplier for environment variables.
    */
   EnvironmentPropertiesConfigurationProvider(Supplier<Map<String, String>> environmentVariablesSupplier) {
     Map<String, String> environmentVariables = environmentVariablesSupplier.get();
@@ -63,7 +63,7 @@ public class EnvironmentPropertiesConfigurationProvider implements Configuration
   }
 
   @Override
-  public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+  public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
     return Optional.ofNullable(configurationAttributes.get(configurationAttributeKey));
   }
 

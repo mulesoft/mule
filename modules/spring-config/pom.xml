@@ -39,6 +39,10 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-properties-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-artifact-ast-dependency-graph</artifactId>
         </dependency>
         <dependency>
