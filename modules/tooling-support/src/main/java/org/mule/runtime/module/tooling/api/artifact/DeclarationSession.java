@@ -16,7 +16,6 @@ import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
-import org.mule.runtime.core.api.el.ExpressionManager;
 
 /**
  * It is in charge of resolving connector's operations and retrieving metadata and sample data for all
@@ -79,12 +78,6 @@ public interface DeclarationSession {
    * @return a {@link SampleDataResult} with the sample data message
    */
   SampleDataResult getSampleData(ComponentElementDeclaration component);
-
-  /**
-   * Exposes the application Expression Manager.
-   * TODO remove once the agent allows injecting the expression language factory service (CMTS-70)
-   */
-  ExpressionManager getExpressionManager();
 
   /**
    * Stops and disposes all resources used by this {@link DeclarationSession}
