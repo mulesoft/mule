@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
@@ -32,7 +33,7 @@ import java.util.Properties;
 public class MuleCustomEntityResolver implements EntityResolver {
 
   public static final String CUSTOM_SCHEMA_MAPPINGS_LOCATION = "META-INF/mule.schemas";
-  private static final Logger LOGGER = LoggerFactory.getLogger(MuleCustomEntityResolver.class);
+  private static final Logger LOGGER = getLogger(MuleCustomEntityResolver.class);
 
   private ClassLoader classLoader;
   private Map<String, String> schemaMappings;
@@ -45,22 +46,31 @@ public class MuleCustomEntityResolver implements EntityResolver {
   @Override
   public InputSource resolveEntity(String publicId, String systemId) {
     if (systemId != null) {
-      String resourceLocation = this.schemaMappings.get(systemId);
+      String resourceLocation = schemaMappings.get(systemId);
       if (resourceLocation != null) {
-        // The caller expects the stream in the InputSource to be open, so this cannot be closed before returning.
-        InputStream is = this.classLoader.getResourceAsStream(resourceLocation);
-        if (is == null) {
+        URL resource = this.classLoader.getResource(resourceLocation);
+        if (resource == null) {
           LOGGER.debug("Couldn't find XML schema [" + systemId + "]: " + resourceLocation);
           return null;
         }
-        InputSource source = new InputSource(is);
-        source.setPublicId(publicId);
-        source.setSystemId(systemId);
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Found XML schema [" + systemId + "] in classpath: " + resourceLocation);
+        // The caller expects the stream in the InputSource to be open, so this cannot be closed before returning.
+        try {
+          URLConnection connection = resource.openConnection();
+          connection.setUseCaches(false);
+          InputStream is = connection.getInputStream();
+
+          InputSource source = new InputSource(is);
+          source.setPublicId(publicId);
+          source.setSystemId(systemId);
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Found XML schema [" + systemId + "] in classpath: " + resourceLocation);
+          }
+          return source;
+        } catch (IOException e) {
+          LOGGER.warn("Error resolving entity [" + systemId + "]: " + resourceLocation, e);
         }
-        return source;
       }
+      return null;
     }
     return null;
   }
