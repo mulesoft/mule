@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -16,7 +18,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
@@ -33,7 +34,7 @@ public class MuleCustomEntityResolver implements EntityResolver {
 
   public static final String CUSTOM_SCHEMA_MAPPINGS_LOCATION = "META-INF/mule.schemas";
   public static final String CUSTOM_SPRING_SCHEMA_MAPPINGS_LOCATION = "META-INF/spring.schemas";
-  private static final Logger LOGGER = LoggerFactory.getLogger(MuleCustomEntityResolver.class);
+  private static final Logger LOGGER = getLogger(MuleCustomEntityResolver.class);
 
   private final ClassLoader classLoader;
   private final Map<String, String> muleSchemaMappings;
@@ -50,10 +51,10 @@ public class MuleCustomEntityResolver implements EntityResolver {
     if (systemId != null) {
       // Runtime takes precedence over plugins, to avoid a misbehaving plugin to override something from the runtime
       InputSource source =
-          resoveEntityInClassloader(muleSchemaMappings, publicId, systemId, MuleCustomEntityResolver.class.getClassLoader());
+          resolveEntityInClassloader(muleSchemaMappings, publicId, systemId, MuleCustomEntityResolver.class.getClassLoader());
 
       if (source == null) {
-        source = resoveEntityInClassloader(appPluginsSchemaMappings, publicId, systemId, this.classLoader);
+        source = resolveEntityInClassloader(appPluginsSchemaMappings, publicId, systemId, this.classLoader);
       }
 
       return source;
@@ -61,7 +62,7 @@ public class MuleCustomEntityResolver implements EntityResolver {
     return null;
   }
 
-  private static InputSource resoveEntityInClassloader(Map<String, String> schemaMappings, String publicId, String systemId,
+  private static InputSource resolveEntityInClassloader(Map<String, String> schemaMappings, String publicId, String systemId,
                                                        ClassLoader cl) {
     if (systemId.startsWith("http://www.springframework.org/") && systemId.endsWith("-current.xsd")) {
       LOGGER
@@ -71,22 +72,29 @@ public class MuleCustomEntityResolver implements EntityResolver {
 
     String resourceLocation = schemaMappings.get(systemId);
     if (resourceLocation != null) {
-      // The caller expects the stream in the InputSource to be open, so this cannot be closed before returning.
-      InputStream is = cl.getResourceAsStream(resourceLocation);
-      if (is == null) {
+      URL resource = cl.getResource(resourceLocation);
+      if (resource == null) {
         LOGGER.debug("Couldn't find XML schema [" + systemId + "]: " + resourceLocation);
         return null;
       }
-      InputSource source = new InputSource(is);
-      source.setPublicId(publicId);
-      source.setSystemId(systemId);
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Found XML schema [" + systemId + "] in classpath: " + resourceLocation);
+      // The caller expects the stream in the InputSource to be open, so this cannot be closed before returning.
+      try {
+        URLConnection connection = resource.openConnection();
+        connection.setUseCaches(false);
+        InputStream is = connection.getInputStream();
+
+        InputSource source = new InputSource(is);
+        source.setPublicId(publicId);
+        source.setSystemId(systemId);
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Found XML schema [" + systemId + "] in classpath: " + resourceLocation);
+        }
+        return source;
+      } catch (IOException e) {
+        LOGGER.warn("Error resolving entity [" + systemId + "]: " + resourceLocation, e);
       }
-      return source;
-    } else {
-      return null;
     }
+    return null;
   }
 
   /**
