@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.slf4j.LoggerFactory.getLogger;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
@@ -78,8 +77,10 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.in
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.functional.api.flow.FlowRunner;
+import org.mule.functional.config.TestComponentBuildingDefinitionProvider;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -94,7 +95,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
@@ -348,13 +348,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         new SingleClassCompiler().dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
 
     internalIsRunningTests =
-        (Boolean) readDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", true);
-    writeDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", true, true);
+        (Boolean) readDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", true);
+    writeDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", true, true);
   }
 
   @BeforeClass
   public static void afterClass() throws IllegalAccessException {
-    writeDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", internalIsRunningTests, true);
+    writeDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", internalIsRunningTests,
+                             true);
   }
 
   protected static File getResourceFile(String resource) throws URISyntaxException {
