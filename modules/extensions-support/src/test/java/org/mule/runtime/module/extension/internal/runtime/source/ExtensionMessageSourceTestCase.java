@@ -107,7 +107,10 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public void handleExceptionAndRestart() throws Exception {
     start();
     messageSource.onException(new ConnectionException(ERROR_MESSAGE));
-    verify(source).onStop();
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source).onStop();
+      return true;
+    }));
     verify(ioScheduler, never()).stop();
     verify(cpuLightScheduler, never()).stop();
 

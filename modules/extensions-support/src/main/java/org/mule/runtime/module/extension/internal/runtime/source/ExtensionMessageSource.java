@@ -91,6 +91,8 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -208,9 +210,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       throws MuleException {
     try {
       RetryCallback retryCallback = createRetryCallback(restarting, restartContext, reconnectionCallback);
-      // When restarting, async must be forced
-      if (restarting && !retryPolicyTemplate.isAsync()) {
-        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(retryCallback, retryScheduler);
+      if (restarting && retryPolicyTemplate.isAsync()) {
+        retryPolicyTemplate.execute(retryCallback, new ImmediateExecutor());
       } else {
         retryPolicyTemplate.execute(retryCallback, retryScheduler);
       }
@@ -323,22 +324,24 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                        sourceAdapter.getName(), getLocation().getRootContainerName()),
                 exception);
 
-    Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
-        .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
-        .orElseGet(() -> create(sink -> {
-          try {
-            exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
-            restart(new ReactiveReconnectionCallback(sink));
-          } catch (Exception e) {
-            sink.error(e);
-          }
-        }));
+    Executors.newSingleThreadExecutor().submit(() -> {
+      Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
+          .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
+          .orElseGet(() -> create(sink -> {
+            try {
+              exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
+              restart(new ReactiveReconnectionCallback(sink));
+            } catch (Exception e) {
+              sink.error(e);
+            }
+          }));
 
-    reconnectionAction
-        .doOnSuccess(v -> onReconnectionSuccessful())
-        .doOnError(this::onReconnectionFailed)
-        .doAfterTerminate(() -> reconnecting.set(false))
-        .subscribe();
+      reconnectionAction
+          .doOnSuccess(v -> onReconnectionSuccessful())
+          .doOnError(this::onReconnectionFailed)
+          .doAfterTerminate(() -> reconnecting.set(false))
+          .subscribe();
+    });
   }
 
   private void onReconnectionSuccessful() {
@@ -746,5 +749,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public String toString() {
     return this.getClass().getSimpleName() + ": " + Objects.toString(sourceAdapter);
+  }
+
+  private class ImmediateExecutor implements Executor {
+
+    @Override
+    public void execute(Runnable command) {
+      command.run();
+    }
   }
 }
