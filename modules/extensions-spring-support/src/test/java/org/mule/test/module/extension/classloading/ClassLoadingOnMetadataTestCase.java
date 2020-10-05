@@ -6,28 +6,31 @@
  */
 package org.mule.test.module.extension.classloading;
 
+import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.tck.util.TestConnectivityUtils.disableAutomaticTestConnectivity;
-import static org.mule.test.classloading.CLNoneConnectionProvider.CONNECT;
-import static org.mule.test.classloading.CLNoneConnectionProvider.DISCONNECT;
-import static org.mule.test.classloading.CLPoolingConnectionProvider.ON_BORROW;
-import static org.mule.test.classloading.CLPoolingConnectionProvider.ON_RETURN;
+import static org.mule.test.classloading.CLKeysResolver.GET_METADATA;
 import static org.mule.test.classloading.api.ClassLoadingHelper.verifyUsedClassLoaders;
 
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.classloading.api.ClassLoadingHelper;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import org.junit.Before;
+import javax.inject.Inject;
+
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ClassLoadingOnConnectionsTestCase extends AbstractExtensionFunctionalTestCase {
+public class ClassLoadingOnMetadataTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @Inject
+  private MetadataService metadataService;
 
   @Rule
   public SystemProperty disableTestConnectivity = disableAutomaticTestConnectivity();
 
-  @Before
-  public void setUp() {
+  @Override
+  protected void doTearDown() throws Exception {
     ClassLoadingHelper.createdClassLoaders.clear();
   }
 
@@ -37,20 +40,8 @@ public class ClassLoadingOnConnectionsTestCase extends AbstractExtensionFunction
   }
 
   @Test
-  public void noneConnectionProvider() throws Exception {
-    flowRunner("none-operation").run();
-    verifyUsedClassLoaders(CONNECT, DISCONNECT);
-  }
-
-  @Test
-  public void cachedConnectionProvider() throws Exception {
-    flowRunner("cached-operation").run();
-    verifyUsedClassLoaders(CONNECT);
-  }
-
-  @Test
-  public void poolingConnectionProvider() throws Exception {
-    flowRunner("pooling-operation").run();
-    verifyUsedClassLoaders(CONNECT, ON_BORROW, ON_RETURN);
+  public void operationWithMetadataResolver() throws Exception {
+    metadataService.getMetadataKeys(builder().globalName("none").build());
+    verifyUsedClassLoaders(GET_METADATA);
   }
 }
