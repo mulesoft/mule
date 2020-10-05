@@ -18,7 +18,6 @@ import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHel
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.resolveConfigName;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -154,6 +153,8 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     if (typeInformation.isDynamicType()) {
+      resolveDslTagNamespace(component).ifPresent(keyParts::add);
+
       resolveConfigId(component).ifPresent(keyParts::add);
 
       typeInformation.getResolverCategory()
@@ -183,6 +184,11 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
                                       .map(sourceElementName -> format("(%s):(%s)", getSourceElementName(component),
                                                                        sourceElementName))
                                       .orElse(format("(%s):(%s)", getSourceElementName(component), "Unknown Type"))));
+  }
+
+  private Optional<MetadataCacheId> resolveDslTagNamespace(ComponentAst elementModel) {
+    String namespace = elementModel.getIdentifier().getNamespace();
+    return of(new MetadataCacheId(namespace.toLowerCase().hashCode(), namespace));
   }
 
   private Optional<MetadataCacheId> doResolve(ComponentAst elementModel) {
