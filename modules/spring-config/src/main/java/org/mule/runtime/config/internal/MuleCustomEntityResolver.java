@@ -63,7 +63,7 @@ public class MuleCustomEntityResolver implements EntityResolver {
   }
 
   private static InputSource resolveEntityInClassloader(Map<String, String> schemaMappings, String publicId, String systemId,
-                                                       ClassLoader cl) {
+                                                        ClassLoader cl) {
     if (systemId.startsWith("http://www.springframework.org/") && systemId.endsWith("-current.xsd")) {
       LOGGER
           .warn("Usage of `-current` spring schemas is discouraged, since it may lead to unexpected changes if the Spring version is upgraded."
