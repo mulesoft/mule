@@ -148,30 +148,13 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     ConfigurationInstance configuration;
     cacheReadLock.lock();
     try {
-      configuration = cache.get(resolverSetResult);
-      if (configuration != null) {
-        // important to account between the boundaries of the lock to prevent race condition
-        updateUsageStatistic(configuration);
-        return configuration;
-      }
-    } finally {
-      cacheReadLock.unlock();
-    }
-
-    cacheWriteLock.lock();
-    try {
-      // re-check in case some other thread beat us to it...
-      configuration = cache.get(resolverSetResult);
-      if (configuration == null) {
-        configuration = createConfiguration(resolverSetResult, event);
-        cache.put(resolverSetResult, configuration);
-      }
-
-      // accounting here for the same reasons as above
+      configuration = cache.computeIfAbsent(resolverSetResult, (r) -> createConfiguration(r, event));
       updateUsageStatistic(configuration);
       return configuration;
+    } catch (WrappingRuntimeException e) {
+      throw e.getWrappedException();
     } finally {
-      cacheWriteLock.unlock();
+      cacheReadLock.unlock();
     }
   }
 
@@ -180,27 +163,27 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     stats.updateLastUsed();
   }
 
-  private ConfigurationInstance createConfiguration(Pair<ResolverSetResult, ResolverSetResult> values, CoreEvent event)
-      throws MuleException {
-
+  private ConfigurationInstance createConfiguration(Pair<ResolverSetResult, ResolverSetResult> values, CoreEvent event) {
     ConfigurationInstance configuration;
     ResolverSetResult connectionProviderValues = values.getSecond();
-    if (connectionProviderValues != null) {
-      configuration = configurationInstanceFactory.createConfiguration(getName(),
-                                                                       values.getFirst(),
-                                                                       event,
-                                                                       connectionProviderResolver,
-                                                                       connectionProviderValues);
-    } else {
-      configuration = configurationInstanceFactory.createConfiguration(getName(),
-                                                                       values.getFirst(),
-                                                                       event,
-                                                                       ofNullable(connectionProviderResolver));
+    try {
+      if (connectionProviderValues != null) {
+        configuration = configurationInstanceFactory.createConfiguration(getName(),
+                                                                         values.getFirst(),
+                                                                         event,
+                                                                         connectionProviderResolver,
+                                                                         connectionProviderValues);
+      } else {
+        configuration = configurationInstanceFactory.createConfiguration(getName(),
+                                                                         values.getFirst(),
+                                                                         event,
+                                                                         ofNullable(connectionProviderResolver));
+      }
+      registerConfiguration(configuration);
+      return configuration;
+    } catch (MuleException e) {
+      throw new WrappingRuntimeException(e);
     }
-
-    registerConfiguration(configuration);
-
-    return configuration;
   }
 
   @Override
@@ -333,4 +316,21 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
         .map(ob -> ((ConnectionProviderObjectBuilder) ob).providerModel);
   }
 
+  /**
+   * Used to preserve exception throwing behaviour in {@link #getConfiguration} as the method {@link #createConfiguration} can no longer throw
+   * checked exception as it is used inside {@link Map#computeIfAbsent}.
+   */
+  private static class WrappingRuntimeException extends RuntimeException {
+
+    private final Exception wrappedException;
+
+    public WrappingRuntimeException(Exception e) {
+      super(e);
+      this.wrappedException = e;
+    }
+
+    public Exception getWrappedException() {
+      return wrappedException;
+    }
+  }
 }

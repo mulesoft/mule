@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MINUTES;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -33,12 +35,14 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
@@ -315,6 +319,17 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
       verify(connProvider, never()).stop();
       verify(connProvider).dispose();
     }
+  }
+
+  @Test
+  public void configFailsOnInitializeOnFactoryCreateConfiguration() throws Exception {
+    final String expectedExceptionMessage = "Init failed!";
+    doThrow(new ConfigurationException(createStaticMessage(expectedExceptionMessage))).when(connectionProviderResolver)
+        .resolve(any());
+    expected.expect(MuleRuntimeException.class);
+    expected.expectCause(instanceOf(ConfigurationException.class));
+    expected.expectCause(hasMessage(is(expectedExceptionMessage)));
+    provider.get(event);
   }
 
   @Test
