@@ -196,7 +196,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
 
   private ValueProviderCacheId resolveValueProviderId(ValueProviderModel valueProviderModel) {
     return aValueProviderCacheId(fromElementWithName("providerId: " + valueProviderModel.getProviderId())
-        .withHashValueFrom(valueProviderModel.getProviderName()));
+        .withHashValueFrom(valueProviderModel.getProviderId()));
   }
 
   private List<ValueProviderCacheId> resolveActingParameterIds(ComponentAst containerComponent,

@@ -321,7 +321,22 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
   }
 
   @Test
-  public void differentConfigsWithSameParameterGetDifferentHash() throws Exception {
+  public void differentConfigsWithDifferentProviderIdGetDifferentHash() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
+    app.addGlobalElement(declareOtherConfig(config.getConnection().get(), "newName",
+                                            PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
+                                            ACTING_PARAMETER_DEFAULT_VALUE,
+                                            PROVIDED_PARAMETER_DEFAULT_VALUE,
+                                            PARAMETER_IN_GROUP_DEFAULT_VALUE));
+    Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
+    when(valueProviderModel.getProviderId()).thenReturn("newValueProviderId");
+    Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
+    checkIdsAreDifferent(config1Id, config2Id);
+  }
+
+  @Test
+  public void differentConfigsWithSameProviderIdGetSameHash() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
     app.addGlobalElement(declareOtherConfig(config.getConnection().get(), "newName",
@@ -331,26 +346,35 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
                                             PARAMETER_IN_GROUP_DEFAULT_VALUE));
     Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
     Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
-    checkIdsAreDifferent(config1Id, config2Id);
+    checkIdsAreEqual(config1Id, config2Id);
   }
 
   @Test
-  public void differentValueProviderNameGetsDifferentHash() throws Exception {
+  public void differentValueProviderIdGetsDifferentHash() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConnection()).thenReturn(true);
     when(valueProviderModel.requiresConfiguration()).thenReturn(true);
     Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
-    when(valueProviderModel.getProviderName()).thenReturn("newValueProviderName");
+    when(valueProviderModel.getProviderId()).thenReturn("newValueProviderId");
     Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     checkIdsAreDifferent(opId1, opId2);
   }
 
   @Test
-  public void differentOperationsWithSameParametersGetsDifferentHash() throws Exception {
+  public void differentOperationsWithDifferentProviderIdGetsDifferentHash() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    when(valueProviderModel.getProviderId()).thenReturn("newValueProviderId");
+    Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OTHER_OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    checkIdsAreDifferent(opId1, opId2);
+  }
+
+  @Test
+  public void differentOperationsWithSameValueProviderIdGetsSameHash() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OTHER_OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
-    checkIdsAreDifferent(opId1, opId2);
+    checkIdsAreEqual(opId1, opId2);
   }
 
   private static class Locator implements ComponentLocator<ComponentAst> {
