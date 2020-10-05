@@ -46,7 +46,7 @@ public class MuleCustomEntityResolver implements EntityResolver {
   @Override
   public InputSource resolveEntity(String publicId, String systemId) {
     if (systemId != null) {
-      String resourceLocation = schemaMappings.get(systemId);
+      String resourceLocation = this.schemaMappings.get(systemId);
       if (resourceLocation != null) {
         URL resource = this.classLoader.getResource(resourceLocation);
         if (resource == null) {
