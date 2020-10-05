@@ -54,6 +54,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 
@@ -211,19 +212,20 @@ public final class ExtensionsOAuthUtils {
    * Gets the value provided by a {@link CheckedSupplier}, if that fails and the reason is that a token refresh is needed,
    * the refresh is performed and the supplier is prompted to provide the value one more time.
    *
-   * @param connectionProvider  the provider that created a connection used in the supplier to provide a value.
-   * @param supplier            a supplier that depends on an oauth based connection to provide a value.
-   * @param <T>                 the type of the value to be provided
-   * @return                    the value the supplier gives
+   * @param connectionProviderSupplier  a supplier of the connection provider that created a connection used in the given
+   *                                    supplier to provide a value.
+   * @param supplier                    a supplier that depends on an oauth based connection to provide a value.
+   * @param <T>                         the type of the value to be provided
+   * @return                            the value the supplier gives
    * @throws Exception
    * @since 4.4.0
    */
-  public static <T> T withRefreshToken(ConnectionProvider connectionProvider, CheckedSupplier<T> supplier)
+  public static <T> T withRefreshToken(Supplier<ConnectionProvider> connectionProviderSupplier, CheckedSupplier<T> supplier)
       throws Exception {
     try {
       return supplier.getChecked();
     } catch (Throwable e) {
-      if (refreshTokenIfNecessary(connectionProvider, e)) {
+      if (refreshTokenIfNecessary(connectionProviderSupplier, e)) {
         try {
           return supplier.getChecked();
         } catch (Exception exception) {
@@ -241,6 +243,22 @@ public final class ExtensionsOAuthUtils {
   }
 
   /**
+   * Gets the value provided by a {@link CheckedSupplier}, if that fails and the reason is that a token refresh is needed,
+   * the refresh is performed and the supplier is prompted to provide the value one more time.
+   *
+   * @param connectionProvider  the provider that created a connection used in the supplier to provide a value.
+   * @param supplier            a supplier that depends on an oauth based connection to provide a value.
+   * @param <T>                 the type of the value to be provided
+   * @return                    the value the supplier gives
+   * @throws Exception
+   * @since 4.4.0
+   */
+  public static <T> T withRefreshToken(ConnectionProvider connectionProvider, CheckedSupplier<T> supplier)
+      throws Exception {
+    return withRefreshToken(() -> connectionProvider, supplier);
+  }
+
+  /**
    *  Performs a token refresh if the underlying {@link ConnectionProvider} of the given {@link ExecutionContextAdapter}
    *  knows how do it and the given {@link Throwable} signals a refresh is needed by either being an
    *  {@link AccessTokenExpiredException} or by one appearing in the chain of causes.
@@ -251,7 +269,7 @@ public final class ExtensionsOAuthUtils {
    */
   public static boolean refreshTokenIfNecessary(ExecutionContextAdapter<OperationModel> operationContext, Throwable e) {
     OAuthConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);
-    return refreshTokenIfNecessary(connectionProvider, e,
+    return refreshTokenIfNecessary(() -> connectionProvider, e,
                                    of(new LazyValue<>(() -> format("at operation '%s:%s' using config '%s'",
                                                                    operationContext.getExtensionModel().getName(),
                                                                    operationContext.getComponentModel().getName(),
@@ -270,10 +288,14 @@ public final class ExtensionsOAuthUtils {
    * @since 4.4.0
    */
   public static boolean refreshTokenIfNecessary(ConnectionProvider connectionProvider, Throwable e) {
-    return refreshTokenIfNecessary(connectionProvider, e, empty(), empty());
+    return refreshTokenIfNecessary(() -> connectionProvider, e, empty(), empty());
   }
 
-  private static boolean refreshTokenIfNecessary(ConnectionProvider connectionProvider, Throwable e,
+  private static boolean refreshTokenIfNecessary(Supplier<ConnectionProvider> connectionProviderSupplier, Throwable e) {
+    return refreshTokenIfNecessary(connectionProviderSupplier, e, empty(), empty());
+  }
+
+  private static boolean refreshTokenIfNecessary(Supplier<ConnectionProvider> connectionProviderSupplier, Throwable e,
                                                  Optional<LazyValue<String>> refreshContext,
                                                  Optional<LazyValue<String>> configName) {
     AccessTokenExpiredException expiredException = getTokenExpirationException(e);
@@ -281,8 +303,8 @@ public final class ExtensionsOAuthUtils {
       return false;
     }
 
-    OAuthConnectionProviderWrapper oauthConnectionProvider = getOAuthConnectionProvider(connectionProvider);
-    if (connectionProvider == null) {
+    OAuthConnectionProviderWrapper oauthConnectionProvider = getOAuthConnectionProvider(connectionProviderSupplier.get());
+    if (oauthConnectionProvider == null) {
       return false;
     }
 
@@ -291,7 +313,7 @@ public final class ExtensionsOAuthUtils {
 
       @Override
       public void visit(AuthorizationCodeGrantType grantType) {
-        AuthorizationCodeConnectionProviderWrapper cp = (AuthorizationCodeConnectionProviderWrapper) connectionProvider;
+        AuthorizationCodeConnectionProviderWrapper cp = (AuthorizationCodeConnectionProviderWrapper) oauthConnectionProvider;
         String rsId = cp.getResourceOwnerId();
         resourceOwnerIdReference.set(of(rsId));
 

@@ -19,6 +19,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -114,7 +115,8 @@ public class MuleSampleDataService implements SampleDataService {
     try {
       return mediator.getSampleData(StaticParameterValueResolver.from(replaceParameterAliases(parameters, componentModel)),
                                     (CheckedSupplier<Object>) () -> ctx.getConnection().orElse(null),
-                                    (CheckedSupplier<Object>) () -> ctx.getConfig().orElse(null));
+                                    (CheckedSupplier<Object>) () -> ctx.getConfig().orElse(null),
+                                    (CheckedSupplier<ConnectionProvider>) () -> ctx.getConnectionProvider().orElse(null));
     } finally {
       ctx.dispose();
     }

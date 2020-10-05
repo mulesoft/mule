@@ -13,10 +13,12 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.withRefreshToken;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
 import static org.mule.sdk.api.data.sample.SampleDataException.UNKNOWN;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -87,7 +89,7 @@ public class SampleDataProviderMediator {
    *                               the value of parameters from the same parameter container.
    * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
    *                               {@link SampleDataProvider}
-   * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
+   * @param configurationSupplier  supplier of configuration instance related to the container and used, if necessary, by the
    *                               {@link SampleDataProvider}
    * @return a {@link Message} carrying the sample data
    * @throws SampleDataException if an error occurs resolving the sample data
@@ -95,6 +97,29 @@ public class SampleDataProviderMediator {
   public Message getSampleData(ParameterValueResolver parameterValueResolver,
                                Supplier<Object> connectionSupplier,
                                Supplier<Object> configurationSupplier)
+      throws SampleDataException {
+    return getSampleData(parameterValueResolver, connectionSupplier, configurationSupplier, () -> null);
+  }
+
+  /**
+   * Resolves the sample data
+   *
+   * @param parameterValueResolver       parameter resolver required if the associated {@link SampleDataProvider} requires
+   *                                     the value of parameters from the same parameter container.
+   * @param connectionSupplier           supplier of connection instances related to the container and used, if necessary,
+   *                                     by the {@link SampleDataProvider}
+   * @param configurationSupplier        supplier of configuration instance related to the container and used, if necessary,
+   *                                     by the  {@link SampleDataProvider}
+   * @param connectionProviderSupplier   the connection provider in charge of providing the connection given by the
+   *                                     connection supplier.
+   *
+   * @return a {@link Message} carrying the sample data
+   * @throws SampleDataException if an error occurs resolving the sample data
+   */
+  public Message getSampleData(ParameterValueResolver parameterValueResolver,
+                               Supplier<Object> connectionSupplier,
+                               Supplier<Object> configurationSupplier,
+                               Supplier<ConnectionProvider> connectionProviderSupplier)
       throws SampleDataException {
     if (sampleDataProperty == null) {
       throw new SampleDataException(
@@ -111,7 +136,7 @@ public class SampleDataProviderMediator {
                                                                            muleContext);
 
       SampleDataProvider provider = factory.createSampleDataProvider();
-      Result result = provider.getSample();
+      Result result = withRefreshToken(connectionProviderSupplier, () -> provider.getSample());
 
       return returnDelegate.asReturnValue(result, createExecutionContext(configurationSupplier)).getMessage();
     } catch (SampleDataException e) {

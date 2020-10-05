@@ -28,6 +28,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -459,7 +460,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getSampleDataProviderMediator()
           .getSampleData(getParameterValueResolver(),
                          (CheckedSupplier<Object>) () -> context.getConnection().orElse(null),
-                         (CheckedSupplier<Object>) () -> context.getConfig().orElse(null))));
+                         (CheckedSupplier<Object>) () -> context.getConfig().orElse(null),
+                         (CheckedSupplier<ConnectionProvider>) () -> context.getConnectionProvider().orElse(null))));
     } catch (MuleRuntimeException e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof SampleDataException) {
