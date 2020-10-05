@@ -385,7 +385,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   }
 
   @Test
-  public void differentConfigsWithSameParameterGetDifferentHash() throws Exception {
+  public void differentConfigsWithSameParameterGetSameHash() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
     app.addGlobalElement(declareOtherConfig(config.getConnection().get(), "newName",
@@ -395,7 +395,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
                                             PARAMETER_IN_GROUP_DEFAULT_VALUE));
     Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
     Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
-    checkIdsAreDifferent(config1Id, config2Id);
+    checkIdsAreEqual(config1Id, config2Id);
   }
 
   @Test
@@ -421,11 +421,11 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   }
 
   @Test
-  public void differentOperationsWithSameParametersGetsDifferentHash() throws Exception {
+  public void differentOperationsWithSameParametersGetsSameHash() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OTHER_OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
-    checkIdsAreDifferent(opId1, opId2);
+    checkIdsAreEqual(opId1, opId2);
   }
 
   @Test

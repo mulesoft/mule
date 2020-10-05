@@ -112,7 +112,8 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
     String id = getSourceElementName(containerComponent);
-    return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(id).containing(parts)));
+    return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(resolveDslTagNamespace(containerComponent))
+        .containing(parts)));
   }
 
   private Optional<ValueProviderCacheId> resolveForComponentModel(ComponentAst containerComponent,
@@ -126,7 +127,12 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
     String id = getSourceElementName(containerComponent);
-    return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(id).containing(parts)));
+    return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(resolveDslTagNamespace(containerComponent))
+        .containing(parts)));
+  }
+
+  private String resolveDslTagNamespace(ComponentAst containerComponent) {
+    return containerComponent.getIdentifier().getNamespace().toLowerCase();
   }
 
   private List<ValueProviderCacheId> resolveIdForInjectedElements(ComponentAst containerComponent,
