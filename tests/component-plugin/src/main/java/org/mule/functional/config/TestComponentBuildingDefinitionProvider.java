@@ -53,12 +53,20 @@ import java.util.List;
  */
 public class TestComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
 
+  private static Boolean internalIsRunningTests;
+
   private ComponentBuildingDefinition.Builder baseDefinition;
 
   public TestComponentBuildingDefinitionProvider() {}
 
   @Override
   public void init() {
+    boolean runningTests = isRunningTests();
+
+    if (!runningTests) {
+      throw new IllegalStateException("Internal runtime mule-test.xsd can't be used in real applications");
+    }
+
     baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(TEST_NAMESPACE);
   }
 
@@ -246,8 +254,20 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
             .withSetterParameterDefinition("valueStartsWith", fromSimpleParameter("valueStartsWith").build())
             .build());
+  }
 
-
+  private boolean isRunningTests() {
+    if (internalIsRunningTests != null) {
+      return internalIsRunningTests;
+    }
+    for (StackTraceElement element : new Throwable().getStackTrace()) {
+      if (element.getClassName().startsWith("org.junit.runners.")) {
+        internalIsRunningTests = true;
+        return true;
+      }
+    }
+    internalIsRunningTests = false;
+    return false;
   }
 
 }
