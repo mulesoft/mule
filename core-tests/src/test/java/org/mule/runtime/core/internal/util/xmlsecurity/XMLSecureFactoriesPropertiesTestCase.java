@@ -6,107 +6,90 @@
  */
 package org.mule.runtime.core.internal.util.xmlsecurity;
 
-import static java.util.Arrays.asList;
-import static javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD;
-import static javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA;
-import static javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+
+import io.qameta.allure.Issue;
+import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.List;
-
-import javax.xml.transform.TransformerFactory;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-public class XMLSecureFactoriesPropertiesTestCase extends AbstractMuleTestCase {
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.validation.Validator;
 
-  private static final List<String> FACTORY_ATTRIBUTES = asList(ACCESS_EXTERNAL_STYLESHEET, ACCESS_EXTERNAL_DTD);
-  private static final List<String> VALIDATOR_PROPERTIES = asList(ACCESS_EXTERNAL_SCHEMA, ACCESS_EXTERNAL_DTD);
-  private static final List<String> SCHEMA_FACTORY_PROPERTIES = asList(ACCESS_EXTERNAL_SCHEMA, ACCESS_EXTERNAL_DTD);
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class)
+public class XMLSecureFactoriesPropertiesTestCase {
 
-  private final DefaultXMLSecureFactories defaultXMLSecureFactories = new DefaultXMLSecureFactories(false, false);
-  private final SchemaFactory schemaFactory =
-      XMLSecureFactories.createDefault().getSchemaFactory("http://www.w3.org/2001/XMLSchema");
-  private final TransformerFactory transformerFactory = XMLSecureFactories.createDefault().getTransformerFactory();
-  private final Validator validatorWrapper = mock(Validator.class);
-  private final SchemaFactory schemaFactoryWrapper = mock(SchemaFactory.class);
-  private final TransformerFactory transformerFactoryWrapper = mock(TransformerFactory.class);
+  private static final String SCHEMA_LOCATION = "http://www.w3.org/2001/XMLSchema";
 
-  @Test
-  public void validatorProperties() throws Exception {
-    SetPropertyAnswer setPropertyAnswer = new SetPropertyAnswer(schemaFactory.newSchema().newValidator());
-    doAnswer(setPropertyAnswer).when(validatorWrapper).setProperty(anyString(), anyObject());
-    defaultXMLSecureFactories.configureValidator(validatorWrapper);
-    assertThat(setPropertyAnswer.exception, is(nullValue()));
-    for (String property : VALIDATOR_PROPERTIES) {
-      verify(validatorWrapper).setProperty(property, "");
-    }
+  private org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories delegate;
+
+  @Before
+  public void setup() {
+    mockStatic(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
+    delegate = mock(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.class);
   }
 
   @Test
-  public void schemaFactoryProperties() throws Exception {
-    SetPropertyAnswer setPropertyAnswer = new SetPropertyAnswer(schemaFactory);
-    doAnswer(setPropertyAnswer).when(schemaFactoryWrapper).setProperty(anyString(), anyObject());
-    defaultXMLSecureFactories.configureSchemaFactory(schemaFactoryWrapper);
-    assertThat(setPropertyAnswer.exception, is(nullValue()));
-    for (String property : SCHEMA_FACTORY_PROPERTIES) {
-      verify(schemaFactoryWrapper).setProperty(property, "");
-    }
+  @Issue("MULE-18814")
+  public void decorateDefaultXmlSecureFactories() {
+    given(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.createDefault()).willReturn(delegate);
+    XMLSecureFactories deprecated = XMLSecureFactories.createDefault();
+
+    assertDecoratedXMLSecureFactories(deprecated);
   }
 
   @Test
-  public void transformerFactoryProperties() {
-    SetPropertyAnswer setPropertyAnswer = new SetPropertyAnswer(transformerFactory);
-    doAnswer(setPropertyAnswer).when(transformerFactoryWrapper).setAttribute(anyString(), anyObject());
-    defaultXMLSecureFactories.configureTransformerFactory(transformerFactoryWrapper);
-    assertThat(setPropertyAnswer.exception, is(nullValue()));
-    for (String property : FACTORY_ATTRIBUTES) {
-      verify(transformerFactoryWrapper).setAttribute(property, "");
-    }
+  @Issue("MULE-18814")
+  public void decorateCustomXmlSecureFactories() {
+    given(org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.createWithConfig(anyBoolean(), anyBoolean()))
+        .willReturn(delegate);
+    XMLSecureFactories deprecated = XMLSecureFactories.createWithConfig(false, false);
+
+    assertDecoratedXMLSecureFactories(deprecated);
   }
 
-  private class SetPropertyAnswer implements Answer<Void> {
+  private void assertDecoratedXMLSecureFactories(XMLSecureFactories deprecated) {
+    assertThat(deprecated, is(notNullValue()));
 
-    private final Object propertySetter;
-    private Exception exception = null;
+    deprecated.getDocumentBuilderFactory();
+    verify(delegate).getDocumentBuilderFactory();
 
-    SetPropertyAnswer(Object propertySetter) {
-      this.propertySetter = propertySetter;
-    }
+    deprecated.getSAXParserFactory();
+    verify(delegate).getSAXParserFactory();
 
-    @Override
-    public Void answer(InvocationOnMock invocation) {
-      String name = (String) invocation.getArguments()[0];
-      Object value = invocation.getArguments()[1];
-      try {
-        if (propertySetter instanceof SchemaFactory) {
-          ((SchemaFactory) propertySetter).setProperty(name, value);
-        } else if (propertySetter instanceof Validator) {
-          ((Validator) propertySetter).setProperty(name, value);
-        } else if (propertySetter instanceof TransformerFactory) {
-          ((TransformerFactory) propertySetter).setAttribute(name, value);
-        } else {
-          throw new IllegalArgumentException("Invalid property setter.");
-        }
-      } catch (Exception e) {
-        exception = e;
-      }
+    deprecated.getXMLInputFactory();
+    verify(delegate).getXMLInputFactory();
 
-      return null;
-    }
+    deprecated.getTransformerFactory();
+    verify(delegate).getTransformerFactory();
+
+    deprecated.getSchemaFactory(SCHEMA_LOCATION);
+    verify(delegate).getSchemaFactory(SCHEMA_LOCATION);
+
+
+    XMLInputFactory xmlInputFactory = mock(XMLInputFactory.class);
+    deprecated.configureXMLInputFactory(xmlInputFactory);
+    verify(delegate).configureXMLInputFactory(xmlInputFactory);
+
+    TransformerFactory transformerFactory = mock(TransformerFactory.class);
+    deprecated.configureTransformerFactory(transformerFactory);
+    verify(delegate).configureTransformerFactory(transformerFactory);
+
+    Validator validator = mock(Validator.class);
+    deprecated.configureValidator(validator);
+    verify(delegate).configureValidator(validator);
   }
-
 }
