@@ -18,7 +18,6 @@ import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newLis
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
-
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -30,6 +29,8 @@ import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,12 +38,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableSet;
-
 public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMetadataCacheIdGeneratorTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelBasedMetadataCacheKeyGeneratorTestCase.class);
   private static final String MY_FLOW = "myFlow";
+  private static final String CONFIGLESS_FLOW = "configlessFlow";
   private static final String MY_CONFIG = "myConfig";
   private static final String OPERATION_LOCATION = MY_FLOW + "/processors/0";
   public static final String MY_GLOBAL_TEMPLATE = "myGlobalTemplate";
@@ -393,13 +393,32 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
                                                   .withParameterGroup(g -> g.withParameter(CONTENT_NAME, "nonKey"))
                                                   .getDeclaration())
                                .getDeclaration())
+        .withGlobalElement(ElementDeclarer.forExtension(MULE_NAME)
+            .newConstruct(FLOW_ELEMENT_IDENTIFIER)
+            .withRefName(CONFIGLESS_FLOW)
+            .withComponent(
+                           newElementDeclarer.newOperation(OPERATION_NAME)
+                               .withParameterGroup(g -> g
+                                   .withParameter(CONTENT_NAME, "nonKey"))
+                               .getDeclaration())
+            .getDeclaration())
+
         .getDeclaration();
 
+    // With config reference (which already includes the namespace:name for the configuration)
     final String extensionOperationLocation = OPERATION_LOCATION;
     final String newExtensionOperationLocation = newFlowName + "/processors/0";
 
     MetadataCacheId oldHash = getIdForComponentOutputMetadata(baseApp, extensionOperationLocation);
     MetadataCacheId newHash = getIdForComponentOutputMetadata(app, newExtensionOperationLocation);
+
+    assertThat(oldHash, is(not(newHash)));
+
+    // Without config reference
+    final String configlessProcessorLocation = CONFIGLESS_FLOW + "/processors/0";
+
+    oldHash = getIdForComponentOutputMetadata(baseApp, configlessProcessorLocation);
+    newHash = getIdForComponentOutputMetadata(app, configlessProcessorLocation);
 
     assertThat(oldHash, is(not(newHash)));
   }
@@ -467,6 +486,15 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
             .withComponent(
                            declarer.newOperation(OPERATION_NAME)
                                .withConfig(MY_CONFIG)
+                               .withParameterGroup(g -> g
+                                   .withParameter(CONTENT_NAME, "nonKey"))
+                               .getDeclaration())
+            .getDeclaration())
+        .withGlobalElement(ElementDeclarer.forExtension(MULE_NAME)
+            .newConstruct(FLOW_ELEMENT_IDENTIFIER)
+            .withRefName(CONFIGLESS_FLOW)
+            .withComponent(
+                           declarer.newOperation(OPERATION_NAME)
                                .withParameterGroup(g -> g
                                    .withParameter(CONTENT_NAME, "nonKey"))
                                .getDeclaration())

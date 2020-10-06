@@ -150,6 +150,8 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     if (typeInformation.isDynamicType()) {
+      resolveDslTagNamespace(component).ifPresent(keyParts::add);
+
       resolveConfigId(component).ifPresent(keyParts::add);
 
       typeInformation.getResolverCategory()
@@ -206,6 +208,11 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
   private Optional<MetadataCacheId> resolveDslTagId(DslElementModel<?> elementModel) {
     return elementModel.getIdentifier()
         .map(id -> new MetadataCacheId(id.hashCode(), id.toString()));
+  }
+
+  private Optional<MetadataCacheId> resolveDslTagNamespace(DslElementModel<?> elementModel) {
+    return elementModel.getIdentifier()
+        .map(id -> new MetadataCacheId(id.getNamespace().toLowerCase().hashCode(), id.getNamespace()));
   }
 
   private Optional<MetadataCacheId> resolveConfigId(DslElementModel<?> elementModel) {

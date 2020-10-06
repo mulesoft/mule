@@ -152,6 +152,8 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     if (typeInformation.isDynamicType()) {
+      resolveDslTagNamespace(component).ifPresent(keyParts::add);
+
       resolveConfigId(component).ifPresent(keyParts::add);
 
       typeInformation.getResolverCategory()
@@ -181,6 +183,11 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
                                       .map(sourceElementName -> format("(%s):(%s)", getSourceElementName(component),
                                                                        sourceElementName))
                                       .orElse(format("(%s):(%s)", getSourceElementName(component), "Unknown Type"))));
+  }
+
+  private Optional<MetadataCacheId> resolveDslTagNamespace(ComponentAst elementModel) {
+    String namespace = elementModel.getIdentifier().getNamespace();
+    return of(new MetadataCacheId(namespace.toLowerCase().hashCode(), namespace));
   }
 
   private Optional<MetadataCacheId> doResolve(ComponentAst elementModel) {
