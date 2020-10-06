@@ -18,7 +18,6 @@ import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHel
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.resolveConfigName;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -31,7 +30,6 @@ import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
@@ -47,7 +45,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotat
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -257,8 +255,8 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
   private Optional<MetadataCacheId> resolveMetadataKeyParts(ComponentAst elementModel,
                                                             ComponentModel componentModel,
                                                             boolean resolveAllKeys) {
-    boolean isPartialFetching = componentModel.getModelProperty(MetadataResolverFactoryModelProperty.class)
-        .map(mp -> mp.getMetadataResolverFactory().getKeyResolver()).map(kr -> kr instanceof PartialTypeKeysResolver)
+    boolean isPartialFetching = componentModel.getModelProperty(TypeResolversInformationModelProperty.class)
+        .map(mp -> mp.isPartialTypeKeyResolver())
         .orElse(false);
 
     if (isPartialFetching || resolveAllKeys) {
