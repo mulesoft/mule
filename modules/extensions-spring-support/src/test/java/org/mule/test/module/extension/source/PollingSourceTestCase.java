@@ -23,6 +23,7 @@ import org.mule.test.petstore.extension.PetAdoptionSource;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
@@ -52,6 +53,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-18842")
   public void vanillaPoll() throws Exception {
     startFlow("vanilla");
     assertAllPetsAdopted();
