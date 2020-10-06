@@ -8,6 +8,7 @@
 package org.mule.test.infrastructure.process;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.mule.test.infrastructure.process.AbstractOSController.MuleProcessStatus.STARTED_STARTED;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.Arrays;
@@ -25,11 +26,21 @@ import org.slf4j.Logger;
 
 public abstract class AbstractOSController {
 
+  /**
+   * These values represent the status returned by running `mule status` for the wrapper and Java processes respectively.
+   */
+  public enum MuleProcessStatus {
+    STARTING_STARTING, STARTED_STARTING, STARTED_STARTED,
+  }
+
   private static Logger logger = getLogger(AbstractOSController.class);
 
-  protected static final String STATUS =
-      "Mule(\\sEnterprise Edition \\(standalone\\))? is running(\\s|:\\sPID:)?\\(?([0-9]+)\\)?.*";
-  protected static final Pattern STATUS_PATTERN = Pattern.compile(STATUS);
+  protected static final String STATUS_PID =
+      "Mule(?:\\sEnterprise Edition \\(standalone\\))? is running(?:\\s|:\\sPID:)?\\(?([0-9]+)\\)?.*";
+  protected static final Pattern STATUS_PID_PATTERN = Pattern.compile(STATUS_PID);
+  protected static final String STATUS_LABELS =
+      "Mule(?:\\sEnterprise Edition \\(standalone\\))? is running:\\sPID:[0-9]+, Wrapper:(\\w+), Java:(\\w+)";
+  protected static final Pattern STATUS_LABELS_PATTERN = Pattern.compile(STATUS_LABELS);
   private static final int DEFAULT_TIMEOUT = 30000;
   private static final String MULE_HOME_VARIABLE = "MULE_HOME";
   private static final String MULE_APP_VARIABLE = "MULE_APP";
@@ -70,6 +81,11 @@ public abstract class AbstractOSController {
     if (error != 0) {
       throw new MuleControllerException("The mule instance couldn't be started");
     }
+
+    if (getProcessesStatus() != STARTED_STARTED) {
+      runSync("dump");
+      throw new MuleControllerException("The mule instance didn't start on time");
+    }
   }
 
   public int stop(String... args) {
@@ -79,6 +95,8 @@ public abstract class AbstractOSController {
   public abstract int status(String... args);
 
   public abstract int getProcessId();
+
+  public abstract MuleProcessStatus getProcessesStatus();
 
   public String getMuleAppName() {
     return muleAppName;

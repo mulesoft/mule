@@ -40,11 +40,32 @@ public class UnixController extends AbstractOSController {
     PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
     executor.setStreamHandler(streamHandler);
     if (this.doExecution(executor, new CommandLine(this.muleBin).addArgument("status"), newEnv) == 0) {
-      Matcher matcher = STATUS_PATTERN.matcher(outputStream.toString());
+      Matcher matcher = STATUS_PID_PATTERN.matcher(outputStream.toString());
       if (matcher.find()) {
-        return Integer.parseInt(matcher.group(3));
+        return Integer.parseInt(matcher.group(1));
       } else {
-        throw new MuleControllerException("bin/mule status didn't return the expected pattern: " + STATUS);
+        throw new MuleControllerException("bin/mule status didn't return the expected pattern: " + STATUS_PID);
+      }
+    } else {
+      throw new MuleControllerException("Mule Runtime is not running");
+    }
+  }
+
+  @Override
+  public MuleProcessStatus getProcessesStatus() {
+    Map<Object, Object> newEnv = this.copyEnvironmentVariables();
+    DefaultExecutor executor = new DefaultExecutor();
+    ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
+    executor.setWatchdog(watchdog);
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+    executor.setStreamHandler(streamHandler);
+    if (this.doExecution(executor, new CommandLine(this.muleBin).addArgument("status"), newEnv) == 0) {
+      Matcher matcher = STATUS_LABELS_PATTERN.matcher(outputStream.toString());
+      if (matcher.find()) {
+        return MuleProcessStatus.valueOf(matcher.group(1) + "_" + matcher.group(2));
+      } else {
+        throw new MuleControllerException("bin/mule status didn't return the expected pattern: " + STATUS_LABELS);
       }
     } else {
       throw new MuleControllerException("Mule Runtime is not running");
