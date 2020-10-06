@@ -6,8 +6,22 @@
  */
 package org.mule.test.classloading.api;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.AllOf.allOf;
+import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.hamcrest.core.StringContains.containsString;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.hamcrest.Matcher;
+import org.hamcrest.core.StringContains;
 
 public class ClassLoadingHelper {
 
@@ -15,5 +29,20 @@ public class ClassLoadingHelper {
 
   public static void addClassLoader(String element) {
     createdClassLoaders.put(element, Thread.currentThread().getContextClassLoader());
+  }
+
+  public static void verifyUsedClassLoaders(String... phasesToExecute) {
+    Map<String, ClassLoader> createdClassLoaders = ClassLoadingHelper.createdClassLoaders;
+    List<ClassLoader> collect = createdClassLoaders.values().stream().distinct().collect(toList());
+    collect.forEach(ClassLoadingHelper::assertExtensionClassLoader);
+    Set<String> executedPhases = createdClassLoaders.keySet();
+    assertThat(executedPhases, is(hasItems(stream(phasesToExecute).map(StringContains::containsString).toArray(Matcher[]::new))));
+  }
+
+  private static void assertExtensionClassLoader(ClassLoader classLoader) {
+    assertThat(classLoader.toString(),
+               allOf(containsString("classloading-extension"),
+                     anyOf(containsString(".TestRegionClassLoader[Region] @"),
+                           containsString("MuleArtifactClassLoader"))));
   }
 }

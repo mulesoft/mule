@@ -6,9 +6,19 @@
  */
 package org.mule.test.classloading;
 
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
+@MetadataScope(keysResolver = CLKeysResolver.class, outputResolver = CLKeysResolver.class)
 public class CLOperations {
+
+  @MetadataKeyId
+  @Parameter
+  @Optional
+  private String key;
 
   public void someOperation(@Connection String connection) {}
 }

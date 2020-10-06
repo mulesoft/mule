@@ -12,6 +12,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -96,18 +97,24 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
-
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys() {
     MetadataKeysContainerBuilder keysBuilder = MetadataKeysContainerBuilder.getInstance();
-    try {
-      MetadataContext metadataContext = getMetadataContext();
-      addComponentKeys(getConfigurationModel().getOperationModels(), metadataContext, keysBuilder);
-      addComponentKeys(getConfigurationModel().getSourceModels(), metadataContext, keysBuilder);
-      metadataContext.dispose();
-    } catch (Exception e) {
-      return failure(newFailure(e).onKeys());
-    }
-    return success(keysBuilder.build());
+    ClassLoader classLoader = getClassLoader(getExtensionModel());
+    return withContextClassLoader(classLoader, () -> {
+      MetadataContext metadataContext = null;
+      try {
+        metadataContext = getMetadataContext(classLoader);
+        addComponentKeys(getConfigurationModel().getOperationModels(), metadataContext, keysBuilder);
+        addComponentKeys(getConfigurationModel().getSourceModels(), metadataContext, keysBuilder);
+        return success(keysBuilder.build());
+      } catch (Exception e) {
+        return failure(newFailure(e).onKeys());
+      } finally {
+        if (metadataContext != null) {
+          metadataContext.dispose();
+        }
+      }
+    });
   }
 
   private void addComponentKeys(List<? extends ComponentModel> components, MetadataContext metadataContext,
@@ -123,7 +130,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
     }
   }
 
-  private MetadataContext getMetadataContext() throws MetadataResolvingException, ConnectionException {
+  private MetadataContext getMetadataContext(ClassLoader classLoader) {
     return new DefaultMetadataContext(() -> {
       CoreEvent fakeEvent = null;
       try {
@@ -135,7 +142,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
         }
       }
     }, connectionManager, metadataService.getMetadataCache(getName()), ExtensionsTypeLoaderFactory.getDefault()
-        .createTypeLoader(getClassLoader(getExtensionModel())));
+        .createTypeLoader(classLoader));
   }
 
   /**
