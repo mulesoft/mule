@@ -41,7 +41,6 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSO
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_MAPPINGS;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.component.location.Location;
@@ -81,6 +80,9 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,9 +96,6 @@ import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 public abstract class AbstractMockedValueProviderExtensionTestCase extends AbstractMuleTestCase {
 
@@ -125,7 +124,9 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected static final String OTHER_CONFIGURATION_NAME = "otherConfiguration";
   protected static final String CONNECTION_PROVIDER_NAME = "connection";
   protected static final String VALUE_PROVIDER_NAME = "valueProvider";
+  protected static final String VALUE_PROVIDER_ID = "valueProviderId";
   protected static final String COMPLEX_VALUE_PROVIDER_NAME = "complexValueProvider";
+  protected static final String COMPLEX_VALUE_PROVIDER_ID = "complexValueProviderId";
 
   protected static final String MY_FLOW = "myFlow";
   protected static final String MY_CONFIG = "myConfig";
@@ -239,12 +240,14 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
     when(valueProviderModel.getPartOrder()).thenReturn(0);
     when(valueProviderModel.getProviderName()).thenReturn(VALUE_PROVIDER_NAME);
+    when(valueProviderModel.getProviderId()).thenReturn(VALUE_PROVIDER_ID);
     when(valueProviderModel.getActingParameters()).thenReturn(asList(ACTING_PARAMETER_NAME, PARAMETER_IN_GROUP_NAME));
     when(valueProviderModel.requiresConfiguration()).thenReturn(false);
     when(valueProviderModel.requiresConnection()).thenReturn(false);
 
     when(complexValueProviderModel.getPartOrder()).thenReturn(0);
     when(complexValueProviderModel.getProviderName()).thenReturn(COMPLEX_VALUE_PROVIDER_NAME);
+    when(complexValueProviderModel.getProviderId()).thenReturn(COMPLEX_VALUE_PROVIDER_ID);
     when(complexValueProviderModel.getActingParameters()).thenReturn(asList(COMPLEX_ACTING_PARAMETER_NAME));
     when(complexValueProviderModel.requiresConfiguration()).thenReturn(false);
     when(complexValueProviderModel.requiresConnection()).thenReturn(false);

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.api.dsl.model.metadata;
 
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkArgument;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getSourceElementName;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveConfigName;
@@ -41,6 +41,8 @@ import java.util.Optional;
 public class DslElementBasedValueProviderCacheIdGenerator implements ValueProviderCacheIdGenerator<DslElementModel<?>> {
 
   private ComponentLocator<DslElementModel<?>> locator;
+
+  private static final String VALUE_PROVIDER = "ValueProvider";
 
   public DslElementBasedValueProviderCacheIdGenerator(ComponentLocator<DslElementModel<?>> locator) {
     this.locator = locator;
@@ -101,11 +103,13 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
                                                                  Map<String, ParameterModelInformation> parameterModelsInformation) {
     List<ValueProviderCacheId> parts = new LinkedList<>();
 
-    parts.add(resolveValueProviderId(valueProviderModel));
     parts.addAll(resolveActingParameterIds(valueProviderModel, parameterModelsInformation));
+    parts.add(resolveValueProviderId(valueProviderModel));
+    parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
     String id = resolveDslTag(containerComponent).orElse(getSourceElementName(containerComponent));
-    return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(id).containing(parts)));
+    return of(aValueProviderCacheId(fromElementWithName(id)
+        .withHashValueFrom(resolveDslTagNamespace(containerComponent).orElse(id)).containing(parts)));
   }
 
   private Optional<ValueProviderCacheId> resolveForComponentModel(DslElementModel<?> containerComponent,
@@ -113,12 +117,18 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
                                                                   Map<String, ParameterModelInformation> parameterModelsInformation) {
     List<ValueProviderCacheId> parts = new LinkedList<>();
 
-    parts.add(resolveValueProviderId(valueProviderModel));
     parts.addAll(resolveActingParameterIds(valueProviderModel, parameterModelsInformation));
     parts.addAll(resolveIdForInjectedElements(containerComponent, valueProviderModel));
+    parts.add(resolveValueProviderId(valueProviderModel));
+    parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
     String id = resolveDslTag(containerComponent).orElse(getSourceElementName(containerComponent));
-    return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(id).containing(parts)));
+    return of(aValueProviderCacheId(fromElementWithName(id)
+        .withHashValueFrom(resolveDslTagNamespace(containerComponent).orElse(id)).containing(parts)));
+  }
+
+  private Optional<String> resolveDslTagNamespace(DslElementModel<?> containerComponent) {
+    return containerComponent.getIdentifier().map(identifier -> identifier.getNamespace().toLowerCase());
   }
 
   private List<ValueProviderCacheId> resolveIdForInjectedElements(DslElementModel<?> containerComponent,
@@ -174,8 +184,8 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
   }
 
   private ValueProviderCacheId resolveValueProviderId(ValueProviderModel valueProviderModel) {
-    return aValueProviderCacheId(fromElementWithName("valueProvider: " + valueProviderModel.getProviderName())
-        .withHashValueFrom(valueProviderModel.getProviderName()));
+    return aValueProviderCacheId(fromElementWithName("providerId: " + valueProviderModel.getProviderId())
+        .withHashValueFrom(valueProviderModel.getProviderId()));
   }
 
   private List<ValueProviderCacheId> resolveActingParameterIds(ValueProviderModel valueProviderModel,

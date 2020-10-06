@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.config.dsl.model;
 
-import static java.lang.System.lineSeparator;
-import static java.util.stream.IntStream.range;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
-import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
@@ -47,23 +43,6 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
     ValueProviderCacheIdGenerator cacheIdGenerator = new ComponentAstBasedValueProviderCacheIdGenerator(locator);
     ComponentAst component = getComponentAst(app, location);
     return cacheIdGenerator.getIdForResolvedValues(component, parameterName);
-  }
-
-  private String collectLog(ValueProviderCacheId valueProviderCacheId, int level) {
-    StringBuilder logId = new StringBuilder();
-    if (level == 0) {
-      logId.append(lineSeparator());
-    }
-    logId.append(valueProviderCacheId.toString());
-    if (!valueProviderCacheId.getParts().isEmpty()) {
-      int newLevel = level + 1;
-      valueProviderCacheId.getParts().forEach(p -> {
-        logId.append(lineSeparator());
-        range(0, newLevel).forEach(i -> logId.append(" "));
-        logId.append("+-").append(collectLog(p, newLevel));
-      });
-    }
-    return logId.toString();
   }
 
   private Optional<ParameterizedElementDeclaration> getParameterElementDeclaration(ArtifactDeclaration artifactDeclaration,
@@ -342,7 +321,22 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
   }
 
   @Test
-  public void differentConfigsWithSameParameterGetDifferentHash() throws Exception {
+  public void differentConfigsWithDifferentProviderIdGetDifferentHash() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
+    app.addGlobalElement(declareOtherConfig(config.getConnection().get(), "newName",
+                                            PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
+                                            ACTING_PARAMETER_DEFAULT_VALUE,
+                                            PROVIDED_PARAMETER_DEFAULT_VALUE,
+                                            PARAMETER_IN_GROUP_DEFAULT_VALUE));
+    Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
+    when(valueProviderModel.getProviderId()).thenReturn("newValueProviderId");
+    Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
+    checkIdsAreDifferent(config1Id, config2Id);
+  }
+
+  @Test
+  public void differentConfigsWithSameProviderIdGetSameHash() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
     app.addGlobalElement(declareOtherConfig(config.getConnection().get(), "newName",
@@ -352,26 +346,35 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
                                             PARAMETER_IN_GROUP_DEFAULT_VALUE));
     Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
     Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
-    checkIdsAreDifferent(config1Id, config2Id);
+    checkIdsAreEqual(config1Id, config2Id);
   }
 
   @Test
-  public void differentValueProviderNameGetsDifferentHash() throws Exception {
+  public void differentValueProviderIdGetsDifferentHash() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConnection()).thenReturn(true);
     when(valueProviderModel.requiresConfiguration()).thenReturn(true);
     Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
-    when(valueProviderModel.getProviderName()).thenReturn("newValueProviderName");
+    when(valueProviderModel.getProviderId()).thenReturn("newValueProviderId");
     Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     checkIdsAreDifferent(opId1, opId2);
   }
 
   @Test
-  public void differentOperationsWithSameParametersGetsDifferentHash() throws Exception {
+  public void differentOperationsWithDifferentProviderIdGetsDifferentHash() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    when(valueProviderModel.getProviderId()).thenReturn("newValueProviderId");
+    Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OTHER_OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    checkIdsAreDifferent(opId1, opId2);
+  }
+
+  @Test
+  public void differentOperationsWithSameValueProviderIdGetsSameHash() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OTHER_OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
-    checkIdsAreDifferent(opId1, opId2);
+    checkIdsAreEqual(opId1, opId2);
   }
 
   private static class Locator implements ComponentLocator<ComponentAst> {
