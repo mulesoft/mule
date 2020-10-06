@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
@@ -77,7 +78,6 @@ import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.ReactiveReconnectionCallback;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
@@ -90,7 +90,6 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -149,6 +148,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private SourceAdapter sourceAdapter;
   private RetryPolicyTemplate retryPolicyTemplate;
   private Scheduler retryScheduler;
+  private Scheduler reconnectScheduler;
   // FlowConstruct is obtained when needed because during MUnit's tooling tests and Lazy Init mode this should never be evaluated.
   private LazyValue<FlowConstruct> flowConstruct;
   private MessageProcessContext messageProcessContext;
@@ -209,7 +209,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       throws MuleException {
     try {
       if (restarting && retryPolicyTemplate.isAsync()) {
-        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), new ImmediateExecutor());
+        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), IMMEDIATE_SCHEDULER);
       } else {
         retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), retryScheduler);
       }
@@ -313,7 +313,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                        sourceAdapter.getName(), getLocation().getRootContainerName()),
                 exception);
 
-    Executors.newSingleThreadExecutor().submit(() -> {
+    reconnectScheduler.submit(() -> {
       Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
           .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
           .orElseGet(() -> create(sink -> {
@@ -374,6 +374,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
       if (retryScheduler == null) {
         retryScheduler = schedulerService.ioScheduler();
+      }
+
+      if (reconnectScheduler == null) {
+        reconnectScheduler = schedulerService.ioScheduler();
       }
 
       synchronized (started) {
@@ -462,6 +466,14 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         retryScheduler.stop();
       } finally {
         retryScheduler = null;
+      }
+    }
+
+    if (reconnectScheduler != null) {
+      try {
+        reconnectScheduler.stop();
+      } finally {
+        reconnectScheduler = null;
       }
     }
   }
@@ -706,13 +718,5 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public String toString() {
     return this.getClass().getSimpleName() + ": " + Objects.toString(sourceAdapter);
-  }
-
-  private class ImmediateExecutor implements Executor {
-
-    @Override
-    public void execute(Runnable command) {
-      command.run();
-    }
   }
 }
