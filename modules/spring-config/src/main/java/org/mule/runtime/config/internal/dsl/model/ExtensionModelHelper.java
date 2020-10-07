@@ -8,9 +8,11 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.*;
 import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
@@ -58,6 +60,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
+import org.mule.runtime.internal.dsl.DslConstants;
 
 /**
  * Helper class to work with a set of {@link ExtensionModel}s
@@ -82,6 +85,7 @@ public class ExtensionModelHelper {
       Caffeine.newBuilder().build();
   private final Cache<ComponentIdentifier, Optional<NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
       Caffeine.newBuilder().build();
+  private final Optional<DslSyntaxResolver> muleTopLevelDslSyntaxResolver;
   private final LoadingCache<ExtensionModel, DslSyntaxResolver> dslSyntaxResolversByExtension;
 
   private final JavaTypeLoader javaTypeLoader = new JavaTypeLoader(ExtensionModelHelper.class.getClassLoader(),
@@ -101,6 +105,8 @@ public class ExtensionModelHelper {
     this.dslSyntaxResolversByExtension =
         Caffeine.newBuilder().build(key -> DslSyntaxResolver.getDefault(key, dslResolvingCtx));
     this.dslResolvingContext = dslResolvingCtx;
+    this.muleTopLevelDslSyntaxResolver = extensionModels.stream().filter(extModel -> extModel.getName().equals(CORE_PREFIX))
+        .map(extModel -> DslSyntaxResolver.getDefault(extModel, dslResolvingCtx)).findAny();
   }
 
   /**
@@ -118,7 +124,7 @@ public class ExtensionModelHelper {
           Optional<? extends NestableElementModel> nestableElementModelOptional = findNestableElementModel(componentIdentifier);
           return nestableElementModelOptional.map(nestableElementModel -> {
             Reference<ComponentType> componentTypeReference = new Reference<>();
-            nestableElementModel.accept(new IsRouteVisitor(componentTypeReference));
+            nestableElementModel.accept(new IsRouteVisitor(componentIdentifier, componentTypeReference));
             return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
           }).orElse(UNKNOWN);
         });
@@ -142,6 +148,10 @@ public class ExtensionModelHelper {
       public void visit(ConstructModel model) {
         if (model.getStereotype().equals(MuleStereotypes.ERROR_HANDLER)) {
           componentTypeReference.set(ERROR_HANDLER);
+          return;
+        }
+        if (model.getStereotype().equals(MuleStereotypes.ON_ERROR)) {
+          componentTypeReference.set(ON_ERROR);
           return;
         }
         if (model.getStereotype().equals(MuleStereotypes.FLOW)) {
@@ -317,9 +327,10 @@ public class ExtensionModelHelper {
    * {@code delegate} when found.
    *
    * @param componentIdentifier the identifier to use for the search.
+   * @param topLevel            whether the component being walked to is a top-level component.
    * @param delegate            the callback to execute on the found model.
    */
-  public void walkToComponent(ComponentIdentifier componentIdentifier, ExtensionWalkerModelDelegate delegate) {
+  public void walkToComponent(ComponentIdentifier componentIdentifier, boolean topLevel, ExtensionWalkerModelDelegate delegate) {
     lookupExtensionModelFor(componentIdentifier)
         .ifPresent(currentExtension -> {
           new ExtensionWalker() {
@@ -362,7 +373,11 @@ public class ExtensionModelHelper {
 
             @Override
             protected void onConstruct(HasConstructModels owner, ConstructModel model) {
-              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+              final DslElementSyntax dslSyntax = muleTopLevelDslSyntaxResolver
+                  .map(resolver -> resolver.resolve(model))
+                  .orElseGet(() -> dslSyntaxResolver.resolve(model));
+
+              if (dslSyntax.getElementName().equals(componentIdentifier.getName())) {
                 delegate.onConstruct(model);
                 stop();
               }
@@ -377,7 +392,7 @@ public class ExtensionModelHelper {
 
             @Override
             protected void onNestable(ComposableModel owner, NestableElementModel model) {
-              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+              if (!topLevel && dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 Optional<ConstructModel> overrider = findOnErrorOverrider(model);
                 if (overrider.isPresent()) {
                   delegate.onConstruct(overrider.get());
@@ -480,10 +495,20 @@ public class ExtensionModelHelper {
 
   static class IsRouteVisitor implements NestableElementModelVisitor {
 
+    private static final String ON_ERROR_CONTINUE = "on-error-continue";
+    private static final String ON_ERROR_PROPAGATE = "on-error-propagate";
+
+    private static final ComponentIdentifier ON_ERROR_CONTINE_IDENTIFIER =
+        builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
+    private static final ComponentIdentifier ON_ERROR_PROPAGATE_IDENTIFIER =
+        builder().namespace(CORE_PREFIX).name(ON_ERROR_PROPAGATE).build();
+
+    private final ComponentIdentifier componentIdentifier;
     private final Reference<TypedComponentIdentifier.ComponentType> reference;
 
-    public IsRouteVisitor(Reference<TypedComponentIdentifier.ComponentType> reference) {
+    public IsRouteVisitor(ComponentIdentifier componentIdentifier, Reference<TypedComponentIdentifier.ComponentType> reference) {
       this.reference = reference;
+      this.componentIdentifier = componentIdentifier;
     }
 
     @Override
@@ -494,7 +519,12 @@ public class ExtensionModelHelper {
 
     @Override
     public void visit(NestedRouteModel component) {
-      reference.set(ROUTE);
+      if (componentIdentifier.equals(ON_ERROR_CONTINE_IDENTIFIER)
+          || componentIdentifier.equals(ON_ERROR_PROPAGATE_IDENTIFIER)) {
+        reference.set(ON_ERROR);
+      } else {
+        reference.set(ROUTE);
+      }
 
     }
   }

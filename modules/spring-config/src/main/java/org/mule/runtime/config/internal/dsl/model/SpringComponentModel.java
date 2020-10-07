@@ -148,9 +148,9 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
   }
 
   private void populateParameterAsts() {
-    if (!parameterAstsPopulated.compareAndSet(false, true)) {
-      return;
-    }
+    //    if (!parameterAstsPopulated.compareAndSet(false, true)) {
+    //      return;
+    //    }
 
     if (!getModel(ParameterizedModel.class).isPresent()) {
       throw new IllegalStateException("Model for '" + this.toString() + "' (a '"
