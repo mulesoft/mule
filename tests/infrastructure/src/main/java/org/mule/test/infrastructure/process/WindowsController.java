@@ -9,6 +9,7 @@ package org.mule.test.infrastructure.process;
 
 import static java.lang.Integer.parseInt;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.mule.test.infrastructure.process.AbstractOSController.MuleProcessStatus.STARTED_STARTED;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -63,6 +64,11 @@ public class WindowsController extends AbstractOSController {
         .filter(this::isServiceRunning)
         .map(this::getId).findAny()
         .orElseThrow(() -> new MuleControllerException("No mule instance is running"));
+  }
+
+  @Override
+  public MuleProcessStatus getProcessesStatus() {
+    return STARTED_STARTED;
   }
 
   private int getId(String serviceName) {
