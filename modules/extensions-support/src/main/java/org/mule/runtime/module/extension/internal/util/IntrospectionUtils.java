@@ -860,6 +860,13 @@ public final class IntrospectionUtils {
         .collect(toCollection(LinkedHashSet::new));
   }
 
+  /**
+   * Determines if the referenced {@code source} should be ignored
+   *
+   * @param source a {@link SourceElement} declaration
+   * @return whether the source is ignored or not
+   * @since 4.4.0
+   */
   public static boolean isIgnored(SourceElement source) {
     if (isIgnoreDisabled()) {
       return false;
