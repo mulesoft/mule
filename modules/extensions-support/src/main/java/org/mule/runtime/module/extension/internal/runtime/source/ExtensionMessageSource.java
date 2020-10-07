@@ -148,7 +148,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private SourceAdapter sourceAdapter;
   private RetryPolicyTemplate retryPolicyTemplate;
   private Scheduler retryScheduler;
-  private Scheduler reconnectScheduler;
   // FlowConstruct is obtained when needed because during MUnit's tooling tests and Lazy Init mode this should never be evaluated.
   private LazyValue<FlowConstruct> flowConstruct;
   private MessageProcessContext messageProcessContext;
@@ -313,7 +312,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                        sourceAdapter.getName(), getLocation().getRootContainerName()),
                 exception);
 
-    reconnectScheduler.submit(() -> {
+    retryScheduler.execute(() -> {
       Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
           .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
           .orElseGet(() -> create(sink -> {
@@ -374,10 +373,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
       if (retryScheduler == null) {
         retryScheduler = schedulerService.ioScheduler();
-      }
-
-      if (reconnectScheduler == null) {
-        reconnectScheduler = schedulerService.ioScheduler();
       }
 
       synchronized (started) {
@@ -466,14 +461,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         retryScheduler.stop();
       } finally {
         retryScheduler = null;
-      }
-    }
-
-    if (reconnectScheduler != null) {
-      try {
-        reconnectScheduler.stop();
-      } finally {
-        reconnectScheduler = null;
       }
     }
   }
