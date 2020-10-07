@@ -757,6 +757,7 @@ class MuleExtensionModelDeclarer {
     onError.onDefaultParameterGroup()
         .withRequiredParameter("ref")
         .ofType(typeLoader.load(String.class))
+        .withAllowedStereotypes(asList(ON_ERROR))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the error handler to reuse.");
 
