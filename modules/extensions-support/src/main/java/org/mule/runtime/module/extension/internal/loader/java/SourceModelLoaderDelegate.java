@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isInputStream;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isIgnored;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -69,6 +71,11 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
                             HasSourceDeclarer declarer,
                             SourceElement sourceType,
                             boolean supportsConfig) {
+
+    if (isIgnored(sourceType)) {
+      return;
+    }
+
     // TODO: MULE-9220 - Add a syntax validator which checks that the sourceType doesn't implement
     validateLifecycle(sourceType, Startable.class);
     validateLifecycle(sourceType, Stoppable.class);

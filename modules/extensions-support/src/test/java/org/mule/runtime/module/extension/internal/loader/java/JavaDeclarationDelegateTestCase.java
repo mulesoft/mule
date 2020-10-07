@@ -8,8 +8,11 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.valueOf;
+import static java.lang.System.clearProperty;
+import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -27,6 +30,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
@@ -122,13 +126,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import com.google.common.reflect.TypeToken;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import com.google.common.reflect.TypeToken;
 
 @SmallTest
 public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclarationTestCase {
@@ -171,6 +174,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String GET_MEDICAL_HISTORY = "getMedicalHistory";
   private static final String APPROVE_INVESTMENT = "approve";
   private static final String IGNORED_OPERATION = "ignoredOperation";
+  private static final String IGNORED_SOURCE = "ignoredOperation";
   private static final String OTHER_HEISENBERG = "OtherHeisenberg";
   private static final String PROCESS_WEAPON = "processWeapon";
   private static final String PROCESS_WEAPON_LIST = "processWeaponList";
@@ -379,6 +383,25 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation, is(notNullValue()));
     assertOutputType(operation.getOutput(), toMetadataType(Fruit.class), false);
     assertOutputType(operation.getOutputAttributes(), TYPE_BUILDER.voidType().build(), false);
+  }
+
+  @Test
+  public void disableIgnore() {
+    setProperty(DISABLE_SDK_IGNORE_COMPONENT, "");
+    try {
+      ExtensionDeclarer declarer = declareExtension();
+      ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
+
+      assertThat(getOperation(extensionDeclaration, IGNORED_OPERATION), is(notNullValue()));
+
+      List<SourceDeclaration> ignoredSources = extensionDeclaration.getMessageSources().stream()
+          .filter(s -> s.getName().toLowerCase().contains("ignore"))
+          .collect(toList());
+
+      assertThat(ignoredSources, hasSize(1));
+    } finally {
+      clearProperty(DISABLE_SDK_IGNORE_COMPONENT);
+    }
   }
 
   private <T extends NamedDeclaration> T findDeclarationByName(Collection<T> declarations, String name) {
