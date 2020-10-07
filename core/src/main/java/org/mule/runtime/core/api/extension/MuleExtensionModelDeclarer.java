@@ -802,11 +802,6 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs."
             + " Default is true.");
-
-    onError.onDefaultParameterGroup()
-            .withOptionalParameter("name")
-            .asComponentId()
-            .ofType(typeLoader.load(String.class));
   }
 
   private void declareGlobalOnErrorRoute(ClassTypeLoader typeLoader, ConstructDeclarer onError) {
