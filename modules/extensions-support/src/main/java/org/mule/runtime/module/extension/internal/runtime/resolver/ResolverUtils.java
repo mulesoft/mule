@@ -17,10 +17,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 
-import java.util.Optional;
-import java.util.function.BooleanSupplier;
-import java.util.function.UnaryOperator;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.runtime.api.exception.MuleException;
@@ -33,6 +29,10 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
+
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
+import java.util.function.UnaryOperator;
 
 /**
  * Utility class to share common behaviour between resolvers
@@ -187,7 +187,7 @@ public class ResolverUtils {
 
   private static Object typedValue(TypedValue<?> typedValue, UnaryOperator valueMapper, Object value) {
     return new TypedValue<>(valueMapper.apply(value), DataType.builder()
-        .type(value.getClass())
+        .type(value != null ? value.getClass() : Object.class)
         .mediaType(typedValue.getDataType().getMediaType())
         .build(), typedValue.getByteLength());
   }
