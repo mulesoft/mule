@@ -1048,6 +1048,11 @@
             </dependency>
             <dependency>
                 <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-artifact-ast-xml-parser</artifactId>
+                <version>${muleAstVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-properties-api</artifactId>
                 <version>${mulePropertiesApiVersion}</version>
             </dependency>

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl.processor;
 
+import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 
 import java.util.ArrayList;
@@ -21,11 +22,13 @@ import java.util.List;
  * required components.
  *
  * @since 4.0
+ * @deprecated since 4.4 use {@link AstXmlParser} instead.
  */
+@Deprecated
 public final class ArtifactConfig {
 
   private String artifactName;
-  private List<ConfigFile> configFiles = new ArrayList<>();
+  private final List<ConfigFile> configFiles = new ArrayList<>();
 
   private ArtifactConfig() {}
 
@@ -42,7 +45,7 @@ public final class ArtifactConfig {
    */
   public static class Builder {
 
-    private ArtifactConfig applicationConfig = new ArtifactConfig();
+    private final ArtifactConfig applicationConfig = new ArtifactConfig();
 
     /**
      * @param applicationName the artifact name

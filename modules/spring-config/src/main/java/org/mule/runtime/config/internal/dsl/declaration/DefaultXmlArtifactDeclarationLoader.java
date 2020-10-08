@@ -15,6 +15,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.CONNECTION;
+import static org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.createDefault;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
@@ -24,7 +25,6 @@ import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.DATETI
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.NUMBER;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.STRING;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.TIME;
-import static org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier.createFromPluginClassloaders;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser.IS_CDATA;
@@ -112,12 +112,10 @@ import org.mule.runtime.app.declaration.api.fluent.RouteElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.SimpleValueType;
 import org.mule.runtime.app.declaration.api.fluent.TopLevelParameterDeclarer;
 import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationServiceRegistry;
-import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.XmlArtifactDeclarationLoader;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
-import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.dsl.api.xml.parser.SimpleConfigAttribute;
@@ -141,6 +139,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.w3c.dom.Document;
+import org.xml.sax.helpers.DefaultHandler;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Default implementation of a {@link XmlArtifactDeclarationLoader}
@@ -183,7 +184,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
    */
   @Override
   public ArtifactDeclaration load(String name, InputStream configResource) {
-
+    // TODO MULE-18921 Migrate this algorithm
     ConfigLine configLine = loadArtifactConfig(name, configResource);
 
     return declareArtifact(configLine);
@@ -193,8 +194,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
     checkArgument(resource != null, "The given application was not found as resource");
 
     Document document =
-        noValidationDocumentLoader().loadDocument(() -> XMLSecureFactories.createDefault().getSAXParserFactory(),
-                                                  new ModuleDelegatingEntityResolver(context.getExtensions()), name, resource);
+        noValidationDocumentLoader().loadDocument(() -> createDefault().getSAXParserFactory(),
+                                                  new DefaultHandler(), name, resource);
 
     XmlApplicationServiceRegistry xmlApplicationServiceRegistry =
         new XmlApplicationServiceRegistry(new SpiServiceRegistry(), context);
@@ -204,6 +205,17 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         .stream().collect(Collectors.toList()), resolveContextArtifactPluginClassLoaders())).parse(document.getDocumentElement())
             .orElseThrow(
                          () -> new MuleRuntimeException(createStaticMessage("Could not load load a Configuration from the given resource")));
+  }
+
+  public static List<XmlNamespaceInfoProvider> createFromPluginClassloaders(Function<ClassLoader, List<XmlNamespaceInfoProvider>> xmlNamespaceInfoProvidersSupplier,
+                                                                            List<ClassLoader> pluginsClassLoaders) {
+    final ImmutableList.Builder<XmlNamespaceInfoProvider> namespaceInfoProvidersBuilder = ImmutableList.builder();
+    namespaceInfoProvidersBuilder
+        .addAll(xmlNamespaceInfoProvidersSupplier.apply(Thread.currentThread().getContextClassLoader()));
+    for (ClassLoader pluginClassLoader : pluginsClassLoaders) {
+      namespaceInfoProvidersBuilder.addAll(xmlNamespaceInfoProvidersSupplier.apply(pluginClassLoader));
+    }
+    return namespaceInfoProvidersBuilder.build();
   }
 
   private ArtifactDeclaration declareArtifact(ConfigLine configLine) {
