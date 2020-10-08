@@ -728,15 +728,6 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
   @Test
   @Issue("MULE-18880")
   public void flowProcessMediatorCollectionItems() throws Exception {
-    FlowProcessTemplate template = mock(FlowProcessTemplate.class);
-    SourceResultAdapter resultAdapter = mock(SourceResultAdapter.class);
-    when(resultAdapter.getResult()).thenReturn(org.mule.runtime.extension.api.runtime.operation.Result.builder()
-        .output(singleton(new TypedValue<>("Hello World", STRING)))
-        .build());
-    when(resultAdapter.getMediaType()).thenReturn(ANY);
-    when(resultAdapter.getCorrelationId()).thenReturn(empty());
-    when(template.getSourceMessage()).thenReturn(resultAdapter);
-
     FlowProcessMediator flowProcessMediator;
 
     PolicyManager policyManager = mock(PolicyManager.class);
@@ -752,11 +743,24 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     when(context.getComponentDecoratorFactory()).thenReturn(componentDecoratorFactory);
     when(context.getMessageSource()).thenReturn(mock(MessageSource.class));
     when(context.getFlowConstruct()).thenReturn(mock(FlowConstruct.class, withSettings().extraInterfaces(Pipeline.class)));
+    // finish preparing the mediator
 
+    // propagate any exceptions
     doAnswer(inv -> {
       throw inv.getArgument(0, Throwable.class);
     }).when(notifier).phaseFailure(any());
 
+    // set the result to a collection of something other that Result to manifest the bug
+    FlowProcessTemplate template = mock(FlowProcessTemplate.class);
+    SourceResultAdapter resultAdapter = mock(SourceResultAdapter.class);
+    when(resultAdapter.getResult()).thenReturn(org.mule.runtime.extension.api.runtime.operation.Result.builder()
+        .output(singleton(new TypedValue<>("Hello World", STRING)))
+        .build());
+    when(resultAdapter.getMediaType()).thenReturn(ANY);
+    when(resultAdapter.getCorrelationId()).thenReturn(empty());
+    when(template.getSourceMessage()).thenReturn(resultAdapter);
+
+    // run
     flowProcessMediator.process(template, context);
 
     verify(sourcePolicy).process(any(), any(), any());
