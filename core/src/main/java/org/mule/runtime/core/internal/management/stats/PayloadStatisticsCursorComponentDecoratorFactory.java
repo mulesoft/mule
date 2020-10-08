@@ -99,30 +99,35 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
   }
 
   @Override
-  public Collection<Result> decorateOutputResultCollection(Collection<Result> decorated,
-                                                           String correlationId) {
+  public <T> Collection<T> decorateOutputCollection(Collection<T> decorated, String correlationId) {
     if (payloadStatistics.isEnabled()) {
       payloadStatistics.addOutputObjectCount(decorated.size());
       return decorated.stream()
-          .map(r -> decorateResult(r, correlationId))
+          .map(r -> (T) ((r instanceof Result) ? decorateResult((Result) r, correlationId) : r))
           .collect(toList());
     } else {
-      return NO_OP_INSTANCE.decorateOutputResultCollection(decorated, correlationId);
+      return NO_OP_INSTANCE.decorateOutputCollection(decorated, correlationId);
     }
   }
 
   @Override
-  public Iterator<Result> decorateOutputResultIterator(Iterator<Result> decorated, String correlationId) {
+  public <T> Iterator<T> decorateOutputIterator(Iterator<T> decorated, String correlationId) {
     if (payloadStatistics.isEnabled()) {
       return decorateOutput(new AbstractIteratorDecorator(decorated) {
 
         @Override
         public Object next() {
-          return decorateResult((Result) super.next(), correlationId);
+          final Object next = super.next();
+
+          if (next instanceof Result) {
+            return decorateResult((Result) next, correlationId);
+          } else {
+            return next;
+          }
         }
       }, correlationId);
     } else {
-      return NO_OP_INSTANCE.decorateOutputResultIterator(decorated, correlationId);
+      return NO_OP_INSTANCE.decorateOutputIterator(decorated, correlationId);
     }
   }
 

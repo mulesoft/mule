@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.management.stats;
 
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.streaming.PagingProvider;
 
 import java.io.InputStream;
@@ -59,13 +58,12 @@ public class NoOpCursorComponentDecoratorFactory implements CursorComponentDecor
   }
 
   @Override
-  public Collection<Result> decorateOutputResultCollection(Collection<Result> decorated,
-                                                           String correlationId) {
+  public <T> Collection<T> decorateOutputCollection(Collection<T> decorated, String correlationId) {
     return decorated;
   }
 
   @Override
-  public Iterator<Result> decorateOutputResultIterator(Iterator<Result> decorated, String correlationId) {
+  public <T> Iterator<T> decorateOutputIterator(Iterator<T> decorated, String correlationId) {
     return decorated;
   }
 
