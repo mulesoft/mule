@@ -63,6 +63,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public static final int TIMEOUT_MILLIS = 50000;
   public static final int POLL_DELAY_MILLIS = 100;
   public static final int TIME_WAIT_MILLIS = 3000;
+  public static final int FLOW_STOP_TIMEOUT = 2000;
 
   private static final String OUT = "out";
 
@@ -112,7 +113,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
             return true;
           });
 
-    stopFlow("source");
+    requestFlowToStopAndWait("source");
 
     final Long gatheredMoneyAfterStop = HeisenbergSource.gatheredMoney;
 
@@ -329,6 +330,20 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   protected void stopFlow(String flowName) throws Exception {
     flow = (Flow) getFlowConstruct(flowName);
     flow.stop();
+  }
+
+  protected void requestFlowToStopAndWait(String flowName) throws Exception {
+    stopFlow(flowName);
+    checkFlowIsStopped(flowName);
+  }
+
+  protected void checkFlowIsStopped(String flowName) throws Exception {
+    flow = (Flow) getFlowConstruct(flowName);
+    check(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS,
+          () -> {
+            assertThat("The flow did not stop in a reasonable amount of time", flow.getLifecycleState().isStopped(), is(true));
+            return true;
+          });
   }
 
   private boolean assertState(boolean executedOnSuccess, boolean executedOnError, boolean executedOnTerminate) {
