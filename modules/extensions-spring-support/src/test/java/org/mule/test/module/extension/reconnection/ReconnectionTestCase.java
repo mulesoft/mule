@@ -19,6 +19,7 @@ import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 
 import org.mule.extension.test.extension.reconnection.FallibleReconnectableSource;
+import org.mule.extension.test.extension.reconnection.NonReconnectableSource;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -69,6 +70,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     capturedEvents = new LinkedList<>();
     ReconnectableConnectionProvider.fail = false;
     FallibleReconnectableSource.fail = false;
+    NonReconnectableSource.fail = false;
   }
 
   @Override
@@ -76,6 +78,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     capturedEvents = null;
     ReconnectableConnectionProvider.fail = false;
     FallibleReconnectableSource.fail = false;
+    NonReconnectableSource.fail = false;
   }
 
   @Test
@@ -93,6 +96,16 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
             .isPresent();
       }
     });
+  }
+
+  @Test
+  public void noReconnectSource() throws Exception {
+    ((Startable) getFlowConstruct("noReconnect")).start();
+    check(TIMEOUT, POLL_DELAY, () -> !capturedEvents.isEmpty());
+    NonReconnectableSource.fail = true;
+    check(TIMEOUT, POLL_DELAY, () -> NonReconnectableSource.attempts.get() > 0);
+    clear(capturedEvents);
+    checkNot(TIMEOUT, POLL_DELAY, () -> size(capturedEvents) > 0);
   }
 
   @Test
@@ -246,5 +259,17 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     closePagingProviderCalls = 0;
     getPageCalls = 0;
     disconnectCalls = 0;
+  }
+
+  private void clear(List<CoreEvent> list) {
+    synchronized (list) {
+      list.clear();
+    }
+  }
+
+  private int size(List<CoreEvent> list) {
+    synchronized (list) {
+      return list.size();
+    }
   }
 }

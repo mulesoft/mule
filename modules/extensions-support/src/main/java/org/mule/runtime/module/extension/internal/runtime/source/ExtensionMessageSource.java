@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
@@ -55,7 +56,6 @@ import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListe
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
-import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -79,7 +79,6 @@ import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.ReactiveReconnectionCallback;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
@@ -183,15 +182,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(boolean restarting, ReactiveReconnectionCallback reconnectionCallback)
+  private void startSource(boolean restarting)
       throws MuleException {
     try {
-      RetryCallback retryCallback = createRetryCallback(restarting, reconnectionCallback);
-      // When restarting, async must be forced
-      if (restarting && !retryPolicyTemplate.isAsync()) {
-        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(retryCallback, retryScheduler);
+      if (restarting && retryPolicyTemplate.isAsync()) {
+        retryPolicyTemplate.execute(new StartSourceCallback(restarting), IMMEDIATE_SCHEDULER);
       } else {
-        retryPolicyTemplate.execute(retryCallback, retryScheduler);
+        retryPolicyTemplate.execute(new StartSourceCallback(restarting), retryScheduler);
       }
     } catch (Throwable e) {
       if (e instanceof MuleException) {
@@ -203,15 +200,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void startSource() throws MuleException {
-    startSource(false, null);
-  }
-
-  private RetryCallback createRetryCallback(boolean restarting, ReactiveReconnectionCallback reconnectionCallback) {
-    RetryCallback retryCallback = new StartSourceCallback(restarting);
-    if (reconnectionCallback != null) {
-      retryCallback = new WithCompletionCallback(retryCallback, reconnectionCallback);
-    }
-    return retryCallback;
+    startSource(false);
   }
 
   private RetryPolicyTemplate createRetryPolicyTemplate(RetryPolicyTemplate customTemplate) {
@@ -279,22 +268,25 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                        sourceAdapter.getName(), getLocation().getRootContainerName()),
                 exception);
 
-    Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
-        .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
-        .orElseGet(() -> create(sink -> {
-          try {
-            exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
-            restart(new ReactiveReconnectionCallback(sink));
-          } catch (Exception e) {
-            sink.error(e);
-          }
-        }));
+    retryScheduler.execute(() -> {
+      Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
+          .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
+          .orElseGet(() -> create(sink -> {
+            try {
+              exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
+              restart();
+              sink.success();
+            } catch (Exception e) {
+              sink.error(e);
+            }
+          }));
 
-    reconnectionAction
-        .doOnSuccess(v -> onReconnectionSuccessful())
-        .doOnError(this::onReconnectionFailed)
-        .doAfterTerminate(() -> reconnecting.set(false))
-        .subscribe();
+      reconnectionAction
+          .doAfterTerminate(() -> reconnecting.set(false))
+          .doOnSuccess(v -> onReconnectionSuccessful())
+          .doOnError(this::onReconnectionFailed)
+          .subscribe();
+    });
   }
 
   private void onReconnectionSuccessful() {
@@ -311,12 +303,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     shutdown();
   }
 
-  private void restart(ReactiveReconnectionCallback reconnectionCallback) throws MuleException {
+  private void restart() throws MuleException {
     synchronized (started) {
       if (started.get()) {
         stopSource();
         disposeSource();
-        startSource(true, reconnectionCallback);
+        startSource(true);
       } else {
         LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", getLocation().getRootContainerName(),
                            getLocation().getRootContainerName()));
@@ -542,39 +534,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private class WithCompletionCallback implements RetryCallback {
-
-    private final ReactiveReconnectionCallback reconnectionCallback;
-    private final RetryCallback delegate;
-
-    WithCompletionCallback(RetryCallback delegate, ReactiveReconnectionCallback reconnectionCallback) {
-      this.delegate = delegate;
-      this.reconnectionCallback = reconnectionCallback;
-    }
-
-    @Override
-    public void doWork(RetryContext context) throws Exception {
-      try {
-        delegate.doWork(context);
-        this.reconnectionCallback.success();
-      } catch (Exception ex) {
-        this.reconnectionCallback
-            .failed(ex instanceof ConnectionException ? (ConnectionException) ex : new ConnectionException(ex));
-        throw ex;
-      }
-    }
-
-    @Override
-    public String getWorkDescription() {
-      return delegate.getWorkDescription();
-    }
-
-    @Override
-    public Object getWorkOwner() {
-      return delegate.getWorkOwner();
-    }
-  }
-
   @Override
   public void setListener(Processor listener) {
     messageProcessor = listener;
@@ -693,4 +652,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     return configurationInstanceOptional;
   }
 
+  /**
+   * Indicates if a reconnection is happening
+   *
+   * @return {@code true} if a reconnection is happening, {@code false} otherwise.
+   */
+  boolean isReconnecting() {
+    return reconnecting.get();
+  }
 }
