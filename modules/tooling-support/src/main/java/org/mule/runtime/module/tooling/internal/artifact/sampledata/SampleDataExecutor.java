@@ -19,6 +19,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.data.sample.SampleDataProviderModel;
+import org.mule.runtime.api.sampledata.SampleDataFailure;
 import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
@@ -30,6 +31,7 @@ import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
+import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import org.mule.sdk.api.data.sample.SampleDataException;
 
@@ -80,6 +82,16 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
       }
     } catch (SampleDataException e) {
       return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
+    } catch (ExpressionNotSupportedException e) {
+      return resultFrom(newFailure(new SampleDataException(e.getMessage(), INVALID_PARAMETER_VALUE))
+          .withFailureCode(INVALID_PARAMETER_VALUE).build());
+    } catch (ExecutorExceptionWrapper e) {
+      Throwable cause = e.getCause();
+      SampleDataFailure.Builder failureBuilder = newFailure(cause);
+      if (cause instanceof SampleDataException) {
+        failureBuilder.withFailureCode(((SampleDataException) cause).getFailureCode());
+      }
+      return resultFrom(failureBuilder.build());
     } catch (Exception e) {
       return resultFrom(newFailure(e).build());
     }
