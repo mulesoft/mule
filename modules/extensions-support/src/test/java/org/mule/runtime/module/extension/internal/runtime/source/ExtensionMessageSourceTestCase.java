@@ -360,6 +360,36 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     }
   }
 
+  @Test
+  public void reconnectTwice() throws Exception {
+    start();
+
+    messageSource.onException(new ConnectionException(ERROR_MESSAGE));
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> !messageSource.isReconnecting()));
+
+    verify(source, times(2)).onStart(sourceCallback);
+    verify(source, times(1)).onStop();
+
+    messageSource.onException(new ConnectionException(ERROR_MESSAGE));
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> !messageSource.isReconnecting()));
+
+    verify(source, times(3)).onStart(sourceCallback);
+    verify(source, times(2)).onStop();
+  }
+
+  @Test
+  public void failToReconnect() throws Exception {
+    start();
+    ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
+    doThrow(connectionException).when(source).onStart(any());
+
+    messageSource.onException(connectionException);
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> !messageSource.isReconnecting()));
+
+    verify(source, times(4)).onStart(sourceCallback);
+    verify(source, times(4)).onStop();
+  }
+
   private BaseMatcher<Throwable> exhaustedBecauseOf(Throwable cause) {
     return exhaustedBecauseOf(sameInstance(cause));
   }

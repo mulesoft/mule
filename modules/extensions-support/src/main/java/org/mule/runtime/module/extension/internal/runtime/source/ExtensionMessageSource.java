@@ -705,4 +705,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   public String toString() {
     return this.getClass().getSimpleName() + ": " + Objects.toString(sourceAdapter);
   }
+
+  /**
+   * Indicates if a reconnection is happening
+   *
+   * @return {@code true} if a reconnection is happening, {@code false} otherwise.
+   */
+  boolean isReconnecting() {
+    return reconnecting.get();
+  }
 }
