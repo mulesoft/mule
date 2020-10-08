@@ -116,7 +116,7 @@ public final class MessageUtils {
     if (result.getOutput() instanceof InputStream) {
       output = componentDecoratorFactory.decorateOutput((InputStream) result.getOutput(), correlationId);
     } else if (result.getOutput() instanceof Collection) {
-      output = componentDecoratorFactory.decorateOutputResultCollection((Collection) result.getOutput(), correlationId);
+      output = componentDecoratorFactory.decorateOutputCollection((Collection) result.getOutput(), correlationId);
     } else if (result.getOutput() instanceof Iterator) {
       output = componentDecoratorFactory.decorateOutput((Iterator) result.getOutput(), correlationId);
     } else {

@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.management.stats;
 
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import java.io.InputStream;
@@ -145,7 +144,7 @@ public interface CursorComponentDecoratorFactory {
    *        measured volume to a specific execution.
    * @return the decorated {@link Collection} with the decorated elements.
    */
-  Collection<Result> decorateOutputResultCollection(Collection<Result> decorated, String correlationId);
+  <T> Collection<T> decorateOutputCollection(Collection<T> decorated, String correlationId);
 
   /**
    * If statistics are enabled, decorates the provided {@link Iterator} for counting its objects and, if applicable, its elements
@@ -158,5 +157,5 @@ public interface CursorComponentDecoratorFactory {
    *        measured volume to a specific execution.
    * @return the decorated {@link Iterator} with the decorated elements.
    */
-  Iterator<Result> decorateOutputResultIterator(Iterator<Result> decorated, String correlationId);
+  <T> Iterator<T> decorateOutputIterator(Iterator<T> decorated, String correlationId);
 }
