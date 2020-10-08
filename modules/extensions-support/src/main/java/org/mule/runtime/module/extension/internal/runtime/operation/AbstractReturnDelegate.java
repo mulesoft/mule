@@ -156,14 +156,14 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       if (value instanceof Collection && returnsListOfMessages) {
         value = toLazyMessageCollection((Collection<Result>) value, operationContext, cursorProviderFactory, event);
         value = toMessageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
-            .decorateOutputResultCollection((Collection<Result>) value, event.getCorrelationId()),
+            .decorateOutputCollection((Collection) value, event.getCorrelationId()),
                                                                            payloadMediaTypeResolver),
                                     cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
                                     originatingLocation);
       } else if (value instanceof Iterator) {
         if (returnsListOfMessages) {
           value = toMessageIterator(new MediaTypeDecoratedResultIterator(componentDecoratorFactory
-              .decorateOutputResultIterator((Iterator<Result>) value, event.getCorrelationId()),
+              .decorateOutputIterator((Iterator) value, event.getCorrelationId()),
                                                                          payloadMediaTypeResolver),
                                     cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
                                     originatingLocation);
