@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.management.stats;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -15,12 +17,36 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STATISTICS;
+
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.api.management.stats.PayloadStatistics;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.execution.FlowProcessMediator;
+import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
+import org.mule.runtime.core.internal.execution.MessageProcessContext;
+import org.mule.runtime.core.internal.execution.PhaseResultNotifier;
+import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.internal.policy.SourcePolicy;
+import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.streaming.PagingProvider;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -35,13 +61,9 @@ import java.util.NoSuchElementException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.management.stats.PayloadStatistics;
-import org.mule.sdk.api.runtime.operation.Result;
-import org.mule.sdk.api.runtime.streaming.PagingProvider;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @Feature(STREAMING)
@@ -587,7 +609,7 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     }
 
     final Collection<Result> decorator =
-        decoratorFactory.componentDecoratorFactory(component1).decorateOutputResultCollection(decorated, CORR_ID);
+        decoratorFactory.componentDecoratorFactory(component1).decorateOutputCollection(decorated, CORR_ID);
 
     final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
 
@@ -618,7 +640,7 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     }
 
     final Collection<Result> decorator =
-        decoratorFactory.componentDecoratorFactory(component1).decorateOutputResultCollection(decorated, CORR_ID);
+        decoratorFactory.componentDecoratorFactory(component1).decorateOutputCollection(decorated, CORR_ID);
 
     final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
 
@@ -653,7 +675,7 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     }
 
     final Collection<Result> decorator =
-        decoratorFactory.componentDecoratorFactory(component1).decorateOutputResultCollection(decorated, CORR_ID);
+        decoratorFactory.componentDecoratorFactory(component1).decorateOutputCollection(decorated, CORR_ID);
 
     final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
 
@@ -683,7 +705,7 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     }
 
     final Iterator<Result> decorator =
-        decoratorFactory.componentDecoratorFactory(component1).decorateOutputResultIterator(decorated.iterator(), CORR_ID);
+        decoratorFactory.componentDecoratorFactory(component1).decorateOutputIterator(decorated.iterator(), CORR_ID);
 
     final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
 
@@ -701,6 +723,47 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
 
     assertThat(statistics.getInputByteCount(), is(0L));
     assertThat(statistics.getInputObjectCount(), is(0L));
+  }
+
+  @Test
+  @Issue("MULE-18880")
+  public void flowProcessMediatorCollectionItems() throws Exception {
+    FlowProcessMediator flowProcessMediator;
+
+    PolicyManager policyManager = mock(PolicyManager.class);
+    final SourcePolicy sourcePolicy = mock(SourcePolicy.class);
+    when(policyManager.createSourcePolicyInstance(any(), any(), any(), any())).thenReturn(sourcePolicy);
+    PhaseResultNotifier notifier = mock(PhaseResultNotifier.class);
+    flowProcessMediator = new FlowProcessMediator(policyManager, notifier);
+    initialiseIfNeeded(flowProcessMediator, muleContext);
+    startIfNeeded(flowProcessMediator);
+
+    MessageProcessContext context = mock(MessageProcessContext.class);
+    final CursorComponentDecoratorFactory componentDecoratorFactory = decoratorFactory.componentDecoratorFactory(component1);
+    when(context.getComponentDecoratorFactory()).thenReturn(componentDecoratorFactory);
+    when(context.getMessageSource()).thenReturn(mock(MessageSource.class));
+    when(context.getFlowConstruct()).thenReturn(mock(FlowConstruct.class, withSettings().extraInterfaces(Pipeline.class)));
+    // finish preparing the mediator
+
+    // propagate any exceptions
+    doAnswer(inv -> {
+      throw inv.getArgument(0, Throwable.class);
+    }).when(notifier).phaseFailure(any());
+
+    // set the result to a collection of something other that Result to manifest the bug
+    FlowProcessTemplate template = mock(FlowProcessTemplate.class);
+    SourceResultAdapter resultAdapter = mock(SourceResultAdapter.class);
+    when(resultAdapter.getResult()).thenReturn(org.mule.runtime.extension.api.runtime.operation.Result.builder()
+        .output(singleton(new TypedValue<>("Hello World", STRING)))
+        .build());
+    when(resultAdapter.getMediaType()).thenReturn(ANY);
+    when(resultAdapter.getCorrelationId()).thenReturn(empty());
+    when(template.getSourceMessage()).thenReturn(resultAdapter);
+
+    // run
+    flowProcessMediator.process(template, context);
+
+    verify(sourcePolicy).process(any(), any(), any());
   }
 
   private void consumeInputStream() throws IOException {

@@ -533,7 +533,7 @@ public class FlowProcessMediator implements Initialisable {
         Collection<Result> resultCollection = new TransformingLegacyResultAdapterCollection((Collection) resultValue);
         eventMessage = toMessage(Result.<Collection<Message>, TypedValue<?>>builder()
             .output(messageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
-                .decorateOutputResultCollection(resultCollection, adapter.getCorrelationId().orElse("")),
+                .decorateOutputCollection(resultCollection, adapter.getCorrelationId().orElse("")),
                                                                              adapter.getPayloadMediaTypeResolver()),
                                       adapter.getCursorProviderFactory(),
                                       ((BaseEventContext) eventCtx).getRootContext(),
