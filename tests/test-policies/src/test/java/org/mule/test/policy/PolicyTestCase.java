@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
@@ -72,6 +73,7 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-18877")
   public void parsesPolicy() throws Exception {
     assertThat(policyProvider, instanceOf(TestPolicyProvider.class));
     TestPolicyProvider testPolicyProvider = (TestPolicyProvider) policyProvider;
