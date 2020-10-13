@@ -7,7 +7,9 @@
 package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.dsl.internal.util.SchemaMappingsUtils.CUSTOM_SCHEMA_MAPPINGS_LOCATION;
+import static org.mule.runtime.dsl.internal.util.SchemaMappingsUtils.getMuleSchemasMappings;
 import static org.mule.runtime.dsl.internal.util.SchemaMappingsUtils.getSchemaMappings;
+import static org.mule.runtime.dsl.internal.util.SchemaMappingsUtils.getSpringSchemasMappings;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.IOException;
@@ -28,7 +30,6 @@ import org.xml.sax.InputSource;
  */
 public class MuleCustomEntityResolver implements EntityResolver {
 
-  public static final String CUSTOM_SPRING_SCHEMA_MAPPINGS_LOCATION = "META-INF/spring.schemas";
   private static final Logger LOGGER = getLogger(MuleCustomEntityResolver.class);
 
   private final ClassLoader classLoader;
@@ -90,12 +91,8 @@ public class MuleCustomEntityResolver implements EntityResolver {
    * Load the specified schema mappings.
    */
   private Map<String, String> getMuleSchemaMappings() {
-    Map<String, String> schemaMappings =
-        getSchemaMappings(CUSTOM_SCHEMA_MAPPINGS_LOCATION,
-                          () -> getClassLoaderToUse(MuleCustomEntityResolver.class.getClassLoader()));
-    Map<String, String> springMappings =
-        getSchemaMappings(CUSTOM_SPRING_SCHEMA_MAPPINGS_LOCATION,
-                          () -> getClassLoaderToUse(MuleCustomEntityResolver.class.getClassLoader()));
+    Map<String, String> schemaMappings = getMuleSchemasMappings();
+    Map<String, String> springMappings = getSpringSchemasMappings();
     schemaMappings.putAll(springMappings);
     return schemaMappings;
   }
