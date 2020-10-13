@@ -22,13 +22,8 @@ import org.hamcrest.TypeSafeMatcher;
  * <pre>
  * {@code
  *     CollectableReference<String> collectableReference = new CollectableReference<>(new String("Hello world"));
- *
  *     System.out.println(collectableReference.get());
- *
- *     new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
- *       assertThat(collectableReference, is(collectedByGc()));
- *       return true;
- *     }, "A strong reference is being maintained."));
+ *     assertThat(collectableReference, is(eventually(collectedByGc())));
  * }
  * </pre>
  *
