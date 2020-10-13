@@ -873,7 +873,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   }
 
   @Test
-  // @Issue("MULE-18183")
+  @Issue("MULE-18884")
   @Description("Check that all internal sinks are complete when ps.dispose() returns.")
   public void disposeWithRegisteredInternalSink2() throws MuleException, InterruptedException {
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "withRegisteredInternalSink");
@@ -898,7 +898,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
           }
 
           completionLatch.countDown();
-          System.out.println("Completing internal Sink");
         }), "justAnEvent");
     fluxSinkRecorder.complete();
 
