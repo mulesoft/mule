@@ -46,6 +46,8 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
@@ -339,11 +341,10 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   protected void checkFlowIsStopped(String flowName) throws Exception {
     flow = (Flow) getFlowConstruct(flowName);
-    check(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS,
-          () -> {
-            assertThat("The flow did not stop in a reasonable amount of time", flow.getLifecycleState().isStopped(), is(true));
-            return true;
-          });
+    new PollingProber(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> {
+      assertThat(flow.getLifecycleState().isStopped(), is(true));
+      return flow.getLifecycleState().isStopped();
+    }, "The flow did not stop in a reasonable amount of time"));
   }
 
   private boolean assertState(boolean executedOnSuccess, boolean executedOnError, boolean executedOnTerminate) {
