@@ -341,10 +341,9 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   protected void checkFlowIsStopped(String flowName) throws Exception {
     flow = (Flow) getFlowConstruct(flowName);
-    new PollingProber(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> {
-      assertThat(flow.getLifecycleState().isStopped(), is(true));
-      return flow.getLifecycleState().isStopped();
-    }, "The flow did not stop in a reasonable amount of time"));
+    new PollingProber(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS)
+        .check(new JUnitLambdaProbe(() -> flow.getLifecycleState().isStopped(),
+                                    "The flow did not stop in a reasonable amount of time"));
   }
 
   private boolean assertState(boolean executedOnSuccess, boolean executedOnError, boolean executedOnTerminate) {
