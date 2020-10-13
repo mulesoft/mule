@@ -8,13 +8,17 @@ package org.mule.runtime.core.internal.util.queue;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.tck.junit4.matcher.Eventually.eventually;
+import static org.mule.tck.util.CollectableReference.collectedByGc;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.Queue;
+import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.api.util.queue.QueueSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.util.CollectableReference;
 
 import org.junit.Test;
 
@@ -47,8 +51,20 @@ public class TransactionalQueueManagerTestCase extends AbstractMuleContextTestCa
   @Test
   public void doNotCreateTwiceTheSameRecoveryQueue() {
     TransactionalQueueManager queueManager = (TransactionalQueueManager) muleContext.getQueueManager();
-    final RecoverableQueueStore recoryQueue = queueManager.getRecoveryQueue(TEST_QUEUE_NAME);
-    assertThat(recoryQueue, is(queueManager.getRecoveryQueue(TEST_QUEUE_NAME)));
+    final RecoverableQueueStore recoveryQueue = queueManager.getRecoveryQueue(TEST_QUEUE_NAME);
+    assertThat(recoveryQueue, is(queueManager.getRecoveryQueue(TEST_QUEUE_NAME)));
+  }
+
+  @Test
+  public void doNotLeakQueueConfigurationAfterQueueDispose() {
+    TransactionalQueueManager queueManager = (TransactionalQueueManager) muleContext.getQueueManager();
+    CollectableReference<QueueConfiguration> collectableReference = new CollectableReference<>(new DefaultQueueConfiguration());
+
+    QueueStore queueStore = queueManager.getQueue(TEST_QUEUE_NAME);
+    queueManager.setQueueConfiguration(TEST_QUEUE_NAME, collectableReference.get());
+    queueManager.disposeQueueStore(queueStore);
+
+    assertThat(collectableReference, is(eventually(collectedByGc())));
   }
 
   @Override
