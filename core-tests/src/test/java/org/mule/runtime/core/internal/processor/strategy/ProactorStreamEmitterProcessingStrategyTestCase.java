@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -50,12 +52,14 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -866,6 +870,42 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     verify(blocking).stop();
     verify(cpuIntensive).stop();
 
+  }
+
+  @Test
+  // @Issue("MULE-18183")
+  @Description("Check that all internal sinks are complete when ps.dispose() returns.")
+  public void disposeWithRegisteredInternalSink2() throws MuleException, InterruptedException {
+    final ProcessingStrategy ps = createProcessingStrategy(muleContext, "withRegisteredInternalSink");
+
+    startIfNeeded(ps);
+
+    final Latch completionLatch = new Latch();
+
+    final FluxSinkRecorder<CoreEvent> fluxSinkRecorder = new FluxSinkRecorder<>();
+    ps.registerInternalSink(fluxSinkRecorder.flux()
+        // force completion to run asynchronously to generate the situation that leads to the bug
+        .publishOn(fromExecutorService(blocking))
+        .doOnComplete(() -> {
+          try {
+            // dispose timeout
+            // + latch await timeout
+            // + some buffer
+            sleep(muleContext.getConfiguration().getShutdownTimeout() + 2000);
+          } catch (InterruptedException e) {
+            currentThread().interrupt();
+            return;
+          }
+
+          completionLatch.countDown();
+          System.out.println("Completing internal Sink");
+        }), "justAnEvent");
+    fluxSinkRecorder.complete();
+
+    disposeIfNeeded(ps, LOGGER);
+    assertThat("ps dispose should have waited for the internal sink completion",
+               completionLatch.await(1000, MILLISECONDS),
+               is(true));
   }
 
   @Test

@@ -151,7 +151,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public void dispose() {
-      final long startMillis = currentTimeMillis();
+      long startMillis = currentTimeMillis();
       final long shutdownTimeout = shutdownTimeoutSupplier.get();
 
       while (!allSchedulersStopped() && currentTimeMillis() - startMillis < shutdownTimeout) {
@@ -172,12 +172,30 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       }
 
       // force the schedulers to be stopped.
-      activeSinksCount.set(0);
+      final int pendingSinks = activeSinksCount.getAndSet(0);
       super.dispose();
+
+      // All pending threads have been interrupted at this point, so we just need to wait for proper completion
+      startMillis = currentTimeMillis();
+      while (activeSinksCount.get() >= -pendingSinks && currentTimeMillis() - startMillis < shutdownTimeout) {
+        try {
+          sleep(10);
+        } catch (InterruptedException e) {
+          currentThread().interrupt();
+          return;
+        }
+      }
+      if (activeSinksCount.get() >= -pendingSinks) {
+        if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
+          throw new IllegalStateException("Completion of ProcessingStrategy sinks not complete/cancelled before shutdown timeout.");
+        } else {
+          LOGGER.warn("Completion of ProcessingStrategy sinks not complete/cancelled before shutdown timeout.");
+        }
+      }
     }
 
     private boolean allSchedulersStopped() {
-      return activeSinksCount.get() == 0;
+      return activeSinksCount.get() <= 0;
     }
 
     @Override
@@ -199,7 +217,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     }
 
     private boolean decrementActiveSinks() {
-      return activeSinksCount.updateAndGet(operand -> operand == 0 ? 0 : operand - 1) == 0;
+      return activeSinksCount.decrementAndGet() <= 0;
     }
 
     @Override
@@ -236,17 +254,11 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public void registerInternalSink(Publisher<CoreEvent> flux, String sinkRepresentation) {
-      Latch completionLatch = new Latch();
-
       from(flux).subscribe(null, e -> {
         LOGGER.error("Exception reached PS subscriber for " + sinkRepresentation, e);
-        completionLatch.release();
         stopSchedulersIfNeeded();
       },
-                           () -> {
-                             completionLatch.release();
-                             stopSchedulersIfNeeded();
-                           });
+                           () -> stopSchedulersIfNeeded());
 
       activeSinksCount.incrementAndGet();
     }
