@@ -875,7 +875,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Test
   @Issue("MULE-18884")
   @Description("Check that all internal sinks are complete when ps.dispose() returns.")
-  public void disposeWithRegisteredInternalSink2() throws MuleException, InterruptedException {
+  public void disposeWaitsForRegisteredInternalSinkCompletion() throws MuleException, InterruptedException {
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "withRegisteredInternalSink");
 
     startIfNeeded(ps);
