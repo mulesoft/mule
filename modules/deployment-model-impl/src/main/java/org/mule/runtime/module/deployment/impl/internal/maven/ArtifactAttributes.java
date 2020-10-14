@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static java.util.Collections.emptySet;
+
+import org.mule.runtime.module.artifact.api.classloader.ExportedService;
+
 import java.util.Set;
 
 /**
@@ -13,12 +17,18 @@ import java.util.Set;
  */
 class ArtifactAttributes {
 
-  private Set<String> packages;
-  private Set<String> resources;
+  private final Set<String> packages;
+  private final Set<String> resources;
+  private final Set<ExportedService> services;
 
   public ArtifactAttributes(Set<String> packages, Set<String> resources) {
+    this(packages, resources, emptySet());
+  }
+
+  public ArtifactAttributes(Set<String> packages, Set<String> resources, Set<ExportedService> services) {
     this.packages = packages;
     this.resources = resources;
+    this.services = services;
   }
 
   public Set<String> getPackages() {
@@ -27,5 +37,9 @@ class ArtifactAttributes {
 
   public Set<String> getResources() {
     return resources;
+  }
+
+  public Set<ExportedService> getServices() {
+    return services;
   }
 }
