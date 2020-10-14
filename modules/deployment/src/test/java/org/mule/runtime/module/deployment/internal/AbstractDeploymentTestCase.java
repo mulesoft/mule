@@ -257,6 +257,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File loadsAppResourceCallbackClassFile;
   protected static File loadsAppResourceCallbackJarFile;
   protected static File pluginEcho1TestClassFile;
+  protected static File pluginEchoSpiTestClassFile;
 
   private static Boolean internalIsRunningTests;
 
@@ -323,6 +324,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .compile("loadsAppResourceCallback.jar");
     pluginEcho1TestClassFile =
         new SingleClassCompiler().dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
+
+    pluginEchoSpiTestClassFile =
+        new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/echo/PluginSpiEcho.java"));
 
     internalIsRunningTests =
         (Boolean) readDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", true);
