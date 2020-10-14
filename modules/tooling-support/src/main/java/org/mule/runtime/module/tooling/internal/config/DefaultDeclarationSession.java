@@ -12,7 +12,6 @@ import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessa
 import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.metadata.resolving.FailureCode.RESOURCE_UNAVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
@@ -130,7 +129,9 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
                           component.getName(), providerName),
                    e);
       return resultFrom(newFailure(e)
-          .withMessage(format("Unknown error while resolving values for providerName: '%s'. %s", providerName,
+          .withMessage(format("Unknown error while resolving values on component: '%s:%s' for providerName: '%s'",
+                              component.getDeclaringExtension(), component.getName(),
+                              providerName,
                               getRootCauseMessage(e)))
           .withReason(getStackTrace(e))
           .build());
@@ -192,7 +193,6 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
                               component.getDeclaringExtension(),
                               component.getName(), getRootCauseMessage(e)))
           .withReason(getStackTrace(e))
-          .withFailureCode(RESOURCE_UNAVAILABLE.getName())
           .build());
     }
   }
