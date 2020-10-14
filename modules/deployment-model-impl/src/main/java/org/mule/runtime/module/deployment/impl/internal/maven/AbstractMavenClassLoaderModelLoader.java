@@ -11,7 +11,6 @@ import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singleton;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -37,7 +36,6 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
-import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -66,15 +64,14 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableSet;
+import com.vdurmont.semver4j.Semver;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ImmutableSet;
-import com.vdurmont.semver4j.Semver;
 
 /**
  * Abstract implementation of {@link ClassLoaderModelLoader} that resolves the dependencies for all the mule artifacts and create
@@ -433,14 +430,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedDependencies, emptyList());
 
     if (!isBlacklisted(artifactBundleDescriptor)) {
-      final ArtifactAttributes localPackages = discoverLocalPackages(dependenciesArtifactsUrls);
-      populateLocalPackages(localPackages, classLoaderModelBuilder);
-
-      localPackages.getServices()
-          .forEach(service -> classLoaderModelBuilder
-              .exportingResources(singleton("META-INF/services/" + service.getServiceInterface())));
+      populateLocalPackages(discoverLocalPackages(dependenciesArtifactsUrls), classLoaderModelBuilder);
     }
-
 
     classLoaderModelBuilder.dependingOn(new HashSet<>(resolvedDependencies));
 
@@ -461,7 +452,6 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   private ArtifactAttributes discoverLocalPackages(List<URL> dependenciesArtifactsUrls) {
     final Set<String> packages = new HashSet<>();
     final Set<String> resources = new HashSet<>();
-    final Set<ExportedService> services = new HashSet<>();
 
     for (URL dependencyArtifactUrl : dependenciesArtifactsUrls) {
       final URI dependencyArtifactUri;
@@ -475,14 +465,13 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         final JarInfo exploredJar = jarExplorerFactory.get().explore(dependencyArtifactUri);
         packages.addAll(exploredJar.getPackages());
         resources.addAll(exploredJar.getResources());
-        services.addAll(exploredJar.getServices());
       } catch (IllegalArgumentException e) {
         // Workaround for MMP-499
         LOGGER.warn("File for dependency artifact not found: '{}'. Skipped localPackages scanning for that artifact.",
                     dependencyArtifactUri);
       }
     }
-    return new ArtifactAttributes(packages, resources, services);
+    return new ArtifactAttributes(packages, resources);
   }
 
   protected void populateLocalPackages(ArtifactAttributes artifactAttributes,

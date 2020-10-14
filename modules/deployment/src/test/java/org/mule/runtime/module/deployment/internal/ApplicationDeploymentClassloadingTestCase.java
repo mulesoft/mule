@@ -378,7 +378,7 @@ public class ApplicationDeploymentClassloadingTestCase extends ApplicationDeploy
     ApplicationFileBuilder artifactFileBuilder = appFileBuilder("plugin-using-app-spi-impl")
         .definedBy("plugin-using-app-spi-impl-config.xml")
         .dependingOn(spiUserPlugin)
-        .dependingOn(new JarFileBuilder("spi-impl", spiImplJarFile))
+        .dependingOnSharedLibrary(new JarFileBuilder("spi-impl", spiImplJarFile))
         .configuredWith(EXPORTED_PACKAGES, "org.foo.spi.impl");
 
     if (lightweight) {
