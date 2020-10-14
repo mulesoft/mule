@@ -695,6 +695,31 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   }
 
 
+  @Test
+  public void globalOnErrors() {
+    ConstructModel onErrorContinue = coreExtensionModel.getConstructModel("onErrorContinue").get();
+    assertThat(onErrorContinue.allowsTopLevelDeclaration(), is(true));
+    assertThat(onErrorContinue.getStereotype().getType(), is(ON_ERROR.getType()));
+
+    assertThat(onErrorContinue.getAllParameterModels(), hasSize(1));
+
+    ParameterModel nameParam = onErrorContinue.getAllParameterModels().get(0);
+    assertThat(nameParam.getName(), is("name"));
+    assertThat(nameParam.getDefaultValue(), is(nullValue()));
+    assertThat(nameParam.isComponentId(), is(true));
+
+    ConstructModel onErrorPropagate = coreExtensionModel.getConstructModel("onErrorPropagate").get();
+    assertThat(onErrorPropagate.allowsTopLevelDeclaration(), is(true));
+    assertThat(onErrorPropagate.getStereotype().getType(), is(ON_ERROR.getType()));
+
+    assertThat(onErrorPropagate.getAllParameterModels(), hasSize(1));
+
+    nameParam = onErrorPropagate.getAllParameterModels().get(0);
+    assertThat(nameParam.getName(), is("name"));
+    assertThat(nameParam.getDefaultValue(), is(nullValue()));
+    assertThat(nameParam.isComponentId(), is(true));
+  }
+
   void verifyOnError(NestedRouteModel route) {
     List<ParameterModel> allParameterModels = route.getAllParameterModels();
     assertThat(allParameterModels, hasSize(4));
