@@ -42,6 +42,7 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
   };
 
   // Classes and JAR resources
+  protected static File pluginEchoSpiTestClassFile;
   protected static File pluginEcho3TestClassFile;
   protected static File pluginEcho2TestClassFile;
   protected static File pluginForbiddenJavaEchoTestClassFile;
@@ -65,6 +66,8 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
         new CompilerUtils.SingleClassCompiler().dependingOn(barUtils2_0JarFile)
             .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
     pluginEcho3TestClassFile = new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
+    pluginEchoSpiTestClassFile =
+        new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/echo/PluginSpiEcho.java"));
 
     pluginForbiddenJavaEchoTestClassFile =
         new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenJavaJarFile)
