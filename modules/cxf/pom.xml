@@ -483,7 +483,7 @@
                     <artifactId>log4j-over-slf4j</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>not-yet-commons-ssl</groupId>
+                    <groupId>ca.juliusdavies</groupId>
                     <artifactId>not-yet-commons-ssl</artifactId>
                 </exclusion>
                 <exclusion>
