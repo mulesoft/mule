@@ -366,14 +366,11 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
     try {
       parentStack.stream().forEachOrdered(inputFlowCallStack::push);
-      // inputFlowCallStack.push(new FlowStackElement("flow", "processor"));
 
       ReactiveProcessor childWithStack = p -> from(p).flatMap(e -> {
         DefaultFlowCallStack stack = (DefaultFlowCallStack) e.getFlowCallStack();
 
         childStack.stream().forEachOrdered(stack::push);
-        // stack.push(new FlowStackElement("sub-flow-1", "processor-1"));
-        // stack.push(new FlowStackElement("sub-flow-2", "processor-2"));
 
         childFlowCallStack.set(stack);
 
