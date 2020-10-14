@@ -23,6 +23,7 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_ARTIFACTS_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
@@ -335,6 +336,91 @@ public class ApplicationDeploymentClassloadingTestCase extends ApplicationDeploy
 
     final TestArtifactDescriptor artifactFileBuilder = appFileBuilder("plugin-depending-on-plugin-app")
         .definedBy("plugin-depending-on-plugin-app-config.xml").dependingOn(dependantPlugin).usingLightWeightPackage();
+    addPackedAppFromBuilder(artifactFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, artifactFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  @Issue("MULE-18889")
+  public void heavyApplicationServicesVisibleFromPlugin() throws Exception {
+    applicationServicesVisibleFromPlugin(false);
+  }
+
+  @Test
+  @Issue("MULE-18889")
+  public void lightApplicationServicesVisibleFromPlugin() throws Exception {
+    applicationServicesVisibleFromPlugin(true);
+  }
+
+  public void applicationServicesVisibleFromPlugin(boolean lightweight) throws Exception {
+    final File spiApiJarFile =
+        new JarCompiler().compiling(getResourceFile("/org/foo/spi/SpiInterface.java")).compile("spi-api.jar");
+    final File spiImplJarFile =
+        new JarCompiler().compiling(getResourceFile("/org/foo/spi/impl/SpiImplementation.java"))
+            .including(new File(ApplicationDeploymentClassloadingTestCase.class
+                .getResource("/org/foo/spi/META-INF/services/org.foo.spi.SpiInterface").toURI()),
+                       "META-INF/services/org.foo.spi.SpiInterface")
+            .dependingOn(spiApiJarFile)
+            .compile("spi-impl.jar");
+
+    ArtifactPluginFileBuilder spiUserPlugin =
+        new ArtifactPluginFileBuilder("spiUserPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+            .containingClass(pluginEchoSpiTestClassFile, "org/foo/echo/PluginSpiEcho.class")
+            .dependingOn(echoPlugin)
+            .dependingOn(new JarFileBuilder("spi-api", spiApiJarFile))
+            .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.spi,org.foo.echo");
+
+    ApplicationFileBuilder artifactFileBuilder = appFileBuilder("plugin-using-app-spi-impl")
+        .definedBy("plugin-using-app-spi-impl-config.xml")
+        .dependingOn(spiUserPlugin)
+        .dependingOnSharedLibrary(new JarFileBuilder("spi-impl", spiImplJarFile))
+        .configuredWith(EXPORTED_PACKAGES, "org.foo.spi.impl");
+
+    if (lightweight) {
+      File mavenRepoFolder = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
+      File testGroupIdRepoFolder = Paths.get(mavenRepoFolder.getAbsolutePath(), "org", "mule", "test").toFile();
+
+      JarFileBuilder spiApiJarFileDependency = new JarFileBuilder("spi-api", spiApiJarFile);
+      copyFile(spiApiJarFileDependency.getArtifactPomFile(),
+               Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "spi-api", "1.0.0", "spi-api-1.0.0.pom").toFile());
+      copyFile(spiApiJarFileDependency.getArtifactFile(),
+               Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "spi-api", "1.0.0", "spi-api-1.0.0.jar").toFile());
+
+      JarFileBuilder spiImplJarFileDependency = new JarFileBuilder("spi-impl", spiImplJarFile);
+      copyFile(spiImplJarFileDependency.getArtifactPomFile(),
+               Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "spi-impl", "1.0.0", "spi-impl-1.0.0.pom").toFile());
+      copyFile(spiImplJarFileDependency.getArtifactFile(),
+               Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "spi-impl", "1.0.0", "spi-impl-1.0.0.jar").toFile());
+
+      JarFileBuilder testJarFileDependency = new JarFileBuilder("echoTestJar", echoTestJarFile);
+      copyFile(testJarFileDependency.getArtifactPomFile(),
+               Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoTestJar", "1.0.0", "echoTestJar-1.0.0.pom").toFile());
+      copyFile(testJarFileDependency.getArtifactFile(),
+               Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoTestJar", "1.0.0", "echoTestJar-1.0.0.jar").toFile());
+
+      copyFile(echoPlugin.getArtifactPomFile(),
+               Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0", "echoPlugin-1.0.0.pom").toFile());
+      copyFile(echoPlugin.getArtifactFile(),
+               Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0", "echoPlugin-1.0.0-mule-plugin.jar")
+                   .toFile());
+
+      copyFile(spiUserPlugin.getArtifactPomFile(),
+               Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "spiUserPlugin", "1.0.0", "spiUserPlugin-1.0.0.pom").toFile());
+      copyFile(spiUserPlugin.getArtifactFile(),
+               Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "spiUserPlugin", "1.0.0", "spiUserPlugin-1.0.0-mule-plugin.jar")
+                   .toFile());
+
+      artifactFileBuilder = artifactFileBuilder.usingLightWeightPackage();
+    } else {
+      artifactFileBuilder = artifactFileBuilder
+          .configuredWith(EXPORTED_RESOURCES, "META-INF/services/org.foo.spi.SpiInterface");
+    }
+
     addPackedAppFromBuilder(artifactFileBuilder);
 
     startDeployment();
