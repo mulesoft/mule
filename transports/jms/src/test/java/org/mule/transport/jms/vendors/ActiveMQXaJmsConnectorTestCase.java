@@ -9,6 +9,7 @@ package org.mule.transport.jms.vendors;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
@@ -37,9 +38,12 @@ public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase
         assertNotNull(c);
         
         ConnectionFactory cf = c.getConnectionFactory();
-        assertTrue(cf instanceof DefaultXAConnectionFactoryWrapper);
+        assertTrue(cf instanceof ActiveMQXAConnectionFactory);
 
-        Connection connection = cf.createConnection();
+        DefaultXAConnectionFactoryWrapper wrapper = new DefaultXAConnectionFactoryWrapper(cf);
+        // can be a proxy
+        Connection connection = wrapper.createConnection();
+
         assertNotNull(connection);
         assertTrue(Proxy.isProxyClass(connection.getClass()));
 

@@ -32,7 +32,8 @@ public class DefaultConnectionFactoryDecorator extends AbstractConnectionFactory
 
     private boolean isConnectionFactoryXaAndThereIsATxManager(ConnectionFactory connectionFactory, MuleContext muleContext)
     {
-        return (isXaConnectionFactory(connectionFactory) && muleContext.getTransactionManager() != null);
+        return (isXaConnectionFactory(connectionFactory) && muleContext.getTransactionManager() != null &&
+                !muleContext.getTransactionManager().getClass().getName().startsWith("com.sun.proxy.$Proxy"));
     }
 
 }
