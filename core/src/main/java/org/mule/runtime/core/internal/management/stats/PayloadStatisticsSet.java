@@ -6,26 +6,30 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import org.mule.runtime.core.api.management.stats.PayloadStatistics;
+
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.LongConsumer;
+import java.util.function.ObjLongConsumer;
 
 import org.apache.commons.collections.set.AbstractSetDecorator;
 
 final class PayloadStatisticsSet<T> extends AbstractSetDecorator {
 
-  private final LongConsumer populator;
+  private final PayloadStatistics statistics;
+  private final ObjLongConsumer<PayloadStatistics> populator;
 
-  PayloadStatisticsSet(Set<T> decorated, LongConsumer populator) {
+  PayloadStatisticsSet(Set<T> decorated, PayloadStatistics statistics, ObjLongConsumer<PayloadStatistics> populator) {
     super(decorated);
+    this.statistics = statistics;
     this.populator = populator;
   }
 
   @Override
   public Iterator iterator() {
-    return new PayloadStatisticsIterator<>(super.iterator(), populator);
+    return new PayloadStatisticsIterator<>(super.iterator(), statistics, populator);
   }
 
   @Override
@@ -35,13 +39,13 @@ final class PayloadStatisticsSet<T> extends AbstractSetDecorator {
 
   @Override
   public Object[] toArray() {
-    populator.accept(size());
+    populator.accept(statistics, size());
     return super.toArray();
   }
 
   @Override
   public Object[] toArray(Object[] object) {
-    populator.accept(size());
+    populator.accept(statistics, size());
     return super.toArray(object);
   }
 
