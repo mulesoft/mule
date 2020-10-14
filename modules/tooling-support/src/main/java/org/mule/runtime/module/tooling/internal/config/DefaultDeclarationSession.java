@@ -12,10 +12,10 @@ import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessa
 import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.RESOURCE_UNAVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
-
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -31,6 +31,7 @@ import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.module.repository.api.BundleNotFoundException;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.AbstractArtifactAgnosticService;
 import org.mule.runtime.module.tooling.internal.ApplicationSupplier;
@@ -107,6 +108,8 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   public ConnectionValidationResult testConnection(String configName) {
     try {
       return withInternalDeclarationSession("testConnection()", session -> session.testConnection(configName));
+    } catch (BundleNotFoundException e) {
+      throw e;
     } catch (Exception e) {
       LOGGER.error(format("Unknown error while performing test connection on config: '%s'", configName), e);
       return failure(format("Unknown error while performing test connection on config: '%s'. %s", configName,
@@ -119,6 +122,8 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   public ValueResult getValues(ParameterizedElementDeclaration component, String providerName) {
     try {
       return withInternalDeclarationSession("getValues()", session -> session.getValues(component, providerName));
+    } catch (BundleNotFoundException e) {
+      throw e;
     } catch (NoClassDefFoundError | Exception e) {
       LOGGER.error(format("Unknown error while resolving values on component: '%s:%s' for providerName: '%s'",
                           component.getDeclaringExtension(),
@@ -136,13 +141,16 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration component) {
     try {
       return withInternalDeclarationSession("getMetadataKeys()", session -> session.getMetadataKeys(component));
+    } catch (BundleNotFoundException e) {
+      throw e;
     } catch (NoClassDefFoundError | Exception e) {
       LOGGER.error(format("Unknown error while resolving metadata keys on component: '%s:%s'", component.getDeclaringExtension(),
                           component.getName()),
                    e);
       return MetadataResult.failure(MetadataFailure.Builder.newFailure()
-          .withMessage(format("Unknown error while resolving metadata keys on component: '%s'. %s", component.getName(),
-                              getRootCauseMessage(e)))
+          .withMessage(format("Unknown error while resolving metadata keys on component: '%s:%s'. %s",
+                              component.getDeclaringExtension(),
+                              component.getName(), getRootCauseMessage(e)))
           .withReason(getStackTrace(e))
           .withFailureCode(UNKNOWN)
           .onComponent());
@@ -153,16 +161,18 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   public MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentElementDeclaration component) {
     try {
       return withInternalDeclarationSession("resolveComponentMetadata()", session -> session.resolveComponentMetadata(component));
+    } catch (BundleNotFoundException e) {
+      throw e;
     } catch (NoClassDefFoundError | Exception e) {
       LOGGER.error(format("Unknown error while resolving metadata on component: '%s:%s'", component.getDeclaringExtension(),
                           component.getName()),
                    e);
       return MetadataResult.failure(MetadataFailure.Builder.newFailure()
-          .withMessage(format("Unknown error while resolving metadata on component: '%s'. %s", component.getName(),
-                              getRootCauseMessage(e)))
+          .withMessage(format("Unknown error while resolving metadata on component: '%s:%s'. %s",
+                              component.getDeclaringExtension(),
+                              component.getName(), getRootCauseMessage(e)))
           .withReason(getStackTrace(e))
           .withFailureCode(UNKNOWN)
-
           .onComponent());
     }
   }
@@ -171,14 +181,18 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   public SampleDataResult getSampleData(ComponentElementDeclaration component) {
     try {
       return withInternalDeclarationSession("getSampleData()", session -> session.getSampleData(component));
+    } catch (BundleNotFoundException e) {
+      throw e;
     } catch (NoClassDefFoundError | Exception e) {
       LOGGER.error(format("Unknown error while retrieving sample data on component: '%s:%s'", component.getDeclaringExtension(),
                           component.getName()),
                    e);
       return SampleDataResult.resultFrom(SampleDataFailure.Builder.newFailure(e)
-          .withMessage(format("Unknown error while resolving sample data on component: '%s'. %s", component.getName(),
-                              getRootCauseMessage(e)))
+          .withMessage(format("Unknown error while resolving sample data on component: '%s:%s'. %s",
+                              component.getDeclaringExtension(),
+                              component.getName(), getRootCauseMessage(e)))
           .withReason(getStackTrace(e))
+          .withFailureCode(RESOURCE_UNAVAILABLE.getName())
           .build());
     }
   }
