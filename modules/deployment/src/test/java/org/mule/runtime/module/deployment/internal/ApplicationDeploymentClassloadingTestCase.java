@@ -345,13 +345,14 @@ public class ApplicationDeploymentClassloadingTestCase extends ApplicationDeploy
     executeApplicationFlow("main");
   }
 
-  // TODO
   @Test
+  @Issue("MULE-18889")
   public void heavyApplicationServicesVisibleFromPlugin() throws Exception {
     applicationServicesVisibleFromPlugin(false);
   }
 
   @Test
+  @Issue("MULE-18889")
   public void lightApplicationServicesVisibleFromPlugin() throws Exception {
     applicationServicesVisibleFromPlugin(true);
   }
