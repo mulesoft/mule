@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.extractValue;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -95,7 +96,7 @@ public class AbstractParameterResolverExecutor {
                                                                             parameterName, parameterGroupName)));
         Object value = extractValue(parameterElement.getValue(),
                                     artifactHelper.getParameterClass(parameterModel, parameterizedElementDeclaration));
-        if (isExpression(value)) {
+        if (!parameterModel.getExpressionSupport().equals(NOT_SUPPORTED) && isExpression(value)) {
           throw new ExpressionNotSupportedException(format("Error resolving value for parameter: '%s' from declaration, it cannot be an EXPRESSION value",
                                                            parameterName));
         }
