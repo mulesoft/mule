@@ -266,7 +266,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   static {
     // Log dropped events/errors
-    Hooks.onErrorDropped(error -> LOGGER.debug("ERROR DROPPED {}", (Object) error));
+    Hooks.onErrorDropped(error -> LOGGER.debug("ERROR DROPPED", error));
     Hooks.onNextDropped(event -> LOGGER.debug("EVENT DROPPED {}", event));
   }
 
