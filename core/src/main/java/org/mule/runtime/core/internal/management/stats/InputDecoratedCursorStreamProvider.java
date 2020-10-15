@@ -17,9 +17,9 @@ import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactor
  */
 public class InputDecoratedCursorStreamProvider implements CursorStreamProvider {
 
-  private CursorStreamProvider delegate;
-  private CursorComponentDecoratorFactory decoratorFactory;
-  private String correlationId;
+  private final CursorStreamProvider delegate;
+  private final CursorComponentDecoratorFactory decoratorFactory;
+  private final String correlationId;
 
   public InputDecoratedCursorStreamProvider(CursorStreamProvider delegate, CursorComponentDecoratorFactory decoratorFactory,
                                             String correlationId) {
@@ -48,4 +48,8 @@ public class InputDecoratedCursorStreamProvider implements CursorStreamProvider 
     return delegate.isClosed();
   }
 
+  @Override
+  public boolean isManaged() {
+    return delegate.isManaged();
+  }
 }
