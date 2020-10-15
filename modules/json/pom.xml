@@ -148,6 +148,11 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson2Version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <version>${rhinoVersion}</version>
+        </dependency>
 
         <!-- test dependencies -->
         <dependency>
