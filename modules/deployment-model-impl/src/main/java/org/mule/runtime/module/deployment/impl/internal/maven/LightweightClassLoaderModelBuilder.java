@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -46,9 +47,9 @@ import org.apache.maven.model.Plugin;
  */
 public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
 
-  private MavenClient mavenClient;
-  private List<BundleDependency> nonProvidedDependencies;
-  private Map<Pair<String, String>, Boolean> sharedLibraryAlreadyExported = new HashMap<>();
+  private final MavenClient mavenClient;
+  private final List<BundleDependency> nonProvidedDependencies;
+  private final Map<Pair<String, String>, Boolean> sharedLibraryAlreadyExported = new HashMap<>();
 
   public LightweightClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor,
                                             MavenClient mavenClient, List<BundleDependency> nonProvidedDependencies) {
@@ -116,6 +117,11 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
     JarInfo jarInfo = fileJarExplorer.explore(resolvedBundleDependency.getBundleUri());
     this.exportingPackages(jarInfo.getPackages());
     this.exportingResources(jarInfo.getResources());
+
+    jarInfo.getServices()
+        .forEach(service -> this
+            .exportingResources(singleton("META-INF/services/" + service.getServiceInterface())));
+
     resolvedBundleDependency.getTransitiveDependenciesList()
         .forEach(this::exportBundleDependencyAndTransitiveDependencies);
   }
