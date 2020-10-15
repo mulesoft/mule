@@ -12,16 +12,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.ObjIntConsumer;
+import java.util.function.ObjLongConsumer;
 
 import org.apache.commons.collections.list.AbstractListDecorator;
 
 final class PayloadStatisticsList<T> extends AbstractListDecorator {
 
   private final PayloadStatistics statistics;
-  private final ObjIntConsumer<PayloadStatistics> populator;
+  private final ObjLongConsumer<PayloadStatistics> populator;
 
-  PayloadStatisticsList(List<T> decorated, PayloadStatistics statistics, ObjIntConsumer<PayloadStatistics> populator) {
+  PayloadStatisticsList(List<T> decorated, PayloadStatistics statistics, ObjLongConsumer<PayloadStatistics> populator) {
     super(decorated);
     this.statistics = statistics;
     this.populator = populator;

@@ -10,16 +10,16 @@ import org.mule.runtime.api.streaming.HasSize;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 
 import java.util.Iterator;
-import java.util.function.ObjIntConsumer;
+import java.util.function.ObjLongConsumer;
 
 import org.apache.commons.collections.iterators.AbstractIteratorDecorator;
 
 final class PayloadStatisticsIterator<T> extends AbstractIteratorDecorator implements HasSize {
 
   private final PayloadStatistics statistics;
-  private final ObjIntConsumer<PayloadStatistics> populator;
+  private final ObjLongConsumer<PayloadStatistics> populator;
 
-  PayloadStatisticsIterator(Iterator<T> iterator, PayloadStatistics statistics, ObjIntConsumer<PayloadStatistics> populator) {
+  PayloadStatisticsIterator(Iterator<T> iterator, PayloadStatistics statistics, ObjLongConsumer<PayloadStatistics> populator) {
     super(iterator);
     this.statistics = statistics;
     this.populator = populator;
