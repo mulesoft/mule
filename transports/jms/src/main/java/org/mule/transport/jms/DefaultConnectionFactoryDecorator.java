@@ -11,6 +11,8 @@ import org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
 
 import javax.jms.ConnectionFactory;
 
+import static java.lang.reflect.Proxy.isProxyClass;
+
 /**
  * Decorates the jms ConnectionFactory with a {@link org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper} in order
  * to avoid releasing jms resources before the XA transaction has ended.
@@ -32,7 +34,8 @@ public class DefaultConnectionFactoryDecorator extends AbstractConnectionFactory
 
     private boolean isConnectionFactoryXaAndThereIsATxManager(ConnectionFactory connectionFactory, MuleContext muleContext)
     {
-        return (isXaConnectionFactory(connectionFactory) && muleContext.getTransactionManager() != null);
+        return (isXaConnectionFactory(connectionFactory) && muleContext.getTransactionManager() != null &&
+                !isProxyClass(muleContext.getTransactionManager().getClass()));
     }
 
 }
