@@ -6,21 +6,17 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
-import org.mule.runtime.core.api.management.stats.PayloadStatistics;
-
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.function.ObjLongConsumer;
+import java.util.function.LongConsumer;
 
 final class PayloadStatisticsInputStream extends FilterInputStream {
 
-  private final PayloadStatistics statistics;
-  private final ObjLongConsumer<PayloadStatistics> populator;
+  private final LongConsumer populator;
 
-  PayloadStatisticsInputStream(InputStream in, PayloadStatistics statistics, ObjLongConsumer<PayloadStatistics> populator) {
+  PayloadStatisticsInputStream(InputStream in, LongConsumer populator) {
     super(in);
-    this.statistics = statistics;
     this.populator = populator;
   }
 
@@ -28,7 +24,7 @@ final class PayloadStatisticsInputStream extends FilterInputStream {
   public int read() throws IOException {
     final int read = super.read();
     if (read != -1) {
-      populator.accept(statistics, 1);
+      populator.accept(1);
     }
     return read;
   }
@@ -38,7 +34,7 @@ final class PayloadStatisticsInputStream extends FilterInputStream {
     final int read = super.read(b, off, len);
     // ignore -1 indicating no data read
     if (read > 0) {
-      populator.accept(statistics, read);
+      populator.accept(read);
     }
     return read;
   }

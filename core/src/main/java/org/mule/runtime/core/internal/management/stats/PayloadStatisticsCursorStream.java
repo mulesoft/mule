@@ -6,23 +6,19 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import java.io.IOException;
+import java.util.function.LongConsumer;
+
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.core.api.management.stats.PayloadStatistics;
-
-import java.io.IOException;
-import java.util.function.ObjLongConsumer;
 
 final class PayloadStatisticsCursorStream extends CursorStream {
 
-  private final PayloadStatistics statistics;
-  private final ObjLongConsumer<PayloadStatistics> populator;
-  private final CursorStream delegate;
+  private final LongConsumer populator;
+  private CursorStream delegate;
 
-  PayloadStatisticsCursorStream(CursorStream delegate, PayloadStatistics statistics,
-                                ObjLongConsumer<PayloadStatistics> populator) {
+  PayloadStatisticsCursorStream(CursorStream delegate, LongConsumer populator) {
     this.delegate = delegate;
-    this.statistics = statistics;
     this.populator = populator;
   }
 
@@ -56,7 +52,7 @@ final class PayloadStatisticsCursorStream extends CursorStream {
   public int read() throws IOException {
     final int read = delegate.read();
     if (read != -1) {
-      populator.accept(statistics, 1);
+      populator.accept(1);
     }
 
     return read;

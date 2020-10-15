@@ -7,28 +7,25 @@
 package org.mule.runtime.core.internal.management.stats;
 
 import org.mule.runtime.api.streaming.HasSize;
-import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 
 import java.util.Iterator;
-import java.util.function.ObjLongConsumer;
+import java.util.function.LongConsumer;
 
 import org.apache.commons.collections.iterators.AbstractIteratorDecorator;
 
 final class PayloadStatisticsIterator<T> extends AbstractIteratorDecorator implements HasSize {
 
-  private final PayloadStatistics statistics;
-  private final ObjLongConsumer<PayloadStatistics> populator;
+  private final LongConsumer populator;
 
-  PayloadStatisticsIterator(Iterator<T> iterator, PayloadStatistics statistics, ObjLongConsumer<PayloadStatistics> populator) {
+  PayloadStatisticsIterator(Iterator<T> iterator, LongConsumer populator) {
     super(iterator);
-    this.statistics = statistics;
     this.populator = populator;
   }
 
   @Override
   public T next() {
     final Object next = super.next();
-    populator.accept(statistics, 1);
+    populator.accept(1);
     return (T) next;
   }
 
