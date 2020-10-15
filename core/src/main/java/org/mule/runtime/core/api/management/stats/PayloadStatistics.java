@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.management.stats;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Contains statistics about the amount of data generated and consumed by a component.
@@ -49,12 +49,12 @@ public class PayloadStatistics implements Statistics {
   private final String componentLocation;
   private final String componentIdentifier;
 
-  private final AtomicLong invocationCount = new AtomicLong();
+  private final LongAdder invocationCount = new LongAdder();
 
-  private final AtomicLong inputObjectCount = new AtomicLong();
-  private final AtomicLong inputByteCount = new AtomicLong();
-  private final AtomicLong outputObjectCount = new AtomicLong();
-  private final AtomicLong outputByteCount = new AtomicLong();
+  private final LongAdder inputObjectCount = new LongAdder();
+  private final LongAdder inputByteCount = new LongAdder();
+  private final LongAdder outputObjectCount = new LongAdder();
+  private final LongAdder outputByteCount = new LongAdder();
 
   public PayloadStatistics(String componentLocation, String componentIdentifier) {
     this.componentLocation = componentLocation;
@@ -83,55 +83,55 @@ public class PayloadStatistics implements Statistics {
    * @return the amount of objects received by this component, if it receives objects.
    */
   public long getInputObjectCount() {
-    return inputObjectCount.get();
+    return inputObjectCount.longValue();
   }
 
   /**
    * @return the amount of bytes received by this component, if it receives bytes.
    */
   public long getInputByteCount() {
-    return inputByteCount.get();
+    return inputByteCount.longValue();
   }
 
   /**
    * @return the amount of objects sent by this component, if it sends objects.
    */
   public long getOutputObjectCount() {
-    return outputObjectCount.get();
+    return outputObjectCount.longValue();
   }
 
   /**
    * @return the amount of bytes sent by this component, if it sends bytes.
    */
   public long getOutputByteCount() {
-    return outputByteCount.get();
+    return outputByteCount.longValue();
   }
 
   /**
    * @return how many times this component was executed.
    */
   public long getInvocationCount() {
-    return invocationCount.get();
+    return invocationCount.longValue();
   }
 
   public void addInputObjectCount(long delta) {
-    inputObjectCount.addAndGet(delta);
+    inputObjectCount.add(delta);
   }
 
   public void addInputByteCount(long delta) {
-    inputByteCount.addAndGet(delta);
+    inputByteCount.add(delta);
   }
 
   public void addOutputObjectCount(long delta) {
-    outputObjectCount.addAndGet(delta);
+    outputObjectCount.add(delta);
   }
 
   public void addOutputByteCount(long delta) {
-    outputByteCount.addAndGet(delta);
+    outputByteCount.add(delta);
   }
 
-  public long incrementInvocationCount() {
-    return invocationCount.incrementAndGet();
+  public void incrementInvocationCount() {
+    invocationCount.increment();
   }
 
   /**
