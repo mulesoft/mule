@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -14,6 +16,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
@@ -65,6 +68,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
@@ -84,6 +88,7 @@ import reactor.util.context.Context;
 
 @SmallTest
 public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
+
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -319,6 +324,67 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     assertThat(contextReference.get(), is(not(input.getContext())));
     BaseEventContext context = (BaseEventContext) contextReference.get();
     assertThat(context.getParentContext().get(), is(input.getContext()));
+  }
+
+  @Test
+  @Issue("MULE-16892")
+  public void handleErrorWithChildAndParentStack() throws Exception {
+
+    List<FlowStackElement> parentStack = asList(new FlowStackElement("flow", "processor"));
+
+    List<FlowStackElement> childStack = asList(
+                                               new FlowStackElement("sub-flow-1", "processor-1"),
+                                               new FlowStackElement("sub-flow-2", "processor-2"));
+
+    assertHandleErrorWithStack(parentStack, childStack);
+  }
+
+  @Test
+  @Issue("MULE-16892")
+  public void handleErrorWithEmptyParentStack() throws Exception {
+
+    List<FlowStackElement> childStack = asList(
+                                               new FlowStackElement("sub-flow-1", "processor-1"),
+                                               new FlowStackElement("sub-flow-2", "processor-2"));
+
+    assertHandleErrorWithStack(EMPTY_LIST, childStack);
+  }
+
+  @Test
+  @Issue("MULE-16892")
+  public void handleErrorWithEmptyStack() throws Exception {
+    assertHandleErrorWithStack(EMPTY_LIST, EMPTY_LIST);
+  }
+
+  private void assertHandleErrorWithStack(List<FlowStackElement> parentStack, List<FlowStackElement> childStack)
+      throws InitialisationException {
+
+    thrown.expectCause(isA(MessagingException.class));
+
+    final DefaultFlowCallStack inputFlowCallStack = (DefaultFlowCallStack) input.getFlowCallStack();
+    Reference<DefaultFlowCallStack> childFlowCallStack = new Reference<>();
+
+    try {
+      parentStack.stream().forEachOrdered(inputFlowCallStack::push);
+
+      ReactiveProcessor childWithStack = p -> from(p).flatMap(e -> {
+        DefaultFlowCallStack stack = (DefaultFlowCallStack) e.getFlowCallStack();
+
+        childStack.stream().forEachOrdered(stack::push);
+
+        childFlowCallStack.set(stack);
+
+        return from(processWithChildContext(e, error, Optional.empty()));
+      });
+
+      from(applyWithChildContextDontPropagateErrors(
+                                                    applyWithChildContextDontPropagateErrors(just(input), childWithStack,
+                                                                                             Optional.empty()),
+                                                    createChain(error), Optional.empty())).subscribe();
+    } finally {
+      assertThat(childFlowCallStack.get(), is(not(nullValue())));
+      assertThat(inputFlowCallStack.getElements(), is(childFlowCallStack.get().getElements()));
+    }
   }
 
   @Test

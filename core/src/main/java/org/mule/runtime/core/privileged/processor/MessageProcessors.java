@@ -52,8 +52,10 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
+import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -527,9 +529,27 @@ public class MessageProcessors {
           } else {
             final FlowStackElement currentStackEntry = ((DefaultFlowCallStack) eventChildCtx.getFlowCallStack()).peek();
             if (currentStackEntry != null) {
-              // For flow-ref to flows, avoid creating a second MessagingException, an instead mutate the thrown on so it has the
+              // For flow-ref to flows, avoid creating a second MessagingException, and instead mutate the thrown on so it has the
               // proper state when is bubbled.
-              ((DefaultFlowCallStack) parentContextEvent.getFlowCallStack()).push(currentStackEntry);
+              DefaultFlowCallStack parentCallStack = (DefaultFlowCallStack) parentContextEvent.getFlowCallStack();
+              List<FlowStackElement> childFlowStacks = eventChildCtx.getFlowCallStack().getElements();
+              ArrayDeque<FlowStackElement> remaining = new ArrayDeque<>();
+
+              // MULE-18883: In order to make parentCallStack consistent with the execution stack, we need to add (in the proper
+              // order) all the remaining FlowStackElement:
+              // 1. save all the elements in the child flow stack until we reach the same element located on the top of the
+              // parent stack.
+              for (FlowStackElement e : childFlowStacks) {
+                if (e.equals(parentCallStack.peek())) {
+                  break;
+                }
+                remaining.push(e);
+              }
+
+              // 2. add the collected elements from previous step in the parent call stack
+              while (!remaining.isEmpty()) {
+                parentCallStack.push(remaining.pop());
+              }
             }
             error.setProcessedEvent(parentContextEvent);
           }
