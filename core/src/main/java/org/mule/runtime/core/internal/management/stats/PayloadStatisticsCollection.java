@@ -12,17 +12,17 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.ObjLongConsumer;
+import java.util.function.ObjIntConsumer;
 
 import org.apache.commons.collections.collection.AbstractCollectionDecorator;
 
 class PayloadStatisticsCollection<T> extends AbstractCollectionDecorator {
 
   private final PayloadStatistics statistics;
-  private final ObjLongConsumer<PayloadStatistics> populator;
+  private final ObjIntConsumer<PayloadStatistics> populator;
 
   PayloadStatisticsCollection(Collection<T> decorated, PayloadStatistics statistics,
-                              ObjLongConsumer<PayloadStatistics> populator) {
+                              ObjIntConsumer<PayloadStatistics> populator) {
     super(decorated);
     this.statistics = statistics;
     this.populator = populator;

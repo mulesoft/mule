@@ -12,16 +12,16 @@ import org.mule.sdk.api.runtime.streaming.PagingProvider;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.ObjLongConsumer;
+import java.util.function.ObjIntConsumer;
 
 class PayloadStatisticsPagingProvider<C, T> implements PagingProvider<C, T> {
 
   private final PagingProvider<C, T> decorated;
   private final PayloadStatistics statistics;
-  private final ObjLongConsumer<PayloadStatistics> populator;
+  private final ObjIntConsumer<PayloadStatistics> populator;
 
   public PayloadStatisticsPagingProvider(PagingProvider<C, T> decorated, PayloadStatistics statistics,
-                                         ObjLongConsumer<PayloadStatistics> populator) {
+                                         ObjIntConsumer<PayloadStatistics> populator) {
     this.decorated = decorated;
     this.statistics = statistics;
     this.populator = populator;

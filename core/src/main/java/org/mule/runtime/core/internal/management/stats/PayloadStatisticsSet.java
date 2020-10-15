@@ -12,16 +12,16 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.ObjLongConsumer;
+import java.util.function.ObjIntConsumer;
 
 import org.apache.commons.collections.set.AbstractSetDecorator;
 
 final class PayloadStatisticsSet<T> extends AbstractSetDecorator {
 
   private final PayloadStatistics statistics;
-  private final ObjLongConsumer<PayloadStatistics> populator;
+  private final ObjIntConsumer<PayloadStatistics> populator;
 
-  PayloadStatisticsSet(Set<T> decorated, PayloadStatistics statistics, ObjLongConsumer<PayloadStatistics> populator) {
+  PayloadStatisticsSet(Set<T> decorated, PayloadStatistics statistics, ObjIntConsumer<PayloadStatistics> populator) {
     super(decorated);
     this.statistics = statistics;
     this.populator = populator;

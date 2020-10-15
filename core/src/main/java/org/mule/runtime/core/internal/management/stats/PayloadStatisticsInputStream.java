@@ -11,14 +11,14 @@ import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.function.ObjLongConsumer;
+import java.util.function.ObjIntConsumer;
 
 final class PayloadStatisticsInputStream extends FilterInputStream {
 
   private final PayloadStatistics statistics;
-  private final ObjLongConsumer<PayloadStatistics> populator;
+  private final ObjIntConsumer<PayloadStatistics> populator;
 
-  PayloadStatisticsInputStream(InputStream in, PayloadStatistics statistics, ObjLongConsumer<PayloadStatistics> populator) {
+  PayloadStatisticsInputStream(InputStream in, PayloadStatistics statistics, ObjIntConsumer<PayloadStatistics> populator) {
     super(in);
     this.statistics = statistics;
     this.populator = populator;

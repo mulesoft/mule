@@ -11,16 +11,16 @@ import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 
 import java.io.IOException;
-import java.util.function.ObjLongConsumer;
+import java.util.function.ObjIntConsumer;
 
 final class PayloadStatisticsCursorStream extends CursorStream {
 
   private final PayloadStatistics statistics;
-  private final ObjLongConsumer<PayloadStatistics> populator;
+  private final ObjIntConsumer<PayloadStatistics> populator;
   private final CursorStream delegate;
 
   PayloadStatisticsCursorStream(CursorStream delegate, PayloadStatistics statistics,
-                                ObjLongConsumer<PayloadStatistics> populator) {
+                                ObjIntConsumer<PayloadStatistics> populator) {
     this.delegate = delegate;
     this.statistics = statistics;
     this.populator = populator;
