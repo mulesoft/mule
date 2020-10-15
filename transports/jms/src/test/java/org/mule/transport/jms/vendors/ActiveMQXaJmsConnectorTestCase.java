@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms.vendors;
 
+import static java.lang.reflect.Proxy.isProxyClass;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -45,13 +46,13 @@ public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase
         Connection connection = wrapper.createConnection();
 
         assertNotNull(connection);
-        assertTrue(Proxy.isProxyClass(connection.getClass()));
+        assertTrue(isProxyClass(connection.getClass()));
 
         try
         {
             final Class clazz = connection.getClass();
             Method cleanupMethod;
-            if (Proxy.isProxyClass(clazz))
+            if (isProxyClass(clazz))
             {
                 TargetInvocationHandler handler =
                         (TargetInvocationHandler) Proxy.getInvocationHandler(connection);
