@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 public abstract class AbstractQueueManager
     implements QueueManager, QueueProvider, QueueStoreCacheListener, MuleContextAware, Initialisable, Disposable {
 
-  private static final Logger LOGGER = getLogger(AbstractQueueManager.class);
+  protected transient Logger logger = getLogger(AbstractQueueManager.class);
 
   private final Map<String, CacheAwareQueueStore> queues = new ConcurrentHashMap<>();
   private final Map<String, QueueConfiguration> queueConfigurations = new HashMap<>();
@@ -61,10 +61,10 @@ public abstract class AbstractQueueManager
         throw new MuleRuntimeException(createStaticMessage(format("A queue with name %s is in use so we cannot change it's configuration",
                                                                   queueName)));
       }
-      if (LOGGER.isDebugEnabled()) {
+      if (logger.isDebugEnabled()) {
         if (queueConfigurations.containsKey(queueName)) {
           QueueConfiguration oldConfiguration = queueConfigurations.get(queueName);
-          LOGGER.debug(format("Replacing queue %s configuration: %s with new newConfig: %s", queueName, oldConfiguration,
+          logger.debug(format("Replacing queue %s configuration: %s with new newConfig: %s", queueName, oldConfiguration,
                               newConfig));
         }
       }
