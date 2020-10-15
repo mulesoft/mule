@@ -138,7 +138,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
     assertThat(coreExtensionModel.getOperationModels(), hasSize(8));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(16));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(18));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -694,6 +694,31 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(mimeType.getType(), is(instanceOf(StringType.class)));
   }
 
+
+  @Test
+  public void globalOnErrors() {
+    ConstructModel onErrorContinue = coreExtensionModel.getConstructModel("onErrorContinue").get();
+    assertThat(onErrorContinue.allowsTopLevelDeclaration(), is(true));
+    assertThat(onErrorContinue.getStereotype().getType(), is(ON_ERROR.getType()));
+
+    assertThat(onErrorContinue.getAllParameterModels(), hasSize(1));
+
+    ParameterModel nameParam = onErrorContinue.getAllParameterModels().get(0);
+    assertThat(nameParam.getName(), is("name"));
+    assertThat(nameParam.getDefaultValue(), is(nullValue()));
+    assertThat(nameParam.isComponentId(), is(true));
+
+    ConstructModel onErrorPropagate = coreExtensionModel.getConstructModel("onErrorPropagate").get();
+    assertThat(onErrorPropagate.allowsTopLevelDeclaration(), is(true));
+    assertThat(onErrorPropagate.getStereotype().getType(), is(ON_ERROR.getType()));
+
+    assertThat(onErrorPropagate.getAllParameterModels(), hasSize(1));
+
+    nameParam = onErrorPropagate.getAllParameterModels().get(0);
+    assertThat(nameParam.getName(), is("name"));
+    assertThat(nameParam.getDefaultValue(), is(nullValue()));
+    assertThat(nameParam.isComponentId(), is(true));
+  }
 
   void verifyOnError(NestedRouteModel route) {
     List<ParameterModel> allParameterModels = route.getAllParameterModels();

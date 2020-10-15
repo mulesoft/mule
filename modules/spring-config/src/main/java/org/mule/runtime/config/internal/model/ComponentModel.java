@@ -273,14 +273,15 @@ public abstract class ComponentModel {
     return empty();
   }
 
-  public void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper, boolean runtimeMode) {
+  public void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper, boolean toplevel, boolean runtimeMode) {
     executeOnComponentTree(this, componentModel -> {
-      componentModel.doResolveTypedComponentIdentifier(extensionModelHelper, runtimeMode);
+      componentModel.doResolveTypedComponentIdentifier(extensionModelHelper, toplevel, runtimeMode);
     });
   }
 
-  private void doResolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper, boolean runtimeMode) {
-    extensionModelHelper.walkToComponent(getIdentifier(), new ExtensionWalkerModelDelegate() {
+  private void doResolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper, boolean topLevel,
+                                                 boolean runtimeMode) {
+    extensionModelHelper.walkToComponent(getIdentifier(), topLevel, new ExtensionWalkerModelDelegate() {
 
       @Override
       public void onConfiguration(ConfigurationModel model) {
@@ -338,6 +339,17 @@ public abstract class ComponentModel {
             .map(group -> addInlineGroup(elementDsl, nestedComponents, group, extensionModelHelper))
             .flatMap(g -> g.getParameterModels().stream())
             .collect(toList());
+
+        final List<ParameterModel> parameters = model.getParameterGroupModels().stream()
+            .flatMap(pg -> pg.getParameterModels().stream())
+            .distinct()
+            .collect(toList());
+
+        parameters
+            .stream()
+            .filter(paramModel -> !inlineGroupedParameters.contains(paramModel))
+            .forEach(paramModel -> elementDsl.getAttribute(paramModel.getName())
+                .ifPresent(attrDsl -> setSimpleParameterValue(ComponentModel.this, paramModel, attrDsl)));
 
         handleNestedParameters(ComponentModel.this, ((ComponentAst) ComponentModel.this).directChildrenStream()
             .filter(childComp -> childComp != ComponentModel.this),

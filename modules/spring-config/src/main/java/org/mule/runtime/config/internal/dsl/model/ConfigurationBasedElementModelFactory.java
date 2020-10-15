@@ -103,6 +103,8 @@ import java.util.Set;
 // TODO MULE-11496 Delete this factory once everything has an ExtensionModel and can be represented with an ElementDeclaration
 class ConfigurationBasedElementModelFactory {
 
+  private static final String ON_ERROR_CONTINUE_MODEL = "onErrorContinue";
+  private static final String ON_ERROR_PROPAGATE_MODEL = "onErrorPropagate";
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   private Map<ExtensionModel, DslSyntaxResolver> resolvers;
   private ExtensionModel currentExtension;
@@ -183,7 +185,14 @@ class ConfigurationBasedElementModelFactory {
         onComponentModel(model);
       }
 
+      private boolean isErrorHandlerModel(final ComponentModel model) {
+        return model.getName().equals(ON_ERROR_CONTINUE_MODEL) || model.getName().equals(ON_ERROR_PROPAGATE_MODEL);
+      }
+
       private void onComponentModel(final ComponentModel model) {
+        if (isErrorHandlerModel(model)) {
+          return;
+        }
         final DslElementSyntax elementDsl = dsl.resolve(model);
         getIdentifier(elementDsl)
             .filter(elementId -> elementId.equals(identifier))
