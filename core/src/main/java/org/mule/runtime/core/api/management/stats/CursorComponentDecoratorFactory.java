@@ -158,4 +158,11 @@ public interface CursorComponentDecoratorFactory {
    * @return the decorated {@link Iterator} with the decorated elements.
    */
   <T> Iterator<T> decorateOutputIterator(Iterator<T> decorated, String correlationId);
+
+  /**
+   * If statistics are enabled, counts the received bytes.
+   * 
+   * @param v the content byte array.
+   */
+  void computeInputByteCount(byte[] v);
 }

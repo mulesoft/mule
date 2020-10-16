@@ -276,7 +276,10 @@ public final class MessageUtils {
    */
   public static Object decorateInput(Object v, String eventCorrelationId,
                                      CursorComponentDecoratorFactory componentDecoratorFactory) {
-    if (v instanceof InputStream) {
+    if (v instanceof byte[]) {
+      componentDecoratorFactory.computeInputByteCount((byte[]) v);
+      return v;
+    } else if (v instanceof InputStream) {
       return componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
     } else if (v instanceof Collection) {
       return componentDecoratorFactory.decorateInput((Collection) v, eventCorrelationId);
