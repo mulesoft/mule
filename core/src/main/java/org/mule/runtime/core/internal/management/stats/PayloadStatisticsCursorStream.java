@@ -11,6 +11,7 @@ import java.util.function.LongConsumer;
 
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
 final class PayloadStatisticsCursorStream extends CursorStream {
 
@@ -45,7 +46,28 @@ final class PayloadStatisticsCursorStream extends CursorStream {
 
   @Override
   public CursorProvider getProvider() {
-    return delegate.getProvider();
+    return new CursorStreamProvider() {
+
+      @Override
+      public CursorStream openCursor() {
+        return new PayloadStatisticsCursorStream((CursorStream) delegate.getProvider().openCursor(), populator);
+      }
+
+      @Override
+      public void close() {
+        delegate.getProvider().close();
+      }
+
+      @Override
+      public void releaseResources() {
+        delegate.getProvider().releaseResources();
+      }
+
+      @Override
+      public boolean isClosed() {
+        return delegate.getProvider().isClosed();
+      }
+    };
   }
 
   @Override
@@ -55,6 +77,16 @@ final class PayloadStatisticsCursorStream extends CursorStream {
       populator.accept(1);
     }
 
+    return read;
+  }
+
+  @Override
+  public int read(byte[] b, int off, int len) throws IOException {
+    final int read = delegate.read(b, off, len);
+    // ignore -1 indicating no data read
+    if (read > 0) {
+      populator.accept(read);
+    }
     return read;
   }
 
