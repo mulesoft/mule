@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.LongConsumer;
 
-public final class PayloadStatisticsInputStream extends FilterInputStream {
+final class PayloadStatisticsInputStream extends FilterInputStream {
 
   private final LongConsumer populator;
 
