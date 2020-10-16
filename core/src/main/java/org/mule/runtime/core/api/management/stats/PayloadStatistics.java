@@ -114,20 +114,20 @@ public class PayloadStatistics implements Statistics {
     return invocationCount.get();
   }
 
-  public long addInputObjectCount(long delta) {
-    return inputObjectCount.addAndGet(delta);
+  public void addInputObjectCount(long delta) {
+    inputObjectCount.addAndGet(delta);
   }
 
-  public long addInputByteCount(long delta) {
-    return inputByteCount.addAndGet(delta);
+  public void addInputByteCount(long delta) {
+    inputByteCount.addAndGet(delta);
   }
 
-  public long addOutputObjectCount(long delta) {
-    return outputObjectCount.addAndGet(delta);
+  public void addOutputObjectCount(long delta) {
+    outputObjectCount.addAndGet(delta);
   }
 
-  public long addOutputByteCount(long delta) {
-    return outputByteCount.addAndGet(delta);
+  public void addOutputByteCount(long delta) {
+    outputByteCount.addAndGet(delta);
   }
 
   public long incrementInvocationCount() {

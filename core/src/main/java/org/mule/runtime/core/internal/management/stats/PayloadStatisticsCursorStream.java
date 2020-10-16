@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
-import java.io.IOException;
-import java.util.function.LongConsumer;
-
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
+
+import java.io.IOException;
+import java.util.function.LongConsumer;
 
 final class PayloadStatisticsCursorStream extends CursorStream {
 
   private final LongConsumer populator;
-  private CursorStream delegate;
+  private final CursorStream delegate;
 
   PayloadStatisticsCursorStream(CursorStream delegate, LongConsumer populator) {
     this.delegate = delegate;
@@ -35,7 +35,6 @@ final class PayloadStatisticsCursorStream extends CursorStream {
   @Override
   public void release() {
     delegate.release();
-
   }
 
   @Override
