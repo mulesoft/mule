@@ -781,7 +781,8 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
 
     final ManagedCursorStreamProvider provider = mock(ManagedCursorStreamProvider.class);
     when(provider.isManaged()).thenCallRealMethod();
-    final InputDecoratedCursorStreamProvider decoratedProvider = new InputDecoratedCursorStreamProvider(provider, decoratorFactory.componentDecoratorFactory(component1), CORR_ID);
+    final InputDecoratedCursorStreamProvider decoratedProvider =
+        new InputDecoratedCursorStreamProvider(provider, decoratorFactory.componentDecoratorFactory(component1), CORR_ID);
 
     final CursorProvider managed = streamingManager.manage(decoratedProvider, testEvent());
 
