@@ -11,14 +11,7 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.mule.runtime.api.util.IOUtils.toByteArray;
 
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.AnyType;
-import org.mule.metadata.api.model.MetadataFormat;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -79,32 +72,4 @@ public class WeaponXOperations {
     }
   }
 
-  /**
-   *
-   * @param wounds
-   * @return
-   */
-  @OutputResolver(output = PassthroughMetadataResolver.class)
-  public Result<Object, Void> woundsPassthrough(@Content(primary = true) TypedValue<Object> wounds) {
-    Result.Builder<Object, Void> builder = Result.<Object, Void>builder()
-        .output(wounds.getValue())
-        .mediaType(wounds.getDataType().getMediaType());
-
-    return builder.build();
-  }
-
-  public static class PassthroughMetadataResolver implements OutputTypeResolver<Object> {
-
-    private static final AnyType ANY_TYPE = BaseTypeBuilder.create(MetadataFormat.JAVA).anyType().build();
-
-    @Override
-    public String getCategoryName() {
-      return "HttpPolicyTransform";
-    }
-
-    @Override
-    public MetadataType getOutputType(MetadataContext context, Object key) {
-      return ANY_TYPE;
-    }
-  }
 }
