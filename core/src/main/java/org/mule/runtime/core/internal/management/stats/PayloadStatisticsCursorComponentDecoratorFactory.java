@@ -177,4 +177,9 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
     }
   }
 
+  @Override
+  public void computeInputByteCount(byte[] v) {
+    payloadStatistics.addInputByteCount(v.length);
+  }
+
 }

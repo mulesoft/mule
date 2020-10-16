@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -14,9 +19,18 @@ import java.util.function.LongConsumer;
 
 import org.apache.commons.collections.collection.AbstractCollectionDecorator;
 
-class PayloadStatisticsCollection<T> extends AbstractCollectionDecorator {
+class PayloadStatisticsCollection<T> extends AbstractCollectionDecorator implements Externalizable {
 
   private final LongConsumer populator;
+
+  public PayloadStatisticsCollection() {
+    // This is needed for serialization engines
+    // like kryo.
+    super(new HashSet());
+    this.populator = l -> {
+      return;
+    };
+  }
 
   PayloadStatisticsCollection(Collection<T> decorated, LongConsumer populator) {
     super(decorated);
@@ -43,5 +57,16 @@ class PayloadStatisticsCollection<T> extends AbstractCollectionDecorator {
   public Object[] toArray(Object[] object) {
     populator.accept(size());
     return super.toArray(object);
+  }
+
+  @Override
+  public void writeExternal(ObjectOutput out) throws IOException {
+    populator.accept(size());
+    out.writeObject(getCollection());
+  }
+
+  @Override
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    this.collection = (Collection) in.readObject();
   }
 }
