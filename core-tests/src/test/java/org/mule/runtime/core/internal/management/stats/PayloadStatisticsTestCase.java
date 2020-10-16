@@ -791,7 +791,7 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
 
   @Test
   @Issue("MULE-18895")
-  @Description("Check that decorated cursors also are cursors so the fucntionality depending on instanceof is not affected.")
+  @Description("Check that decorated cursors are also cursors so that the functionality depending on instanceof is not affected.")
   public void managedCursorInputNotManagedTwice() throws MuleException {
     final InputStream stream = mock(CursorStream.class);
     final InputStream decorated =
@@ -802,7 +802,7 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
 
   @Test
   @Issue("MULE-18895")
-  @Description("Check that decorated cursors also are cursors so the fucntionality depending on instanceof is not affected.")
+  @Description("Check that decorated cursors are also cursors so that the functionality depending on instanceof is not affected.")
   public void managedCursorOuputNotManagedTwice() throws MuleException {
     final InputStream stream = mock(CursorStream.class);
     final InputStream decorated =
