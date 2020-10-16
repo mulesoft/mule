@@ -425,6 +425,17 @@ public interface AllureConstants {
 
   }
 
+  interface SerializationFeature {
+
+    String SERIALIZATION = "Serialization";
+
+    interface SerializationStory {
+
+      String STATISTICS = "Payload statistics";
+    }
+
+  }
+
   interface RoutersFeature {
 
     String ROUTERS = "Routers";
