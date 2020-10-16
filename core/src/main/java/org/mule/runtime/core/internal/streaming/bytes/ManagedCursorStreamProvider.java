@@ -34,4 +34,8 @@ public class ManagedCursorStreamProvider extends ManagedCursorProvider<CursorStr
   protected CursorStream managedCursor(CursorStream cursor) {
     return new ManagedCursorStreamDecorator(this, cursor, getJanitor());
   }
+
+  public boolean isManaged() {
+    return true;
+  }
 }

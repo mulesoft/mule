@@ -38,7 +38,6 @@ import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.streaming.AtomicStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.CursorManager;
-import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.NullStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
@@ -163,7 +162,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
    */
   @Override
   public CursorProvider manage(CursorProvider provider, EventContext creatorEventContext) {
-    if (provider instanceof ManagedCursorProvider) {
+    if (provider.isManaged()) {
       return provider;
     }
     return cursorManager.manage(provider, (DefaultEventContext) ((BaseEventContext) creatorEventContext).getRootContext());

@@ -38,4 +38,8 @@ final class PayloadStatisticsInputStream extends FilterInputStream {
     }
     return read;
   }
+
+  public InputStream getDelegate() {
+    return in;
+  }
 }
