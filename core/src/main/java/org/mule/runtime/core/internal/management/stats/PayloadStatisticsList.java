@@ -63,6 +63,7 @@ final class PayloadStatisticsList<T> extends AbstractListDecorator implements Ex
 
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
+    populator.accept(size());
     out.writeObject(getList());
   }
 

@@ -61,6 +61,7 @@ final class PayloadStatisticsSet<T> extends AbstractSetDecorator implements Exte
 
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
+    populator.accept(size());
     out.writeObject(getSet());
   }
 
