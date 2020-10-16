@@ -65,7 +65,11 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
   @Override
   public InputStream decorateInput(InputStream decorated, String correlationId) {
     if (payloadStatistics.isEnabled()) {
-      return new PayloadStatisticsInputStream(decorated, payloadStatistics::addInputByteCount);
+      if (decorated instanceof CursorStream) {
+        return new PayloadStatisticsCursorStream((CursorStream) decorated, payloadStatistics::addInputByteCount);
+      } else {
+        return new PayloadStatisticsInputStream(decorated, payloadStatistics::addInputByteCount);
+      }
     } else {
       return NO_OP_INSTANCE.decorateInput(decorated, correlationId);
     }
@@ -92,7 +96,11 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
   @Override
   public InputStream decorateOutput(InputStream decorated, String correlationId) {
     if (payloadStatistics.isEnabled()) {
-      return new PayloadStatisticsInputStream(decorated, payloadStatistics::addOutputByteCount);
+      if (decorated instanceof CursorStream) {
+        return new PayloadStatisticsCursorStream((CursorStream) decorated, payloadStatistics::addOutputByteCount);
+      } else {
+        return new PayloadStatisticsInputStream(decorated, payloadStatistics::addOutputByteCount);
+      }
     } else {
       return NO_OP_INSTANCE.decorateOutput(decorated, correlationId);
     }

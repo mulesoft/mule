@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.LongConsumer;
 
-final class PayloadStatisticsInputStream extends FilterInputStream {
+public final class PayloadStatisticsInputStream extends FilterInputStream {
 
   private final LongConsumer populator;
 
@@ -37,5 +37,9 @@ final class PayloadStatisticsInputStream extends FilterInputStream {
       populator.accept(read);
     }
     return read;
+  }
+
+  public InputStream getDelegate() {
+    return in;
   }
 }

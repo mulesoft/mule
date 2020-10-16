@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -32,11 +33,14 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingSto
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.execution.FlowProcessMediator;
 import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
@@ -44,6 +48,7 @@ import org.mule.runtime.core.internal.execution.PhaseResultNotifier;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
+import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.streaming.PagingProvider;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -62,6 +67,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
@@ -764,6 +770,44 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     flowProcessMediator.process(template, context);
 
     verify(sourcePolicy).process(any(), any(), any());
+  }
+
+  @Test
+  @Issue("MULE-XXXXX")
+  @Description("Check that managing a decorator of a cursor provider returns the same instance instead of attempting to manage it again.")
+  public void managedProviderNotManagedTwice() throws MuleException {
+    final DefaultStreamingManager streamingManager = new DefaultStreamingManager();
+    initialiseIfNeeded(streamingManager, muleContext);
+
+    final ManagedCursorStreamProvider provider = mock(ManagedCursorStreamProvider.class);
+    when(provider.isManaged()).thenCallRealMethod();
+    final InputDecoratedCursorStreamProvider decoratedProvider = new InputDecoratedCursorStreamProvider(provider, decoratorFactory.componentDecoratorFactory(component1), CORR_ID);
+
+    final CursorProvider managed = streamingManager.manage(decoratedProvider, testEvent());
+
+    assertThat(managed, is(sameInstance(decoratedProvider)));
+  }
+
+  @Test
+  @Issue("MULE-XXXXX")
+  @Description("Check that decorated cursors also are cursors so the fucntionality depending on instanceof is not affected.")
+  public void managedCursorInputNotManagedTwice() throws MuleException {
+    final InputStream stream = mock(CursorStream.class);
+    final InputStream decorated =
+        decoratorFactory.componentDecoratorFactory(component1).decorateInput(stream, CORR_ID);
+
+    assertThat(decorated, instanceOf(CursorStream.class));
+  }
+
+  @Test
+  @Issue("MULE-XXXXX")
+  @Description("Check that decorated cursors also are cursors so the fucntionality depending on instanceof is not affected.")
+  public void managedCursorOuputNotManagedTwice() throws MuleException {
+    final InputStream stream = mock(CursorStream.class);
+    final InputStream decorated =
+        decoratorFactory.componentDecoratorFactory(component1).decorateOutput(stream, CORR_ID);
+
+    assertThat(decorated, instanceOf(CursorStream.class));
   }
 
   private void consumeInputStream() throws IOException {
