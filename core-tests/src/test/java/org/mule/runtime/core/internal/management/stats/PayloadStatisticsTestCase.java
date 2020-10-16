@@ -773,7 +773,7 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
   }
 
   @Test
-  @Issue("MULE-XXXXX")
+  @Issue("MULE-18895")
   @Description("Check that managing a decorator of a cursor provider returns the same instance instead of attempting to manage it again.")
   public void managedProviderNotManagedTwice() throws MuleException {
     final DefaultStreamingManager streamingManager = new DefaultStreamingManager();
@@ -790,7 +790,7 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
   }
 
   @Test
-  @Issue("MULE-XXXXX")
+  @Issue("MULE-18895")
   @Description("Check that decorated cursors also are cursors so the fucntionality depending on instanceof is not affected.")
   public void managedCursorInputNotManagedTwice() throws MuleException {
     final InputStream stream = mock(CursorStream.class);
@@ -801,7 +801,7 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
   }
 
   @Test
-  @Issue("MULE-XXXXX")
+  @Issue("MULE-18895")
   @Description("Check that decorated cursors also are cursors so the fucntionality depending on instanceof is not affected.")
   public void managedCursorOuputNotManagedTwice() throws MuleException {
     final InputStream stream = mock(CursorStream.class);
