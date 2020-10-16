@@ -76,4 +76,9 @@ public class NoOpCursorComponentDecoratorFactory implements CursorComponentDecor
   public CursorStream decorateOutput(CursorStream decorated, String correlationId) {
     return decorated;
   }
+
+  @Override
+  public void computeInputByteCount(byte[] v) {
+    // Nothing to do
+  }
 }
