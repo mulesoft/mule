@@ -46,7 +46,6 @@ final class PayloadStatisticsCursorStream extends CursorStream {
 
   @Override
   public CursorProvider getProvider() {
-    // return delegate.getProvider();
     return new CursorStreamProvider() {
 
       @Override
