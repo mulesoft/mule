@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.util.queue.Queue;
+import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Queue implementation that executes operations: - If there is no transaction context then executes the operation directly to the
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TransactionAwareQueueStore implements Queue {
 
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = getLogger(TransactionAwareQueueStore.class);
 
   private final MuleContext muleContext;
   private final TransactionContextProvider transactionContextProvider;
@@ -130,7 +131,7 @@ public class TransactionAwareQueueStore implements Queue {
       }
       return item;
     } catch (Exception e) {
-      logger.warn("Unable to deserialize message", e);
+      LOGGER.warn("Unable to deserialize message", e);
       return null;
     }
   }

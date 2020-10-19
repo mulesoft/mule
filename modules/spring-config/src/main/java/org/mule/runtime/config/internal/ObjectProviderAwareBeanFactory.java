@@ -10,6 +10,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
@@ -22,16 +23,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.util.ClassUtils;
 
 /**
  * {@link org.springframework.beans.factory.ListableBeanFactory} implementation that will resolve beans using a list of
  * {@link ObjectProvider}s if it was not able to find a bean on itself.
- * 
+ *
  * @since 4.0
  */
 public class ObjectProviderAwareBeanFactory extends DefaultListableBeanFactory {
@@ -127,6 +132,18 @@ public class ObjectProviderAwareBeanFactory extends DefaultListableBeanFactory {
       }
     }
     return super.determineTargetType(beanName, mbd, typesToMatch);
+  }
+
+  @Override
+  public void autowireBean(Object existingBean) {
+    // Use non-singleton bean definition, to avoid registering bean as dependent bean.
+    RootBeanDefinition bd = new RootBeanDefinition(ClassUtils.getUserClass(existingBean));
+    bd.setScope(BeanDefinition.SCOPE_PROTOTYPE);
+    // Same as superclass, but not calling ClassUtils.isCacheSafe
+    // bd.allowCaching = ClassUtils.isCacheSafe(bd.getBeanClass(), getBeanClassLoader());
+    BeanWrapper bw = new BeanWrapperImpl(existingBean);
+    initBeanWrapper(bw);
+    populateBean(bd.getBeanClass().getName(), bd, bw);
   }
 
   public <T> Map<String, T> getBeansOfTypeWithObjectProviderObjects(Class<T> type, boolean includeNonSingletons,
