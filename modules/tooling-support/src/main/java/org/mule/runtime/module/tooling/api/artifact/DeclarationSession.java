@@ -16,6 +16,7 @@ import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
+import org.mule.runtime.module.repository.api.BundleNotFoundException;
 
 /**
  * It is in charge of resolving connector's operations and retrieving metadata and sample data for all
@@ -36,6 +37,7 @@ public interface DeclarationSession {
    *
    * @param configName The name of the config for which to test connection.
    * @return a {@link ConnectionValidationResult} with the result of the connectivity testing
+   * @throws BundleNotFoundException if any of the dependencies defined for the session could not be resolved
    */
   ConnectionValidationResult testConnection(String configName);
 
@@ -49,15 +51,17 @@ public interface DeclarationSession {
    *                  then its reference name should be specified in the declaration.
    * @param providerName the name of the value provider for which to resolve the {@link org.mule.runtime.api.value.Value}s
    * @return a {@link ValueResult} with the accepted parameter values to use
+   * @throws BundleNotFoundException if any of the dependencies defined for the session could not be resolved
    */
   ValueResult getValues(ParameterizedElementDeclaration parameterizedElementDeclaration, String providerName);
 
   /**
    * Returns the list of keys that can be resolved associated to the specified component.
    *
-   * @param component the location of the {@link org.mule.runtime.api.metadata.MetadataKeyProvider} component to query for its available keys.
+   * @param component the location of the {@link org.mule.runtime.api.metadata.MetadataKeyProvider} component to query for its available keys
    * @return Successful {@link MetadataResult} if the keys are successfully resolved Failure {@link MetadataResult} if there is an
    *         error while resolving the keys
+   * @throws BundleNotFoundException if any of the dependencies defined for the session could not be resolved
    */
   MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration component);
 
@@ -68,6 +72,7 @@ public interface DeclarationSession {
    *
    * @param component the component whose dynamic metadata types are required
    * @return a {@link MetadataResult} of {@link ComponentMetadataTypesDescriptor} containing all the dynamic types
+   * @throws BundleNotFoundException if any of the dependencies defined for the session could not be resolved
    */
   MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentElementDeclaration component);
 
@@ -76,11 +81,12 @@ public interface DeclarationSession {
    *
    * @param component the component whose sample data is required
    * @return a {@link SampleDataResult} with the sample data message
+   * @throws BundleNotFoundException if any of the dependencies defined for the session could not be resolved
    */
   SampleDataResult getSampleData(ComponentElementDeclaration component);
 
   /**
-   * Stops and disposes all resources used by this {@link DeclarationSession}
+   * Stops and disposes all resources used by this {@link DeclarationSession}.
    */
   void dispose();
 
