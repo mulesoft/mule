@@ -45,6 +45,7 @@ import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.hamcrest.Matcher;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -133,6 +134,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  @Ignore("MULE-18882")
   public void reconnectWithEnrichedException() throws Exception {
     startFlow("sourceFailedOnRuntime");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> sourceTimesStarted > 2);
