@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.management.stats;
 
 import static java.lang.Boolean.getBoolean;
+import static java.lang.Boolean.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
@@ -28,7 +29,7 @@ import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 public class AllStatistics {
 
   private boolean isStatisticsEnabled = getBoolean(MULE_ENABLE_STATISTICS);
-  private boolean payloadStatisticsDisabled = new Boolean(getProperty(MULE_DISABLE_PAYLOAD_STATISTICS, "true"));
+  private boolean payloadStatisticsDisabled = valueOf((getProperty(MULE_DISABLE_PAYLOAD_STATISTICS, "true")));
 
   private long startTime;
   private final ApplicationStatistics appStats;
