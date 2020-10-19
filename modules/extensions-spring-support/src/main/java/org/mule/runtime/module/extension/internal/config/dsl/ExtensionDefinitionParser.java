@@ -158,7 +158,6 @@ public abstract class ExtensionDefinitionParser {
           new SchedulingStrategyParsingDelegate(),
           new DefaultObjectParsingDelegate());
   protected final DslSyntaxResolver dslResolver;
-  private final ConversionService conversionService = new DefaultConversionService();
   private final Map<String, AttributeDefinition.Builder> parameters = new HashMap<>();
   private final List<ComponentBuildingDefinition> parsedDefinitions = new ArrayList<>();
   protected final Map<String, String> infrastructureParameterMap = getNameMap();
