@@ -32,10 +32,6 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import reactor.core.publisher.Flux;
-import reactor.util.context.Context;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,6 +40,12 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
+import reactor.core.publisher.Flux;
+import reactor.util.context.Context;
 
 class ForeachRouter {
 
@@ -61,7 +63,7 @@ class ForeachRouter {
   private Flux<CoreEvent> downstreamFlux;
   private final FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
   private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
-  private final AtomicReference<Context> downstreamCtxReference = new AtomicReference(empty());
+  private final AtomicReference<Context> downstreamCtxReference = new AtomicReference<>(empty());
 
   private final AtomicInteger inflightEvents = new AtomicInteger(0);
   private final AtomicBoolean completeDeferred = new AtomicBoolean(false);
@@ -130,6 +132,8 @@ class ForeachRouter {
               completeRouterIfNecessary();
             }
           } catch (Exception e) {
+            LOGGER.error("Exception in foreach after iteration", e);
+
             // Delete foreach context
             this.eventWithCurrentContextDeleted(evt);
             downstreamRecorder.next(left(new MessagingException(evt, e, owner)));
