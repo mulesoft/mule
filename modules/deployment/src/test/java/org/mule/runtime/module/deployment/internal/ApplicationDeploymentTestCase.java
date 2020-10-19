@@ -48,6 +48,7 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -233,6 +234,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Ignore("MULE-18898")
   public void deployAndRedeployAppWithDeploymentProperties() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
