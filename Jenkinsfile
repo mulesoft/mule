@@ -1,4 +1,4 @@
-def UPSTREAM_PROJECTS_LIST = [ "Mule-runtime/metadata-model-api/support/1.2.2",
+def UPSTREAM_PROJECTS_LIST = [ "Mule-runtime/metadata-model-api/1.2.2-OCTOBER",
                                "Mule-runtime/mule-api/1.2.2-OCTOBER",
                                "Mule-runtime/mule-extensions-api/1.2.2-OCTOBER",
                                "Mule-runtime/mule-maven-client/support/1.4.2" ]
