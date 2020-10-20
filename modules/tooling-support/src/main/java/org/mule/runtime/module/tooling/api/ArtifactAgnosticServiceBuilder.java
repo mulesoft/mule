@@ -44,6 +44,16 @@ public interface ArtifactAgnosticServiceBuilder<T extends ArtifactAgnosticServic
    */
   T addDependency(Dependency dependency);
 
+  /**
+   * Adds a resource needed by the artifact that must be written under the expected relative resource path to the artifact root path.
+   * <p>
+   *
+   * @param resourcePath {@link String} that defines the classpath resource path which is how the resource would be defined when used
+   *        in the artifact declaration as value for a parameter.
+   *        For instance, {@code <tls:trust-store path="tls/ssltest-cacerts.jks"/>} the resourcePath should be {@link tls/ssltest-cacerts.jks}.
+   * @param content {@code binary} content of the file.
+   * @return the builder
+   */
   T addResource(String resourcePath, byte[] content);
 
   /**
