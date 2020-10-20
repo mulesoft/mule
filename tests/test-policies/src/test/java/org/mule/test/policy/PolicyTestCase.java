@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
@@ -34,7 +35,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
@@ -61,8 +61,8 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
       @Override
       public void configure(MuleContext muleContext) throws ConfigurationException {
         final AtomicReference<Optional<PolicyInstance>> policyReference = new AtomicReference<>();
-        muleContext.getCustomizationService().registerCustomServiceImpl("customPolicyProvider",
-                                                                        new TestPolicyProvider(policyReference));
+        muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_POLICY_PROVIDER,
+                                                                         new TestPolicyProvider(policyReference));
       }
 
       @Override
@@ -73,7 +73,6 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
   }
 
   @Test
-  @Ignore("MULE-18877")
   public void parsesPolicy() throws Exception {
     assertThat(policyProvider, instanceOf(TestPolicyProvider.class));
     TestPolicyProvider testPolicyProvider = (TestPolicyProvider) policyProvider;
