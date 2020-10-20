@@ -77,14 +77,17 @@ public abstract class AbstractOSController {
   public abstract String getMuleBin();
 
   public void start(String... args) {
-    int error = runSync("start", args);
-    if (error != 0) {
-      throw new MuleControllerException("The mule instance couldn't be started");
-    }
-
-    if (getProcessesStatus() != STARTED_STARTED) {
-      runSync("dump");
-      throw new MuleControllerException("The mule instance didn't start on time");
+    try {
+      int error = runSync("start", args);
+      if (error != 0) {
+        throw new MuleControllerException("The mule instance couldn't be started. Errno: " + error);
+      }
+    } finally {
+      final MuleProcessStatus processesStatus = getProcessesStatus();
+      if (processesStatus != STARTED_STARTED) {
+        runSync("dump");
+        throw new MuleControllerException("The mule instance didn't start on time: " + processesStatus.toString());
+      }
     }
   }
 
