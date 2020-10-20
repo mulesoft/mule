@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -13,6 +14,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.store.ObjectStoreSettings.DEFAULT_EXPIRATION_INTERVAL;
 import static org.mule.runtime.core.api.util.ClassUtils.setFieldValue;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -73,32 +75,34 @@ public class PollingSourceWrapperTestCase {
   @Test
   public void waterMarkingStoresGetCreatedOnStart() throws MuleException {
     pollingSourceWrapper.onStart(callbackMock);
-    assertPersistentStoreIsCreated(EXPECTED_WATERMARK_OS);
-    assertPersistentStoreIsCreated(EXPECTED_RECENT_IDS_OS);
-    assertPersistentStoreIsCreated(EXPECTED_IDS_UPDATED_WATERMARK_OS);
+    assertPersistentStoreIsCreated(EXPECTED_WATERMARK_OS, DEFAULT_EXPIRATION_INTERVAL);
+    assertPersistentStoreIsCreated(EXPECTED_RECENT_IDS_OS, DEFAULT_EXPIRATION_INTERVAL);
+    assertPersistentStoreIsCreated(EXPECTED_IDS_UPDATED_WATERMARK_OS, DEFAULT_EXPIRATION_INTERVAL);
   }
 
   @Test
   public void idempotencyStoreGetsCreatedOnStart() throws MuleException {
     pollingSourceWrapper.onStart(callbackMock);
-    assertTransientStoreIsCreated(EXPECTED_INFLIGHT_IDS_OS);
+    assertTransientStoreIsCreated(EXPECTED_INFLIGHT_IDS_OS, DEFAULT_EXPIRATION_INTERVAL);
   }
 
-  private void assertPersistentStoreIsCreated(String expectedName) {
-    assertStoreIsCreated(expectedName, true);
+  private void assertPersistentStoreIsCreated(String expectedName, Long expirationInterval) {
+    assertStoreIsCreated(expectedName, true, expirationInterval);
   }
 
-  private void assertTransientStoreIsCreated(String expectedName) {
-    assertStoreIsCreated(expectedName, false);
+  private void assertTransientStoreIsCreated(String expectedName, Long expirationInterval) {
+    assertStoreIsCreated(expectedName, false, expirationInterval);
   }
 
-  private void assertStoreIsCreated(String expectedName, boolean isPersistent) {
+  private void assertStoreIsCreated(String expectedName, boolean isPersistent, Long expirationInterval) {
     ArgumentCaptor<ObjectStoreSettings> settingsCaptor = forClass(ObjectStoreSettings.class);
 
     verify(objectStoreManagerMock).getOrCreateObjectStore(eq(expectedName),
                                                           settingsCaptor.capture());
     ObjectStoreSettings watermarkSettings = settingsCaptor.getValue();
+
     assertThat(watermarkSettings.isPersistent(), is(isPersistent));
+    assertThat(watermarkSettings.getExpirationInterval(), is(equalTo(expirationInterval)));
   }
 
   private void setComponentLocationMock() throws Exception {
