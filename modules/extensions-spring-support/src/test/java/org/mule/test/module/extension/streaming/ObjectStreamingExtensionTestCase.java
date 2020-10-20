@@ -30,6 +30,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.apache.commons.collections.IteratorUtils;
 import org.hamcrest.BaseMatcher;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -92,6 +93,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
 
   @Test
   @Description("Operation is configured not to stream and stream gets closed automatically even if not consumed")
+  @Ignore("MULE-18860")
   public void nonRepeatableStreamIsManaged() throws Exception {
     Object stream = getObjectStream("getStreamWithoutStreaming", false);
     assertThat(stream, is(instanceOf(ConsumerStreamingIterator.class)));
