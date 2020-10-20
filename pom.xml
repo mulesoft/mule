@@ -232,7 +232,7 @@
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.2.1-20201020</muleDslApiVersion>
         <muleExtensionsApiVersion>1.2.2-20201020</muleExtensionsApiVersion>
-        <muleHttpPolicyApiVersion>1.2.1-HF-SNAPSHOT</muleHttpPolicyApiVersion>
+        <muleHttpPolicyApiVersion>1.2.1-20201020</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.4.2-HF-SNAPSHOT</muleMavenClientApi>
         <muleMavenClientImpl>1.4.2-HF-SNAPSHOT</muleMavenClientImpl>
         <muleMavenClientTest>1.4.2-HF-SNAPSHOT</muleMavenClientTest>
