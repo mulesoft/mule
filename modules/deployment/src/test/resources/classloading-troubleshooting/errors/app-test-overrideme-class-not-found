@@ -1,0 +1,29 @@
+org.mule.runtime.module.deployment.impl.internal.classloader.MuleClassNotFoundException: Couldn't find class: test.OverrideMe 
+ ------------------------
+| Runtime Class Loader |
+------------------------
+           ^            
+           |            
+------------------------
+|   Domain Region CL   |
+------------------------
+           |            
+            ------------> ------------------------
+           |              | Domain Class Loader  |
+           |              ------------------------
+           ^            
+           |            
+------------------------
+|    App Region CL     |
+------------------------
+           |            
+            ------------> ------------------------
+           |              |    Java Plugin CL    |
+           |              ------------------------
+           |            
+            ------------> ------------------------
+                          |   App Class Loader   |
+                          ------------------------
+ 
+ Current classloader in context is (Java Plugin CL) 
+ The class exists in the following context (Domain Class Loader) but is not exported. Try exporting the package where the class by modifying the mule-artifact.json file

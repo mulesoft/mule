@@ -1,0 +1,22 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++ Failed to deploy artifact                                                    +
++ 'domain-classloading-troubleshooting-1.0.0-mule-domain',                     +
++ org.mule.runtime.deployment.model.api.DeploymentInitException:               +
++ MuleClassNotFoundException: Couldn't find class: OverrideMe                  +
++  ------------------------                                                    +
++ | Runtime Class Loader |                                                     +
++ ------------------------                                                     +
++            ^                                                                 +
++            |                                                                 +
++ ------------------------                                                     +
++ |   Domain Region CL   |                                                     +
++ ------------------------                                                     +
++            |                                                                 +
++             ------------> ------------------------                           +
++                           | Domain Class Loader  |                           +
++                           ------------------------                           +
++                                                                              +
++  Current classloader in context is (Domain Class Loader)                     +
++ Seems the class doesn't exist in any classloader. Verify you wrote the       +
++ right class name.                                                            +
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

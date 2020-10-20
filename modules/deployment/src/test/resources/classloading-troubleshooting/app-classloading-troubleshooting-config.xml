@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:java="http://www.mulesoft.org/schema/mule/java"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+
+    <!--<configuration-properties file="jms.properties"/> -->
+
+    <object name="overrideMe2" class="OverrideMe2"/>
+
+    <flow name="classloading-appFlow" >
+        <scheduler>
+            <scheduling-strategy >
+                <fixed-frequency frequency="100" timeUnit="MILLISECONDS" />
+            </scheduling-strategy>
+        </scheduler>
+        <java:new class="test.OverrideMe" constructor="OverrideMe()"/>
+        <logger level="ERROR" message="works!"/>
+    </flow>
+
+</mule>

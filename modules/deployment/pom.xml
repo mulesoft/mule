@@ -16,6 +16,8 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <!-- Mule Connectors and Modules -->
+        <muleJavaModuleVersion>1.3.0-SNAPSHOT</muleJavaModuleVersion>
     </properties>
 
     <dependencies>
@@ -130,6 +132,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.module</groupId>
+            <artifactId>mule-java-module</artifactId>
+            <version>${muleJavaModuleVersion}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.tests.plugin</groupId>
             <artifactId>mule-tests-component-plugin</artifactId>
             <version>${project.version}</version>
@@ -205,6 +214,12 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>uk.org.lidalia</groupId>
+            <artifactId>slf4j-test</artifactId>
+            <version>1.2.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -224,9 +239,15 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <!-- -->
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExcludes>org.apache.logging.log4j:log4j-slf4j-impl</classpathDependencyExcludes>
+                    </classpathDependencyExcludes>
+
                     <systemPropertyVariables>
                         <testComponentPlugin>${org.mule.tests.plugin:mule-tests-component-plugin:jar:mule-plugin}</testComponentPlugin>
                         <extensionsApiLib>${org.mule.runtime:mule-extensions-api:jar}</extensionsApiLib>
+                        <muleJavaModule>${org.mule.module:mule-java-module:jar:mule-plugin}</muleJavaModule>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
