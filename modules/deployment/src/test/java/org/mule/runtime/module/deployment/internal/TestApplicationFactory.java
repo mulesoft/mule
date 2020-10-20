@@ -36,6 +36,8 @@ import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRep
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -44,6 +46,8 @@ import java.util.Properties;
  * on application deployment phases.
  */
 public class TestApplicationFactory extends DefaultApplicationFactory {
+
+  private static List<Runnable> afterTasks = new ArrayList<>();
 
   private boolean failOnStopApplication;
   private boolean failOnDisposeApplication;
@@ -102,6 +106,13 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     testApplicationWrapper.setFailOnDisposeApplication(failOnDisposeApplication);
     testApplicationWrapper.setFailOnStopApplication(failOnStopApplication);
 
+    if (failOnStopApplication) {
+      afterTasks.add(() -> app.stop());
+    }
+    if (failOnDisposeApplication) {
+      afterTasks.add(() -> app.dispose());
+    }
+
     return testApplicationWrapper;
   }
 
@@ -113,4 +124,11 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     this.failOnStopApplication = failOnStopApplication;
   }
 
+  /**
+   * Finish the dispose/stop process that was aborted due to an exception.
+   */
+  public static void after() {
+    afterTasks.forEach(Runnable::run);
+    afterTasks.clear();
+  }
 }
