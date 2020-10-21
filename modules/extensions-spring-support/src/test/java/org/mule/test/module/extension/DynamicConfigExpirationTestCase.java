@@ -7,16 +7,25 @@
 package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
+import static org.mule.tck.probe.PollingProber.check;
+import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closePagingProviderCalls;
+import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.getPageCalls;
 
 import org.mule.functional.api.flow.FlowRunner;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +40,30 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   @Override
   protected String getConfigFile() {
     return "dynamic-config-expiration.xml";
+  }
+
+  private static List<CoreEvent> capturedEvents;
+
+  public static class CaptureEventProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      synchronized (capturedEvents) {
+        capturedEvents.add(event);
+      }
+      return event;
+    }
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    resetCounters();
+    capturedEvents = new LinkedList<>();
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    capturedEvents = null;
   }
 
   @Test
@@ -85,6 +118,26 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     doNotExpireDynamicConfigWithCustomExpirationUsedBySource();
   }
 
+  @Test
+  public void doNotExpireConfigUsedByPagedOperation() throws Exception {
+    flowRunner("dynamicForPagedOperationWithReconnection").withPayload("Waltercito White").withVariable("failOn", 99).run();
+  }
+
+  @Test
+  public void doNotExpireConfigUsedByPagedOperationWithReconnectionOnFirstPage() throws Exception {
+    flowRunner("dynamicForPagedOperationWithReconnection").withPayload("Waltercito White").withVariable("failOn", 1).run();
+  }
+
+  @Test
+  public void doNotExpireConfigUsedByPagedOperationWithReconnectionOnSecondPage() throws Exception {
+    flowRunner("dynamicForPagedOperationWithReconnection").withPayload("Waltercito White").withVariable("failOn", 2).run();
+  }
+
+  @Test
+  public void doNotExpireConfigUsedByConnectedStreamingOperation() throws Exception {
+    flowRunner("dynamicWithShortExpirationForStreamingOperation").withPayload("Waltercito White").run();
+  }
+
   private void assertInitialised(HeisenbergExtension config) {
     assertThat(config.getInitialise(), is(1));
     assertThat(config.getStart(), is(1));
@@ -113,5 +166,10 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     assertThat(config.getPersonalInfo().getName(), is(payload));
 
     return config;
+  }
+
+  public static void resetCounters() {
+    closePagingProviderCalls = 0;
+    getPageCalls = 0;
   }
 }

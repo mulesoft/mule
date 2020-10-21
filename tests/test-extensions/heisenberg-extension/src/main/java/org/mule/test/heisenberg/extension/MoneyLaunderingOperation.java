@@ -251,6 +251,33 @@ public class MoneyLaunderingOperation {
     };
   }
 
+  public PagingProvider<HeisenbergConnection, PersonalInfo> failingConnectionPagedOperation(@Config HeisenbergExtension config,
+                                                                                            Integer failOn) {
+    return new PagingProvider<HeisenbergConnection, PersonalInfo>() {
+
+      @Override
+      public List<PersonalInfo> getPage(HeisenbergConnection connection) {
+
+        getPageCalls++;
+        if (getPageCalls == failOn) {
+          throw new ModuleException(CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
+        }
+        if (getPageCalls > 3) {
+          return emptyList();
+        }
+        return singletonList(INVOLVED_PEOPLE.get(getPageCalls));
+      }
+
+      @Override
+      public Optional<Integer> getTotalResults(HeisenbergConnection connection) {
+        return Optional.of(2);
+      }
+
+      @Override
+      public void close(HeisenbergConnection connection) throws MuleException {}
+    };
+  }
+
   @Validator
   @Throws(ValidationErrorTypeProvider.class)
   public void validateMoney() {

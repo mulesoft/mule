@@ -228,6 +228,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     cacheWriteLock.lock();
     try {
       return cache.entrySet().stream().filter(entry -> isExpired(entry.getValue())).map(entry -> {
+        System.out.println("Config " + entry.getValue().getName() + " is expired. Invalidating and unregistering.");
         cache.remove(entry.getKey());
         unRegisterConfiguration(entry.getValue());
         return entry.getValue();
@@ -239,7 +240,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private boolean isExpired(ConfigurationInstance configuration) {
     ConfigurationStats stats = configuration.getStatistics();
-    return stats.getRunningSources() == 0 && stats.getInflightOperations() == 0
+    return stats.getRunningSources() == 0 && stats.getInflightOperations() == 0 && stats.getOpenedStreams() == 0
         && expirationPolicy.isExpired(stats.getLastUsedMillis(), MILLISECONDS);
   }
 

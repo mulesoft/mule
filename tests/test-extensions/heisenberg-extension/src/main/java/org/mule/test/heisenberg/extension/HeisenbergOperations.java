@@ -34,7 +34,6 @@ import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
-import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -82,6 +81,7 @@ import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -518,6 +518,28 @@ public class HeisenbergOperations implements Disposable {
   @MediaType(value = TEXT_PLAIN, strict = false)
   public InputStream nameAsStream(@Config HeisenbergExtension config) {
     return new ByteArrayInputStream(sayMyName(config).getBytes());
+  }
+
+  @MediaType(value = TEXT_PLAIN, strict = false)
+  public InputStream nameAsStreamConnected(@Config HeisenbergExtension config, @Connection HeisenbergConnection connection) {
+    return new InputStream() {
+
+      private int timesRead = 0;
+      private byte[] name = config.getPersonalInfo().getName().getBytes();
+
+      @Override
+      public int read() throws IOException {
+        if (config.getDispose() == 0) {
+          if (timesRead < name.length) {
+            timesRead++;
+            return name[timesRead - 1];
+          }
+          return -1;
+        } else {
+          throw new RuntimeException("Config is disposed.");
+        }
+      }
+    };
   }
 
   @Override

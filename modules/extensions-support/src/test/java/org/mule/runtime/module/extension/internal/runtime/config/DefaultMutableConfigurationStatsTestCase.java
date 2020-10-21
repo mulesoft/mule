@@ -54,4 +54,13 @@ public class DefaultMutableConfigurationStatsTestCase extends AbstractMuleTestCa
     assertThat(stats.discountRunningSource(), is(0));
     assertThat(stats.getRunningSources(), is(0));
   }
+
+  @Test
+  public void openStream() {
+    assertThat(stats.getOpenedStreams(), is(0));
+    assertThat(stats.addOpenedStream(), is(1));
+    assertThat(stats.getOpenedStreams(), is(1));
+    assertThat(stats.discountOpenedStream(), is(0));
+    assertThat(stats.getOpenedStreams(), is(0));
+  }
 }

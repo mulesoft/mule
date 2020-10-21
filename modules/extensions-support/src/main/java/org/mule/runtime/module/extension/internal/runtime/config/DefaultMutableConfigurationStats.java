@@ -19,6 +19,7 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
 
   private final AtomicInteger inflightOperations = new AtomicInteger(0);
   private final AtomicInteger runningSources = new AtomicInteger(0);
+  private final AtomicInteger openedStreams = new AtomicInteger(0);
   private final TimeSupplier timeSupplier;
   private long lastUsedMillis;
 
@@ -69,7 +70,16 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
    * {@inheritDoc}
    */
   @Override
+  public int getOpenedStreams() {
+    return openedStreams.get();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public int addInflightOperation() {
+    System.out.println("Incrementing InFlight Counter");
     updateLastUsed();
     return inflightOperations.incrementAndGet();
   }
@@ -79,6 +89,7 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
    */
   @Override
   public int discountInflightOperation() {
+    System.out.println("Decrementing InFlight Counter");
     updateLastUsed();
     return inflightOperations.decrementAndGet();
   }
@@ -99,5 +110,25 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
   public int discountRunningSource() {
     updateLastUsed();
     return runningSources.decrementAndGet();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int addOpenedStream() {
+    System.out.println("Incrementing Streaming Counter");
+    updateLastUsed();
+    return openedStreams.incrementAndGet();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int discountOpenedStream() {
+    System.out.println("Decrementing Streaming Counter");
+    updateLastUsed();
+    return openedStreams.decrementAndGet();
   }
 }

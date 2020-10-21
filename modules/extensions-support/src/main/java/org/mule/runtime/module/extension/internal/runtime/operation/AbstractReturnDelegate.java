@@ -20,7 +20,9 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENC
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler.nullHandler;
 import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.tryToMutateConfigurationStats;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -36,13 +38,16 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.util.StreamingUtils;
+import org.mule.runtime.core.internal.context.notification.Configuration;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultIterator;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.CollectionReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.MapReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler;
@@ -55,6 +60,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.apache.commons.io.input.ClosedInputStream;
 import org.apache.commons.io.input.ProxyInputStream;
@@ -133,8 +139,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       if (resultValue.getOutput() instanceof InputStream) {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
-          resultValue = resultValue.copy()
-              .output(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler))
+          ConfigurationInstance config = (ConfigurationInstance) operationContext.getConfiguration().get();
+          resultValue = resultValue
+              .copy().output(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler,
+                                                             incrementOpenedStream(config), decrementOpenedStream(config)))
               .build();
         }
       }
@@ -188,8 +196,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       if (value.getOutput() instanceof InputStream) {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
-          value = value.copy()
-              .output(new ConnectedInputStreamWrapper((InputStream) value.getOutput(), connectionHandler))
+          ConfigurationInstance config = (ConfigurationInstance) operationContext.getConfiguration().get();
+          value = value
+              .copy().output(new ConnectedInputStreamWrapper((InputStream) value.getOutput(), connectionHandler,
+                                                             incrementOpenedStream(config), decrementOpenedStream(config)))
               .build();
         }
 
@@ -220,7 +230,9 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     if (value instanceof InputStream) {
       ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
       if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
-        value = new ConnectedInputStreamWrapper((InputStream) value, connectionHandler);
+        ConfigurationInstance config = (ConfigurationInstance) operationContext.getConfiguration().get();
+        value = new ConnectedInputStreamWrapper((InputStream) value, connectionHandler, incrementOpenedStream(config),
+                                                decrementOpenedStream(config));
       }
     }
 
@@ -251,13 +263,25 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     return contextMimeType.orElse(mediaType).withCharset(contextEncoding.orElse(existingEncoding));
   }
 
+  private Runnable incrementOpenedStream(ConfigurationInstance config) {
+    return () -> tryToMutateConfigurationStats(config, (MutableConfigurationStats::addOpenedStream));
+  }
+
+  private Runnable decrementOpenedStream(ConfigurationInstance config) {
+    return () -> tryToMutateConfigurationStats(config, (MutableConfigurationStats::discountOpenedStream));
+  }
+
   protected class ConnectedInputStreamWrapper extends ProxyInputStream {
 
     private final ConnectionHandler<?> connectionHandler;
+    private Runnable onClose;
 
-    private ConnectedInputStreamWrapper(InputStream delegate, ConnectionHandler<?> connectionHandler) {
+    private ConnectedInputStreamWrapper(InputStream delegate, ConnectionHandler<?> connectionHandler, Runnable onCreate,
+                                        Runnable onClose) {
       super(delegate);
       this.connectionHandler = connectionHandler;
+      this.onClose = onClose;
+      onCreate.run();
     }
 
     /**
@@ -280,6 +304,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
         in = new ClosedInputStream();
       } finally {
         connectionHandler.release();
+        onClose.run();
       }
     }
 

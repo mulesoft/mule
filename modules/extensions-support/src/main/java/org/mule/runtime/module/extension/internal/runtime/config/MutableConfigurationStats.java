@@ -51,4 +51,20 @@ public interface MutableConfigurationStats extends ConfigurationStats {
    * @since 4.1.6 4.2.2 4.3.0
    */
   int discountRunningSource();
+
+  /**
+   * Increments the return value of {@link #getOpenedStreams()} by one
+   *
+   * @return the new value
+   * @since 4.2.3 4.3.0
+   */
+  int addOpenedStream();
+
+  /**
+   * Decrements the return value of {@link #getOpenedStreams()} by one
+   *
+   * @return the new value
+   * @since 4.2.3 4.3.0
+   */
+  int discountOpenedStream();
 }
