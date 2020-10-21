@@ -16,7 +16,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -27,6 +26,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarati
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -50,7 +50,11 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   }
 
   protected ExtensionDeclarer declareExtension() {
-    return getLoader().declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+    return declareExtension(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+  }
+
+  protected ExtensionDeclarer declareExtension(ExtensionLoadingContext context) {
+    return getLoader().declare(context);
   }
 
   protected ConfigurationDeclaration getConfiguration(ExtensionDeclaration extensionDeclaration, final String configurationName) {

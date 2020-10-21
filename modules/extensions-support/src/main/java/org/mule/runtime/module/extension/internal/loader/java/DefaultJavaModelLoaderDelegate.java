@@ -34,7 +34,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.StackableTypesParameterContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
@@ -42,11 +41,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.LicenseMo
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Describes an {@link ExtensionModel} by analyzing the annotations in the class provided in the constructor
@@ -116,18 +115,18 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     parseExternalLibs(extensionElement, declarer);
     addExceptionEnricher(extensionElement, declarer);
 
-    configLoaderDelegate.declareConfigurations(declarer, extensionElement);
+    configLoaderDelegate.declareConfigurations(declarer, extensionElement, context);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, extensionElement);
 
     if (!isEmpty(extensionElement.getConfigurations())) {
       operationLoaderDelegate
-          .declareOperations(declarer, declarer, null, extensionElement.getOperations(), false);
+          .declareOperations(declarer, declarer, null, extensionElement.getOperations(), false, context);
 
       functionModelLoaderDelegate
-          .declareFunctions(declarer, declarer, null, extensionElement.getFunctions());
+          .declareFunctions(declarer, declarer, null, extensionElement.getFunctions(), context);
 
       extensionElement.getSources()
-          .forEach(source -> sourceModelLoaderDelegate.declareMessageSource(declarer, declarer, source, false));
+          .forEach(source -> sourceModelLoaderDelegate.declareMessageSource(declarer, declarer, source, false, context));
     }
 
     return declarer;

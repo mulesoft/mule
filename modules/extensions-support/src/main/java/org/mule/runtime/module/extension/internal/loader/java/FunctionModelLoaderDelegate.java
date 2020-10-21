@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isIgnored;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -15,6 +16,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasFunctionDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionContainerElement;
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
@@ -45,24 +47,33 @@ final class FunctionModelLoaderDelegate extends AbstractModelLoaderDelegate {
     super(delegate);
   }
 
-  void declareFunctions(ExtensionDeclarer extensionDeclarer, HasFunctionDeclarer declarer,
-                        WithFunctionContainers functionContainers) {
+  void declareFunctions(ExtensionDeclarer extensionDeclarer,
+                        HasFunctionDeclarer declarer,
+                        WithFunctionContainers functionContainers,
+                        ExtensionLoadingContext loadingContext) {
     functionContainers.getFunctionContainers()
-        .forEach(functionContainer -> declareFunctions(extensionDeclarer, declarer, functionContainer));
+        .forEach(functionContainer -> declareFunctions(extensionDeclarer, declarer, functionContainer, loadingContext));
   }
 
-  void declareFunctions(ExtensionDeclarer extensionDeclarer, HasFunctionDeclarer declarer,
-                        FunctionContainerElement functionContainerElement) {
+  void declareFunctions(ExtensionDeclarer extensionDeclarer,
+                        HasFunctionDeclarer declarer,
+                        FunctionContainerElement functionContainerElement,
+                        ExtensionLoadingContext loaderContext) {
     declareFunctions(extensionDeclarer, declarer, functionContainerElement,
-                     functionContainerElement.getFunctions());
+                     functionContainerElement.getFunctions(), loaderContext);
   }
 
   void declareFunctions(ExtensionDeclarer extensionDeclarer,
                         HasFunctionDeclarer declarer,
                         FunctionContainerElement methodOwnerClass,
-                        List<FunctionElement> functions) {
+                        List<FunctionElement> functions,
+                        ExtensionLoadingContext loaderContext) {
 
     for (FunctionElement function : functions) {
+
+      if (isIgnored(function, loaderContext)) {
+        continue;
+      }
 
       FunctionContainerElement functionOwner = methodOwnerClass != null ? methodOwnerClass : function.getEnclosingType();
 

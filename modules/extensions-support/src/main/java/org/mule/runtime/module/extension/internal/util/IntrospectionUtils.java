@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.asList;
@@ -28,7 +27,6 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getId;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
@@ -96,6 +94,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.ParameterResol
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -104,9 +103,9 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
+import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -849,59 +848,29 @@ public final class IntrospectionUtils {
 
   public static Collection<Method> getApiMethods(Class<?> declaringClass) {
     return getMethodsStream(declaringClass)
-        .filter(method -> !isIgnored(method))
+        .filter(method -> !isLifecycleMethod(method))
         .collect(toCollection(LinkedHashSet::new));
   }
 
   public static Collection<ExecutableElement> getApiMethods(TypeElement typeElement,
                                                             ProcessingEnvironment processingEnvironment) {
     return getMethodsStream(typeElement, true, processingEnvironment)
-        .filter(method -> !isIgnored(method, processingEnvironment))
+        .filter(method -> !isLifecycleMethod(method, processingEnvironment))
         .collect(toCollection(LinkedHashSet::new));
   }
 
   /**
-   * Determines if the referenced {@code source} should be ignored
+   * Determines if the referenced {@code element} should be ignored
    *
-   * @param source a {@link SourceElement} declaration
+   * @param element a {@link WithAnnotations} declaration
+   * @param context the introspection {@link ExtensionLoadingContext}
    * @return whether the source is ignored or not
    * @since 4.4.0
    */
-  public static boolean isIgnored(SourceElement source) {
-    if (isIgnoreDisabled()) {
-      return false;
-    }
-
-    return source.isAnnotatedWith(Ignore.class) || source.isAnnotatedWith(org.mule.sdk.api.annotation.Ignore.class);
-  }
-
-  private static boolean isIgnored(Method method) {
-    if (isLifecycleMethod(method)) {
-      return true;
-    }
-
-    if (isIgnoreDisabled()) {
-      return false;
-    }
-
-    return method.isAnnotationPresent(Ignore.class) || method.isAnnotationPresent(org.mule.sdk.api.annotation.Ignore.class);
-  }
-
-  private static boolean isIgnored(ExecutableElement typeElement, ProcessingEnvironment processingEnvironment) {
-    if (isLifecycleMethod(typeElement, processingEnvironment)) {
-      return true;
-    }
-
-    if (isIgnoreDisabled()) {
-      return false;
-    }
-
-    return typeElement.getAnnotation(Ignore.class) != null ||
-        typeElement.getAnnotation(org.mule.sdk.api.annotation.Ignore.class) != null;
-  }
-
-  private static boolean isIgnoreDisabled() {
-    return getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
+  public static boolean isIgnored(WithAnnotations element, ExtensionLoadingContext context) {
+    return context.isIgnoreDirectiveEnabled()
+        ? element.isAnnotatedWith(Ignore.class) || element.isAnnotatedWith(org.mule.sdk.api.annotation.Ignore.class)
+        : false;
   }
 
   private static boolean isLifecycleMethod(Method method) {
