@@ -21,7 +21,6 @@ import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getTestLogger;
 
 import io.qameta.allure.Feature;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -42,9 +41,6 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.List;
 
-/**
- * Contains test for application classloading isolation scenarios
- */
 @Feature(CLASSLOADING_ISOLATION)
 public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestCase {
 
@@ -170,7 +166,6 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   }
 
   @Test
-  @Ignore
   public void applicationResourceNotFoundButInDomain() throws Exception {
     completeDomain();
 
@@ -182,12 +177,14 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     deployDomainAndApplication(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER, APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
 
     assertDeploymentFailure(applicationDeploymentListener, APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER.getId());
+
+    assertExpectedContentInAppLog(logUtilLogger,
+                                  "classloading-troubleshooting/errors/app-jms-properties-resource-not-found");
   }
 
   private void completeDomain() {
-    addOverrideLibrary(addDomainConfigYamlFile(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER))
+    addOverrideLibrary(addJmsPropertiesResourceFile(addDomainConfigYamlFile(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER)))
         .dependingOn(overriderTestLibrary);
-    //.containingResource("classloading-troubleshooting/jms.properties", "jms.properties");
   }
 
   private <T extends DeployableFileBuilder<T>> DeployableFileBuilder<T> addOverrideLibrary(DeployableFileBuilder<T> deployableFileBuilder) {

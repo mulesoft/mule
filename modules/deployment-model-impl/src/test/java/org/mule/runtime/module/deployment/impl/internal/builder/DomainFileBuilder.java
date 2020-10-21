@@ -77,6 +77,11 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
   }
 
   @Override
+  public String getScope() {
+    return PROVIDED_SCOPE;
+  }
+
+  @Override
   protected DomainFileBuilder getThis() {
     return this;
   }

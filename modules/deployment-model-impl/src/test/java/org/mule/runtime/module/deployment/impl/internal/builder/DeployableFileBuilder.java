@@ -35,6 +35,8 @@ import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -221,8 +223,18 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
   private Artifact getArtifact(AbstractDependencyFileBuilder builder, boolean shared) {
     ArtifactCoordinates artifactCoordinates =
         new ArtifactCoordinates(builder.getGroupId(), builder.getArtifactId(), builder.getVersion(), builder.getType(),
-                                builder.getClassifier());
-    final Artifact artifact = new Artifact(artifactCoordinates, builder.getArtifactFile().toURI());
+                                builder.getClassifier(), builder.getScope());
+    URI uri;
+    if (MULE_DOMAIN_CLASSIFIER.equals(builder.getClassifier())) {
+      try {
+        uri = new URI("");
+      } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
+    } else {
+      uri = builder.getArtifactFile().toURI();
+    }
+    final Artifact artifact = new Artifact(artifactCoordinates, uri);
     // mule-maven-plugin (packager) will not include packages/resources for mule-plugin dependencies
     if (isSupportingPackagesResourcesInformation() && !MULE_PLUGIN_CLASSIFIER.equals(builder.getClassifier())) {
       JarInfo jarInfo = jarFileExplorer.explore(artifact.getUri());

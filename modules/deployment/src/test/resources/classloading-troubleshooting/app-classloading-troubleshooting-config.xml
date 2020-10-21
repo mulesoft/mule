@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
 
-    <!--<configuration-properties file="jms.properties"/> -->
+    <configuration-properties file="jms.properties"/>
 
     <object name="overrideMe2" class="OverrideMe2"/>
 
