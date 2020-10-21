@@ -7,13 +7,16 @@
 package org.mule.runtime.module.extension.api.loader;
 
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
@@ -82,6 +85,7 @@ import java.util.function.BiFunction;
 
 public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
 
+  private static final boolean IGNORE_DISABLED = getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
   public static final String TYPE_PROPERTY_NAME = "type";
   public static final String EXTENSION_TYPE = "EXTENSION_TYPE";
   public static final String VERSION = "version";
@@ -173,6 +177,9 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
     context.addCustomValidators(customValidators);
     context.addCustomDeclarationEnrichers(customDeclarationEnrichers);
     context.addCustomDeclarationEnrichers(getPrivilegedDeclarationEnrichers(context));
+    if (IGNORE_DISABLED) {
+      context.addParameter(DISABLE_COMPONENT_IGNORE, true);
+    }
   }
 
   /**

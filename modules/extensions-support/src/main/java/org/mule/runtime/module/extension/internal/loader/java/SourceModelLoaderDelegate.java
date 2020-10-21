@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
@@ -61,18 +62,21 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
     super(delegate);
   }
 
-  void declareMessageSources(ExtensionDeclarer extensionDeclarer, HasSourceDeclarer declarer,
-                             WithMessageSources typeComponent) {
+  void declareMessageSources(ExtensionDeclarer extensionDeclarer,
+                             HasSourceDeclarer declarer,
+                             WithMessageSources typeComponent,
+                             ExtensionLoadingContext context) {
     // TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
-    typeComponent.getSources().forEach(source -> declareMessageSource(extensionDeclarer, declarer, source, true));
+    typeComponent.getSources().forEach(source -> declareMessageSource(extensionDeclarer, declarer, source, true, context));
   }
 
   void declareMessageSource(ExtensionDeclarer extensionDeclarer,
                             HasSourceDeclarer declarer,
                             SourceElement sourceType,
-                            boolean supportsConfig) {
+                            boolean supportsConfig,
+                            ExtensionLoadingContext context) {
 
-    if (isIgnored(sourceType)) {
+    if (isIgnored(sourceType, context)) {
       return;
     }
 

@@ -16,6 +16,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.NoImplicit;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.property.NoImplicitModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
@@ -43,18 +44,21 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     super(delegate);
   }
 
-  void declareConfigurations(ExtensionDeclarer declaration, ExtensionElement extensionElement) {
+  void declareConfigurations(ExtensionDeclarer declaration, ExtensionElement extensionElement, ExtensionLoadingContext context) {
     List<ConfigurationElement> configurations = extensionElement.getConfigurations();
     if (configurations.isEmpty()) {
-      declareConfiguration(declaration, extensionElement, extensionElement);
+      declareConfiguration(declaration, extensionElement, extensionElement, context);
     } else {
       for (ConfigurationElement configuration : configurations) {
-        declareConfiguration(declaration, extensionElement, configuration);
+        declareConfiguration(declaration, extensionElement, configuration, context);
       }
     }
   }
 
-  private void declareConfiguration(ExtensionDeclarer declarer, ExtensionElement extensionType, ComponentElement configType) {
+  private void declareConfiguration(ExtensionDeclarer declarer,
+                                    ExtensionElement extensionType,
+                                    ComponentElement configType,
+                                    ExtensionLoadingContext loadingContext) {
     checkConfigurationIsNotAnOperation(extensionType, configType);
     ConfigurationDeclarer configurationDeclarer;
 
@@ -91,9 +95,9 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     ParameterDeclarationContext context = new ParameterDeclarationContext(CONFIGURATION, configurationDeclarer.getDeclaration());
     loader.getFieldParametersLoader().declare(configurationDeclarer, configType.getParameters(), context);
 
-    getOperationLoaderDelegate().declareOperations(declarer, configurationDeclarer, configType);
-    getSourceModelLoaderDelegate().declareMessageSources(declarer, configurationDeclarer, configType);
-    getFunctionModelLoaderDelegate().declareFunctions(declarer, configurationDeclarer, configType);
+    getOperationLoaderDelegate().declareOperations(declarer, configurationDeclarer, configType, loadingContext);
+    getSourceModelLoaderDelegate().declareMessageSources(declarer, configurationDeclarer, configType, loadingContext);
+    getFunctionModelLoaderDelegate().declareFunctions(declarer, configurationDeclarer, configType, loadingContext);
     getConnectionProviderModelLoaderDelegate().declareConnectionProviders(configurationDeclarer, configType);
   }
 
