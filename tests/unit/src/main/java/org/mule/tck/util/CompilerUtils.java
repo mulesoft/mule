@@ -15,6 +15,10 @@ import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.tck.ZipUtils.compress;
 
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.tck.ZipUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -33,11 +37,6 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 
 import org.apache.commons.io.filefilter.NameFileFilter;
-
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.tck.ZipUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,7 @@ public class CompilerUtils {
 
   /**
    * Base class to create compiler utilities.
-   * 
+   *
    * @param <T> class of the implemented compiler
    */
   private static abstract class AbstractCompiler<T extends AbstractCompiler> {
@@ -180,12 +179,12 @@ public class CompilerUtils {
 
   /**
    * Base class to create a compiler that compiles multiple source files.
-   * 
+   *
    * @param <T> class of the implemented compiler
    */
   protected static abstract class MultipleFileCompiler<T extends MultipleFileCompiler> extends AbstractCompiler<T> {
 
-    private List<ZipUtils.ZipResource> configuredResources = new ArrayList<>();
+    private final List<ZipUtils.ZipResource> configuredResources = new ArrayList<>();
 
     /**
      * Indicates which source file must be compiled.
@@ -331,7 +330,7 @@ public class CompilerUtils {
         CompilerTask compilerTask =
             new CompilerTaskBuilder().compiling(sources).dependingOn(requiredJars)
                 .withProperty("extension.version", extensionVersion)
-                .processingAnnotations(EXTENSION_ANNOTATION_PROCESSOR_CLASSNAME)
+                .processingAnnotations(EXTENSION_ANNOTATION_PROCESSOR_CLASSNAME, System.getProperty("java.class.path"))
                 .toTarget(metaInfFolder).build();
 
         compilerTask.compile();
@@ -355,6 +354,7 @@ public class CompilerUtils {
     private File[] sources = {};
     private File[] jarFiles = {};
     private String annotationProcessorClassName;
+    private String processorPath;
     private final List<String> processProperties = new ArrayList<>();
 
     public CompilerTaskBuilder toTarget(File target) {
@@ -386,6 +386,20 @@ public class CompilerUtils {
       return this;
     }
 
+    /**
+     * Configures an annotation processor to use as part of the compilation
+     *
+     * @param annotationProcessorClassName the class name of the annotations processor to use
+     * @param processorPath the classpath to use for the annotation processing.
+     * @return
+     */
+    public CompilerTaskBuilder processingAnnotations(String annotationProcessorClassName, String processorPath) {
+      this.annotationProcessorClassName = annotationProcessorClassName;
+      this.processorPath = processorPath;
+
+      return this;
+    }
+
     public CompilerTask build() {
       if (sources.length == 0) {
         throw new IllegalArgumentException("Must define at least a source file to compile");
@@ -409,6 +423,11 @@ public class CompilerUtils {
         options.add("-processor");
         options.add(annotationProcessorClassName);
         options.add("-proc:only");
+
+        if (processorPath != null) {
+          options.add("-processorpath");
+          options.add(processorPath);
+        }
       }
 
       if (target != null) {
