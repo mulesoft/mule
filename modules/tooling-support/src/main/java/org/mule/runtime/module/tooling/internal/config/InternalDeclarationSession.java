@@ -12,7 +12,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -80,13 +79,16 @@ public class InternalDeclarationSession implements DeclarationSession {
   InternalDeclarationSession(ArtifactDeclaration artifactDeclaration) {
     this.artifactHelperLazyValue =
         new LazyValue<>(() -> new ArtifactHelper(extensionManager, componentLocator, artifactDeclaration));
+
     this.valueProviderExecutorLazyValue =
         new LazyValue<>(() -> new ValueProviderExecutor(muleContext, connectionManager, expressionManager, reflectionCache,
                                                         artifactHelper()));
     this.metadataKeysExecutorLazyValue =
         new LazyValue<>(() -> new MetadataKeysExecutor(connectionManager, reflectionCache, artifactHelper()));
+
     this.metadataComponentExecutorLazyValue =
         new LazyValue<>(() -> new MetadataComponentExecutor(connectionManager, reflectionCache, artifactHelper()));
+
     this.sampleDataExecutorLazyValue =
         new LazyValue<>(() -> new SampleDataExecutor(muleContext, connectionManager, expressionManager, sampleDataService,
                                                      reflectionCache, artifactHelper()));

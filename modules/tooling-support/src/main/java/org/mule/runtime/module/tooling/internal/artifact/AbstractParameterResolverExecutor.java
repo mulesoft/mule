@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact;
 
+import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.extractValue;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -27,6 +29,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValu
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.HashMap;
@@ -39,6 +42,8 @@ public class AbstractParameterResolverExecutor {
   protected final ReflectionCache reflectionCache;
   protected final ArtifactHelper artifactHelper;
 
+  public static final String INVALID_PARAMETER_VALUE = "INVALID_PARAMETER_VALUE";
+
   public AbstractParameterResolverExecutor(MuleContext muleContext, ExpressionManager expressionManager,
                                            ReflectionCache reflectionCache, ArtifactHelper artifactHelper) {
     this.muleContext = muleContext;
@@ -48,7 +53,8 @@ public class AbstractParameterResolverExecutor {
   }
 
   protected ParameterValueResolver parameterValueResolver(ParameterizedElementDeclaration parameterizedElementDeclaration,
-                                                          ParameterizedModel parameterizedModel) {
+                                                          ParameterizedModel parameterizedModel)
+      throws ExpressionNotSupportedException {
     Map<String, Object> parametersMap = parametersMap(parameterizedElementDeclaration, parameterizedModel);
 
     try {
@@ -68,7 +74,8 @@ public class AbstractParameterResolverExecutor {
   }
 
   protected Map<String, Object> parametersMap(ParameterizedElementDeclaration parameterizedElementDeclaration,
-                                              ParameterizedModel parameterizedModel) {
+                                              ParameterizedModel parameterizedModel)
+      throws ExpressionNotSupportedException {
     Map<String, Object> parametersMap = new HashMap<>();
 
     Map<String, ParameterGroupModel> parameterGroups =
@@ -87,9 +94,13 @@ public class AbstractParameterResolverExecutor {
         final ParameterModel parameterModel = parameterGroupModel.getParameter(parameterName)
             .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find parameter with name: '%s' in parameter group: '%s'",
                                                                             parameterName, parameterGroupName)));
-        parametersMap.put(parameterName,
-                          extractValue(parameterElement.getValue(),
-                                       artifactHelper.getParameterClass(parameterModel, parameterizedElementDeclaration)));
+        Object value = extractValue(parameterElement.getValue(),
+                                    artifactHelper.getParameterClass(parameterModel, parameterizedElementDeclaration));
+        if (!parameterModel.getExpressionSupport().equals(NOT_SUPPORTED) && isExpression(value)) {
+          throw new ExpressionNotSupportedException(format("Error resolving value for parameter: '%s' from declaration, it cannot be an EXPRESSION value",
+                                                           parameterName));
+        }
+        parametersMap.put(parameterName, value);
       }
     }
     return parametersMap;

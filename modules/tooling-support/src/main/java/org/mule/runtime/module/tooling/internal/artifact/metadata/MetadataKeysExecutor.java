@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact.metadata;
 
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
@@ -23,6 +24,7 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
@@ -52,6 +54,8 @@ public class MetadataKeysExecutor extends MetadataExecutor {
       return withContextClassLoader(extensionClassLoader,
                                     () -> withMetadataContext(metadataContext, () -> metadataMediator
                                         .getMetadataKeys(metadataContext, metadataKey, reflectionCache)));
+    } catch (ExpressionNotSupportedException e) {
+      return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(INVALID_METADATA_KEY).onKeys());
     } catch (MetadataResolvingException e) {
       return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(e.getFailure()).onKeys());
     } catch (Exception e) {

@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
+import org.mule.runtime.api.value.ResolvingFailure;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
@@ -31,6 +32,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
+import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
@@ -76,8 +78,16 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       }
     } catch (ValueResolvingException e) {
       return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
+    } catch (ExpressionNotSupportedException e) {
+      return resultFrom(newFailure(new ValueResolvingException(e.getMessage(), INVALID_PARAMETER_VALUE))
+          .withFailureCode(INVALID_PARAMETER_VALUE).build());
     } catch (ExecutorExceptionWrapper e) {
-      return resultFrom(newFailure(e.getCause()).build());
+      Throwable cause = e.getCause();
+      ResolvingFailure.Builder failureBuilder = newFailure(cause);
+      if (cause instanceof ValueResolvingException) {
+        failureBuilder.withFailureCode(((ValueResolvingException) cause).getFailureCode());
+      }
+      return resultFrom(failureBuilder.build());
     } catch (Exception e) {
       return resultFrom(newFailure(e).build());
     }
