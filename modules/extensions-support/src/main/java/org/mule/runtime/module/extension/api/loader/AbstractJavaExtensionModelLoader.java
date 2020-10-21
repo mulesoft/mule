@@ -16,6 +16,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
@@ -177,7 +178,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
     context.addCustomDeclarationEnrichers(customDeclarationEnrichers);
     context.addCustomDeclarationEnrichers(getPrivilegedDeclarationEnrichers(context));
     if (IGNORE_DISABLED) {
-      context.setIgnoreDirectiveEnabled(false);
+      context.addParameter(DISABLE_COMPONENT_IGNORE, true);
     }
   }
 

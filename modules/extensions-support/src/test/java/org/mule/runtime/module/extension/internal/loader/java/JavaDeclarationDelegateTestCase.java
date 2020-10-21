@@ -34,6 +34,7 @@ import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
@@ -385,7 +386,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   @Test
   public void disableIgnore() {
     DefaultExtensionLoadingContext loadingContext = createLoadingContext();
-    loadingContext.setIgnoreDirectiveEnabled(false);
+    loadingContext.addParameter(DISABLE_COMPONENT_IGNORE, true);
     ExtensionDeclarer declarer = declareExtension(loadingContext);
     ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
 

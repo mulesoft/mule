@@ -32,6 +32,7 @@ import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIgnoreDisabled;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -868,9 +869,9 @@ public final class IntrospectionUtils {
    * @since 4.4.0
    */
   public static boolean isIgnored(WithAnnotations element, ExtensionLoadingContext context) {
-    return context.isIgnoreDirectiveEnabled()
-        ? element.isAnnotatedWith(Ignore.class) || element.isAnnotatedWith(org.mule.sdk.api.annotation.Ignore.class)
-        : false;
+    return isIgnoreDisabled(context)
+        ? false
+        : element.isAnnotatedWith(Ignore.class) || element.isAnnotatedWith(org.mule.sdk.api.annotation.Ignore.class);
   }
 
   private static boolean isLifecycleMethod(Method method) {

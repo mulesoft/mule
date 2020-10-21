@@ -20,6 +20,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
  */
 public class ExtensionProperties {
 
+  private static final String EXTENSION_LOADER_PROPERTY_PREFIX = "EXTENSION_LOADER_";
+
   /**
    * The key of an execution context variable on which the connection to be used was set
    */
@@ -97,6 +99,12 @@ public class ExtensionProperties {
    */
   public static final String COMPONENT_CONFIG_NAME = PROPERTY_PREFIX + "COMPONENT_CONFIG_NAME";
 
+  /**
+   * Disables the {@code ignore} directive when loading an Extension.
+   *
+   * @since 1.4.0
+   */
+  public static final String DISABLE_COMPONENT_IGNORE = EXTENSION_LOADER_PROPERTY_PREFIX + "DISABLE_COMPONENT_IGNORE";
 
   private ExtensionProperties() {}
 }

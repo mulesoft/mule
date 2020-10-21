@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -22,6 +23,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.event.NullEventFactory;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
@@ -36,8 +38,6 @@ import java.util.Map;
 public class MuleExtensionUtils {
 
   private MuleExtensionUtils() {}
-
-
 
   /**
    * Loads a extension model
@@ -103,4 +103,9 @@ public class MuleExtensionUtils {
     return new DefaultExtensionManager();
   }
 
+  public static boolean isIgnoreDisabled(ExtensionLoadingContext loadingContext) {
+    return loadingContext.getParameter(DISABLE_COMPONENT_IGNORE)
+        .map(v -> v instanceof Boolean ? (Boolean) v : false)
+        .orElse(false);
+  }
 }
