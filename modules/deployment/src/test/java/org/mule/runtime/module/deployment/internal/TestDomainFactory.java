@@ -36,10 +36,14 @@ import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
 public class TestDomainFactory extends DefaultDomainFactory {
+
+  private static List<Runnable> afterTasks = new ArrayList<>();
 
   private boolean failOnStop;
   private boolean failOnDispose;
@@ -86,12 +90,16 @@ public class TestDomainFactory extends DefaultDomainFactory {
 
   @Override
   public Domain createArtifact(File artifactLocation, Optional<Properties> properties) throws IOException {
-    TestDomainWrapper testDomainWrapper = new TestDomainWrapper(super.createArtifact(artifactLocation, properties));
+    final Domain domain = super.createArtifact(artifactLocation, properties);
+    TestDomainWrapper testDomainWrapper = new TestDomainWrapper(domain);
+
     if (this.failOnStop) {
       testDomainWrapper.setFailOnStop();
+      afterTasks.add(() -> domain.stop());
     }
     if (this.failOnDispose) {
       testDomainWrapper.setFailOnDispose();
+      afterTasks.add(() -> domain.dispose());
     }
     return testDomainWrapper;
   }
@@ -104,4 +112,11 @@ public class TestDomainFactory extends DefaultDomainFactory {
     failOnDispose = true;
   }
 
+  /**
+   * Finish the dispose/stop process that was aborted due to an exception.
+   */
+  public static void after() {
+    afterTasks.forEach(Runnable::run);
+    afterTasks.clear();
+  }
 }
