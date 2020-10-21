@@ -355,7 +355,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     flow = (Flow) getFlowConstruct(flowName);
     new PollingProber(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS)
         .check(new JUnitLambdaProbe(() -> flow.getLifecycleState().isStarted(),
-            "The flow did not start in a reasonable amount of time"));
+                                    "The flow did not start in a reasonable amount of time"));
   }
 
   private boolean assertState(boolean executedOnSuccess, boolean executedOnError, boolean executedOnTerminate) {
