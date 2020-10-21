@@ -107,7 +107,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   @Test
   public void sourceRestartedWithDynamicConfig() throws Exception {
     final Long gatheredMoney = HeisenbergSource.gatheredMoney;
-    startFlow("source");
+    requestFlowToStartAndWait("source");
 
     check(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
           () -> {
