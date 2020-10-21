@@ -23,6 +23,20 @@
         <test:processor class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
     </flow>
 
+    <flow name="reconnectAfterFailure" initialState="stopped">
+        <reconnection:fallible-reconnectable-source config-ref="reconnection_Config">
+            <reconnect-forever frequency="2000" />
+        </reconnection:fallible-reconnectable-source>
+        <test:processor class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
+    </flow>
+
+    <flow name="noReconnect" initialState="stopped">
+        <reconnection:non-reconnectable-source config-ref="reconnection_Config">
+            <reconnect count="5" frequency="200" />
+        </reconnection:non-reconnectable-source>
+        <test:processor class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
+    </flow>
+
     <flow name="switchConnection">
         <reconnection:switch-connection />
     </flow>

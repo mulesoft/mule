@@ -124,6 +124,8 @@ public abstract class AbstractQueueManager
       final String queueName = queueStore.getName();
       if (this.queues.remove(queueName) == null) {
         throw new IllegalArgumentException(format("There's no queue for name %s", queueName));
+      } else {
+        clearQueueConfiguration(queueName);
       }
     } catch (Exception e) {
       throw new MuleRuntimeException(e);

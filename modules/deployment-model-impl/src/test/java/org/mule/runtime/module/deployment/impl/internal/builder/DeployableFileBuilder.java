@@ -53,7 +53,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
   private boolean useHeavyPackage = true;
   private String classloaderModelVersion = "1.0";
-  private JarExplorer jarFileExplorer = new FileJarExplorer();
+  private final JarExplorer jarFileExplorer = new FileJarExplorer();
 
   public DeployableFileBuilder(String artifactId, boolean upperCaseInExtension) {
     super(artifactId, upperCaseInExtension);

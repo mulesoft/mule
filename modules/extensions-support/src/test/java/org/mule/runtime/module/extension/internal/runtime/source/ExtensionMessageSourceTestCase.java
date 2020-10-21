@@ -106,7 +106,10 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public void handleExceptionAndRestart() throws Exception {
     start();
     messageSource.onException(new ConnectionException(ERROR_MESSAGE));
-    verify(source).onStop();
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source).onStop();
+      return true;
+    }));
     verify(ioScheduler, never()).stop();
     verify(cpuLightScheduler, never()).stop();
 
@@ -350,6 +353,36 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
         description.appendText("Exception was not wrapped as expected");
       }
     });
+  }
+
+  @Test
+  public void reconnectTwice() throws Exception {
+    start();
+
+    messageSource.onException(new ConnectionException(ERROR_MESSAGE));
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> !messageSource.isReconnecting()));
+
+    verify(source, times(2)).onStart(sourceCallback);
+    verify(source, times(1)).onStop();
+
+    messageSource.onException(new ConnectionException(ERROR_MESSAGE));
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> !messageSource.isReconnecting()));
+
+    verify(source, times(3)).onStart(sourceCallback);
+    verify(source, times(2)).onStop();
+  }
+
+  @Test
+  public void failToReconnect() throws Exception {
+    start();
+    ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
+    doThrow(connectionException).when(source).onStart(any());
+
+    messageSource.onException(connectionException);
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> !messageSource.isReconnecting()));
+
+    verify(source, times(4)).onStart(sourceCallback);
+    verify(source, times(4)).onStop();
   }
 
   private BaseMatcher<Throwable> exhaustedBecauseOf(Throwable cause) {

@@ -16,7 +16,10 @@ import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
 import static org.mule.tck.probe.PollingProber.check;
+import static org.mule.tck.probe.PollingProber.checkNot;
 
+import org.mule.extension.test.extension.reconnection.FallibleReconnectableSource;
+import org.mule.extension.test.extension.reconnection.NonReconnectableSource;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -41,6 +44,9 @@ import org.junit.Test;
 
 public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
+  private final static long TIMEOUT = 5000;
+  private final static long POLL_DELAY = 500;
+
   private static List<CoreEvent> capturedEvents;
 
   public static class CaptureProcessor implements Processor {
@@ -63,12 +69,16 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   protected void doSetUp() throws Exception {
     capturedEvents = new LinkedList<>();
     ReconnectableConnectionProvider.fail = false;
+    FallibleReconnectableSource.fail = false;
+    NonReconnectableSource.fail = false;
   }
 
   @Override
   protected void doTearDown() throws Exception {
     capturedEvents = null;
     ReconnectableConnectionProvider.fail = false;
+    FallibleReconnectableSource.fail = false;
+    NonReconnectableSource.fail = false;
   }
 
   @Test
@@ -86,6 +96,26 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
             .isPresent();
       }
     });
+  }
+
+  @Test
+  public void noReconnectSource() throws Exception {
+    ((Startable) getFlowConstruct("noReconnect")).start();
+    check(TIMEOUT, POLL_DELAY, () -> !capturedEvents.isEmpty());
+    NonReconnectableSource.fail = true;
+    check(TIMEOUT, POLL_DELAY, () -> NonReconnectableSource.attempts.get() > 0);
+    clear(capturedEvents);
+    checkNot(TIMEOUT, POLL_DELAY, () -> size(capturedEvents) > 0);
+  }
+
+  @Test
+  public void doNotStartSourceTwiceAfterExceptionOnReconnection() throws Exception {
+    ((Startable) getFlowConstruct("reconnectAfterFailure")).start();
+    check(TIMEOUT, POLL_DELAY, () -> !capturedEvents.isEmpty());
+    FallibleReconnectableSource.fail = true;
+    checkNot(TIMEOUT, POLL_DELAY, () -> FallibleReconnectableSource.simultaneouslyStartedSources);
+    FallibleReconnectableSource.release();
+    checkNot(TIMEOUT, POLL_DELAY, () -> FallibleReconnectableSource.simultaneouslyStartedSources);
   }
 
   @Test
@@ -229,5 +259,17 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     closePagingProviderCalls = 0;
     getPageCalls = 0;
     disconnectCalls = 0;
+  }
+
+  private void clear(List<CoreEvent> list) {
+    synchronized (list) {
+      list.clear();
+    }
+  }
+
+  private int size(List<CoreEvent> list) {
+    synchronized (list) {
+      return list.size();
+    }
   }
 }
