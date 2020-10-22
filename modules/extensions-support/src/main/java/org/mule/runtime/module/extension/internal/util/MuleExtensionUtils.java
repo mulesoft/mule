@@ -66,6 +66,7 @@ import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
+import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
@@ -81,7 +82,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Connectio
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ComponentExecutorCompletableAdapterFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveOperationExecutorFactoryWrapper;
@@ -371,17 +372,17 @@ public class MuleExtensionUtils {
 
 
   /**
-   * Tests the given {@code sourceModel} for a {@link SourceFactoryModelProperty} and if present it returns the enclosed
-   * {@link SourceFactory}. If no such property is found, then a {@link IllegalSourceModelDefinitionException} is thrown
+   * Tests the given {@code sourceModel} for a {@link SdkSourceFactoryModelProperty} and if present it returns the enclosed
+   * {@link SdkSourceFactory}. If no such property is found, then a {@link IllegalSourceModelDefinitionException} is thrown
    *
    * @param sourceModel a {@link SourceModel}
    * @return a {@link SourceFactory}
    * @throws IllegalSourceModelDefinitionException if the source is not properly enriched
    */
-  public static SourceFactory getSourceFactory(SourceModel sourceModel) {
+  public static SdkSourceFactory getSdkSourceFactory(SourceModel sourceModel) {
     return fromModelProperty(sourceModel,
-                             SourceFactoryModelProperty.class,
-                             SourceFactoryModelProperty::getSourceFactory,
+                             SdkSourceFactoryModelProperty.class,
+                             SdkSourceFactoryModelProperty::getMessageSourceFactory,
                              () -> new IllegalSourceModelDefinitionException(
                                                                              format("Source '%s' does not provide a %s",
                                                                                     sourceModel.getName(),

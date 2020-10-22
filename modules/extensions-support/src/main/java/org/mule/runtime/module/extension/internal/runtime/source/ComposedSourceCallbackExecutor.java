@@ -10,7 +10,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.util.Map;
 

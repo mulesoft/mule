@@ -24,33 +24,33 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
-public class DefaultSourceFactoryTestCase extends AbstractMuleTestCase {
+public class DefaultSdkSourceFactoryTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
   @Test
   public void create() {
-    assertThat(new DefaultSourceFactory(HeisenbergSource.class).createSource(), is(instanceOf(HeisenbergSource.class)));
+    assertThat(new DefaultSdkSourceFactory(HeisenbergSource.class).createMessageSource(), is(instanceOf(HeisenbergSource.class)));
   }
 
   @Test
   public void nullType() {
     expectedException.expect(IllegalArgumentException.class);
-    new DefaultSourceFactory(null);
+    new DefaultSdkSourceFactory(null);
   }
 
   @Test
   public void notInstantiable() {
     expectedException.expect(IllegalArgumentException.class);
-    new DefaultSourceFactory(Source.class);
+    new DefaultSdkSourceFactory(Source.class);
   }
 
   @Test
   public void exceptionOnInstantiation() {
     expectedException.expect(RuntimeException.class);
     expectedException.expectCause(Matchers.instanceOf(InvocationTargetException.class));
-    new DefaultSourceFactory(UncreatableSource.class).createSource();
+    new DefaultSdkSourceFactory(UncreatableSource.class).createMessageSource();
   }
 
   public static class UncreatableSource extends Source {

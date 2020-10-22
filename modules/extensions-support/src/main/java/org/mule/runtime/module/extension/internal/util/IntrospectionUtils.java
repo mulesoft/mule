@@ -99,7 +99,6 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
-import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
@@ -116,6 +115,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.sdk.api.runtime.source.Source;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;

@@ -30,12 +30,12 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedMethodComponentExecutor;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.lang.reflect.Method;
 import java.util.List;

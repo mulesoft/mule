@@ -21,8 +21,11 @@ import org.mule.runtime.module.extension.api.loader.java.type.FunctionContainerE
 import org.mule.runtime.module.extension.api.loader.java.type.OperationContainerElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Abstract implementation of {@link ComponentWrapper}
@@ -40,11 +43,19 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
    */
   @Override
   public List<SourceElement> getSources() {
-    final Optional<Sources> optionalSources = this.getAnnotation(Sources.class);
-    if (optionalSources.isPresent()) {
-      return stream(optionalSources.get().value()).map(s -> new SourceTypeWrapper(s, typeLoader)).collect(toList());
-    }
-    return emptyList();
+    List<SourceElement> elements = new ArrayList<>();
+    collectSources(elements, Sources.class, Sources::value);
+    collectSources(elements, org.mule.sdk.api.annotation.Sources.class, org.mule.sdk.api.annotation.Sources::value);
+
+    return elements;
+  }
+
+  private <A extends Annotation> void collectSources(List<SourceElement> accumulator,
+                                                     Class<A> annotationClass,
+                                                     Function<A, Class[]> extractionFunction) {
+    getAnnotation(annotationClass)
+        .map(a -> stream(extractionFunction.apply(a)))
+        .ifPresent(stream -> stream.forEach(s -> accumulator.add(new SourceTypeWrapper(s, typeLoader))));
   }
 
   /**

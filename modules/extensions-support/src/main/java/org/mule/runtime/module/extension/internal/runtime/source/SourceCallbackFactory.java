@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+
+import org.mule.sdk.api.runtime.source.SourceCallback;
 
 /**
  * A factory to create {@link SourceCallback} instances
