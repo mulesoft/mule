@@ -512,6 +512,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     policyParametrization = "";
   }
 
+  @After
+  public void undeployApps() {
+    deploymentService.getApplications().forEach(app -> deploymentService.undeploy(app.getArtifactName()));
+    TestApplicationFactory.after();
+  }
+
   protected void configureDeploymentService() {
     deploymentService.addDeploymentListener(applicationDeploymentListener);
     deploymentService.addDomainDeploymentListener(domainDeploymentListener);
