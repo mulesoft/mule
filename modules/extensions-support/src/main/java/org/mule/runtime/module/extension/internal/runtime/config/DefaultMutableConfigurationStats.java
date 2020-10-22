@@ -79,7 +79,6 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
    */
   @Override
   public int addInflightOperation() {
-    System.out.println("Incrementing InFlight Counter");
     updateLastUsed();
     return inflightOperations.incrementAndGet();
   }
@@ -89,7 +88,6 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
    */
   @Override
   public int discountInflightOperation() {
-    System.out.println("Decrementing InFlight Counter");
     updateLastUsed();
     return inflightOperations.decrementAndGet();
   }
@@ -117,7 +115,6 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
    */
   @Override
   public int addOpenedStream() {
-    System.out.println("Incrementing Streaming Counter");
     updateLastUsed();
     return openedStreams.incrementAndGet();
   }
@@ -127,7 +124,6 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
    */
   @Override
   public int discountOpenedStream() {
-    System.out.println("Decrementing Streaming Counter");
     updateLastUsed();
     return openedStreams.decrementAndGet();
   }

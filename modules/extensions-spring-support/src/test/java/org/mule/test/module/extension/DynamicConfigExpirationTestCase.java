@@ -42,30 +42,6 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     return "dynamic-config-expiration.xml";
   }
 
-  private static List<CoreEvent> capturedEvents;
-
-  public static class CaptureEventProcessor implements Processor {
-
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-      synchronized (capturedEvents) {
-        capturedEvents.add(event);
-      }
-      return event;
-    }
-  }
-
-  @Override
-  protected void doSetUp() throws Exception {
-    resetCounters();
-    capturedEvents = new LinkedList<>();
-  }
-
-  @Override
-  protected void doTearDown() throws Exception {
-    capturedEvents = null;
-  }
-
   @Test
   public void expireDynamicConfig() throws Exception {
     HeisenbergExtension config = invokeDynamicConfig("dynamic", "heisenberg", "Walt");
@@ -166,10 +142,5 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     assertThat(config.getPersonalInfo().getName(), is(payload));
 
     return config;
-  }
-
-  public static void resetCounters() {
-    closePagingProviderCalls = 0;
-    getPageCalls = 0;
   }
 }

@@ -228,7 +228,6 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     cacheWriteLock.lock();
     try {
       return cache.entrySet().stream().filter(entry -> isExpired(entry.getValue())).map(entry -> {
-        System.out.println("Config " + entry.getValue().getName() + " is expired. Invalidating and unregistering.");
         cache.remove(entry.getKey());
         unRegisterConfiguration(entry.getValue());
         return entry.getValue();
