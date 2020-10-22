@@ -85,6 +85,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
   protected ForkJoinStrategy strategy;
   protected ProcessingStrategy processingStrategy;
+  protected Scheduler actualScheduler;
   protected Scheduler scheduler;
   protected ErrorType timeoutErrorType;
 
@@ -93,15 +94,16 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     processingStrategy = mock(ProcessingStrategy.class);
     when(processingStrategy.onPipeline(any(ReactiveProcessor.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
-    scheduler = muleContext.getSchedulerService().ioScheduler();
+    actualScheduler = muleContext.getSchedulerService().ioScheduler();
+    scheduler = spy(actualScheduler);
     timeoutErrorType = muleContext.getErrorTypeRepository().getErrorType(TIMEOUT).get();
     setupConcurrentProcessingStrategy();
-    strategy = createStrategy(processingStrategy, Integer.MAX_VALUE, true, MAX_VALUE);
+    strategy = createStrategy(processingStrategy, MAX_VALUE, true, MAX_VALUE);
   }
 
   @After
   public void tearDown() {
-    scheduler.stop();
+    actualScheduler.stop();
   }
 
   protected abstract ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
