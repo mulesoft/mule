@@ -14,6 +14,8 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.internal.processor.LoggerMessageProcessor.MULE_LOGGING_BLOCKING_CATEGORIES;
+import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
+import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.PROCESSING_TYPE;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,19 +24,26 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(LOGGING)
+@Story(PROCESSING_TYPE)
 public class LoggerBlockingCategoriesTestCase extends AbstractMuleTestCase {
 
   @Rule
   public SystemProperty muleEnableStatistics =
       new SystemProperty(MULE_LOGGING_BLOCKING_CATEGORIES, "some.category");
 
-
   @Test
+  @Description("Blocking category type results in blocking processing type")
   public void processTypeOfBlockingCategoryIsBlocking() {
     testCategory("some.category", BLOCKING);
   }
 
   @Test
+  @Description("Non Blocking category results in cpu light processing type")
   public void processTypeOfNonBlockingCategoryIsCpuLight() {
     testCategory("other.category", CPU_LITE);
   }
@@ -43,7 +52,6 @@ public class LoggerBlockingCategoriesTestCase extends AbstractMuleTestCase {
     LoggerMessageProcessor loggerMessageProcessor = loggerMessageProcessor(category);
     assertThat(loggerMessageProcessor.getProcessingType(), is(expectedProcessingType));
   }
-
 
   private LoggerMessageProcessor loggerMessageProcessor(String category) {
     LoggerMessageProcessor loggerMessageProcessor = new LoggerMessageProcessor();
