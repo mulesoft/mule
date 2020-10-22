@@ -69,11 +69,13 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Properties;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 /**
  * Contains test for domain deployment
@@ -135,6 +137,11 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     pluginForbiddenMuleThirdPartyEchoTestClassFile =
         new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
             .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
+  }
+
+  @After
+  public void disposeStaleDomains() {
+    TestDomainFactory.after();
   }
 
   @Test

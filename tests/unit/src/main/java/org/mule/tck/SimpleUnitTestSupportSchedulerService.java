@@ -8,11 +8,6 @@ package org.mule.tck;
 
 import static java.util.Collections.synchronizedList;
 import static java.util.Collections.unmodifiableList;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -26,7 +21,6 @@ import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 
 /**
@@ -154,15 +148,10 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
     };
   }
 
-  protected SimpleUnitTestSupportLifecycleSchedulerDecorator decorateScheduler(SimpleUnitTestSupportScheduler scheduler) {
-    return withContextClassLoader(SimpleUnitTestSupportSchedulerService.class.getClassLoader(), () -> {
-      SimpleUnitTestSupportLifecycleSchedulerDecorator spied =
-          spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(resolveSchedulerCreationLocation(), scheduler, this));
-
-      doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString());
-      doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString(), any());
-      return spied;
-    });
+  private SimpleUnitTestSupportLifecycleSchedulerDecorator decorateScheduler(SimpleUnitTestSupportScheduler scheduler) {
+    return withContextClassLoader(SimpleUnitTestSupportSchedulerService.class.getClassLoader(),
+                                  () -> new SimpleUnitTestSupportLifecycleSchedulerDecorator(resolveSchedulerCreationLocation(),
+                                                                                             scheduler, this));
   }
 
   private String resolveSchedulerCreationLocation() {
