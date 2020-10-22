@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
@@ -112,9 +113,16 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
     AtomicReference<Scheduler> pollScheduler = new AtomicReference<>();
 
     doAnswer(invocation -> {
-      Scheduler scheduler = (Scheduler) invocation.callRealMethod();
-      pollScheduler.set(scheduler);
-      return scheduler;
+      if (pollScheduler.get() == null) {
+        Scheduler scheduler = (Scheduler) invocation.callRealMethod();
+        final Scheduler spiedScheduler = spy(scheduler);
+        doAnswer(inv -> {
+          scheduler.stop();
+          return null;
+        }).when(spiedScheduler).stop();
+        pollScheduler.set(spiedScheduler);
+      }
+      return pollScheduler.get();
     }).when(schedulerService).cpuLightScheduler();
 
     DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
