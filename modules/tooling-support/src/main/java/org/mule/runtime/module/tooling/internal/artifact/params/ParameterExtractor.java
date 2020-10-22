@@ -14,13 +14,24 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ParameterExtractor implements ParameterValueVisitor {
 
-  private static final ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectMapper objectMapper;
+
+  static {
+    //This was added to handle complex parameters and transforming from a Map<String, Object>
+    // to the actual object of type defined my the mod]el.
+    //Also, it was tested with the simple types allowed and has the same behaviour for ISO8601 as defined here:
+    //org.mule.runtime.module.extension.internal.config.dsl.resolver.ValueResolverFactoryTypeVisitor
+    objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+  }
+
   private Object value;
 
   public static <T> T extractValue(ParameterValue parameterValue, Class<T> type) {
