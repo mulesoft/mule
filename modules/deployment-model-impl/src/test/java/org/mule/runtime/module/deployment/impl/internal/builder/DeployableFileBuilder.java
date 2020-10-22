@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
@@ -236,7 +237,11 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
     }
     final Artifact artifact = new Artifact(artifactCoordinates, uri);
     // mule-maven-plugin (packager) will not include packages/resources for mule-plugin dependencies
-    if (isSupportingPackagesResourcesInformation() && !MULE_PLUGIN_CLASSIFIER.equals(builder.getClassifier())) {
+    boolean shouldAddPackagesAndResources = !MULE_PLUGIN_CLASSIFIER.equals(artifact.getArtifactCoordinates().getClassifier())
+        && artifact.getUri() != null
+        // mule-domain are set with a "" URI
+        && isNotBlank(artifact.getUri().getPath());
+    if (isSupportingPackagesResourcesInformation() && shouldAddPackagesAndResources) {
       JarInfo jarInfo = jarFileExplorer.explore(artifact.getUri());
       artifact.setPackages(jarInfo.getPackages().toArray(new String[jarInfo.getPackages().size()]));
       artifact.setResources(jarInfo.getResources().toArray(new String[jarInfo.getResources().size()]));

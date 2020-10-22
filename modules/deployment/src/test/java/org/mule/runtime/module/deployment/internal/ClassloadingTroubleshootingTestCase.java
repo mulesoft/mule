@@ -44,15 +44,17 @@ import java.util.List;
 @Feature(CLASSLOADING_ISOLATION)
 public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestCase {
 
-  private static final int EXPECTED_CONTENT_IN_LOG_SECS = 60 * 1000;
+  private static final int EXPECTED_CONTENT_IN_LOG_SECS = 10 * 1000;
 
   private final ApplicationFileBuilder APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER =
       new ApplicationFileBuilder("app-classloading-troubleshooting")
-          .definedBy("classloading-troubleshooting/app-classloading-troubleshooting-config.xml");
+          .definedBy("classloading-troubleshooting/app-classloading-troubleshooting-config.xml")
+          .withClassloaderModelVersion("1.2.0");
 
   private final DomainFileBuilder DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER =
       new DomainFileBuilder("domain-classloading-troubleshooting")
-          .definedBy("classloading-troubleshooting/domain-classloading-troubleshooting-config.xml");
+          .definedBy("classloading-troubleshooting/domain-classloading-troubleshooting-config.xml")
+          .withClassloaderModelVersion("1.2.0");
 
   private JarFileBuilder overriderLibrary;
   private JarFileBuilder overrider2Library;
@@ -132,7 +134,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   public void applicationClassNotFound() throws Exception {
     completeDomain();
 
-    APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER
+    addJmsPropertiesResourceFile(APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER)
         .dependingOn(muleJavaModulePlugin)
         .dependingOn(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
 
@@ -150,7 +152,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   public void applicationClassNotFoundButInDomain() throws Exception {
     completeDomain();
 
-    APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER
+    addJmsPropertiesResourceFile(APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER)
         .dependingOn(muleJavaModulePlugin)
         .dependingOn(overrider2Library)
         .dependingOn(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
