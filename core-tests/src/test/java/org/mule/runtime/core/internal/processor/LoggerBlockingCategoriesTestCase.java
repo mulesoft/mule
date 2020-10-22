@@ -11,9 +11,9 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOGGING_BLOCKING_CATEGORIES;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.internal.processor.LoggerMessageProcessor.MULE_LOGGING_BLOCKING_CATEGORIES;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.PROCESSING_TYPE;
 
@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @Feature(LOGGING)
@@ -38,12 +39,14 @@ public class LoggerBlockingCategoriesTestCase extends AbstractMuleTestCase {
 
   @Test
   @Description("Blocking category type results in blocking processing type")
+  @Issue("MULE-16414")
   public void processTypeOfBlockingCategoryIsBlocking() {
     testCategory("some.category", BLOCKING);
   }
 
   @Test
   @Description("Non Blocking category results in cpu light processing type")
+  @Issue("MULE-16414")
   public void processTypeOfNonBlockingCategoryIsCpuLight() {
     testCategory("other.category", CPU_LITE);
   }
