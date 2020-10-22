@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.processor;
 
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOGGING_BLOCKING_CATEGORIES;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
@@ -38,8 +38,6 @@ import org.slf4j.LoggerFactory;
  * suit your needs.
  */
 public class LoggerMessageProcessor extends AbstractComponent implements Processor, Initialisable, MuleContextAware {
-
-  public static final String MULE_LOGGING_BLOCKING_CATEGORIES = SYSTEM_PROPERTY_PREFIX + "logging.blockingCategories";
 
   // TODO - MULE-16446: Logger execution type should be defined according to the appender used
   private static final String BLOCKING_CATEGORIES_PROPERTY = System.getProperty(MULE_LOGGING_BLOCKING_CATEGORIES, "");
