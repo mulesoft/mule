@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor;
 
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOGGING_BLOCKING_CATEGORIES;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
@@ -32,13 +33,13 @@ import org.slf4j.LoggerFactory;
 /**
  * MessageProcessor implementation that logs the current element of a value evaluated from it using an expression evaluator. By
  * default the current messages is logged using the {@link Level#INFO} level to the
- * 'org.mule.runtime.core.internal.processor.LoggerMessageProcessor' category. The level and category can both be configured to suit
- * your needs.
+ * 'org.mule.runtime.core.internal.processor.LoggerMessageProcessor' category. The level and category can both be configured to
+ * suit your needs.
  */
 public class LoggerMessageProcessor extends AbstractComponent implements Processor, Initialisable, MuleContextAware {
 
   // TODO - MULE-16446: Logger execution type should be defined according to the appender used
-  private static final String BLOCKING_CATEGORIES_PROPERTY = System.getProperty("mule.logging.blockingCategories", "");
+  private static final String BLOCKING_CATEGORIES_PROPERTY = System.getProperty(MULE_LOGGING_BLOCKING_CATEGORIES, "");
   private static final Set<String> BLOCKING_CATEGORIES = new HashSet<>(asList(BLOCKING_CATEGORIES_PROPERTY.split(",")));
   private static final String WILDCARD = "*";
 
