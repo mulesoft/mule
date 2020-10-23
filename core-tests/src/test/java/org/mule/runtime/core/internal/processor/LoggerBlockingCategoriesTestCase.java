@@ -6,22 +6,25 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static java.lang.reflect.Modifier.FINAL;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOGGING_BLOCKING_CATEGORIES;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.PROCESSING_TYPE;
 
-import org.junit.Rule;
+import java.lang.reflect.Field;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
 
 import io.qameta.allure.Description;
@@ -33,9 +36,32 @@ import io.qameta.allure.Story;
 @Story(PROCESSING_TYPE)
 public class LoggerBlockingCategoriesTestCase extends AbstractMuleTestCase {
 
-  @Rule
-  public SystemProperty muleEnableStatistics =
-      new SystemProperty(MULE_LOGGING_BLOCKING_CATEGORIES, "some.category");
+  private Object oldBlockingCategoryProperty;
+
+  @Before
+  public void before() throws Exception {
+    // This is done because LoggerMessageProcessor is loaded by other tests.
+    // Thus, the setting of the system property for a final static field
+    // has no effect.
+    Field field = LoggerMessageProcessor.class.getDeclaredField("BLOCKING_CATEGORIES");
+    field.setAccessible(true);
+    Field modifiersField = Field.class.getDeclaredField("modifiers");
+    modifiersField.setAccessible(true);
+    modifiersField.setInt(field, field.getModifiers() & ~FINAL);
+    oldBlockingCategoryProperty = field.get(null);
+    field.set(null, singleton("some.category"));
+  }
+
+  @After
+  public void after() throws Exception {
+    Field field = LoggerMessageProcessor.class.getDeclaredField("BLOCKING_CATEGORIES");
+    field.setAccessible(true);
+    field.set(null, oldBlockingCategoryProperty);
+    Field modifiersField = Field.class.getDeclaredField("modifiers");
+    modifiersField.setAccessible(true);
+    modifiersField.setInt(field, field.getModifiers() | FINAL);
+    field.setAccessible(true);
+  }
 
   @Test
   @Description("Blocking category type results in blocking processing type")
