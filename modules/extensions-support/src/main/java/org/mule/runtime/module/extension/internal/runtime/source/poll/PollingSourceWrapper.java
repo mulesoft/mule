@@ -358,6 +358,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
               if (updatedWatermarkCompare == 0) {
                 pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
               } else if (updatedWatermarkCompare < 0) {
+                idsOnUpdatedWatermark.clear();
                 pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
                 setUpdatedWatermark(itemWatermark);
               }
