@@ -40,7 +40,7 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
 
   // TODO - MULE-16446: Logger execution type should be defined according to the appender used
   private static final String BLOCKING_CATEGORIES_PROPERTY = System.getProperty(MULE_LOGGING_BLOCKING_CATEGORIES, "");
-  static Set<String> BLOCKING_CATEGORIES = new HashSet<>(asList(BLOCKING_CATEGORIES_PROPERTY.split(",")));
+  private static final Set<String> BLOCKING_CATEGORIES = new HashSet<>(asList(BLOCKING_CATEGORIES_PROPERTY.split(",")));
   private static final String WILDCARD = "*";
 
   protected transient Logger logger;
@@ -70,9 +70,9 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
   }
 
   protected void initProcessingTypeIfPossible() {
-    if (BLOCKING_CATEGORIES.size() == 1 && BLOCKING_CATEGORIES.contains(EMPTY)) {
+    if (getBlockingCategories().size() == 1 && getBlockingCategories().contains(EMPTY)) {
       processingType = CPU_LITE;
-    } else if (BLOCKING_CATEGORIES.contains(WILDCARD)) {
+    } else if (getBlockingCategories().contains(WILDCARD)) {
       processingType = BLOCKING;
     }
   }
@@ -96,7 +96,7 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
   }
 
   private boolean isBlocking(String category) {
-    return BLOCKING_CATEGORIES.stream().anyMatch(blockingCategory -> blockingCategory.equals(category) ||
+    return getBlockingCategories().stream().anyMatch(blockingCategory -> blockingCategory.equals(category) ||
         (category != null && category.startsWith(blockingCategory + ".")));
   }
 
@@ -140,6 +140,7 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
   }
 
   public enum LogLevel {
+
     ERROR {
 
       @Override
@@ -204,5 +205,9 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
     public abstract void log(Logger logger, Object object);
 
     public abstract boolean isEnabled(Logger logger);
+  }
+
+  protected Set<String> getBlockingCategories() {
+    return BLOCKING_CATEGORIES;
   }
 }
