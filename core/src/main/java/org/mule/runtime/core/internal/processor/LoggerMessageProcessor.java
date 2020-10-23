@@ -40,7 +40,7 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
 
   // TODO - MULE-16446: Logger execution type should be defined according to the appender used
   private static final String BLOCKING_CATEGORIES_PROPERTY = System.getProperty(MULE_LOGGING_BLOCKING_CATEGORIES, "");
-  private static final Set<String> BLOCKING_CATEGORIES = new HashSet<>(asList(BLOCKING_CATEGORIES_PROPERTY.split(",")));
+  static Set<String> BLOCKING_CATEGORIES = new HashSet<>(asList(BLOCKING_CATEGORIES_PROPERTY.split(",")));
   private static final String WILDCARD = "*";
 
   protected transient Logger logger;

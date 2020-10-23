@@ -15,10 +15,12 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.internal.processor.LoggerMessageProcessor.BLOCKING_CATEGORIES;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.PROCESSING_TYPE;
 
 import java.lang.reflect.Field;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -36,31 +38,20 @@ import io.qameta.allure.Story;
 @Story(PROCESSING_TYPE)
 public class LoggerBlockingCategoriesTestCase extends AbstractMuleTestCase {
 
-  private Object oldBlockingCategoryProperty;
+  private Set<String> oldBlockingCategories;
 
   @Before
   public void before() throws Exception {
     // This is done because LoggerMessageProcessor is loaded by other tests.
     // Thus, the setting of the system property for a final static field
     // has no effect.
-    Field field = LoggerMessageProcessor.class.getDeclaredField("BLOCKING_CATEGORIES");
-    field.setAccessible(true);
-    Field modifiersField = Field.class.getDeclaredField("modifiers");
-    modifiersField.setAccessible(true);
-    modifiersField.setInt(field, field.getModifiers() & ~FINAL);
-    oldBlockingCategoryProperty = field.get(null);
-    field.set(null, singleton("some.category"));
+    oldBlockingCategories = BLOCKING_CATEGORIES;
+    BLOCKING_CATEGORIES = singleton("some.category");
   }
 
   @After
   public void after() throws Exception {
-    Field field = LoggerMessageProcessor.class.getDeclaredField("BLOCKING_CATEGORIES");
-    field.setAccessible(true);
-    field.set(null, oldBlockingCategoryProperty);
-    Field modifiersField = Field.class.getDeclaredField("modifiers");
-    modifiersField.setAccessible(true);
-    modifiersField.setInt(field, field.getModifiers() | FINAL);
-    field.setAccessible(true);
+    BLOCKING_CATEGORIES = oldBlockingCategories;
   }
 
   @Test
