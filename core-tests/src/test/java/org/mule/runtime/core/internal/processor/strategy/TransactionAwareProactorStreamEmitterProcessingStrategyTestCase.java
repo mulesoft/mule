@@ -21,6 +21,8 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -89,5 +91,12 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Test
+  @Ignore("MULE-18919")
+  @Override
+  public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
+    //Implemented in the supperclass. Overriden in order to ignore it
   }
 }
