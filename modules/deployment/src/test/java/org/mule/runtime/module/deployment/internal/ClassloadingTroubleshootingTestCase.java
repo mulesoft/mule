@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -38,24 +42,18 @@ import uk.org.lidalia.slf4jtest.TestLogger;
 import uk.org.lidalia.slf4jtest.TestLoggerFactoryResetRule;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Feature(CLASSLOADING_ISOLATION)
 public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestCase {
 
   private static final int EXPECTED_CONTENT_IN_LOG_SECS = 10 * 1000;
+  private static final String CLASSLOADER_MODEL_VERSION = "1.2.0";
 
-  private final ApplicationFileBuilder APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER =
-      new ApplicationFileBuilder("app-classloading-troubleshooting")
-          .definedBy("classloading-troubleshooting/app-classloading-troubleshooting-config.xml")
-          .withClassloaderModelVersion("1.2.0");
-
-  private final DomainFileBuilder DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER =
-      new DomainFileBuilder("domain-classloading-troubleshooting")
-          .definedBy("classloading-troubleshooting/domain-classloading-troubleshooting-config.xml")
-          .withClassloaderModelVersion("1.2.0");
-
+  private File mavenRepoFolder;
   private JarFileBuilder overriderLibrary;
   private JarFileBuilder overrider2Library;
   private JarFileBuilder overriderTestLibrary;
@@ -77,12 +75,12 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
   @Parameters(name = "Parallel: {0}")
   public static List<Boolean> params() {
-    // Only run without parallel deployment since this configuration does not affect re-deployment at all
     return asList(false);
   }
 
   @Before
   public void setup() throws URISyntaxException {
+    mavenRepoFolder = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
     overriderLibrary =
         new JarFileBuilder("overrider-library",
                            new JarCompiler().compiling(getResourceFile("/classloading-troubleshooting/src/OverrideMe.java"))
@@ -91,106 +89,207 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
         new JarFileBuilder("overrider2-library",
                            new JarCompiler().compiling(getResourceFile("/classloading-troubleshooting/src/OverrideMe2.java"))
                                .compile("overrider2-library.jar"));
-
     overriderTestLibrary =
         new JarFileBuilder("overrider-test-library",
                            new JarCompiler().compiling(getResourceFile("/classloading-troubleshooting/src/test/OverrideMe.java"))
                                .compile("overrider-test-library.jar"));
-
     muleJavaModulePlugin =
         new JarFileBuilder("mule-java-module", new File(getProperty("muleJavaModule"))).withGroupId("org.mule.module")
             .withClassifier(MULE_PLUGIN_CLASSIFIER).withVersion("1.3.0-SNAPSHOT");
   }
 
   @Test
-  public void domainResourceNotFoundInConfigProperties() throws Exception {
-    addOverrideLibrary(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
+  public void heavyDomainResourceNotFoundInConfigProperties() throws Exception {
+    domainResourceNotFoundInConfigProperties(false);
+  }
 
-    addPackedDomainFromBuilder(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
+  @Test
+  public void lightDomainResourceNotFoundInConfigProperties() throws Exception {
+    domainResourceNotFoundInConfigProperties(true);
+  }
+
+  private void domainResourceNotFoundInConfigProperties(boolean useLightWeightPackage) throws Exception {
+    DomainFileBuilder domainFileBuilder = createDomainFileBuilder(useLightWeightPackage);
+    addOverrideLibrary(domainFileBuilder, useLightWeightPackage);
+    addPackedDomainFromBuilder(domainFileBuilder);
 
     startDeployment();
 
-    assertDeploymentFailure(domainDeploymentListener, DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER.getId());
-
+    assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
     assertExpectedContentInAppLog(logUtilLogger,
                                   "classloading-troubleshooting/errors/domain-config-yaml-not-found");
   }
 
   @Test
-  public void domainClassNotFoundInObject() throws Exception {
-    addDomainConfigYamlFile(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
+  public void heavyDomainClassNotFoundInObject() throws Exception {
+    domainClassNotFoundInObject(false);
+  }
 
-    addPackedDomainFromBuilder(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
+  @Test
+  public void lightDomainClassNotFoundInObject() throws Exception {
+    domainClassNotFoundInObject(true);
+  }
+
+  private void domainClassNotFoundInObject(boolean useLightWeightPackage) throws Exception {
+    DomainFileBuilder domainFileBuilder = createDomainFileBuilder(useLightWeightPackage);
+    addDomainConfigYamlFile(domainFileBuilder);
+    addPackedDomainFromBuilder(domainFileBuilder);
 
     startDeployment();
 
-    assertDeploymentFailure(domainDeploymentListener, DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER.getId());
-
+    assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
     assertExpectedContentInAppLog(logUtilLogger,
                                   "classloading-troubleshooting/errors/domain-overrideme-class-not-found");
   }
 
   @Test
-  public void applicationClassNotFound() throws Exception {
-    completeDomain();
+  public void heavyApplicationClassNotFound() throws Exception {
+    applicationClassNotFound(false);
+  }
 
-    addJmsPropertiesResourceFile(APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER)
-        .dependingOn(muleJavaModulePlugin)
-        .dependingOn(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
+  @Test
+  public void lightApplicationClassNotFound() throws Exception {
+    applicationClassNotFound(true);
+  }
 
-    deployDomainAndApplication(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER, APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
+  private void applicationClassNotFound(boolean useLightWeightPackage) throws Exception {
+    DomainFileBuilder domainFileBuilder = createDomainFileBuilder(useLightWeightPackage);
+    completeDomain(domainFileBuilder, useLightWeightPackage);
 
-    assertDeploymentSuccess(domainDeploymentListener, DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER.getId());
+    ApplicationFileBuilder applicationFileBuilder = createApplicationFileBuilder(useLightWeightPackage);
+    addJmsPropertiesResourceFile(addJavaModulePlugin(applicationFileBuilder, useLightWeightPackage))
+        .dependingOn(domainFileBuilder);
 
-    assertDeploymentFailure(applicationDeploymentListener, APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER.getId());
+    deployDomainAndApplication(domainFileBuilder, applicationFileBuilder);
 
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
     assertExpectedContentInAppLog(logUtilLogger,
                                   "classloading-troubleshooting/errors/app-overrideme2-class-not-found");
   }
 
   @Test
-  public void applicationClassNotFoundButInDomain() throws Exception {
-    completeDomain();
+  public void heavyApplicationClassNotFoundButInDomain() throws Exception {
+    applicationClassNotFoundButInDomain(false);
+  }
 
-    addJmsPropertiesResourceFile(APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER)
-        .dependingOn(muleJavaModulePlugin)
-        .dependingOn(overrider2Library)
-        .dependingOn(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
+  @Test
+  public void lightApplicationClassNotFoundButInDomain() throws Exception {
+    applicationClassNotFoundButInDomain(true);
+  }
 
-    deployDomainAndApplication(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER, APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
+  public void applicationClassNotFoundButInDomain(boolean useLightWeightPackage) throws Exception {
+    DomainFileBuilder domainFileBuilder = createDomainFileBuilder(useLightWeightPackage);
+    completeDomain(domainFileBuilder, useLightWeightPackage);
 
-    assertDeploymentSuccess(domainDeploymentListener, DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER.getId());
+    ApplicationFileBuilder applicationFileBuilder = createApplicationFileBuilder(useLightWeightPackage);
+    addJmsPropertiesResourceFile(
+                                 addOverride2Library(
+                                                     addJavaModulePlugin(applicationFileBuilder, useLightWeightPackage),
+                                                     useLightWeightPackage))
+                                                         .dependingOn(domainFileBuilder);
 
-    assertDeploymentSuccess(applicationDeploymentListener, APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER.getId());
+    deployDomainAndApplication(domainFileBuilder, applicationFileBuilder);
 
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
     assertExpectedContentInAppLog(onErrorPropagateHandlerLogger,
                                   "classloading-troubleshooting/errors/app-test-overrideme-class-not-found");
   }
 
   @Test
-  public void applicationResourceNotFoundButInDomain() throws Exception {
-    completeDomain();
+  public void heavyApplicationResourceNotFoundButInDomain() throws Exception {
+    applicationResourceNotFoundButInDomain(false);
+  }
 
-    APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER
-        .dependingOn(muleJavaModulePlugin)
-        .dependingOn(overrider2Library)
-        .dependingOn(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
+  @Test
+  public void lightApplicationResourceNotFoundButInDomain() throws Exception {
+    applicationResourceNotFoundButInDomain(true);
+  }
 
-    deployDomainAndApplication(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER, APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER);
+  private void applicationResourceNotFoundButInDomain(boolean useLightWeightPackage) throws Exception {
+    DomainFileBuilder domainFileBuilder = createDomainFileBuilder(useLightWeightPackage);
+    completeDomain(domainFileBuilder, useLightWeightPackage);
 
-    assertDeploymentFailure(applicationDeploymentListener, APP_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER.getId());
+    ApplicationFileBuilder applicationFileBuilder = createApplicationFileBuilder(useLightWeightPackage);
+    addOverride2Library(
+                        addJavaModulePlugin(applicationFileBuilder, useLightWeightPackage),
+                        useLightWeightPackage)
+                            .dependingOn(domainFileBuilder);
 
+    deployDomainAndApplication(domainFileBuilder, applicationFileBuilder);
+
+    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
     assertExpectedContentInAppLog(logUtilLogger,
                                   "classloading-troubleshooting/errors/app-jms-properties-resource-not-found");
   }
 
-  private void completeDomain() {
-    addOverrideLibrary(addJmsPropertiesResourceFile(addDomainConfigYamlFile(DOMAIN_CLASSLOADING_TROUBLESHOOTING_FILE_BUILDER)))
-        .dependingOn(overriderTestLibrary);
+  private DomainFileBuilder createDomainFileBuilder(boolean useLightWeightPackage) {
+    DomainFileBuilder builder = new DomainFileBuilder("domain-classloading-troubleshooting")
+        .definedBy("classloading-troubleshooting/domain-classloading-troubleshooting-config.xml")
+        .withClassloaderModelVersion(CLASSLOADER_MODEL_VERSION);
+    if (useLightWeightPackage) {
+      builder.usingLightWeightPackage();
+    }
+    return builder;
   }
 
-  private <T extends DeployableFileBuilder<T>> DeployableFileBuilder<T> addOverrideLibrary(DeployableFileBuilder<T> deployableFileBuilder) {
+
+  private ApplicationFileBuilder createApplicationFileBuilder(boolean useLightWeightPackage) {
+    ApplicationFileBuilder builder = new ApplicationFileBuilder("app-classloading-troubleshooting")
+        .definedBy("classloading-troubleshooting/app-classloading-troubleshooting-config.xml")
+        .withClassloaderModelVersion(CLASSLOADER_MODEL_VERSION);
+    if (useLightWeightPackage) {
+      builder.usingLightWeightPackage();
+    }
+    return builder;
+  }
+
+  private void completeDomain(DomainFileBuilder domainFileBuilder, boolean useLightWeightPackage) throws IOException {
+    addOverriderTestLibrary(
+                            addOverrideLibrary(
+                                               addJmsPropertiesResourceFile(addDomainConfigYamlFile(domainFileBuilder)),
+                                               useLightWeightPackage),
+                            useLightWeightPackage);
+  }
+
+  private <T extends DeployableFileBuilder<T>> DeployableFileBuilder<T> addOverrideLibrary(DeployableFileBuilder<T> deployableFileBuilder,
+                                                                                           boolean useLightWeightPackage)
+      throws IOException {
+    if (useLightWeightPackage) {
+      addDependencyToRepository(overriderLibrary);
+    }
     return deployableFileBuilder.dependingOn(overriderLibrary);
+  }
+
+  private <T extends DeployableFileBuilder<T>> DeployableFileBuilder<T> addOverride2Library(DeployableFileBuilder<T> deployableFileBuilder,
+                                                                                            boolean useLightWeightPackage)
+      throws IOException {
+    if (useLightWeightPackage) {
+      addDependencyToRepository(overrider2Library);
+    }
+    return deployableFileBuilder.dependingOn(overrider2Library);
+  }
+
+  private <T extends DeployableFileBuilder<T>> DeployableFileBuilder<T> addOverriderTestLibrary(DeployableFileBuilder<T> deployableFileBuilder,
+                                                                                                boolean useLightWeightPackage)
+      throws IOException {
+    if (useLightWeightPackage) {
+      addDependencyToRepository(overriderTestLibrary);
+    }
+    return deployableFileBuilder.dependingOn(overriderTestLibrary);
+  }
+
+  private <T extends DeployableFileBuilder<T>> DeployableFileBuilder<T> addJavaModulePlugin(DeployableFileBuilder<T> deployableFileBuilder,
+                                                                                            boolean useLightWeightPackage)
+      throws IOException {
+    if (useLightWeightPackage) {
+      addDependencyToRepository(muleJavaModulePlugin);
+    }
+
+    deployableFileBuilder.dependingOn(muleJavaModulePlugin);
+
+    return deployableFileBuilder;
   }
 
   private <T extends DeployableFileBuilder<T>> DeployableFileBuilder<T> addDomainConfigYamlFile(DeployableFileBuilder<T> deployableFileBuilder) {
@@ -199,6 +298,24 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
   private <T extends DeployableFileBuilder<T>> DeployableFileBuilder<T> addJmsPropertiesResourceFile(DeployableFileBuilder<T> deployableFileBuilder) {
     return deployableFileBuilder.containingResource("classloading-troubleshooting/jms.properties", "jms.properties");
+  }
+
+  private void addDependencyToRepository(JarFileBuilder jarFileBuilder) throws IOException {
+    String[] groupId = jarFileBuilder.getGroupId().split("\\.");
+    File moduleGroupIdRepoFolder = Paths.get(mavenRepoFolder.getAbsolutePath(), groupId).toFile();
+    String artifactId = jarFileBuilder.getArtifactId();
+    String version = jarFileBuilder.getVersion();
+
+    copyFile(jarFileBuilder.getArtifactPomFile(),
+             Paths.get(moduleGroupIdRepoFolder.getAbsolutePath(), artifactId, version,
+                       format("%s-%s.pom", artifactId, version))
+                 .toFile());
+
+    String classifierSuffix = ofNullable(jarFileBuilder.getClassifier()).map(s -> "-" + s).orElse("");
+    copyFile(jarFileBuilder.getArtifactFile(),
+             Paths.get(moduleGroupIdRepoFolder.getAbsolutePath(), artifactId, version,
+                       format("%s-%s%s.jar", artifactId, version, classifierSuffix))
+                 .toFile());
   }
 
   private void deployDomainAndApplication(DomainFileBuilder domainFileBuilder,
