@@ -44,7 +44,6 @@ import java.util.regex.Matcher;
 import org.slf4j.Logger;
 import sun.misc.CompoundEnumeration;
 
-
 /**
  * Defines a classloader for a Mule artifact composed of other artifacts.
  * <p/>
