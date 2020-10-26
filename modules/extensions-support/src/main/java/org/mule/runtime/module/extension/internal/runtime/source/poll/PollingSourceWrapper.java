@@ -366,17 +366,17 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
             }
           } catch (ObjectStoreException e) {
             throw new MuleRuntimeException(
-                                           createStaticMessage("An error occurred while checking the previus watermark" +
+                                           createStaticMessage("An error occurred while checking the previous watermark" +
                                                " for an item id that was recently processed. Item with ID [%s]",
                                                                itemId),
                                            e);
           }
         } else if (compare == 0 && pollItem.getItemId().isPresent()) {
           try {
-            accept = !(recentlyProcessedIds.contains(itemId) || idsOnUpdatedWatermark.contains(itemId));
+            accept = !recentlyProcessedIds.contains(itemId);
           } catch (ObjectStoreException e) {
             throw new MuleRuntimeException(
-                                           createStaticMessage("An error occurred while checking the existance for Item with ID [%s]",
+                                           createStaticMessage("An error occurred while checking the existence for Item with ID [%s]",
                                                                itemId),
                                            e);
           }
