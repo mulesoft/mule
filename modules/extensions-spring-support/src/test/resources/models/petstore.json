@@ -15490,7 +15490,8 @@
               "implementedInterfaces": [
                 "java.io.Serializable",
                 "java.lang.reflect.GenericDeclaration",
-                "java.lang.reflect.Type"
+                "java.lang.reflect.Type",
+                "java.lang.reflect.AnnotatedElement"
               ],
               "parent": "",
               "genericTypes": [],
@@ -15539,7 +15540,8 @@
                     "implementedInterfaces": [
                       "java.io.Serializable",
                       "java.lang.reflect.GenericDeclaration",
-                      "java.lang.reflect.Type"
+                      "java.lang.reflect.Type",
+                      "java.lang.reflect.AnnotatedElement"
                     ],
                     "parent": "",
                     "genericTypes": [],
