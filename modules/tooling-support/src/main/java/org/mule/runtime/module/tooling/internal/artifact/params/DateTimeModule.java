@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.runtime.module.tooling.internal.artifact.params;
 
 import static java.lang.String.format;
@@ -35,9 +41,12 @@ public class DateTimeModule extends SimpleModule {
 
   DateTimeModule() {
     //This is copied from the behavior in Runtime to avoid inconsistencies.
-    addDeserializer(LocalDate.class, new DateTimeDeserializer<>(LocalDate.class, d -> LocalDate.of(d.getYear(), d.getMonthOfYear(), d.getDayOfMonth())));
+    addDeserializer(LocalDate.class,
+                    new DateTimeDeserializer<>(LocalDate.class,
+                                               d -> LocalDate.of(d.getYear(), d.getMonthOfYear(), d.getDayOfMonth())));
     addDeserializer(Date.class, new DateTimeDeserializer<>(Date.class, d -> d.toDate()));
-    addDeserializer(LocalDateTime.class, new DateTimeDeserializer<>(LocalDateTime.class, d -> LocalDateTime.ofInstant(Instant.ofEpochMilli(d.getMillis()), ZoneId.of(d.getZone().getID()))));
+    addDeserializer(LocalDateTime.class, new DateTimeDeserializer<>(LocalDateTime.class, d -> LocalDateTime
+        .ofInstant(Instant.ofEpochMilli(d.getMillis()), ZoneId.of(d.getZone().getID()))));
     addDeserializer(Calendar.class, new DateTimeDeserializer<>(Calendar.class, d -> {
       Calendar calendar = Calendar.getInstance();
       calendar.setTime(d.toDate());
@@ -71,8 +80,7 @@ public class DateTimeModule extends SimpleModule {
         //This is copied from the behavior in Runtime to avoid inconsistencies.
         try {
           return mapper.apply(ISODateTimeFormat.dateTimeParser().withOffsetParsed().parseDateTime(string));
-        }
-        catch (DateTimeParseException e) {
+        } catch (DateTimeParseException e) {
           throw new IllegalArgumentException(format("Could not parse value '%s' according to ISO 8601", string));
         }
       }
