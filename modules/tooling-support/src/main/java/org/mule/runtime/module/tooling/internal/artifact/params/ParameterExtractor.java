@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact.params;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
@@ -14,10 +15,10 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.HashMap;
 import java.util.Map;
+
 
 public class ParameterExtractor implements ParameterValueVisitor {
 
@@ -29,7 +30,7 @@ public class ParameterExtractor implements ParameterValueVisitor {
     //Also, it was tested with the simple types allowed and has the same behaviour for ISO8601 as defined here:
     //org.mule.runtime.module.extension.internal.config.dsl.resolver.ValueResolverFactoryTypeVisitor
     objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.registerModule(new DateTimeModule());
   }
 
   private Object value;
@@ -44,7 +45,8 @@ public class ParameterExtractor implements ParameterValueVisitor {
     return extractor.get();
   }
 
-  private ParameterExtractor() {}
+  private ParameterExtractor() {
+  }
 
   @Override
   public void visitSimpleValue(ParameterSimpleValue text) {
