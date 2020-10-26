@@ -6,22 +6,22 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOGGING_BLOCKING_CATEGORIES;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.PROCESSING_TYPE;
 
-import org.junit.Rule;
+import java.util.Set;
+
 import org.junit.Test;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.slf4j.Logger;
 
 import io.qameta.allure.Description;
@@ -33,9 +33,7 @@ import io.qameta.allure.Story;
 @Story(PROCESSING_TYPE)
 public class LoggerBlockingCategoriesTestCase extends AbstractMuleTestCase {
 
-  @Rule
-  public SystemProperty muleEnableStatistics =
-      new SystemProperty(MULE_LOGGING_BLOCKING_CATEGORIES, "some.category");
+  private Set<String> oldBlockingCategories;
 
   @Test
   @Description("Blocking category type results in blocking processing type")
@@ -57,7 +55,7 @@ public class LoggerBlockingCategoriesTestCase extends AbstractMuleTestCase {
   }
 
   private LoggerMessageProcessor loggerMessageProcessor(String category) {
-    LoggerMessageProcessor loggerMessageProcessor = new LoggerMessageProcessor();
+    LoggerMessageProcessor loggerMessageProcessor = new TestLoggerMessageProcessor();
     loggerMessageProcessor.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     loggerMessageProcessor.initLogger();
     loggerMessageProcessor.initProcessingTypeIfPossible();
@@ -65,6 +63,17 @@ public class LoggerBlockingCategoriesTestCase extends AbstractMuleTestCase {
     loggerMessageProcessor.setLevel("INFO");
     loggerMessageProcessor.setCategory(category);
     return loggerMessageProcessor;
+  }
+
+  /**
+   * This class is used so that the the blocking categories does not depend on the order of classloading imposed by surefire.
+   */
+  private static class TestLoggerMessageProcessor extends LoggerMessageProcessor {
+
+    @Override
+    protected Set<String> getBlockingCategories() {
+      return singleton("some.category");
+    }
   }
 
 }
