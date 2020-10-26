@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.PROCESSING_TYPE;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
@@ -40,6 +41,7 @@ public class LoggerBlockingCategoriesTestCase extends AbstractMuleTestCase {
   @Test
   @Description("Blocking category type results in blocking processing type")
   @Issue("MULE-16414")
+  @Ignore("MULE-18924")
   public void processTypeOfBlockingCategoryIsBlocking() {
     testCategory("some.category", BLOCKING);
   }
