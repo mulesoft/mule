@@ -54,7 +54,7 @@
     <petstore:config name="petstoreDiscountDates" cashierName="jim">
         <petstore:connection username="john" password="doe">
             <petstore:discount-dates>
-                <petstore:discount-date value="2008-09-15T15:53:23+05:00"/>
+                <petstore:discount-date value="2008-09-15T15:53:23"/>
             </petstore:discount-dates>
         </petstore:connection>
         <petstore:pets>
