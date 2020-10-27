@@ -13,6 +13,7 @@
     "id": "mule",
     "attributes": {
       "exportedPackages": [
+        "org.mule.test.oauth"
       ],
       "exportedResources": [
       ]
