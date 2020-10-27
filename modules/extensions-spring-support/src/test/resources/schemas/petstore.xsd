@@ -738,12 +738,12 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="required" name="signature"></xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="signature"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
