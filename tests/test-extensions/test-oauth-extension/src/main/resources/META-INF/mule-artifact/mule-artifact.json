@@ -1,0 +1,25 @@
+{
+  "minMuleVersion": "4.3.0",
+  "requiredProduct": "MULE",
+  "extensionModelLoaderDescriptor": {
+    "id": "java",
+    "attributes": {
+      "type": "org.mule.test.oauth.TestOAuthExtension",
+      "version": "4.4.0-SNAPSHOT"
+    }
+  },
+  "name": "oauth-extension",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [
+      ],
+      "exportedResources": [
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}
