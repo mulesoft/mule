@@ -524,18 +524,18 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     Lock osClearingLock = lockFactory.createLock(UPDATE_PROCESSED_LOCK);
     try {
       osClearingLock.lock();
-      List<String> strings = recentlyProcessedIds.allKeys();
-      idsOnUpdatedWatermark.clear();
+      List<String> strings = idsOnUpdatedWatermark.allKeys();
+      recentlyProcessedIds.clear();
       strings.forEach(key -> {
         try {
-          idsOnUpdatedWatermark.store(key, recentlyProcessedIds.retrieve(key));
+          recentlyProcessedIds.store(key, idsOnUpdatedWatermark.retrieve(key));
         } catch (ObjectStoreException e) {
           throw new MuleRuntimeException(createStaticMessage("An error occurred while updating the watermark Ids. Failed to update key '%s' in Watermark-IDs ObjectStore: %s",
                                                              key, e.getMessage()),
                                          e);
         }
       });
-      recentlyProcessedIds.clear();
+      idsOnUpdatedWatermark.clear();
     } finally {
       safeUnlock(osClearingLock);
     }
