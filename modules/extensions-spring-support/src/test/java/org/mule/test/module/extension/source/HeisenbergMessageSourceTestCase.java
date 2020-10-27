@@ -117,7 +117,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   @Test
   public void sourceRestartedWithDynamicConfig() throws Exception {
     final Long gatheredMoney = HeisenbergSource.gatheredMoney;
-    startFlow("source");
+    requestFlowToStartAndWait("source");
 
     check(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
           () -> {
@@ -136,7 +136,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
                return true;
              });
 
-    startFlow("source");
+    requestFlowToStartAndWait("source");
 
     // Check that money is gathered after flow is restarted
     check(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
@@ -349,6 +349,18 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     new PollingProber(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS)
         .check(new JUnitLambdaProbe(() -> flow.getLifecycleState().isStopped(),
                                     "The flow did not stop in a reasonable amount of time"));
+  }
+
+  protected void requestFlowToStartAndWait(String flowName) throws Exception {
+    startFlow(flowName);
+    checkFlowIsStarted(flowName);
+  }
+
+  private void checkFlowIsStarted(String flowName) throws Exception {
+    flow = (Flow) getFlowConstruct(flowName);
+    new PollingProber(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS)
+        .check(new JUnitLambdaProbe(() -> flow.getLifecycleState().isStarted(),
+                                    "The flow did not start in a reasonable amount of time"));
   }
 
   private boolean assertState(boolean executedOnSuccess, boolean executedOnError, boolean executedOnTerminate) {
