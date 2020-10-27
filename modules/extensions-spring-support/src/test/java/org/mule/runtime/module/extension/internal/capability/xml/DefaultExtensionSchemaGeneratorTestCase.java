@@ -69,7 +69,6 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -157,7 +156,6 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  @Ignore("MULE-18839")
   public void generate() throws Exception {
     String schema = generator.generate(extensionUnderTest, new SchemaTestDslContext());
     try {
