@@ -24,7 +24,7 @@ import java.util.function.Function;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringUtils.leftPad;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 
 /**
  * Implementation for {@link ThreadNotificationService}. It collects {@link ThreadNotificationElement}' and

@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 
 import java.util.Collection;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
