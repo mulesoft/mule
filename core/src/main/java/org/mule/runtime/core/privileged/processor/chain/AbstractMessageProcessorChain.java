@@ -25,7 +25,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
-import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
@@ -49,7 +48,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
-import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -58,7 +56,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
@@ -150,10 +147,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   @Inject
   private StreamingManager streamingManager;
 
-  @Inject
-  private ThreadNotificationService threadNotificationService;
-  private ThreadNotificationLogger threadNotificationLogger;
-
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
                                 List<Processor> processors, FlowExceptionHandler messagingExceptionHandler) {
@@ -195,7 +188,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             return from(propagateCompletion(upstream, errorSwitchSinkSinkRef.flux(),
                                             pub -> from(pub)
                                                 .map(event -> right(MessagingException.class, event))
-                                                .doOnNext(r -> errorSwitchSinkSinkRef.next(r)),
+                                                .doOnNext(errorSwitchSinkSinkRef::next),
                                             inflightEvents,
                                             () -> {
                                               errorSwitchSinkSinkRef.complete();
@@ -340,17 +333,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
     if (processingStrategy != null) {
-      if (muleContext.getConfiguration().isThreadLoggingEnabled()) {
-        interceptors.add((processor, next) -> stream -> from(stream)
-            .subscriberContext(context -> context.put(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY, threadNotificationLogger))
-            .doOnNext(event -> threadNotificationLogger.setStartingThread(event.getContext().getId(), true))
-            .transform(processingStrategy
-                .onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)))
-            .doOnNext(event -> threadNotificationLogger.setFinishThread(event.getContext().getId())));
-      } else {
-        interceptors.add((processor, next) -> processingStrategy
-            .onProcessor(new InterceptedReactiveProcessor(processor, next, null)));
-      }
+      interceptors.add((processor, next) -> processingStrategy
+          .onProcessor(new InterceptedReactiveProcessor(processor, next)));
     }
 
     // Apply processor interceptors around processor and other core logic
@@ -543,9 +527,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .stream()
         .map(ProcessorInterceptorFactoryAdapter::new)
         .collect(toList()), muleContext.getInjector()));
-
-    threadNotificationLogger =
-        new ThreadNotificationLogger(threadNotificationService, muleContext.getConfiguration().isThreadLoggingEnabled());
 
     initialiseIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
   }

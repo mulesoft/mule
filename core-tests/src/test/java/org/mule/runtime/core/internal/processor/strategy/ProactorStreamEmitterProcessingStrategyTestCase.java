@@ -123,7 +123,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                        CORES,
                                                        maxConcurrency,
                                                        true,
-                                                       false,
                                                        () -> muleContext.getConfiguration().getShutdownTimeout());
   }
 
@@ -293,7 +292,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     1,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false,
                                                                                                     () -> muleContext
                                                                                                         .getConfiguration()
                                                                                                         .getShutdownTimeout()))
@@ -334,7 +332,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     1,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false,
                                                                                                     () -> muleContext
                                                                                                         .getConfiguration()
                                                                                                         .getShutdownTimeout()))
@@ -373,7 +370,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     CORES,
                                                                                                     1,
                                                                                                     true,
-                                                                                                    false,
                                                                                                     () -> muleContext
                                                                                                         .getConfiguration()
                                                                                                         .getShutdownTimeout())),
@@ -398,7 +394,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     CORES,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false,
                                                                                                     () -> muleContext
                                                                                                         .getConfiguration()
                                                                                                         .getShutdownTimeout())),
@@ -425,7 +420,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     CORES,
                                                                                                     1,
                                                                                                     true,
-                                                                                                    false,
                                                                                                     () -> muleContext
                                                                                                         .getConfiguration()
                                                                                                         .getShutdownTimeout())),
@@ -452,7 +446,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     1,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false,
                                                                                                     () -> muleContext
                                                                                                         .getConfiguration()
                                                                                                         .getShutdownTimeout())),
@@ -508,7 +501,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     4,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false,
                                                                                                     () -> muleContext
                                                                                                         .getConfiguration()
                                                                                                         .getShutdownTimeout()))
@@ -762,7 +754,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     4,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false,
                                                                                                     () -> muleContext
                                                                                                         .getConfiguration()
                                                                                                         .getShutdownTimeout()))

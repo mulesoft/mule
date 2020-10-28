@@ -16,7 +16,10 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Allows to track {@link ThreadNotificationElement} to log Thread switches measured latency
  *
  * @since 4.2
+ *
+ * @deprecated since 4.4.0 this feature was removed
  */
+@Deprecated
 public interface ThreadNotificationService {
 
   String REGISTRY_KEY = "_muleThreadNotificationService";

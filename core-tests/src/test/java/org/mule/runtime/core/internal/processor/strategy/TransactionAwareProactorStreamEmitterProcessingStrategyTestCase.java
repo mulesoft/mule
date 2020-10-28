@@ -50,7 +50,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Mode> parameters() {
-    return asList(new Mode[] {Mode.FLOW, SOURCE});
+    return asList(Mode.FLOW, SOURCE);
   }
 
   @After
@@ -70,7 +70,6 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
                                                                                                                     MAX_VALUE,
                                                                                                                     MAX_VALUE,
                                                                                                                     false,
-                                                                                                                    false,
                                                                                                                     () -> muleContext
                                                                                                                         .getConfiguration()
                                                                                                                         .getShutdownTimeout()));
@@ -89,7 +88,6 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
                                                                                                                     maxConcurrency,
                                                                                                                     maxConcurrency,
                                                                                                                     true,
-                                                                                                                    false,
                                                                                                                     () -> muleContext
                                                                                                                         .getConfiguration()
                                                                                                                         .getShutdownTimeout()));
