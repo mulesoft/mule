@@ -136,12 +136,6 @@ public interface MuleConfiguration {
   DynamicConfigExpiration getDynamicConfigExpiration();
 
   /**
-   * @return whether the Thread Logging Notifications are enabled
-   * @since 4.2
-   */
-  boolean isThreadLoggingEnabled();
-
-  /**
    * @return whether streaming iterable items should follow the iterable repeatability
    * @since 4.3
    */

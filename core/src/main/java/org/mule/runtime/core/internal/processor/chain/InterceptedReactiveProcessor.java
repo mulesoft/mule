@@ -11,7 +11,6 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
 
 import org.reactivestreams.Publisher;
 
@@ -28,14 +27,11 @@ public final class InterceptedReactiveProcessor implements ReactiveProcessor {
   private final ReactiveProcessor processor;
   private final ReactiveProcessor next;
   private final ProcessingType processingType;
-  private final ThreadNotificationLogger threadNotificationLogger;
 
-  public InterceptedReactiveProcessor(ReactiveProcessor processor, ReactiveProcessor next,
-                                      ThreadNotificationLogger threadNotificationLogger) {
+  public InterceptedReactiveProcessor(ReactiveProcessor processor, ReactiveProcessor next) {
     this.processor = processor;
     this.processingType = processor.getProcessingType();
     this.next = next;
-    this.threadNotificationLogger = threadNotificationLogger;
   }
 
   @Override
@@ -45,15 +41,7 @@ public final class InterceptedReactiveProcessor implements ReactiveProcessor {
       flux = flux.checkpoint(((Component) processor).getLocation().getLocation());
     }
 
-    if (threadNotificationLogger != null) {
-      return flux
-          .doOnNext(event -> threadNotificationLogger.setFinishThread(event.getContext().getId()))
-          .transform(publisher -> next.apply(publisher))
-          .doOnNext(event -> threadNotificationLogger.setStartingThread(event.getContext().getId()));
-    } else {
-      return flux
-          .transform(publisher -> next.apply(publisher));
-    }
+    return flux.transform(next);
   }
 
   @Override
