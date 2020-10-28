@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.FLOW;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
@@ -50,7 +51,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Mode> parameters() {
-    return asList(Mode.FLOW, SOURCE);
+    return asList(FLOW, SOURCE);
   }
 
   @After
