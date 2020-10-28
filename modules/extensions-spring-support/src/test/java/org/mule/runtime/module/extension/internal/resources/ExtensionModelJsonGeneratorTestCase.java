@@ -58,7 +58,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -142,7 +141,6 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Ignore("MULE-18840")
   public void generate() throws Exception {
     final String json = generator.serialize(extensionUnderTest).trim();
     try {
