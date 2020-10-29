@@ -49,7 +49,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:listen-payments>
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
     </flow>
 
 </mule>

@@ -550,7 +550,7 @@ public abstract class ExtensionDefinitionParser {
       @Override
       public void visitArrayType(ArrayType arrayType) {
         if (!parseAsContent(isContent, arrayType)) {
-          parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(),
+          parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, false, fieldDsl.get(),
                                    emptySet());
         }
       }
@@ -578,7 +578,8 @@ public abstract class ExtensionDefinitionParser {
    */
   protected void parseCollectionParameter(ParameterModel parameter, ArrayType arrayType, DslElementSyntax parameterDsl) {
     parseCollectionParameter(parameter.getName(), parameter.getName(), arrayType, parameter.getDefaultValue(),
-                             parameter.getExpressionSupport(), parameter.isRequired(), parameterDsl,
+                             parameter.getExpressionSupport(), parameter.isRequired(),
+                             parameter.getDslConfiguration().allowsReferences(), parameterDsl,
                              parameter.getModelProperties());
   }
 
@@ -593,10 +594,12 @@ public abstract class ExtensionDefinitionParser {
    * @param required          whether the parameter is required
    */
   protected void parseCollectionParameter(String key, String name, ArrayType arrayType, Object defaultValue,
-                                          ExpressionSupport expressionSupport, boolean required, DslElementSyntax parameterDsl,
+                                          ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences,
+                                          DslElementSyntax parameterDsl,
                                           Set<ModelProperty> modelProperties) {
 
-    parseAttributeParameter(key, name, arrayType, defaultValue, expressionSupport, required, modelProperties, emptyList());
+    parseAttributeParameter(key, name, arrayType, defaultValue, expressionSupport, required, acceptsReferences, modelProperties,
+                            emptyList());
 
     Class<?> collectionType = ExtensionMetadataTypeUtils.getType(arrayType).orElse(null);
 

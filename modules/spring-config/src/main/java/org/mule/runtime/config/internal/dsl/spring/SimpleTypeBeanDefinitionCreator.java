@@ -6,17 +6,12 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static java.util.regex.Pattern.compile;
-import static org.apache.commons.lang3.text.WordUtils.capitalize;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
+import static org.mule.runtime.config.internal.dsl.spring.ParameterGroupUtils.getSourceCallbackAwareParameter;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -24,11 +19,8 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 /**
  * Bean definition creator for elements that end up representing simple types.
@@ -76,45 +68,20 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private ComponentParameterAst getParamInOwnerComponent(CreateBeanDefinitionRequest createBeanDefinitionRequest,
                                                          ComponentAst componentModel) {
-    ComponentAst ownerComponent = null;
-    ParameterizedModel ownerComponentModel = null;
-    int ownerIndex = 0;
-    for (int i = createBeanDefinitionRequest.getComponentModelHierarchy().size() - 1; i >= 0; --i) {
-      final ComponentAst possibleOwner = createBeanDefinitionRequest.getComponentModelHierarchy().get(i);
-      final Optional<ParameterizedModel> model = possibleOwner.getModel(ParameterizedModel.class);
-      if (model.isPresent()) {
-        ownerComponent = possibleOwner;
-        ownerComponentModel = model.get();
-        ownerIndex = i;
-        break;
-      }
-    }
+    ComponentAst ownerComponent = resolveOwnerComponent(createBeanDefinitionRequest);
 
     if (ownerComponent != null) {
       final String paramName = toCamelCase(componentModel.getIdentifier().getName(), "-");
 
-      if (ownerComponentModel instanceof SourceModel) {
+      ParameterizedModel ownerComponentModel = ownerComponent.getModel(ParameterizedModel.class).get();
+      if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
         // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
         // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
         // previous implementations.
-
+        int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
         final ComponentAst possibleGroup = createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
 
-        List<ParameterGroupModel> sourceParamGroups = new ArrayList<>();
-        sourceParamGroups.addAll(ownerComponentModel.getParameterGroupModels());
-        ((SourceModel) ownerComponentModel).getSuccessCallback()
-            .ifPresent(scb -> sourceParamGroups.addAll(scb.getParameterGroupModels()));
-        ((SourceModel) ownerComponentModel).getErrorCallback()
-            .ifPresent(ecb -> sourceParamGroups.addAll(ecb.getParameterGroupModels()));
-
-        for (ParameterGroupModel parameterGroupModel : sourceParamGroups) {
-          if (parameterGroupModel.getParameter(paramName).isPresent()
-              && parameterGroupModel.isShowInDsl()
-              && possibleGroup.getIdentifier().getName().equals(getSanitizedElementName(parameterGroupModel))) {
-            return ownerComponent.getParameter(parameterGroupModel.getName(), paramName);
-          }
-        }
-        return null;
+        return getSourceCallbackAwareParameter(ownerComponent, paramName, possibleGroup, (SourceModel) ownerComponentModel);
       } else {
         ComponentParameterAst paramInOwner =
             ownerComponent.getParameter(paramName);
@@ -129,19 +96,6 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
     } else {
       return null;
     }
-  }
-
-  private final static Pattern SANITIZE_PATTERN = compile("\\s+");
-
-  /**
-   * Provides a sanitized, hyphenized, space-free name that can be used as an XML element-name for a given {@link NamedObject}
-   *
-   * @param component the {@link NamedObject} who's name we want to convert
-   * @return a sanitized, hyphenized, space-free name that can be used as an XML element-name
-   */
-  // TODO MULE-18660: remove and use a resolved DSLElementSyntax available in the ast
-  private static String getSanitizedElementName(NamedObject component) {
-    return SANITIZE_PATTERN.matcher(hyphenize(sanitizeName(capitalize(component.getName())))).replaceAll("");
   }
 
 }

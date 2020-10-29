@@ -14,6 +14,7 @@ import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
@@ -64,6 +65,7 @@ import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
+import org.mule.runtime.extension.api.declaration.type.annotation.LiteralTypeAnnotation;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.properties.api.ResourceProvider;
 
@@ -378,6 +380,7 @@ public class ApplicationModel implements ArtifactAst {
     // TODO MULE-17711 (AST) re-enable (and possibly refactor) this validation
     // validateParameterAndChildForSameAttributeAreNotDefinedTogether();
     validateNamedTopLevelElementsHaveName();
+    validateNoExpressionsInNoExpressionsSupportedParams();
   }
 
   private void validateFlowRefPointsToExistingFlow() {
@@ -632,6 +635,20 @@ public class ApplicationModel implements ArtifactAst {
                                                                   identifier.getNamespace(), identifier.getName())));
       }
     });
+  }
+
+  private void validateNoExpressionsInNoExpressionsSupportedParams() {
+    recursiveStream()
+        .filter(component -> component.getModel(ParameterizedModel.class).isPresent())
+        .forEach(component -> component.getParameters()
+            .forEach(param -> param.getValue()
+                .applyLeft(expr -> {
+                  if (NOT_SUPPORTED.equals(param.getModel().getExpressionSupport())
+                      && !param.getModel().getType().getAnnotation(LiteralTypeAnnotation.class).isPresent()) {
+                    throw new MuleRuntimeException(createStaticMessage(format("An expression value was given for parameter '%s' but it doesn't support expressions",
+                                                                              param.getModel().getName())));
+                  }
+                })));
   }
 
   /**

@@ -8,10 +8,10 @@ package org.mule.runtime.extension.internal.loader;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Sets.newHashSet;
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.lang.Thread.currentThread;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -66,6 +66,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.builder.ArtifactAstBuilder;
@@ -88,11 +89,9 @@ import org.mule.runtime.config.internal.dsl.model.extension.xml.property.Private
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier;
 import org.mule.runtime.config.internal.util.NoOpXmlErrorHandler;
-import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
 import org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -338,7 +337,7 @@ public final class XmlExtensionLoaderDelegate {
       final URL operationsOutputResource = getResource(operationsOutputPathValue);
       if (operationsOutputResource != null) {
         try {
-          declarationMap = DeclarationOperation.fromString(IOUtils.toString(operationsOutputResource));
+          declarationMap = DeclarationOperation.fromString(IOUtils.toString(operationsOutputResource, UTF_8));
         } catch (IOException e) {
           throw new IllegalArgumentException(format("The declarations file [%s] for the module '%s' cannot be read properly",
                                                     operationsOutputPathValue, modulePath),
@@ -470,8 +469,8 @@ public final class XmlExtensionLoaderDelegate {
 
     final String name = moduleModel.getRawParameterValue(MODULE_NAME).orElse(null);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
-    final String category = moduleModel.getRawParameterValue(CATEGORY).orElse(null);
-    final String vendor = moduleModel.getRawParameterValue(VENDOR).orElse(null);
+    final String category = moduleModel.getRawParameterValue(CATEGORY).orElse("COMMUNITY");
+    final String vendor = moduleModel.getRawParameterValue(VENDOR).orElse("MuleSoft");
     final XmlDslModel xmlDslModel = comesFromTNS
         ? getTnsXmlDslModel(moduleModel, name, version)
         : getXmlDslModel(moduleModel, name, version);
@@ -531,7 +530,7 @@ public final class XmlExtensionLoaderDelegate {
 
     validateNoCycles(directedGraph);
 
-    // make all operations added to hasOperationDeclarer be properly enriched with the referenced operations, hwether they are
+    // make all operations added to hasOperationDeclarer be properly enriched with the referenced operations, whether they are
     // public or private.
     ExtensionDeclarer temporalAllOpsDeclarer = new ExtensionDeclarer();
     fillDeclarer(temporalAllOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
@@ -696,7 +695,7 @@ public final class XmlExtensionLoaderDelegate {
     final Map<String, String> schemaLocations = moduleModel.getRawParameterValue("xsi:schemaLocation")
         .map(schLoc -> {
           Map<String, String> myMap = new HashMap<>();
-          String[] pairs = schLoc.split(" ");
+          String[] pairs = schLoc.trim().split("\\s+");
           for (int i = 0; i < pairs.length; i = i + 2) {
             myMap.put(pairs[i], pairs[i + 1]);
           }
@@ -721,8 +720,8 @@ public final class XmlExtensionLoaderDelegate {
     return createXmlLanguageModel(prefix, namespace, name, version);
   }
 
-  private String getDescription(ComponentAst componentModel) {
-    return componentModel.getRawParameterValue(DOC_DESCRIPTION).orElse("");
+  private String getDescription(ComponentAst moduleModel) {
+    return moduleModel.getRawParameterValue(DOC_DESCRIPTION).orElse("");
   }
 
   private List<ComponentAst> extractGlobalElementsFrom(ComponentAst moduleModel) {
@@ -827,10 +826,12 @@ public final class XmlExtensionLoaderDelegate {
           .withConnectionManagementType(ConnectionManagementType.NONE);
       connectionProperties.stream().forEach(param -> extractProperty(connectionProviderDeclarer, param));
 
-      testConnectionGlobalElementOptional.ifPresent(testConnectionGlobalElement -> testConnectionGlobalElement
-          .getRawParameterValue(GLOBAL_ELEMENT_NAME_ATTRIBUTE)
+
+      testConnectionGlobalElementOptional
+          .flatMap(testConnectionGlobalElement -> testConnectionGlobalElement.getParameter(GLOBAL_ELEMENT_NAME_ATTRIBUTE)
+              .getValue().getValue())
           .ifPresent(testConnectionGlobalElementName -> connectionProviderDeclarer
-              .withModelProperty(new TestConnectionGlobalElementModelProperty(testConnectionGlobalElementName))));
+              .withModelProperty(new TestConnectionGlobalElementModelProperty((String) testConnectionGlobalElementName)));
     }
 
   }
@@ -909,8 +910,8 @@ public final class XmlExtensionLoaderDelegate {
 
     moduleModel.directChildrenStream()
         .filter(child -> child.getIdentifier().equals(OPERATION_IDENTIFIER))
-        .filter(operationModel -> operationModel.getRawParameterValue(ATTRIBUTE_VISIBILITY).map(OperationVisibility::valueOf)
-            .orElse(null) == visibility)
+        .filter(operationModel -> operationModel.getParameter(ATTRIBUTE_VISIBILITY).getValue().getRight()
+            .equals(visibility.toString()))
         .forEach(operationModel -> extractOperationExtension(declarer, operationModel, directedGraph, xmlDslModel,
                                                              tnsExtensionModel));
   }
@@ -997,7 +998,7 @@ public final class XmlExtensionLoaderDelegate {
       optionalParametersComponentModel.get().directChildrenStream()
           .filter(child -> child.getIdentifier().equals(OPERATION_PARAMETER_IDENTIFIER))
           .forEach(param -> {
-            final String role = param.getRawParameterValue(ROLE).orElse(null);
+            final String role = param.getParameter(ROLE).getValue().getRight().toString();
             extractParameter(operationDeclarer, param, getRole(role));
           });
     }
@@ -1008,43 +1009,39 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param, ParameterRole role) {
-    String receivedInputType = param.getRawParameterValue(TYPE_ATTRIBUTE).orElse(null);
     final LayoutModel.LayoutModelBuilder layoutModelBuilder = builder();
-    if (parseBoolean(param.getRawParameterValue(PASSWORD).orElse(null))) {
-      layoutModelBuilder.asPassword();
-    }
-    layoutModelBuilder.order(getOrder(param.getRawParameterValue(ORDER_ATTRIBUTE).orElse(null)));
-    layoutModelBuilder.tabName(getTab(param.getRawParameterValue(TAB_ATTRIBUTE).orElse(null)));
 
-    final DisplayModel displayModel = getDisplayModel(param);
-    MetadataType parameterType = extractType(receivedInputType);
+    param.getParameter(PASSWORD).getValue().getValue()
+        .filter(v -> (boolean) v)
+        .ifPresent(value -> layoutModelBuilder.asPassword());
 
-    ParameterDeclarer parameterDeclarer = getParameterDeclarer(parameterizedDeclarer, param);
-    parameterDeclarer.describedAs(getDescription(param))
-        .withLayout(layoutModelBuilder.build())
-        .withDisplayModel(displayModel)
-        .withRole(role)
-        .ofType(parameterType);
+    param.getParameter(ORDER_ATTRIBUTE).getValue().getValue().ifPresent(value -> layoutModelBuilder.order((int) value));
+    param.getParameter(TAB_ATTRIBUTE).getValue().getValue().ifPresent(value -> layoutModelBuilder.tabName((String) value));
+
+    param.getParameter(TYPE_ATTRIBUTE).getValue().getValue()
+        .ifPresent(receivedInputType -> {
+
+          final DisplayModel displayModel = getDisplayModel(param);
+          MetadataType parameterType = extractType((String) receivedInputType);
+
+          ParameterDeclarer parameterDeclarer = getParameterDeclarer(parameterizedDeclarer, param);
+          parameterDeclarer.describedAs(getDescription(param))
+              .withLayout(layoutModelBuilder.build())
+              .withDisplayModel(displayModel)
+              .withRole(role)
+              .ofType(parameterType);
+        });
   }
 
   private DisplayModel getDisplayModel(ComponentAst componentModel) {
     final DisplayModel.DisplayModelBuilder displayModelBuilder = DisplayModel.builder();
-    displayModelBuilder.displayName(componentModel.getRawParameterValue(DISPLAY_NAME_ATTRIBUTE).orElse(null));
-    displayModelBuilder.summary(componentModel.getRawParameterValue(SUMMARY_ATTRIBUTE).orElse(null));
-    displayModelBuilder.example(componentModel.getRawParameterValue(EXAMPLE_ATTRIBUTE).orElse(null));
+    componentModel.getParameter(DISPLAY_NAME_ATTRIBUTE)
+        .getValue().getValue().ifPresent(value -> displayModelBuilder.displayName((String) value));
+    componentModel.getParameter(SUMMARY_ATTRIBUTE)
+        .getValue().getValue().ifPresent(value -> displayModelBuilder.summary((String) value));
+    componentModel.getParameter(EXAMPLE_ATTRIBUTE)
+        .getValue().getValue().ifPresent(value -> displayModelBuilder.example((String) value));
     return displayModelBuilder.build();
-  }
-
-  private String getTab(String tab) {
-    return StringUtils.isBlank(tab) ? Placement.DEFAULT_TAB : tab;
-  }
-
-  private int getOrder(final String order) {
-    try {
-      return Integer.parseInt(order);
-    } catch (NumberFormatException e) {
-      return Placement.DEFAULT_ORDER;
-    }
   }
 
   /**
@@ -1065,9 +1062,9 @@ public final class XmlExtensionLoaderDelegate {
    * @return the {@link ParameterDeclarer}, being created as required or optional with a default value if applies.
    */
   private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param) {
-    final String parameterName = param.getRawParameterValue(PARAMETER_NAME).orElse(null);
-    final Optional<String> parameterDefaultValue = param.getRawParameterValue(PARAMETER_DEFAULT_VALUE);
-    final UseEnum use = UseEnum.valueOf(param.getRawParameterValue(ATTRIBUTE_USE).orElse(null));
+    final String parameterName = param.getParameter(PARAMETER_NAME).getRawValue();
+    final Optional<String> parameterDefaultValue = param.getParameter(PARAMETER_DEFAULT_VALUE).getValue().getValue();
+    final UseEnum use = UseEnum.valueOf(param.getParameter(ATTRIBUTE_USE).getValue().getRight().toString());
     if (UseEnum.REQUIRED.equals(use) && parameterDefaultValue.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("The parameter [%s] cannot have the %s attribute set to %s when it has a default value",
                                                                 parameterName, ATTRIBUTE_USE, UseEnum.REQUIRED));

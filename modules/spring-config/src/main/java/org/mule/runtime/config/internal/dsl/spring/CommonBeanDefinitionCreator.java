@@ -22,6 +22,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -178,8 +179,18 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
                                                ComponentBuildingDefinition componentBuildingDefinition,
                                                final BeanDefinitionBuilder beanDefinitionBuilder) {
     final ComponentAst componentModel = request.getComponentModel();
+    ComponentAst ownerComponent;
+    if (componentModel.getModel(ParameterizedModel.class).isPresent()) {
+      ownerComponent = componentModel;
+    } else {
+      ownerComponent = resolveOwnerComponent(request);
+      if (ownerComponent == null) {
+        ownerComponent = componentModel;
+      }
+    }
 
-    processObjectConstructionParameters(springComponentModels, componentModel, componentBuildingDefinition,
+    processObjectConstructionParameters(springComponentModels, ownerComponent, componentModel, request,
+                                        componentBuildingDefinition,
                                         new BeanDefinitionBuilderHelper(beanDefinitionBuilder));
     processMuleProperties(componentModel, beanDefinitionBuilder, beanDefinitionPostProcessor);
     if (componentBuildingDefinition.isPrototype()) {
@@ -213,11 +224,12 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   }
 
   private void processObjectConstructionParameters(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                                   final ComponentAst componentModel,
+                                                   ComponentAst ownerComponent, final ComponentAst componentModel,
+                                                   CreateBeanDefinitionRequest createBeanDefinitionRequest,
                                                    final ComponentBuildingDefinition componentBuildingDefinition,
                                                    final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
-    new ComponentConfigurationBuilder(springComponentModels, componentModel, componentBuildingDefinition,
-                                      beanDefinitionBuilderHelper)
+    new ComponentConfigurationBuilder(springComponentModels, ownerComponent, componentModel, createBeanDefinitionRequest,
+                                      componentBuildingDefinition, beanDefinitionBuilderHelper)
                                           .processConfiguration();
 
   }

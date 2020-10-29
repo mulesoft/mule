@@ -121,14 +121,14 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private CompiledExpression targetValueExpression;
 
   public ModuleOperationMessageProcessor(Map<String, String> properties,
-                                         Map<String, String> parameters,
+                                         Map<String, Object> parameters,
                                          List<EnrichedErrorMapping> errorMappings,
                                          ExtensionModel extensionModel, OperationModel operationModel) {
     this.properties = parseParameters(properties, getAllProperties(extensionModel));
     this.parameters = parseParameters(parameters, operationModel.getAllParameterModels());
     this.returnsVoid = MetadataTypeUtils.isVoid(operationModel.getOutput().getType());
-    this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of(parameters.remove(TARGET_PARAMETER_NAME)) : empty();
-    this.targetValue = parameters.remove(TARGET_VALUE_PARAMETER_NAME);
+    this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of((String) parameters.remove(TARGET_PARAMETER_NAME)) : empty();
+    this.targetValue = (String) parameters.remove(TARGET_VALUE_PARAMETER_NAME);
     this.errorMappings = errorMappings;
   }
 
@@ -156,7 +156,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
    * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}
    * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(CoreEvent, String, MetadataType)}
    */
-  private Map<String, Pair<String, MetadataType>> parseParameters(Map<String, String> parameters,
+  private Map<String, Pair<String, MetadataType>> parseParameters(Map<String, ?> parameters,
                                                                   List<ParameterModel> parameterModels) {
     final Map<String, Pair<String, MetadataType>> result = new HashMap<>();
 
@@ -165,7 +165,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
       if (parameterName.equals(TARGET_PARAMETER_NAME) || parameterName.equals(TARGET_VALUE_PARAMETER_NAME)) {
         // nothing to do, these are not forwarded to the event for the inner chain
       } else if (parameters.containsKey(parameterName)) {
-        final String xmlValue = parameters.get(parameterName).trim();
+        final String xmlValue = parameters.get(parameterName).toString().trim();
         result.put(parameterName, new Pair<>(xmlValue, parameterModel.getType()));
       } else if (parameterModel.getDefaultValue() != null
           && (PRIMARY_CONTENT.equals(parameterModel.getRole())
