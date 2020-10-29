@@ -29,25 +29,11 @@ import java.util.List;
 @MediaType(TEXT_PLAIN)
 public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
 
-  /*  public static final List<String> ALL_WATERMARK_PETS =
-      asList("Anibal", "Barbara", "Colonel Meow", "Daphne", "COLONEL MEOW", "Emma", "Fabrizzio", "Grumpy");
-  public static final List<String> SOME_WATERMARK_PETS =
-      asList("Anibal", "Barbara", "Colonel Meow", "Daphne", "COLONEL MEOW");
-  public static final List<Integer> PET_WATERMARKS = asList(1, 2, 3, 3, 10, 5, 6, 7);*/
-
-  public static final List<String> ALL_WATERMARK_PETS =
-      asList("Anibal", "ANIBAL", "Barbara");
-  public static final List<String> SOME_WATERMARK_PETS =
-      asList("Anibal", "ANIBAL");
+  public static final List<String> ALL_WATERMARK_PETS = asList("Anibal", "ANIBAL", "Barbara");
+  public static final List<String> SOME_WATERMARK_PETS = asList("Anibal", "ANIBAL");
   public static final List<Integer> PET_WATERMARKS = asList(5, 10, 7);
-  public static int ADOPTED_PET_COUNT;
-  public static int FAILED_ADOPTION_COUNT;
-  public static int COMPLETED_POLLS;
-  public static int REJECTED_ADOPTIONS;
   public static int STARTED_POLLS;
   protected List<String> pets;
-  private final Integer cutoff = 1;
-  private final Integer secondCutoff = 2;
 
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
@@ -70,19 +56,13 @@ public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
   }
 
   @OnSuccess
-  public synchronized void onSuccess() {
-    ADOPTED_PET_COUNT++;
-  }
+  public synchronized void onSuccess() {}
 
   @OnError
-  public synchronized void onError() {
-    FAILED_ADOPTION_COUNT++;
-  }
+  public synchronized void onError() {}
 
   @OnTerminate
-  public synchronized void onTerminate() {
-    COMPLETED_POLLS++;
-  }
+  public synchronized void onTerminate() {}
 
   @Override
   public void poll(PollContext<String, Void> pollContext) {
@@ -108,12 +88,10 @@ public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
   }
 
   @Override
-  public void onRejectedItem(Result<String, Void> result, SourceCallbackContext context) {
-    REJECTED_ADOPTIONS++;
-  }
+  public void onRejectedItem(Result<String, Void> result, SourceCallbackContext context) {}
 
   private synchronized void resetCounters() {
-    ADOPTED_PET_COUNT = FAILED_ADOPTION_COUNT = COMPLETED_POLLS = REJECTED_ADOPTIONS = STARTED_POLLS = 0;
+    STARTED_POLLS = 0;
   }
 
 }
