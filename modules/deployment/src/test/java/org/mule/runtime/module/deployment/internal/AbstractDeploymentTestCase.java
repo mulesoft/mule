@@ -1076,7 +1076,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                                                                                                 emptySet())),
                                                                           new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
                                  artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderManager,
-                                 getRuntimeLockFactory());
+                                 getRuntimeLockFactory(), null);
   }
 
   /**

@@ -18,6 +18,7 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ public final class ArtifactContextConfiguration {
   private Optional<MuleContext> parentContext = empty();
   private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
   private LockFactory runtimeLockFactory;
+  private ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory;
 
   private ArtifactContextConfiguration() {}
 
@@ -132,6 +134,10 @@ public final class ArtifactContextConfiguration {
 
   public LockFactory getRuntimeLockFactory() {
     return runtimeLockFactory;
+  }
+
+  public ComponentBuildingDefinitionRegistryFactory getComponentBuildingDefinitionRegistryFactory() {
+    return componentBuildingDefinitionRegistryFactory;
   }
 
   /**
@@ -249,6 +255,16 @@ public final class ArtifactContextConfiguration {
      */
     public ArtifactContextConfigurationBuilder setRuntimeLockFactory(LockFactory runtimeLockFactory) {
       artifactContextConfiguration.runtimeLockFactory = runtimeLockFactory;
+      return this;
+    }
+
+    /**
+     * @param componentBuildingDefinitionRegistryFactory the factory {@link ComponentBuildingDefinitionRegistryFactory} 
+     *                                                   used to create a {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry}
+     * @return {@code this} builder
+     */
+    public ArtifactContextConfigurationBuilder setComponentBuildingDefinitionRegistryFactory(ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
+      artifactContextConfiguration.componentBuildingDefinitionRegistryFactory = componentBuildingDefinitionRegistryFactory;
       return this;
     }
 

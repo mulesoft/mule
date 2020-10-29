@@ -55,6 +55,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
@@ -121,6 +122,7 @@ public class ArtifactContextBuilder {
   private Optional<Properties> properties = empty();
   private String dataFolderName;
   private LockFactory runtimeLockFactory;
+  private ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory;
 
   private ArtifactContextBuilder() {}
 
@@ -374,6 +376,16 @@ public class ArtifactContextBuilder {
     return this;
   }
 
+  /**
+   * @param componentBuildingDefinitionRegistryFactory the factory {@link ComponentBuildingDefinitionRegistryFactory}
+   *                                                   used to create a {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry}
+   * @return
+   */
+  public ArtifactContextBuilder setComponentBuildingDefinitionRegistryFactory(ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
+    this.componentBuildingDefinitionRegistryFactory = componentBuildingDefinitionRegistryFactory;
+    return this;
+  }
+
   private Map<String, String> merge(Map<String, String> properties, Properties deploymentProperties) {
     if (deploymentProperties == null) {
       return properties;
@@ -449,7 +461,8 @@ public class ArtifactContextBuilder {
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
                     .setServiceConfigurators(serviceConfigurators)
-                    .setRuntimeLockFactory(runtimeLockFactory);
+                    .setRuntimeLockFactory(runtimeLockFactory)
+                    .setComponentBuildingDefinitionRegistryFactory(componentBuildingDefinitionRegistryFactory);
 
             withArtifactMuleContext(parentArtifact, artifactContextConfigurationBuilder::setParentContext);
             artifactContext

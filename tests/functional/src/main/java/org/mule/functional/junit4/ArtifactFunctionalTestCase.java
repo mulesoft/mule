@@ -21,11 +21,12 @@ import org.mule.functional.services.NullPolicyProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
-import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
@@ -116,9 +117,16 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
   private static TestServicesMuleContextConfigurator serviceConfigurator;
 
+  private static TestComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory;
+
   @BeforeClass
   public static void configureClassLoaderRepository() {
     classLoaderRepository = new TestClassLoaderRepository();
+  }
+
+  @BeforeClass
+  public static void configureComponentBuildingDefinitionRegistryFactory() {
+    componentBuildingDefinitionRegistryFactory = new TestComponentBuildingDefinitionRegistryFactory();
   }
 
   @Override
@@ -222,6 +230,17 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
   protected void configureSpringXmlConfigurationBuilder(ConfigurationBuilder builder) {
     builder.addServiceConfigurator(serviceConfigurator);
+    if (builder instanceof SpringXmlConfigurationBuilder) {
+      if (mustRegenerateExtensionModels()) {
+        ((SpringXmlConfigurationBuilder) builder)
+            .setComponentBuildingDefinitionRegistryFactory(new DefaultComponentBuildingDefinitionRegistryFactory());
+      } else {
+        // ((SpringXmlConfigurationBuilder) builder)
+        //    .setComponentBuildingDefinitionRegistryFactory(new DefaultComponentBuildingDefinitionRegistryFactory());
+        ((SpringXmlConfigurationBuilder) builder)
+            .setComponentBuildingDefinitionRegistryFactory(componentBuildingDefinitionRegistryFactory);
+      }
+    }
   }
 
   private static void createServiceManager() {

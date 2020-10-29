@@ -24,6 +24,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -125,6 +126,12 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   public Application createArtifact(ApplicationDescriptor descriptor) throws IOException {
+    return createArtifact(descriptor, null);
+  }
+
+  public Application createArtifact(ApplicationDescriptor descriptor,
+                                    ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory)
+      throws IOException {
     Domain domain = getDomainForDescriptor(descriptor);
 
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
@@ -159,7 +166,8 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     DefaultMuleApplication delegate =
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
                                    serviceRepository, extensionModelLoaderRepository, descriptor.getArtifactLocation(),
-                                   classLoaderRepository, applicationPolicyProvider, getRuntimeLockFactory());
+                                   classLoaderRepository, applicationPolicyProvider, getRuntimeLockFactory(),
+                                   componentBuildingDefinitionRegistryFactory);
 
     applicationPolicyProvider.setApplication(delegate);
     return new ApplicationWrapper(delegate);

@@ -14,7 +14,6 @@ import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATI
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.SINGLE;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.addAnnotation;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
@@ -30,6 +29,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry.WrapperElementType.SINGLE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
@@ -39,7 +39,6 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
-import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
@@ -57,6 +56,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
