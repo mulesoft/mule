@@ -100,12 +100,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.google.common.reflect.TypeToken;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+
+import com.google.common.reflect.TypeToken;
 
 @SmallTest
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
@@ -127,7 +128,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     OperationMessageProcessor operationMessageProcessor =
         new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, emptyList(),
-                                      resolverSet, cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
+                                      resolverSet, cursorStreamProviderFactory, new NoRetryPolicyTemplate(), null,
+                                      extensionManager,
                                       mockPolicyManager, reflectionCache, null,
                                       muleContext.getConfiguration().getShutdownTimeout());
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));

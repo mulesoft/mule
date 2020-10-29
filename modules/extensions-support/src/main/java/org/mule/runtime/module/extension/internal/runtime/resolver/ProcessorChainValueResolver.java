@@ -47,18 +47,32 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
 
   private final MessageProcessorChain chain;
 
-  public ProcessorChainValueResolver(MuleContext ctx, final MessageProcessorChain delegate) {
-    this.chain = new LazyInitializerChainDecorator(ctx, delegate);
+  /**
+   * Creates a resolver for the provided chain executor. The lifecycle of the provided {@code chain} must be managed by the owner
+   * of the chain.
+   *
+   * @param chain the chain to create an executor for
+   */
+  public ProcessorChainValueResolver(final MessageProcessorChain chain) {
+    this.chain = chain;
+  }
+
+  /**
+   * Creates a resolver for a new chain executor with the give {@code processors}, tying the lifecycle of that chain to the
+   * lifecycle of the provided {@code muleContext}.
+   *
+   * @param ctx the context to tie the lifecycle of the chain to be created to
+   * @param processors the processors that will be part of the chain to create an executor for
+   */
+  public ProcessorChainValueResolver(MuleContext ctx, List<Processor> processors) {
+    // TODO MULE-18939 lifecycle of this chain must be managed by its owner, not the muleContext
+    this(new LazyInitializerChainDecorator(ctx, newChain(empty(), processors)));
 
     try {
       registerObject(ctx, new ObjectNameHelper(ctx).getUniqueName(""), this.chain);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not register nested MessageProcessorChain"), e);
     }
-  }
-
-  public ProcessorChainValueResolver(MuleContext ctx, List<Processor> processors) {
-    this(ctx, newChain(empty(), processors));
   }
 
   /**

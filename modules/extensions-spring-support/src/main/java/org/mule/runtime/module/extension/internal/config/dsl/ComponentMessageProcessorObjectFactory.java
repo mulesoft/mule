@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
+import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -19,6 +21,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
@@ -60,12 +63,17 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
 
   @Override
   public P doGetObject() {
+    final MessageProcessorChain nestedChain;
+
     if (nestedProcessors != null) {
+      nestedChain = newChain(empty(), nestedProcessors);
       componentModel.getNestedComponents().stream()
           .filter(component -> component instanceof NestedChainModel)
           .findFirst()
           .ifPresent(chain -> parameters.put(chain.getName(),
-                                             new ProcessorChainValueResolver(muleContext, nestedProcessors)));
+                                             new ProcessorChainValueResolver(nestedChain)));
+    } else {
+      nestedChain = null;
     }
 
     return getMessageProcessorBuilder()
@@ -76,6 +84,7 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
         .setLazyMode(isLazyInitMode(properties))
         .setCursorProviderFactory(cursorProviderFactory)
         .setRetryPolicyTemplate(retryPolicyTemplate)
+        .setNestedChain(nestedChain)
         .build();
   }
 

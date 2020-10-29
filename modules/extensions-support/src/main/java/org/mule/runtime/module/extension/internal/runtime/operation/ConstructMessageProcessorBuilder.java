@@ -39,7 +39,7 @@ public final class ConstructMessageProcessorBuilder
     return new ConstructMessageProcessor(extensionModel, operationModel,
                                          getConfigurationProvider(), target, targetValue,
                                          arguments,
-                                         cursorProviderFactory, retryPolicyTemplate,
+                                         cursorProviderFactory, retryPolicyTemplate, nestedChain,
                                          extensionManager,
                                          policyManager,
                                          reflectionCache,

@@ -91,7 +91,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     processor = new ComponentMessageProcessor<ComponentModel>(extensionModel,
                                                               componentModel, null, null, null,
-                                                              resolverSet, null, null,
+                                                              resolverSet, null, null, null,
                                                               extensionManager,
                                                               mockPolicyManager, null, null,
                                                               muleContext.getConfiguration().getShutdownTimeout()) {

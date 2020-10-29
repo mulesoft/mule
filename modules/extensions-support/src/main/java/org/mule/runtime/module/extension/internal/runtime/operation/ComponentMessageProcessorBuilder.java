@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
@@ -54,6 +55,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected String targetValue;
   protected CursorProviderFactory cursorProviderFactory;
   protected RetryPolicyTemplate retryPolicyTemplate;
+  protected MessageProcessorChain nestedChain;
   protected boolean lazyModeEnabled;
 
   public ComponentMessageProcessorBuilder(ExtensionModel extensionModel,
@@ -146,8 +148,8 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     return this;
   }
 
-  public ComponentMessageProcessorBuilder<M, P> setNestedProcessors(RetryPolicyTemplate retryPolicyTemplate) {
-    this.retryPolicyTemplate = retryPolicyTemplate;
+  public ComponentMessageProcessorBuilder<M, P> setNestedChain(MessageProcessorChain nestedChain) {
+    this.nestedChain = nestedChain;
     return this;
   }
 

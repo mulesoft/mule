@@ -23,6 +23,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.qameta.allure.Issue;
+
 public class ScopeExecutionTestCase extends AbstractScopeExecutionTestCase {
 
   @Rule
@@ -153,4 +155,12 @@ public class ScopeExecutionTestCase extends AbstractScopeExecutionTestCase {
     String result = (String) flowRunner("scopeWithMuleAllowedStereotype").run().getMessage().getPayload().getValue();
     assertThat(result, is("Ok"));
   }
+
+  @Test
+  @Issue("MULE-18938")
+  public void scopeChainLazilyStarted() throws Exception {
+    String result = (String) flowRunner("scopeChainLazilyStarted").run().getMessage().getPayload().getValue();
+    assertThat(result, is("newPayload"));
+  }
+
 }

@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
@@ -62,11 +63,13 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    ResolverSet resolverSet,
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
+                                   MessageProcessorChain nestedChain,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache) {
     this(extensionModel, operationModel, configurationProvider, target, targetValue, errorMappings, resolverSet,
-         cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache, null, -1);
+         cursorProviderFactory, retryPolicyTemplate, nestedChain,
+         extensionManager, policyManager, reflectionCache, null, -1);
   }
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
@@ -78,14 +81,15 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    ResolverSet resolverSet,
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
+                                   MessageProcessorChain nestedChain,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache,
                                    ResultTransformer resultTransformer,
                                    long terminationTimeout) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
-          cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache,
-          resultTransformer, terminationTimeout);
+          cursorProviderFactory, retryPolicyTemplate, nestedChain,
+          extensionManager, policyManager, reflectionCache, resultTransformer, terminationTimeout);
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
     this.errorMappings = errorMappings;
   }

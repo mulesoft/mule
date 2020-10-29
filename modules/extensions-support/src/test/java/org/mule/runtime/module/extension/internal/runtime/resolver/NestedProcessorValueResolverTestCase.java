@@ -26,17 +26,20 @@ import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalC
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
 
-@RunWith(MockitoJUnitRunner.class)
 public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
 
   @Mock(lenient = true)
   private MessageProcessorChain messageProcessor;
@@ -54,7 +57,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
 
   @Test
   public void yieldsNestedProcessor() throws Exception {
-    ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(muleContext, messageProcessor);
+    ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(messageProcessor);
     final CoreEvent event = testEvent();
 
     Chain nestedProcessor = resolver.resolve(ValueResolvingContext.builder(event)
@@ -77,7 +80,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
 
   @Test
   public void alwaysGivesDifferentInstances() throws Exception {
-    ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(muleContext, messageProcessor);
+    ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(messageProcessor);
     ValueResolvingContext ctx = ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build();
     Chain resolved1 = resolver.resolve(ctx);
     Chain resolved2 = resolver.resolve(ctx);
@@ -87,7 +90,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
 
   @Test
   public void chainIsCalledAsNonBlocking() throws Exception {
-    ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(muleContext, messageProcessor);
+    ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(messageProcessor);
 
     Chain resolve = resolver.resolve(ValueResolvingContext.builder(testEvent())
         .withExpressionManager(expressionManager)
