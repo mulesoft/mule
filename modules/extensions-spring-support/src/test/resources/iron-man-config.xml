@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:test-components="http://www.mulesoft.org/schema/mule/test-components"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd
                http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
 
     <object name="captureThread" class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" />
@@ -22,10 +22,11 @@
     </marvel:iron-man-config>
 
     <flow name="fireMissile">
-        <test:assert-intercepting responseSameTask="false" />
-        <marvel:fire-missile at="#[payload]" config-ref="ironMan"/>
-        
-        <flow-ref name="captureThread"/>
+        <test-components:assert-intercepting responseSameTask="false">
+            <marvel:fire-missile at="#[payload]" config-ref="ironMan"/>
+            
+            <flow-ref name="captureThread"/>
+        </test-components:assert-intercepting>
         <error-handler>
             <on-error-propagate>
                 <logger/>
@@ -40,18 +41,20 @@
     </flow>
 
     <flow name="warMachineFireMissile">
-        <test:assert-intercepting responseSameTask="false" />
-        <marvel:fire-missile at="#[payload]" config-ref="warMachine"/>
-
-        <flow-ref name="captureThread"/>
+        <test-components:assert-intercepting responseSameTask="false">
+            <marvel:fire-missile at="#[payload]" config-ref="warMachine"/>
+    
+            <flow-ref name="captureThread"/>
+        </test-components:assert-intercepting>
     </flow>
 
     <flow name="computeFlightPlan">
-        <test:assert-intercepting responseSameTask="false" />
-        <marvel:compute-flight-plan config-ref="ironMan" />
-
-        <!-- TODO: MULE-18119 - uncomment the following line when this issue is fixed -->
-        <!-- <flow-ref name="captureThread"/> -->
+        <test-components:assert-intercepting responseSameTask="false">
+            <marvel:compute-flight-plan config-ref="ironMan" />
+    
+            <!-- TODO: MULE-18119 - uncomment the following line when this issue is fixed -->
+            <!-- <flow-ref name="captureThread"/> -->
+        </test-components:assert-intercepting>
     </flow>
 
 </mule>

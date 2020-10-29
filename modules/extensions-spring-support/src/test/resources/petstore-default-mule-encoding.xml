@@ -7,6 +7,7 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
+    <object name="testProcessor" class="org.mule.test.module.extension.connector.PetStoreDefaultEncodingTestCase$TestProcessor"/>
 
     <petstore:config name="config" cashierName="jim" pets="#[mel:[]]">
         <petstore:connection username="john" password="doe"/>
@@ -34,7 +35,7 @@
 
     <flow name="sourceEncoding" initialState="stopped">
         <petstore:pet-source birds="Primate"/>
-        <test:processor class="org.mule.test.module.extension.connector.PetStoreDefaultEncodingTestCase$TestProcessor"/>
+        <flow-ref name="testProcessor"/>
     </flow>
 
     <flow name="inlinePojoEncoding">

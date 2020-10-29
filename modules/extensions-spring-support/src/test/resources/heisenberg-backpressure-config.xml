@@ -7,6 +7,8 @@
                           http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                           http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
+    <object name="collect" class="org.mule.test.module.extension.source.BackPressureTestCase$Collector" />
+
     <heisenberg:config name="heisenberg"
                        age="50"
                        cancer="true"
@@ -44,7 +46,7 @@
             </heisenberg:error-info>
         </heisenberg:listen-payments>
 
-        <test:processor waitTime="15000" />
+        <set-payload value="#[java!org::mule::tck::junit4::AbstractMuleContextTestCase::sleepFor(payload, 15000)]"/>
     </flow>
 
     <flow name="configuredToDrop" initialState="stopped" maxConcurrency="1">
@@ -64,7 +66,7 @@
             </heisenberg:error-info>
         </heisenberg:listen-payments>
 
-        <test:processor waitTime="15000" />
+        <set-payload value="#[java!org::mule::tck::junit4::AbstractMuleContextTestCase::sleepFor(payload, 15000)]"/>
     </flow>
 
     <flow name="defaultCase" initialState="stopped" maxConcurrency="1">
@@ -84,8 +86,8 @@
             </heisenberg:error-info>
         </heisenberg:reconnectable-listen-payments>
         
-        <test:processor waitTime="1000" />
-        <test:processor class="org.mule.test.module.extension.source.BackPressureTestCase$Collector" />
+        <set-payload value="#[java!org::mule::tck::junit4::AbstractMuleContextTestCase::sleepFor(payload, 1000)]"/>
+        <flow-ref name="collect"/>
     </flow>
 
 </mule>

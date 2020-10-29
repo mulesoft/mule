@@ -7,10 +7,11 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
+    <object name="testProcessor" class="org.mule.test.module.extension.connector.SourceWithCorrelationIdTestCase$TestProcessor"/>
 
     <flow name="sourceEncoding">
         <petstore:pet-source birds="Primate"/>
-        <test:processor class="org.mule.test.module.extension.connector.SourceWithCorrelationIdTestCase$TestProcessor"/>
+        <flow-ref name="testProcessor"/>
     </flow>
 
 </mule>

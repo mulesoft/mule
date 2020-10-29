@@ -7,6 +7,8 @@
                 http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
+    <object name="adopt" class="org.mule.test.module.extension.source.PollingSourceWatermarkTestCase$AdoptionProcessor"/>
+
     <flow name="watermark" initialState="stopped">
         <petstore:pet-adoption-source watermark="true" idempotent="true">
             <scheduling-strategy>
@@ -58,7 +60,4 @@
         <flow-ref name="adopt"/>
     </flow>
 
-    <flow name="adopt">
-        <test:processor class="org.mule.test.module.extension.source.PollingSourceWatermarkTestCase$AdoptionProcessor"/>
-    </flow>
 </mule>
