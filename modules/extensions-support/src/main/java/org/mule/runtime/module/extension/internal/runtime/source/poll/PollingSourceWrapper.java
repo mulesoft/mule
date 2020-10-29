@@ -302,6 +302,14 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       return watermarkComparator;
     }
 
+    private void renewUpdatedWatermark(String itemId, Serializable itemWatermark) throws ObjectStoreException {
+      idsOnUpdatedWatermark.clear();
+      if (itemId != null) {
+        idsOnUpdatedWatermark.store(itemId, itemWatermark);
+      }
+      setUpdatedWatermark(itemWatermark);
+    }
+
     private void setUpdatedWatermark(Serializable updatedWatermark) {
       try {
         this.updatedWatermark = updatedWatermark;
@@ -351,6 +359,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
               Serializable previousItemWatermark = recentlyProcessedIds.retrieve(itemId);
               if (compareWatermarks(itemWatermark, previousItemWatermark, watermarkComparator) <= 0) {
                 accept = false;
+              } else {
+                recentlyProcessedIds.remove(itemId);
+                recentlyProcessedIds.store(itemId, itemWatermark);
+                renewUpdatedWatermark(itemId, itemWatermark);
               }
             } else {
               int updatedWatermarkCompare =
@@ -358,9 +370,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
               if (updatedWatermarkCompare == 0) {
                 pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
               } else if (updatedWatermarkCompare < 0) {
-                idsOnUpdatedWatermark.clear();
-                pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
-                setUpdatedWatermark(itemWatermark);
+                renewUpdatedWatermark(itemId, itemWatermark);
               }
 
             }

@@ -16,6 +16,15 @@
         <flow-ref name="adopt"/>
     </flow>
 
+    <flow name="splitWatermark" initialState="stopped">
+        <petstore:watermarking-pet-adoption-source watermark="true" idempotent="true">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+        </petstore:watermarking-pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
     <flow name="adopt">
         <test:processor class="org.mule.test.module.extension.source.PollingSourceWatermarkTestCase$AdoptionProcessor"/>
     </flow>

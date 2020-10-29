@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
+import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.SOME_WATERMARK_PETS;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -64,15 +65,21 @@ public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalT
 
     assertAllPetsAdopted();
 
-    assertIdempotentAdoptions();
+    assertIdempotentAdoptions(ALL_PETS);
+  }
+
+  @Test
+  public void splitWatermarkPoll() throws Exception {
+    startFlow("splitWatermark");
+
+    assertIdempotentAdoptions(SOME_WATERMARK_PETS);
   }
 
 
-
-  private void assertIdempotentAdoptions() {
+  private void assertIdempotentAdoptions(List<String> pets) {
     checkNot(LONG_TIMEOUT, PROBER_FREQUENCY, () -> {
       synchronized (ADOPTION_EVENTS) {
-        return ADOPTION_EVENTS.size() > ALL_PETS.size();
+        return ADOPTION_EVENTS.size() > pets.size();
       }
     });
   }
