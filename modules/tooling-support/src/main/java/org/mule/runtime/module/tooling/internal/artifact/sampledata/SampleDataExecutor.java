@@ -13,7 +13,6 @@ import static org.mule.runtime.api.sampledata.SampleDataFailure.Builder.newFailu
 import static org.mule.runtime.api.sampledata.SampleDataResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -27,7 +26,6 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
@@ -36,6 +34,7 @@ import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import org.mule.sdk.api.data.sample.SampleDataException;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
@@ -61,25 +60,16 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
       ExtensionModel extensionModel = artifactHelper.getExtensionModel(componentElementDeclaration);
       String extensionName = extensionModel.getName();
 
-      Optional<ConfigurationInstance> optionalConfigurationInstance =
-          getConfigurationInstance(componentModel, componentElementDeclaration);
-
-      ExtensionResolvingContext context = new ExtensionResolvingContext(() -> optionalConfigurationInstance,
-                                                                        connectionManager);
 
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
-      try {
-        return resultFrom(withContextClassLoader(extensionClassLoader, () -> sampleDataService.getSampleData(extensionName,
-                                                                                                             componentName,
-                                                                                                             parametersMap(componentElementDeclaration,
-                                                                                                                           componentModel),
-                                                                                                             () -> optionalConfigurationInstance),
-                                                 SampleDataException.class, e -> {
-                                                   throw new ExecutorExceptionWrapper(e);
-                                                 }));
-      } finally {
-        context.dispose();
-      }
+      return resultFrom(withContextClassLoader(extensionClassLoader, () -> sampleDataService.getSampleData(extensionName,
+                                                                                                           componentName,
+                                                                                                           parametersMap(componentElementDeclaration,
+                                                                                                                         componentModel),
+                                                                                                           getConfigurationInstance(componentElementDeclaration)),
+                                               SampleDataException.class, e -> {
+                                                 throw new ExecutorExceptionWrapper(e);
+                                               }));
     } catch (SampleDataException e) {
       return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
     } catch (ExpressionNotSupportedException e) {
@@ -97,25 +87,13 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
     }
   }
 
-  private Optional<ConfigurationInstance> getConfigurationInstance(ComponentModel componentModel,
-                                                                   ComponentElementDeclaration componentElementDeclaration)
-      throws SampleDataException {
-    Optional<String> optionalConfigRef = ofNullable(componentElementDeclaration.getConfigRef());
-    Optional<ConfigurationInstance> optionalConfigurationInstance = optionalConfigRef
-        .map(configRef -> artifactHelper.getConfigurationInstance(configRef))
-        .orElse(empty());
-
-    if (optionalConfigRef.isPresent()) {
-      Optional<SampleDataProviderModel> valueProviderModelOptional = getSampleDataProviderModel(componentModel);
-      if (valueProviderModelOptional.isPresent() && valueProviderModelOptional.get().requiresConfiguration()
-          && !optionalConfigurationInstance.isPresent()) {
-        throw new SampleDataException(format("The sample data provider requires a configuration but the one referenced by element declaration with name: '%s' is not present",
-                                             optionalConfigRef.get()),
-                                      MISSING_REQUIRED_PARAMETERS);
-      }
-    }
-
-    return optionalConfigurationInstance;
+  private Supplier<Optional<ConfigurationInstance>> getConfigurationInstance(ComponentElementDeclaration componentElementDeclaration) {
+    return () -> {
+      Optional<String> optionalConfigRef = ofNullable(componentElementDeclaration.getConfigRef());
+      return optionalConfigRef
+          .map(configRef -> artifactHelper.getConfigurationInstance(configRef))
+          .orElse(empty());
+    };
   }
 
   private Optional<SampleDataProviderModel> getSampleDataProviderModel(ComponentModel componentModel) {
