@@ -34,8 +34,8 @@ public abstract class AbstractScopeExecutionTestCase extends AbstractExtensionFu
   public SystemProperty maxRedelivery = new SystemProperty("killingReason", KILL_REASON);
 
   @Override
-  protected String[] getConfigFiles() {
-    return new String[] {"scopes/heisenberg-scope-config.xml"};
+  protected String getConfigFile() {
+    return "scopes/heisenberg-scope-config.xml";
   }
 
   @Override

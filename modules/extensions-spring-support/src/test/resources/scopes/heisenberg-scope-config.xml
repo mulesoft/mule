@@ -2,10 +2,12 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
       xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns:test-components="http://www.mulesoft.org/schema/mule/test-components"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
-               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd
+               http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd">
     <configuration-properties file="heisenberg.properties"/>
 
     <heisenberg:config name="heisenberg"
@@ -74,6 +76,17 @@
         <heisenberg:always-fails-wrapper>
             <logger message="#[payload]"/>
         </heisenberg:always-fails-wrapper>
+    </flow>
+
+    <flow name="scopeChainLazilyStarted" initialState="stopped">
+        <heisenberg:tap-phones>
+            <test-components:non-blocking/>
+            <heisenberg:tap-phones>
+                <test-components:non-blocking/>
+                <set-variable variableName="varName" value="varValue"/>
+                <set-payload value="#['newPayload']"/>
+            </heisenberg:tap-phones>
+        </heisenberg:tap-phones>
     </flow>
 
     <flow name="failWithConnectivityErrorFromOtherExtension">
