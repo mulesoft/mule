@@ -7,10 +7,6 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getInstance;
-import static uk.org.lidalia.slf4jext.Level.INFO;
-
-import org.junit.Before;
 import org.junit.Rule;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import uk.org.lidalia.slf4jtest.TestLoggerFactoryResetRule;
@@ -24,9 +20,4 @@ public abstract class AbstractDeploymentLoggingTestCase extends AbstractMuleTest
 
   @Rule
   public TestLoggerFactoryResetRule testLoggerFactoryResetRule = new TestLoggerFactoryResetRule();
-
-  @Before
-  public void setupLogger() {
-    getInstance().setPrintLevel(INFO);
-  }
 }
