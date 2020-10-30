@@ -27,6 +27,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -441,13 +442,14 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  @Issue("MULE-18929")
   public void cachesEvictedDoesntIncreaseActivePoliciesCount() throws InterruptedException {
     final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
     when(policyProvider.isSourcePoliciesAvailable()).thenReturn(true);
     when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
     policiesChangeCallbackCaptor.getValue().run();
 
-    policyManager.setOuterCachesExpireTime(2);
+    policyManager.setOuterCachesExpireTime(1);
 
     InternalEvent event = mock(InternalEvent.class);
     SourcePolicyContext ctx = mock(SourcePolicyContext.class);
@@ -459,7 +461,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     final SourcePolicy policy1 = policyManager.createSourcePolicyInstance(flow1Component, event, ePub -> ePub,
                                                                           mock(MessageSourceResponseParametersProcessor.class));
 
-    Thread.sleep(3000);
+    Thread.sleep(1500);
 
     final SourcePolicy policy2 = policyManager.createSourcePolicyInstance(flow1Component, event, ePub -> ePub,
                                                                           mock(MessageSourceResponseParametersProcessor.class));
