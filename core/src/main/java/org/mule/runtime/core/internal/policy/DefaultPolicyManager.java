@@ -476,5 +476,23 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     public void dispose() {
       deferredDispose.dispose();
     }
+
+    /* MULE-18929: since outer cache has an expiring time but inner cache doesn't, we are could be creating
+    * a new weak reference for the same policy. This will make that the activePolicies set will increase
+    * in size for expired policies, unnecessary. Hence, overriding hashCode and equals methods to avoid having
+    * more than one weak reference in the set */
+    @Override
+    public int hashCode() {
+      return this.get().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (!(o instanceof DeferredDisposableWeakReference)) {
+        return false;
+      }
+      return this.get().equals(((DeferredDisposableWeakReference) o).get());
+    }
+
   }
 }
