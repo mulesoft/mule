@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
@@ -461,7 +462,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     final SourcePolicy policy1 = policyManager.createSourcePolicyInstance(flow1Component, event, ePub -> ePub,
                                                                           mock(MessageSourceResponseParametersProcessor.class));
 
-    Thread.sleep(1500);
+    sleep(1500);
 
     final SourcePolicy policy2 = policyManager.createSourcePolicyInstance(flow1Component, event, ePub -> ePub,
                                                                           mock(MessageSourceResponseParametersProcessor.class));
