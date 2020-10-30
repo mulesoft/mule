@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.api.DeploymentService;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
@@ -36,7 +35,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
+public class DomainArchiveDeployerTestCase extends AbstractDeploymentLoggingTestCase {
 
   public static final String DOMAIN_ZIP_PATH = "someZipFile";
   public static final String DOMAIN_NAME = "domain-name";

@@ -39,7 +39,6 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import uk.org.lidalia.slf4jtest.LoggingEvent;
 import uk.org.lidalia.slf4jtest.TestLogger;
-import uk.org.lidalia.slf4jtest.TestLoggerFactoryResetRule;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,9 +60,6 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
   @Rule
   public SystemProperty muleDesignModeSystemProperty = new SystemProperty(MULE_DESIGN_MODE, "true");
-
-  @Rule
-  public TestLoggerFactoryResetRule testLoggerFactoryResetRule = new TestLoggerFactoryResetRule();
 
   private TestLogger logUtilLogger = getTestLogger(LogUtil.class);
 

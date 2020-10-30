@@ -15,7 +15,6 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.MuleContextUtils;
 
@@ -27,7 +26,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class MuleContextDeploymentListenerTestCase extends AbstractMuleTestCase {
+public class MuleContextDeploymentListenerTestCase extends AbstractDeploymentLoggingTestCase {
 
   private static final String APP_NAME = "app";
 
