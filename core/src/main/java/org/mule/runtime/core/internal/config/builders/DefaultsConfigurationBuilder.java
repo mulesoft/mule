@@ -50,7 +50,6 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -60,7 +59,6 @@ import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
-import org.mule.runtime.core.internal.context.thread.notification.DefaultThreadNotificationService;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.event.DefaultEventContextService;
@@ -147,7 +145,6 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_NOTIFICATION_DISPATCHER, new DefaultNotificationDispatcher(), muleContext);
     registerObject(NotificationListenerRegistry.REGISTRY_KEY, new DefaultNotificationListenerRegistry(), muleContext);
     registerObject(EventContextService.REGISTRY_KEY, new DefaultEventContextService(), muleContext);
-    registerObject(ThreadNotificationService.REGISTRY_KEY, new DefaultThreadNotificationService(), muleContext);
     registerObject(OBJECT_TRANSACTION_FACTORY_LOCATOR, new TransactionFactoryLocator(), muleContext);
     registerObject(OBJECT_CLUSTER_SERVICE, new DefaultClusterService(), muleContext);
 

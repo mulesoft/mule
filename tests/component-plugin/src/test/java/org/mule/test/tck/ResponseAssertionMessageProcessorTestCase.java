@@ -12,21 +12,11 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
-import org.mule.functional.api.component.TestNonBlockingProcessor;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.tck.SensingNullMessageProcessor;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageProcessorTestCase {
-
-  private TestNonBlockingProcessor testNonBlockingProcessor;
-
-  @Before
-  public void before() throws InitialisationException {
-    testNonBlockingProcessor = new TestNonBlockingProcessor();
-  }
 
   @Override
   protected ResponseAssertionMessageProcessor createAssertionMessageProcessor() {
@@ -38,7 +28,6 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
   @Test
   public void responseProcess() throws Exception {
     ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setListener(testNonBlockingProcessor);
     asp.setExpressionManager(expressionManager);
     asp.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     asp.setExpression(TRUE_EXPRESSION);
@@ -57,7 +46,6 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
   @Test
   public void responseProcessNonBlocking() throws Exception {
     ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setListener(testNonBlockingProcessor);
     asp.setExpressionManager(expressionManager);
     asp.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     asp.setExpression(TRUE_EXPRESSION);

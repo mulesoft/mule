@@ -11,7 +11,6 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_TRACE;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
@@ -134,12 +133,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    * Whether transports and processors timeouts should be disabled in order to allow step debugging of mule flows.
    */
   private boolean disableTimeouts = false;
-
-  /**
-   * Whether Thread Logging Notifications are enabled to be logged.
-   * Set system property to -1 to avoid logging, but gather statistics.
-   */
-  private final boolean theadLoggingEnabled = Integer.getInteger(MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT, -1) > 0;
 
   private MuleContext muleContext;
   private boolean containerMode;
@@ -640,11 +633,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   @Override
   public DynamicConfigExpiration getDynamicConfigExpiration() {
     return dynamicConfigExpiration;
-  }
-
-  @Override
-  public boolean isThreadLoggingEnabled() {
-    return theadLoggingEnabled;
   }
 
   public void setDynamicConfigExpiration(DynamicConfigExpiration dynamicConfigExpiration) {

@@ -245,14 +245,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="non-blocking-processor" substitutionGroup="mule:abstract-message-processor">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="mule:abstractMessageProcessorType"/>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
     <xsd:element name="queue" type="queueType" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>

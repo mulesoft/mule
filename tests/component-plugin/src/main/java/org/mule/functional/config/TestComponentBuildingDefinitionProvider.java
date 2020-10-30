@@ -34,7 +34,6 @@ import org.mule.functional.api.component.SharedSource;
 import org.mule.functional.api.component.SkeletonSource;
 import org.mule.functional.api.component.StacktraceLogChecker;
 import org.mule.functional.api.component.SummaryLogChecker;
-import org.mule.functional.api.component.TestNonBlockingProcessor;
 import org.mule.functional.api.component.ThrowProcessor;
 import org.mule.functional.client.QueueWriterMessageProcessor;
 import org.mule.runtime.api.component.Component;
@@ -174,11 +173,6 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("lifecycle-tracker-scope")
         .withTypeDefinition(fromType(LifecycleTrackerScope.class))
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition
-        .withIdentifier("non-blocking-processor")
-        .withTypeDefinition(fromType(TestNonBlockingProcessor.class))
         .build());
 
     componentBuildingDefinitions.add(baseDefinition

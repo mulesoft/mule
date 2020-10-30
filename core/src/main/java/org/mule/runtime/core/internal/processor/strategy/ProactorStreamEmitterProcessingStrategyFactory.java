@@ -11,10 +11,8 @@ import static java.lang.Math.max;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
-import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -25,7 +23,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
 import org.mule.runtime.core.internal.processor.strategy.StreamEmitterProcessingStrategyFactory.StreamEmitterProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 
@@ -68,7 +65,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
                                                        resolveParallelism(),
                                                        getMaxConcurrency(),
                                                        isMaxConcurrencyEagerCheck(),
-                                                       muleContext.getConfiguration().isThreadLoggingEnabled(),
                                                        () -> muleContext.getConfiguration().getShutdownTimeout());
   }
 
@@ -81,7 +77,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
 
     private static final Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategy.class);
 
-    private final boolean isThreadLoggingEnabled;
     private final Supplier<Scheduler> blockingSchedulerSupplier;
     private final Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
 
@@ -97,13 +92,11 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
                                                    int parallelism,
                                                    int maxConcurrency,
                                                    boolean maxConcurrencyEagerCheck,
-                                                   boolean isThreadLoggingEnabled,
                                                    Supplier<Long> shutdownTimeoutSupplier) {
       super(bufferSize, subscriberCount, flowDispatchSchedulerSupplier, cpuLightSchedulerSupplier, parallelism, maxConcurrency,
             maxConcurrencyEagerCheck, shutdownTimeoutSupplier);
       this.blockingSchedulerSupplier = blockingSchedulerSupplier;
       this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
-      this.isThreadLoggingEnabled = isThreadLoggingEnabled;
     }
 
     @Override
@@ -199,40 +192,16 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
 
     private Mono<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
                                                 Mono<CoreEvent> eventFlux) {
-      if (isThreadLoggingEnabled) {
-        return Mono.from(eventFlux)
-            .flatMap(e -> subscriberContext()
-                .flatMap(ctx -> Mono.just(e).transform(processor)
-                    .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
-                        .getOrEmpty(
-                                    THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY),
-                                                                                               decorateScheduler(
-                                                                                                                 processorScheduler),
-                                                                                               e.getContext().getId())))));
-      } else {
-        return Mono.from(eventFlux)
-            .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
-            .transform(processor);
-      }
+      return Mono.from(eventFlux)
+          .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
+          .transform(processor);
     }
 
     private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
                                                 Flux<CoreEvent> eventFlux) {
-      if (isThreadLoggingEnabled) {
-        return Flux.from(eventFlux)
-            .flatMap(e -> subscriberContext()
-                .flatMap(ctx -> Mono.just(e).transform(processor)
-                    .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
-                        .getOrEmpty(
-                                    THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY),
-                                                                                               decorateScheduler(
-                                                                                                                 processorScheduler),
-                                                                                               e.getContext().getId())))));
-      } else {
-        return Flux.from(eventFlux)
-            .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
-            .transform(processor);
-      }
+      return Flux.from(eventFlux)
+          .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
+          .transform(processor);
     }
 
     @Override

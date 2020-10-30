@@ -12,23 +12,35 @@ import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
-import org.mule.runtime.app.declaration.api.fluent.SimpleValueType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
+
 
 public class ParameterExtractor implements ParameterValueVisitor {
 
-  private static final ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectMapper objectMapper;
+
+  static {
+    //This was added to handle complex parameters and transforming from a Map<String, Object>
+    // to the actual object of type defined my the model.
+    //TODO: CMTS-108
+    objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new DateTimeModule());
+    objectMapper.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
+  }
+
   private Object value;
 
   public static <T> T extractValue(ParameterValue parameterValue, Class<T> type) {
     return objectMapper.convertValue(extractValue(parameterValue), type);
   }
 
-  public static Object extractValue(ParameterValue parameterValue) {
+  private static Object extractValue(ParameterValue parameterValue) {
     final ParameterExtractor extractor = new ParameterExtractor();
     parameterValue.accept(extractor);
     return extractor.get();
@@ -38,23 +50,7 @@ public class ParameterExtractor implements ParameterValueVisitor {
 
   @Override
   public void visitSimpleValue(ParameterSimpleValue text) {
-    SimpleValueType valueType = text.getType();
-    String value = text.getValue();
-    if (valueType != null) {
-      switch (valueType) {
-        case BOOLEAN:
-          this.value = Boolean.valueOf(value);
-          break;
-        case NUMBER:
-          this.value = Integer.valueOf(value);
-          break;
-        default:
-          this.value = value;
-          break;
-      }
-    } else {
-      this.value = value;
-    }
+    this.value = text.getValue();
   }
 
   @Override

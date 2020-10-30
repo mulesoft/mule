@@ -10,14 +10,16 @@ import org.slf4j.Logger;
 
 import java.util.Collection;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Allows to track {@link ThreadNotificationElement} to log Thread switches measured latency
  *
  * @since 4.2
+ *
+ * @deprecated since 4.4.0 this feature was removed
  */
+@Deprecated
 public interface ThreadNotificationService {
 
   String REGISTRY_KEY = "_muleThreadNotificationService";
