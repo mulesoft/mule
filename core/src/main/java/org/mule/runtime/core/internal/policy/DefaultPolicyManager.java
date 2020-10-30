@@ -144,11 +144,11 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   // These next caches cache the actual composite policies for a given parameters. Since many parameters combinations may result
   // in a same set of policies to be applied, many entries of this cache may reference the same composite policy instance.
 
-  private final Cache<Pair<String, PolicyPointcutParameters>, SourcePolicy> sourcePolicyOuterCache =
+  private Cache<Pair<String, PolicyPointcutParameters>, SourcePolicy> sourcePolicyOuterCache =
       Caffeine.newBuilder()
           .expireAfterAccess(60, SECONDS)
           .build();
-  private final Cache<Pair<ComponentIdentifier, PolicyPointcutParameters>, OperationPolicy> operationPolicyOuterCache =
+  private Cache<Pair<ComponentIdentifier, PolicyPointcutParameters>, OperationPolicy> operationPolicyOuterCache =
       Caffeine.newBuilder()
           .expireAfterAccess(60, SECONDS)
           .build();
@@ -461,6 +461,20 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
         }
       }
     }
+  }
+
+  // Testing purposes
+  void setOuterCachesExpireTime(int timeout) {
+    sourcePolicyOuterCache = Caffeine.newBuilder()
+        .expireAfterAccess(timeout, SECONDS)
+        .build();
+    operationPolicyOuterCache = Caffeine.newBuilder()
+        .expireAfterAccess(timeout, SECONDS)
+        .build();
+  }
+
+  int getActivePoliciesCount() {
+    return activePolicies.size();
   }
 
   private static final class DeferredDisposableWeakReference extends WeakReference<DeferredDisposable> implements Disposable {

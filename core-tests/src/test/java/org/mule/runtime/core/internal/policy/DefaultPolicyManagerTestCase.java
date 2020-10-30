@@ -440,6 +440,34 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     assertThat(policy2, instanceOf(NoSourcePolicy.class));
   }
 
+  @Test
+  public void cachesEvictedDoesntIncreaseActivePoliciesCount() throws InterruptedException {
+    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    when(policyProvider.isSourcePoliciesAvailable()).thenReturn(true);
+    when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
+    policiesChangeCallbackCaptor.getValue().run();
+
+    policyManager.setOuterCachesExpireTime(2);
+
+    InternalEvent event = mock(InternalEvent.class);
+    SourcePolicyContext ctx = mock(SourcePolicyContext.class);
+    when(event.getSourcePolicyContext()).thenReturn((EventInternalContext) ctx);
+    when(ctx.getPointcutParameters()).thenReturn(mock(PolicyPointcutParameters.class));
+
+    when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
+
+    final SourcePolicy policy1 = policyManager.createSourcePolicyInstance(flow1Component, event, ePub -> ePub,
+                                                                          mock(MessageSourceResponseParametersProcessor.class));
+
+    Thread.sleep(3000);
+
+    final SourcePolicy policy2 = policyManager.createSourcePolicyInstance(flow1Component, event, ePub -> ePub,
+                                                                          mock(MessageSourceResponseParametersProcessor.class));
+
+    assertThat(policy1, is(policy2));
+    assertThat(policyManager.getActivePoliciesCount(), is(1));
+  }
+
   private Policy mockPolicy() {
     PolicyChain policyChain = mock(PolicyChain.class, RETURNS_DEEP_STUBS);
     when(policyChain.apply(any()))
