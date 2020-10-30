@@ -97,6 +97,7 @@ import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
+import org.mule.runtime.extension.api.property.AllowsExpressionWithoutMarkersModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
@@ -569,6 +570,7 @@ class MuleExtensionModelDeclarer {
     when.onDefaultParameterGroup()
         .withRequiredParameter("expression")
         .ofType(typeLoader.load(boolean.class))
+        .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty())
         .describedAs("The expression to evaluate.");
 
     choice.withRoute("otherwise").withMaxOccurs(1).withChain();
