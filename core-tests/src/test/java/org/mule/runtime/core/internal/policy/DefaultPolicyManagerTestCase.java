@@ -450,7 +450,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
     policiesChangeCallbackCaptor.getValue().run();
 
-    policyManager.setOuterCachesExpireTime(1);
+    policyManager.setOuterCachesExpireTime(1, SECONDS);
 
     InternalEvent event = mock(InternalEvent.class);
     SourcePolicyContext ctx = mock(SourcePolicyContext.class);
@@ -467,7 +467,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     final SourcePolicy policy2 = policyManager.createSourcePolicyInstance(flow1Component, event, ePub -> ePub,
                                                                           mock(MessageSourceResponseParametersProcessor.class));
 
-    assertThat(policy1, is(policy2));
+    assertThat(policy1, sameInstance(policy2));
     assertThat(policyManager.getActivePoliciesCount(), is(1));
   }
 

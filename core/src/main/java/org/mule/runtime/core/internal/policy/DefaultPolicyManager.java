@@ -55,6 +55,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -464,12 +465,12 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   }
 
   // Testing purposes
-  void setOuterCachesExpireTime(int timeout) {
+  void setOuterCachesExpireTime(int timeout, TimeUnit timeUnit) {
     sourcePolicyOuterCache = Caffeine.newBuilder()
-        .expireAfterAccess(timeout, SECONDS)
+        .expireAfterAccess(timeout, timeUnit)
         .build();
     operationPolicyOuterCache = Caffeine.newBuilder()
-        .expireAfterAccess(timeout, SECONDS)
+        .expireAfterAccess(timeout, timeUnit)
         .build();
   }
 
@@ -480,10 +481,12 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   private static final class DeferredDisposableWeakReference extends WeakReference<DeferredDisposable> implements Disposable {
 
     private final Disposable deferredDispose;
+    private final int hash;
 
     public DeferredDisposableWeakReference(DeferredDisposable referent, ReferenceQueue<? super DeferredDisposable> q) {
       super(referent, q);
       this.deferredDispose = referent.deferredDispose();
+      this.hash = referent.hashCode();
     }
 
     @Override
@@ -497,15 +500,29 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     * more than one weak reference in the set */
     @Override
     public int hashCode() {
-      return this.get().hashCode();
+      return hash;
     }
 
+    /* Important consideration: if the referent object is collected, it will be equal to NULL. Possible problem:
+    *  if two collected referents had the same hash code (or simply generates a collision in the set) but where
+    *  different objects, since we lost the objects (== null) for us will be both equal. This could be a conceptual
+    *  problem since we would have "equivalent" different objects in a set, but considering our usage this won't be
+    *  a problem: we use it to maintain the weak reference to dispose them (deferredDispose). So, when we add
+    *  a weak reference to the set, its referent is obviously not null. When we remove them, if such collision happens,
+    *  we will simply remove one of them (since equivalence), and in the next iteration we will remove the other one,
+    *  independently of the hash implementation */
     @Override
     public boolean equals(Object o) {
       if (!(o instanceof DeferredDisposableWeakReference)) {
         return false;
       }
-      return this.get().equals(((DeferredDisposableWeakReference) o).get());
+      DeferredDisposable referent = this.get();
+      DeferredDisposable otherReferent = ((DeferredDisposableWeakReference) o).get();
+      if (referent != null) {
+        return referent.equals(otherReferent);
+      } else {
+        return otherReferent == null;
+      }
     }
 
   }
