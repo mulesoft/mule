@@ -6,7 +6,6 @@
  */
 package org.mule.test.petstore.extension;
 
-import static java.util.Arrays.asList;
 import static java.util.Comparator.naturalOrder;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
@@ -22,18 +21,15 @@ import org.mule.runtime.extension.api.runtime.source.PollContext;
 import org.mule.runtime.extension.api.runtime.source.PollingSource;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @MetadataScope(outputResolver = PollingSourceMetadataResolver.class)
 @MediaType(TEXT_PLAIN)
 public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
 
-  public static final List<String> ALL_WATERMARK_PETS = asList("Anibal", "ANIBAL", "Barbara");
-  public static final List<String> SOME_WATERMARK_PETS = asList("Anibal", "ANIBAL");
-  public static final List<Integer> PET_WATERMARKS = asList(5, 10, 7);
   public static int STARTED_POLLS;
-  protected List<String> pets;
+  private static int index;
+  private static int polls;
 
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
@@ -43,15 +39,24 @@ public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
   protected boolean idempotent;
 
+  @Parameter
+  protected List<String> pets;
+
+  @Parameter
+  protected List<Integer> watermarks;
+
+  @Parameter
+  protected Integer itemsPerPoll;
+
   @Override
   protected void doStart() throws MuleException {
-    pets = new ArrayList<>(ALL_WATERMARK_PETS);
     resetCounters();
+    polls = (pets.size() / itemsPerPoll) + 1;
+    System.out.println(pets);
   }
 
   @Override
   protected void doStop() {
-    pets.clear();
     resetCounters();
   }
 
@@ -67,31 +72,32 @@ public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
   @Override
   public void poll(PollContext<String, Void> pollContext) {
     STARTED_POLLS++;
-    if (STARTED_POLLS > 3) {
+    if (STARTED_POLLS > polls) {
       return;
     }
-    pollContext.setWatermarkComparator(naturalOrder());
-    int index = STARTED_POLLS - 1;
-    Result<String, Void> result = Result.<String, Void>builder().output(pets.get(index)).build();
-    Integer watermarkValue = PET_WATERMARKS.get(index);
-    pollContext.accept(item -> {
-      item.setResult(result);
+    for (int i = 0; i < itemsPerPoll && index < pets.size(); i++, index++) {
+      pollContext.setWatermarkComparator(naturalOrder());
+      Result<String, Void> result = Result.<String, Void>builder().output(pets.get(index)).build();
+      Integer watermarkValue = watermarks.get(index);
+      pollContext.accept(item -> {
+        item.setResult(result);
 
-      if (idempotent) {
-        item.setId(result.getOutput().toLowerCase());
-      }
+        if (idempotent) {
+          item.setId(result.getOutput().toLowerCase());
+        }
 
-      if (watermark) {
-        item.setWatermark(watermarkValue);
-      }
-    });
+        if (watermark) {
+          item.setWatermark(watermarkValue);
+        }
+      });
+    }
   }
 
   @Override
   public void onRejectedItem(Result<String, Void> result, SourceCallbackContext context) {}
 
   private synchronized void resetCounters() {
-    STARTED_POLLS = 0;
+    index = polls = STARTED_POLLS = 0;
   }
 
 }

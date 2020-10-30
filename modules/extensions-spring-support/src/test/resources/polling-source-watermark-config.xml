@@ -16,11 +16,44 @@
         <flow-ref name="adopt"/>
     </flow>
 
-    <flow name="splitWatermark" initialState="stopped">
-        <petstore:watermarking-pet-adoption-source watermark="true" idempotent="true">
+    <flow name="repeatedItemInNewPollSetsUpdatedWatermark" initialState="stopped">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="1" watermark="true" idempotent="true">
             <scheduling-strategy>
                 <fixed-frequency frequency="100"/>
             </scheduling-strategy>
+            <petstore:pets>
+                <petstore:pet value="Anibal" />
+                <petstore:pet value="ANIBAL" />
+                <petstore:pet value="Barbara" />
+            </petstore:pets>
+            <petstore:watermarks>
+                <petstore:watermark value="5" />
+                <petstore:watermark value="10" />
+                <petstore:watermark value="7" />
+            </petstore:watermarks>
+        </petstore:watermarking-pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="repeatedItemInNewPollDoesNotSetUpdatedWatermark" initialState="stopped">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="2" watermark="true" idempotent="true">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+            <petstore:pets>
+                <petstore:pet value="Anibal" />
+                <petstore:pet value="Barbara" />
+                <petstore:pet value="Colonel Meow" />
+                <petstore:pet value="BARBARA" />
+                <petstore:pet value="Daphne" />
+            </petstore:pets>
+            <petstore:watermarks>
+                <petstore:watermark value="4" />
+                <petstore:watermark value="5" />
+                <petstore:watermark value="10" />
+                <petstore:watermark value="7" />
+                <petstore:watermark value="8" />
+            </petstore:watermarks>
         </petstore:watermarking-pet-adoption-source>
         <flow-ref name="adopt"/>
     </flow>

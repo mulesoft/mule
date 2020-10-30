@@ -352,26 +352,19 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       } else {
         compare = currentWatermark != null ? compareWatermarks(currentWatermark, itemWatermark, watermarkComparator) : -1;
         if (compare < 0) {
-
           try {
             if (itemId != null && recentlyProcessedIds.contains(itemId)) {
               Serializable previousItemWatermark = recentlyProcessedIds.retrieve(itemId);
               if (compareWatermarks(itemWatermark, previousItemWatermark, watermarkComparator) <= 0) {
                 accept = false;
-              } else {
-                recentlyProcessedIds.remove(itemId);
-                recentlyProcessedIds.store(itemId, itemWatermark);
-                renewUpdatedWatermark(itemId, itemWatermark);
               }
-            } else {
-              int updatedWatermarkCompare =
-                  updatedWatermark != null ? compareWatermarks(updatedWatermark, itemWatermark, watermarkComparator) : -1;
-              if (updatedWatermarkCompare == 0) {
-                pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
-              } else if (updatedWatermarkCompare < 0) {
-                renewUpdatedWatermark(itemId, itemWatermark);
-              }
-
+            }
+            int updatedWatermarkCompare =
+                updatedWatermark != null ? compareWatermarks(updatedWatermark, itemWatermark, watermarkComparator) : -1;
+            if (updatedWatermarkCompare == 0) {
+              pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
+            } else if (updatedWatermarkCompare < 0) {
+              renewUpdatedWatermark(itemId, itemWatermark);
             }
           } catch (ObjectStoreException e) {
             throw new MuleRuntimeException(

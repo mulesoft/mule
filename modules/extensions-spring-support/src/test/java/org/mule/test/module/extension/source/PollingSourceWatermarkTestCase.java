@@ -6,11 +6,11 @@
  */
 package org.mule.test.module.extension.source;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
-import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.SOME_WATERMARK_PETS;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -63,18 +63,32 @@ public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalT
   public void watermarkPoll() throws Exception {
     startFlow("watermark");
 
-    assertAllPetsAdopted();
+    assertAllPetsAdopted(ALL_PETS);
 
     assertIdempotentAdoptions(ALL_PETS);
   }
 
   @Test
-  public void splitWatermarkPoll() throws Exception {
-    startFlow("splitWatermark");
+  public void repeatedItemInNewPollSetsUpdatedWatermark() throws Exception {
+    List<String> expectedPets = asList("Anibal", "ANIBAL");
 
-    assertIdempotentAdoptions(SOME_WATERMARK_PETS);
+    startFlow("repeatedItemInNewPollSetsUpdatedWatermark");
+
+    assertAllPetsAdopted(expectedPets);
+
+    assertIdempotentAdoptions(expectedPets);
   }
 
+  @Test
+  public void repeatedItemInNewPollDoesNotSetUpdatedWatermark() throws Exception {
+    List<String> expectedPets = asList("Anibal", "Barbara", "Colonel Meow", "BARBARA");
+
+    startFlow("repeatedItemInNewPollDoesNotSetUpdatedWatermark");
+
+    assertAllPetsAdopted(expectedPets);
+
+    assertIdempotentAdoptions(expectedPets);
+  }
 
   private void assertIdempotentAdoptions(List<String> pets) {
     checkNot(LONG_TIMEOUT, PROBER_FREQUENCY, () -> {
@@ -84,12 +98,12 @@ public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalT
     });
   }
 
-  private void assertAllPetsAdopted() {
+  private void assertAllPetsAdopted(List<String> pets) {
     check(SHORT_TIMEOUT, PROBER_FREQUENCY, () -> {
       synchronized (ADOPTION_EVENTS) {
-        return ADOPTION_EVENTS.size() >= ALL_PETS.size() &&
+        return ADOPTION_EVENTS.size() >= pets.size() &&
             ADOPTION_EVENTS.stream().map(e -> e.getMessage().getPayload().getValue().toString()).collect(toList())
-                .containsAll(ALL_PETS);
+                .containsAll(pets);
       }
     });
   }
