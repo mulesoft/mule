@@ -21,24 +21,20 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.util.CompilerUtils.JarCompiler;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
-import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getTestLogger;
 
 import io.qameta.allure.Feature;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
-import org.mule.runtime.core.internal.logging.LogUtil;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
+import org.mule.runtime.module.deployment.logging.MemoryAppenderResource;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import uk.org.lidalia.slf4jtest.LoggingEvent;
-import uk.org.lidalia.slf4jtest.TestLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,18 +48,15 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   private static final int EXPECTED_CONTENT_IN_LOG_SECS = 10 * 1000;
   private static final String CLASSLOADER_MODEL_VERSION = "1.2.0";
 
+  @Rule
+  public SystemProperty muleDesignModeSystemProperty = new SystemProperty(MULE_DESIGN_MODE, "true");
+
   private File mavenRepoFolder;
   private JarFileBuilder overriderLibrary;
   private JarFileBuilder overrider2Library;
   private JarFileBuilder overriderTestLibrary;
   private JarFileBuilder muleJavaModulePlugin;
-
-  @Rule
-  public SystemProperty muleDesignModeSystemProperty = new SystemProperty(MULE_DESIGN_MODE, "true");
-
-  private TestLogger logUtilLogger = getTestLogger(LogUtil.class);
-
-  private TestLogger onErrorPropagateHandlerLogger = getTestLogger(OnErrorPropagateHandler.class);
+  private MemoryAppenderResource appender;
 
   public ClassloadingTroubleshootingTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -92,6 +85,14 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     muleJavaModulePlugin =
         new JarFileBuilder("mule-java-module", new File(getProperty("muleJavaModule"))).withGroupId("org.mule.module")
             .withClassifier(MULE_PLUGIN_CLASSIFIER).withVersion("1.3.0-SNAPSHOT");
+
+    appender = new MemoryAppenderResource(containerClassLoader.getClassLoader());
+  }
+
+  @Override
+  public void tearDown() throws Exception {
+    super.tearDown();
+    appender.tearDown();
   }
 
   @Test
@@ -112,8 +113,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     startDeployment();
 
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
-    assertExpectedContentInAppLog(logUtilLogger,
-                                  "classloading-troubleshooting/errors/domain-config-yaml-not-found");
+    assertExpectedContentInAppLog("classloading-troubleshooting/errors/domain-config-yaml-not-found");
   }
 
   @Test
@@ -134,8 +134,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     startDeployment();
 
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
-    assertExpectedContentInAppLog(logUtilLogger,
-                                  "classloading-troubleshooting/errors/domain-overrideme-class-not-found");
+    assertExpectedContentInAppLog("classloading-troubleshooting/errors/domain-overrideme-class-not-found");
   }
 
   @Test
@@ -160,8 +159,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
-    assertExpectedContentInAppLog(logUtilLogger,
-                                  "classloading-troubleshooting/errors/app-overrideme2-class-not-found");
+
+    assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-overrideme2-class-not-found");
   }
 
   @Test
@@ -189,8 +188,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-    assertExpectedContentInAppLog(onErrorPropagateHandlerLogger,
-                                  "classloading-troubleshooting/errors/app-test-overrideme-class-not-found");
+    assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-test-overrideme-class-not-found");
   }
 
   @Test
@@ -216,8 +214,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     deployDomainAndApplication(domainFileBuilder, applicationFileBuilder);
 
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
-    assertExpectedContentInAppLog(logUtilLogger,
-                                  "classloading-troubleshooting/errors/app-jms-properties-resource-not-found");
+    assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-jms-properties-resource-not-found");
   }
 
   private DomainFileBuilder createDomainFileBuilder(boolean useLightWeightPackage) {
@@ -329,20 +326,18 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     startDeployment();
   }
 
-  private void assertExpectedContentInAppLog(TestLogger logger, String fileLocation) throws Exception {
+  private void assertExpectedContentInAppLog(String fileLocation) throws Exception {
     File logContent =
         new File(getResourceAsUrl(fileLocation, ClassloadingTroubleshootingTestCase.class)
             .toURI());
-
     final String expectedErrorLog = readFileToString(logContent);
-
     new PollingProber(EXPECTED_CONTENT_IN_LOG_SECS, DEFAULT_POLLING_INTERVAL)
         .check(new Probe() {
 
           @Override
           public boolean isSatisfied() {
             try {
-              assertThat(contains(logger.getAllLoggingEvents(), expectedErrorLog), is(true));
+              assertThat(contains(expectedErrorLog), is(true));
               return true;
             } catch (Exception e) {
               return false;
@@ -356,7 +351,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
         });
   }
 
-  private boolean contains(List<LoggingEvent> events, String content) {
-    return events.stream().anyMatch(event -> event.getMessage().contains(content));
+  private boolean contains(String content) {
+    return appender.getLogLines().anyMatch(event -> event.contains(content));
   }
 }

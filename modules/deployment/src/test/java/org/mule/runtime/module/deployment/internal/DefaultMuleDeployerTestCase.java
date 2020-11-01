@@ -14,12 +14,13 @@ import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
 @SmallTest
-public class DefaultMuleDeployerTestCase extends AbstractDeploymentLoggingTestCase {
+public class DefaultMuleDeployerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void disposesAppOnDeployFailure() throws Exception {

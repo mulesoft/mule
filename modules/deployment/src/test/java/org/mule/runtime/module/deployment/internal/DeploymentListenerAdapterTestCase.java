@@ -18,6 +18,7 @@ import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Rule;
@@ -29,7 +30,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DeploymentListenerAdapterTestCase extends AbstractDeploymentLoggingTestCase {
+public class DeploymentListenerAdapterTestCase extends AbstractMuleTestCase {
 
   private static final String ARTIFACT_NAME = "artifactName";
 

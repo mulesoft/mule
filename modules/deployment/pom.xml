@@ -214,12 +214,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>uk.org.lidalia</groupId>
-            <artifactId>slf4j-test</artifactId>
-            <version>1.2.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -239,10 +233,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <classpathDependencyExcludes>
-                        <classpathDependencyExcludes>org.apache.logging.log4j:log4j-slf4j-impl</classpathDependencyExcludes>
-                    </classpathDependencyExcludes>
-
                     <systemPropertyVariables>
                         <testComponentPlugin>${org.mule.tests.plugin:mule-tests-component-plugin:jar:mule-plugin}</testComponentPlugin>
                         <extensionsApiLib>${org.mule.runtime:mule-extensions-api:jar}</extensionsApiLib>

@@ -16,6 +16,7 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultArchiveDeployerTestCase extends AbstractDeploymentLoggingTestCase {
+public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
 
   private static final String ARTIFACT_ID = "test";
 
