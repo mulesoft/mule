@@ -219,7 +219,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static final String MIN_MULE_VERSION = "4.0.0";
 
-  protected DefaultClassLoaderManager artifactClassLoaderManager;
+  private DefaultClassLoaderManager artifactClassLoaderManager;
   protected ModuleRepository moduleRepository;
   private TestModuleDiscoverer moduleDiscoverer;
 
