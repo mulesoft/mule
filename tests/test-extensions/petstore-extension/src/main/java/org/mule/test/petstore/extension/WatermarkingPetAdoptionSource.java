@@ -28,8 +28,8 @@ import java.util.List;
 public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
 
   public static int STARTED_POLLS;
-  private static int index;
-  private static int polls;
+  private int index;
+  private int polls;
 
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
@@ -52,7 +52,6 @@ public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
   protected void doStart() throws MuleException {
     resetCounters();
     polls = (pets.size() / itemsPerPoll) + 1;
-    System.out.println(pets);
   }
 
   @Override
