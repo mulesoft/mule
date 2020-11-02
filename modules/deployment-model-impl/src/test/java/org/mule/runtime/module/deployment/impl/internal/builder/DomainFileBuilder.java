@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -26,7 +27,6 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 
-import com.google.common.base.Preconditions;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
@@ -99,8 +99,8 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
    */
   public DomainFileBuilder configuredWith(String propertyName, String propertyValue) {
     checkImmutable();
-    Preconditions.checkArgument(!isEmpty(propertyName), "Property name cannot be empty");
-    Preconditions.checkArgument(propertyValue != null, "Property value cannot be null");
+    requireNonNull(!isEmpty(propertyName), "propertyName cannot be empty");
+    requireNonNull(propertyValue != null, "propertyValue cannot be null");
     properties.put(propertyName, propertyValue);
     return this;
   }
@@ -172,13 +172,12 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
     });
     MuleArtifactLoaderDescriptorBuilder muleArtifactClassLoaderDescriptorBuilder =
         new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID);
-    exportedResources.ifPresent(resources -> {
-      muleArtifactClassLoaderDescriptorBuilder.addProperty(EXPORTED_RESOURCES, resources.split(","));
-    });
+    exportedResources
+        .ifPresent(resources -> muleArtifactClassLoaderDescriptorBuilder.addProperty(EXPORTED_RESOURCES, resources.split(",")));
 
-    exportedClassPackages.ifPresent(packages -> {
-      muleArtifactClassLoaderDescriptorBuilder.addProperty(EXPORTED_PACKAGES, packages.split(","));
-    });
+    exportedClassPackages
+        .ifPresent(packages -> muleArtifactClassLoaderDescriptorBuilder.addProperty(EXPORTED_PACKAGES, packages.split(",")));
+
     muleDomainModelBuilder.withClassLoaderModelDescriptorLoader(muleArtifactClassLoaderDescriptorBuilder.build());
     muleDomainModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     String applicationDescriptorContent = new MuleDomainModelJsonSerializer().serialize(muleDomainModelBuilder.build());

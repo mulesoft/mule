@@ -16,8 +16,6 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <!-- Mule Connectors and Modules -->
-        <muleJavaModuleVersion>1.3.0-SNAPSHOT</muleJavaModuleVersion>
     </properties>
 
     <dependencies>
@@ -132,13 +130,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
-            <artifactId>mule-java-module</artifactId>
-            <version>${muleJavaModuleVersion}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.tests.plugin</groupId>
             <artifactId>mule-tests-component-plugin</artifactId>
             <version>${project.version}</version>
@@ -236,7 +227,6 @@
                     <systemPropertyVariables>
                         <testComponentPlugin>${org.mule.tests.plugin:mule-tests-component-plugin:jar:mule-plugin}</testComponentPlugin>
                         <extensionsApiLib>${org.mule.runtime:mule-extensions-api:jar}</extensionsApiLib>
-                        <muleJavaModule>${org.mule.module:mule-java-module:jar:mule-plugin}</muleJavaModule>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

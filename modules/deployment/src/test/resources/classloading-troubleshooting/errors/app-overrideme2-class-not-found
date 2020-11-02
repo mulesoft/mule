@@ -20,10 +20,6 @@ Caused by: org.mule.runtime.api.exception.MuleRuntimeException: org.mule.runtime
 ------------------------
            |            
             ------------> ------------------------
-           |              |    Java Plugin CL    |
-           |              ------------------------
-           |            
-            ------------> ------------------------
                           |   App Class Loader   |
                           ------------------------
  

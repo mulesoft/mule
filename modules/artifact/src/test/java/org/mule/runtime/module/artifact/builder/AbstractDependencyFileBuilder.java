@@ -214,7 +214,7 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
   }
 
   /**
-   * @param scope the maven classifier
+   * @param scope the maven scope
    * @return the same builder instance
    */
   public T withScope(String scope) {

@@ -8,7 +8,6 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.readFileToString;
@@ -17,7 +16,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.util.CompilerUtils.JarCompiler;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
@@ -55,7 +53,6 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   private JarFileBuilder overriderLibrary;
   private JarFileBuilder overrider2Library;
   private JarFileBuilder overriderTestLibrary;
-  private JarFileBuilder muleJavaModulePlugin;
   private MemoryAppenderResource appender;
 
   public ClassloadingTroubleshootingTestCase(boolean parallelDeployment) {
@@ -82,9 +79,6 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
         new JarFileBuilder("overrider-test-library",
                            new JarCompiler().compiling(getResourceFile("/classloading-troubleshooting/src/test/OverrideMe.java"))
                                .compile("overrider-test-library.jar"));
-    muleJavaModulePlugin =
-        new JarFileBuilder("mule-java-module", new File(getProperty("muleJavaModule"))).withGroupId("org.mule.module")
-            .withClassifier(MULE_PLUGIN_CLASSIFIER).withVersion("1.3.0-SNAPSHOT");
 
     appender = new MemoryAppenderResource(containerClassLoader.getClassLoader());
   }
@@ -152,7 +146,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     completeDomain(domainFileBuilder, useLightWeightPackage);
 
     ApplicationFileBuilder applicationFileBuilder = createApplicationFileBuilder(useLightWeightPackage);
-    addJmsPropertiesResourceFile(addJavaModulePlugin(applicationFileBuilder, useLightWeightPackage))
+    addJmsPropertiesResourceFile(applicationFileBuilder)
         .dependingOn(domainFileBuilder);
 
     deployDomainAndApplication(domainFileBuilder, applicationFileBuilder);
@@ -179,15 +173,13 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
     ApplicationFileBuilder applicationFileBuilder = createApplicationFileBuilder(useLightWeightPackage);
     addJmsPropertiesResourceFile(
-                                 addOverride2Library(
-                                                     addJavaModulePlugin(applicationFileBuilder, useLightWeightPackage),
-                                                     useLightWeightPackage))
-                                                         .dependingOn(domainFileBuilder);
+                                 addOverride2Library(applicationFileBuilder, useLightWeightPackage))
+                                     .dependingOn(domainFileBuilder);
 
     deployDomainAndApplication(domainFileBuilder, applicationFileBuilder);
 
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
-    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
     assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-test-overrideme-class-not-found");
   }
 
@@ -206,10 +198,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     completeDomain(domainFileBuilder, useLightWeightPackage);
 
     ApplicationFileBuilder applicationFileBuilder = createApplicationFileBuilder(useLightWeightPackage);
-    addOverride2Library(
-                        addJavaModulePlugin(applicationFileBuilder, useLightWeightPackage),
-                        useLightWeightPackage)
-                            .dependingOn(domainFileBuilder);
+    addOverride2Library(applicationFileBuilder, useLightWeightPackage)
+        .dependingOn(domainFileBuilder);
 
     deployDomainAndApplication(domainFileBuilder, applicationFileBuilder);
 
@@ -271,18 +261,6 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
       addDependencyToRepository(overriderTestLibrary);
     }
     return deployableFileBuilder.dependingOn(overriderTestLibrary);
-  }
-
-  private <T extends DeployableFileBuilder<T>> DeployableFileBuilder<T> addJavaModulePlugin(DeployableFileBuilder<T> deployableFileBuilder,
-                                                                                            boolean useLightWeightPackage)
-      throws IOException {
-    if (useLightWeightPackage) {
-      addDependencyToRepository(muleJavaModulePlugin);
-    }
-
-    deployableFileBuilder.dependingOn(muleJavaModulePlugin);
-
-    return deployableFileBuilder;
   }
 
   private <T extends DeployableFileBuilder<T>> DeployableFileBuilder<T> addDomainConfigYamlFile(DeployableFileBuilder<T> deployableFileBuilder) {
