@@ -26,12 +26,7 @@ import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public abstract class MetadataExecutor {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(MetadataExecutor.class);
 
   protected ConnectionManager connectionManager;
   protected ReflectionCache reflectionCache;
