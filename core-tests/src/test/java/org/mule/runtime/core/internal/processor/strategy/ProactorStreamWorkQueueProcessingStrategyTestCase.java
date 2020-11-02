@@ -489,7 +489,7 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   }
 
   @Test
-  @FlakyTest(times = 200)
+  //@FlakyTest(times = 200)
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
     assumeThat(mode, is(SOURCE));
 

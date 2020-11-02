@@ -568,6 +568,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
         try {
           return just(event)
               .doOnNext(flow::checkBackpressure)
+                  .doOnError(e -> {
+                    LOGGER.error("We are having a " + e.getClass());
+                  })
               .onErrorMap(FlowBackPressureException.class,
                           backPressureExceptionMapper())
               .transform(triggerableMessageSource.getListener())
@@ -583,8 +586,11 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   private Function<FlowBackPressureException, Throwable> backPressureExceptionMapper() {
     return backpressureException -> {
       try {
+        LOGGER.error("We are creaging a messaging exception with backpressure exception " + backpressureException);
         return new MessagingException(newEvent(), backpressureException);
       } catch (MuleException e) {
+        LOGGER.error("There was an error, propagating exception " + e);
+        e.printStackTrace();
         throw propagate(e);
       }
     };
