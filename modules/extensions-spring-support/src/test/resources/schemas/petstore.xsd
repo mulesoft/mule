@@ -784,6 +784,49 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WatermarkingPetAdoptionSourceType" substitutionGroup="mule:abstract-message-source" name="watermarking-pet-adoption-source"></xs:element>
+  <xs:complexType name="WatermarkingPetAdoptionSourceType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="1" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+          <xs:element minOccurs="1" maxOccurs="1" ref="mule:scheduling-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="pets">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="pet">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="watermarks">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="watermark">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="watermark"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="idempotent"></xs:attribute>
+        <xs:attribute type="mule:substitutableName" use="optional" name="pets"></xs:attribute>
+        <xs:attribute type="mule:substitutableName" use="optional" name="watermarks"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="required" name="itemsPerPoll"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Pet-sourceType" substitutionGroup="mule:abstract-message-source" name="pet-source"></xs:element>
   <xs:complexType name="Pet-sourceType">
     <xs:complexContent>
