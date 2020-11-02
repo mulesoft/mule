@@ -1722,6 +1722,9 @@
                       "typeId": "org.mule.runtime.api.config.PoolingProfile",
                       "description": {
                         "value": "A pooling profile is used to configure the pooling behaviour of Mule components. Each component can have its own pooling profile."
+                      },
+                      "typeAlias": {
+                        "value": "pooling-profile"
                       }
                     },
                     "fields": [

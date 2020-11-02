@@ -331,6 +331,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "TrustStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "trust-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                         }
@@ -448,6 +455,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "KeyStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "key-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Key store configuration. The key store contains the keys of this server/client."
                         }
@@ -7849,6 +7863,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "TrustStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "trust-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                             }
@@ -7966,6 +7987,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "KeyStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "key-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Key store configuration. The key store contains the keys of this server/client."
                             }
@@ -8886,6 +8914,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "TrustStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "trust-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                             }
@@ -9003,6 +9038,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "KeyStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "key-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Key store configuration. The key store contains the keys of this server/client."
                             }
@@ -9927,6 +9969,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "TrustStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "trust-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                             }
@@ -10044,6 +10093,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "KeyStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "key-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Key store configuration. The key store contains the keys of this server/client."
                             }
@@ -10618,6 +10674,9 @@
                       "typeId": "org.mule.runtime.api.config.PoolingProfile",
                       "description": {
                         "value": "A pooling profile is used to configure the pooling behaviour of Mule components. Each component can have its own pooling profile."
+                      },
+                      "typeAlias": {
+                        "value": "pooling-profile"
                       }
                     },
                     "fields": [
@@ -11174,6 +11233,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "TrustStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "trust-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                             }
@@ -11291,6 +11357,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "KeyStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "key-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Key store configuration. The key store contains the keys of this server/client."
                             }
@@ -12211,6 +12284,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "TrustStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "trust-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                             }
@@ -12328,6 +12408,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "KeyStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "key-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Key store configuration. The key store contains the keys of this server/client."
                             }
@@ -21198,6 +21285,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "TrustStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "trust-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                         }
@@ -21315,6 +21409,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "KeyStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "key-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Key store configuration. The key store contains the keys of this server/client."
                         }
@@ -22235,6 +22336,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "TrustStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "trust-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                         }
@@ -22352,6 +22460,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "KeyStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "key-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Key store configuration. The key store contains the keys of this server/client."
                         }
@@ -23276,6 +23391,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "TrustStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "trust-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                         }
@@ -23393,6 +23515,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "KeyStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "key-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Key store configuration. The key store contains the keys of this server/client."
                         }
@@ -23967,6 +24096,9 @@
                   "typeId": "org.mule.runtime.api.config.PoolingProfile",
                   "description": {
                     "value": "A pooling profile is used to configure the pooling behaviour of Mule components. Each component can have its own pooling profile."
+                  },
+                  "typeAlias": {
+                    "value": "pooling-profile"
                   }
                 },
                 "fields": [
@@ -24523,6 +24655,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "TrustStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "trust-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                         }
@@ -24640,6 +24779,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "KeyStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "key-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Key store configuration. The key store contains the keys of this server/client."
                         }
@@ -25560,6 +25706,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "TrustStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "trust-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                         }
@@ -25677,6 +25830,13 @@
                       "type": "Object",
                       "annotations": {
                         "typeId": "KeyStore",
+                        "QName": {
+                          "value": {
+                            "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                            "localPart": "key-store",
+                            "prefix": "tls"
+                          }
+                        },
                         "description": {
                           "value": "Key store configuration. The key store contains the keys of this server/client."
                         }
@@ -30098,6 +30258,13 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "TrustStore",
+                    "QName": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                        "localPart": "trust-store",
+                        "prefix": "tls"
+                      }
+                    },
                     "description": {
                       "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                     }
@@ -30215,6 +30382,13 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "KeyStore",
+                    "QName": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                        "localPart": "key-store",
+                        "prefix": "tls"
+                      }
+                    },
                     "description": {
                       "value": "Key store configuration. The key store contains the keys of this server/client."
                     }
@@ -30838,6 +31012,13 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "TrustStore",
+                    "QName": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                        "localPart": "trust-store",
+                        "prefix": "tls"
+                      }
+                    },
                     "description": {
                       "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                     }
@@ -30955,6 +31136,13 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "KeyStore",
+                    "QName": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                        "localPart": "key-store",
+                        "prefix": "tls"
+                      }
+                    },
                     "description": {
                       "value": "Key store configuration. The key store contains the keys of this server/client."
                     }
@@ -31415,6 +31603,13 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "TrustStore",
+                    "QName": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                        "localPart": "trust-store",
+                        "prefix": "tls"
+                      }
+                    },
                     "description": {
                       "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                     }
@@ -31532,6 +31727,13 @@
                   "type": "Object",
                   "annotations": {
                     "typeId": "KeyStore",
+                    "QName": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                        "localPart": "key-store",
+                        "prefix": "tls"
+                      }
+                    },
                     "description": {
                       "value": "Key store configuration. The key store contains the keys of this server/client."
                     }
@@ -32034,6 +32236,13 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "TrustStore",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                              "localPart": "trust-store",
+                              "prefix": "tls"
+                            }
+                          },
                           "description": {
                             "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                           }
@@ -32151,6 +32360,13 @@
                         "type": "Object",
                         "annotations": {
                           "typeId": "KeyStore",
+                          "QName": {
+                            "value": {
+                              "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                              "localPart": "key-store",
+                              "prefix": "tls"
+                            }
+                          },
                           "description": {
                             "value": "Key store configuration. The key store contains the keys of this server/client."
                           }
@@ -32681,6 +32897,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "TrustStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "trust-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
                             }
@@ -32798,6 +33021,13 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "KeyStore",
+                            "QName": {
+                              "value": {
+                                "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                                "localPart": "key-store",
+                                "prefix": "tls"
+                              }
+                            },
                             "description": {
                               "value": "Key store configuration. The key store contains the keys of this server/client."
                             }
