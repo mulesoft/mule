@@ -11,16 +11,22 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_REDEPLOYMENT_ENABLED;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
+
+import com.google.common.base.Preconditions;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
@@ -36,11 +42,14 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Creates Mule Domain files.
  */
 public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> {
+
+  private Properties properties = new Properties();
 
   /**
    * Creates a new builder
@@ -81,6 +90,21 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
     return PROVIDED_SCOPE;
   }
 
+  /**
+   * Adds a property into the plugin properties file.
+   *
+   * @param propertyName name fo the property to add. Non empty
+   * @param propertyValue value of the property to add. Non null.
+   * @return the same builder instance
+   */
+  public DomainFileBuilder configuredWith(String propertyName, String propertyValue) {
+    checkImmutable();
+    Preconditions.checkArgument(!isEmpty(propertyName), "Property name cannot be empty");
+    Preconditions.checkArgument(propertyValue != null, "Property value cannot be null");
+    properties.put(propertyName, propertyValue);
+    return this;
+  }
+
   @Override
   protected DomainFileBuilder getThis() {
     return this;
@@ -111,15 +135,18 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
     }
 
     Object redeploymentEnabled = deployProperties.get(PROPERTY_REDEPLOYMENT_ENABLED);
-    Object configResources = deployProperties.get(PROPERTY_CONFIG_RESOURCES);
+    Optional<String> configResources = ofNullable((String) deployProperties.get(PROPERTY_CONFIG_RESOURCES));
+
+    Optional<String> exportedResources = ofNullable((String) properties.get(EXPORTED_RESOURCE_PROPERTY));
+    Optional<String> exportedClassPackages = ofNullable((String) properties.get(EXPORTED_CLASS_PACKAGES_PROPERTY));
 
     File domainDescriptor = createDomainJsonDescriptorFile(
                                                            redeploymentEnabled == null
                                                                ? empty()
                                                                : ofNullable(Boolean
                                                                    .valueOf((String) redeploymentEnabled)),
-                                                           Optional.ofNullable((String) configResources),
-                                                           empty());
+                                                           configResources,
+                                                           exportedResources, exportedClassPackages);
 
     customResources.add(new ZipResource(domainDescriptor.getAbsolutePath(), MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION));
     return customResources;
@@ -131,7 +158,8 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
   }
 
   private File createDomainJsonDescriptorFile(Optional<Boolean> redeploymentEnabled,
-                                              Optional<String> configResources, Optional<String> exportedResources) {
+                                              Optional<String> configResources, Optional<String> exportedResources,
+                                              Optional<String> exportedClassPackages) {
     File domainDescriptor = new File(getTempFolder(), getArtifactId() + "domain.json");
     domainDescriptor.deleteOnExit();
     MuleDomainModel.MuleDomainModelBuilder muleDomainModelBuilder =
@@ -146,6 +174,10 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
         new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID);
     exportedResources.ifPresent(resources -> {
       muleArtifactClassLoaderDescriptorBuilder.addProperty(EXPORTED_RESOURCES, resources.split(","));
+    });
+
+    exportedClassPackages.ifPresent(packages -> {
+      muleArtifactClassLoaderDescriptorBuilder.addProperty(EXPORTED_PACKAGES, packages.split(","));
     });
     muleDomainModelBuilder.withClassLoaderModelDescriptorLoader(muleArtifactClassLoaderDescriptorBuilder.build());
     muleDomainModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
