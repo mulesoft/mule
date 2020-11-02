@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.source;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
@@ -62,27 +63,47 @@ public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalT
   public void watermarkPoll() throws Exception {
     startFlow("watermark");
 
-    assertAllPetsAdopted();
+    assertAllPetsAdopted(ALL_PETS);
 
-    assertIdempotentAdoptions();
+    assertIdempotentAdoptions(ALL_PETS);
   }
 
+  @Test
+  public void repeatedItemInNewPollSetsUpdatedWatermark() throws Exception {
+    List<String> expectedPets = asList("Anibal", "ANIBAL");
 
+    startFlow("repeatedItemInNewPollSetsUpdatedWatermark");
 
-  private void assertIdempotentAdoptions() {
+    assertAllPetsAdopted(expectedPets);
+
+    assertIdempotentAdoptions(expectedPets);
+  }
+
+  @Test
+  public void repeatedItemInNewPollDoesNotSetUpdatedWatermark() throws Exception {
+    List<String> expectedPets = asList("Anibal", "Barbara", "Colonel Meow", "BARBARA");
+
+    startFlow("repeatedItemInNewPollDoesNotSetUpdatedWatermark");
+
+    assertAllPetsAdopted(expectedPets);
+
+    assertIdempotentAdoptions(expectedPets);
+  }
+
+  private void assertIdempotentAdoptions(List<String> pets) {
     checkNot(LONG_TIMEOUT, PROBER_FREQUENCY, () -> {
       synchronized (ADOPTION_EVENTS) {
-        return ADOPTION_EVENTS.size() > ALL_PETS.size();
+        return ADOPTION_EVENTS.size() > pets.size();
       }
     });
   }
 
-  private void assertAllPetsAdopted() {
+  private void assertAllPetsAdopted(List<String> pets) {
     check(SHORT_TIMEOUT, PROBER_FREQUENCY, () -> {
       synchronized (ADOPTION_EVENTS) {
-        return ADOPTION_EVENTS.size() >= ALL_PETS.size() &&
+        return ADOPTION_EVENTS.size() >= pets.size() &&
             ADOPTION_EVENTS.stream().map(e -> e.getMessage().getPayload().getValue().toString()).collect(toList())
-                .containsAll(ALL_PETS);
+                .containsAll(pets);
       }
     });
   }
