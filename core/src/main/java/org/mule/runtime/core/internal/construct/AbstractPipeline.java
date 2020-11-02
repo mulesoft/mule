@@ -330,7 +330,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                            innerEventPub -> routeThroughProcessingStrategyTransformerInnerFlux(sinkRecorder,
                                                                                                                innerEventPub),
                                            () -> sinkRecorder.complete(), t -> sinkRecorder.error(t),
-                                           muleContext.getConfiguration().getShutdownTimeout(),
+                                           60000,
                                            completionCallbackScheduler, getDslSource()))
                                                .map(result -> {
                                                  result.applyLeft(t -> {
