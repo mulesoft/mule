@@ -76,12 +76,14 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
@@ -111,6 +113,19 @@ import com.google.gson.reflect.TypeToken;
  * @since 4.0
  */
 class MuleExtensionModelDeclarer {
+
+  private static final Class<? extends ModelProperty> allowsExpressionWithoutMarkersModelPropertyClass;
+
+  static {
+    Class<? extends ModelProperty> foundClass = null;
+    try {
+      foundClass = (Class<? extends ModelProperty>) Class
+          .forName("org.mule.runtime.module.extension.api.loader.java.property.AllowsExpressionWithoutMarkersModelProperty");
+    } catch (ClassNotFoundException | SecurityException e) {
+      // No custom location processing
+    }
+    allowsExpressionWithoutMarkersModelPropertyClass = foundClass;
+  }
 
   final ErrorModel anyError = newError(ANY).build();
   final ErrorModel routingError = newError(ROUTING).withParent(anyError).build();
@@ -566,9 +581,20 @@ class MuleExtensionModelDeclarer {
 
     NestedRouteDeclarer when = choice.withRoute("when").withMinOccurs(1);
     when.withChain();
-    when.onDefaultParameterGroup()
+    ParameterDeclarer expressionParam = when.onDefaultParameterGroup()
         .withRequiredParameter("expression")
-        .ofType(typeLoader.load(boolean.class))
+        .ofType(typeLoader.load(boolean.class));
+
+    if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
+      try {
+        expressionParam = expressionParam
+            .withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
+      } catch (InstantiationException | IllegalAccessException e) {
+        // ignore
+      }
+    }
+
+    expressionParam
         .describedAs("The expression to evaluate.");
 
     choice.withRoute("otherwise").withMaxOccurs(1).withChain();
