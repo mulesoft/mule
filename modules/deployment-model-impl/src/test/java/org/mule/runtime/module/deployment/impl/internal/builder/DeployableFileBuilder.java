@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
@@ -35,6 +36,8 @@ import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -221,10 +224,24 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
   private Artifact getArtifact(AbstractDependencyFileBuilder builder, boolean shared) {
     ArtifactCoordinates artifactCoordinates =
         new ArtifactCoordinates(builder.getGroupId(), builder.getArtifactId(), builder.getVersion(), builder.getType(),
-                                builder.getClassifier());
-    final Artifact artifact = new Artifact(artifactCoordinates, builder.getArtifactFile().toURI());
+                                builder.getClassifier(), builder.getScope());
+    URI uri;
+    if (MULE_DOMAIN_CLASSIFIER.equals(builder.getClassifier())) {
+      try {
+        uri = new URI("");
+      } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
+    } else {
+      uri = builder.getArtifactFile().toURI();
+    }
+    final Artifact artifact = new Artifact(artifactCoordinates, uri);
     // mule-maven-plugin (packager) will not include packages/resources for mule-plugin dependencies
-    if (isSupportingPackagesResourcesInformation() && !MULE_PLUGIN_CLASSIFIER.equals(builder.getClassifier())) {
+    boolean shouldAddPackagesAndResources = !MULE_PLUGIN_CLASSIFIER.equals(artifact.getArtifactCoordinates().getClassifier())
+        && artifact.getUri() != null
+        // mule-domain are set with a "" URI
+        && isNotBlank(artifact.getUri().getPath());
+    if (isSupportingPackagesResourcesInformation() && shouldAddPackagesAndResources) {
       JarInfo jarInfo = jarFileExplorer.explore(artifact.getUri());
       artifact.setPackages(jarInfo.getPackages().toArray(new String[jarInfo.getPackages().size()]));
       artifact.setResources(jarInfo.getResources().toArray(new String[jarInfo.getResources().size()]));

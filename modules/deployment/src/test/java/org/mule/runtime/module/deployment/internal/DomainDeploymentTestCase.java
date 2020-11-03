@@ -1638,6 +1638,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void domainIncludingForbiddenJavaClass() throws Exception {
     DomainFileBuilder domainFileBuilder = new DomainFileBuilder("forbidden-domain")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
         .definedBy("empty-domain-config.xml")
         .containingClass(pluginForbiddenJavaEchoTestClassFile, "org/foo/echo/PluginForbiddenJavaEcho.class")
         .dependingOn(new JarFileBuilder("barUtilsForbiddenJavaJarFile", barUtilsForbiddenJavaJarFile));
@@ -1666,6 +1667,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void domainIncludingForbiddenMuleContainerClass() throws Exception {
     DomainFileBuilder domainFileBuilder = new DomainFileBuilder("forbidden-domain")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
         .definedBy("empty-domain-config.xml")
         .containingClass(pluginForbiddenMuleContainerEchoTestClassFile, "org/foo/echo/PluginForbiddenMuleContainerEcho.class")
         .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleContainerJarFile", barUtilsForbiddenMuleContainerJarFile));
@@ -1694,6 +1696,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void domainIncludingForbiddenMuleContainerThirdParty() throws Exception {
     DomainFileBuilder domainFileBuilder = new DomainFileBuilder("forbidden-domain")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
         .definedBy("empty-domain-config.xml")
         .containingClass(pluginForbiddenMuleThirdPartyEchoTestClassFile, "org/foo/echo/PluginForbiddenMuleThirdPartyEcho.class")
         .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleThirdPartyJarFile", barUtilsForbiddenMuleThirdPartyJarFile));
