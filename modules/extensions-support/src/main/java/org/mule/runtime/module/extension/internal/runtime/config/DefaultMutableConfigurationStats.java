@@ -19,6 +19,7 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
 
   private final AtomicInteger inflightOperations = new AtomicInteger(0);
   private final AtomicInteger runningSources = new AtomicInteger(0);
+  private final AtomicInteger activeComponents = new AtomicInteger(0);
   private final TimeSupplier timeSupplier;
   private long lastUsedMillis;
 
@@ -69,6 +70,14 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
    * {@inheritDoc}
    */
   @Override
+  public int getActiveComponents() {
+    return activeComponents.get();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public int addInflightOperation() {
     updateLastUsed();
     return inflightOperations.incrementAndGet();
@@ -99,5 +108,23 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
   public int discountRunningSource() {
     updateLastUsed();
     return runningSources.decrementAndGet();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int addActiveComponent() {
+    updateLastUsed();
+    return activeComponents.incrementAndGet();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int discountActiveComponent() {
+    updateLastUsed();
+    return activeComponents.decrementAndGet();
   }
 }

@@ -59,6 +59,8 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
@@ -92,6 +94,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -548,6 +551,22 @@ public class MuleExtensionUtils {
       return (MutableConfigurationStats) (context.getConfiguration().get()).getStatistics();
     } else {
       return null;
+    }
+  }
+
+  /**
+   * Calls a consumer of the {@link MutableConfigurationStats} for a given {@link ConfigurationInstance}
+   *
+   * @param configurationInstance the {@link ConfigurationInstance} from where to extract the stats
+   * @param mutableConfigurationStatsConsumer the {@link MutableConfigurationStats} consumer
+   *
+   * @since 4.2.3 4.3.1
+   */
+  public static void tryToMutateConfigurationStats(ConfigurationInstance configurationInstance,
+                                                   Consumer<MutableConfigurationStats> mutableConfigurationStatsConsumer) {
+    ConfigurationStats configurationStats = configurationInstance.getStatistics();
+    if (configurationStats instanceof MutableConfigurationStats) {
+      mutableConfigurationStatsConsumer.accept((MutableConfigurationStats) configurationStats);
     }
   }
 }

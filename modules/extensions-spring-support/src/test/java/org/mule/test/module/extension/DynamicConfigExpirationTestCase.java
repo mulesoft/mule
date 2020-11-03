@@ -7,16 +7,27 @@
 package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
+import static org.mule.tck.probe.PollingProber.check;
+import static org.mule.tck.probe.PollingProber.checkNot;
+import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closePagingProviderCalls;
+import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.getPageCalls;
 
 import org.mule.functional.api.flow.FlowRunner;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +42,39 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   @Override
   protected String getConfigFile() {
     return "dynamic-config-expiration.xml";
+  }
+
+  private static List<Integer> capturedStats;
+
+  public static class CaptureEventProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      synchronized (capturedStats) {
+        TypedValue configVariable = event.getVariables().get("heisenbergConfig");
+        if (configVariable != null) {
+          HeisenbergExtension config = (HeisenbergExtension) configVariable.getValue();
+          capturedStats.add(muleContext.getExtensionManager().getConfiguration(config.getConfigName(), event).getStatistics()
+              .getActiveComponents());
+        } else {
+          capturedStats
+              .add(muleContext.getExtensionManager().getConfiguration("heisenbergWithShortExpiration", event).getStatistics()
+                  .getActiveComponents());
+        }
+      }
+      return event;
+    }
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    resetCounters();
+    capturedStats = new LinkedList<>();
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    capturedStats = null;
   }
 
   @Test
@@ -85,6 +129,38 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     doNotExpireDynamicConfigWithCustomExpirationUsedBySource();
   }
 
+  @Test
+  public void doNotExpireConfigUsedByPagedOperation() throws Exception {
+    flowRunner("dynamicWithShortExpirationForPagedOperation").withVariable("heisenbergName", "Waltercito White")
+        .withVariable("failOn", -1).run();
+    checkNot(30000, 3000, () -> capturedStats.size() > 4);
+    assertThat(capturedStats, contains(2, 2, 2, 1));
+  }
+
+  @Test
+  public void doNotExpireConfigUsedByPagedOperationWithReconnectionOnFirstPage() throws Exception {
+    flowRunner("dynamicWithShortExpirationForPagedOperation").withVariable("heisenbergName", "Waltercito White")
+        .withVariable("failOn", 1).run();
+    checkNot(30000, 3000, () -> capturedStats.size() > 3);
+    assertThat(capturedStats, contains(2, 2, 1));
+  }
+
+  @Test
+  public void doNotExpireConfigUsedByPagedOperationWithReconnectionOnSecondPage() throws Exception {
+    flowRunner("dynamicWithShortExpirationForPagedOperation").withVariable("heisenbergName", "Waltercito White")
+        .withVariable("failOn", 2).run();
+    checkNot(30000, 3000, () -> capturedStats.size() > 3);
+    assertThat(capturedStats, contains(2, 2, 1));
+  }
+
+  @Test
+  public void doNotExpireConfigUsedByStreamingOperation() throws Exception {
+    flowRunner("dynamicWithShortExpirationForStreamingOperation").withVariable("heisenbergName", "Waltercito White")
+        .run();
+    checkNot(30000, 3000, () -> capturedStats.size() > 2);
+    assertThat(capturedStats, contains(2, 1));
+  }
+
   private void assertInitialised(HeisenbergExtension config) {
     assertThat(config.getInitialise(), is(1));
     assertThat(config.getStart(), is(1));
@@ -113,5 +189,10 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     assertThat(config.getPersonalInfo().getName(), is(payload));
 
     return config;
+  }
+
+  public static void resetCounters() {
+    closePagingProviderCalls = 0;
+    getPageCalls = 0;
   }
 }

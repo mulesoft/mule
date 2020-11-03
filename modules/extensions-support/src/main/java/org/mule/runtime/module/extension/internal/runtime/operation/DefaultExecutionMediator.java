@@ -102,6 +102,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     final MutableConfigurationStats stats = getMutableConfigurationStats(context);
     if (stats != null) {
       stats.addInflightOperation();
+      stats.addActiveComponent();
     }
 
     try {
@@ -163,6 +164,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
         } finally {
           if (stats != null) {
             stats.discountInflightOperation();
+            stats.discountActiveComponent();
           }
         }
       }
@@ -177,6 +179,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
           } finally {
             if (stats != null) {
               stats.discountInflightOperation();
+              stats.discountActiveComponent();
             }
           }
         }
