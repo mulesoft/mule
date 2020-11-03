@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Long.MIN_VALUE;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -66,6 +67,7 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -515,7 +517,10 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
       }
 
       // Give time for the extra dispatch to get to the point where it starts retrying
-      Thread.sleep(500);
+      ProactorStreamProcessingStrategy strategy = (ProactorStreamProcessingStrategy) flow.getProcessingStrategy();
+      do {
+        Thread.sleep(500);
+      } while (strategy.lastRetryTimestamp.get() == MIN_VALUE);
 
       expectedException.expectCause(instanceOf(FlowBackPressureRequiredSchedulerBusyException.class));
       processFlow(newEvent());
