@@ -568,9 +568,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
         try {
           return just(event)
               .doOnNext(flow::checkBackpressure)
-                  .doOnError(e -> {
-                    LOGGER.error("We are having a " + e.getClass());
-                  })
+              .doOnError(e -> {
+                LOGGER.error("We are having a " + e.getClass());
+              })
               .onErrorMap(FlowBackPressureException.class,
                           backPressureExceptionMapper())
               .transform(triggerableMessageSource.getListener())
