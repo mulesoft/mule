@@ -6,13 +6,18 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
+import static org.mule.runtime.config.internal.dsl.spring.ParameterGroupUtils.getSourceCallbackAwareParameter;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -23,6 +28,7 @@ import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.SetterAttributeDefinition;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -52,16 +58,22 @@ class ComponentConfigurationBuilder<T> {
   private final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper;
   private final ObjectReferencePopulator objectReferencePopulator = new ObjectReferencePopulator();
   private final List<ComponentValue> complexParameters;
+  private final ComponentAst ownerComponent;
   private final ComponentAst componentModel;
+  private final CreateBeanDefinitionRequest createBeanDefinitionRequest;
   private final ComponentBuildingDefinition<T> componentBuildingDefinition;
 
   public ComponentConfigurationBuilder(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                       ComponentAst componentModel, ComponentBuildingDefinition<T> componentBuildingDefinition,
+                                       ComponentAst ownerComponent, ComponentAst componentModel,
+                                       CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                                       ComponentBuildingDefinition<T> componentBuildingDefinition,
                                        BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
+    this.ownerComponent = ownerComponent;
     this.componentModel = componentModel;
+    this.createBeanDefinitionRequest = createBeanDefinitionRequest;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.beanDefinitionBuilderHelper = beanDefinitionBuilderHelper;
-    this.complexParameters = collectComplexParametersWithTypes(springComponentModels, componentModel);
+    this.complexParameters = collectComplexParametersWithTypes(springComponentModels, ownerComponent, componentModel);
   }
 
   public void processConfiguration() {
@@ -75,7 +87,7 @@ class ComponentConfigurationBuilder<T> {
   }
 
   private List<ComponentValue> collectComplexParametersWithTypes(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                                                 ComponentAst componentModel) {
+                                                                 ComponentAst ownerComponent, ComponentAst componentModel) {
     /*
      * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition. This code will go
      * away one we remove the old parsing method.
@@ -283,15 +295,15 @@ class ComponentConfigurationBuilder<T> {
     @Override
     public void onReferenceSimpleParameter(final String configAttributeName) {
       if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(configAttributeName)) {
-        componentModel.getRawParameterValue(configAttributeName)
-            .ifPresent(reference -> this.value = new RuntimeBeanReference(reference));
+        getParameterValue(configAttributeName, null)
+            .ifPresent(reference -> this.value = new RuntimeBeanReference((String) reference));
       }
     }
 
     @Override
     public void onSoftReferenceSimpleParameter(String softReference) {
       if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(softReference)) {
-        componentModel.getRawParameterValue(softReference)
+        getParameterValue(softReference, null)
             .ifPresent(reference -> this.value = reference);
       }
     }
@@ -309,15 +321,66 @@ class ComponentConfigurationBuilder<T> {
     @Override
     public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {
       if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(parameterName)) {
-        Object parameterValue = componentModel.getRawParameterValue(parameterName)
+        getParameterValue(parameterName, defaultValue)
+            .map(parameterValue -> typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue)
+            .ifPresent(convertedParameterValue -> this.value = convertedParameterValue);
+      }
+    }
+
+    private Optional<Object> getParameterValue(String parameterName, Object defaultValue) {
+      ComponentParameterAst parameter = ownerComponent.getModel(ParameterizedModel.class)
+          .map(ownerComponentModel -> {
+            if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
+              // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
+              // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
+              // previous implementations.
+              int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
+              final ComponentAst possibleGroup =
+                  ownerIndex + 1 >= createBeanDefinitionRequest.getComponentModelHierarchy().size()
+                      ? componentModel
+                      : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
+
+              return getSourceCallbackAwareParameter(ownerComponent, parameterName, possibleGroup,
+                                                     (SourceModel) ownerComponentModel);
+            } else {
+              ComponentParameterAst p = ownerComponent.getParameter(parameterName);
+
+              if (p == null) {
+                // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.
+                return ownerComponent.getParameter(componentModel.getIdentifier().getName());
+              }
+
+              return p;
+            }
+          })
+          .orElse(null);
+
+      Object parameterValue;
+      if (parameter == null) {
+        // Fallback for test components that do not have an extension model.
+        parameterValue = componentModel.getRawParameterValue(parameterName)
             .map(v -> (Object) v)
             .orElse(defaultValue);
+      } else {
+        parameterValue = parameter.getValue()
+            .mapLeft(expr -> DEFAULT_EXPRESSION_PREFIX + expr + DEFAULT_EXPRESSION_POSTFIX)
+            .getValue()
+            .orElse(null);
 
-        if (parameterValue != null) {
-          parameterValue = typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue;
+        if (defaultValue != null && parameterValue == null) {
+          logger
+              .warn("Paramerter {} from extension {} has a defaultValue configured in the componentBuildingDefinition but not in the extensionModel.",
+                    parameterName, ownerComponent.getIdentifier().getNamespace());
+          parameterValue = defaultValue;
         }
-        this.value = parameterValue;
       }
+
+      if (parameterValue instanceof ComponentAst || parameterValue instanceof Collection) {
+        // Do not set complex parameters here
+        return empty();
+      }
+
+      return ofNullable(parameterValue);
     }
 
     @Override

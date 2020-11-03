@@ -6,13 +6,13 @@
  */
 package org.mule.test.module.extension;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static java.util.Arrays.asList;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.hamcrest.Description;
@@ -35,20 +35,20 @@ public class ExpressionSupportTestCase extends AbstractExtensionFunctionalTestCa
   }
 
   @Parameters(name = "{0}")
-  public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {{"heisenberg-invalid-expression-parameter.xml"},
-        {"heisenberg-fixed-parameter-with-expression.xml"}, {"heisenberg-invalid-expression-parameter-inside-group.xml"}});
+  public static Collection<String> data() {
+    return asList("heisenberg-invalid-expression-parameter.xml",
+                  "heisenberg-fixed-parameter-with-expression.xml",
+                  "heisenberg-invalid-expression-parameter-inside-group.xml");
   }
 
   @Override
-  protected String[] getConfigFiles() {
-    return new String[] {config};
+  protected String getConfigFile() {
+    return config;
   }
 
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
-    expectedException.expect(InitialisationException.class);
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedException.expect(ConfigurationException.class);
     expectedException.expectCause(new TypeSafeMatcher<Throwable>() {
 
       @Override

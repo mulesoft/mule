@@ -31,7 +31,7 @@ import org.springframework.beans.factory.FactoryBean;
 public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponent
     implements FactoryBean<ModuleOperationMessageProcessor> {
 
-  private Map<String, String> parameters = emptyMap();
+  private Map<String, Object> parameters = emptyMap();
 
   private List<EnrichedErrorMapping> errorMappings = emptyList();
 
@@ -68,7 +68,7 @@ public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponen
   public Map<String, String> getProperties() {
     // `properties` in the scope of a Xml-Sdk operation means the parameters of the config.
     if (parameters.containsKey(MODULE_OPERATION_CONFIG_REF)) {
-      return extensionManager.getConfigurationProvider(parameters.get(MODULE_OPERATION_CONFIG_REF))
+      return extensionManager.getConfigurationProvider((String) parameters.get(MODULE_OPERATION_CONFIG_REF))
           .filter(cp -> cp instanceof XmlSdkConfigurationProvider)
           .map(cp -> ((XmlSdkConfigurationProvider) cp).getParameters())
           .orElse(emptyMap());
@@ -77,7 +77,7 @@ public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponen
     }
   }
 
-  public void setParameters(Map<String, String> parameters) {
+  public void setParameters(Map<String, Object> parameters) {
     this.parameters = parameters;
   }
 

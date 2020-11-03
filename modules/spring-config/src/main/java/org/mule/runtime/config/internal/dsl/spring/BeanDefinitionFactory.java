@@ -175,9 +175,11 @@ public class BeanDefinitionFactory {
                                 componentModel.getModel(ParameterizedModel.class)
                                     .map(pm -> {
                                       componentModel.getParameters().stream()
-                                          .filter(param -> param.getResolvedRawValue() != null)
+                                          .filter(param -> param.getValue().getValue().isPresent())
                                           .forEach(param -> rawParams.put(param.getModel().getName(),
-                                                                          param.getResolvedRawValue()));
+                                                                          param.getValue()
+                                                                              .mapLeft(expr -> "#[" + expr + "]")
+                                                                              .getValue().get().toString()));
 
                                       return rawParams;
                                     })

@@ -17,6 +17,8 @@ import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PRE
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 
 import org.mule.runtime.api.el.CompiledExpression;
@@ -109,7 +111,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   }
 
   private void evaluateCorrectArguments() {
-    if (targetValue != null && target == null) {
+    if (!isSanitizedPayload(sanitize(targetValue)) && target == null) {
       throw new IllegalArgumentException("Can't define a targetValue with no target");
     }
   }
@@ -135,22 +137,19 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
       messageBuilder.mediaType(configuredMediaType);
     }
     Message resultMessage = messageBuilder.build();
+
     if (target == null) {
       return CoreEvent.builder(event).message(resultMessage).build();
     } else {
-      if (targetValue == null) { //Return the whole message
-        return CoreEvent.builder(event).addVariable(target, resultMessage).build();
-      } else { //typeValue was defined by the user
-        if (KEEP_TYPE_TARGET_AND_TARGET_VAR) {
-          CoreEvent resultEvent = CoreEvent.builder(event).message(resultMessage).build();
-          return outputToTarget(event, resultEvent, target, targetValueExpression, expressionManager);
-        } else {
-          return CoreEvent.builder(event).addVariable(target,
-                                                      expressionManager
-                                                          .evaluate(targetValue, CoreEvent.builder(event)
-                                                              .message(resultMessage).build()))
-              .build();
-        }
+      if (KEEP_TYPE_TARGET_AND_TARGET_VAR) {
+        CoreEvent resultEvent = CoreEvent.builder(event).message(resultMessage).build();
+        return outputToTarget(event, resultEvent, target, targetValueExpression, expressionManager);
+      } else {
+        return CoreEvent.builder(event).addVariable(target,
+                                                    expressionManager
+                                                        .evaluate(targetValue, CoreEvent.builder(event)
+                                                            .message(resultMessage).build()))
+            .build();
       }
     }
   }

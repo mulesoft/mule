@@ -10,6 +10,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
+import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -94,22 +95,26 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
 
       @Override
       public <T> Either<String, T> getValue() {
-        return (Either<String, T>) originalParameter.getValue()
-            .mapLeft(expr -> {
-              return literalsParameters.getOrDefault(expr, expr);
-            })
+        final Either<String, T> originalValue = originalParameter.getValue();
+
+        if (originalValue.isLeft()) {
+          final String expression = "#[" + originalValue.getLeft() + "]";
+          if (literalsParameters.containsKey(expression)) {
+            // Do the Gorvachev
+            return right((T) literalsParameters.get(expression));
+          } else {
+            return originalValue;
+          }
+        }
+
+        return (Either<String, T>) originalValue
             .mapRight(v -> {
               if (v instanceof String) {
-                String stringValue = (String) v;
-                if (moduleGlobalElementsNames.contains(stringValue)) {
-                  return stringValue.concat("-").concat(defaultGlobalElementSuffix);
-                } else {
-                  return literalsParameters.getOrDefault(stringValue, stringValue);
-                }
+                return macroExpandedRawValue((String) v);
               } else if (originalParameter.getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME)) {
                 return mapErrorMappings(originalParameter);
               }
-              return null;
+              return v;
             });
       }
 
