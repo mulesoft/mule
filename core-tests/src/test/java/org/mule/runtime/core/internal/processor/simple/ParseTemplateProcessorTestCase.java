@@ -23,10 +23,13 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.core.internal.util.TestFileUtils.isFileOpen;
 
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -66,6 +69,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
     parseTemplateProcessor = new ParseTemplateProcessor();
     parseTemplateProcessor.setExpressionManager(mockExpressionManager);
+    parseTemplateProcessor.setTargetValue("#[payload]");
   }
 
   @Test
@@ -236,6 +240,10 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   public void parseTemplateToTarget() throws InitialisationException {
     String payload = "Payload";
     String template = "Template";
+
+    final CompiledExpression compiledExpr = mock(CompiledExpression.class);
+    when(mockExpressionManager.compile(any(), any())).thenReturn(compiledExpr);
+
     parseTemplateProcessor.setContent(template);
     parseTemplateProcessor.setTarget("some_target_variable");
     parseTemplateProcessor.initialise();
@@ -243,11 +251,15 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     when(mockMuleMessage.getPayload()).thenReturn(of(payload));
     when(mockMuleMessage.getAttributes()).thenReturn(of(new HashMap<>()));
     when(mockExpressionManager.parseLogTemplate(any(), any(), any(), any())).thenReturn("Parsed");
+    final ExpressionManagerSession session = mock(ExpressionManagerSession.class);
+    final TypedValue<String> typedValue = new TypedValue<>("Parsed", DataType.STRING);
+    when(session.evaluate(compiledExpr)).thenAnswer(inv -> typedValue);
+    when(mockExpressionManager.openSession(any())).thenReturn(session);
 
     CoreEvent response = parseTemplateProcessor.process(event);
     assertNotNull(response);
     assertEquals(payload, response.getMessage().getPayload().getValue());
     assertEquals("Parsed",
-                 ((Message) response.getVariables().get("some_target_variable").getValue()).getPayload().getValue());
+                 response.getVariables().get("some_target_variable").getValue());
   }
 }
