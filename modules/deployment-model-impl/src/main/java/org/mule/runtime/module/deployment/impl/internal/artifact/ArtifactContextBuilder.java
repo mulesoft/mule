@@ -55,6 +55,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
@@ -377,7 +378,10 @@ public class ArtifactContextBuilder {
   }
 
   /**
-   * Allows the usage of {@link ComponentBuildingDefinitionRegistryFactory} to create a {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry}.
+   * Provides a {@link ComponentBuildingDefinitionRegistryFactory} factory to create a {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry} registry.
+   * </p>
+   * Registry holds all {@link ComponentBuildingDefinition} needed to create componentBuildingDefinitionRegistry {@link org.springframework.beans.factory.config.BeanDefinition} 
+   * that can later be converted to a runtime object that will be part of the artifact.
    * 
    * @param componentBuildingDefinitionRegistryFactory the {@link ComponentBuildingDefinitionRegistryFactory} factory
    *                                                   used to create a {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry}

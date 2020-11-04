@@ -231,7 +231,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   protected void configureSpringXmlConfigurationBuilder(ConfigurationBuilder builder) {
     builder.addServiceConfigurator(serviceConfigurator);
     if (builder instanceof SpringXmlConfigurationBuilder) {
-      if (mustRegenerateExtensionModels()) {
+      if (mustRegenerateComponentBuildingDefinitionRegistryFactory() || mustRegenerateExtensionModels()) {
         ((SpringXmlConfigurationBuilder) builder)
             .setComponentBuildingDefinitionRegistryFactory(new DefaultComponentBuildingDefinitionRegistryFactory());
       } else {
@@ -299,6 +299,16 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
    * @return whether the tests on this class need for extensions model to be generated again.
    */
   protected boolean mustRegenerateExtensionModels() {
+    return false;
+  }
+
+  /**
+   * if this return {@code true} a new {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory} instance will be used by tests.
+   * It's useful when same test class load different extensions through tests.
+   *
+   * @return whether the tests on this class need for {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory} to be generated again.
+   */
+  protected boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
     return false;
   }
 

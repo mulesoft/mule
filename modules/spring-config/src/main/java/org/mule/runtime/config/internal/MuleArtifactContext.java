@@ -208,11 +208,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     originalRegistry = ((MuleRegistryHelper) getMuleRegistry()).getDelegate();
 
     extensionManager = muleContext.getExtensionManager();
-    final Set<ExtensionModel> extensions = getExtensions();
 
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
-                                  componentBuildingDefinitionRegistryFactory.create(extensions));
+                                  componentBuildingDefinitionRegistryFactory.create(getExtensions()));
 
     this.applicationModel = createApplicationModel();
   }
