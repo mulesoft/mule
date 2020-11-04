@@ -87,5 +87,9 @@ public class ModuleGlobalElementTestCase extends AbstractCeXmlExtensionMuleArtif
     assertThat(client.getPassword(), is("notDoe"));
   }
 
+  @Override
+  public boolean mustRegenerateExtensionModels() {
+    return true;
+  }
 
 }

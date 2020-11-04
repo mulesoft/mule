@@ -195,4 +195,9 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractCeXmlEx
         .withVariable("secondPart", SECOND_PART)
         .run();
   }
+
+  @Override
+  public boolean mustRegenerateExtensionModels() {
+    return true;
+  }
 }

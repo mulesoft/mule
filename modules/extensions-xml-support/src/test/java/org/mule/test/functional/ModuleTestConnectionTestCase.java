@@ -71,4 +71,9 @@ public class ModuleTestConnectionTestCase extends AbstractCeXmlExtensionMuleArti
     assertThat(connectionValidationResult.isValid(), is(true));
     connectionProvider.disconnect(connect);
   }
+
+  @Override
+  public boolean mustRegenerateExtensionModels() {
+    return true;
+  }
 }
