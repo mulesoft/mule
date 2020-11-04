@@ -149,7 +149,7 @@
         <foreach collection="#[payload]">
             <logger level="ERROR" message="#[payload.personalInfo.name]" />
             <set-variable variableName="heisenbergConfig" value="#[payload]" />
-            <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureEventProcessor"/>
+            <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureConfigStateProcessor"/>
             <logger level="ERROR" message="#[%dw 2.0
                             import * from dw::Runtime
                             output application/json
@@ -161,19 +161,42 @@
                             output application/json
                             ---
                             'Waiting for 5000 milliseconds' wait 5000]"/>
-        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureEventProcessor"/>
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureConfigStateProcessor"/>
+    </flow>
+
+    <flow name="dynamicWithShortExpirationForPagedOperationCapturingEvents">
+        <heisenberg:get-config-failing-paged-operation failOn="#[vars.failOn]" config-ref="heisenbergWithShortExpiration"/>
+        <foreach collection="#[payload]">
+            <logger level="ERROR" message="#[payload.personalInfo.name]" />
+            <set-variable variableName="heisenbergConfig" value="#[payload]" />
+            <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureStatisticsProcessor"/>
+        </foreach>
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureStatisticsProcessor"/>
     </flow>
 
     <flow name="dynamicWithShortExpirationForStreamingOperation">
         <heisenberg:name-as-stream-connected config-ref="heisenbergWithShortExpiration" />
-        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureEventProcessor"/>
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureStreamingConfigStateProcessor"/>
         <logger level="ERROR" message="#[%dw 2.0
                             import * from dw::Runtime
                             output application/json
                             ---
                             'Waiting for 5000 milliseconds' wait 5000]"/>
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureStreamingConfigStateProcessor"/>
         <logger level="ERROR" message="#[payload]"/>
-        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureEventProcessor"/>
+        <logger level="ERROR" message="#[%dw 2.0
+                            import * from dw::Runtime
+                            output application/json
+                            ---
+                            'Waiting for 5000 milliseconds' wait 5000]"/>
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureStreamingConfigStateProcessor"/>
+    </flow>
+
+    <flow name="dynamicWithShortExpirationForStreamingOperationCapturingEvents">
+        <heisenberg:name-as-stream-connected config-ref="heisenbergWithShortExpiration" />
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureStatisticsProcessor"/>
+        <logger level="ERROR" message="#[payload]"/>
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureStatisticsProcessor"/>
     </flow>
 
 </mule>

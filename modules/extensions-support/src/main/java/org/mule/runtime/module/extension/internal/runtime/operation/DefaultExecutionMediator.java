@@ -42,7 +42,7 @@ import java.util.function.Consumer;
  * <p>
  * It also inspects the {@link ConfigurationStats} obtained from the {@link ConfigurationDeclaration} in the {@code context}. If
  * the stats class implements the {@link MutableConfigurationStats} interface, then
- * {@link MutableConfigurationStats#addInflightOperation()} and {@link MutableConfigurationStats#discountInflightOperation()} are
+ * {@link MutableConfigurationStats#addActiveComponent()} and {@link MutableConfigurationStats#discountActiveComponent()} are
  * guaranteed to be called, whatever the operation's outcome.
  * <p>
  * In case of operation failure, it will execute the {@link Interceptor#onError(ExecutionContext, Throwable)} method of all the
@@ -101,8 +101,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
     final MutableConfigurationStats stats = getMutableConfigurationStats(context);
     if (stats != null) {
-      stats.addInflightOperation();
-      stats.addActiveComponent();
+      //stats.addActiveComponent();
     }
 
     try {
@@ -163,8 +162,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
           }
         } finally {
           if (stats != null) {
-            stats.discountInflightOperation();
-            stats.discountActiveComponent();
+            //stats.discountActiveComponent();
           }
         }
       }
@@ -178,8 +176,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
             executorCallback.error(t);
           } finally {
             if (stats != null) {
-              stats.discountInflightOperation();
-              stats.discountActiveComponent();
+              //stats.discountActiveComponent();
             }
           }
         }

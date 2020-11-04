@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.messageCollection;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.messageIterator;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFinal;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isJavaCollection;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
@@ -151,8 +152,8 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
           resultValue = resultValue
               .copy().output(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler,
-                                                             incrementActiveComponent(operationContext),
-                                                             decrementActiveComponent(operationContext)))
+                                                             getIncrementActiveComponent(operationContext),
+                                                             getDecrementActiveComponent(operationContext)))
               .build();
         }
       }
@@ -229,8 +230,8 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
           result = result.copy()
               .output(StreamingUtils.streamingContent(new ConnectedInputStreamWrapper(componentDecoratorFactory
                   .decorateOutput((InputStream) result.getOutput(), event.getCorrelationId()), connectionHandler,
-                                                                                      incrementActiveComponent(operationContext),
-                                                                                      decrementActiveComponent(operationContext)),
+                                                                                      getIncrementActiveComponent(operationContext),
+                                                                                      getDecrementActiveComponent(operationContext)),
                                                       cursorProviderFactory, event,
                                                       operationContext.getComponent().getLocation()))
               .build();
@@ -262,8 +263,8 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
       if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
         value = componentDecoratorFactory
             .decorateOutput(new ConnectedInputStreamWrapper((InputStream) value, connectionHandler,
-                                                            incrementActiveComponent(operationContext),
-                                                            decrementActiveComponent(operationContext)),
+                                                            getIncrementActiveComponent(operationContext),
+                                                            getDecrementActiveComponent(operationContext)),
                             correlationId);
       }
     }
@@ -302,22 +303,20 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
     return contextMimeType.withCharset(contextEncoding);
   }
 
-  private Runnable incrementActiveComponent(ExecutionContextAdapter executionContext) {
+  private Runnable getIncrementActiveComponent(ExecutionContextAdapter executionContext) {
     Optional<ConfigurationInstance> config = executionContext.getConfiguration();
-    return config
-        .<Runnable>map(configurationInstance -> () -> tryToMutateConfigurationStats(configurationInstance,
-                                                                                    (MutableConfigurationStats::addActiveComponent)))
-        .orElseGet(() -> () -> {
-        });
+    if (config.isPresent()) {
+      return () -> tryToMutateConfigurationStats(config.get(), (MutableConfigurationStats::addActiveComponent));
+    }
+    return null;
   }
 
-  private Runnable decrementActiveComponent(ExecutionContextAdapter executionContext) {
+  private Runnable getDecrementActiveComponent(ExecutionContextAdapter executionContext) {
     Optional<ConfigurationInstance> config = executionContext.getConfiguration();
-    return config
-        .<Runnable>map(configurationInstance -> () -> tryToMutateConfigurationStats(configurationInstance,
-                                                                                    (MutableConfigurationStats::discountActiveComponent)))
-        .orElseGet(() -> () -> {
-        });
+    if (config.isPresent()) {
+      return () -> tryToMutateConfigurationStats(config.get(), (MutableConfigurationStats::discountActiveComponent));
+    }
+    return null;
   }
 
   protected class ConnectedInputStreamWrapper extends ProxyInputStream {
@@ -331,7 +330,9 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
       super(delegate);
       this.connectionHandler = connectionHandler;
       this.onClose = onClose;
-      onCreate.run();
+      if (onCreate != null) {
+        onCreate.run();
+      }
     }
 
     /**
@@ -354,7 +355,7 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
         in = new ClosedInputStream();
       } finally {
         connectionHandler.release();
-        if (alreadyClosed.compareAndSet(false, true)) {
+        if (onClose != null && alreadyClosed.compareAndSet(false, true)) {
           onClose.run();
         }
       }

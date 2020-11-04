@@ -681,18 +681,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private Optional<ConfigurationInstance> startUsingConfiguration(CoreEvent event) {
-    return getConfigurationAndTryToMutateStats(event,
-                                               (mutableConfigurationStats -> {
-                                                 mutableConfigurationStats.addRunningSource();
-                                                 mutableConfigurationStats.addActiveComponent();
-                                               }));
+    return getConfigurationAndTryToMutateStats(event, (MutableConfigurationStats::addActiveComponent));
   }
 
   private void stopUsingConfiguration(CoreEvent event) {
-    getConfigurationAndTryToMutateStats(event, (mutableConfigurationStats -> {
-      mutableConfigurationStats.discountRunningSource();
-      mutableConfigurationStats.discountActiveComponent();
-    }));
+    getConfigurationAndTryToMutateStats(event, (MutableConfigurationStats::discountActiveComponent));
   }
 
   private Optional<ConfigurationInstance> getConfigurationAndTryToMutateStats(CoreEvent event,

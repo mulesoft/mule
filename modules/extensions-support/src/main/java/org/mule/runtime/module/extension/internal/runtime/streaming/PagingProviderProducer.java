@@ -15,6 +15,7 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.tryToMutateConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.isPartOfActiveTransaction;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
@@ -223,14 +224,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       return connectionSupplier.getConnection();
     } catch (MuleException e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
-    }
-  }
-
-  private void tryToMutateConfigurationStats(ConfigurationInstance configurationInstance,
-                                             Consumer<MutableConfigurationStats> mutableConfigurationStatsConsumer) {
-    ConfigurationStats configurationStats = configurationInstance.getStatistics();
-    if (configurationStats instanceof MutableConfigurationStats) {
-      mutableConfigurationStatsConsumer.accept((MutableConfigurationStats) configurationStats);
     }
   }
 

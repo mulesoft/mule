@@ -279,10 +279,6 @@ public class MoneyLaunderingOperation {
     };
   }
 
-  public HeisenbergExtension sayMyConfig(@Config HeisenbergExtension config) {
-    return config;
-  }
-
   @Validator
   @Throws(ValidationErrorTypeProvider.class)
   public void validateMoney() {

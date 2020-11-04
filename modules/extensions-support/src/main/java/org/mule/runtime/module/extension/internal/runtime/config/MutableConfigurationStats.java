@@ -68,7 +68,7 @@ public interface MutableConfigurationStats extends ConfigurationStats {
    * Increments the return value of {@link #getActiveComponents()} by one
    *
    * @return the new value
-   * @since 4.2.3 4.3.1
+   * @since 4.2.3 4.3.1 4.4.0
    */
   int addActiveComponent();
 
@@ -76,7 +76,7 @@ public interface MutableConfigurationStats extends ConfigurationStats {
    * Decrements the return value of {@link #getActiveComponents()} by one
    *
    * @return the new value
-   * @since 4.2.3 4.3.1
+   * @since 4.2.3 4.3.1 4.4.0
    */
   int discountActiveComponent();
 }

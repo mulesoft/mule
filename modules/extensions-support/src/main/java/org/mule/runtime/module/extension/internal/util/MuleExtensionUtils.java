@@ -560,7 +560,7 @@ public class MuleExtensionUtils {
    * @param configurationInstance the {@link ConfigurationInstance} from where to extract the stats
    * @param mutableConfigurationStatsConsumer the {@link MutableConfigurationStats} consumer
    *
-   * @since 4.2.3 4.3.1
+   * @since 4.2.3 4.3.1 4.4.0
    */
   public static void tryToMutateConfigurationStats(ConfigurationInstance configurationInstance,
                                                    Consumer<MutableConfigurationStats> mutableConfigurationStatsConsumer) {
