@@ -377,7 +377,9 @@ public class ArtifactContextBuilder {
   }
 
   /**
-   * @param componentBuildingDefinitionRegistryFactory the factory {@link ComponentBuildingDefinitionRegistryFactory}
+   * Allows the usage of {@link ComponentBuildingDefinitionRegistryFactory} to create a {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry}.
+   * 
+   * @param componentBuildingDefinitionRegistryFactory the {@link ComponentBuildingDefinitionRegistryFactory} factory
    *                                                   used to create a {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry}
    * @return
    */

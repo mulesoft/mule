@@ -60,8 +60,6 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
    *        Non null.
    * @param domainClassLoaderBuilderFactory creates builders to build the classloaders for each domain. Non null.
    * @param extensionModelLoaderManager manager capable of resolve {@link ExtensionModel extension models}. Non null.
-   * @param licenseValidator the license validator to use for plugins.
-   * @param runtimeLockFactory {@link LockFactory} for Runtime, a unique and shared lock factory to be used between different artifacts.
    */
   public DefaultDomainFactory(DomainDescriptorFactory domainDescriptorFactory,
                               DomainManager domainManager,

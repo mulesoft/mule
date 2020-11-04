@@ -235,8 +235,6 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
         ((SpringXmlConfigurationBuilder) builder)
             .setComponentBuildingDefinitionRegistryFactory(new DefaultComponentBuildingDefinitionRegistryFactory());
       } else {
-        // ((SpringXmlConfigurationBuilder) builder)
-        //    .setComponentBuildingDefinitionRegistryFactory(new DefaultComponentBuildingDefinitionRegistryFactory());
         ((SpringXmlConfigurationBuilder) builder)
             .setComponentBuildingDefinitionRegistryFactory(componentBuildingDefinitionRegistryFactory);
       }
