@@ -734,7 +734,7 @@
         </xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="required" name="initialBatchNumber"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
-        <xs:attribute type="mule:substitutableLong" use="optional" default="300" name="frequency"></xs:attribute>
+        <xs:attribute type="mule:substitutableLong" use="optional" default="500" name="frequency"></xs:attribute>
         <xs:attribute type="mule:substitutableName" use="optional" name="debtProperties"></xs:attribute>
         <xs:attribute type="mule:substitutableName" use="optional" name="usableWeapons"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
@@ -897,7 +897,7 @@
         </xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="required" name="initialBatchNumber"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
-        <xs:attribute type="mule:substitutableLong" use="optional" default="300" name="frequency"></xs:attribute>
+        <xs:attribute type="mule:substitutableLong" use="optional" default="500" name="frequency"></xs:attribute>
         <xs:attribute type="mule:substitutableName" use="optional" name="debtProperties"></xs:attribute>
         <xs:attribute type="mule:substitutableName" use="optional" name="usableWeapons"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
@@ -1057,7 +1057,7 @@
         </xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="required" name="initialBatchNumber"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
-        <xs:attribute type="mule:substitutableLong" use="optional" default="300" name="frequency"></xs:attribute>
+        <xs:attribute type="mule:substitutableLong" use="optional" default="500" name="frequency"></xs:attribute>
         <xs:attribute type="mule:substitutableName" use="optional" name="debtProperties"></xs:attribute>
         <xs:attribute type="mule:substitutableName" use="optional" name="usableWeapons"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="reconnectable"></xs:attribute>

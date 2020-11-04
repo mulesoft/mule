@@ -29,10 +29,10 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.CORE_POOL_SIZE
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_BODY;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
+import static org.mule.test.heisenberg.extension.HeisenbergSource.resetHeisenbergSource;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 
-import org.junit.Ignore;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
@@ -74,7 +74,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   @Override
   protected void doSetUp() throws Exception {
     sourceTimesStarted = 0;
-    reset();
+    resetHeisenbergSource();
     super.doSetUp();
   }
 
@@ -85,20 +85,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     }
 
     super.doTearDown();
-    reset();
-  }
-
-  private void reset() {
-    HeisenbergSource.receivedGroupOnSource = false;
-    HeisenbergSource.receivedInlineOnError = false;
-    HeisenbergSource.receivedInlineOnSuccess = false;
-    HeisenbergSource.executedOnSuccess = false;
-    HeisenbergSource.executedOnError = false;
-    HeisenbergSource.executedOnTerminate = false;
-    HeisenbergSource.error = Optional.empty();
-    HeisenbergSource.gatheredMoney = 0;
-    HeisenbergSource.configName = null;
-    HeisenbergSource.location = null;
+    resetHeisenbergSource();
   }
 
   @Test
@@ -134,7 +121,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
-  @Ignore("MULE-18915")
   public void reconnectWithEnrichedException() throws Exception {
     startFlow("sourceFailedOnRuntime");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> sourceTimesStarted > 2);
