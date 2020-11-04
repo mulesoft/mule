@@ -201,7 +201,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
    */
   private BackPressureReason checkCapacity(CoreEvent event) {
     if (lastRetryTimestamp.get() != MIN_VALUE) {
-      if (lastRetryTimestamp.updateAndGet(LAST_RETRY_TIMESTAMP_CHECK_OPERATOR) != MIN_VALUE) {
+      if (lastRetryTimestamp.updateAndGet(LAST_RETRY_TIMESTAMP_CHECK_OPERATOR) != MIN_VALUE || true) {
         // If there is maxConcurrency value set, honor it and don't buffer here
         if (!maxConcurrencyEagerCheck) {
           // TODO MULE-17265 Make this configurable in the flow

@@ -517,7 +517,7 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
 
     try {
       // Fill the threads, the queue and an extra one to keep retrying
-      for (int i = 0; i < (2 * 2) + 2; ++i) {
+      for (int i = 0; i < (2 * 2) + 1; ++i) {
         futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
       }
 
