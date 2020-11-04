@@ -522,10 +522,7 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
       }
 
       // Give time for the extra dispatch to get to the point where it starts retrying
-      ProactorStreamProcessingStrategy strategy = (ProactorStreamProcessingStrategy) flow.getProcessingStrategy();
-      do {
-        Thread.sleep(1000);
-      } while (strategy.lastRetryTimestamp.get() == MIN_VALUE);
+      Thread.sleep(1000);
 
       expectedException.expectCause(instanceOf(FlowBackPressureRequiredSchedulerBusyException.class));
       processFlow(newEvent());
