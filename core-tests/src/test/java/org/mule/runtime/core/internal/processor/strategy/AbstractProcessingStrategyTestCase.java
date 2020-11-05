@@ -81,7 +81,13 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -555,8 +561,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     assertThat(schedulers, schedulerNameMatcher);
   }
 
-  AtomicInteger count = new AtomicInteger(0);
-
   protected CoreEvent processFlow(CoreEvent event) throws Exception {
     return processFlow(event, empty());
   }
@@ -587,11 +591,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   private Function<FlowBackPressureException, Throwable> backPressureExceptionMapper() {
     return backpressureException -> {
       try {
-        LOGGER.error("We are creaging a messaging exception with backpressure exception " + backpressureException);
         return new MessagingException(newEvent(), backpressureException);
       } catch (MuleException e) {
-        LOGGER.error("There was an error, propagating exception " + e);
-        e.printStackTrace();
         throw propagate(e);
       }
     };
