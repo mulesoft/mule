@@ -199,15 +199,15 @@ public class SimpleRetryPolicy implements RetryPolicy {
   }
 
   private void logRetrying(long attempts) {
-    if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Retrying execution of event, attempt {} of {}.", attempts,
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Retrying execution of event, attempt {} of {}.", attempts,
                   count != RETRY_COUNT_FOREVER ? valueOf(count) : "unlimited");
     }
   }
 
   private void logRetriesExhausted() {
-    if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Retry attempts exhausted. Failing...");
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Retry attempts exhausted. Failing...");
     }
   }
 }
