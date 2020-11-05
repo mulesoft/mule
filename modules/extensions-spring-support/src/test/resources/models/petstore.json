@@ -22578,7 +22578,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "name": "watermark",
+              "name": "useWatermark",
               "description": "",
               "modelProperties": {}
             },
@@ -22802,7 +22802,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "@ref:org.mule.runtime.api.scheduler.SchedulingStrategy"
+                "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
               },
               "hasDynamicType": false,
               "required": true,
@@ -23010,8 +23010,7 @@
             "resolverName": "OUTPUT_PAYLOAD",
             "requiresConnection": false,
             "requiresConfiguration": false
-          },
-          "partialTypeKeyResolver": false
+          }
         }
       },
       "kind": "source"
