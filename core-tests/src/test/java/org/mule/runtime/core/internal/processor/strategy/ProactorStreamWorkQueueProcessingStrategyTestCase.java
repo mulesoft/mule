@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
+import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -514,18 +515,20 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
     flow.start();
 
     List<Future> futures = new ArrayList<>();
+    CountDownLatch untilBP = new CountDownLatch(5);
 
     try {
       // Fill the threads, the queue and an extra one to keep retrying
       for (int i = 0; i < (2 * 2) + 1; ++i) {
-        futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
+        futures.add(asyncExecutor.submit(() -> processFlow(newEvent(), of(untilBP))));
       }
 
       // Give time for the extra dispatch to get to the point where it starts retrying
-      ProactorStreamProcessingStrategy strategy = (ProactorStreamProcessingStrategy) flow.getProcessingStrategy();
-      do {
-        Thread.sleep(1000);
-      } while (strategy.lastRetryTimestamp.get() == MIN_VALUE);
+      //ProactorStreamProcessingStrategy strategy = (ProactorStreamProcessingStrategy) flow.getProcessingStrategy();
+      //do {
+      untilBP.await();
+      Thread.sleep(1000);
+      //} while (strategy.lastRetryTimestamp.get() == MIN_VALUE);
 
       expectedException.expectCause(instanceOf(FlowBackPressureRequiredSchedulerBusyException.class));
       processFlow(newEvent());
