@@ -45,7 +45,6 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
-import org.junit.runner.RunWith;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -60,8 +59,6 @@ import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedule
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory.ProactorStreamWorkQueueProcessingStrategy;
 import org.mule.tck.TriggerableMessageSource;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
-import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
@@ -81,15 +78,10 @@ import io.qameta.allure.Story;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
-@RunWith(FlakinessDetectorTestRunner.class)
 public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  /*public ProactorStreamWorkQueueProcessingStrategyTestCase(Mode mode) {
+  public ProactorStreamWorkQueueProcessingStrategyTestCase(Mode mode) {
     super(mode);
-  }*/
-
-  public ProactorStreamWorkQueueProcessingStrategyTestCase() {
-    super(SOURCE);
   }
 
   @Override
@@ -490,7 +482,6 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   }
 
   @Test
-  @FlakyTest(times = 300)
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
     assumeThat(mode, is(SOURCE));
 

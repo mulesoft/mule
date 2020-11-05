@@ -36,7 +36,7 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
     implements TransactionAwareProcessingStrategyTestCase {
 
   public TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase(AbstractProcessingStrategyTestCase.Mode mode) {
-    super();
+    super(mode);
   }
 
   @After
