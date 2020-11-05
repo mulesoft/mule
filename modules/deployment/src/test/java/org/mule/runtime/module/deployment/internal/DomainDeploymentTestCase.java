@@ -663,6 +663,35 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  @Issue("MULE-14131")
+  @Description("Plugin as dependency in domain and app")
+  public void deploysAppAndDomainWithSamePluginDependency() throws Exception {
+
+    final String domainId = "shared-lib";
+    final ArtifactPluginFileBuilder pluginFileBuilder =
+            new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
+                    .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
+                    .dependingOn(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile));
+
+    final DomainFileBuilder domainFileBuilder =
+            new DomainFileBuilder(domainId).dependingOnSharedLibrary(new JarFileBuilder("barUtils1.0", barUtils1_0JarFile))
+                    .definedBy("empty-domain-config.xml").dependingOn(pluginFileBuilder);
+
+    final ApplicationFileBuilder applicationFileBuilder =
+            new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
+                    .dependingOn(pluginFileBuilder).dependingOn(domainFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
   public void deploysAppUsingDomainPluginThatLoadsAppResource() throws Exception {
     ArtifactPluginFileBuilder loadsAppResourceCallbackPlugin = new ArtifactPluginFileBuilder("loadsAppResourceCallbackPlugin")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
