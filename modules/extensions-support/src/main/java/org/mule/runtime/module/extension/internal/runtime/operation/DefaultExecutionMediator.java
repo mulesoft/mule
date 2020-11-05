@@ -101,7 +101,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
     final MutableConfigurationStats stats = getMutableConfigurationStats(context);
     if (stats != null) {
-      //stats.addActiveComponent();
+      stats.addActiveComponent();
     }
 
     try {
@@ -162,7 +162,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
           }
         } finally {
           if (stats != null) {
-            //stats.discountActiveComponent();
+            stats.discountActiveComponent();
           }
         }
       }
@@ -176,7 +176,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
             executorCallback.error(t);
           } finally {
             if (stats != null) {
-              //stats.discountActiveComponent();
+              stats.discountActiveComponent();
             }
           }
         }

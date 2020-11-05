@@ -7,11 +7,8 @@
 package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
-import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closePagingProviderCalls;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.getPageCalls;
@@ -31,6 +28,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctionalTestCase {
@@ -45,8 +44,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   }
 
   private static List<Integer> capturedStats;
-  private static List<Integer> capturedConfigStates;
-  private static HeisenbergExtension streamingConfig;
+  private static HeisenbergExtension config;
 
   public static class CaptureStatisticsProcessor implements Processor {
 
@@ -72,32 +70,12 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
-      synchronized (capturedConfigStates) {
-        TypedValue configVariable = event.getVariables().get("heisenbergConfig");
-        if (configVariable != null) {
-          HeisenbergExtension config = (HeisenbergExtension) configVariable.getValue();
-          capturedConfigStates.add(config.getDispose());
-        } else {
-          HeisenbergExtension config =
-              (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenbergWithShortExpiration", event)
-                  .getValue();
-          capturedConfigStates.add(config.getDispose());
-        }
-      }
-      return event;
-    }
-  }
-
-  public static class CaptureStreamingConfigStateProcessor implements Processor {
-
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-      synchronized (capturedConfigStates) {
-        if (streamingConfig == null) {
-          streamingConfig = (HeisenbergExtension) muleContext.getExtensionManager()
+      synchronized (capturedStats) {
+        if (config == null) {
+          config = (HeisenbergExtension) muleContext.getExtensionManager()
               .getConfiguration("heisenbergWithShortExpiration", event).getValue();
         }
-        capturedConfigStates.add(streamingConfig.getDispose());
+        capturedStats.add(config.getDispose());
       }
       return event;
     }
@@ -107,13 +85,13 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   protected void doSetUp() throws Exception {
     resetCounters();
     capturedStats = new LinkedList<>();
-    capturedConfigStates = new LinkedList<>();
+    config = null;
   }
 
   @Override
   protected void doTearDown() throws Exception {
     capturedStats = null;
-    capturedConfigStates = null;
+    config = null;
   }
 
   @Test
@@ -169,35 +147,39 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  @Ignore("Un-ignored once once MULE-18774 is fixed")
   public void doNotExpireConfigUsedByPagedOperation() throws Exception {
     flowRunner("dynamicWithShortExpirationForPagedOperation").withVariable("heisenbergName", "Waltercito White")
         .withVariable("failOn", -1).run();
-    checkNot(30000, 3000, () -> capturedConfigStates.size() > 4);
-    assertThat(capturedConfigStates, contains(0, 0, 0, 1));
+    checkNot(30000, 3000, () -> capturedStats.size() > 4);
+    assertThat(capturedStats, contains(0, 0, 0, 1));
   }
 
   @Test
+  @Ignore("Un-ignored once once MULE-18774 is fixed")
   public void doNotExpireConfigUsedByPagedOperationWithReconnectionOnFirstPage() throws Exception {
     flowRunner("dynamicWithShortExpirationForPagedOperation").withVariable("heisenbergName", "Waltercito White")
         .withVariable("failOn", 1).run();
-    checkNot(30000, 3000, () -> capturedConfigStates.size() > 3);
-    assertThat(capturedConfigStates, contains(0, 0, 1));
+    checkNot(30000, 3000, () -> capturedStats.size() > 3);
+    assertThat(capturedStats, contains(0, 0, 1));
   }
 
   @Test
+  @Ignore("Un-ignored once once MULE-18774 is fixed")
   public void doNotExpireConfigUsedByPagedOperationWithReconnectionOnSecondPage() throws Exception {
     flowRunner("dynamicWithShortExpirationForPagedOperation").withVariable("heisenbergName", "Waltercito White")
         .withVariable("failOn", 2).run();
-    checkNot(30000, 3000, () -> capturedConfigStates.size() > 3);
-    assertThat(capturedConfigStates, contains(0, 0, 1));
+    checkNot(30000, 3000, () -> capturedStats.size() > 3);
+    assertThat(capturedStats, contains(0, 0, 1));
   }
 
   @Test
+  @Ignore("Un-ignored once once MULE-18774 is fixed")
   public void doNotExpireConfigUsedByStreamingOperation() throws Exception {
     flowRunner("dynamicWithShortExpirationForStreamingOperation").withVariable("heisenbergName", "Waltercito White")
         .run();
-    checkNot(30000, 3000, () -> capturedConfigStates.size() > 3);
-    assertThat(capturedConfigStates, contains(0, 0, 1));
+    checkNot(30000, 3000, () -> capturedStats.size() > 3);
+    assertThat(capturedStats, contains(0, 0, 1));
   }
 
   // Remove this test once MULE-18774 is fixed
@@ -206,7 +188,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     flowRunner("dynamicWithShortExpirationForPagedOperationCapturingEvents").withVariable("heisenbergName", "Waltercito White")
         .withVariable("failOn", -1).run();
     checkNot(10000, 3000, () -> capturedStats.size() > 4);
-    //assertThat(capturedStats, contains(2, 2, 2, 1));
+    assertThat(capturedStats, contains(2, 2, 2, 1));
   }
 
   // Remove this test once MULE-18774 is fixed
@@ -215,7 +197,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     flowRunner("dynamicWithShortExpirationForPagedOperationCapturingEvents").withVariable("heisenbergName", "Waltercito White")
         .withVariable("failOn", 1).run();
     checkNot(10000, 3000, () -> capturedStats.size() > 3);
-    //assertThat(capturedStats, contains(2, 2, 1));
+    assertThat(capturedStats, contains(2, 2, 1));
   }
 
   // Remove this test once MULE-18774 is fixed
@@ -224,7 +206,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     flowRunner("dynamicWithShortExpirationForPagedOperationCapturingEvents").withVariable("heisenbergName", "Waltercito White")
         .withVariable("failOn", 2).run();
     checkNot(10000, 3000, () -> capturedStats.size() > 3);
-    //assertThat(capturedStats, contains(2, 2, 1));
+    assertThat(capturedStats, contains(2, 2, 1));
   }
 
   // Remove this test once MULE-18774 is fixed
@@ -234,7 +216,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
         .withVariable("heisenbergName", "Waltercito White")
         .run();
     checkNot(10000, 3000, () -> capturedStats.size() > 2);
-    //assertThat(capturedStats, contains(2, 1));
+    assertThat(capturedStats, contains(2, 1));
   }
 
   private void assertInitialised(HeisenbergExtension config) {
