@@ -84,8 +84,12 @@ import io.qameta.allure.Story;
 @RunWith(FlakinessDetectorTestRunner.class)
 public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  public ProactorStreamWorkQueueProcessingStrategyTestCase(Mode mode) {
+  /*public ProactorStreamWorkQueueProcessingStrategyTestCase(Mode mode) {
     super(mode);
+  }*/
+
+  public ProactorStreamWorkQueueProcessingStrategyTestCase() {
+    super(SOURCE);
   }
 
   @Override
