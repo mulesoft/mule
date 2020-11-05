@@ -165,7 +165,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
     while (prefixIndex != -1) {
       int suffixIndex = testValue.indexOf(PLACEHOLDER_SUFFIX, prefixIndex + PLACEHOLDER_PREFIX.length());
       innerPlaceholderKey = testValue.substring(prefixIndex + PLACEHOLDER_PREFIX.length(), suffixIndex);
-      Object objectValueFound = rootResolver.orElse(this).resolvePlaceholderKeyValue(innerPlaceholderKey);
+      Object objectValueFound = tryResolveByRoot(innerPlaceholderKey);
       // only use the value as string if it's a concat of placeholders
       if (value.equals(PLACEHOLDER_PREFIX + innerPlaceholderKey + PLACEHOLDER_SUFFIX)) {
         return objectValueFound;
@@ -185,7 +185,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
     });
   }
 
-  private void setRootResolver(ConfigurationPropertiesResolver rootResolver) {
+  public void setRootResolver(ConfigurationPropertiesResolver rootResolver) {
     this.rootResolver = of(rootResolver);
     propagateRootResolver(rootResolver);
   }
