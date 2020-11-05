@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -63,10 +64,10 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InOrder;
 
@@ -481,7 +482,6 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   }
 
   @Test
-  @Ignore("MULE-18522")
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
     assumeThat(mode, is(SOURCE));
 
@@ -499,15 +499,17 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
     flow.start();
 
     List<Future> futures = new ArrayList<>();
+    CountDownLatch untilBP = new CountDownLatch(5);
 
     try {
       // Fill the threads, the queue and an extra one to keep retrying
       for (int i = 0; i < (2 * 2) + 1; ++i) {
-        futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
+        futures.add(asyncExecutor.submit(() -> processFlow(newEvent(), of(untilBP))));
       }
 
+      untilBP.await();
       // Give time for the extra dispatch to get to the point where it starts retrying
-      Thread.sleep(500);
+      Thread.sleep(1000);
 
       expectedException.expectCause(instanceOf(FlowBackPressureRequiredSchedulerBusyException.class));
       processFlow(newEvent());

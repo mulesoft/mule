@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedSet;
+import static java.util.Optional.empty;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -84,6 +85,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -560,6 +562,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   }
 
   protected CoreEvent processFlow(CoreEvent event) throws Exception {
+    return processFlow(event, empty());
+  }
+
+  protected CoreEvent processFlow(CoreEvent event, Optional<CountDownLatch> latch) throws Exception {
     setMuleContextIfNeeded(flow, muleContext);
     switch (mode) {
       case FLOW:
@@ -567,9 +573,11 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       case SOURCE:
         try {
           return just(event)
-              .doOnNext(flow::checkBackpressure)
-              .onErrorMap(FlowBackPressureException.class,
-                          backPressureExceptionMapper())
+              .doOnNext(e -> {
+                flow.checkBackpressure(e);
+                latch.ifPresent(l -> l.countDown());
+              })
+              .onErrorMap(FlowBackPressureException.class, backPressureExceptionMapper())
               .transform(triggerableMessageSource.getListener())
               .block();
         } catch (Throwable throwable) {
