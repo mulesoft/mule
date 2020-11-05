@@ -117,16 +117,12 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
   private static TestServicesMuleContextConfigurator serviceConfigurator;
 
-  private static TestComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory;
+  private static TestComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
+      new TestComponentBuildingDefinitionRegistryFactory();
 
   @BeforeClass
   public static void configureClassLoaderRepository() {
     classLoaderRepository = new TestClassLoaderRepository();
-  }
-
-  @BeforeClass
-  public static void configureComponentBuildingDefinitionRegistryFactory() {
-    componentBuildingDefinitionRegistryFactory = new TestComponentBuildingDefinitionRegistryFactory();
   }
 
   @Override

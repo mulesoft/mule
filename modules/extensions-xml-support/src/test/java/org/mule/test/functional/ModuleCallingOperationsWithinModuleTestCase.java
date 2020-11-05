@@ -198,8 +198,7 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractCeXmlEx
 
   @Override
   public boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
-    // returns true because not same extensions are loaded by all tests. 
-    // returning false will fails while creating application context on some tests. 
-    return false;
+    // returns true because not same extensions are loaded by all tests.
+    return true;
   }
 }

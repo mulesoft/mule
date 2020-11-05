@@ -6,33 +6,53 @@
  */
 package org.mule.functional.junit4;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
+import org.slf4j.Logger;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Test implementation of {@link ComponentBuildingDefinitionRegistryFactory} which creates instances of
- * {@link ComponentBuildingDefinitionRegistry} and return same instance every time create is called.
+ * Test implementation of {@link ComponentBuildingDefinitionRegistryFactory} which cache created 
+ * factory and return same instance by extension models collection.
  * 
  * @since 4.4.0
  */
 public class TestComponentBuildingDefinitionRegistryFactory implements ComponentBuildingDefinitionRegistryFactory {
 
-  private final Object lock = new Object();
-  private ComponentBuildingDefinitionRegistry instance;
+  private static final Logger LOGGER = getLogger(TestComponentBuildingDefinitionRegistryFactory.class);
+  private static final String EMPTY_KEY = "empty-key";
+  private static final String NULL_KEY = "null-key";
+  private static final String EXTENSION_SEPARATOR = ",";
+
+  private final Map<String, ComponentBuildingDefinitionRegistry> registries = new ConcurrentHashMap<>();
 
   @Override
   public ComponentBuildingDefinitionRegistry create(Set<ExtensionModel> extensionModels) {
-    if (instance == null) {
-      synchronized (lock) {
-        if (instance == null) {
-          instance = new DefaultComponentBuildingDefinitionRegistryFactory().create(extensionModels);
-        }
+    String key = getExtensionsKey(extensionModels);
+
+    return registries.computeIfAbsent(key, k -> {
+      LOGGER.info(format("Creating new ComponentBuildingDefinitionRegistryFactory for key: %s", key));
+      return new DefaultComponentBuildingDefinitionRegistryFactory().create(extensionModels);
+    });
+  }
+
+  private String getExtensionsKey(Set<ExtensionModel> extensionModels) {
+    if (extensionModels == null) {
+      return NULL_KEY;
+    } else {
+      if (extensionModels.isEmpty()) {
+        return EMPTY_KEY;
       }
+      return extensionModels.stream().map(ExtensionModel::getName).sorted().collect(joining(EXTENSION_SEPARATOR));
     }
-    return instance;
   }
 }
