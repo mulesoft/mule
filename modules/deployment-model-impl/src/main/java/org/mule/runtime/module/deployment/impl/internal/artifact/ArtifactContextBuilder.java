@@ -55,8 +55,6 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
@@ -123,7 +121,6 @@ public class ArtifactContextBuilder {
   private Optional<Properties> properties = empty();
   private String dataFolderName;
   private LockFactory runtimeLockFactory;
-  private ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory;
 
   private ArtifactContextBuilder() {}
 
@@ -377,21 +374,6 @@ public class ArtifactContextBuilder {
     return this;
   }
 
-  /**
-   * Provides a {@link ComponentBuildingDefinitionRegistryFactory} factory to create a {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry} registry.
-   * </p>
-   * Registry holds all {@link ComponentBuildingDefinition} needed to create componentBuildingDefinitionRegistry {@link org.springframework.beans.factory.config.BeanDefinition} 
-   * that can later be converted to a runtime object that will be part of the artifact.
-   * 
-   * @param componentBuildingDefinitionRegistryFactory the {@link ComponentBuildingDefinitionRegistryFactory} factory
-   *                                                   used to create a {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry}
-   * @return
-   */
-  public ArtifactContextBuilder setComponentBuildingDefinitionRegistryFactory(ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
-    this.componentBuildingDefinitionRegistryFactory = componentBuildingDefinitionRegistryFactory;
-    return this;
-  }
-
   private Map<String, String> merge(Map<String, String> properties, Properties deploymentProperties) {
     if (deploymentProperties == null) {
       return properties;
@@ -467,8 +449,7 @@ public class ArtifactContextBuilder {
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
                     .setServiceConfigurators(serviceConfigurators)
-                    .setRuntimeLockFactory(runtimeLockFactory)
-                    .setComponentBuildingDefinitionRegistryFactory(componentBuildingDefinitionRegistryFactory);
+                    .setRuntimeLockFactory(runtimeLockFactory);
 
             withArtifactMuleContext(parentArtifact, artifactContextConfigurationBuilder::setParentContext);
             artifactContext

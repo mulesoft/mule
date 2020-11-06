@@ -61,6 +61,7 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -78,7 +79,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.ConfigResource;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.io.File;

@@ -11,9 +11,10 @@ import static java.util.stream.Collectors.joining;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
+
 import org.slf4j.Logger;
 
 import java.util.Map;

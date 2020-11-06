@@ -20,6 +20,7 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
@@ -41,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 

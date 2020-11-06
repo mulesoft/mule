@@ -25,7 +25,6 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
@@ -47,6 +46,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   private final ServiceRepository serviceRepository;
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory;
+
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
 
   /**
@@ -134,12 +134,6 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
   @Override
   protected Domain doCreateArtifact(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
-    return createArtifact(domainLocation, deploymentProperties, null);
-  }
-
-  public Domain createArtifact(File domainLocation, Optional<Properties> deploymentProperties,
-                               ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory)
-      throws IOException {
     String domainName = domainLocation.getName();
     if (domainManager.contains(domainName)) {
       throw new IllegalArgumentException(format("Domain '%s'  already exists", domainName));
@@ -166,7 +160,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(domainDescriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-                              extensionModelLoaderManager, getRuntimeLockFactory(), componentBuildingDefinitionRegistryFactory);
+                              extensionModelLoaderManager, getRuntimeLockFactory());
 
     DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
     domainManager.addDomain(domainWrapper);

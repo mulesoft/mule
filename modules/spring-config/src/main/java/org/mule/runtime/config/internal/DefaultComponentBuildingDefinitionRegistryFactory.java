@@ -13,8 +13,8 @@ import static org.mule.runtime.deployment.model.internal.application.MuleApplica
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistryFactory;
 
 import java.util.Set;
 
@@ -28,7 +28,7 @@ public class DefaultComponentBuildingDefinitionRegistryFactory implements Compon
 
   @Override
   public ComponentBuildingDefinitionRegistry create(Set<ExtensionModel> extensionModels) {
-    DefaultComponentBuildingDefinitionRegistry registry = new DefaultComponentBuildingDefinitionRegistry();
+    ComponentBuildingDefinitionRegistry registry = new ComponentBuildingDefinitionRegistry();
 
     getRuntimeComponentBuildingDefinitionProvider().getComponentBuildingDefinitions()
         .forEach(registry::register);

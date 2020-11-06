@@ -117,7 +117,7 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
                           List<ArtifactPlugin> artifactPlugins, ExtensionModelLoaderManager extensionModelLoaderManager,
                           LockFactory runtimeLockFactory) {
       super(descriptor, deploymentClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-            extensionModelLoaderManager, runtimeLockFactory, null);
+            extensionModelLoaderManager, runtimeLockFactory);
     }
 
     @Override

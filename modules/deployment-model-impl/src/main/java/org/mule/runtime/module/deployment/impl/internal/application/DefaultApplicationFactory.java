@@ -16,7 +16,6 @@ import static org.mule.runtime.module.deployment.impl.internal.application.Defau
 
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -25,7 +24,6 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -126,32 +124,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     return applicationDescriptorFactory.create(artifactLocation, deploymentProperties);
   }
 
-  /**
-   * Creates an instance of {@link Application}
-   * 
-   * @param descriptor the artifact descriptor of the artifact.
-   *                      
-   * @return the created artifact.
-   * @throws IOException if there was a problem reading the content of the artifact.
-   * @deprecated use {@link #createArtifact(ApplicationDescriptor, ComponentBuildingDefinitionRegistryFactory)} instead
-   */
-  @Deprecated
   public Application createArtifact(ApplicationDescriptor descriptor) throws IOException {
-    return createArtifact(descriptor, null);
-  }
-
-  /**
-   * Creates an instance of {@link Application}
-   *
-   * @param descriptor the artifact descriptor of the artifact.
-   * @param componentBuildingDefinitionRegistryFactory a factory used to create {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistry} registry. Can be null
-   * 
-   * @return the created artifact.
-   * @throws IOException if there was a problem reading the content of the artifact.
-   */
-  public Application createArtifact(ApplicationDescriptor descriptor,
-                                    ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory)
-      throws IOException {
     Domain domain = getDomainForDescriptor(descriptor);
 
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
@@ -186,8 +159,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     DefaultMuleApplication delegate =
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
                                    serviceRepository, extensionModelLoaderRepository, descriptor.getArtifactLocation(),
-                                   classLoaderRepository, applicationPolicyProvider, getRuntimeLockFactory(),
-                                   componentBuildingDefinitionRegistryFactory);
+                                   classLoaderRepository, applicationPolicyProvider, getRuntimeLockFactory());
 
     applicationPolicyProvider.setApplication(delegate);
     return new ApplicationWrapper(delegate);
