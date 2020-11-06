@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.heisenberg.extension.AsyncHeisenbergSource.completionCallback;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourceTestCase {
@@ -35,15 +34,17 @@ public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourc
 
   @Test
   public void asyncSource() throws Exception {
-    startFlow("source");
+    requestFlowToStartAndWait("source");
     assertSourceCompleted();
     assertThat(completionCallback, is(notNullValue()));
+    requestFlowToStopAndWait("source");
   }
 
   @Test
   public void asyncOnException() throws Exception {
-    startFlow("sourceFailed");
+    requestFlowToStartAndWait("sourceFailed");
     assertSourceFailed();
     assertThat(completionCallback, is(notNullValue()));
+    requestFlowToStopAndWait("source");
   }
 }
