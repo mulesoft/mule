@@ -33,7 +33,7 @@ public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
 
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
-  protected boolean watermark;
+  protected boolean useWatermark;
 
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
@@ -85,7 +85,7 @@ public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
           item.setId(result.getOutput().toLowerCase());
         }
 
-        if (watermark) {
+        if (useWatermark) {
           item.setWatermark(watermarkValue);
         }
       });

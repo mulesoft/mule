@@ -27917,7 +27917,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "name": "watermark",
+              "name": "useWatermark",
               "description": "",
               "modelProperties": {}
             },
