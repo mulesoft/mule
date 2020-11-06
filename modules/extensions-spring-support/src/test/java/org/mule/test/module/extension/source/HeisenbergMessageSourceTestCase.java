@@ -95,6 +95,10 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Override
   protected void doTearDown() throws Exception {
+    if (flow != null) {
+      requestFlowToStopAndWait(flow.getName());
+    }
+
     super.doTearDown();
     resetHeisenbergSource();
   }
@@ -104,8 +108,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     requestFlowToStartAndWait("source");
 
     assertSourceCompleted();
-
-    requestFlowToStopAndWait("source");
   }
 
   @Test
@@ -138,8 +140,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
             assertThat(HeisenbergSource.gatheredMoney, greaterThan(gatheredMoneyAfterStop));
             return true;
           });
-
-    requestFlowToStopAndWait("source");
   }
 
   protected void assertSourceCompleted() {
@@ -153,9 +153,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     requestFlowToStartAndWait("sourceFailed");
 
     assertSourceFailed();
-
-    requestFlowToStopAndWait("sourceFailed");
-
   }
 
   protected void assertSourceFailed() {
@@ -169,14 +166,12 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public void enrichExceptionOnStart() throws Exception {
     expectedException.expectMessage(ENRICHED_MESSAGE + CORE_POOL_SIZE_ERROR_MESSAGE);
     requestFlowToStartAndWait("sourceFailedOnStart");
-    requestFlowToStopAndWait("sourceFailedOnStart");
   }
 
   @Test
   public void reconnectWithEnrichedException() throws Exception {
     requestFlowToStartAndWait("sourceFailedOnRuntime");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> sourceTimesStarted > 2);
-    requestFlowToStopAndWait("sourceFailedOnRuntime");
   }
 
   @Test
@@ -189,7 +184,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(HeisenbergSource.terminateStatus, is(SUCCESS));
     assertThat(HeisenbergSource.error, empty());
 
-    requestFlowToStopAndWait("source");
   }
 
   @Test
@@ -203,8 +197,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(HeisenbergSource.error, not(empty()));
 
     assertThat(queueManager.read(OUT, RECEIVE_TIMEOUT, MILLISECONDS).getMessage(), hasPayload(equalTo("Expected.")));
-
-    requestFlowToStopAndWait("sourceWithInvalidSuccessParameter");
   }
 
   @Test
@@ -218,8 +210,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(HeisenbergSource.error, not(empty()));
 
     assertThat(queueManager.read(OUT, RECEIVE_TIMEOUT, MILLISECONDS).getMessage(), hasPayload(equalTo("Expected.")));
-
-    requestFlowToStopAndWait("sourceFailsOnSuccessBodyCallsOnErrorAndOnTerminate");
   }
 
   @Test
@@ -239,8 +229,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat((String) me.getInfo().get(INFO_LOCATION_KEY),
                containsString("sourceWithInvalidSuccessAndErrorParameters/source"));
     assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:success-info"));
-
-    requestFlowToStopAndWait("sourceWithInvalidSuccessAndErrorParameters");
   }
 
   @Test
@@ -254,22 +242,18 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     Optional<Error> optionalError = HeisenbergSource.error;
     assertThat(optionalError, is(not(empty())));
     assertThat(optionalError.get().getErrorType(), is(errorType(SOURCE_ERROR_RESPONSE_SEND)));
-
-    requestFlowToStopAndWait("sourceFailsInsideOnError");
   }
 
   @Test
   public void failureInFlowCallsOnErrorDirectlyAndHandlesItCorrectly() throws Exception {
     requestFlowToStartAndWait("failureInFlowCallsOnErrorDirectly");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, true, true));
-    requestFlowToStopAndWait("failureInFlowCallsOnErrorDirectly");
   }
 
   @Test
   public void failureInFlowErrorHandlerCallsOnErrorDirectlyAndHandlesItCorrectly() throws Exception {
     requestFlowToStartAndWait("failureInFlowErrorHandlerCallsOnErrorDirectly");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, true, true));
-    requestFlowToStopAndWait("failureInFlowErrorHandlerCallsOnErrorDirectly");
   }
 
   @Test
@@ -287,7 +271,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat((String) me.getInfo().get(INFO_LOCATION_KEY),
                containsString("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt/source"));
     assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:success-info"));
-    requestFlowToStopAndWait("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt");
   }
 
   @Test
@@ -330,14 +313,12 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public void componentLocationInjected() throws Exception {
     requestFlowToStartAndWait("source");
     assertThat(HeisenbergSource.location, is("source/source"));
-    requestFlowToStopAndWait("source");
   }
 
   @Test
   public void configNameInjected() throws Exception {
     requestFlowToStartAndWait("source");
     assertThat(HeisenbergSource.configName, is("heisenberg"));
-    requestFlowToStopAndWait("source");
   }
 
   @Test
@@ -346,9 +327,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     requestFlowToStartAndWait("sameChildInBothCallbacks");
 
     assertSourceCompleted();
-
-    requestFlowToStopAndWait("sameChildInBothCallbacks");
-
   }
 
   private void assertParameter(Map<String, Object> parameters, String propertyName, Matcher matcher) {

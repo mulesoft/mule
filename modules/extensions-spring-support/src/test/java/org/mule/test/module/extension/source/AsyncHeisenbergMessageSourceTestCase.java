@@ -37,7 +37,6 @@ public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourc
     requestFlowToStartAndWait("source");
     assertSourceCompleted();
     assertThat(completionCallback, is(notNullValue()));
-    requestFlowToStopAndWait("source");
   }
 
   @Test
@@ -45,6 +44,5 @@ public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourc
     requestFlowToStartAndWait("sourceFailed");
     assertSourceFailed();
     assertThat(completionCallback, is(notNullValue()));
-    requestFlowToStopAndWait("source");
   }
 }
