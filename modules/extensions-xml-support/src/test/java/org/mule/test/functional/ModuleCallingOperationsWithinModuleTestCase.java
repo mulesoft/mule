@@ -195,4 +195,10 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractCeXmlEx
         .withVariable("secondPart", SECOND_PART)
         .run();
   }
+
+  @Override
+  public boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
+    // returns true because not same extensions are loaded by all tests.
+    return true;
+  }
 }

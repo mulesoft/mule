@@ -202,4 +202,10 @@ public class ModuleSimpleTestCase extends AbstractCeXmlExtensionMuleArtifactFunc
     CoreEvent event = flowRunner("testSetPayloadHardcodedFlowThruSubflowWithNestedElements").run();
     assertThat(event.getMessage().getPayload().getValue(), is("hardcoded value"));
   }
+
+  @Override
+  public boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
+    // returns true because not same extensions are loaded by all tests.
+    return true;
+  }
 }
