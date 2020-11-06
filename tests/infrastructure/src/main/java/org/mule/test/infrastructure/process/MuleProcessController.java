@@ -7,9 +7,13 @@
 
 package org.mule.test.infrastructure.process;
 
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MuleProcessController {
 
@@ -43,7 +47,15 @@ public class MuleProcessController {
   }
 
   public void start(String... args) {
-    getController().start(args);
+    if (Boolean.getBoolean(SYSTEM_PROPERTY_PREFIX + "test.wrapperDebug")) {
+      final List<String> debugArgs = new ArrayList<>();
+      debugArgs.add("wrapperDebug");
+      debugArgs.addAll(asList(args));
+
+      getController().start(debugArgs.toArray(new String[args.length + 1]));
+    } else {
+      getController().start(args);
+    }
   }
 
   public void stop(String... args) {
