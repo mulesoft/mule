@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.retry.policies;
 
+import static java.lang.String.valueOf;
 import static java.time.Duration.ofMillis;
+import static org.mule.runtime.core.api.retry.policy.PolicyStatus.policyExhausted;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
@@ -21,6 +23,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.retry.policy.PolicyStatus;
 import org.mule.runtime.core.api.retry.policy.RetryPolicy;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.time.Duration;
@@ -69,22 +72,25 @@ public class SimpleRetryPolicy implements RetryPolicy {
         .handleIf(shouldRetry)
         .withMaxRetries(count != RETRY_COUNT_FOREVER ? count : -1)
         .withDelay(frequency)
-        .onRetry(listener -> onRetry.accept(listener.getLastFailure()))
+        .onRetry(listener -> {
+          logRetrying(listener.getAttemptCount());
+          onRetry.accept(listener.getLastFailure());
+        })
         .onRetriesExceeded(listener -> {
-          LOGGER.info("Retry attempts exhausted. Failing...");
+          logRetriesExhausted();
           Throwable t = errorFunction.apply(listener.getFailure());
           onExhausted.accept(t);
         });
 
     final IsFirst first = new IsFirst();
-    final LazyValue<Boolean> isTransanctional = new LazyValue<>(() -> isTransactionActive());
+    final LazyValue<Boolean> isTransactional = new LazyValue<>(TransactionCoordination::isTransactionActive);
 
     return Failsafe.with(actingPolicy)
-        .with(new ConditionalExecutorServiceDecorator(retryScheduler, s -> first.isFirst() || isTransanctional.get()))
+        .with(new ConditionalExecutorServiceDecorator(retryScheduler, s -> first.isFirst() || isTransactional.get()))
         .getStageAsync(futureSupplier::get);
   }
 
-  private class IsFirst {
+  private static class IsFirst {
 
     private boolean first = true;
 
@@ -114,16 +120,15 @@ public class SimpleRetryPolicy implements RetryPolicy {
           retry = retry.retryMax(count - 1);
         }
 
-        final LazyValue<Boolean> isTransanctional = new LazyValue<>(() -> isTransactionActive());
+        final LazyValue<Boolean> isTransanctional = new LazyValue<>(TransactionCoordination::isTransactionActive);
         reactor.core.scheduler.Scheduler reactorRetryScheduler =
             fromExecutorService(new ConditionalExecutorServiceDecorator(retryScheduler, s -> isTransanctional.get()));
 
         Mono<T> retryMono = from(publisher)
             .retryWhen(retry.withBackoffScheduler(reactorRetryScheduler)
-                .doOnRetry(retryContext -> LOGGER.info("Retrying execution of event, attempt {} of {}.", retryContext.iteration(),
-                                                       count != RETRY_COUNT_FOREVER ? String.valueOf(count) : "unlimited")))
+                .doOnRetry(retryContext -> logRetrying(retryContext.iteration())))
             .doOnError(e2 -> {
-              LOGGER.info("Retry attempts exhausted. Failing...");
+              logRetriesExhausted();
               onExhausted.accept(unwrap(e2));
             })
             .onErrorMap(RetryExhaustedException.class, e2 -> errorFunction.apply(unwrap(e2.getCause())));
@@ -142,13 +147,11 @@ public class SimpleRetryPolicy implements RetryPolicy {
   @Override
   public PolicyStatus applyPolicy(Throwable cause) {
     if (isExhausted() || !isApplicableTo(cause)) {
-      return PolicyStatus.policyExhausted(cause);
+      return policyExhausted(cause);
     } else {
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info(
-                    "Waiting for " + frequency.toMillis() + "ms before reconnecting. Failed attempt "
-                        + (retryCounter.current().get() + 1)
-                        + " of " + (count != RETRY_COUNT_FOREVER ? String.valueOf(count) : "unlimited"));
+        LOGGER.info("Waiting for {} ms before reconnecting. Failed attempt {} of {}", frequency.toMillis(),
+                    retryCounter.current().get() + 1, count != RETRY_COUNT_FOREVER ? valueOf(count) : "unlimited");
       }
 
       try {
@@ -157,7 +160,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
         return PolicyStatus.policyOk();
       } catch (InterruptedException e) {
         // If we get an interrupt exception, some one is telling us to stop
-        return PolicyStatus.policyExhausted(e);
+        return policyExhausted(e);
       }
     }
   }
@@ -193,5 +196,16 @@ public class SimpleRetryPolicy implements RetryPolicy {
     protected AtomicInteger initialValue() {
       return new AtomicInteger(0);
     }
+  }
+
+  private void logRetrying(long attempts) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Retrying execution of event, attempt {} of {}.", attempts,
+                   count != RETRY_COUNT_FOREVER ? valueOf(count) : "unlimited");
+    }
+  }
+
+  private void logRetriesExhausted() {
+    LOGGER.debug("Retry attempts exhausted. Failing...");
   }
 }
