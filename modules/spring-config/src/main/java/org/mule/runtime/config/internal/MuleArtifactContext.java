@@ -136,15 +136,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   private final OptionalObjectsController optionalObjectsController;
   private final Map<String, String> artifactProperties;
-  private final ArtifactDeclaration artifactDeclaration;
   private final Optional<ConfigurationProperties> parentConfigurationProperties;
   private final DefaultRegistry serviceDiscoverer;
   private final DefaultResourceLocator resourceLocator;
   private final ApplicationModel applicationModel;
   private final MuleContextWithRegistry muleContext;
-  private final ConfigResource[] artifactConfigResources;
   private final BeanDefinitionFactory beanDefinitionFactory;
-  private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private final ArtifactType artifactType;
   protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator(componentName -> {
     try {
@@ -181,11 +178,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;
-    this.artifactConfigResources = artifactConfigResources;
     this.optionalObjectsController = optionalObjectsController;
     this.artifactProperties = artifactProperties;
     this.artifactType = artifactType;
-    this.artifactDeclaration = artifactDeclaration;
     this.parentConfigurationProperties = parentConfigurationProperties;
     this.disableXmlValidations = disableXmlValidations;
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
@@ -198,7 +193,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
                                   componentBuildingDefinitionRegistryFactory.create(getExtensions()));
 
-    this.applicationModel = createApplicationModel();
+    this.applicationModel = createApplicationModel(artifactDeclaration, artifactConfigResources);
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -214,7 +209,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     });
   }
 
-  private ApplicationModel createApplicationModel() {
+  private ApplicationModel createApplicationModel(ArtifactDeclaration artifactDeclaration,
+                                                  ConfigResource[] artifactConfigResources) {
     try {
       final ArtifactAst artifactAst;
 
@@ -280,14 +276,38 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         artifactAst = toArtifactast(artifactDeclaration, getExtensions());
       }
 
-      return new ApplicationModel(artifactAst,
-                                  artifactProperties, parentConfigurationProperties,
-                                  new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader()));
+      return validateModel(new ApplicationModel(artifactAst,
+                                                artifactProperties, parentConfigurationProperties,
+                                                new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader())));
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  private String compToLoc(ComponentAst component) {
+    return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
+        + component.getMetadata().getStartLine().orElse(-1) + "]";
+  }
+
+  private ApplicationModel validateModel(ApplicationModel appModel) {
+    final ValidationResult validate = MuleAstUtils.validate(appModel);
+
+    final Collection<ValidationResultItem> items = validate.getItems();
+    if (!items.isEmpty()) {
+
+      final String allMessages = validate.getItems()
+          .stream()
+          .map(v -> compToLoc(v.getComponent()) + ": " + v.getMessage())
+          .collect(joining(lineSeparator()));
+
+
+      throw new MuleRuntimeException(createStaticMessage(allMessages));
+    }
+
+    return appModel;
+    // TODO MULE-18318 (AST) all this validations will be moved to an entity that does the validation and allows to aggregate all
   }
 
   public void initialize() {
