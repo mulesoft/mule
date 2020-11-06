@@ -271,6 +271,14 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
       return watermarkComparator;
     }
 
+    private void renewUpdatedWatermark(String itemId, Serializable itemWatermark) throws ObjectStoreException {
+      idsOnUpdatedWatermark.clear();
+      if (itemId != null) {
+        idsOnUpdatedWatermark.store(itemId, itemWatermark);
+      }
+      setUpdatedWatermark(itemWatermark);
+    }
+
     private void setUpdatedWatermark(Serializable updatedWatermark) {
       try {
         this.updatedWatermark = updatedWatermark;
@@ -314,37 +322,33 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
       } else {
         compare = currentWatermark != null ? compareWatermarks(currentWatermark, itemWatermark, watermarkComparator) : -1;
         if (compare < 0) {
-
           try {
             if (itemId != null && recentlyProcessedIds.contains(itemId)) {
               Serializable previousItemWatermark = recentlyProcessedIds.retrieve(itemId);
               if (compareWatermarks(itemWatermark, previousItemWatermark, watermarkComparator) <= 0) {
                 accept = false;
               }
-            } else {
-              int updatedWatermarkCompare =
-                  updatedWatermark != null ? compareWatermarks(updatedWatermark, itemWatermark, watermarkComparator) : -1;
-              if (updatedWatermarkCompare == 0) {
-                pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
-              } else if (updatedWatermarkCompare < 0) {
-                pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
-                setUpdatedWatermark(itemWatermark);
-              }
-
+            }
+            int updatedWatermarkCompare =
+                updatedWatermark != null ? compareWatermarks(updatedWatermark, itemWatermark, watermarkComparator) : -1;
+            if (updatedWatermarkCompare == 0) {
+              pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
+            } else if (updatedWatermarkCompare < 0) {
+              renewUpdatedWatermark(itemId, itemWatermark);
             }
           } catch (ObjectStoreException e) {
             throw new MuleRuntimeException(
-                                           createStaticMessage("An error occurred while checking the previus watermark" +
+                                           createStaticMessage("An error occurred while checking the previous watermark" +
                                                " for an item id that was recently processed. Item with ID [%s]",
                                                                itemId),
                                            e);
           }
         } else if (compare == 0 && pollItem.getItemId().isPresent()) {
           try {
-            accept = !(recentlyProcessedIds.contains(itemId) || idsOnUpdatedWatermark.contains(itemId));
+            accept = !recentlyProcessedIds.contains(itemId);
           } catch (ObjectStoreException e) {
             throw new MuleRuntimeException(
-                                           createStaticMessage("An error occurred while checking the existance for Item with ID [%s]",
+                                           createStaticMessage("An error occurred while checking the existence for Item with ID [%s]",
                                                                itemId),
                                            e);
           }
@@ -492,18 +496,18 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
     Lock osClearingLock = lockFactory.createLock(UPDATE_PROCESSED_LOCK);
     try {
       osClearingLock.lock();
-      List<String> strings = recentlyProcessedIds.allKeys();
-      idsOnUpdatedWatermark.clear();
+      List<String> strings = idsOnUpdatedWatermark.allKeys();
+      recentlyProcessedIds.clear();
       strings.forEach(key -> {
         try {
-          idsOnUpdatedWatermark.store(key, recentlyProcessedIds.retrieve(key));
+          recentlyProcessedIds.store(key, idsOnUpdatedWatermark.retrieve(key));
         } catch (ObjectStoreException e) {
           throw new MuleRuntimeException(createStaticMessage("An error occurred while updating the watermark Ids. Failed to update key '%s' in Watermark-IDs ObjectStore: %s",
                                                              key, e.getMessage()),
                                          e);
         }
       });
-      recentlyProcessedIds.clear();
+      idsOnUpdatedWatermark.clear();
     } finally {
       safeUnlock(osClearingLock);
     }
