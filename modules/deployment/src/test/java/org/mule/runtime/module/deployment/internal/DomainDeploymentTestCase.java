@@ -669,17 +669,17 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final String domainId = "shared-lib";
     final ArtifactPluginFileBuilder pluginFileBuilder =
-            new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
-                    .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
-                    .dependingOn(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile));
+        new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
+            .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
+            .dependingOn(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile));
 
     final DomainFileBuilder domainFileBuilder =
-            new DomainFileBuilder(domainId).dependingOnSharedLibrary(new JarFileBuilder("barUtils1.0", barUtils1_0JarFile))
-                    .definedBy("empty-domain-config.xml").dependingOn(pluginFileBuilder);
+        new DomainFileBuilder(domainId).dependingOnSharedLibrary(new JarFileBuilder("barUtils1.0", barUtils1_0JarFile))
+            .definedBy("empty-domain-config.xml").dependingOn(pluginFileBuilder);
 
     final ApplicationFileBuilder applicationFileBuilder =
-            new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
-                    .dependingOn(pluginFileBuilder).dependingOn(domainFileBuilder);
+        new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
+            .dependingOn(pluginFileBuilder).dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);
