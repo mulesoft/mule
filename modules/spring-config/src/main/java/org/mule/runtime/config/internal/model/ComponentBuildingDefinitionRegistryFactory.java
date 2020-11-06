@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model;
+package org.mule.runtime.config.internal.model;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 
 import java.util.Set;
 

@@ -14,7 +14,7 @@ import static org.mule.runtime.deployment.model.internal.application.MuleApplica
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
-import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 
 import java.util.Set;
 
