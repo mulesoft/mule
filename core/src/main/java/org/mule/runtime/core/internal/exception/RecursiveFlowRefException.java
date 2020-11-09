@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.processor.Processor;
 /**
  * Exception thrown when a recursion exists between static flow-refs.
  *
- * @since 4.3.0
+ * @since 4.3.0, 4.2.3
  */
 public class RecursiveFlowRefException extends LifecycleException {
 
