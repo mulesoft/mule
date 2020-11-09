@@ -21,8 +21,6 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
-import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -41,9 +39,7 @@ import javax.inject.Inject;
 import org.junit.Test;
 
 import io.qameta.allure.Story;
-import org.mule.test.runner.RunnerDelegateTo;
 
-@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalTestCase {
 
   public static final int POLL_DELAY_MILLIS = 300;
@@ -173,7 +169,6 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
   @Test
   @Story(BACKPRESSURE)
-  @FlakyTest(times = 150)
   public void sourceFiresNotificationsOnBackPressure() throws Exception {
     Latch failed = new Latch();
     final Reference<ExtensionNotification> batchFailed = new Reference<>();
