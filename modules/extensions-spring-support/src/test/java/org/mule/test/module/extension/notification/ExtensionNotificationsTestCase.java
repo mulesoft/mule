@@ -182,7 +182,7 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
     requestFlowToStartAndWait("sourceNotificationsBackPressure");
 
-    assertThat("Batch failure notification not received.", failed.await(100000, MILLISECONDS), is(true));
+    assertThat("Batch failure notification not received.", failed.await(10000, MILLISECONDS), is(true));
 
     ExtensionNotification backPressureNotification = batchFailed.get();
     assertThat(backPressureNotification, is(notNullValue()));
