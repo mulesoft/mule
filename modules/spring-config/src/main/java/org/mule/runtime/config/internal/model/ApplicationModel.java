@@ -346,7 +346,7 @@ public class ApplicationModel implements ArtifactAst {
     // and crafted declared extension models)
     resolveComponentTypes();
     muleComponentModels
-        .forEach(componentModel -> componentModel.resolveTypedComponentIdentifier(extensionModelHelper, true, runtimeMode));
+        .forEach(componentModel -> componentModel.resolveTypedComponentIdentifier(extensionModelHelper, runtimeMode));
     final ComponentLocationVisitor clv = new ComponentLocationVisitor();
     recursiveStreamWithHierarchy().forEach(clv);
   }
@@ -357,7 +357,7 @@ public class ApplicationModel implements ArtifactAst {
       // connectors and crafted declared extension models)
       resolveComponentTypes();
       muleComponentModels
-          .forEach(componentModel -> componentModel.resolveTypedComponentIdentifier(extensionModelHelper, false, runtimeMode));
+          .forEach(componentModel -> componentModel.resolveTypedComponentIdentifier(extensionModelHelper, runtimeMode));
     });
     // Have to index again the component models with macro expanded ones
     indexComponentModels();

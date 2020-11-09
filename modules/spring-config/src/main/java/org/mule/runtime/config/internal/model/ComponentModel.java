@@ -41,6 +41,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.SimpleType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -273,9 +274,9 @@ public abstract class ComponentModel {
     return empty();
   }
 
-  public void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper, boolean toplevel, boolean runtimeMode) {
+  public void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper, boolean runtimeMode) {
     executeOnComponentTree(this, componentModel -> {
-      componentModel.doResolveTypedComponentIdentifier(extensionModelHelper, toplevel, runtimeMode);
+      componentModel.doResolveTypedComponentIdentifier(extensionModelHelper, componentModel.isRoot(), runtimeMode);
     });
   }
 
