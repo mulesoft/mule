@@ -11,15 +11,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
@@ -38,7 +39,7 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
                                                       String location,
                                                       String parameterName)
       throws Exception {
-    ApplicationModel app = loadApplicationModel(appDeclaration);
+    ArtifactAst app = loadApplicationModel(appDeclaration);
     Locator locator = new Locator(app);
     ValueProviderCacheIdGenerator cacheIdGenerator = new ComponentAstBasedValueProviderCacheIdGenerator(locator);
     ComponentAst component = getComponentAst(app, location);
@@ -381,7 +382,7 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
 
     private final Map<Location, ComponentAst> components = new HashMap<>();
 
-    Locator(ApplicationModel app) {
+    Locator(ArtifactAst app) {
       app.topLevelComponentsStream().forEach(this::addComponent);
     }
 

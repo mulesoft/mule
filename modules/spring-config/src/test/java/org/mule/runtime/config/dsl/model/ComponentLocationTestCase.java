@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.dsl.model;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -14,15 +13,15 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
+import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 
 import java.util.Set;
@@ -50,7 +49,7 @@ public class ComponentLocationTestCase extends AbstractDslModelTestCase {
 
   @Test
   public void validateConnectionLocation() throws Exception {
-    ApplicationModel applicationModel = loadApplicationModel(buildAppDeclaration());
+    ArtifactAst applicationModel = toArtifactast(buildAppDeclaration(), extensions);
 
     ComponentAst config = applicationModel.topLevelComponentsStream().findFirst().get();
     assertThat(config.getModel(ConfigurationModel.class), is(not(empty())));
@@ -59,12 +58,6 @@ public class ComponentLocationTestCase extends AbstractDslModelTestCase {
     ComponentAst connection = config.directChildrenStream().findFirst().get();
     assertThat(connection.getModel(ConnectionProviderModel.class), is(not(empty())));
     assertThat(connection.getLocation().getLocation(), equalTo(CONFIG_NAME + "/connection"));
-  }
-
-  protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
-    return new ApplicationModel(new ArtifactConfig.Builder().build(),
-                                declaration, extensions, emptyMap(), empty(),
-                                uri -> getClass().getResourceAsStream(uri));
   }
 
   private ArtifactDeclaration buildAppDeclaration() {

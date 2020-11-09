@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -23,6 +24,7 @@ import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
@@ -30,12 +32,9 @@ import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedValueProv
 import org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DslElementBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +44,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
 
 public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValueProviderExtensionTestCase {
 
@@ -60,7 +61,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
                                                       String location,
                                                       String parameterName)
       throws Exception {
-    ApplicationModel app = loadApplicationModel(appDeclaration);
+    ArtifactAst app = loadApplicationModel(appDeclaration);
     Locator locator = new Locator(app);
     ComponentLocator<DslElementModel<?>> dslLocator =
         l -> getDeclaration(appDeclaration, l.toString()).map(d -> dslElementModelFactory.create(d).orElse(null));
