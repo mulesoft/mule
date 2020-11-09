@@ -21,6 +21,9 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
+import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -38,8 +41,13 @@ import javax.inject.Inject;
 import org.junit.Test;
 
 import io.qameta.allure.Story;
+import org.mule.test.runner.RunnerDelegateTo;
 
+@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalTestCase {
+
+  public static final int POLL_DELAY_MILLIS = 300;
+  public static final int FLOW_STOP_TIMEOUT = 2000;
 
   private static final String HEISENBERG = HeisenbergExtension.HEISENBERG.toUpperCase();
   private static final String NEW_BATCH = "NEW_BATCH";
@@ -121,6 +129,8 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
     ExtensionNotification batchTerminated = verifyNotificationAndValue(notifications.get(BATCH_TERMINATED), 1);
     assertThat(batchTerminated.getEvent().getCorrelationId(), is(correlationId));
+
+    requestFlowToStopAndWait("sourceNotifications");
   }
 
   @Test
@@ -156,10 +166,14 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
     ExtensionNotification batchTerminated = verifyNotificationAndValue(notifications.get(BATCH_TERMINATED), 1);
     assertThat(batchTerminated.getEvent().getCorrelationId(), is(correlationId));
+
+    requestFlowToStopAndWait("sourceNotificationsError");
+
   }
 
   @Test
   @Story(BACKPRESSURE)
+  @FlakyTest(times = 150)
   public void sourceFiresNotificationsOnBackPressure() throws Exception {
     Latch failed = new Latch();
     final Reference<ExtensionNotification> batchFailed = new Reference<>();
@@ -171,10 +185,9 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
       }
     }, true);
 
-    Flow flow = (Flow) getFlowConstruct("sourceNotificationsBackPressure");
-    flow.start();
+    requestFlowToStartAndWait("sourceNotificationsBackPressure");
 
-    assertThat("Batch failure notification not received.", failed.await(10000, MILLISECONDS), is(true));
+    assertThat("Batch failure notification not received.", failed.await(100000, MILLISECONDS), is(true));
 
     ExtensionNotification backPressureNotification = batchFailed.get();
     assertThat(backPressureNotification, is(notNullValue()));
@@ -193,7 +206,8 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
         return "Expected notifications not found.";
       }
     });
-    flow.stop();
+
+    requestFlowToStopAndWait("sourceNotificationsBackPressure");
 
     MultiMap<String, ExtensionNotification> notifications = listener.getNotifications();
     Set<String> keys = notifications.keySet();
@@ -232,6 +246,40 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
   private void setUpListener(Consumer<ExtensionNotification> onNotification, boolean correlationOn) {
     listener = new TestExtensionNotificationListener(onNotification, correlationOn);
     notificationListenerRegistry.registerListener(listener);
+  }
+
+  protected void requestFlowToStartAndWait(String flowName) throws Exception {
+    startFlow(flowName);
+    checkFlowIsStarted(flowName);
+  }
+
+  protected void startFlow(String flowName) throws Exception {
+    Flow flow = (Flow) getFlowConstruct(flowName);
+    flow.start();
+  }
+
+  protected void stopFlow(String flowName) throws Exception {
+    Flow flow = (Flow) getFlowConstruct(flowName);
+    flow.stop();
+  }
+
+  protected void requestFlowToStopAndWait(String flowName) throws Exception {
+    stopFlow(flowName);
+    checkFlowIsStopped(flowName);
+  }
+
+  protected void checkFlowIsStopped(String flowName) throws Exception {
+    Flow flow = (Flow) getFlowConstruct(flowName);
+    new PollingProber(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS)
+        .check(new JUnitLambdaProbe(() -> flow.getLifecycleState().isStopped(),
+                                    "The flow did not stop in a reasonable amount of time"));
+  }
+
+  private void checkFlowIsStarted(String flowName) throws Exception {
+    Flow flow = (Flow) getFlowConstruct(flowName);
+    new PollingProber(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS)
+        .check(new JUnitLambdaProbe(() -> flow.getLifecycleState().isStarted(),
+                                    "The flow did not start in a reasonable amount of time"));
   }
 
   private class TestExtensionNotificationListener implements ExtensionNotificationListener {
