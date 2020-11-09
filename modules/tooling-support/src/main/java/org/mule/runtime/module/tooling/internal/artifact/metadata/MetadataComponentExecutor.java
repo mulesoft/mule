@@ -29,6 +29,7 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.ArrayList;
@@ -63,6 +64,8 @@ public class MetadataComponentExecutor extends MetadataExecutor {
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
 
       return resolveMetadata(componentModel, optionalConfigurationInstance, metadataKey, extensionClassLoader);
+    } catch (ExpressionNotSupportedException e) {
+      return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(INVALID_METADATA_KEY).onKeys());
     } catch (MetadataResolvingException e) {
       return failure(newFailure(e).withFailureCode(e.getFailure()).onComponent());
     } catch (Exception e) {
