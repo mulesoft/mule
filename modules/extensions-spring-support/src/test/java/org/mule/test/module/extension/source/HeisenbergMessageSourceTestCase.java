@@ -45,6 +45,8 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.tests.api.TestQueueManager;
@@ -67,6 +69,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public static final int TIMEOUT_MILLIS = 30000;
   public static final int POLL_DELAY_MILLIS = 300;
   public static final int TIME_WAIT_MILLIS = 3000;
+  public static final int FLOW_STOP_TIMEOUT = 2000;
 
   private static final String OUT = "out";
 
@@ -93,7 +96,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   @Override
   protected void doTearDown() throws Exception {
     if (flow != null) {
-      flow.stop();
+      requestFlowToStopAndWait(flow.getName());
     }
 
     super.doTearDown();
@@ -102,7 +105,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Test
   public void source() throws Exception {
-    startFlow("source");
+    requestFlowToStartAndWait("source");
 
     assertSourceCompleted();
   }
@@ -110,7 +113,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   @Test
   public void sourceRestartedWithDynamicConfig() throws Exception {
     final Long gatheredMoney = HeisenbergSource.gatheredMoney;
-    startFlow("source");
+    requestFlowToStartAndWait("source");
 
     check(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
           () -> {
@@ -118,7 +121,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
             return true;
           });
 
-    stopFlow("source");
+    requestFlowToStopAndWait("source");
 
     final Long gatheredMoneyAfterStop = HeisenbergSource.gatheredMoney;
 
@@ -129,7 +132,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
                return true;
              });
 
-    startFlow("source");
+    requestFlowToStartAndWait("source");
 
     // Check that money is gathered after flow is restarted
     check(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
@@ -147,7 +150,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Test
   public void onException() throws Exception {
-    startFlow("sourceFailed");
+    requestFlowToStartAndWait("sourceFailed");
+
     assertSourceFailed();
   }
 
@@ -161,29 +165,30 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   @Test
   public void enrichExceptionOnStart() throws Exception {
     expectedException.expectMessage(ENRICHED_MESSAGE + CORE_POOL_SIZE_ERROR_MESSAGE);
-    startFlow("sourceFailedOnStart");
+    requestFlowToStartAndWait("sourceFailedOnStart");
   }
 
   @Test
   public void reconnectWithEnrichedException() throws Exception {
-    startFlow("sourceFailedOnRuntime");
+    requestFlowToStartAndWait("sourceFailedOnRuntime");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> sourceTimesStarted > 2);
   }
 
   @Test
   public void sourceOnSuccessCallsOnTerminate() throws Exception {
-    startFlow("source");
+    requestFlowToStartAndWait("source");
 
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
           () -> assertState(true, false, true));
 
     assertThat(HeisenbergSource.terminateStatus, is(SUCCESS));
     assertThat(HeisenbergSource.error, empty());
+
   }
 
   @Test
   public void sourceFailsOnSuccessParametersCallsOnErrorAndOnTerminate() throws Exception {
-    startFlow("sourceWithInvalidSuccessParameter");
+    requestFlowToStartAndWait("sourceWithInvalidSuccessParameter");
 
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
           () -> assertState(false, true, true));
@@ -196,7 +201,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Test
   public void sourceFailsOnSuccessBodyCallsOnErrorAndOnTerminate() throws Exception {
-    startFlow("sourceFailsOnSuccessBodyCallsOnErrorAndOnTerminate");
+    requestFlowToStartAndWait("sourceFailsOnSuccessBodyCallsOnErrorAndOnTerminate");
 
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
           () -> assertState(true, true, true));
@@ -209,7 +214,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Test
   public void sourceFailsOnSuccessAndOnErrorParametersCallsOnTerminate() throws Exception {
-    startFlow("sourceWithInvalidSuccessAndErrorParameters");
+    requestFlowToStartAndWait("sourceWithInvalidSuccessAndErrorParameters");
 
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
           () -> assertState(false, false, true));
@@ -228,7 +233,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Test
   public void sourceFailsInsideOnErrorAndCallsOnTerminate() throws Exception {
-    startFlow("sourceFailsInsideOnError");
+    requestFlowToStartAndWait("sourceFailsInsideOnError");
 
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, true, true));
 
@@ -241,19 +246,19 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Test
   public void failureInFlowCallsOnErrorDirectlyAndHandlesItCorrectly() throws Exception {
-    startFlow("failureInFlowCallsOnErrorDirectly");
+    requestFlowToStartAndWait("failureInFlowCallsOnErrorDirectly");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, true, true));
   }
 
   @Test
   public void failureInFlowErrorHandlerCallsOnErrorDirectlyAndHandlesItCorrectly() throws Exception {
-    startFlow("failureInFlowErrorHandlerCallsOnErrorDirectly");
+    requestFlowToStartAndWait("failureInFlowErrorHandlerCallsOnErrorDirectly");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, true, true));
   }
 
   @Test
   public void failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt() throws Exception {
-    startFlow("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt");
+    requestFlowToStartAndWait("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, false, true));
 
     assertThat(HeisenbergSource.terminateStatus, is(ERROR_INVOKE));
@@ -306,20 +311,20 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Test
   public void componentLocationInjected() throws Exception {
-    startFlow("source");
+    requestFlowToStartAndWait("source");
     assertThat(HeisenbergSource.location, is("source/source"));
   }
 
   @Test
   public void configNameInjected() throws Exception {
-    startFlow("source");
+    requestFlowToStartAndWait("source");
     assertThat(HeisenbergSource.configName, is("heisenberg"));
   }
 
   @Test
   @Issue("MULE-18759")
   public void sameChildInBothCallbacks() throws Exception {
-    startFlow("sameChildInBothCallbacks");
+    requestFlowToStartAndWait("sameChildInBothCallbacks");
 
     assertSourceCompleted();
   }
@@ -336,6 +341,30 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   protected void stopFlow(String flowName) throws Exception {
     flow = (Flow) getFlowConstruct(flowName);
     flow.stop();
+  }
+
+  protected void requestFlowToStopAndWait(String flowName) throws Exception {
+    stopFlow(flowName);
+    checkFlowIsStopped(flowName);
+  }
+
+  protected void checkFlowIsStopped(String flowName) throws Exception {
+    flow = (Flow) getFlowConstruct(flowName);
+    new PollingProber(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS)
+        .check(new JUnitLambdaProbe(() -> flow.getLifecycleState().isStopped(),
+                                    "The flow did not stop in a reasonable amount of time"));
+  }
+
+  protected void requestFlowToStartAndWait(String flowName) throws Exception {
+    startFlow(flowName);
+    checkFlowIsStarted(flowName);
+  }
+
+  private void checkFlowIsStarted(String flowName) throws Exception {
+    flow = (Flow) getFlowConstruct(flowName);
+    new PollingProber(FLOW_STOP_TIMEOUT, POLL_DELAY_MILLIS)
+        .check(new JUnitLambdaProbe(() -> flow.getLifecycleState().isStarted(),
+                                    "The flow did not start in a reasonable amount of time"));
   }
 
   private boolean assertState(boolean executedOnSuccess, boolean executedOnError, boolean executedOnTerminate) {
