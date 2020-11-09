@@ -14,6 +14,7 @@ import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -108,4 +109,14 @@ public class MuleExtensionUtils {
         .map(v -> v instanceof Boolean ? (Boolean) v : false)
         .orElse(false);
   }
+
+  /**
+   * ADD JDOC
+   */
+  public static boolean isPollingSourceLimitEnabled(ExtensionLoadingContext loadingContext) {
+    return loadingContext.getParameter(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER)
+            .map(v -> v instanceof Boolean ? (Boolean) v : false)
+            .orElse(false);
+  }
+
 }
