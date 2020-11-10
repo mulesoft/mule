@@ -303,6 +303,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       }
       if (minimumRejectedByLimitPassingWatermark == null ||
           compareWatermarks(itemWatermark, minimumRejectedByLimitPassingWatermark, watermarkComparator) < 0) {
+        LOGGER.debug("An item that passed all previous validations is being rejected by the poll limit and its watermark" +
+            "value will be stored so that is processed on future polls if sent for processing.");
         minimumRejectedByLimitPassingWatermark = itemWatermark;
       }
     }
@@ -316,10 +318,15 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       switch (watermarkStatus) {
         case ON_NEW_HIGH:
           renewUpdatedWatermark(itemWatermark);
+          LOGGER.debug("A new watermark maximum has been found when processing item with id {} for source in flow {}", itemId,
+                       flowName);
         case ON_HIGH:
           addToUpdatedWatermark(itemId, itemWatermark);
+          LOGGER.debug("Watermark value for item with id {} is equal to the maximum value found for source in flow {}", itemId,
+                       flowName);
         case PASSED:
           addToRecentlyProcessedIds(itemId, itemWatermark);
+          LOGGER.debug("Item with id {} passed the watermark validation and will be processed in flow {}", itemId, flowName);
         case REJECT:
           break;
       }
@@ -345,7 +352,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
         try {
           idsOnUpdatedWatermark.store(itemId, itemWatermark);
         } catch (ObjectStoreException e) {
-          // THROW MULE RUNTIME EXCEPTION
+          throw new MuleRuntimeException(
+                                         createStaticMessage("An error occurred while updating the watermark for Item with ID [%s]",
+                                                             itemId),
+                                         e);
         }
       }
     }
@@ -555,6 +565,11 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
                                Serializable minimumRejectedByLimitPassingWatermark) {
     try {
       if (minimumRejectedByLimitPassingWatermark != null) {
+        LOGGER
+            .debug("During the poll in the flow {}, items were rejected due to the item limit, a lower watermark than the maximum found will"
+                +
+                "have to be the new current watermark to ensure that those items are not left without being processed.",
+                   flowName);
         setCurrentWatermarkAsMinimumRejectWatermark(minimumRejectedByLimitPassingWatermark);
       } else {
         updateWatermark(value, comparator);

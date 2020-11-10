@@ -111,7 +111,11 @@ public class MuleExtensionUtils {
   }
 
   /**
-   * ADD JDOC
+   * Determines if the {@code maxItemsPerPoll} parameter must be added to polling sources.
+   *
+   * @param loadingContext the {@link ExtensionLoadingContext}
+   * @return whether the parameter should be added or not.
+   * @since 4.4.0
    */
   public static boolean isPollingSourceLimitEnabled(ExtensionLoadingContext loadingContext) {
     return loadingContext.getParameter(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER)

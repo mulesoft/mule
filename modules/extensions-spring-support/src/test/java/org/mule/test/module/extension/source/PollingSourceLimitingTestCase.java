@@ -111,7 +111,7 @@ public class PollingSourceLimitingTestCase extends AbstractExtensionFunctionalTe
 
   private void waitForAllPetsToBeAdopted() {
     check(PROBER_TIMEOUT, PROBER_FREQUENCY,
-          () -> getAdoptedPets() == NUMBER_OF_PETS);
+          () -> ADOPTIONS.size() == NUMBER_OF_PETS);
   }
 
   private void startFlow(String flowName) throws Exception {
@@ -119,19 +119,15 @@ public class PollingSourceLimitingTestCase extends AbstractExtensionFunctionalTe
   }
 
   private void assertLimitIsApplied(int limit) {
-    int adoptionPolls = ADOPTIONS.size();
-    for (int i = 0; i < adoptionPolls - 2; i++) {
+    int adoptionPolls = ADOPTIONS.keySet().size();
+    for (int i = 0; i < adoptionPolls - 1; i++) {
       assertThat(ADOPTIONS.getAll(i), hasSize(limit));
     }
     assertThat(ADOPTIONS.getAll(adoptionPolls - 1), hasSize(lessThanOrEqualTo(limit)));
   }
 
-  private int getAdoptedPets() {
-    return ADOPTIONS.keySet().stream().map(key -> ADOPTIONS.getAll(key).size()).reduce(0, Integer::sum);
-  }
-
   private void checkNoMorePetsAdopted() {
-    checkNot(CHECK_NOT_PROBER_TIMEOUT, PROBER_FREQUENCY, () -> getAdoptedPets() > NUMBER_OF_PETS);
+    checkNot(CHECK_NOT_PROBER_TIMEOUT, PROBER_FREQUENCY, () -> ADOPTIONS.size() > NUMBER_OF_PETS);
   }
 
 }
