@@ -65,7 +65,7 @@ public class MetadataComponentExecutor extends MetadataExecutor {
 
       return resolveMetadata(componentModel, optionalConfigurationInstance, metadataKey, extensionClassLoader);
     } catch (ExpressionNotSupportedException e) {
-      return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(INVALID_METADATA_KEY).onKeys());
+      return failure(newFailure(e).withFailureCode(INVALID_METADATA_KEY).onKeys());
     } catch (MetadataResolvingException e) {
       return failure(newFailure(e).withFailureCode(e.getFailure()).onComponent());
     } catch (Exception e) {
