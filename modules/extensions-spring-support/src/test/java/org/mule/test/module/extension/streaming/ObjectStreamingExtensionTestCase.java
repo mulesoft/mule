@@ -112,7 +112,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
 
     ConsumerStreamingIterator streamingIterator = (ConsumerStreamingIterator) stream;
     new PollingProber(1000, 100)
-            .check(new JUnitLambdaProbe(() -> !streamingIterator.hasNext()));
+        .check(new JUnitLambdaProbe(() -> !streamingIterator.hasNext()));
 
     expectedException.expect(new BaseMatcher<Throwable>() {
 
