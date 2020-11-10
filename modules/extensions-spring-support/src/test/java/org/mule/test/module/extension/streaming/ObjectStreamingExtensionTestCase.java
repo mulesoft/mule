@@ -20,6 +20,8 @@ import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.ArrayList;
@@ -36,9 +38,13 @@ import org.junit.rules.ExpectedException;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
+import org.mule.test.runner.RunnerDelegateTo;
 
 @Feature(STREAMING)
 @Story(OBJECT_STREAMING)
+@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final int DATA_SIZE = 100;
@@ -99,12 +105,15 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
 
   @Test
   @Description("Operation is configured not to stream and stream gets closed automatically even if not consumed")
+  @FlakyTest(times = 1000)
   public void nonRepeatableStreamIsManaged() throws Exception {
     Object stream = getObjectStream("getStreamWithoutStreaming", false);
     assertThat(stream, is(instanceOf(ConsumerStreamingIterator.class)));
 
     ConsumerStreamingIterator streamingIterator = (ConsumerStreamingIterator) stream;
-    assertThat(streamingIterator.hasNext(), is(false));
+    new PollingProber(1000, 100)
+            .check(new JUnitLambdaProbe(() -> !streamingIterator.hasNext()));
+
     expectedException.expect(new BaseMatcher<Throwable>() {
 
       @Override
