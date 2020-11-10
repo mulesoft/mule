@@ -7,9 +7,13 @@
 package org.mule.test.module.extension.source;
 
 import static java.util.Arrays.asList;
+import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
+import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_SDK_POLLING_SOURCE_LIMIT;
 
 import org.junit.ClassRule;
+import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -40,6 +44,12 @@ public class NegativePollingSourceLimitingTestCase extends InvalidExtensionConfi
   public static Collection<Object> modeParameters() {
     return asList(new Object[] {"Negative number", "negative-polling-source-limiting-config.xml"},
                   new Object[] {"Zero", "zero-polling-source-limiting-config.xml"});
+  }
+
+  @Override
+  protected void additionalExceptionAssertions(ExpectedException expectedException) {
+    expectedException
+        .expectCause(hasCause(hasCause(hasMessage("The maxItemsPerPoll parameter must have a value greater than 1"))));
   }
 
   @Override
