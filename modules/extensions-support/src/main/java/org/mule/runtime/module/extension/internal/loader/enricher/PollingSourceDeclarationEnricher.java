@@ -75,7 +75,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
 
             source.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(declareSchedulingStrategyParameter(loader));
 
-            if(isPollingSourceLimitEnabled(extensionLoadingContext)){
+            if (isPollingSourceLimitEnabled(extensionLoadingContext)) {
               source.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(declarePollingSourceLimitParameter());
             }
           }
@@ -86,7 +86,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
         ParameterDeclaration parameter = new ParameterDeclaration(POLLING_SOURCE_LIMIT_PARAMETER_NAME);
         parameter.setDescription(POLLING_SOURCE_LIMIT_PARAMETER_DESCRIPTION);
         parameter.setRequired(false);
-        parameter.setType(BaseTypeBuilder.create(JAVA).numberType().integer().range(1,null).build(), false);
+        parameter.setType(BaseTypeBuilder.create(JAVA).numberType().integer().range(1, null).build(), false);
         parameter.setExpressionSupport(NOT_SUPPORTED);
         parameter.addModelProperty(new SyntheticModelModelProperty());
         parameter.addModelProperty(new SinceMuleVersionModelProperty(POLLING_SOURCE_LIMIT_MULE_VERSION));
@@ -103,12 +103,12 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
         parameter.setExpressionSupport(NOT_SUPPORTED);
         parameter.addModelProperty(new InfrastructureParameterModelProperty(10));
         parameter.addModelProperty(new QNameModelProperty(new QName(CORE_NAMESPACE, SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER,
-                CORE_PREFIX)));
+                                                                    CORE_PREFIX)));
         parameter.setDslConfiguration(ParameterDslConfiguration.builder()
-                .allowsInlineDefinition(true)
-                .allowsReferences(false)
-                .allowTopLevelDefinition(false)
-                .build());
+            .allowsInlineDefinition(true)
+            .allowsReferences(false)
+            .allowTopLevelDefinition(false)
+            .build());
 
         return parameter;
       }

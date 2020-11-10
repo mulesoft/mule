@@ -115,8 +115,8 @@ public class MuleExtensionUtils {
    */
   public static boolean isPollingSourceLimitEnabled(ExtensionLoadingContext loadingContext) {
     return loadingContext.getParameter(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER)
-            .map(v -> v instanceof Boolean ? (Boolean) v : false)
-            .orElse(false);
+        .map(v -> v instanceof Boolean ? (Boolean) v : false)
+        .orElse(false);
   }
 
 }

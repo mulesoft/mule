@@ -137,7 +137,8 @@ public final class SourceConfigurer {
         } else {
           context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
           SchedulingStrategy scheduler = (SchedulingStrategy) valueResolver.resolve(context);
-          configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler, resolverMaxItemsPerPoll(resolverSet, context, initialiserEvent));
+          configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler,
+                                                        resolverMaxItemsPerPoll(resolverSet, context, initialiserEvent));
         }
       }
 
@@ -155,14 +156,16 @@ public final class SourceConfigurer {
     }
   }
 
-  private int resolverMaxItemsPerPoll(ResolverSet resolverSet, ValueResolvingContext context, CoreEvent event) throws MuleException {
+  private int resolverMaxItemsPerPoll(ResolverSet resolverSet, ValueResolvingContext context, CoreEvent event)
+      throws MuleException {
     ValueResolver<?> valueResolver = resolverSet.getResolvers().get(POLLING_SOURCE_LIMIT_PARAMETER_NAME);
     if (valueResolver == null) {
       return Integer.MAX_VALUE;
     } else {
       int maxItemsPerPoll = (Integer) valueResolver.resolve(context);
-      if(maxItemsPerPoll < 1) {
-        throw new IllegalStateException(format("The %s parameter must have a value greater than 1", POLLING_SOURCE_LIMIT_PARAMETER_NAME));
+      if (maxItemsPerPoll < 1) {
+        throw new IllegalStateException(format("The %s parameter must have a value greater than 1",
+                                               POLLING_SOURCE_LIMIT_PARAMETER_NAME));
       }
       return maxItemsPerPoll;
     }
