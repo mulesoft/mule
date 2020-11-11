@@ -7,31 +7,29 @@
 package org.mule.test.module.extension.source;
 
 import static java.util.Arrays.asList;
-import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_SDK_POLLING_SOURCE_LIMIT;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 
-import org.junit.ClassRule;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @RunnerDelegateTo(Parameterized.class)
 public class NegativePollingSourceLimitingTestCase extends InvalidExtensionConfigTestCase {
 
-  @ClassRule
-  public static SystemProperty enableLimit = new SystemProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT, "true");
+  private static final Map<String, Object> EXTENSION_LOADER_CONTEXT_ADDITIONAL_PARAMS = new HashMap<String, Object>() {
 
-  @Override
-  protected boolean mustRegenerateExtensionModels() {
-    return true;
-  }
+    {
+      put(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
+    }
+  };
 
   @Parameterized.Parameter
   public String parameterizationName;
@@ -44,6 +42,16 @@ public class NegativePollingSourceLimitingTestCase extends InvalidExtensionConfi
   public static Collection<Object> modeParameters() {
     return asList(new Object[] {"Negative number", "negative-polling-source-limiting-config.xml"},
                   new Object[] {"Zero", "zero-polling-source-limiting-config.xml"});
+  }
+
+  @Override
+  protected Map<String, Object> getExtensionLoaderContextAdditionalParameters() {
+    return EXTENSION_LOADER_CONTEXT_ADDITIONAL_PARAMS;
+  }
+
+  @Override
+  protected boolean mustRegenerateExtensionModels() {
+    return true;
   }
 
   @Override
