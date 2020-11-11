@@ -486,10 +486,6 @@
                     <groupId>ca.juliusdavies</groupId>
                     <artifactId>not-yet-commons-ssl</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.apache.velocity</groupId>
-                    <artifactId>velocity</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
 
