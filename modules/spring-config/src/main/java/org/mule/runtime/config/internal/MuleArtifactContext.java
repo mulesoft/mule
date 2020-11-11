@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Comparator.comparing;
@@ -93,12 +94,9 @@ import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
-import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
@@ -268,11 +266,15 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           }
           final AstXmlParser parser = builder.build();
 
-          final URL[] urls = Arrays.stream(artifactConfigResources)
-              .map(configFile -> configFile.getUrl())
-              .toArray(size -> new URL[size]);
-
-          artifactAst = parser.parse(urls);
+          artifactAst = parser.parse(stream(artifactConfigResources)
+              .map(configFile -> {
+                try {
+                  return new Pair<>(configFile.getResourceName(), configFile.getInputStream());
+                } catch (IOException e) {
+                  throw new MuleRuntimeException(e);
+                }
+              })
+              .collect(toList()));
         }
       } else {
         artifactAst = toArtifactast(artifactDeclaration, getExtensions());
