@@ -26,6 +26,14 @@
         <simple-prefix:set-payload-param-default-value-use-optional />
     </flow>
 
+    <flow name="testSetPayloadParamDefaultExpressionFlow">
+        <simple-prefix:set-payload-param-default-value-expression />
+    </flow>
+
+    <flow name="testSetPayloadParamDefaultExpressionUseOptionalFlow">
+        <simple-prefix:set-payload-param-default-value-expression-use-optional />
+    </flow>
+
     <flow name="testSetPayloadNoSideEffectFlowVariable">
         <set-variable variableName="testVar" value="unchanged value"/>
         <simple-prefix:set-payload-no-side-effect />

@@ -1042,7 +1042,9 @@ public final class XmlExtensionLoaderDelegate {
    */
   private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param) {
     final String parameterName = param.getParameter(PARAMETER_NAME).getRawValue();
-    final Optional<String> parameterDefaultValue = param.getParameter(PARAMETER_DEFAULT_VALUE).getValue().getValue();
+    final Optional<String> parameterDefaultValue = param.getParameter(PARAMETER_DEFAULT_VALUE).getValue()
+        .mapLeft(expr -> "#[" + expr + "]")
+        .getValue();
     final UseEnum use = UseEnum.valueOf(param.getParameter(ATTRIBUTE_USE).getValue().getRight().toString());
     if (UseEnum.REQUIRED.equals(use) && parameterDefaultValue.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("The parameter [%s] cannot have the %s attribute set to %s when it has a default value",

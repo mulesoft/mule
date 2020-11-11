@@ -45,6 +45,26 @@
         <output type="string"/>
     </operation>
 
+    <operation name="set-payload-param-default-value-expression">
+        <parameters>
+            <parameter name="value" type="string" defaultValue="#[payload ++ '50']"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[vars.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-param-default-value-expression-use-optional">
+        <parameters>
+            <parameter name="value" type="string" use="OPTIONAL" defaultValue="#[payload ++ '50']"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[vars.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
     <operation name="set-payload-no-side-effect">
         <body>
             <mule:set-payload value="10"/>

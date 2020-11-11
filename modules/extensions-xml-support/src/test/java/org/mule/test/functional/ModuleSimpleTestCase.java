@@ -98,6 +98,18 @@ public class ModuleSimpleTestCase extends AbstractCeXmlExtensionMuleArtifactFunc
   }
 
   @Test
+  public void testSetPayloadParamDefaultExpressionFlow() throws Exception {
+    CoreEvent muleEvent = flowRunner("testSetPayloadParamDefaultExpressionFlow").withPayload("51").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("5150"));
+  }
+
+  @Test
+  public void testSetPayloadParamDefaultExpressionUseOptionalFlow() throws Exception {
+    CoreEvent muleEvent = flowRunner("testSetPayloadParamDefaultExpressionUseOptionalFlow").withPayload("51").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("5150"));
+  }
+
+  @Test
   public void testSetPayloadNoSideEffectFlowVariable() throws Exception {
     CoreEvent muleEvent = flowRunner("testSetPayloadNoSideEffectFlowVariable").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("10"));
