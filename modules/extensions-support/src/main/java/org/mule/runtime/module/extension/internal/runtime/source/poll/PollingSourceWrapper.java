@@ -598,7 +598,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   private void setCurrentWatermarkAsMinimumRejectWatermark(Serializable minimumRejectedByLimitPassingWatermark)
       throws ObjectStoreException {
     if (watermarkObjectStore.contains(WATERMARK_ITEM_OS_KEY)) {
-      watermarkObjectStore.retrieve(WATERMARK_ITEM_OS_KEY);
       watermarkObjectStore.remove(WATERMARK_ITEM_OS_KEY);
     }
     watermarkObjectStore.store(WATERMARK_ITEM_OS_KEY, minimumRejectedByLimitPassingWatermark);
