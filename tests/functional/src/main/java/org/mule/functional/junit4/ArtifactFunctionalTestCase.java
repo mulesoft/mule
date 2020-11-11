@@ -7,6 +7,7 @@
 
 package org.mule.functional.junit4;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -262,10 +263,10 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
           + " so it should be annotated to only run with: " + ArtifactClassLoaderRunner.class + ". See " + RunnerDelegateTo.class
           + " for defining a delegate runner to be used.");
     }
-
+    Map<String, Object> extensionLoaderParameters = getExtensionLoaderContextAdditionalParameters();
     if (extensionsManagerConfigurationBuilder != null) {
-      if (mustRegenerateExtensionModels()) {
-        reloadableExtensionsManagerConfigurationBuilder.loadExtensionModels();
+      if (mustRegenerateExtensionModels() || !extensionLoaderParameters.isEmpty()) {
+        reloadableExtensionsManagerConfigurationBuilder.loadExtensionModels(extensionLoaderParameters);
         builders.add(0, reloadableExtensionsManagerConfigurationBuilder);
       } else {
         builders.add(0, extensionsManagerConfigurationBuilder);
@@ -296,6 +297,16 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
    */
   protected boolean mustRegenerateExtensionModels() {
     return false;
+  }
+
+  /**
+   * Subclasses can override this method so that extension models are generated with an extension loading context that contains
+   * the parameters returned by this method.
+   *
+   * @return a map with parameters to be added to the extension loader context.
+   */
+  protected Map<String, Object> getExtensionLoaderContextAdditionalParameters() {
+    return emptyMap();
   }
 
   /**

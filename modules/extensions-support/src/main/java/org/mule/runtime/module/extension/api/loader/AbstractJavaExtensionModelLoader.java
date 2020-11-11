@@ -88,7 +88,7 @@ import java.util.function.BiFunction;
 public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
 
   private static final boolean IGNORE_DISABLED = getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
-  private final boolean ENABLE_POLLING_SOURCE_LIMIT = getProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT) != null;
+  private static final boolean ENABLE_POLLING_SOURCE_LIMIT = getProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT) != null;
   public static final String TYPE_PROPERTY_NAME = "type";
   public static final String EXTENSION_TYPE = "EXTENSION_TYPE";
   public static final String VERSION = "version";

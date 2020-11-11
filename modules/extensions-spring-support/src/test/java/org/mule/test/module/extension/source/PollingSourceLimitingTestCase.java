@@ -9,7 +9,7 @@ package org.mule.test.module.extension.source;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.number.OrderingComparison.lessThanOrEqualTo;
-import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_SDK_POLLING_SOURCE_LIMIT;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 
@@ -18,10 +18,11 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import org.junit.ClassRule;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Test;
 
 public class PollingSourceLimitingTestCase extends AbstractExtensionFunctionalTestCase {
@@ -31,10 +32,14 @@ public class PollingSourceLimitingTestCase extends AbstractExtensionFunctionalTe
   private static int PROBER_FREQUENCY = 500;
   private static int NUMBER_OF_PETS = 7;
 
-  private static MultiMap<Integer, String> ADOPTIONS = new MultiMap<>();
+  private static final Map<String, Object> EXTENSION_LOADER_CONTEXT_ADDITIONAL_PARAMS = new HashMap<String, Object>() {
 
-  @ClassRule
-  public static SystemProperty enableLimit = new SystemProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT, "true");
+    {
+      put(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
+    }
+  };
+
+  private static MultiMap<Integer, String> ADOPTIONS = new MultiMap<>();
 
   public static class AdoptionProcessor implements Processor {
 
@@ -57,6 +62,11 @@ public class PollingSourceLimitingTestCase extends AbstractExtensionFunctionalTe
   @Override
   protected boolean mustRegenerateExtensionModels() {
     return true;
+  }
+
+  @Override
+  protected Map<String, Object> getExtensionLoaderContextAdditionalParameters() {
+    return EXTENSION_LOADER_CONTEXT_ADDITIONAL_PARAMS;
   }
 
   @Override
