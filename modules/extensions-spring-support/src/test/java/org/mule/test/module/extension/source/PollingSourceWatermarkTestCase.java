@@ -11,9 +11,12 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
+import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.beginLatch;
+import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.resetSource;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -26,7 +29,7 @@ import org.junit.Test;
 public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static int TEST_TIMEOUT = 120000;
-  private static int SHORT_TIMEOUT = 5000;
+  private static int SHORT_TIMEOUT = 30000;
   private static int LONG_TIMEOUT = 30000;
   private static int PROBER_FREQUENCY = 100;
 
@@ -52,6 +55,7 @@ public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalT
   @Override
   protected void doTearDown() throws Exception {
     ADOPTION_EVENTS.clear();
+    resetSource();
   }
 
   @Override
@@ -90,6 +94,42 @@ public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalT
     assertIdempotentAdoptions(expectedPets);
   }
 
+  @Test
+  public void unprocessedItemsAreRejectedWithoutImpactingWatermarkWhenSourceIsStoppedMidPoll() throws Exception {
+    assertWatermarkingForStopStartScenario(asList("Anibal", "Barbara", "Elsa"),
+                                           "unprocessedItemsAreRejectedWithoutImpactingWatermarkWhenSourceIsStoppedMidPoll");
+  }
+
+  @Test
+  public void processedItemsWithSameWatermarkAreNotReprocessedWhenSourceIsRestartedMidPoll() throws Exception {
+    assertWatermarkingForStopStartScenario(asList("Anibal", "Barbara"),
+                                           "processedItemsWithSameWatermarkAreNotReprocessedWhenSourceIsRestartedMidPoll");
+  }
+
+  @Test
+  public void processedItemsWithNewWatermarkAreReprocessedWhenSourceIsRestartedMidPoll() throws Exception {
+    assertWatermarkingForStopStartScenario(asList("Anibal", "Barbara", "ANIBAL", "BARBARA", "Colonel Meow"),
+                                           "processedItemsWithNewWatermarkAreReprocessedWhenSourceIsRestartedMidPoll");
+  }
+
+  @Test
+  public void unprocessedItemsAreProcessedWhenSourceIsRestartedMidPoll() throws Exception {
+    assertWatermarkingForStopStartScenario(asList("Anibal", "Barbara", "Colonel Meow", "Daphne", "Elsa"),
+                                           "unprocessedItemsAreProcessedWhenSourceIsRestartedMidPoll");
+  }
+
+  private void assertWatermarkingForStopStartScenario(List<String> expectedPets, String flowName) throws Exception {
+    startFlow(flowName);
+    beginLatch.await();
+    stopFlow(flowName);
+    check(5000, 1000, () -> getFlowConstruct(flowName).getLifecycleState().isStopped());
+    startFlow(flowName);
+
+    assertAllPetsAdopted(expectedPets);
+
+    assertIdempotentAdoptions(expectedPets);
+  }
+
   private void assertIdempotentAdoptions(List<String> pets) {
     checkNot(LONG_TIMEOUT, PROBER_FREQUENCY, () -> {
       synchronized (ADOPTION_EVENTS) {
@@ -110,5 +150,9 @@ public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalT
 
   private void startFlow(String flowName) throws Exception {
     ((Startable) getFlowConstruct(flowName)).start();
+  }
+
+  private void stopFlow(String flowName) throws Exception {
+    ((Stoppable) getFlowConstruct(flowName)).stop();
   }
 }
