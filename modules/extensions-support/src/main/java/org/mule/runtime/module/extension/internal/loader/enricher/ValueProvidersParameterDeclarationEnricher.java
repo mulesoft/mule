@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderId;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -34,6 +36,7 @@ import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarat
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
@@ -114,13 +117,14 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                                                 paramDeclaration,
                                                                                 paramDeclaration::setValueProviderModel,
                                                                                 1,
-                                                                                parameterNames, paramDeclaration.getName()));
+                                                                                parameterNames, paramDeclaration.getName(),
+                                                                                allParameters));
 
     dynamicGroupOptions
         .forEach((paramGroupDeclaration, resolverClass) -> getParts(paramGroupDeclaration)
             .forEach((paramDeclaration, order) -> enrichParameter(resolverClass, paramDeclaration,
                                                                   paramDeclaration::setValueProviderModel, order, parameterNames,
-                                                                  paramGroupDeclaration.getName())));
+                                                                  paramGroupDeclaration.getName(), allParameters)));
   }
 
   /**
@@ -133,7 +137,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
   private void enrichParameter(OfValues resolverClass,
                                BaseDeclaration paramDeclaration,
                                Consumer<ValueProviderModel> valueProviderModelConsumer, Integer partOrder,
-                               Map<String, String> containerParameterNames, String name) {
+                               Map<String, String> containerParameterNames, String name,
+                               List<ParameterDeclaration> allParameters) {
 
     ValueProviderFactoryModelPropertyBuilder propertyBuilder =
         ValueProviderFactoryModelProperty.builder(resolverClass.value());
@@ -156,6 +161,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
 
     valueProviderModelConsumer
         .accept(new ValueProviderModel(getRequiredParametersAliases(resolverParameters, containerParameterNames),
+                                       getParametersModel(resolverParameters, containerParameterNames, allParameters),
                                        requiresConfiguration.get(), requiresConnection.get(), resolverClass.open(), partOrder,
                                        name, getValueProviderId(resolverClass.value())));
   }
@@ -252,6 +258,25 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     return parameterDeclarations.stream()
         .filter(ExtensionParameter::isRequired)
         .map(param -> parameterNames.getOrDefault(param.getName(), param.getName()))
+        .collect(toList());
+  }
+
+  private List<ParameterModel> getParametersModel(List<ExtensionParameter> parameterDeclarations,
+                                                  Map<String, String> parameterNames,
+                                                  List<ParameterDeclaration> allParameters) {
+    Map<String, Boolean> paramsInfo = parameterDeclarations.stream()
+        .collect(toMap(param -> parameterNames.getOrDefault(param.getName(), param.getName()), ExtensionParameter::isRequired));
+    return allParameters.stream()
+        .filter(param -> paramsInfo.containsKey(param.getName()))
+        .map(param -> new ImmutableParameterModel(param.getName(),
+                                                  param.getDescription(), param.getType(),
+                                                  param.hasDynamicType(), paramsInfo.get(param.getName()),
+                                                  param.isConfigOverride(),
+                                                  param.isComponentId(),
+                                                  param.getExpressionSupport(), param.getDefaultValue(), param.getRole(),
+                                                  param.getDslConfiguration(), param.getDisplayModel(), param.getLayoutModel(),
+                                                  param.getValueProviderModel(), param.getAllowedStereotypeModels(),
+                                                  param.getModelProperties()))
         .collect(toList());
   }
 
