@@ -290,6 +290,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   @Test
   public void dynamicFlowRefDoesNotExist() throws Exception {
+    doReturn(true).when(expressionManager).isExpression(anyString());
     doReturn(new TypedValue<>("other", STRING)).when(expressionManager).evaluate(eq(DYNAMIC_NON_EXISTANT), eq(DataType.STRING),
                                                                                  eq(NULL_BINDING_CONTEXT), any(CoreEvent.class),
                                                                                  any(ComponentLocation.class), eq(true));
@@ -326,7 +327,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
                                    .setScope(BeanDefinition.SCOPE_PROTOTYPE)
                                    .getBeanDefinition();
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);
-    //Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
+    // Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
     Flow concurrentCallerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
     ProcessingStrategy concurrentCallerFlowProcessingStrategy = mock(ProcessingStrategy.class);
     when(locator.find(Location.builder().globalName("concurrentFlow").build())).thenReturn(of(concurrentCallerFlow));
@@ -486,6 +487,11 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   private FlowRefFactoryBean createDynamicFlowRefFactoryBean(Processor target, Object targetBuilder,
                                                              ApplicationContext applicationContext)
       throws Exception {
+    doReturn(true).when(expressionManager).isExpression(anyString());
+    doReturn(new TypedValue<>(PARSED_DYNAMIC_REFERENCED_FLOW, STRING)).when(expressionManager)
+        .evaluate(eq(DYNAMIC_REFERENCED_FLOW), eq(DataType.STRING),
+                  eq(NULL_BINDING_CONTEXT), any(CoreEvent.class),
+                  any(ComponentLocation.class), eq(true));
     if (targetBuilder != null) {
       doReturn(targetBuilder).when(applicationContext).getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW));
     } else {

@@ -7,18 +7,22 @@
 package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
- * Exception thrown when a recursion exists between static flow-refs.
+ * Exception thrown when a too many nested static subFlows are encountered.
  *
- * @since 4.3.0
+ * @since 4.4, 4.3.1, 4.2.3
  */
-public class RecursiveSubFlowException extends LifecycleException {
+public class DeepSubFlowNestingFlowRefException extends LifecycleException {
 
-  public RecursiveSubFlowException(String offendingFlowName, Processor flowRefProcessor) {
-    super(createStaticMessage("Found a possible infinite recursion involving flow named " + offendingFlowName), flowRefProcessor);
+  private static final long serialVersionUID = 2988543857363646772L;
+
+  public DeepSubFlowNestingFlowRefException(String offendingFlowName, Processor flowRefProcessor) {
+    super(createStaticMessage("Found too many nested static 'sub-flow's: " + offendingFlowName),
+          flowRefProcessor);
 
   }
 }
