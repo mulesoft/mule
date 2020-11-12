@@ -20,6 +20,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isPollingSourceLimitEnabled;
+import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor.getInfrastructureType;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -35,6 +36,7 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
+import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
@@ -44,6 +46,7 @@ import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.extension.api.runtime.source.PollingSource;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
 import javax.xml.namespace.QName;
 
@@ -58,6 +61,11 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
+    final int schedulingStrategyParameterSequence =
+        getInfrastructureType(new TypeWrapper(SchedulingStrategy.class,
+                                              new DefaultExtensionsTypeLoaderFactory()
+                                                  .createTypeLoader(extensionLoadingContext.getExtensionClassLoader())))
+                                                      .map(infrastructureType -> infrastructureType.getSequence()).orElse(0);
     ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
     ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
     Reference<Boolean> thereArePollingSources = new Reference<>(false);
@@ -101,7 +109,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
         parameter.setRequired(true);
         parameter.setType(loader.load(SchedulingStrategy.class), false);
         parameter.setExpressionSupport(NOT_SUPPORTED);
-        parameter.addModelProperty(new InfrastructureParameterModelProperty(10));
+        parameter.addModelProperty(new InfrastructureParameterModelProperty(schedulingStrategyParameterSequence));
         parameter.addModelProperty(new QNameModelProperty(new QName(CORE_NAMESPACE, SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER,
                                                                     CORE_PREFIX)));
         parameter.setDslConfiguration(ParameterDslConfiguration.builder()
