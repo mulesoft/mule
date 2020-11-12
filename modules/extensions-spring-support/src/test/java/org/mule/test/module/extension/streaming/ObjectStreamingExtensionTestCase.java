@@ -113,6 +113,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
           return true;
         }));
 
+
     expectedException.expect(new BaseMatcher<Throwable>() {
 
       @Override

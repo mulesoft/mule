@@ -400,6 +400,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
       super.prepareObjectProviders();
 
+      LOGGER.debug("Will create beans: {}", applicationComponents);
       return createBeans(applicationComponents);
     });
   }

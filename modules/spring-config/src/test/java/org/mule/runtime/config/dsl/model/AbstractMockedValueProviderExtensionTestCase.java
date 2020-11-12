@@ -25,7 +25,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -33,6 +32,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
+import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
@@ -41,6 +41,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSO
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_MAPPINGS;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.component.location.Location;
@@ -67,8 +68,8 @@ import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
@@ -80,9 +81,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,11 +89,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 public abstract class AbstractMockedValueProviderExtensionTestCase extends AbstractMuleTestCase {
 
@@ -134,6 +136,9 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected static final String SOURCE_LOCATION = MY_FLOW + "/source";
   protected static final String OPERATION_LOCATION = MY_FLOW + "/processors/0";
   protected static final String OTHER_OPERATION_LOCATION = MY_FLOW + "/processors/1";
+
+  @Rule
+  public MockitoRule mockito = MockitoJUnit.rule();
 
   @Mock(lenient = true)
   protected ExtensionModel mockExtension;
@@ -213,8 +218,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
   @Before
   public void before() {
-    initMocks(this);
-
     initializeExtensionMock(mockExtension);
 
     when(nameParameter.getName()).thenReturn("name");
@@ -432,11 +435,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     declarer = ElementDeclarer.forExtension(EXTENSION_NAME);
   }
 
-  @After
-  public void tearDown() {
-    Mockito.framework().clearInlineMocks();
-  }
-
   protected void initializeExtensionMock(ExtensionModel extension) {
     when(extension.getName()).thenReturn(EXTENSION_NAME);
     when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
@@ -634,7 +632,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   }
 
 
-  protected ComponentAst getComponentAst(ApplicationModel app, String location) {
+  protected ComponentAst getComponentAst(ArtifactAst app, String location) {
     Reference<ComponentAst> componentAst = new Reference<>();
     app.recursiveStream().forEach(c -> {
       if (c.getLocation().getLocation().equals(location)) {
@@ -651,8 +649,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
 
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
-    return new ApplicationModel(new ArtifactConfig.Builder().build(),
-                                declaration, extensions, emptyMap(), empty(),
+    return new ApplicationModel(toArtifactast(declaration, extensions), emptyMap(), empty(),
                                 uri -> getClass().getResourceAsStream(uri));
   }
 
@@ -690,7 +687,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
     private final Map<Location, ComponentAst> components = new HashMap<>();
 
-    Locator(ApplicationModel app) {
+    Locator(ArtifactAst app) {
       app.topLevelComponentsStream().forEach(this::addComponent);
     }
 
