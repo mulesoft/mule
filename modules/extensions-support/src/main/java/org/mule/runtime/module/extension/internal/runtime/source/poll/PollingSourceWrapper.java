@@ -25,6 +25,10 @@ import static org.mule.runtime.extension.api.runtime.source.PollingSource.RECENT
 import static org.mule.runtime.extension.api.runtime.source.PollingSource.UPDATED_WATERMARK_ITEM_OS_KEY;
 import static org.mule.runtime.extension.api.runtime.source.PollingSource.WATERMARK_ITEM_OS_KEY;
 import static org.mule.runtime.extension.api.runtime.source.PollingSource.WATERMARK_OS_NAME_SUFFIX;
+import static org.mule.runtime.module.extension.internal.runtime.source.poll.WatermarkStatus.ON_HIGH;
+import static org.mule.runtime.module.extension.internal.runtime.source.poll.WatermarkStatus.ON_NEW_HIGH;
+import static org.mule.runtime.module.extension.internal.runtime.source.poll.WatermarkStatus.PASSED;
+import static org.mule.runtime.module.extension.internal.runtime.source.poll.WatermarkStatus.REJECT;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
@@ -85,6 +89,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
   private final PollingSource<T, A> delegate;
   private final SchedulingStrategy scheduler;
+  private final int maxItemsPerPoll;
 
   @Inject
   private LockFactory lockFactory;
@@ -109,9 +114,14 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   private DelegateRunnable delegateRunnable;
 
   public PollingSourceWrapper(PollingSource<T, A> delegate, SchedulingStrategy scheduler) {
+    this(delegate, scheduler, Integer.MAX_VALUE);
+  }
+
+  public PollingSourceWrapper(PollingSource<T, A> delegate, SchedulingStrategy scheduler, int maxItemsPerPoll) {
     super(delegate);
     this.delegate = delegate;
     this.scheduler = scheduler;
+    this.maxItemsPerPoll = maxItemsPerPoll;
   }
 
   @Override
@@ -191,7 +201,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       try {
         delegate.poll(pollContext);
         pollContext.getUpdatedWatermark()
-            .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator()));
+            .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator(),
+                                            pollContext.getMinimumRejectedByLimitPassingWatermark().orElse(null)));
       } catch (Throwable t) {
         LOGGER.error(format("Found exception trying to process item on source at flow '%s'. %s",
                             flowName, t.getMessage()),
@@ -235,13 +246,18 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     private final SourceCallback<T, A> sourceCallback;
     private Serializable currentWatermark;
     private Serializable updatedWatermark;
+    private Serializable minimumRejectedByLimitPassingWatermark;
     private Comparator<Serializable> watermarkComparator = null;
+
+    private int currentPollItems;
 
     private DefaultPollContext(SourceCallback<T, A> sourceCallback, Serializable currentWatermark,
                                Serializable updatedWatermark) {
       this.sourceCallback = sourceCallback;
       this.currentWatermark = currentWatermark;
       this.updatedWatermark = updatedWatermark;
+      this.currentPollItems = 0;
+      this.minimumRejectedByLimitPassingWatermark = null;
     }
 
     @Override
@@ -253,23 +269,111 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       pollItem.validate();
 
-      PollItemStatus status;
+      PollItemStatus status = ACCEPTED;
+      boolean currentPollItemLimitApplied = false;
       if (!acquireItem(pollItem, callbackContext)) {
         status = ALREADY_IN_PROCESS;
-      } else if (!passesWatermark(pollItem)) {
-        status = FILTERED_BY_WATERMARK;
-      } else if (isRequestedToStop()) {
-        status = SOURCE_STOPPING;
       } else {
-        sourceCallback.handle(pollItem.getResult(), callbackContext);
-        status = ACCEPTED;
+        WatermarkStatus watermarkStatus = passesWatermark(pollItem);
+        if (watermarkStatus == REJECT) {
+          status = FILTERED_BY_WATERMARK;
+        } else if (isRequestedToStop()) {
+          status = SOURCE_STOPPING;
+        } else if (currentPollItems < maxItemsPerPoll) {
+          currentPollItems++;
+          sourceCallback.handle(pollItem.getResult(), callbackContext);
+          saveWatermarkValue(watermarkStatus, pollItem);
+        } else {
+          currentPollItemLimitApplied = true;
+          processLimitApplied(watermarkStatus, pollItem);
+        }
       }
 
-      if (status != ACCEPTED) {
+      if (status != ACCEPTED || currentPollItemLimitApplied) {
         rejectItem(pollItem.getResult(), callbackContext);
       }
 
       return status;
+    }
+
+    private void processLimitApplied(WatermarkStatus watermarkStatus, DefaultPollItem pollItem) {
+      Serializable itemWatermark = pollItem.getWatermark().orElse(null);
+      if (itemWatermark == null || watermarkStatus != PASSED) {
+        return;
+      }
+      if (minimumRejectedByLimitPassingWatermark == null ||
+          compareWatermarks(itemWatermark, minimumRejectedByLimitPassingWatermark, watermarkComparator) < 0) {
+        LOGGER.debug("An item that passed all previous validations is being rejected by the poll limit and its watermark" +
+            "value will be stored so that is processed on future polls if sent for processing.");
+        minimumRejectedByLimitPassingWatermark = itemWatermark;
+      }
+    }
+
+    private void saveWatermarkValue(WatermarkStatus watermarkStatus, DefaultPollItem pollItem) {
+      String itemId = pollItem.getItemId().orElse(null);
+      Serializable itemWatermark = pollItem.getWatermark().orElse(null);
+      if (itemWatermark == null) {
+        return;
+      }
+      switch (watermarkStatus) {
+        case ON_NEW_HIGH:
+          renewUpdatedWatermark(itemWatermark);
+          LOGGER.debug("A new watermark maximum has been found when processing item with id {} for source in flow {}", itemId,
+                       flowName);
+        case ON_HIGH:
+          addToUpdatedWatermark(itemId, itemWatermark);
+          LOGGER.debug("Watermark value for item with id {} is equal to the maximum value found for source in flow {}", itemId,
+                       flowName);
+        case PASSED:
+          addToRecentlyProcessedIds(itemId, itemWatermark);
+          LOGGER.debug("Item with id {} passed the watermark validation and will be processed in flow {}", itemId, flowName);
+        case REJECT:
+          break;
+      }
+    }
+
+    private void renewUpdatedWatermark(Serializable itemWatermark) {
+      try {
+        idsOnUpdatedWatermark.clear();
+        this.updatedWatermark = itemWatermark;
+        if (watermarkObjectStore.contains(UPDATED_WATERMARK_ITEM_OS_KEY)) {
+          watermarkObjectStore.remove(UPDATED_WATERMARK_ITEM_OS_KEY);
+        }
+        watermarkObjectStore.store(UPDATED_WATERMARK_ITEM_OS_KEY, updatedWatermark);
+      } catch (ObjectStoreException e) {
+        throw new MuleRuntimeException(
+                                       createStaticMessage("An error occurred while trying to update the updatedWatermark in the the object store"),
+                                       e);
+      }
+    }
+
+    private void addToUpdatedWatermark(String itemId, Serializable itemWatermark) {
+      if (itemId != null) {
+        try {
+          idsOnUpdatedWatermark.store(itemId, itemWatermark);
+        } catch (ObjectStoreException e) {
+          throw new MuleRuntimeException(
+                                         createStaticMessage("An error occurred while updating the watermark for Item with ID [%s]",
+                                                             itemId),
+                                         e);
+        }
+      }
+    }
+
+    private void addToRecentlyProcessedIds(String itemId, Serializable itemWatermark) {
+      try {
+        if (itemId != null) {
+          if (recentlyProcessedIds.contains(itemId)) {
+            recentlyProcessedIds.remove(itemId);
+          }
+          recentlyProcessedIds.store(itemId, itemWatermark);
+        }
+      } catch (ObjectStoreException e) {
+        throw new MuleRuntimeException(
+                                       createStaticMessage("An error occurred while updating the watermark for Item with ID [%s]",
+                                                           itemId),
+                                       e);
+      }
     }
 
     @Override
@@ -293,6 +397,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       sourceCallback.onConnectionException(e);
     }
 
+    public Optional<Serializable> getMinimumRejectedByLimitPassingWatermark() {
+      return ofNullable(minimumRejectedByLimitPassingWatermark);
+    }
+
     private Optional<Serializable> getUpdatedWatermark() {
       return ofNullable(updatedWatermark);
     }
@@ -301,54 +409,17 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       return watermarkComparator;
     }
 
-    private void renewUpdatedWatermark(String itemId, Serializable itemWatermark) throws ObjectStoreException {
-      idsOnUpdatedWatermark.clear();
-      if (itemId != null) {
-        idsOnUpdatedWatermark.store(itemId, itemWatermark);
-      }
-      setUpdatedWatermark(itemWatermark);
-    }
-
-    private void setUpdatedWatermark(Serializable updatedWatermark) {
-      try {
-        this.updatedWatermark = updatedWatermark;
-        if (watermarkObjectStore.contains(UPDATED_WATERMARK_ITEM_OS_KEY)) {
-          watermarkObjectStore.remove(UPDATED_WATERMARK_ITEM_OS_KEY);
-        }
-        watermarkObjectStore.store(UPDATED_WATERMARK_ITEM_OS_KEY, updatedWatermark);
-      } catch (ObjectStoreException e) {
-        throw new MuleRuntimeException(
-                                       createStaticMessage("An error occurred while trying to update the updatedWatermark in the the object store"),
-                                       e);
-      }
-    }
-
-    private void addToIdsOnUpdatedWatermark(String itemId, Serializable itemWatermark) {
-      try {
-        if (!idsOnUpdatedWatermark.contains(itemId)) {
-          idsOnUpdatedWatermark.store(itemId, itemWatermark);
-        }
-      } catch (ObjectStoreException e) {
-        throw new MuleRuntimeException(
-                                       createStaticMessage("An error occurred while adding an item id to the object store" +
-                                           " of the items with the highest updated watermark for Item with ID [%s]",
-                                                           itemId),
-                                       e);
-      }
-    }
-
-    private boolean passesWatermark(DefaultPollItem pollItem) {
+    private WatermarkStatus passesWatermark(DefaultPollItem pollItem) {
       Serializable itemWatermark = pollItem.getWatermark().orElse(null);
       if (itemWatermark == null) {
-        return true;
+        return PASSED;
       }
       String itemId = pollItem.getItemId().orElse(null);
 
-      boolean accept = true;
+      WatermarkStatus status = PASSED;
       int compare;
       if (currentWatermark == null && updatedWatermark == null) {
-        setUpdatedWatermark(itemWatermark);
-        pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
+        status = ON_NEW_HIGH;
       } else {
         compare = currentWatermark != null ? compareWatermarks(currentWatermark, itemWatermark, watermarkComparator) : -1;
         if (compare < 0) {
@@ -356,15 +427,17 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
             if (itemId != null && recentlyProcessedIds.contains(itemId)) {
               Serializable previousItemWatermark = recentlyProcessedIds.retrieve(itemId);
               if (compareWatermarks(itemWatermark, previousItemWatermark, watermarkComparator) <= 0) {
-                accept = false;
+                status = REJECT;
               }
             }
-            int updatedWatermarkCompare =
-                updatedWatermark != null ? compareWatermarks(updatedWatermark, itemWatermark, watermarkComparator) : -1;
-            if (updatedWatermarkCompare == 0) {
-              pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
-            } else if (updatedWatermarkCompare < 0) {
-              renewUpdatedWatermark(itemId, itemWatermark);
+            if (status != REJECT) {
+              int updatedWatermarkCompare =
+                  updatedWatermark != null ? compareWatermarks(updatedWatermark, itemWatermark, watermarkComparator) : -1;
+              if (updatedWatermarkCompare == 0) {
+                status = ON_HIGH;
+              } else if (updatedWatermarkCompare < 0) {
+                status = ON_NEW_HIGH;
+              }
             }
           } catch (ObjectStoreException e) {
             throw new MuleRuntimeException(
@@ -375,7 +448,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
           }
         } else if (compare == 0 && pollItem.getItemId().isPresent()) {
           try {
-            accept = !recentlyProcessedIds.contains(itemId);
+            status = recentlyProcessedIds.contains(itemId) ? REJECT : PASSED;
           } catch (ObjectStoreException e) {
             throw new MuleRuntimeException(
                                            createStaticMessage("An error occurred while checking the existence for Item with ID [%s]",
@@ -383,32 +456,18 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
                                            e);
           }
         } else {
-          accept = false;
+          status = REJECT;
         }
       }
 
-      if (accept) {
-        try {
-          if (itemId != null) {
-            if (recentlyProcessedIds.contains(itemId)) {
-              recentlyProcessedIds.remove(itemId);
-            }
-            recentlyProcessedIds.store(itemId, itemWatermark);
-          }
-        } catch (ObjectStoreException e) {
-          throw new MuleRuntimeException(
-                                         createStaticMessage("An error occurred while updating the watermark for Item with ID [%s]",
-                                                             itemId),
-                                         e);
-        }
-      } else {
+      if (status == REJECT) {
         if (LOGGER.isDebugEnabled()) {
           itemId = pollItem.getItemId().orElseGet(() -> pollItem.getResult().getAttributes().map(Object::toString).orElse(""));
           LOGGER.debug("Source in flow '{}' is skipping item '{}' because it was rejected by the watermark", flowName, itemId);
         }
       }
 
-      return accept;
+      return status;
     }
   }
 
@@ -502,24 +561,46 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     return lockFactory.createLock(formatKey("watermark"));
   }
 
-  private void updateWatermark(Serializable value, Comparator comparator) {
+  private void updateWatermark(Serializable value, Comparator comparator,
+                               Serializable minimumRejectedByLimitPassingWatermark) {
     try {
-      if (watermarkObjectStore.contains(WATERMARK_ITEM_OS_KEY)) {
-        Serializable currentValue = watermarkObjectStore.retrieve(WATERMARK_ITEM_OS_KEY);
-        if (compareWatermarks(currentValue, value, comparator) >= 0) {
-          return;
-        }
-        watermarkObjectStore.remove(WATERMARK_ITEM_OS_KEY);
+      if (minimumRejectedByLimitPassingWatermark != null) {
+        LOGGER
+            .debug("During the poll in the flow {}, items were rejected due to the item limit, a lower watermark than the maximum found will"
+                +
+                "have to be the new current watermark to ensure that those items are not left without being processed.",
+                   flowName);
+        setCurrentWatermarkAsMinimumRejectWatermark(minimumRejectedByLimitPassingWatermark);
+      } else {
+        updateWatermark(value, comparator);
       }
-
-      updateRecentlyProcessedIds();
-      watermarkObjectStore.store(WATERMARK_ITEM_OS_KEY, value);
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(
                                      createStaticMessage(format("Failed to update watermark value for message source at location '%s'. %s",
                                                                 flowName, e.getMessage())),
                                      e);
     }
+  }
+
+  private void updateWatermark(Serializable value, Comparator comparator) throws ObjectStoreException {
+    if (watermarkObjectStore.contains(WATERMARK_ITEM_OS_KEY)) {
+      Serializable currentValue = watermarkObjectStore.retrieve(WATERMARK_ITEM_OS_KEY);
+      if (compareWatermarks(currentValue, value, comparator) >= 0) {
+        return;
+      }
+      watermarkObjectStore.remove(WATERMARK_ITEM_OS_KEY);
+    }
+
+    updateRecentlyProcessedIds();
+    watermarkObjectStore.store(WATERMARK_ITEM_OS_KEY, value);
+  }
+
+  private void setCurrentWatermarkAsMinimumRejectWatermark(Serializable minimumRejectedByLimitPassingWatermark)
+      throws ObjectStoreException {
+    if (watermarkObjectStore.contains(WATERMARK_ITEM_OS_KEY)) {
+      watermarkObjectStore.remove(WATERMARK_ITEM_OS_KEY);
+    }
+    watermarkObjectStore.store(WATERMARK_ITEM_OS_KEY, minimumRejectedByLimitPassingWatermark);
   }
 
   private void updateRecentlyProcessedIds() throws ObjectStoreException {

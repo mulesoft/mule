@@ -106,5 +106,13 @@ public class ExtensionProperties {
    */
   public static final String DISABLE_COMPONENT_IGNORE = EXTENSION_LOADER_PROPERTY_PREFIX + "DISABLE_COMPONENT_IGNORE";
 
+  /**
+   * When present, adds to polling sources the parameter to configure the item limit per poll feature.
+   *
+   * @since 1.4.0
+   */
+  public static final String ENABLE_POLLING_SOURCE_LIMIT_PARAMETER =
+      EXTENSION_LOADER_PROPERTY_PREFIX + "ENABLE_POLLING_SOURCE_LIMIT";
+
   private ExtensionProperties() {}
 }

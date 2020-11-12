@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
+import static org.mule.runtime.extension.api.ExtensionConstants.POLLING_SOURCE_LIMIT_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
@@ -135,7 +137,8 @@ public final class SourceConfigurer {
         } else {
           context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
           SchedulingStrategy scheduler = (SchedulingStrategy) valueResolver.resolve(context);
-          configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler);
+          configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler,
+                                                        resolverMaxItemsPerPoll(resolverSet, context, initialiserEvent));
         }
       }
 
@@ -150,6 +153,21 @@ public final class SourceConfigurer {
       if (context != null) {
         context.close();
       }
+    }
+  }
+
+  private int resolverMaxItemsPerPoll(ResolverSet resolverSet, ValueResolvingContext context, CoreEvent event)
+      throws MuleException {
+    ValueResolver<?> valueResolver = resolverSet.getResolvers().get(POLLING_SOURCE_LIMIT_PARAMETER_NAME);
+    if (valueResolver == null) {
+      return Integer.MAX_VALUE;
+    } else {
+      int maxItemsPerPoll = (Integer) valueResolver.resolve(context);
+      if (maxItemsPerPoll < 1) {
+        throw new IllegalArgumentException(format("The %s parameter must have a value greater than 1",
+                                                  POLLING_SOURCE_LIMIT_PARAMETER_NAME));
+      }
+      return maxItemsPerPoll;
     }
   }
 }
