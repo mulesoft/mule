@@ -2,10 +2,12 @@
 <module name="module-simple-proxy"
 
         xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
         xmlns:simple-prefix="http://www.mulesoft.org/schema/a/different/path/mule/module-simple"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
            http://www.mulesoft.org/schema/a/different/path/mule/module-simple http://www.mulesoft.org/schema/a/different/path/mule/module-simple/current/mule-simple-prefix.xsd">
     <operation name="set-payload-hardcoded-value">
         <body>
@@ -47,6 +49,28 @@
         </parameters>
         <body>
             <simple-prefix:set-payload-param-default-value-use-optional/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-param-default-value-expression">
+        <parameters>
+            <parameter name="value" type="string" defaultValue="#[payload]"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[vars.value]"/>
+            <simple-prefix:set-payload-param-default-value-expression/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-param-default-value-expression-use-optional">
+        <parameters>
+            <parameter name="value" type="string" use="OPTIONAL" defaultValue="#[payload]"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[vars.value]"/>
+            <simple-prefix:set-payload-param-default-value-expression-use-optional/>
         </body>
         <output type="string"/>
     </operation>

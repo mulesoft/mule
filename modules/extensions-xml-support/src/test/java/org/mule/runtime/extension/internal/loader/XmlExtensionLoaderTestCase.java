@@ -107,7 +107,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getName(), is("module-simple"));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
-    assertThat(extensionModel.getOperationModels().size(), is(11));
+    assertThat(extensionModel.getOperationModels().size(), is(13));
 
     Optional<OperationModel> operationModelOptional = extensionModel.getOperationModel("set-payload-concat-params-values");
     assertThat(operationModelOptional.isPresent(), is(true));
