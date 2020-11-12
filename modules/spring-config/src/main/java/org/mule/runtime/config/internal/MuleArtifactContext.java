@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.newSetFromMap;
@@ -14,6 +15,7 @@ import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
@@ -23,6 +25,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.validate;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
@@ -60,6 +63,8 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.validation.ValidationResult;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
@@ -79,8 +84,6 @@ import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -97,6 +100,7 @@ import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
@@ -292,12 +296,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private ApplicationModel validateModel(ApplicationModel appModel) {
-    final ValidationResult validate = MuleAstUtils.validate(appModel);
+    final ValidationResult validation = validate(appModel);
 
-    final Collection<ValidationResultItem> items = validate.getItems();
+    final Collection<ValidationResultItem> items = validation.getItems();
     if (!items.isEmpty()) {
 
-      final String allMessages = validate.getItems()
+      final String allMessages = validation.getItems()
           .stream()
           .map(v -> compToLoc(v.getComponent()) + ": " + v.getMessage())
           .collect(joining(lineSeparator()));
