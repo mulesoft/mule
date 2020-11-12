@@ -11,13 +11,16 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
+import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_REF_IDENTIFIER;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.declaration.type.annotation.LiteralTypeAnnotation;
 
 import java.util.List;
@@ -46,17 +49,27 @@ public class NoExpressionsInNoExpressionsSupportedParams implements Validation {
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(component -> component.getModel(ParameterizedModel.class).isPresent());
+    return currentElemement(component -> component.getModel(ParameterizedModel.class).isPresent())
+        // According to the extension model, flow-ref cannot be dynamic,
+        // But this check is needed to avoid breaking on legacy cases that use dynamic flow-refs.
+        .and(currentElemement(equalsIdentifier(FLOW_REF_IDENTIFIER).negate()));
   }
 
   @Override
   public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
     for (ComponentParameterAst param : component.getParameters()) {
-      if (NOT_SUPPORTED.equals(param.getModel().getExpressionSupport())
-          && !param.getModel().getType().getAnnotation(LiteralTypeAnnotation.class).isPresent()
-          && param.getValue().isLeft()) {
-        return of(format("An expression value was given for parameter '%s' but it doesn't support expressions",
-                         param.getModel().getName()));
+      if (!param.getModel().isComponentId()
+          && param.getValue().isRight()
+          && param.getValue().getRight() instanceof String) {
+        final String stringValue = (String) param.getValue().getRight();
+
+        if (NOT_SUPPORTED.equals(param.getModel().getExpressionSupport())
+            && !param.getModel().getType().getAnnotation(LiteralTypeAnnotation.class).isPresent()
+            && stringValue.startsWith(ExpressionManager.DEFAULT_EXPRESSION_PREFIX)
+            && stringValue.endsWith(ExpressionManager.DEFAULT_EXPRESSION_POSTFIX)) {
+          return of(format("An expression value was given for parameter '%s' but it doesn't support expressions",
+                           param.getModel().getName()));
+        }
       }
     }
 

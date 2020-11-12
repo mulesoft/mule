@@ -13,6 +13,8 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equals
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_REF_IDENTIFIER;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -53,6 +55,13 @@ public class FlowRefPointsToExistingFlow implements Validation {
     return component.getParameter("name").getValue()
         .reduce(l -> empty(),
                 nameAttribute -> {
+                  if (((String) nameAttribute).startsWith(DEFAULT_EXPRESSION_PREFIX)
+                      && ((String) nameAttribute).endsWith(DEFAULT_EXPRESSION_POSTFIX)) {
+                    // According to the extension model, flow-ref cannot be dynamic,
+                    // But this check is needed to avoid breaking on legacy cases that use dynamic flow-refs.
+                    return empty();
+                  }
+
                   if (artifact.topLevelComponentsStream()
                       .noneMatch(equalsComponentId((String) nameAttribute))) {
                     return of("'flow-ref' is pointing to '" + nameAttribute

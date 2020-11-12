@@ -8,10 +8,13 @@ package org.mule.runtime.core.api.source.scheduler;
 
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.FixedFrequencySchedulerConfiguration;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -25,14 +28,17 @@ import java.util.concurrent.TimeUnit;
 public final class FixedFrequencyScheduler extends PeriodicScheduler implements FixedFrequencySchedulerConfiguration {
 
   @Parameter
+  @Expression(NOT_SUPPORTED)
   @Optional(defaultValue = "MILLISECONDS")
   private TimeUnit timeUnit = MILLISECONDS;
 
   @Parameter
+  @Expression(NOT_SUPPORTED)
   @Optional(defaultValue = "60000")
   private long frequency = 60000l;
 
   @Parameter
+  @Expression(NOT_SUPPORTED)
   @Optional(defaultValue = "0")
   private long startDelay = 1000l;
 
@@ -58,14 +64,17 @@ public final class FixedFrequencyScheduler extends PeriodicScheduler implements 
     this.startDelay = startDelay;
   }
 
+  @Override
   public TimeUnit getTimeUnit() {
     return timeUnit;
   }
 
+  @Override
   public long getFrequency() {
     return frequency;
   }
 
+  @Override
   public long getStartDelay() {
     return startDelay;
   }

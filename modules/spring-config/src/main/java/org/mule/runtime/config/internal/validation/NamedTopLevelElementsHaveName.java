@@ -69,7 +69,7 @@ public class NamedTopLevelElementsHaveName implements Validation {
                 .anyMatch(ParameterModel::isComponentId))
             .orElse(false)) {
       final ComponentIdentifier identifier = topLevelComponent.getIdentifier();
-      return of(format("Global element %s:%s does not provide a name attribute.",
+      return of(format("Global element '%s:%s' does not provide a name attribute.",
                        identifier.getNamespace(), identifier.getName()));
     }
 
