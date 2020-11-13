@@ -645,23 +645,49 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(onErrorContinue.allowsTopLevelDeclaration(), is(true));
     assertThat(onErrorContinue.getStereotype().getType(), is(ON_ERROR.getType()));
 
-    assertThat(onErrorContinue.getAllParameterModels(), hasSize(1));
+    final List<ParameterModel> continueParams = onErrorContinue.getAllParameterModels();
+    assertThat(continueParams, hasSize(5));
 
-    ParameterModel nameParam = onErrorContinue.getAllParameterModels().get(0);
-    assertThat(nameParam.getName(), is("name"));
-    assertThat(nameParam.getDefaultValue(), is(nullValue()));
-    assertThat(nameParam.isComponentId(), is(true));
+    assertGlobalOnErrorParams(continueParams);
 
     ConstructModel onErrorPropagate = coreExtensionModel.getConstructModel("onErrorPropagate").get();
     assertThat(onErrorPropagate.allowsTopLevelDeclaration(), is(true));
     assertThat(onErrorPropagate.getStereotype().getType(), is(ON_ERROR.getType()));
 
-    assertThat(onErrorPropagate.getAllParameterModels(), hasSize(1));
+    final List<ParameterModel> propagateParams = onErrorPropagate.getAllParameterModels();
+    assertThat(propagateParams, hasSize(5));
 
-    nameParam = onErrorPropagate.getAllParameterModels().get(0);
+    assertGlobalOnErrorParams(propagateParams);
+  }
+
+  private void assertGlobalOnErrorParams(final List<ParameterModel> propagateParams) {
+    ParameterModel nameParam;
+    nameParam = propagateParams.get(0);
     assertThat(nameParam.getName(), is("name"));
     assertThat(nameParam.getDefaultValue(), is(nullValue()));
     assertThat(nameParam.isComponentId(), is(true));
+
+    ParameterModel when = propagateParams.get(1);
+    assertThat(when.getName(), is("when"));
+    assertThat(when.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(when.getExpressionSupport(), is(SUPPORTED));
+    assertThat(when.isRequired(), is(false));
+
+    ParameterModel type = propagateParams.get(2);
+    assertErrorType(type, "type");
+
+    ParameterModel log = propagateParams.get(3);
+    assertThat(log.getName(), is("logException"));
+    assertThat(log.getType(), is(instanceOf(DefaultBooleanType.class)));
+    assertThat(log.getExpressionSupport(), is(SUPPORTED));
+    assertThat(log.isRequired(), is(false));
+
+    ParameterModel notifications = propagateParams.get(4);
+    assertThat(notifications.getName(), is("enableNotifications"));
+    assertThat(notifications.getType(), is(instanceOf(DefaultBooleanType.class)));
+    assertThat(notifications.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(notifications.isRequired(), is(false));
+    assertThat(notifications.getDefaultValue(), is(true));
   }
 
   @Test

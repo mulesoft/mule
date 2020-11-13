@@ -280,9 +280,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         artifactAst = toArtifactast(artifactDeclaration, getExtensions());
       }
 
-      return validateModel(new ApplicationModel(artifactAst,
+      return new ApplicationModel(validateModel(artifactAst),
                                                 artifactProperties, parentConfigurationProperties,
-                                                new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader())));
+                                  new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader()));
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -295,7 +295,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         + component.getMetadata().getStartLine().orElse(-1) + "]";
   }
 
-  private ApplicationModel validateModel(ApplicationModel appModel) {
+  private ArtifactAst validateModel(ArtifactAst appModel) {
     final ValidationResult validation = validate(appModel);
 
     final Collection<ValidationResultItem> items = validation.getItems();
@@ -311,7 +311,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
 
     return appModel;
-    // TODO MULE-18318 (AST) all this validations will be moved to an entity that does the validation and allows to aggregate all
   }
 
   public void initialize() {
