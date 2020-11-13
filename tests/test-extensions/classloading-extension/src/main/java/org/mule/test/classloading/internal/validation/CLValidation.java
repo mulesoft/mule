@@ -6,8 +6,8 @@
  */
 package org.mule.test.classloading.internal.validation;
 
-import static com.google.common.base.Predicates.alwaysFalse;
-import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -41,12 +41,12 @@ public class CLValidation implements Validation {
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return alwaysFalse();
+    return currentElemement(comp -> comp.getIdentifier().getName().equals("invalid-config"));
   }
 
   @Override
   public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
-    return empty();
+    return of("'invalid-config' is invalid");
   }
 
 }
