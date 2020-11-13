@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
@@ -38,6 +39,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import org.hamcrest.Matcher;
+import reactor.core.publisher.Flux;
 
 /**
  * Provides a fluent API for running events through flows.
@@ -212,8 +214,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   }
 
   private ExecutionCallback<CoreEvent> getFlowRunCallback() {
-    // TODO MULE-13053 Update and improve FlowRunner to support non-blocking flow execution and assertions.
-    return () -> flow.process(getOrBuildEvent());
+    return just(getOrBuildEvent()).transform(flow::apply)::blockFirst;
   }
 
   private ExecutionCallback<CoreEvent> getFlowDispatchCallback() {
