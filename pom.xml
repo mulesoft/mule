@@ -186,7 +186,7 @@
         <jackson2Version>2.11.3</jackson2Version>
         <javax.inject.version>1</javax.inject.version>
         <javax.transaction.version>1.2</javax.transaction.version>
-        <jerseyVersion>2.16</jerseyVersion>
+        <jerseyVersion>2.11</jerseyVersion>
         <javassistVersion>3.7.ga</javassistVersion>
         <jakartaMailVersion>1.6.4</jakartaMailVersion>
         <javaXmlBindVersion>2.3.1-MULE-001</javaXmlBindVersion>
