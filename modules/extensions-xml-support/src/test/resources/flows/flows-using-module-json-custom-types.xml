@@ -60,4 +60,12 @@
         <modulejson:get-hardcoded-type1-as-json target="someVariable"/>
         <modulejson:check-street-is-avenue street="#[vars.someVariable.street_type]" target="checkingFromHardcodedType1WithVariables"/>
     </flow>
+    
+    <flow name="testJoinStringArray">
+        <modulejson:join-string-array behaviourArray="#[['1', '2']]">
+            <modulejson:content-array>
+                <![CDATA[#[%dw 2.0 output application/json --- ['a', 'b']]]]>
+            </modulejson:content-array>
+        </modulejson:join-string-array>
+    </flow>
 </mule>

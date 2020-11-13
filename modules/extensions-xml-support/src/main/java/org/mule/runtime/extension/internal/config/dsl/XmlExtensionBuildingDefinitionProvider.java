@@ -7,6 +7,7 @@
 package org.mule.runtime.extension.internal.config.dsl;
 
 import static java.util.Collections.emptySet;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
@@ -170,7 +171,8 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
     final List<ParameterModel> allParameterModels = operationModel.getAllParameterModels();
     for (ParameterModel parameterModel : allParameterModels) {
-      if (parameterModel.getDslConfiguration().allowsInlineDefinition()) {
+      if (parameterModel.getDslConfiguration().allowsInlineDefinition() &&
+          parameterModel.getRole() != BEHAVIOUR) {
         paramsDefinitions.add(newBuilder()
             .withKey(parameterModel.getName())
             .withAttributeDefinition(fromChildConfiguration(String.class)
