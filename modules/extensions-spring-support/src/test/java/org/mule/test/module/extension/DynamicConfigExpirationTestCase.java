@@ -7,19 +7,26 @@
 package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.mule.tck.probe.PollingProber.check;
 
 import org.mule.functional.api.flow.FlowRunner;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.junit.Before;
 import org.junit.Test;
 
 public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctionalTestCase {
@@ -31,6 +38,29 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   @Override
   protected String getConfigFile() {
     return "dynamic-config-expiration.xml";
+  }
+
+  private static List<Integer> disposedStatuses;
+  private static HeisenbergExtension config;
+
+  public static class CaptureProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      synchronized (disposedStatuses) {
+        if (config == null) {
+          config = (HeisenbergExtension) event.getMessage().getPayload().getValue();
+        }
+        disposedStatuses.add(config.getDispose());
+      }
+      return event;
+    }
+  }
+
+  @Before
+  public void setUp() {
+    disposedStatuses = new ArrayList<>();
+    config = null;
   }
 
   @Test
@@ -83,6 +113,17 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     doNotExpireDynamicConfigWithCustomExpirationUsedBySource();
     sourceWithDynamicConfig.start();
     doNotExpireDynamicConfigWithCustomExpirationUsedBySource();
+  }
+
+  @Test
+  public void dynamicConfigIsExpiredBeforeFlowEnds() throws Exception {
+    flowRunner("multipleOperationsWithDynamicConfig").withPayload("Walter Blanco").run();
+    check(15000, 2500, () -> {
+      synchronized (disposedStatuses) {
+        return disposedStatuses.size() == 2;
+      }
+    });
+    assertThat(disposedStatuses, contains(0, 1));
   }
 
   private void assertInitialised(HeisenbergExtension config) {

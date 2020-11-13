@@ -608,4 +608,8 @@ public class HeisenbergOperations implements Disposable {
       }
     };
   }
+
+  public HeisenbergExtension getConfig(@Config HeisenbergExtension config) {
+    return config;
+  }
 }
