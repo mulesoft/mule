@@ -11,21 +11,21 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isNullType;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.CONNECTION_FAILURE;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.metadata.MetadataResolverUtils.resolveWithOAuthRefresh;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
-import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor.ParameterMetadataDescriptorBuilder;
@@ -38,6 +38,8 @@ import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * Metadata service delegate implementations that handles the resolution
@@ -136,14 +138,16 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
           .withReason(NULL_TYPE_ERROR)
           .onParameter(parameter.getName());
       return failure(parameter.getType(), failure);
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).withMessage("Failed to establish connection: " + ExceptionUtils.getMessage(e))
+          .withFailureCode(CONNECTION_FAILURE).onKeys());
     } catch (Exception e) {
       return failure(parameter.getType(), newFailure(e).onParameter(parameter.getName()));
     }
   }
 
   private MetadataType adaptToListIfNecessary(MetadataType resolvedType, ParameterModel parameter,
-                                              MetadataContext metadataContext)
-      throws MetadataResolvingException {
+                                              MetadataContext metadataContext) {
 
     MetadataType inputType = parameter.getType();
     if (!isCollection(inputType) || isNullType(resolvedType)) {

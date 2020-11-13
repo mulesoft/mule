@@ -9,13 +9,14 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.CONNECTION_FAILURE;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.metadata.MetadataResolverUtils.resolveWithOAuthRefresh;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
-
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -40,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * Metadata service delegate implementations that handles the resolution
@@ -95,7 +98,9 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
       keysContainer.add(componentResolverName, enrichedMetadataKeys);
 
       return success(keysContainer.build());
-
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).withMessage("Failed to establish connection: " + ExceptionUtils.getMessage(e))
+          .withFailureCode(CONNECTION_FAILURE).onKeys());
     } catch (Exception e) {
       return failure(newFailure(e).onKeys());
     }

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isNullType;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.CONNECTION_FAILURE;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
@@ -16,12 +17,12 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.metadata.MetadataResolverUtils.resolveWithOAuthRefresh;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -47,6 +48,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * Metadata service delegate implementations that handles the resolution
@@ -140,6 +143,9 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
           .withReason(NULL_TYPE_ERROR)
           .onOutputPayload();
       return failure(output.getType(), failure);
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).withMessage("Failed to establish connection: " + ExceptionUtils.getMessage(e))
+          .withFailureCode(CONNECTION_FAILURE).onKeys());
     } catch (Exception e) {
       return failure(output.getType(), newFailure(e).onOutputPayload());
     }
@@ -175,6 +181,9 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
           .withReason(NULL_TYPE_ERROR)
           .onOutputAttributes();
       return failure(failure);
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).withMessage("Failed to establish connection: " + ExceptionUtils.getMessage(e))
+          .withFailureCode(CONNECTION_FAILURE).onKeys());
     } catch (Exception e) {
       return failure(newFailure(e).onOutputAttributes());
     }
