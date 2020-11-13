@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -160,10 +162,9 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     paramDeclaration.addModelProperty(propertyBuilder.build());
 
     valueProviderModelConsumer
-        .accept(new ValueProviderModel(getRequiredParametersAliases(resolverParameters, containerParameterNames),
-                                       getParametersModel(resolverParameters, containerParameterNames, allParameters),
-                                       requiresConfiguration.get(), requiresConnection.get(), resolverClass.open(), partOrder,
-                                       name, getValueProviderId(resolverClass.value())));
+        .accept(new ValueProviderModel(requiresConfiguration.get(), requiresConnection.get(), resolverClass.open(), partOrder,
+                                       name, getValueProviderId(resolverClass.value()),
+                                       getParametersModel(resolverParameters, containerParameterNames, allParameters)));
   }
 
   /**
@@ -253,14 +254,6 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
         .orElse(empty());
   }
 
-  private List<String> getRequiredParametersAliases(List<ExtensionParameter> parameterDeclarations,
-                                                    Map<String, String> parameterNames) {
-    return parameterDeclarations.stream()
-        .filter(ExtensionParameter::isRequired)
-        .map(param -> parameterNames.getOrDefault(param.getName(), param.getName()))
-        .collect(toList());
-  }
-
   private List<ParameterModel> getParametersModel(List<ExtensionParameter> parameterDeclarations,
                                                   Map<String, String> parameterNames,
                                                   List<ParameterDeclaration> allParameters) {
@@ -268,15 +261,10 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
         .collect(toMap(param -> parameterNames.getOrDefault(param.getName(), param.getName()), ExtensionParameter::isRequired));
     return allParameters.stream()
         .filter(param -> paramsInfo.containsKey(param.getName()))
-        .map(param -> new ImmutableParameterModel(param.getName(),
-                                                  param.getDescription(), param.getType(),
+        .map(param -> new ImmutableParameterModel(param.getName(), param.getDescription(), param.getType(),
                                                   param.hasDynamicType(), paramsInfo.get(param.getName()),
-                                                  param.isConfigOverride(),
-                                                  param.isComponentId(),
-                                                  param.getExpressionSupport(), param.getDefaultValue(), param.getRole(),
-                                                  param.getDslConfiguration(), param.getDisplayModel(), param.getLayoutModel(),
-                                                  param.getValueProviderModel(), param.getAllowedStereotypeModels(),
-                                                  param.getModelProperties()))
+                                                  param.isConfigOverride(), param.isComponentId(), null, null, null,
+                                                  param.getDslConfiguration(), null, null, null, emptyList(), emptySet()))
         .collect(toList());
   }
 

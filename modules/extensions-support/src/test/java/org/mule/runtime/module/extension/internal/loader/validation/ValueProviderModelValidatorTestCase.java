@@ -223,7 +223,7 @@ public class ValueProviderModelValidatorTestCase {
     when(parameter.getName()).thenReturn("someName");
     when(parameter.getType()).thenReturn(STRING_TYPE);
     when(parameter.getValueProviderModel())
-        .thenReturn(of(new ValueProviderModel(emptyList(), emptyList(), false, false, true, 1, "name", valueProviderId)));
+        .thenReturn(of(new ValueProviderModel(emptyList(), false, false, true, 1, "name", valueProviderId)));
   }
 
   public static class SomeValueProvider implements ValueProvider {

@@ -79,18 +79,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "required1",
@@ -106,18 +98,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 3
                     },
                     "allowedStereotypeModels": [],
                     "name": "required2",
@@ -712,18 +696,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 5
                     },
                     "allowedStereotypeModels": [],
                     "name": "anyParameter",
@@ -1343,18 +1319,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 5
                     },
                     "allowedStereotypeModels": [],
                     "name": "anyParameter",
@@ -3171,18 +3139,10 @@
                         "required": true,
                         "isConfigOverride": false,
                         "isComponentId": false,
-                        "expressionSupport": "SUPPORTED",
-                        "role": "BEHAVIOUR",
                         "dslConfiguration": {
                           "allowsInlineDefinition": true,
                           "allowsReferences": true,
                           "allowTopLevelDefinition": false
-                        },
-                        "layoutModel": {
-                          "password": false,
-                          "text": false,
-                          "query": false,
-                          "order": 2
                         },
                         "allowedStereotypeModels": [],
                         "name": "required1",
@@ -3198,18 +3158,10 @@
                         "required": true,
                         "isConfigOverride": false,
                         "isComponentId": false,
-                        "expressionSupport": "SUPPORTED",
-                        "role": "BEHAVIOUR",
                         "dslConfiguration": {
                           "allowsInlineDefinition": true,
                           "allowsReferences": true,
                           "allowTopLevelDefinition": false
-                        },
-                        "layoutModel": {
-                          "password": false,
-                          "text": false,
-                          "query": false,
-                          "order": 3
                         },
                         "allowedStereotypeModels": [],
                         "name": "required2",
@@ -3580,18 +3532,10 @@
                         "required": true,
                         "isConfigOverride": false,
                         "isComponentId": false,
-                        "expressionSupport": "SUPPORTED",
-                        "role": "BEHAVIOUR",
                         "dslConfiguration": {
                           "allowsInlineDefinition": true,
                           "allowsReferences": true,
                           "allowTopLevelDefinition": false
-                        },
-                        "layoutModel": {
-                          "password": false,
-                          "text": false,
-                          "query": false,
-                          "order": 3
                         },
                         "allowedStereotypeModels": [],
                         "name": "anyParameter",
@@ -3987,18 +3931,10 @@
                         "required": true,
                         "isConfigOverride": false,
                         "isComponentId": false,
-                        "expressionSupport": "SUPPORTED",
-                        "role": "BEHAVIOUR",
                         "dslConfiguration": {
                           "allowsInlineDefinition": true,
                           "allowsReferences": true,
                           "allowTopLevelDefinition": false
-                        },
-                        "layoutModel": {
-                          "password": false,
-                          "text": false,
-                          "query": false,
-                          "order": 3
                         },
                         "allowedStereotypeModels": [],
                         "name": "anyParameter",
@@ -4680,18 +4616,10 @@
                         "required": true,
                         "isConfigOverride": false,
                         "isComponentId": false,
-                        "expressionSupport": "SUPPORTED",
-                        "role": "BEHAVIOUR",
                         "dslConfiguration": {
                           "allowsInlineDefinition": true,
                           "allowsReferences": true,
                           "allowTopLevelDefinition": false
-                        },
-                        "layoutModel": {
-                          "password": false,
-                          "text": false,
-                          "query": false,
-                          "order": 2
                         },
                         "allowedStereotypeModels": [],
                         "name": "errorCode",
@@ -6718,18 +6646,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "errorCode",
@@ -8076,18 +7996,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 3
                     },
                     "allowedStereotypeModels": [],
                     "name": "anyParameter",
@@ -8398,8 +8310,8 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [
-                  "requiredInteger",
                   "requiredBoolean",
+                  "requiredInteger",
                   "strings"
                 ],
                 "parameters": [
@@ -8412,18 +8324,10 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "requiredString",
@@ -8442,19 +8346,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "false",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 3
                     },
                     "allowedStereotypeModels": [],
                     "name": "requiredBoolean",
@@ -8485,18 +8380,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 4
                     },
                     "allowedStereotypeModels": [],
                     "name": "requiredInteger",
@@ -8533,18 +8420,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 5
                     },
                     "allowedStereotypeModels": [],
                     "name": "strings",
@@ -8963,18 +8842,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 1
                     },
                     "allowedStereotypeModels": [],
                     "name": "superString",
@@ -9218,18 +9089,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 3
                     },
                     "allowedStereotypeModels": [],
                     "name": "anyParameter",
@@ -9552,18 +9415,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "complexActingParameter",
@@ -9834,18 +9689,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "errorCode",
@@ -10114,18 +9961,10 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "optionalValue",
@@ -10394,18 +10233,10 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "optionalValue",
@@ -10674,19 +10505,10 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "OPERATION_DEFAULT_VALUE",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "optionalValue",
@@ -10958,18 +10780,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "requiredValue",
@@ -10985,18 +10799,10 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 3
                     },
                     "allowedStereotypeModels": [],
                     "name": "optionalValue",
@@ -11294,18 +11100,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "requiredValue",
@@ -11321,19 +11119,10 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "OPERATION_DEFAULT_VALUE",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 3
                     },
                     "allowedStereotypeModels": [],
                     "name": "optionalValue",
@@ -11632,18 +11421,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "requiredValue",
@@ -11659,18 +11440,10 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 3
                     },
                     "allowedStereotypeModels": [],
                     "name": "optionalValue",
@@ -11966,19 +11739,10 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "OPERATION_DEFAULT_VALUE",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "optionalValue",
@@ -13233,18 +12997,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 4
                     },
                     "allowedStereotypeModels": [],
                     "name": "anyParameter",
@@ -13846,18 +13602,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 1
                     },
                     "allowedStereotypeModels": [],
                     "name": "superString",
@@ -14293,8 +14041,8 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [
-                  "requiredInteger",
                   "requiredBoolean",
+                  "requiredInteger",
                   "strings"
                 ],
                 "parameters": [
@@ -14307,18 +14055,10 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2
                     },
                     "allowedStereotypeModels": [],
                     "name": "requiredString",
@@ -14337,19 +14077,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "defaultValue": "false",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 3
                     },
                     "allowedStereotypeModels": [],
                     "name": "requiredBoolean",
@@ -14380,18 +14111,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 4
                     },
                     "allowedStereotypeModels": [],
                     "name": "requiredInteger",
@@ -14428,18 +14151,10 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
                       "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 5
                     },
                     "allowedStereotypeModels": [],
                     "name": "strings",

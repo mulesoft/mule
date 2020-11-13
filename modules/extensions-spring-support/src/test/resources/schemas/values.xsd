@@ -690,4 +690,77 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithOptionalParameterType" substitutionGroup="mule:abstract-operator" name="with-optional-parameter"></xs:element>
+  <xs:complexType name="WithOptionalParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="providedParameters"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="optionalValue"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithOptionalParameterAsRequiredType" substitutionGroup="mule:abstract-operator" name="with-optional-parameter-as-required"></xs:element>
+  <xs:complexType name="WithOptionalParameterAsRequiredType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="providedParameters"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="optionalValue"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithOptionalParameterWithDefaultType" substitutionGroup="mule:abstract-operator" name="with-optional-parameter-with-default"></xs:element>
+  <xs:complexType name="WithOptionalParameterWithDefaultType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="providedParameters"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="OPERATION_DEFAULT_VALUE" name="optionalValue"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithRequiredAndOptionalParametersType" substitutionGroup="mule:abstract-operator" name="with-required-and-optional-parameters"></xs:element>
+  <xs:complexType name="WithRequiredAndOptionalParametersType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="providedParameters"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="requiredValue"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="optionalValue"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithRequiredAndOptionalWithDefaultParametersType" substitutionGroup="mule:abstract-operator" name="with-required-and-optional-with-default-parameters"></xs:element>
+  <xs:complexType name="WithRequiredAndOptionalWithDefaultParametersType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="providedParameters"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="requiredValue"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="OPERATION_DEFAULT_VALUE" name="optionalValue"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithRequiredParameterAndOptionalParameterAsRequiredType" substitutionGroup="mule:abstract-operator" name="with-required-parameter-and-optional-parameter-as-required"></xs:element>
+  <xs:complexType name="WithRequiredParameterAndOptionalParameterAsRequiredType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="providedParameters"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="requiredValue"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="optionalValue"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithVPOptionalParameterWithDefaultValueType" substitutionGroup="mule:abstract-operator" name="with-vp-optional-parameter-with-default-value"></xs:element>
+  <xs:complexType name="WithVPOptionalParameterWithDefaultValueType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="providedParameters"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="OPERATION_DEFAULT_VALUE" name="optionalValue"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 </xs:schema>
