@@ -7,6 +7,7 @@
 
 package org.mule.test.runner.api;
 
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -28,7 +29,10 @@ import com.google.common.collect.ImmutableSet;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +106,10 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
   }
 
   public void loadExtensionModels() {
+    loadExtensionModels(emptyMap());
+  }
+
+  public void loadExtensionModels(Map<String, Object> extensionLoadingContextParameters) {
     extensionModels.clear();
     try {
       loadRuntimeExtensionModels().forEach(extensionModels::add);
@@ -119,9 +127,12 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
             LOGGER.debug("Discovered extension '{}'", artifactName);
             MulePluginBasedLoaderFinder finder = new MulePluginBasedLoaderFinder(json.openStream());
             if (finder.isExtensionModelLoaderDescriptorDefined()) {
+              Map<String, Object> attributes = new HashMap<>();
+              attributes.putAll(finder.getParams());
+              attributes.putAll(extensionLoadingContextParameters);
               ExtensionModel extension =
                   finder.getLoader().loadExtensionModel(classLoader, getDefault(ImmutableSet.copyOf(extensionModels)),
-                                                        finder.getParams());
+                                                        attributes);
               extensionModels.add(extension);
             } else {
               LOGGER

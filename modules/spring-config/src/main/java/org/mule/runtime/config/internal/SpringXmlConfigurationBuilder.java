@@ -9,18 +9,20 @@ package org.mule.runtime.config.internal;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
-import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
+import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -60,6 +62,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private MuleArtifactContext muleArtifactContext;
   private final ArtifactType artifactType;
   private final LockFactory runtimeLockFactory;
+  private Optional<ComponentBuildingDefinitionRegistryFactory> componentBuildingDefinitionRegistryFactory = empty();
 
   public SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                        ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
@@ -170,19 +173,26 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                          OptionalObjectsController optionalObjectsController) {
     MuleArtifactContext muleArtifactContext;
 
+    ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
+        this.componentBuildingDefinitionRegistryFactory
+            .orElse(new DefaultComponentBuildingDefinitionRegistryFactory());
+
     if (enableLazyInit) {
       muleArtifactContext = new LazyMuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration,
                                                         optionalObjectsController,
                                                         getArtifactProperties(), artifactType,
-                                                        resolveContextArtifactPluginClassLoaders(),
                                                         resolveComponentModelInitializer(),
                                                         resolveParentConfigurationProperties(), disableXmlValidations,
-                                                        runtimeLockFactory);
+                                                        runtimeLockFactory,
+                                                        componentBuildingDefinitionRegistryFactory);
     } else {
       muleArtifactContext =
-          new MuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration, optionalObjectsController,
-                                  getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders(),
-                                  resolveParentConfigurationProperties(), disableXmlValidations);
+          new MuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration,
+                                  optionalObjectsController,
+                                  resolveParentConfigurationProperties(),
+                                  getArtifactProperties(), artifactType,
+                                  disableXmlValidations,
+                                  componentBuildingDefinitionRegistryFactory);
       muleArtifactContext.initialize();
     }
 
@@ -270,5 +280,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   @Override
   public void setParentContext(MuleContext domainContext) {
     this.parentContext = ((MuleContextWithRegistry) domainContext).getRegistry().get("springApplicationContext");
+  }
+
+  public void setComponentBuildingDefinitionRegistryFactory(ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
+    this.componentBuildingDefinitionRegistryFactory = ofNullable(componentBuildingDefinitionRegistryFactory);
   }
 }

@@ -17,7 +17,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -31,10 +30,8 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
-import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -66,13 +63,12 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.builder.ArtifactAstBuilder;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
+import org.mule.runtime.ast.api.xml.AstXmlParser;
+import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
-import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
@@ -87,11 +83,7 @@ import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalE
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
-import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier;
-import org.mule.runtime.config.internal.util.NoOpXmlErrorHandler;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
-import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
-import org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -129,12 +121,10 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang3.StringUtils;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
-import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -292,8 +282,8 @@ public final class XmlExtensionLoaderDelegate {
                                                                 resource.getFile())));
     }
 
-    Document moduleDocument = getModuleDocument(extensions, resource);
-    loadModuleExtension(context.getExtensionDeclarer(), resource, moduleDocument,
+    ArtifactAst moduleAst = getModuleDocument(extensions, resource);
+    loadModuleExtension(context.getExtensionDeclarer(), moduleAst,
                         new ExtensionModelHelper(extensions), false);
   }
 
@@ -347,19 +337,16 @@ public final class XmlExtensionLoaderDelegate {
     });
   }
 
-  private Document getModuleDocument(Set<ExtensionModel> extensions, URL resource) {
-    XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader =
-        validateXml
-            ? schemaValidatingDocumentLoader()
-            : schemaValidatingDocumentLoader(NoOpXmlErrorHandler::new);
-    try {
-      return xmlConfigurationDocumentLoader.loadDocument(() -> XMLSecureFactories.createDefault().getSAXParserFactory(),
-                                                         new ModuleDelegatingEntityResolver(extensions), resource.getFile(),
-                                                         resource.openStream());
-    } catch (IOException e) {
-      throw new MuleRuntimeException(createStaticMessage(format("There was an issue reading the stream for the resource %s",
-                                                                resource.getFile())));
+  private ArtifactAst getModuleDocument(Set<ExtensionModel> extensions, URL resource) {
+    Builder parserBuilder = AstXmlParser.builder()
+        .withExtensionModels(extensions);
+    if (!validateXml) {
+      parserBuilder = parserBuilder.withSchemaValidationsDisabled();
     }
+    AstXmlParser xmlToAstParser = parserBuilder
+        .build();
+
+    return xmlToAstParser.parse(resource);
   }
 
   /**
@@ -373,7 +360,6 @@ public final class XmlExtensionLoaderDelegate {
    */
   private Optional<ExtensionModel> createTnsExtensionModel(URL resource, ExtensionModelHelper extensionModelHelper)
       throws IOException {
-    ExtensionModel result = null;
     final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
     try (InputStream in = getClass().getClassLoader().getResourceAsStream(TRANSFORMATION_FOR_TNS_RESOURCE)) {
       final Source xslt = new StreamSource(in);
@@ -387,34 +373,27 @@ public final class XmlExtensionLoaderDelegate {
                                                                 resource.getFile())),
                                      e);
     }
-    final Document transformedModuleDocument = schemaValidatingDocumentLoader(NoOpXmlErrorHandler::new)
-        .loadDocument(() -> XMLSecureFactories.createDefault().getSAXParserFactory(),
-                      new ModuleDelegatingEntityResolver(extensionModelHelper.getExtensionsModels()), resource.getFile(),
-                      new ByteArrayInputStream(resultStream.toByteArray()));
-    if (StringUtils.isNotBlank(transformedModuleDocument.getDocumentElement().getAttribute(XMLNS_TNS))) {
-      final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
-      loadModuleExtension(extensionDeclarer, resource, transformedModuleDocument, extensionModelHelper, true);
-      result = createExtensionModel(extensionDeclarer);
+
+    final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
+    AstXmlParser xmlToAstParser = AstXmlParser.builder()
+        .withExtensionModels(extensionModelHelper.getExtensionsModels())
+        .withSchemaValidationsDisabled()
+        .build();
+
+    ArtifactAst transformedModuleAst =
+        xmlToAstParser.parse("transformed_" + resource.getFile(), new ByteArrayInputStream(resultStream.toByteArray()));
+
+    if (transformedModuleAst.topLevelComponentsStream().findFirst().get().getRawParameterValue(XMLNS_TNS).isPresent()) {
+      loadModuleExtension(extensionDeclarer, transformedModuleAst, extensionModelHelper, true);
+      return of(createExtensionModel(extensionDeclarer));
+    } else {
+      return empty();
     }
-    return ofNullable(result);
   }
 
-  private ComponentAst getModuleComponentModel(URL resource, Document moduleDocument, Set<ExtensionModel> extensions) {
-    XmlApplicationParser xmlApplicationParser =
-        new XmlApplicationParser(XmlNamespaceInfoProviderSupplier.createFromExtensionModels(extensions, Optional.empty()));
-    Optional<ConfigLine> parseModule = xmlApplicationParser.parse(moduleDocument.getDocumentElement());
-    if (!parseModule.isPresent()) {
-      // This happens in org.mule.runtime.config.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
-      throw new IllegalArgumentException(format("There was an issue trying to read the stream of '%s'", resource.getFile()));
-    }
-    final ConfigLine configLine = parseModule.get();
-    final ComponentModelReader componentModelReader = new ComponentModelReader();
-
-    final ArtifactAstBuilder artifactAstBuilder = ArtifactAstBuilder.builder(extensions);
-    componentModelReader.extractComponentDefinitionModel(configLine, modulePath, artifactAstBuilder.addTopLevelComponent());
-    final ArtifactAst ast = artifactAstBuilder.build();
-    ast.updatePropertiesResolver(getConfigurationPropertiesResolver(ast));
-    return ast.topLevelComponentsStream().findAny().get();
+  private ComponentAst getModuleComponentModel(ArtifactAst moduleAst, Set<ExtensionModel> extensions) {
+    moduleAst.updatePropertiesResolver(getConfigurationPropertiesResolver(moduleAst));
+    return moduleAst.topLevelComponentsStream().findAny().get();
   }
 
   private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ArtifactAst ast) {
@@ -457,10 +436,9 @@ public final class XmlExtensionLoaderDelegate {
     }));
   }
 
-  private void loadModuleExtension(ExtensionDeclarer declarer, URL resource, Document moduleDocument,
+  private void loadModuleExtension(ExtensionDeclarer declarer, ArtifactAst moduleAst,
                                    ExtensionModelHelper extensionModelHelper, boolean comesFromTNS) {
-    ComponentAst moduleModel =
-        getModuleComponentModel(resource, moduleDocument, extensionModelHelper.getExtensionsModels());
+    ComponentAst moduleModel = getModuleComponentModel(moduleAst, extensionModelHelper.getExtensionsModels());
     if (!moduleModel.getIdentifier().equals(MODULE_IDENTIFIER)) {
       throw new MuleRuntimeException(createStaticMessage(format("The root element of a module must be '%s', but found '%s'",
                                                                 MODULE_IDENTIFIER.toString(),
@@ -485,7 +463,7 @@ public final class XmlExtensionLoaderDelegate {
     resourcesPaths.stream().forEach(declarer::withResource);
 
     fillDeclarer(declarer, name, version, category, vendor, xmlDslModel, description);
-    declarer.withModelProperty(getXmlExtensionModelProperty(moduleDocument, xmlDslModel));
+    declarer.withModelProperty(getXmlExtensionModelProperty(moduleAst, xmlDslModel));
 
     Graph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     // loading public operations
@@ -675,17 +653,18 @@ public final class XmlExtensionLoaderDelegate {
    * Calculates all the used namespaces of the given <module/> leaving behind the (possible) cyclic reference if there are
    * {@link MacroExpansionModuleModel#TNS_PREFIX} references by removing the current namespace generation.
    *
-   * @param moduleModel XML of the <module/>
+   * @param moduleAst AST of the <module/>
    * @param xmlDslModel the {@link XmlDslModel} for the current {@link ExtensionModel} generation
    * @return a {@link XmlExtensionModelProperty} which contains all the namespaces dependencies. Among them could be dependencies
    *         that must be macro expanded and others which might not.
    */
-  private XmlExtensionModelProperty getXmlExtensionModelProperty(Document moduleModel,
+  private XmlExtensionModelProperty getXmlExtensionModelProperty(ArtifactAst moduleAst,
                                                                  XmlDslModel xmlDslModel) {
-    final Set<String> namespaceDependencies = getUsedNamespaces(moduleModel).stream()
+    return new XmlExtensionModelProperty(moduleAst.topLevelComponentsStream().findFirst().get().getParameters().stream()
+        .filter(param -> param.getModel().getName().startsWith(XMLNS_ATTRIBUTE + ":"))
+        .map(param -> param.getRawValue())
         .filter(namespace -> !xmlDslModel.getNamespace().equals(namespace))
-        .collect(toSet());
-    return new XmlExtensionModelProperty(namespaceDependencies);
+        .collect(toSet()));
   }
 
   private XmlDslModel getTnsXmlDslModel(ComponentAst moduleModel, String name, String version) {
@@ -1063,7 +1042,9 @@ public final class XmlExtensionLoaderDelegate {
    */
   private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param) {
     final String parameterName = param.getParameter(PARAMETER_NAME).getRawValue();
-    final Optional<String> parameterDefaultValue = param.getParameter(PARAMETER_DEFAULT_VALUE).getValue().getValue();
+    final Optional<String> parameterDefaultValue = param.getParameter(PARAMETER_DEFAULT_VALUE).getValue()
+        .mapLeft(expr -> "#[" + expr + "]")
+        .getValue();
     final UseEnum use = UseEnum.valueOf(param.getParameter(ATTRIBUTE_USE).getValue().getRight().toString());
     if (UseEnum.REQUIRED.equals(use) && parameterDefaultValue.isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("The parameter [%s] cannot have the %s attribute set to %s when it has a default value",

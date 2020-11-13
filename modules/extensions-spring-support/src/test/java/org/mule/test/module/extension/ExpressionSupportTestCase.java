@@ -7,10 +7,11 @@
 package org.mule.test.module.extension;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 
-import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
@@ -48,7 +49,8 @@ public class ExpressionSupportTestCase extends AbstractExtensionFunctionalTestCa
 
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
-    expectedException.expect(ConfigurationException.class);
+    expectedException.expect(InitialisationException.class);
+    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
     expectedException.expectCause(new TypeSafeMatcher<Throwable>() {
 
       @Override

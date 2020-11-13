@@ -25,6 +25,7 @@ import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newPar
 import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -51,7 +52,7 @@ import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
-import org.mule.runtime.config.internal.model.ApplicationModel;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
@@ -59,8 +60,6 @@ import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
-
-import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,12 +71,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.creation.MockSettingsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableList;
+
+import io.qameta.allure.Issue;
 
 public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadataCacheIdGeneratorTestCase {
 
@@ -93,6 +95,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   private static final String ANOTHER_OPERATION_LOCATION = MY_FLOW + "/processors/1";
   public static final String MY_GLOBAL_TEMPLATE = "myGlobalTemplate";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     super.setUp();
@@ -103,7 +106,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   @Test
   public void idempotentHashCalculation() throws Exception {
     ArtifactDeclaration app = getBaseApp();
-    ApplicationModel applicationModel = loadApplicationModel(app);
+    ArtifactAst applicationModel = loadApplicationModel(app);
     Map<String, MetadataCacheId> hashByLocation = new HashMap<>();
 
     applicationModel.topLevelComponentsStream()
@@ -119,7 +122,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     LOGGER.debug(hashByLocation.toString());
 
     ArtifactDeclaration reloadedApp = getBaseApp();
-    ApplicationModel reload = loadApplicationModel(app);
+    ArtifactAst reload = loadApplicationModel(app);
 
     reload.topLevelComponentsStream()
         .forEach(component -> {

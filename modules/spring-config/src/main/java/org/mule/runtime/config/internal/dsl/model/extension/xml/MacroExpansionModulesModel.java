@@ -10,9 +10,7 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
-import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static org.apache.commons.lang3.StringUtils.repeat;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.ComponentModelReaderHelper.toXml;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -20,14 +18,11 @@ import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-
-import javax.xml.XMLConstants;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
@@ -36,9 +31,6 @@ import org.jgrapht.traverse.GraphIterator;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 /**
  * A {@link MacroExpansionModulesModel} goes over all the parametrized {@link ExtensionModel} by filtering them if they have the
@@ -114,7 +106,9 @@ public class MacroExpansionModulesModel {
             lastFile.set(fileName);
           }
 
-          buf.append(toXml(comp)).append(lineSeparator());
+          buf
+              .append(comp.getMetadata().getSourceCode().orElse(""))
+              .append(lineSeparator());
         });
 
         buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
@@ -193,26 +187,4 @@ public class MacroExpansionModulesModel {
         .getNamespacesDependencies();
   }
 
-  /**
-   * Given an XML, will look for all attributes of the root element that start with {@link XMLConstants#XMLNS_ATTRIBUTE} and for
-   * each of those, it will pick up the value of it, to then add it to a collection of used namespaces.
-   *
-   * @param rootComponentModel element to look for the attributes.
-   * @return a collection of used namespaces.
-   */
-  public static Set<String> getUsedNamespaces(Document moduleDocument) {
-    Set<String> namespaces = new HashSet<>();
-
-    final NamedNodeMap rootAttributes = moduleDocument.getFirstChild().getAttributes();
-    for (int i = 0; i < rootAttributes.getLength(); i++) {
-      Node node = rootAttributes.item(i);
-      String name = node.getNodeName();
-
-      if (name.startsWith(XMLNS_ATTRIBUTE + ":")) {
-        namespaces.add(node.getNodeValue());
-      }
-    }
-
-    return namespaces;
-  }
 }

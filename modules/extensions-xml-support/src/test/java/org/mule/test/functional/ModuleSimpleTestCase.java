@@ -98,6 +98,18 @@ public class ModuleSimpleTestCase extends AbstractCeXmlExtensionMuleArtifactFunc
   }
 
   @Test
+  public void testSetPayloadParamDefaultExpressionFlow() throws Exception {
+    CoreEvent muleEvent = flowRunner("testSetPayloadParamDefaultExpressionFlow").withPayload("51").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("5150"));
+  }
+
+  @Test
+  public void testSetPayloadParamDefaultExpressionUseOptionalFlow() throws Exception {
+    CoreEvent muleEvent = flowRunner("testSetPayloadParamDefaultExpressionUseOptionalFlow").withPayload("51").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("5150"));
+  }
+
+  @Test
   public void testSetPayloadNoSideEffectFlowVariable() throws Exception {
     CoreEvent muleEvent = flowRunner("testSetPayloadNoSideEffectFlowVariable").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("10"));
@@ -201,5 +213,11 @@ public class ModuleSimpleTestCase extends AbstractCeXmlExtensionMuleArtifactFunc
   public void testSetPayloadHardcodedFlowThruSubflowWithNestedElements() throws Exception {
     CoreEvent event = flowRunner("testSetPayloadHardcodedFlowThruSubflowWithNestedElements").run();
     assertThat(event.getMessage().getPayload().getValue(), is("hardcoded value"));
+  }
+
+  @Override
+  public boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
+    // returns true because not same extensions are loaded by all tests.
+    return true;
   }
 }

@@ -26,6 +26,14 @@
         <module-simple-proxy:set-payload-param-default-value-use-optional />
     </flow>
 
+    <flow name="testSetPayloadParamDefaultExpressionFlow">
+        <module-simple-proxy:set-payload-param-default-value-expression />
+    </flow>
+
+    <flow name="testSetPayloadParamDefaultExpressionUseOptionalFlow">
+        <module-simple-proxy:set-payload-param-default-value-expression-use-optional />
+    </flow>
+
     <flow name="testSetPayloadNoSideEffectFlowVariable">
         <set-variable variableName="testVar" value="unchanged value"/>
         <module-simple-proxy:set-payload-no-side-effect />

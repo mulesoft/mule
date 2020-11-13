@@ -17,7 +17,7 @@
     </flow>
 
     <flow name="repeatedItemInNewPollSetsUpdatedWatermark" initialState="stopped">
-        <petstore:watermarking-pet-adoption-source itemsPerPoll="1" useWatermark="true" idempotent="true">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="1">
             <scheduling-strategy>
                 <fixed-frequency frequency="100"/>
             </scheduling-strategy>
@@ -36,7 +36,7 @@
     </flow>
 
     <flow name="repeatedItemInNewPollDoesNotSetUpdatedWatermark" initialState="stopped">
-        <petstore:watermarking-pet-adoption-source itemsPerPoll="2" useWatermark="true" idempotent="true">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="2">
             <scheduling-strategy>
                 <fixed-frequency frequency="100"/>
             </scheduling-strategy>
@@ -53,108 +53,6 @@
                 <petstore:watermark value="10" />
                 <petstore:watermark value="7" />
                 <petstore:watermark value="8" />
-            </petstore:watermarks>
-        </petstore:watermarking-pet-adoption-source>
-        <flow-ref name="adopt"/>
-    </flow>
-
-    <flow name="unprocessedItemsAreRejectedWithoutImpactingWatermarkWhenSourceIsStoppedMidPoll" initialState="stopped">
-        <petstore:watermarking-pet-adoption-source itemsPerPoll="4" useWatermark="true" idempotent="true" awaitOnItem="3">
-            <scheduling-strategy>
-                <fixed-frequency frequency="100"/>
-            </scheduling-strategy>
-            <petstore:pets>
-                <petstore:pet value="Anibal" />
-                <petstore:pet value="Barbara" />
-                <petstore:pet value="Colonel Meow" />
-                <petstore:pet value="Daphne" />
-                <petstore:pet value="Elsa" />
-            </petstore:pets>
-            <petstore:watermarks>
-                <petstore:watermark value="1" />
-                <petstore:watermark value="5" />
-                <petstore:watermark value="10" />
-                <petstore:watermark value="11" />
-                <petstore:watermark value="6" />
-            </petstore:watermarks>
-        </petstore:watermarking-pet-adoption-source>
-        <flow-ref name="adopt"/>
-    </flow>
-
-    <flow name="processedItemsWithSameWatermarkAreNotReprocessedWhenSourceIsRestartedMidPoll" initialState="stopped">
-        <petstore:watermarking-pet-adoption-source itemsPerPoll="3" useWatermark="true" idempotent="true" awaitOnItem="3">
-            <scheduling-strategy>
-                <fixed-frequency frequency="100"/>
-            </scheduling-strategy>
-            <petstore:pets>
-                <petstore:pet value="Anibal" />
-                <petstore:pet value="Barbara" />
-                <petstore:pet value="Colonel Meow" />
-                <petstore:pet value="ANIBAL" />
-                <petstore:pet value="BARBARA" />
-            </petstore:pets>
-            <petstore:watermarks>
-                <petstore:watermark value="1" />
-                <petstore:watermark value="5" />
-                <petstore:watermark value="4" />
-                <petstore:watermark value="1" />
-                <petstore:watermark value="5" />
-            </petstore:watermarks>
-        </petstore:watermarking-pet-adoption-source>
-        <flow-ref name="adopt"/>
-    </flow>
-
-    <flow name="processedItemsWithNewWatermarkAreReprocessedWhenSourceIsRestartedMidPoll" initialState="stopped">
-        <petstore:watermarking-pet-adoption-source itemsPerPoll="3" useWatermark="true" idempotent="true" awaitOnItem="3">
-            <scheduling-strategy>
-                <fixed-frequency frequency="100"/>
-            </scheduling-strategy>
-            <petstore:pets>
-                <petstore:pet value="Anibal" />
-                <petstore:pet value="Barbara" />
-                <petstore:pet value="Colonel Meow" />
-                <petstore:pet value="ANIBAL" />
-                <petstore:pet value="BARBARA" />
-                <petstore:pet value="Colonel Meow" />
-                <petstore:pet value="Daphne" />
-            </petstore:pets>
-            <petstore:watermarks>
-                <petstore:watermark value="1" />
-                <petstore:watermark value="5" />
-                <petstore:watermark value="5" />
-                <petstore:watermark value="5" />
-                <petstore:watermark value="10" />
-                <petstore:watermark value="5" />
-                <petstore:watermark value="9" />
-            </petstore:watermarks>
-        </petstore:watermarking-pet-adoption-source>
-        <flow-ref name="adopt"/>
-    </flow>
-
-    <flow name="unprocessedItemsAreProcessedWhenSourceIsRestartedMidPoll" initialState="stopped">
-        <petstore:watermarking-pet-adoption-source itemsPerPoll="5" useWatermark="true" idempotent="true" awaitOnItem="3">
-            <scheduling-strategy>
-                <fixed-frequency frequency="100"/>
-            </scheduling-strategy>
-            <petstore:pets>
-                <petstore:pet value="Anibal" />
-                <petstore:pet value="Barbara" />
-                <petstore:pet value="Colonel Meow" />
-                <petstore:pet value="Daphne" />
-                <petstore:pet value="Elsa" />
-                <petstore:pet value="Colonel Meow" />
-                <petstore:pet value="Daphne" />
-                <petstore:pet value="Elsa" />
-            </petstore:pets>
-            <petstore:watermarks>
-                <petstore:watermark value="1" />
-                <petstore:watermark value="10" />
-                <petstore:watermark value="6" />
-                <petstore:watermark value="5" />
-                <petstore:watermark value="11" />
-                <petstore:watermark value="6" />
-                <petstore:watermark value="5" />
-                <petstore:watermark value="11" />
             </petstore:watermarks>
         </petstore:watermarking-pet-adoption-source>
         <flow-ref name="adopt"/>

@@ -1133,11 +1133,10 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
                                                          Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
-        action.proceed();
-        return supplyAsync(() -> {
-          event.message(Message.of(TEST_PAYLOAD));
-          return event;
-        });
+        return action.proceed().thenCompose(result -> supplyAsync(() -> {
+          result.message(Message.of(TEST_PAYLOAD));
+          return result;
+        }));
       }
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
