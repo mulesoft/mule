@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.rx;
 
 import static java.lang.Boolean.getBoolean;
-import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.create;
 import static reactor.util.context.Context.empty;
 
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -26,10 +27,13 @@ import reactor.core.publisher.FluxSink;
  */
 public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
+  private static final Logger LOGGER = getLogger(FluxSinkRecorder.class);
+
   private volatile FluxSinkRecorderDelegate<T> delegate = new NotYetAcceptedDelegate<>();
+
   private static final boolean SAVE_STACK_TRACE_ON_COMPLETE =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "fluxSinkRecorder.saveStackTraceOnComplete");
-  private StackTraceElement[] stackTraceOnComplete = null;
+  private Throwable throwableToSaveStackTrace = null;
 
   public Flux<T> flux() {
     return create(this)
@@ -48,16 +52,23 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
   }
 
   public void next(T response) {
+    if (throwableToSaveStackTrace != null) {
+      LOGGER.warn("Event will be dropped {}\nCompletion StackTrace:", response);
+      throwableToSaveStackTrace.printStackTrace();
+    }
     delegate.next(response);
   }
 
   public void error(Throwable error) {
+    if (SAVE_STACK_TRACE_ON_COMPLETE) {
+      throwableToSaveStackTrace = new Throwable();
+    }
     delegate.error(error);
   }
 
   public void complete() {
     if (SAVE_STACK_TRACE_ON_COMPLETE) {
-      stackTraceOnComplete = currentThread().getStackTrace();
+      throwableToSaveStackTrace = new Throwable();
     }
     delegate.complete();
   }

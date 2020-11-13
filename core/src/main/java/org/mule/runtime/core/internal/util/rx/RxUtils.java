@@ -200,8 +200,11 @@ public class RxUtils {
 
     return doPropagateCompletion(upstream, downstream, transformer,
                                  new AtomicInteger(0), completer, errorForwarder,
-                                 () -> delayedExecutor.schedule(() -> completer.runOnce(), completionTimeoutMillis,
-                                                                MILLISECONDS));
+                                 () -> delayedExecutor.schedule(() -> {
+                                   LOGGER.warn("Calling completer after {} milliseconds",
+                                               completionTimeoutMillis);
+                                   completer.runOnce();
+                                 }, completionTimeoutMillis, MILLISECONDS));
   }
 
   private static <T, U> Publisher<T> doPropagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
