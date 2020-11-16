@@ -81,6 +81,7 @@ import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
@@ -818,6 +819,23 @@ class MuleExtensionModelDeclarer {
   private void declareOnErrorRoute(ClassTypeLoader typeLoader, NestedRouteDeclarer onError) {
     onError.withChain();
 
+    declareOnErrorRouteParams(typeLoader, onError);
+  }
+
+  private void declareGlobalOnErrorRoute(ClassTypeLoader typeLoader, ConstructDeclarer onError) {
+    onError.withStereotype(ON_ERROR)
+        .allowingTopLevelDefinition()
+        .withChain();
+
+    onError.onDefaultParameterGroup()
+        .withRequiredParameter("name")
+        .asComponentId()
+        .ofType(typeLoader.load(String.class));
+
+    declareOnErrorRouteParams(typeLoader, onError);
+  }
+
+  private void declareOnErrorRouteParams(ClassTypeLoader typeLoader, HasParametersDeclarer onError) {
     onError.onDefaultParameterGroup()
         .withOptionalParameter("when")
         .ofType(typeLoader.load(String.class))
@@ -845,17 +863,6 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs."
             + " Default is true.");
-  }
-
-  private void declareGlobalOnErrorRoute(ClassTypeLoader typeLoader, ConstructDeclarer onError) {
-    onError.withStereotype(ON_ERROR)
-        .allowingTopLevelDefinition()
-        .withChain();
-
-    onError.onDefaultParameterGroup()
-        .withRequiredParameter("name")
-        .asComponentId()
-        .ofType(typeLoader.load(String.class));
   }
 
   private void declareErrors(ExtensionDeclarer extensionDeclarer) {

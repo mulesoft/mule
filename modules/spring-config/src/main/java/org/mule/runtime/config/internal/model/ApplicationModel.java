@@ -6,44 +6,24 @@
  */
 package org.mule.runtime.config.internal.model;
 
-import static com.google.common.base.Joiner.on;
-import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_REF_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.createConfigurationAttributeResolver;
-import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
-import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
-import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.construct.ConstructModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
@@ -51,10 +31,7 @@ import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
-import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
-import org.mule.runtime.extension.api.declaration.type.annotation.LiteralTypeAnnotation;
-import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.ArrayList;
@@ -68,8 +45,6 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -90,7 +65,6 @@ public class ApplicationModel implements ArtifactAst {
   // TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
   public static final String ERROR_MAPPING = "error-mapping";
   public static final String ON_ERROR = "on-error";
-  public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
   public static final String TYPE_ES_ATTRIBUTE = "type";
   public static final String PROPERTY_ELEMENT = "property";
@@ -132,27 +106,6 @@ public class ApplicationModel implements ArtifactAst {
   public static final ComponentIdentifier SECURITY_MANAGER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(SECURITY_MANAGER).build();
 
-  public static final String CLASS_ATTRIBUTE = "class";
-
-  private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =
-      ImmutableSet.<ComponentIdentifier>builder()
-          .add(builder().namespace(MULE_ROOT_ELEMENT).name("alias").build())
-          .add(builder().namespace(MULE_ROOT_ELEMENT).name("password-encryption-strategy")
-              .build())
-          .add(builder().namespace(MULE_ROOT_ELEMENT).name("custom-security-provider")
-              .build())
-          .add(builder().namespace(MULE_ROOT_ELEMENT).name("custom-encryption-strategy")
-              .build())
-          .add(builder().namespace(MULE_ROOT_ELEMENT)
-              .name("secret-key-encryption-strategy")
-              .build())
-          .add(builder().namespace(MULE_ROOT_ELEMENT).name("import").build())
-          .add(builder().namespace(MULE_ROOT_ELEMENT).name("security-manager").build())
-          // TODO MULE-18366 Remove these entries from test namespace
-          .add(builder().namespace(TEST_NAMESPACE).name("queue").build())
-          .add(builder().namespace(TEST_NAMESPACE).name("invocation-counter").build())
-          .build();
-
   private ArtifactAst ast;
   private final ArtifactAst originalAst;
   private final PropertiesResolverConfigurationProperties configurationProperties;
@@ -191,8 +144,6 @@ public class ApplicationModel implements ArtifactAst {
 
     this.ast = originalAst;
     indexComponentModels(originalAst);
-
-    validateModel();
   }
 
   private void indexComponentModels(ArtifactAst originalAst) {
@@ -293,290 +244,6 @@ public class ApplicationModel implements ArtifactAst {
   public Optional<ComponentAst> findComponentDefinitionModel(ComponentIdentifier componentIdentifier) {
     return topLevelComponentsStream()
         .filter(componentModel -> componentModel.getIdentifier().equals(componentIdentifier)).findFirst();
-  }
-
-  private void validateModel() {
-    // TODO MULE-18318 (AST) all this validations will be moved to an entity that does the validation and allows to aggregate all
-    // validations instead of failing fast.
-    validateSingletonsAreNotRepeated();
-    validateSingletonsAreNotRepeatedPerFile();
-    validateNameIsNotRepeated();
-    validateNameHasValidCharacters();
-    validateFlowRefPointsToExistingFlow();
-    validateErrorMappings();
-    validateErrorHandlerStructure();
-    // TODO MULE-17711 (AST) re-enable (and possibly refactor) this validation
-    // validateParameterAndChildForSameAttributeAreNotDefinedTogether();
-    validateNamedTopLevelElementsHaveName();
-    validateNoExpressionsInNoExpressionsSupportedParams();
-  }
-
-  private void validateFlowRefPointsToExistingFlow() {
-    recursiveStream()
-        .filter(componentModel -> componentModel.getIdentifier().equals(FLOW_REF_IDENTIFIER))
-        .forEach(componentModel -> {
-          componentModel.getParameter("name").getValue().applyRight(nameAttribute -> {
-            // Need to check this, since the name field is a reference according to the extModel and the AST assumes there are no
-            // expressions there.
-            if (!((String) nameAttribute).startsWith(DEFAULT_EXPRESSION_PREFIX)) {
-              findTopLevelNamedComponent((String) nameAttribute)
-                  .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("flow-ref at %s:%s is pointing to %s which does not exist",
-                                                                                  componentModel.getMetadata().getFileName()
-                                                                                      .orElse("unknown"),
-                                                                                  componentModel.getMetadata().getStartLine()
-                                                                                      .orElse(-1),
-                                                                                  nameAttribute)));
-            }
-          });
-        });
-  }
-
-  private void validateParameterAndChildForSameAttributeAreNotDefinedTogether() {
-    recursiveStream().forEach(componentModel -> componentModel.directChildrenStream()
-        .forEach(child -> {
-          final String paramName = toCamelCase(child.getIdentifier().getName(), "-");
-          final String singularParamName = pluralize(paramName);
-
-          if (componentModel.getRawParameterValue(paramName).isPresent()
-              || componentModel.getRawParameterValue(singularParamName).isPresent()) {
-            throw new MuleRuntimeException(createStaticMessage(
-                                                               format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. "
-                                                                   + "Only one must be used.", componentModel.getIdentifier(),
-                                                                      child.getIdentifier(),
-                                                                      singularParamName)));
-          }
-        }));
-  }
-
-  private void validateSingletonsAreNotRepeated() {
-    Map<ComponentIdentifier, ComponentAst> existingSingletonsByIdentifier = new HashMap<>();
-
-    topLevelComponentsStream().forEach(componentModel -> {
-      if (componentModel.getModel(EnrichableModel.class)
-          .flatMap(enrchModel -> enrchModel.getModelProperty(SingletonModelProperty.class).map(smp -> !smp.isAppliesToFile()))
-          .orElse(false)) {
-        ComponentIdentifier singletonIdentifier = componentModel.getIdentifier();
-        if (existingSingletonsByIdentifier.containsKey(singletonIdentifier)) {
-          ComponentAst otherComponentModel = existingSingletonsByIdentifier.get(singletonIdentifier);
-          if (componentModel.getMetadata().getFileName().isPresent()
-              && componentModel.getMetadata().getStartLine().isPresent()
-              && otherComponentModel.getMetadata().getFileName().isPresent()
-              && otherComponentModel.getMetadata().getStartLine().isPresent()) {
-            throw new MuleRuntimeException(createStaticMessage("The configuration element [%s] can only appear once, but was present in both [%s:%d] and [%s:%d]",
-                                                               componentModel.getIdentifier(),
-                                                               otherComponentModel.getMetadata().getFileName().get(),
-                                                               otherComponentModel.getMetadata().getStartLine().getAsInt(),
-                                                               componentModel.getMetadata().getFileName().get(),
-                                                               componentModel.getMetadata().getStartLine().getAsInt()));
-          } else {
-            throw new MuleRuntimeException(createStaticMessage("The configuration element [%s] can only appear once, but was present multiple times",
-                                                               componentModel.getIdentifier()));
-          }
-        }
-        existingSingletonsByIdentifier.put(singletonIdentifier, componentModel);
-      }
-    });
-  }
-
-  private void validateSingletonsAreNotRepeatedPerFile() {
-    Map<String, Map<ComponentIdentifier, ComponentAst>> existingSingletonsByIdentifierByFileName = new HashMap<>();
-
-    topLevelComponentsStream().forEach(componentModel -> {
-      if (componentModel.getModel(EnrichableModel.class)
-          .flatMap(enrchModel -> enrchModel.getModelProperty(SingletonModelProperty.class)
-              .map(SingletonModelProperty::isAppliesToFile))
-          .orElse(false)) {
-
-        componentModel.getMetadata().getFileName()
-            .ifPresent(fileName -> {
-              Map<ComponentIdentifier, ComponentAst> existingSingletonsByIdentifier =
-                  existingSingletonsByIdentifierByFileName.computeIfAbsent(fileName, k -> new HashMap<>());
-
-              ComponentIdentifier singletonIdentifier = componentModel.getIdentifier();
-              if (existingSingletonsByIdentifier.containsKey(singletonIdentifier)) {
-                ComponentAst otherComponentModel = existingSingletonsByIdentifier.get(singletonIdentifier);
-                if (componentModel.getMetadata().getFileName().isPresent()
-                    && componentModel.getMetadata().getStartLine().isPresent()
-                    && otherComponentModel.getMetadata().getFileName().isPresent()
-                    && otherComponentModel.getMetadata().getStartLine().isPresent()) {
-                  throw new MuleRuntimeException(createStaticMessage("The configuration element [%s] can only appear once, but was present in both [%s:%d] and [%s:%d]",
-                                                                     componentModel.getIdentifier(),
-                                                                     otherComponentModel.getMetadata().getFileName().get(),
-                                                                     otherComponentModel.getMetadata().getStartLine().getAsInt(),
-                                                                     componentModel.getMetadata().getFileName().get(),
-                                                                     componentModel.getMetadata().getStartLine().getAsInt()));
-                } else {
-                  throw new MuleRuntimeException(createStaticMessage("The configuration element [%s] can only appear once, but was present multiple times",
-                                                                     componentModel.getIdentifier()));
-                }
-              }
-              existingSingletonsByIdentifier.put(singletonIdentifier, componentModel);
-            });
-      }
-    });
-  }
-
-  private void validateNameIsNotRepeated() {
-    Map<String, ComponentAst> existingObjectsWithName = new HashMap<>();
-    topLevelComponentsStream()
-        .filter(componentModel -> !ignoredNameValidationComponentList.contains(componentModel.getIdentifier()))
-        .filter(componentModel -> !componentModel.getModel(HasStereotypeModel.class)
-            .map(sm -> sm.getStereotype().isAssignableTo(APP_CONFIG))
-            .orElse(false))
-        .forEach(componentModel -> componentModel.getComponentId()
-            .ifPresent(nameAttributeValue -> {
-              if (existingObjectsWithName.containsKey(nameAttributeValue)) {
-                throw new MuleRuntimeException(createStaticMessage("Two configuration elements have been defined with the same global name. Global name [%s] must be unique. Clashing components are %s and %s",
-                                                                   nameAttributeValue,
-                                                                   existingObjectsWithName.get(nameAttributeValue)
-                                                                       .getIdentifier(),
-                                                                   componentModel.getIdentifier()));
-              }
-              existingObjectsWithName.put(nameAttributeValue, componentModel);
-            }));
-  }
-
-  private void validateNameHasValidCharacters() {
-    topLevelComponentsStream().forEach(componentModel -> componentModel.getComponentId()
-        .ifPresent(nameAttributeValue -> {
-          try {
-            verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
-          } catch (IllegalArgumentException e) {
-            throw new MuleRuntimeException(createStaticMessage(format("Invalid global element name '%s' in %s:%s. Problem is: %s",
-                                                                      nameAttributeValue,
-                                                                      componentModel.getMetadata().getFileName()
-                                                                          .orElse("unknown"),
-                                                                      componentModel.getMetadata().getStartLine().orElse(-1),
-                                                                      e.getMessage())));
-          }
-        }));
-  }
-
-  private void validateErrorMappings() {
-    recursiveStream().forEach(componentModel -> forEachErrorMappingDo(componentModel, mappings -> {
-      List<ErrorMapping> anyMappings = mappings.stream()
-          .filter(this::isErrorMappingWithSourceAny)
-          .collect(toList());
-      if (anyMappings.size() > 1) {
-        throw new MuleRuntimeException(createStaticMessage("Only one mapping for 'ANY' or an empty source type is allowed."));
-      } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(mappings.get(mappings.size() - 1))) {
-        throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have 'ANY' or an empty source type."));
-      }
-      List<String> sources = mappings.stream()
-          .map(ErrorMapping::getSource)
-          .collect(toList());
-      List<String> distinctSources = sources.stream()
-          .distinct()
-          .collect(toList());
-      if (sources.size() != distinctSources.size()) {
-        throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are '%s'.",
-                                                                  on("', '")
-                                                                      .join(disjunction(sources, distinctSources)))));
-      }
-    }));
-  }
-
-  private boolean isErrorMappingWithSourceAny(ErrorMapping model) {
-    return ANY_IDENTIFIER.equals(model.getSource());
-  }
-
-  private void validateErrorHandlerStructure() {
-    recursiveStream().forEach(component -> {
-      if (component.getIdentifier().equals(ERROR_HANDLER_IDENTIFIER)) {
-        validateRefOrOnErrorsExclusiveness(component);
-        validateOnErrorsHaveTypeOrWhenAttribute(component);
-        validateNoMoreThanOneOnErrorPropagateWithRedelivery(component);
-      }
-    });
-  }
-
-  private void validateRefOrOnErrorsExclusiveness(ComponentAst component) {
-    if (component.getRawParameterValue(REFERENCE_ATTRIBUTE).isPresent()
-        && component.directChildrenStream().count() > 0) {
-      throw new MuleRuntimeException(createStaticMessage("A reference error-handler cannot have on-errors."));
-    }
-  }
-
-  private void validateNoMoreThanOneOnErrorPropagateWithRedelivery(ComponentAst component) {
-    if (component.directChildrenStream()
-        .filter(exceptionStrategyComponent -> exceptionStrategyComponent
-            .getRawParameterValue(MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE).isPresent())
-        .count() > 1) {
-      throw new MuleRuntimeException(createStaticMessage("Only one on-error-propagate within a error-handler can handle message redelivery. Remove one of the maxRedeliveryAttempts attributes"));
-    }
-  }
-
-  private void validateOnErrorsHaveTypeOrWhenAttribute(ComponentAst component) {
-    final long count = component.directChildrenStream().count();
-    if (count > 0) {
-      component.directChildrenStream()
-          // last error handler should be the catch all, so that one is not validated
-          .limit(count - 1)
-          .forEach(innerComponent -> {
-            ComponentAst componentModel = getOnErrorComponentModel(innerComponent);
-            if (!componentModel.getRawParameterValue(WHEN_CHOICE_ES_ATTRIBUTE).isPresent()
-                && !componentModel.getRawParameterValue(TYPE_ES_ATTRIBUTE).isPresent()) {
-              throw new MuleRuntimeException(createStaticMessage(
-                                                                 "Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
-            }
-          });
-    }
-  }
-
-  private ComponentAst getOnErrorComponentModel(ComponentAst onErrorModel) {
-    if (ON_ERROR_IDENTIFIER.equals(onErrorModel.getIdentifier())) {
-      return onErrorModel.getRawParameterValue(REFERENCE_ATTRIBUTE)
-          .map(sharedOnErrorName -> findTopLevelNamedComponent(sharedOnErrorName)
-              .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("Could not find on-error reference named '%s'",
-                                                                                     sharedOnErrorName)))))
-          .orElse(onErrorModel);
-    } else {
-      return onErrorModel;
-    }
-  }
-
-  private void validateNamedTopLevelElementsHaveName() {
-    topLevelComponentsStream().forEach(topLevelComponent -> {
-      if (topLevelComponent.getComponentId().isPresent()) {
-        // We have a name, good to go!
-        return;
-      }
-      if (!topLevelComponent.getModel(Object.class).isPresent()) {
-        // Skip the validation if there is no model available. This situation happens in some test cases.
-        return;
-      }
-      if (topLevelComponent.getModel(HasStereotypeModel.class)
-          .map(sm -> sm.getStereotype().isAssignableTo(APP_CONFIG))
-          .orElse(false)) {
-        // APP_CONFIGs need not be referenced by name, so this exception is ok
-        // Not making this exception would break backwards compatibility in spring:security-manager
-        return;
-      }
-
-      if (!topLevelComponent.getModel(ConstructModel.class).isPresent()
-          || topLevelComponent.getModel(ParameterizedModel.class)
-              .map(pmzd -> pmzd.getAllParameterModels().stream()
-                  .anyMatch(ParameterModel::isComponentId))
-              .orElse(false)) {
-        final ComponentIdentifier identifier = topLevelComponent.getIdentifier();
-        throw new MuleRuntimeException(createStaticMessage(format("Global element %s:%s does not provide a name attribute.",
-                                                                  identifier.getNamespace(), identifier.getName())));
-      }
-    });
-  }
-
-  private void validateNoExpressionsInNoExpressionsSupportedParams() {
-    recursiveStream()
-        .filter(component -> component.getModel(ParameterizedModel.class).isPresent())
-        .forEach(component -> component.getParameters()
-            .forEach(param -> param.getValue()
-                .applyLeft(expr -> {
-                  if (NOT_SUPPORTED.equals(param.getModel().getExpressionSupport())
-                      && !param.getModel().getType().getAnnotation(LiteralTypeAnnotation.class).isPresent()) {
-                    throw new MuleRuntimeException(createStaticMessage(format("An expression value was given for parameter '%s' but it doesn't support expressions",
-                                                                              param.getModel().getName())));
-                  }
-                })));
   }
 
   /**
