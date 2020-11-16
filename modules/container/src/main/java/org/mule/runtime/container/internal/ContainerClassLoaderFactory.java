@@ -14,7 +14,6 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ALLOW_JRE_EXTENSION;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_JRE_EXTENSION_PACKAGES;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
 import org.mule.runtime.container.api.ModuleRepository;
@@ -195,7 +194,7 @@ public class ContainerClassLoaderFactory {
     // If an extension uses a class provided by the mule-sdk-api artifact, the container classloader should use
     // the class with which the extension was compiled.
     if (exportedPackage.startsWith(MULE_SDK_API_PACKAGE)) {
-      return CHILD_FIRST;
+      return PARENT_FIRST;
     }
     // Let artifacts extend non "java." JRE packages
     if (ALLOW_JRE_EXTENSION && stream(JRE_EXTENDABLE_PACKAGES).anyMatch(exportedPackage::startsWith)) {
