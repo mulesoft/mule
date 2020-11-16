@@ -102,8 +102,12 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
     assertThat(stream, is(instanceOf(ConsumerStreamingIterator.class)));
 
     ConsumerStreamingIterator streamingIterator = (ConsumerStreamingIterator) stream;
+
     new PollingProber(1000, 100)
-        .check(new JUnitLambdaProbe(() -> !streamingIterator.hasNext()));
+        .check(new JUnitLambdaProbe(() -> {
+          assertThat(streamingIterator.hasNext(), is(false));
+          return true;
+        }));
 
     expectedException.expect(new BaseMatcher<Throwable>() {
 
