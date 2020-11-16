@@ -118,7 +118,22 @@ public class InternalDeclarationSession implements DeclarationSession {
   public ConnectionValidationResult testConnection(String configName) {
     return artifactHelper()
         .findConnectionProvider(configName)
-        .map(cp -> connectionManager.testConnectivity(cp))
+        .map(cp -> {
+          // We need to manually create a connection instead of delegating this to the connection handler
+          // as it is being set with org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY
+          // and testingConnections from the adapter will return always true.
+          Object connection = null;
+          try {
+            connection = cp.connect();
+            return cp.validate(connection);
+          } catch (Exception e) {
+            return failure(format("Could not perform connectivity testing on configuration: '%s'", configName), e);
+          } finally {
+            if (connection != null) {
+              cp.disconnect(connection);
+            }
+          }
+        })
         .orElseGet(() -> failure(format("Could not perform test connection for configuration: '%s'. Connection provider is not defined",
                                         configName),
                                  new MuleRuntimeException(createStaticMessage("Could not find connection provider"))));
