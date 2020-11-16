@@ -200,9 +200,13 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       DefaultPollContext pollContext = new DefaultPollContext(sourceCallback, getCurrentWatermark(), getUpdatedWatermark());
       try {
         delegate.poll(pollContext);
-        pollContext.getUpdatedWatermark()
-            .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator(),
-                                            pollContext.getMinimumRejectedByLimitPassingWatermark().orElse(null)));
+        if (isRequestedToStop()) {
+          updateRecentlyProcessedIds(false);
+        } else {
+          pollContext.getUpdatedWatermark()
+              .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator(),
+                                              pollContext.getMinimumRejectedByLimitPassingWatermark().orElse(null)));
+        }
       } catch (Throwable t) {
         LOGGER.error(format("Found exception trying to process item on source at flow '%s'. %s",
                             flowName, t.getMessage()),
@@ -271,14 +275,14 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       PollItemStatus status = ACCEPTED;
       boolean currentPollItemLimitApplied = false;
-      if (!acquireItem(pollItem, callbackContext)) {
+      if (isRequestedToStop()) {
+        status = SOURCE_STOPPING;
+      } else if (!acquireItem(pollItem, callbackContext)) {
         status = ALREADY_IN_PROCESS;
       } else {
         WatermarkStatus watermarkStatus = passesWatermark(pollItem);
         if (watermarkStatus == REJECT) {
           status = FILTERED_BY_WATERMARK;
-        } else if (isRequestedToStop()) {
-          status = SOURCE_STOPPING;
         } else if (currentPollItems < maxItemsPerPoll) {
           currentPollItems++;
           sourceCallback.handle(pollItem.getResult(), callbackContext);
@@ -591,7 +595,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       watermarkObjectStore.remove(WATERMARK_ITEM_OS_KEY);
     }
 
-    updateRecentlyProcessedIds();
+    updateRecentlyProcessedIds(true);
     watermarkObjectStore.store(WATERMARK_ITEM_OS_KEY, value);
   }
 
@@ -603,14 +607,19 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     watermarkObjectStore.store(WATERMARK_ITEM_OS_KEY, minimumRejectedByLimitPassingWatermark);
   }
 
-  private void updateRecentlyProcessedIds() throws ObjectStoreException {
+  private void updateRecentlyProcessedIds(boolean clearRecentlyProcessed) throws ObjectStoreException {
     Lock osClearingLock = lockFactory.createLock(UPDATE_PROCESSED_LOCK);
     try {
       osClearingLock.lock();
       List<String> strings = idsOnUpdatedWatermark.allKeys();
-      recentlyProcessedIds.clear();
+      if (clearRecentlyProcessed) {
+        recentlyProcessedIds.clear();
+      }
       strings.forEach(key -> {
         try {
+          if (!clearRecentlyProcessed && recentlyProcessedIds.contains(key)) {
+            recentlyProcessedIds.remove(key);
+          }
           recentlyProcessedIds.store(key, idsOnUpdatedWatermark.retrieve(key));
         } catch (ObjectStoreException e) {
           throw new MuleRuntimeException(createStaticMessage("An error occurred while updating the watermark Ids. Failed to update key '%s' in Watermark-IDs ObjectStore: %s",
