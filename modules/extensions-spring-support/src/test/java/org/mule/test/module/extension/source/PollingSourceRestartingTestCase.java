@@ -103,18 +103,21 @@ public class PollingSourceRestartingTestCase extends AbstractExtensionFunctional
   public void unprocessedItemsAreProcessedWhenSourceIsRestartedMidPollWithLimit() throws Exception {
     assertWatermarkingForStopStartScenario(asList("Anibal", "Barbara", "Colonel Meow", "Daphne", "Elsa"),
                                            "unprocessedItemsAreProcessedWhenSourceIsRestartedMidPollWithLimit");
+    assertLimitIsApplied(3);
   }
 
   @Test
   public void processedItemsWithSameWatermarkAreNotReprocessedWhenSourceIsRestartedMidPollWithLimit() throws Exception {
     assertWatermarkingForStopStartScenario(asList("Anibal", "Barbara"),
                                            "processedItemsWithSameWatermarkAreNotReprocessedWhenSourceIsRestartedMidPollWithLimit");
+    assertLimitIsApplied(2);
   }
 
   @Test
   public void processedItemsWithNewWatermarkAreReprocessedWhenSourceIsRestartedMidPollWithLimit() throws Exception {
     assertWatermarkingForStopStartScenario(asList("Anibal", "Barbara", "ANIBAL", "BARBARA", "Colonel Meow"),
-                                           "processedItemsWithNewWatermarkAreReprocessedWhenSourceIsRestartedMidPoll");
+                                           "processedItemsWithNewWatermarkAreReprocessedWhenSourceIsRestartedMidPollWithLimit");
+    assertLimitIsApplied(2);
   }
 
   private void assertWatermarkingForStopStartScenario(List<String> expectedPets, String flowName) throws Exception {
