@@ -192,7 +192,7 @@ public class ContainerClassLoaderFactory {
    */
   private LookupStrategy getSpecialLookupStrategy(String exportedPackage) {
     // If an extension uses a class provided by the mule-sdk-api artifact, the container classloader should use
-    // the class with which the extension was compiled.
+    // the class with which the extension was compiled only if the class is not present in the distribution.
     if (exportedPackage.startsWith(MULE_SDK_API_PACKAGE)) {
       return PARENT_FIRST;
     }
