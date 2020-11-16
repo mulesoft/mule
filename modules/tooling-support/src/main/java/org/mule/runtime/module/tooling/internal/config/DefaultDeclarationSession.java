@@ -130,6 +130,11 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
       throw e;
     } catch (NoClassDefFoundError | Exception e) {
       if (isOAuthRootCauseException(e)) {
+        LOGGER.error(format("OAuth Service error while resolving values on component: '%s:%s' for providerName: '%s'",
+                            component.getDeclaringExtension(),
+                            component.getName(), providerName),
+                     e);
+
         return resultFrom(newFailure()
             .withFailureCode(CONNECTION_FAILURE.getName())
             .withMessage(getRootCauseMessage(e))
@@ -159,6 +164,11 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
       throw e;
     } catch (NoClassDefFoundError | Exception e) {
       if (isOAuthRootCauseException(e)) {
+        LOGGER.error(format("OAuth Service error while resolving metadata keys on component: '%s:%s'",
+                            component.getDeclaringExtension(),
+                            component.getName()),
+                     e);
+
         return MetadataResult.failure(MetadataFailure.Builder.newFailure()
             .withFailureCode(CONNECTION_FAILURE)
             .withMessage(getRootCauseMessage(e))
@@ -187,6 +197,11 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
       throw e;
     } catch (NoClassDefFoundError | Exception e) {
       if (isOAuthRootCauseException(e)) {
+        LOGGER
+            .error(format("OAuth Service error while resolving metadata on component: '%s:%s'", component.getDeclaringExtension(),
+                          component.getName()),
+                   e);
+
         return MetadataResult.failure(MetadataFailure.Builder.newFailure()
             .withFailureCode(CONNECTION_FAILURE)
             .withMessage(getRootCauseMessage(e))
@@ -215,6 +230,11 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
       throw e;
     } catch (NoClassDefFoundError | Exception e) {
       if (isOAuthRootCauseException(e)) {
+        LOGGER.error(format("OAuth Service error while retrieving sample data on component: '%s:%s'",
+                            component.getDeclaringExtension(),
+                            component.getName()),
+                     e);
+
         return SampleDataResult.resultFrom(SampleDataFailure.Builder.newFailure(e)
             .withFailureCode(CONNECTION_FAILURE.getName())
             .withMessage(getRootCauseMessage(e))
