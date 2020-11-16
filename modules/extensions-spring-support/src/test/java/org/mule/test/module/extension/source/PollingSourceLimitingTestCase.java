@@ -33,6 +33,7 @@ public class PollingSourceLimitingTestCase extends AbstractExtensionFunctionalTe
   private static int NUMBER_OF_PETS = 7;
 
   protected static final Map<String, Object> EXTENSION_LOADER_CONTEXT_ADDITIONAL_PARAMS = new HashMap<String, Object>() {
+
     {
       put(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
     }
@@ -118,12 +119,12 @@ public class PollingSourceLimitingTestCase extends AbstractExtensionFunctionalTe
     checkNoMorePetsAdopted();
   }
 
-  protected void waitForAllPetsToBeAdopted() {
+  private void waitForAllPetsToBeAdopted() {
     check(PROBER_TIMEOUT, PROBER_FREQUENCY,
           () -> ADOPTIONS.size() == NUMBER_OF_PETS);
   }
 
-  protected void startFlow(String flowName) throws Exception {
+  private void startFlow(String flowName) throws Exception {
     ((Startable) getFlowConstruct(flowName)).start();
   }
 
