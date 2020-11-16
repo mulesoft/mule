@@ -10,7 +10,18 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
-import org.mule.test.values.extension.resolver.*;
+import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
+import org.mule.test.values.extension.resolver.SimpleValueProvider;
+import org.mule.test.values.extension.resolver.WithComplexActingParameter;
+import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
+import org.mule.test.values.extension.resolver.WithConfigValueProvider;
+import org.mule.test.values.extension.resolver.WithErrorValueProvider;
+import org.mule.test.values.extension.resolver.WithOptionalParametersValueProvider;
+import org.mule.test.values.extension.resolver.WithOptionalParametersWithDefaultValueProvider;
+import org.mule.test.values.extension.resolver.WithRequiredAndOptionalParametersValueProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider;
+import org.mule.test.values.extension.resolver.WithMuleContextValueProvider;
 
 import java.util.List;
 
