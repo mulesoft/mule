@@ -151,7 +151,7 @@
         <aspectjVersion>1.8.5</aspectjVersion>
         <asyncHttpClientVersion>1.14-MULE-019</asyncHttpClientVersion>
         <bshVersion>2.0b4</bshVersion>
-        <bouncycastleVersion>1.66</bouncycastleVersion>
+        <bouncycastleVersion>1.67</bouncycastleVersion>
         <c3p0Version>0.9.5.4</c3p0Version>
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
@@ -183,7 +183,7 @@
         <hamcrestVersion>1.3</hamcrestVersion>
         <hk2Version>2.3.0-b05</hk2Version>
         <jacksonVersion>1.9.14-MULE-002</jacksonVersion>
-        <jackson2Version>2.10.0</jackson2Version>
+        <jackson2Version>2.11.3</jackson2Version>
         <javax.inject.version>1</javax.inject.version>
         <javax.transaction.version>1.2</javax.transaction.version>
         <jerseyVersion>2.11</jerseyVersion>
@@ -197,7 +197,7 @@
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.1.3</jdomVersion>
         <jdom2Version>2.0.6</jdom2Version>
-        <jettyVersion>9.4.31.v20200723</jettyVersion>
+        <jettyVersion>9.4.34.v20201102</jettyVersion>
         <jodaTimeVersion>2.9.7</jodaTimeVersion>
         <jschVersion>0.1.54</jschVersion>
         <jsonSchemaValidatorVersion>2.2.8</jsonSchemaValidatorVersion>
@@ -1168,7 +1168,7 @@
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-ext-jdk15on</artifactId>
+                <artifactId>bcprov-ext-jdk15to18</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
             <dependency>
