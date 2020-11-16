@@ -117,7 +117,18 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
 
   @Test
   public void dynamicConfigIsExpiredBeforeFlowEnds() throws Exception {
-    flowRunner("multipleOperationsWithDynamicConfig").withPayload("Walter Blanco").run();
+    flowRunner("dynamicConfigIsExpiredBeforeFlowEnds").withPayload("Walter Blanco").run();
+    check(15000, 2500, () -> {
+      synchronized (disposedStatuses) {
+        return disposedStatuses.size() == 2;
+      }
+    });
+    assertThat(disposedStatuses, contains(0, 1));
+  }
+
+  @Test
+  public void dynamicConfigIsExpiredBeforeFlowWithErrorHandlerEnds() throws Exception {
+    flowRunner("dynamicConfigIsExpiredBeforeFlowWithErrorHandlerEnds").withPayload("Walter Blanco").run();
     check(15000, 2500, () -> {
       synchronized (disposedStatuses) {
         return disposedStatuses.size() == 2;

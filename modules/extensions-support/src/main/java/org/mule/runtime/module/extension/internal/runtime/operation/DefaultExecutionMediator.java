@@ -151,6 +151,9 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       public void complete(Object value) {
         // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
         // Race conditions appear otherwise, specially in connection pooling scenarios.
+        if (stats != null) {
+          stats.discountInflightOperation();
+        }
         try {
           interceptorChain.onSuccess(context, value);
           executorCallback.complete(value);
@@ -160,25 +163,18 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
           } finally {
             executorCallback.error(t);
           }
-        } finally {
-          if (stats != null) {
-            stats.discountInflightOperation();
-          }
         }
       }
 
       @Override
       public void error(Throwable t) {
+        if (stats != null) {
+          stats.discountInflightOperation();
+        }
         try {
           t = handleError(t, context);
         } finally {
-          try {
-            executorCallback.error(t);
-          } finally {
-            if (stats != null) {
-              stats.discountInflightOperation();
-            }
-          }
+          executorCallback.error(t);
         }
       }
     };

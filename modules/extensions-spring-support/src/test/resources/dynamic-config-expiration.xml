@@ -116,11 +116,25 @@
         <heisenberg:say-my-name config-ref="heisenbergWithCustomExpiration"/>
     </flow>
 
-    <flow name="multipleOperationsWithDynamicConfig">
+    <flow name="dynamicConfigIsExpiredBeforeFlowEnds">
         <heisenberg:get-config config-ref="heisenbergWithCustomExpiration"/>
         <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
         <logger level="ERROR" message="#[ import * from dw::Runtime --- 'Waiting for 10000ms' wait 10000]"/>
         <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
+    </flow>
+
+    <flow name="dynamicConfigIsExpiredBeforeFlowWithErrorHandlerEnds">
+        <try>
+            <heisenberg:get-config config-ref="heisenbergWithCustomExpiration"/>
+            <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
+            <raise-error description="Custom error occurred." type="CUSTOM:CUSTOM"/>
+            <error-handler>
+                <on-error-continue>
+                    <logger level="ERROR" message="#[ import * from dw::Runtime --- 'Waiting for 10000ms' wait 10000]"/>
+                    <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
+                </on-error-continue>
+            </error-handler>
+        </try>
     </flow>
 
 </mule>
