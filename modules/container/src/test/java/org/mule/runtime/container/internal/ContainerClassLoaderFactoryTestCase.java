@@ -136,10 +136,10 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
     final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
-    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.sdk.api.connectivity.Foo"), sameInstance(CHILD_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.sdk.api.connectivity.Foo"), sameInstance(PARENT_FIRST));
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.omg.test.Bar"), sameInstance(PARENT_FIRST));
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.sdk.api.runtime.streaming.SomeStreaming"),
-               sameInstance(CHILD_FIRST));
+               sameInstance(PARENT_FIRST));
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.extension.validation.api.condition.SomeCondition"),
                instanceOf(ContainerOnlyLookupStrategy.class));
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.xml.sax.test.Bar"), sameInstance(PARENT_FIRST));
