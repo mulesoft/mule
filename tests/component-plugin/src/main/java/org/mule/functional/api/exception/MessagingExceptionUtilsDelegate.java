@@ -8,9 +8,9 @@ package org.mule.functional.api.exception;
 
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.config.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
-import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionUtils;
 

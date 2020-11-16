@@ -53,6 +53,7 @@ import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -108,7 +109,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   }
 
   private void mockErrorTypeLocator() {
-    ErrorTypeLocator typeLocator = ((PrivilegedMuleContext) muleContext).getErrorTypeLocator();
+    ErrorTypeLocator typeLocator = mock(ErrorTypeLocator.class);
+    ((ContributedErrorTypeLocator) ((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).setDelegate(typeLocator);
+
     ErrorType errorType = mock(ErrorType.class);
     when(errorType.getIdentifier()).thenReturn("ID");
     when(errorType.getNamespace()).thenReturn("NS");

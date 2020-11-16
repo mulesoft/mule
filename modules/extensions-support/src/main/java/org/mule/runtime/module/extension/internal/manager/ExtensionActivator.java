@@ -51,18 +51,15 @@ import java.util.stream.Stream;
  */
 public final class ExtensionActivator implements Startable, Stoppable {
 
-  private final ExtensionErrorsRegistrant extensionErrorsRegistrant;
   private final MuleContext muleContext;
   private final Set<Class<? extends Enum>> enumTypes = new HashSet<>();
   private final List<Object> lifecycleAwareElements = new LinkedList<>();
 
-  ExtensionActivator(ExtensionErrorsRegistrant extensionErrorsRegistrant, MuleContext muleContext) {
-    this.extensionErrorsRegistrant = extensionErrorsRegistrant;
+  ExtensionActivator(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
 
   void activateExtension(ExtensionModel extensionModel) {
-    extensionErrorsRegistrant.registerErrors(extensionModel);
     registerEnumTransformers(extensionModel);
     registerExpressionFunctions(extensionModel);
   }

@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -38,6 +39,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
  *
  * @since 4.0
  */
+@NoExtend
 public class ErrorTypeLocator {
 
   private final ExceptionMapper defaultExceptionMapper;
@@ -46,9 +48,9 @@ public class ErrorTypeLocator {
 
   private final LoadingCache<Pair<ComponentIdentifier, Class<? extends Throwable>>, ErrorType> componentErrorTypeCache;
 
-  private ErrorTypeLocator(ExceptionMapper defaultExceptionMapper,
-                           Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers,
-                           ErrorType defaultError) {
+  protected ErrorTypeLocator(ExceptionMapper defaultExceptionMapper,
+                             Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers,
+                             ErrorType defaultError) {
     this.defaultExceptionMapper = defaultExceptionMapper;
     this.componentExceptionMappers = componentExceptionMappers;
     this.defaultError = defaultError;

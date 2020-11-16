@@ -3,6 +3,17 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.privileged.exception.ErrorTypeLocator",
+          "new": "class org.mule.runtime.core.privileged.exception.ErrorTypeLocator",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "ErrorTypeLocator",
+          "elementKind": "class",
+          "justification": "MULE-18993: Had to make constructor protected"
+        },
+        {
           "code": "java.method.visibilityReduced",
           "old": "method void org.mule.runtime.core.privileged.exception.EventProcessingException::storeErrorTypeInfo(java.lang.Throwable)",
           "new": "method void org.mule.runtime.core.privileged.exception.EventProcessingException::storeErrorTypeInfo(java.lang.Throwable)",

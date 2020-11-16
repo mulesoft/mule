@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
-import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE;
@@ -21,10 +21,11 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_ID
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESPONSE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
+import org.mule.runtime.config.internal.error.ErrorTypeBuilder;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
+@Deprecated
 public class DefaultErrorTypeRepository implements ErrorTypeRepository {
 
   /**
@@ -75,8 +77,8 @@ public class DefaultErrorTypeRepository implements ErrorTypeRepository {
       ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(CRITICAL_IDENTIFIER)
           .parentErrorType(null).build();
 
-  private Map<ComponentIdentifier, ErrorType> errorTypes = new HashMap<>();
-  private Map<ComponentIdentifier, ErrorType> internalErrorTypes = new HashMap<>();
+  private final Map<ComponentIdentifier, ErrorType> errorTypes = new HashMap<>();
+  private final Map<ComponentIdentifier, ErrorType> internalErrorTypes = new HashMap<>();
 
   public DefaultErrorTypeRepository() {
     this.errorTypes.put(ANY, ANY_ERROR_TYPE);

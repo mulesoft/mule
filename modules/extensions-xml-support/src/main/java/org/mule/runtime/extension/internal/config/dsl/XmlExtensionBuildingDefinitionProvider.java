@@ -17,6 +17,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -158,7 +159,8 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
         .withSetterParameterDefinition("extensionModel", fromFixedValue(extensionModel).build())
         .withSetterParameterDefinition("operationModel", fromFixedValue(operationModel).build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .withSetterParameterDefinition("errorMappings", fromChildCollectionConfiguration(EnrichedErrorMapping.class).build())
+        .withSetterParameterDefinition(ERROR_MAPPINGS_PARAMETER_NAME,
+                                       fromChildCollectionConfiguration(EnrichedErrorMapping.class).build())
         .asPrototype().build());
   }
 

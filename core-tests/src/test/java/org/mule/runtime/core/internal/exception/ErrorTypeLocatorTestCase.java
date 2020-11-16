@@ -10,7 +10,8 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
+import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.getCoreErrorTypeRepo;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.EXCEPTION_MAPPINGS;
 
@@ -21,6 +22,7 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -28,7 +30,7 @@ import io.qameta.allure.Story;
 @Story(EXCEPTION_MAPPINGS)
 public class ErrorTypeLocatorTestCase extends AbstractMuleTestCase {
 
-  private final ErrorTypeRepository repository = new DefaultErrorTypeRepository();
+  private final ErrorTypeRepository repository = getCoreErrorTypeRepo();
 
   @Test
   public void useDefaultErrorWhenNoMappingFound() {

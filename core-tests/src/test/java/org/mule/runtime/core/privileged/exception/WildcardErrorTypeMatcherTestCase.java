@@ -11,20 +11,19 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_TYPES;
 
-import org.junit.Test;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.config.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.exception.AbstractErrorTypeMatcherTestCase;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
-import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
+
+import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -56,8 +55,12 @@ public class WildcardErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTe
   public void matchChild() {
     ComponentIdentifier customTransformerIdentifier =
         ComponentIdentifier.builder().name("custom").namespace(CORE_NAMESPACE_NAME).build();
-    ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
-    ErrorType customTransformerErrorType = errorTypeRepository.addErrorType(customTransformerIdentifier, transformationErrorType);
+    ErrorType customTransformerErrorType = ErrorTypeBuilder.builder()
+        .namespace(customTransformerIdentifier.getNamespace())
+        .identifier(customTransformerIdentifier.getName())
+        .parentErrorType(transformationErrorType)
+        .build();
+
     ErrorTypeMatcher transformationMatcher = new WildcardErrorTypeMatcher(identifierFromErrorType(transformationErrorType));
 
     assertThat(transformationMatcher.match(customTransformerErrorType), is(true));

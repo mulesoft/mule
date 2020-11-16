@@ -14,7 +14,7 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
@@ -78,7 +78,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySourceWrapper;
-import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.RestartContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.Restartable;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
