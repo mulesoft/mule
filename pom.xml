@@ -1168,7 +1168,7 @@
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-ext-jdk15on</artifactId>
+                <artifactId>bcprov-ext-jdk15to18</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
             <dependency>
