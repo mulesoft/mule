@@ -209,7 +209,7 @@
 /mule-standalone-${productVersion}/lib/opt/axiom-impl-1.2.14.jar
 /mule-standalone-${productVersion}/lib/opt/backport9-1.8.jar
 /mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.67.jar
-/mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.67.jar
+/mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15to18-1.67.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.67.jar
 /mule-standalone-${productVersion}/lib/opt/bcpkix-jdk15on-1.67.jar
 /mule-standalone-${productVersion}/lib/opt/btf-1.2.jar
