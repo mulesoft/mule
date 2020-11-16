@@ -31,8 +31,8 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
   private volatile FluxSinkRecorderDelegate<T> delegate = new NotYetAcceptedDelegate<>();
 
-  private static final boolean SAVE_STACK_TRACE_ON_COMPLETE =
-      getBoolean(SYSTEM_PROPERTY_PREFIX + "fluxSinkRecorder.saveStackTraceOnComplete");
+  private static final boolean PRINT_STACK_TRACE_ON_DROP =
+      getBoolean(SYSTEM_PROPERTY_PREFIX + "fluxSinkRecorder.printCompletionStackTraceOnDrop");
   private Throwable throwableToSaveStackTrace = null;
 
   public Flux<T> flux() {
@@ -60,14 +60,14 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
   }
 
   public void error(Throwable error) {
-    if (SAVE_STACK_TRACE_ON_COMPLETE) {
+    if (PRINT_STACK_TRACE_ON_DROP) {
       throwableToSaveStackTrace = new Throwable();
     }
     delegate.error(error);
   }
 
   public void complete() {
-    if (SAVE_STACK_TRACE_ON_COMPLETE) {
+    if (PRINT_STACK_TRACE_ON_DROP) {
       throwableToSaveStackTrace = new Throwable();
     }
     delegate.complete();
