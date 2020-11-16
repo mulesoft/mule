@@ -140,7 +140,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
       return failure(parameter.getType(), failure);
     } catch (ConnectionException e) {
       return failure(newFailure(e).withMessage("Failed to establish connection: " + ExceptionUtils.getMessage(e))
-          .withFailureCode(CONNECTION_FAILURE).onKeys());
+          .withFailureCode(CONNECTION_FAILURE).onComponent());
     } catch (Exception e) {
       return failure(parameter.getType(), newFailure(e).onParameter(parameter.getName()));
     }

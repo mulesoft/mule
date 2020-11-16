@@ -145,7 +145,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
       return failure(output.getType(), failure);
     } catch (ConnectionException e) {
       return failure(newFailure(e).withMessage("Failed to establish connection: " + ExceptionUtils.getMessage(e))
-          .withFailureCode(CONNECTION_FAILURE).onKeys());
+          .withFailureCode(CONNECTION_FAILURE).onComponent());
     } catch (Exception e) {
       return failure(output.getType(), newFailure(e).onOutputPayload());
     }
@@ -183,7 +183,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
       return failure(failure);
     } catch (ConnectionException e) {
       return failure(newFailure(e).withMessage("Failed to establish connection: " + ExceptionUtils.getMessage(e))
-          .withFailureCode(CONNECTION_FAILURE).onKeys());
+          .withFailureCode(CONNECTION_FAILURE).onComponent());
     } catch (Exception e) {
       return failure(newFailure(e).onOutputAttributes());
     }

@@ -9,6 +9,7 @@ package org.mule.runtime.module.tooling.internal.config;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
@@ -38,6 +39,7 @@ public class DefaultDeclarationSessionBuilder
         .put(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY,
              String.valueOf(!valueOf(getProperty(MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY, "false"))))
         .put(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, TRUE)
+        .put(MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY, TRUE)
         .build();
   }
 
