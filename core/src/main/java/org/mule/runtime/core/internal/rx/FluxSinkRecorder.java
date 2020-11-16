@@ -33,7 +33,7 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
   private static final boolean PRINT_STACK_TRACE_ON_DROP =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "fluxSinkRecorder.printCompletionStackTraceOnDrop");
-  private Throwable throwableToSaveStackTrace = null;
+  private String completionStackTrace = null;
 
   public Flux<T> flux() {
     return create(this)
@@ -52,25 +52,33 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
   }
 
   public void next(T response) {
-    if (throwableToSaveStackTrace != null) {
-      LOGGER.warn("Event will be dropped {}\nCompletion StackTrace:", response);
-      throwableToSaveStackTrace.printStackTrace();
+    if (completionStackTrace != null) {
+      LOGGER.warn("Event will be dropped {}\nCompletion StackTrace:\n{}", response, completionStackTrace);
     }
     delegate.next(response);
   }
 
   public void error(Throwable error) {
     if (PRINT_STACK_TRACE_ON_DROP) {
-      throwableToSaveStackTrace = new Throwable();
+      completionStackTrace = getStackTraceAsString();
     }
     delegate.error(error);
   }
 
   public void complete() {
     if (PRINT_STACK_TRACE_ON_DROP) {
-      throwableToSaveStackTrace = new Throwable();
+      completionStackTrace = getStackTraceAsString();
     }
     delegate.complete();
+  }
+
+  private String getStackTraceAsString() {
+    StringBuilder sb = new StringBuilder();
+    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+    for (StackTraceElement element : stackTrace) {
+      sb.append('\t').append(element).append('\n');
+    }
+    return sb.toString();
   }
 
   private interface FluxSinkRecorderDelegate<T> extends Consumer<FluxSink<T>> {
