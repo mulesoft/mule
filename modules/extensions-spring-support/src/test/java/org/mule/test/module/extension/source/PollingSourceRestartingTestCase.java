@@ -35,7 +35,7 @@ import org.junit.Test;
 public class PollingSourceRestartingTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static int PROBER_TIMEOUT = 30000;
-  private static int CHECK_NOT_PROBER_TIMEOUT = 30000;
+  private static int CHECK_NOT_PROBER_TIMEOUT = 5000;
   private static int PROBER_FREQUENCY = 500;
 
   protected static final Map<String, Object> EXTENSION_LOADER_CONTEXT_ADDITIONAL_PARAMS = new HashMap<String, Object>() {

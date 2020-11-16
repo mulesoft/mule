@@ -32,14 +32,14 @@ public class PollingSourceLimitingTestCase extends AbstractExtensionFunctionalTe
   private static int PROBER_FREQUENCY = 500;
   private static int NUMBER_OF_PETS = 7;
 
-  protected static final Map<String, Object> EXTENSION_LOADER_CONTEXT_ADDITIONAL_PARAMS = new HashMap<String, Object>() {
+  private static final Map<String, Object> EXTENSION_LOADER_CONTEXT_ADDITIONAL_PARAMS = new HashMap<String, Object>() {
 
     {
       put(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
     }
   };
 
-  protected static MultiMap<Integer, String> ADOPTIONS = new MultiMap<>();
+  private static MultiMap<Integer, String> ADOPTIONS = new MultiMap<>();
 
   public static class AdoptionProcessor implements Processor {
 
