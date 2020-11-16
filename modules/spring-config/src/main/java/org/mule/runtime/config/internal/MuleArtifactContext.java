@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.newSetFromMap;
@@ -14,6 +15,7 @@ import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
@@ -23,6 +25,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.validate;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
@@ -60,6 +63,8 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.validation.ValidationResult;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
@@ -79,8 +84,6 @@ import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -97,6 +100,7 @@ import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
@@ -136,15 +140,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   private final OptionalObjectsController optionalObjectsController;
   private final Map<String, String> artifactProperties;
-  private final ArtifactDeclaration artifactDeclaration;
   private final Optional<ConfigurationProperties> parentConfigurationProperties;
   private final DefaultRegistry serviceDiscoverer;
   private final DefaultResourceLocator resourceLocator;
   private final ApplicationModel applicationModel;
   private final MuleContextWithRegistry muleContext;
-  private final ConfigResource[] artifactConfigResources;
   private final BeanDefinitionFactory beanDefinitionFactory;
-  private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private final ArtifactType artifactType;
   protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator(componentName -> {
     try {
@@ -181,11 +182,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;
-    this.artifactConfigResources = artifactConfigResources;
     this.optionalObjectsController = optionalObjectsController;
     this.artifactProperties = artifactProperties;
     this.artifactType = artifactType;
-    this.artifactDeclaration = artifactDeclaration;
     this.parentConfigurationProperties = parentConfigurationProperties;
     this.disableXmlValidations = disableXmlValidations;
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
@@ -198,7 +197,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
                                   componentBuildingDefinitionRegistryFactory.create(getExtensions()));
 
-    this.applicationModel = createApplicationModel();
+    this.applicationModel = createApplicationModel(artifactDeclaration, artifactConfigResources);
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -214,7 +213,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     });
   }
 
-  private ApplicationModel createApplicationModel() {
+  private ApplicationModel createApplicationModel(ArtifactDeclaration artifactDeclaration,
+                                                  ConfigResource[] artifactConfigResources) {
     try {
       final ArtifactAst artifactAst;
 
@@ -280,14 +280,39 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         artifactAst = toArtifactast(artifactDeclaration, getExtensions());
       }
 
-      return new ApplicationModel(artifactAst,
-                                  artifactProperties, parentConfigurationProperties,
-                                  new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader()));
+      // TODO validate the AST instead of the model
+      return (ApplicationModel) validateModel(new ApplicationModel(artifactAst,
+                                                                   artifactProperties, parentConfigurationProperties,
+                                                                   new ClassLoaderResourceProvider(muleContext
+                                                                       .getExecutionClassLoader())));
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  private String compToLoc(ComponentAst component) {
+    return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
+        + component.getMetadata().getStartLine().orElse(-1) + "]";
+  }
+
+  private ArtifactAst validateModel(ArtifactAst appModel) {
+    final ValidationResult validation = validate(appModel);
+
+    final Collection<ValidationResultItem> items = validation.getItems();
+    if (!items.isEmpty()) {
+
+      final String allMessages = validation.getItems()
+          .stream()
+          .map(v -> compToLoc(v.getComponent()) + ": " + v.getMessage())
+          .collect(joining(lineSeparator()));
+
+
+      throw new MuleRuntimeException(createStaticMessage(allMessages));
+    }
+
+    return appModel;
   }
 
   public void initialize() {
