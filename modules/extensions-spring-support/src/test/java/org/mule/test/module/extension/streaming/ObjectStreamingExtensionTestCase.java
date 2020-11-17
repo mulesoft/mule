@@ -35,6 +35,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
+
 @Feature(STREAMING)
 @Story(OBJECT_STREAMING)
 public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
@@ -99,7 +102,13 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
     assertThat(stream, is(instanceOf(ConsumerStreamingIterator.class)));
 
     ConsumerStreamingIterator streamingIterator = (ConsumerStreamingIterator) stream;
-    assertThat(streamingIterator.hasNext(), is(false));
+
+    new PollingProber(1000, 100)
+        .check(new JUnitLambdaProbe(() -> {
+          assertThat(streamingIterator.hasNext(), is(false));
+          return true;
+        }));
+
     expectedException.expect(new BaseMatcher<Throwable>() {
 
       @Override
