@@ -615,6 +615,7 @@ public class HeisenbergOperations implements Disposable {
     if (fail) {
       throw new MuleRuntimeException(createStaticMessage("Failed returning the config"));
     }
+    System.out.println("Hola");
     return config;
   }
 }

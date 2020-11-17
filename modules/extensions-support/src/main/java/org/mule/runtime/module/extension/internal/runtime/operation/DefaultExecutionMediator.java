@@ -168,12 +168,12 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
       @Override
       public void error(Throwable t) {
-        if (stats != null) {
-          stats.discountInflightOperation();
-        }
         try {
           t = handleError(t, context);
         } finally {
+          if (stats != null) {
+            stats.discountInflightOperation();
+          }
           executorCallback.error(t);
         }
       }

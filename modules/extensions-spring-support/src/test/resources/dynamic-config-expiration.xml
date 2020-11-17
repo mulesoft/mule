@@ -137,6 +137,7 @@
                 </on-error-continue>
             </error-handler>
         </try>
+        <logger level="ERROR" message="#[ import * from dw::Runtime --- 'Waiting for 10000ms' wait 10000]"/>
     </flow>
 
 </mule>
