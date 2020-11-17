@@ -19,6 +19,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -29,6 +30,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 import org.mule.tck.junit4.matcher.EventMatcher;
@@ -40,6 +42,7 @@ import java.util.function.Function;
 
 import org.hamcrest.Matcher;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
 /**
  * Provides a fluent API for running events through flows.
@@ -214,7 +217,17 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   }
 
   private ExecutionCallback<CoreEvent> getFlowRunCallback() {
-    return just(getOrBuildEvent()).transform(flow::apply)::blockFirst;
+    return () -> {
+      Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>(null);
+
+      CoreEvent result = Flux.<CoreEvent>create(fluxSink -> {
+        fluxSink.next(getOrBuildEvent());
+        sinkReference.set(fluxSink);
+      }).transform(flow::apply).blockFirst();
+
+      sinkReference.get().complete();
+      return result;
+    };
   }
 
   private ExecutionCallback<CoreEvent> getFlowDispatchCallback() {
