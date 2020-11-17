@@ -4397,6 +4397,7 @@
           "notifications": [],
           "sampleDataProviderModel": {
             "actingParameters": [],
+            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -13830,6 +13831,7 @@
           "notifications": [],
           "sampleDataProviderModel": {
             "actingParameters": [],
+            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -20366,6 +20368,7 @@
           "notifications": [],
           "sampleDataProviderModel": {
             "actingParameters": [],
+            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -27755,6 +27758,7 @@
           "notifications": [],
           "sampleDataProviderModel": {
             "actingParameters": [],
+            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
