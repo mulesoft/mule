@@ -79,7 +79,15 @@ public class ModuleExtensionModelJsonTestCase extends AbstractMuleTestCase {
     final List<String> extensions = new ArrayList<String>() {
 
       {
+        add("module-calling-operations-within-module");
+        add("module-capitalized-name");
+        add("module-documentation");
+        add("module-global-element");
+        add("module-global-element-default");
         add("module-json-custom-types");
+        add("module-properties");
+        add("module-stereotypes");
+        add("module-xsd-custom-types");
       }
     };
 
