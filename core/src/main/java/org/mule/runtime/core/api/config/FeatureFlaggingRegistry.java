@@ -7,18 +7,54 @@
 
 package org.mule.runtime.core.api.config;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 /**
  * @TODO document
+ *
  * @since 4.4.0
  */
-public interface FeatureFlaggingRegistry {
+public class FeatureFlaggingRegistry {
 
-  void registerFeature(String feature, Predicate<MuleContext> condition);
+  private final Map<String, Predicate<MuleContext>> configurations = new ConcurrentHashMap<>();
 
-  Map<String, Predicate<MuleContext>> getFeatureConfigurations();
+  private static final FeatureFlaggingRegistry INSTANCE = new FeatureFlaggingRegistry();
+
+  public static final FeatureFlaggingRegistry getInstance() {
+    return INSTANCE;
+  }
+
+  private FeatureFlaggingRegistry() {}
+
+  public void registerFeature(String feature, Predicate<MuleContext> condition) {
+    if (isNullOrEmpty(feature)) {
+      throw new MuleRuntimeException(createStaticMessage("Invalid feature name"));
+    }
+
+    if (condition == null) {
+      throw new MuleRuntimeException(createStaticMessage("Error registering %s: condition must not be null", feature));
+    }
+
+    Predicate<MuleContext> added = configurations.putIfAbsent(feature, condition);
+    if (added != null) {
+      throw new MuleRuntimeException(createStaticMessage("Feature %s already registered", feature));
+    }
+  }
+
+  public Map<String, Predicate<MuleContext>> getFeatureConfigurations() {
+    return unmodifiableMap(configurations);
+  }
+
+  protected void clearFeatureConfigurations() {
+    configurations.clear();
+  }
 }

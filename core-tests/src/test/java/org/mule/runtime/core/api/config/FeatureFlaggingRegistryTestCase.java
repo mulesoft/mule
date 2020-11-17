@@ -5,23 +5,23 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.config;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
-import org.mule.tck.size.SmallTest;
+package org.mule.runtime.core.api.config;
 
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.tck.size.SmallTest;
+
 @SmallTest
-public class DefaultFeatureFlaggingRegistryTestCase {
+public class FeatureFlaggingRegistryTestCase {
 
   private static final String SOME_FEATURE = "SOME_FEATURE";
 
@@ -32,7 +32,12 @@ public class DefaultFeatureFlaggingRegistryTestCase {
 
   @Before
   public void setUp() {
-    featureFlaggingRegistry = new DefaultFeatureFlaggingRegistry();
+    featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+  }
+
+  @After
+  public void after() {
+    featureFlaggingRegistry.clearFeatureConfigurations();
   }
 
   @Test
