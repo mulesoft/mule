@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.setValueIntoField;
-
+import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILURE;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
@@ -70,7 +70,13 @@ public class ValueProviderFactory {
       injectValueProviderFields(resolver);
 
       if (factoryModelProperty.usesConnection()) {
-        Object connection = connectionSupplier.get();
+        Object connection;
+        try {
+          connection = connectionSupplier.get();
+        } catch (Exception e) {
+          throw new ValueResolvingException("Failed to establish connection: " + e.getMessage(), CONNECTION_FAILURE, e);
+        }
+
         if (connection == null) {
           throw new ValueResolvingException("The value provider requires a connection and none was provided",
                                             MISSING_REQUIRED_PARAMETERS);

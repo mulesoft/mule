@@ -8,10 +8,12 @@ package org.mule.runtime.module.tooling.internal.config;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.CONNECTION_FAILURE;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
@@ -34,6 +36,9 @@ import org.mule.runtime.module.repository.api.BundleNotFoundException;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.internal.AbstractArtifactAgnosticService;
 import org.mule.runtime.module.tooling.internal.ApplicationSupplier;
+import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
+import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
+import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
 
 import java.util.function.Function;
 
@@ -124,6 +129,19 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
     } catch (BundleNotFoundException e) {
       throw e;
     } catch (NoClassDefFoundError | Exception e) {
+      if (isOAuthRootCauseException(e)) {
+        LOGGER.error(format("OAuth Service error while resolving values on component: '%s:%s' for providerName: '%s'",
+                            component.getDeclaringExtension(),
+                            component.getName(), providerName),
+                     e);
+
+        return resultFrom(newFailure()
+            .withFailureCode(CONNECTION_FAILURE.getName())
+            .withMessage(getRootCauseMessage(e))
+            .withReason(getStackTrace(e))
+            .build());
+      }
+
       LOGGER.error(format("Unknown error while resolving values on component: '%s:%s' for providerName: '%s'",
                           component.getDeclaringExtension(),
                           component.getName(), providerName),
@@ -145,6 +163,19 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
     } catch (BundleNotFoundException e) {
       throw e;
     } catch (NoClassDefFoundError | Exception e) {
+      if (isOAuthRootCauseException(e)) {
+        LOGGER.error(format("OAuth Service error while resolving metadata keys on component: '%s:%s'",
+                            component.getDeclaringExtension(),
+                            component.getName()),
+                     e);
+
+        return MetadataResult.failure(MetadataFailure.Builder.newFailure()
+            .withFailureCode(CONNECTION_FAILURE)
+            .withMessage(getRootCauseMessage(e))
+            .withReason(getStackTrace(e))
+            .onKeys());
+      }
+
       LOGGER.error(format("Unknown error while resolving metadata keys on component: '%s:%s'", component.getDeclaringExtension(),
                           component.getName()),
                    e);
@@ -165,6 +196,19 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
     } catch (BundleNotFoundException e) {
       throw e;
     } catch (NoClassDefFoundError | Exception e) {
+      if (isOAuthRootCauseException(e)) {
+        LOGGER
+            .error(format("OAuth Service error while resolving metadata on component: '%s:%s'", component.getDeclaringExtension(),
+                          component.getName()),
+                   e);
+
+        return MetadataResult.failure(MetadataFailure.Builder.newFailure()
+            .withFailureCode(CONNECTION_FAILURE)
+            .withMessage(getRootCauseMessage(e))
+            .withReason(getStackTrace(e))
+            .onComponent());
+      }
+
       LOGGER.error(format("Unknown error while resolving metadata on component: '%s:%s'", component.getDeclaringExtension(),
                           component.getName()),
                    e);
@@ -185,6 +229,19 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
     } catch (BundleNotFoundException e) {
       throw e;
     } catch (NoClassDefFoundError | Exception e) {
+      if (isOAuthRootCauseException(e)) {
+        LOGGER.error(format("OAuth Service error while retrieving sample data on component: '%s:%s'",
+                            component.getDeclaringExtension(),
+                            component.getName()),
+                     e);
+
+        return SampleDataResult.resultFrom(SampleDataFailure.Builder.newFailure(e)
+            .withFailureCode(CONNECTION_FAILURE.getName())
+            .withMessage(getRootCauseMessage(e))
+            .withReason(getStackTrace(e))
+            .build());
+      }
+
       LOGGER.error(format("Unknown error while retrieving sample data on component: '%s:%s'", component.getDeclaringExtension(),
                           component.getName()),
                    e);
@@ -195,6 +252,13 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
           .withReason(getStackTrace(e))
           .build());
     }
+  }
+
+  private boolean isOAuthRootCauseException(Throwable e) {
+    Throwable rootCause = getRootCause(e);
+    return rootCause instanceof TokenUrlResponseException ||
+        rootCause instanceof TokenNotFoundException ||
+        rootCause instanceof RequestAuthenticationException;
   }
 
   @Override
