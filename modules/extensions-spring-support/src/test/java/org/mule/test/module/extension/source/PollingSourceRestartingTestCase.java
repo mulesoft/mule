@@ -124,7 +124,7 @@ public class PollingSourceRestartingTestCase extends AbstractExtensionFunctional
     startFlow(flowName);
     beginLatch.await();
     stopFlow(flowName);
-    check(5000, 1000, () -> getFlowConstruct(flowName).getLifecycleState().isStopped());
+    check(PROBER_TIMEOUT, PROBER_FREQUENCY, () -> getFlowConstruct(flowName).getLifecycleState().isStopped());
     startFlow(flowName);
 
     waitForAllPetsToBeAdopted(expectedPets);
