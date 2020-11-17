@@ -6002,6 +6002,37 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": "false",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "fail",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
@@ -6035,7 +6066,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4
+                    "order": 2
                   },
                   "allowedStereotypeModels": [
                     {
@@ -6057,7 +6088,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 0
+                "order": 1
               },
               "showInDsl": false,
               "name": "General",
@@ -6086,7 +6117,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -6118,7 +6149,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -6135,7 +6166,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "showInDsl": false,
               "name": "Output",
@@ -6234,7 +6265,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 5,
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
@@ -6262,7 +6293,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2
+                "order": 3
               },
               "showInDsl": false,
               "name": "Error Mappings",

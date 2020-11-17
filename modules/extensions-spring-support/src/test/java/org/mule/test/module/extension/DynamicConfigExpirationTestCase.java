@@ -31,6 +31,9 @@ import org.junit.Test;
 
 public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctionalTestCase {
 
+  private static final int PROBER_TIMEOUT = 20000;
+  private static final int POLLING_FREQUENCY = 2500;
+
   @Inject
   @Named("sourceWithDynamicConfig")
   public Flow sourceWithDynamicConfig;
@@ -118,7 +121,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   @Test
   public void dynamicConfigIsExpiredBeforeFlowEnds() throws Exception {
     flowRunner("dynamicConfigIsExpiredBeforeFlowEnds").withPayload("Walter Blanco").run();
-    check(15000, 2500, () -> {
+    check(PROBER_TIMEOUT, POLLING_FREQUENCY, () -> {
       synchronized (disposedStatuses) {
         return disposedStatuses.size() == 2;
       }
@@ -127,9 +130,9 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   }
 
   @Test
-  public void dynamicConfigIsExpiredBeforeFlowWithErrorHandlerEnds() throws Exception {
-    flowRunner("dynamicConfigIsExpiredBeforeFlowWithErrorHandlerEnds").withPayload("Walter Blanco").run();
-    check(15000, 2500, () -> {
+  public void dynamicConfigIsExpiredBeforeFlowEndsWhenOperationFails() throws Exception {
+    flowRunner("dynamicConfigIsExpiredBeforeFlowEndsWhenOperationFails").run();
+    check(PROBER_TIMEOUT, POLLING_FREQUENCY, () -> {
       synchronized (disposedStatuses) {
         return disposedStatuses.size() == 2;
       }

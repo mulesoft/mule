@@ -123,11 +123,13 @@
         <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
     </flow>
 
-    <flow name="dynamicConfigIsExpiredBeforeFlowWithErrorHandlerEnds">
+    <flow name="dynamicConfigIsExpiredBeforeFlowEndsWhenOperationFails">
         <try>
+            <set-payload value="Walter Blanco"/>
             <heisenberg:get-config config-ref="heisenbergWithCustomExpiration"/>
             <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
-            <raise-error description="Custom error occurred." type="CUSTOM:CUSTOM"/>
+            <set-payload value="Walter Blanco"/>
+            <heisenberg:get-config config-ref="heisenbergWithCustomExpiration" fail="true"/>
             <error-handler>
                 <on-error-continue>
                     <logger level="ERROR" message="#[ import * from dw::Runtime --- 'Waiting for 10000ms' wait 10000]"/>
