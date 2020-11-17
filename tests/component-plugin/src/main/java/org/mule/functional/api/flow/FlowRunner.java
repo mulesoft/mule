@@ -220,10 +220,19 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
     return () -> {
       Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>(null);
 
-      CoreEvent result = Flux.<CoreEvent>create(fluxSink -> {
-        fluxSink.next(getOrBuildEvent());
-        sinkReference.set(fluxSink);
-      }).transform(flow::apply).blockFirst();
+      CoreEvent result;
+      try {
+        result = Flux.<CoreEvent>create(fluxSink -> {
+          fluxSink.next(getOrBuildEvent());
+          sinkReference.set(fluxSink);
+        }).transform(flow::apply).blockFirst();
+      } catch (RuntimeException ex) {
+        if (ex.getCause() instanceof MuleException) {
+          throw (MuleException) ex.getCause();
+        } else {
+          throw ex;
+        }
+      }
 
       sinkReference.get().complete();
       return result;
