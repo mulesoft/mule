@@ -13,8 +13,8 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromParameterAst;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
@@ -172,7 +172,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
       if (parameterModel.getDslConfiguration().allowsInlineDefinition()) {
         paramsDefinitions.add(newBuilder()
             .withKey(parameterModel.getName())
-            .withAttributeDefinition(fromParameterAst(parameterModel.getName()).build())
+            .withAttributeDefinition(fromSimpleParameter(parameterModel.getName()).build())
             .build());
 
         definitions.add(baseDefinition
@@ -182,7 +182,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
       } else {
         paramsDefinitions.add(newBuilder()
             .withKey(parameterModel.getName())
-            .withAttributeDefinition(fromParameterAst(parameterModel.getName()).build())
+            .withAttributeDefinition(fromSimpleParameter(parameterModel.getName()).build())
             .build());
       }
     }
