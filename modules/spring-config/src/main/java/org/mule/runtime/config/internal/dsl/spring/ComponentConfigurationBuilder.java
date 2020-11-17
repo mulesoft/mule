@@ -274,6 +274,13 @@ class ComponentConfigurationBuilder<T> {
       valueConsumer.accept(managedMap);
     }
 
+    @Override
+    public void onParameterAst(String parameter) {
+      ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
+      valueExtractor.onParameterAst(parameter);
+      valueConsumer.accept(valueExtractor.getValue());
+    }
+
   }
 
   /**
@@ -464,6 +471,14 @@ class ComponentConfigurationBuilder<T> {
     public void onMultipleValues(KeyAttributeDefinitionPair[] definitions) {
       for (KeyAttributeDefinitionPair definition : definitions) {
         definition.getAttributeDefinition().accept(this);
+      }
+    }
+
+    @Override
+    public void onParameterAst(String parameterAst) {
+      if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(parameterAst)) {
+        getParameterValue(parameterAst, null)
+            .ifPresent(parameterValue -> this.value = parameterValue);
       }
     }
   }

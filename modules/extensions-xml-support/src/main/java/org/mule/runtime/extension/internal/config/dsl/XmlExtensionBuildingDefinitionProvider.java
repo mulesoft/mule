@@ -7,16 +7,14 @@
 package org.mule.runtime.extension.internal.config.dsl;
 
 import static java.util.Collections.emptySet;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromParameterAst;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
@@ -171,14 +169,10 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
     final List<ParameterModel> allParameterModels = operationModel.getAllParameterModels();
     for (ParameterModel parameterModel : allParameterModels) {
-      if (parameterModel.getDslConfiguration().allowsInlineDefinition() &&
-          parameterModel.getRole() != BEHAVIOUR) {
+      if (parameterModel.getDslConfiguration().allowsInlineDefinition()) {
         paramsDefinitions.add(newBuilder()
             .withKey(parameterModel.getName())
-            .withAttributeDefinition(fromChildConfiguration(String.class)
-                .withIdentifier(dslSyntaxResolver.resolve(parameterModel)
-                    .getElementName())
-                .withDefaultValue(parameterModel.getDefaultValue()).build())
+            .withAttributeDefinition(fromParameterAst(parameterModel.getName()).build())
             .build());
 
         definitions.add(baseDefinition
@@ -188,10 +182,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
       } else {
         paramsDefinitions.add(newBuilder()
             .withKey(parameterModel.getName())
-            .withAttributeDefinition(fromSimpleParameter(dslSyntaxResolver.resolve(parameterModel)
-                .getAttributeName())
-                    .withDefaultValue(parameterModel.getDefaultValue())
-                    .build())
+            .withAttributeDefinition(fromParameterAst(parameterModel.getName()).build())
             .build());
       }
     }

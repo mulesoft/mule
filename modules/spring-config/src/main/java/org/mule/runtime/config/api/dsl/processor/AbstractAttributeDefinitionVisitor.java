@@ -91,6 +91,11 @@ public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVi
     doOnOperation("onReferenceSimpleParameter");
   }
 
+  @Override
+  public void onParameterAst(String parameterAst) {
+    doOnOperation("onParameterAst");
+  }
+
   protected void doOnOperation(String operation) {
     // Do nothing.
   }
