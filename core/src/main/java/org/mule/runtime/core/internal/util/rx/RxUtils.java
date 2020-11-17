@@ -181,6 +181,7 @@ public class RxUtils {
    * @param completionTimeoutMillis how long to wait for pending items to finish processing before actually propagating the
    *        completion or cancellation downstream.
    * @param delayedExecutor the executor that will delay the completion or cancellation propagation when there are pending items
+   * @param dslSource DSL source of the caller object. It's logged when the propagation is done by the delayedExecutor
    * @return an enriched downstream where items and events will be triggered according to the rules defined for this method.
    */
   public static <T, U> Publisher<T> propagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
