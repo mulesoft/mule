@@ -21,18 +21,21 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -58,6 +61,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
@@ -65,6 +69,7 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
@@ -475,7 +480,7 @@ public final class XmlExtensionLoaderDelegate {
 
     ExtensionDeclarer temporalPublicOpsDeclarer = new ExtensionDeclarer();
     fillDeclarer(temporalPublicOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
-    loadOperationsFrom(temporalPublicOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
+    loadOperationsFrom(empty(), temporalPublicOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                        OperationVisibility.PUBLIC, empty());
 
     validateNoCycles(directedGraph);
@@ -490,13 +495,13 @@ public final class XmlExtensionLoaderDelegate {
     // loading private operations
     if (comesFromTNS) {
       // when parsing for the TNS, we need the <operation/>s to be part of the extension model to validate the XML properly
-      loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
+      loadOperationsFrom(empty(), hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
                          OperationVisibility.PRIVATE, empty());
     } else {
       // when parsing for the macro expansion, the <operation/>s will be left in the PrivateOperationsModelProperty model property
       ExtensionDeclarer temporalPrivateOpsDeclarer = new ExtensionDeclarer();
       fillDeclarer(temporalPrivateOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
-      loadOperationsFrom(temporalPrivateOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
+      loadOperationsFrom(empty(), temporalPrivateOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                          OperationVisibility.PRIVATE, empty());
       final ExtensionModel privateTnsExtensionModel = createExtensionModel(temporalPrivateOpsDeclarer);
       moduleModel = enrichRecursively(moduleModel, privateTnsExtensionModel);
@@ -512,9 +517,9 @@ public final class XmlExtensionLoaderDelegate {
     // public or private.
     ExtensionDeclarer temporalAllOpsDeclarer = new ExtensionDeclarer();
     fillDeclarer(temporalAllOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
-    loadOperationsFrom(temporalAllOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
+    loadOperationsFrom(empty(), temporalAllOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                        OperationVisibility.PRIVATE, empty());
-    loadOperationsFrom(temporalAllOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
+    loadOperationsFrom(empty(), temporalAllOpsDeclarer, moduleModel, directedGraph, xmlDslModel,
                        OperationVisibility.PUBLIC, empty());
 
     Optional<ExtensionModel> allTnsExtensionModel = empty();
@@ -525,7 +530,7 @@ public final class XmlExtensionLoaderDelegate {
       // extension model.
     }
 
-    loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
+    loadOperationsFrom(of(declarer), hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel,
                        OperationVisibility.PUBLIC, allTnsExtensionModel);
   }
 
@@ -883,7 +888,8 @@ public final class XmlExtensionLoaderDelegate {
     return testConnectionComponentModels.stream().findFirst();
   }
 
-  private void loadOperationsFrom(HasOperationDeclarer declarer, ComponentAst moduleModel,
+  private void loadOperationsFrom(Optional<ExtensionDeclarer> extensionDeclarer,
+                                  HasOperationDeclarer declarer, ComponentAst moduleModel,
                                   Graph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel,
                                   final OperationVisibility visibility, Optional<ExtensionModel> tnsExtensionModel) {
 
@@ -891,11 +897,13 @@ public final class XmlExtensionLoaderDelegate {
         .filter(child -> child.getIdentifier().equals(OPERATION_IDENTIFIER))
         .filter(operationModel -> operationModel.getParameter(ATTRIBUTE_VISIBILITY).getValue().getRight()
             .equals(visibility.toString()))
-        .forEach(operationModel -> extractOperationExtension(declarer, operationModel, directedGraph, xmlDslModel,
+        .forEach(operationModel -> extractOperationExtension(extensionDeclarer, declarer, operationModel, directedGraph,
+                                                             xmlDslModel,
                                                              tnsExtensionModel));
   }
 
-  private void extractOperationExtension(HasOperationDeclarer declarer, ComponentAst operationModel,
+  private void extractOperationExtension(Optional<ExtensionDeclarer> extensionDeclarer,
+                                         HasOperationDeclarer declarer, ComponentAst operationModel,
                                          Graph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel,
                                          Optional<ExtensionModel> tnsExtensionModel) {
     String operationName = operationModel.getComponentId().orElse(null);
@@ -924,7 +932,7 @@ public final class XmlExtensionLoaderDelegate {
                       getDeclarationOutputFor(operationName));
     extractOutputType(operationDeclarer.withOutputAttributes(), OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER, operationModel,
                       getDeclarationOutputAttributesFor(operationName));
-    declareErrorModels(operationDeclarer, xmlDslModel, operationName, operationModel);
+    declareErrorModels(extensionDeclarer, operationDeclarer, xmlDslModel, operationName, operationModel);
   }
 
   private Optional<MetadataType> getDeclarationOutputFor(String operationName) {
@@ -1106,28 +1114,65 @@ public final class XmlExtensionLoaderDelegate {
     return metadataType.get();
   }
 
-  private void declareErrorModels(OperationDeclarer operationDeclarer, XmlDslModel xmlDslModel, String operationName,
+  private void declareErrorModels(Optional<ExtensionDeclarer> extensionDeclarer,
+                                  OperationDeclarer operationDeclarer, XmlDslModel xmlDslModel, String operationName,
                                   ComponentAst operationModel) {
-    Optional<ComponentAst> optionalParametersComponentModel = operationModel.directChildrenStream()
+    Optional<ComponentAst> optionalErrorsComponentModel = operationModel.directChildrenStream()
         .filter(child -> child.getIdentifier().equals(OPERATION_ERRORS_IDENTIFIER)).findAny();
-    optionalParametersComponentModel.ifPresent(componentModel -> componentModel.directChildrenStream()
+    optionalErrorsComponentModel.ifPresent(componentModel -> componentModel.directChildrenStream()
         .filter(child -> child.getIdentifier().equals(OPERATION_ERROR_IDENTIFIER))
         .forEach(param -> {
           final String namespace = xmlDslModel.getPrefix().toUpperCase();
-          param.getRawParameterValue(ERROR_TYPE_ATTRIBUTE)
-              .map(tn -> {
-                if (tn.contains(NAMESPACE_SEPARATOR)) {
-                  throw new IllegalModelDefinitionException(format("The operation [%s] cannot have an <error> [%s] that contains a reserved character [%s]",
-                                                                   operationName, tn,
-                                                                   NAMESPACE_SEPARATOR));
-                }
-                return operationDeclarer.withErrorModel(ErrorModelBuilder.newError(tn, namespace)
-                    .withParent(ErrorModelBuilder.newError(ANY).build())
-                    .build());
-              })
-              .orElseThrow(() -> new IllegalModelDefinitionException(format("The operation [%s] cannot have an <error> with an empty 'type' attribute",
-                                                                            operationName)));
+          final String errorType = (String) param.getParameter(ERROR_TYPE_ATTRIBUTE).getValue().getRight();;
+
+          if (errorType.contains(NAMESPACE_SEPARATOR)) {
+            throw new IllegalModelDefinitionException(format("The operation [%s] cannot have an <error> [%s] that contains a reserved character [%s]",
+                                                             operationName, errorType,
+                                                             NAMESPACE_SEPARATOR));
+          }
+          final ErrorModel errorModel = ErrorModelBuilder.newError(errorType, namespace)
+              .withParent(ErrorModelBuilder.newError(ANY).build())
+              .build();
+          operationDeclarer.withErrorModel(errorModel);
+          extensionDeclarer.ifPresent(ext -> ext.withErrorModel(errorModel));
         }));
+
+    // Add error models for error types used in raise and error mapping for completeness of the extension model.
+    extensionDeclarer.ifPresent(ext -> {
+      operationModel.recursiveStream()
+          .forEach(comp -> {
+            if (comp.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
+              final ComponentParameterAst parameter = comp.getParameter(ERROR_TYPE_ATTRIBUTE);
+
+              if (parameter != null) {
+                parameter.getValue().getValue()
+                    .map(r -> (String) r)
+                    // We can just ignore this as we should allow an empty value here
+                    .filter(representation -> !isEmpty(representation))
+                    .ifPresent(representation -> {
+                      ComponentIdentifier raiseType = buildFromStringRepresentation(representation);
+                      ext.withErrorModel(ErrorModelBuilder.newError(raiseType.getName(), raiseType.getNamespace())
+                          .withParent(ErrorModelBuilder.newError(ANY).build())
+                          .build());
+                    });
+              }
+            }
+
+            forEachErrorMappingDo(comp, mappings -> mappings
+                .forEach(mapping -> {
+                  final String representation = mapping.getTarget();
+                  if (isEmpty(representation)) {
+                    // We can just ignore this as it will be validated afterwards
+                    return;
+                  }
+
+                  ComponentIdentifier target = buildFromStringRepresentation(representation);
+                  ext.withErrorModel(ErrorModelBuilder.newError(target.getName(), target.getNamespace())
+                      .withParent(ErrorModelBuilder.newError(ANY).build())
+                      .build());
+                }));
+          });
+    });
   }
 
   /**

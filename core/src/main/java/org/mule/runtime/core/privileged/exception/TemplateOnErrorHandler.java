@@ -9,6 +9,7 @@ package org.mule.runtime.core.privileged.exception;
 import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.stream;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
@@ -22,6 +23,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -383,9 +385,13 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
               // errorType if not present in the repository already.
               if (configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false)) {
                 return errorTypeRepository.addErrorType(errorTypeComponentIdentifier, errorTypeRepository.getAnyErrorType());
+              } else if (getBoolean(MULE_LAX_ERROR_TYPES)) {
+                LOGGER.warn("Could not find ErrorType for the given identifier: {}", parsedIdentifier);
+                return errorTypeRepository.addErrorType(errorTypeComponentIdentifier, errorTypeRepository.getAnyErrorType());
+              } else {
+                throw new MuleRuntimeException(createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
+                                                                   parsedIdentifier));
               }
-              throw new MuleRuntimeException(createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
-                                                                 parsedIdentifier));
             }));
       }
 
