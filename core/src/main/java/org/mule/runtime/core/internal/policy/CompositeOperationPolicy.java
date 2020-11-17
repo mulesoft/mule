@@ -152,8 +152,8 @@ public class CompositeOperationPolicy
     return from(propagateCompletion(from(eventPub), sinkRecorder.flux(), pub -> from(pub)
         .doOnNext(new OperationDispatcher(sinkRecorder, getParametersTransformer(), this.operation))
         .map(e -> Either.empty()), sinkRecorder::complete, sinkRecorder::error,
-                                    shutdownTimeout,
-                                    completionCallbackScheduler))
+                                    shutdownTimeout, completionCallbackScheduler,
+                                    operation.getDslSource()))
                                         .map(result -> {
                                           result.applyLeft(t -> {
                                             throw propagate(t);

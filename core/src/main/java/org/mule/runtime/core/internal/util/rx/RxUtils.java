@@ -187,7 +187,8 @@ public class RxUtils {
                                                         Function<Publisher<U>, Publisher<T>> transformer,
                                                         CheckedRunnable completionCallback,
                                                         CheckedConsumer<Throwable> errorCallback,
-                                                        long completionTimeoutMillis, ScheduledExecutorService delayedExecutor) {
+                                                        long completionTimeoutMillis, ScheduledExecutorService delayedExecutor,
+                                                        final String dslSource) {
     requireNonNull(upstream, "'upstream' must not be null");
     requireNonNull(downstream, "'downstream' must not be null");
     requireNonNull(transformer, "'transformer' must not be null");
@@ -201,8 +202,8 @@ public class RxUtils {
     return doPropagateCompletion(upstream, downstream, transformer,
                                  new AtomicInteger(0), completer, errorForwarder,
                                  () -> delayedExecutor.schedule(() -> {
-                                   LOGGER.warn("Calling completer after {} milliseconds",
-                                               completionTimeoutMillis);
+                                   LOGGER.warn("Propagating completion after {} milliseconds\nDSL Source:\n{}",
+                                               completionTimeoutMillis, dslSource);
                                    completer.runOnce();
                                  }, completionTimeoutMillis, MILLISECONDS));
   }
