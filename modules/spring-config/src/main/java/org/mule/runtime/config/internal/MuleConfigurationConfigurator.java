@@ -7,11 +7,17 @@
 package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
+
+import java.util.List;
+
+import javax.inject.Inject;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
@@ -20,11 +26,6 @@ import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
@@ -133,7 +134,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
       defaultConfig.setDefaultErrorHandlerName(config.getDefaultErrorHandlerName());
       defaultConfig.addExtensions(config.getExtensions());
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
-      defaultConfig.setDynamicConfigExpiration(config.getDynamicConfigExpiration());
+      defaultConfig.setDynamicConfigExpiration(resolveDynamicConfigExpiration());
       defaultConfig.setInheritIterableRepeatability(config.isInheritIterableRepeatability());
       applyDefaultIfNoObjectSerializerSet(defaultConfig);
 
@@ -142,6 +143,11 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
       throw new ConfigurationException(createStaticMessage("Unable to set properties on read-only MuleConfiguration: "
           + configuration.getClass()));
     }
+  }
+
+  private DynamicConfigExpiration resolveDynamicConfigExpiration() {
+    return registry.lookupByName(OBJECT_TIME_SUPPLIER)
+        .map(ts -> DynamicConfigExpiration.getDefault((TimeSupplier) ts)).orElse(config.getDynamicConfigExpiration());
   }
 
 }
