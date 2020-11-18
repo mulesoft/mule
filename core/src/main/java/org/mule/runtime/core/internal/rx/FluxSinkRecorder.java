@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.rx;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_PRINT_STACK_TRACES_ON_DROP;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.create;
 import static reactor.util.context.Context.empty;
 
@@ -13,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -23,7 +27,13 @@ import reactor.core.publisher.FluxSink;
  */
 public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
+  private static final Logger LOGGER = getLogger(FluxSinkRecorder.class);
+
   private volatile FluxSinkRecorderDelegate<T> delegate = new NotYetAcceptedDelegate<>();
+
+  private static final boolean PRINT_STACK_TRACES_ON_DROP = getBoolean(MULE_PRINT_STACK_TRACES_ON_DROP);
+  private volatile String completionStackTrace = null;
+  private volatile String acceptStackTrace = null;
 
   public Flux<T> flux() {
     return create(this)
@@ -32,6 +42,11 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
   @Override
   public void accept(FluxSink<T> fluxSink) {
+    if (PRINT_STACK_TRACES_ON_DROP) {
+      synchronized (this) {
+        acceptStackTrace = getStackTraceAsString();
+      }
+    }
     FluxSinkRecorderDelegate<T> previousDelegate = this.delegate;
     delegate = new DirectDelegate<>(fluxSink);
     previousDelegate.accept(fluxSink);
@@ -42,26 +57,53 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
   }
 
   public void next(T response) {
+    if (PRINT_STACK_TRACES_ON_DROP) {
+      synchronized (this) {
+        if (completionStackTrace != null) {
+          LOGGER.warn("Event will be dropped {}\nCompletion StackTrace:\n{}\nAccept StackTrace:\n{}", response,
+                      completionStackTrace, acceptStackTrace);
+        }
+      }
+    }
     delegate.next(response);
   }
 
   public void error(Throwable error) {
+    if (PRINT_STACK_TRACES_ON_DROP) {
+      synchronized (this) {
+        completionStackTrace = getStackTraceAsString();
+      }
+    }
     delegate.error(error);
   }
 
   public void complete() {
+    if (PRINT_STACK_TRACES_ON_DROP) {
+      synchronized (this) {
+        completionStackTrace = getStackTraceAsString();
+      }
+    }
     delegate.complete();
+  }
+
+  private String getStackTraceAsString() {
+    StringBuilder sb = new StringBuilder();
+    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+    for (StackTraceElement element : stackTrace) {
+      sb.append('\t').append(element).append('\n');
+    }
+    return sb.toString();
   }
 
   private interface FluxSinkRecorderDelegate<T> extends Consumer<FluxSink<T>> {
 
-    public FluxSink<T> getFluxSink();
+    FluxSink<T> getFluxSink();
 
-    public void next(T response);
+    void next(T response);
 
-    public void error(Throwable error);
+    void error(Throwable error);
 
-    public void complete();
+    void complete();
 
   }
 
@@ -77,7 +119,7 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
       synchronized (this) {
         this.fluxSink = fluxSink;
       }
-      bufferedEvents.forEach(e -> e.run());
+      bufferedEvents.forEach(Runnable::run);
     }
 
     @Override
@@ -121,9 +163,7 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
       synchronized (this) {
         if (fluxSink == null) {
           present = false;
-          bufferedEvents.add(() -> {
-            fluxSink.complete();
-          });
+          bufferedEvents.add(() -> fluxSink.complete());
         }
       }
 
@@ -137,7 +177,7 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
     private final FluxSink<T> fluxSink;
 
-    public DirectDelegate(FluxSink<T> fluxSink) {
+    DirectDelegate(FluxSink<T> fluxSink) {
       this.fluxSink = fluxSink;
     }
 

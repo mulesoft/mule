@@ -88,7 +88,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
                                      () -> emitter.complete(), t -> emitter.error(t),
-                                     RECEIVE_TIMEOUT, scheduledExecutor);
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
         })
         .subscribe(s -> results.add(s),
                    e -> e.printStackTrace(),
@@ -138,7 +138,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
                                        }
                                        emitter.error(t);
                                      },
-                                     RECEIVE_TIMEOUT, scheduledExecutor);
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
         })
         .subscribe(s -> results.add(s),
                    e -> completeWithError.set(true));
@@ -185,7 +185,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
                                      () -> emitter.complete(), t -> emitter.error(t),
-                                     RECEIVE_TIMEOUT, scheduledExecutor);
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
         })
         .subscriberContext(ctx -> ctx.put("key", "value"))
         .subscribe(s -> {
@@ -221,7 +221,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
                                      () -> emitter.complete(), t -> emitter.error(t),
-                                     RECEIVE_TIMEOUT, scheduledExecutor);
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
         })
         .subscriberContext(ctx -> ctx.put("key", "value"))
         .subscribe(s -> {
