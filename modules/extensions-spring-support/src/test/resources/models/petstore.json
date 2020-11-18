@@ -22677,7 +22677,24 @@
       "outputAttributes": {
         "type": {
           "format": "java",
-          "type": "Void"
+          "type": "Number",
+          "annotations": {
+            "classInformation": {
+              "classname": "java.lang.Integer",
+              "hasDefaultConstructor": false,
+              "isInterface": false,
+              "isInstantiable": false,
+              "isAbstract": false,
+              "isFinal": true,
+              "implementedInterfaces": [
+                "java.lang.Comparable"
+              ],
+              "parent": "java.lang.Number",
+              "genericTypes": [],
+              "isMap": false
+            },
+            "int": {}
+          }
         },
         "hasDynamicType": false,
         "description": "",
@@ -22707,9 +22724,23 @@
             {
               "type": {
                 "format": "java",
-                "type": "Boolean",
+                "type": "Number",
                 "annotations": {
-                  "typeId": "boolean"
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -22717,7 +22748,7 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "false",
+              "defaultValue": "0",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
@@ -22731,38 +22762,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "name": "useWatermark",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean",
-                "annotations": {
-                  "typeId": "boolean"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "false",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "allowedStereotypeModels": [],
-              "name": "idempotent",
+              "name": "awaitOnItem",
               "description": "",
               "modelProperties": {}
             },
@@ -22807,7 +22807,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3
+                "order": 2
               },
               "allowedStereotypeModels": [],
               "name": "pets",
@@ -22872,7 +22872,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4
+                "order": 3
               },
               "allowedStereotypeModels": [],
               "name": "watermarks",
@@ -22916,7 +22916,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5
+                "order": 4
               },
               "allowedStereotypeModels": [],
               "name": "itemsPerPoll",
@@ -22944,7 +22944,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 8,
+                "order": 7,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -22972,7 +22972,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 6
+                "order": 5
               },
               "allowedStereotypeModels": [],
               "name": "schedulingStrategy",
@@ -23121,7 +23121,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 7,
+                "order": 6,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],

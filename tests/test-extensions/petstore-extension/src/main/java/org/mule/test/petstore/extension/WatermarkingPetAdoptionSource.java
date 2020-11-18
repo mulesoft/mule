@@ -22,22 +22,22 @@ import org.mule.runtime.extension.api.runtime.source.PollingSource;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 @MetadataScope(outputResolver = PollingSourceMetadataResolver.class)
 @MediaType(TEXT_PLAIN)
-public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
+public class WatermarkingPetAdoptionSource extends PollingSource<String, Integer> {
 
-  public static int STARTED_POLLS;
-  private int index;
-  private int polls;
+  private int pollCounter;
+  private static int index = 0;
+  private static boolean alreadyWaited = false;
+  private static CountDownLatch continueLatch = new CountDownLatch(1);
+
+  public static CountDownLatch beginLatch = new CountDownLatch(1);
 
   @Parameter
-  @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
-  protected boolean useWatermark;
-
-  @Parameter
-  @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
-  protected boolean idempotent;
+  @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "0")
+  protected Integer awaitOnItem;
 
   @Parameter
   protected List<String> pets;
@@ -47,17 +47,6 @@ public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
 
   @Parameter
   protected Integer itemsPerPoll;
-
-  @Override
-  protected void doStart() throws MuleException {
-    resetCounters();
-    polls = (pets.size() / itemsPerPoll) + 1;
-  }
-
-  @Override
-  protected void doStop() {
-    resetCounters();
-  }
 
   @OnSuccess
   public synchronized void onSuccess() {}
@@ -69,34 +58,44 @@ public class WatermarkingPetAdoptionSource extends PollingSource<String, Void> {
   public synchronized void onTerminate() {}
 
   @Override
-  public void poll(PollContext<String, Void> pollContext) {
-    STARTED_POLLS++;
-    if (STARTED_POLLS > polls) {
-      return;
-    }
+  protected void doStart() throws MuleException {}
+
+  @Override
+  protected void doStop() {}
+
+  @Override
+  public void poll(PollContext<String, Integer> pollContext) {
     for (int i = 0; i < itemsPerPoll && index < pets.size(); i++, index++) {
+      if (index == (awaitOnItem - 1) && !alreadyWaited) {
+        try {
+          beginLatch.countDown();
+          continueLatch.await();
+        } catch (InterruptedException e) {
+          //Stopping the source will interrupt the latch, so we do nothing and keep pushing items.
+        } finally {
+          alreadyWaited = true;
+        }
+      }
       pollContext.setWatermarkComparator(naturalOrder());
-      Result<String, Void> result = Result.<String, Void>builder().output(pets.get(index)).build();
+      Result<String, Integer> result = Result.<String, Integer>builder().output(pets.get(index)).attributes(pollCounter).build();
       Integer watermarkValue = watermarks.get(index);
       pollContext.accept(item -> {
         item.setResult(result);
-
-        if (idempotent) {
-          item.setId(result.getOutput().toLowerCase());
-        }
-
-        if (useWatermark) {
-          item.setWatermark(watermarkValue);
-        }
+        item.setId(result.getOutput().toLowerCase());
+        item.setWatermark(watermarkValue);
       });
     }
+    pollCounter++;
   }
 
   @Override
-  public void onRejectedItem(Result<String, Void> result, SourceCallbackContext context) {}
+  public void onRejectedItem(Result<String, Integer> result, SourceCallbackContext context) {}
 
-  private synchronized void resetCounters() {
-    index = polls = STARTED_POLLS = 0;
+  public static synchronized void resetSource() {
+    beginLatch = new CountDownLatch(1);
+    continueLatch = new CountDownLatch(1);
+    alreadyWaited = false;
+    index = 0;
   }
 
 }
