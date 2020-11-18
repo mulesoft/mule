@@ -11,7 +11,6 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
@@ -30,7 +29,6 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 import org.mule.tck.junit4.matcher.EventMatcher;
@@ -241,8 +239,22 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
   private ExecutionCallback<CoreEvent> getFlowDispatchCallback() {
     return () -> {
-      // TODO MULE-13053 Update and improve FlowRunner to support non-blocking flow execution and assertions.
-      flow.process(getOrBuildEvent());
+      Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>(null);
+
+      try {
+        Flux.<CoreEvent>create(fluxSink -> {
+          fluxSink.next(getOrBuildEvent());
+          sinkReference.set(fluxSink);
+        }).transform(flow::apply).blockFirst();
+      } catch (RuntimeException ex) {
+        if (ex.getCause() instanceof MuleException) {
+          throw (MuleException) ex.getCause();
+        } else {
+          throw ex;
+        }
+      }
+
+      sinkReference.get().complete();
       return null;
     };
   }
