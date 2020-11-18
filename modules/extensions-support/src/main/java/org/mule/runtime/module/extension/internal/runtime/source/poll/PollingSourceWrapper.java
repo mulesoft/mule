@@ -192,7 +192,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
         delegate.poll(pollContext);
         if (!isRequestedToStop()) {
           pollContext.getUpdatedWatermark()
-                  .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator()));
+              .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator()));
         }
       } catch (Throwable t) {
         LOGGER.error(format("Found exception trying to process item on source at flow '%s'. %s",
