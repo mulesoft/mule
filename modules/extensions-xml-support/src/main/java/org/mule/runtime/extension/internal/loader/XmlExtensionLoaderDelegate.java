@@ -1123,7 +1123,7 @@ public final class XmlExtensionLoaderDelegate {
         .filter(child -> child.getIdentifier().equals(OPERATION_ERROR_IDENTIFIER))
         .forEach(param -> {
           final String namespace = xmlDslModel.getPrefix().toUpperCase();
-          final String errorType = (String) param.getParameter(ERROR_TYPE_ATTRIBUTE).getValue().getRight();;
+          final String errorType = (String) param.getParameter(ERROR_TYPE_ATTRIBUTE).getValue().getRight();
 
           if (errorType.contains(NAMESPACE_SEPARATOR)) {
             throw new IllegalModelDefinitionException(format("The operation [%s] cannot have an <error> [%s] that contains a reserved character [%s]",

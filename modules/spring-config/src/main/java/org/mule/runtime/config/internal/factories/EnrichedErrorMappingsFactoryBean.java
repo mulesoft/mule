@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -28,12 +29,11 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class EnrichedErrorMappingsFactoryBean extends AbstractComponentFactory<EnrichedErrorMapping> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(EnrichedErrorMappingsFactoryBean.class);
+  private static final Logger LOGGER = getLogger(EnrichedErrorMappingsFactoryBean.class);
 
   public static final String CORE_ERROR_NS = CORE_PREFIX.toUpperCase();
 
