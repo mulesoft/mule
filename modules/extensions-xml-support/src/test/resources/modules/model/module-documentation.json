@@ -1151,7 +1151,22 @@
   "connectionProviders": [],
   "messageSources": [],
   "notifications": [],
-  "errors": [],
+  "errors": [
+    {
+      "error": "MODULE-DOCUMENTATION:CUSTOM_ERROR_HERE",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MODULE-DOCUMENTATION:ANOTHER_CUSTOM_ERROR_HERE",
+      "parent": "MULE:ANY",
+      "handleable": true
+    }
+  ],
   "modelProperties": {
     "org.mule.runtime.extension.api.property.XmlExtensionModelProperty": {
       "namespacesDependencies": [

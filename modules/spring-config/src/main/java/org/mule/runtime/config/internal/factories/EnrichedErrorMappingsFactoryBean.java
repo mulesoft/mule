@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -21,10 +24,16 @@ import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 
 public class EnrichedErrorMappingsFactoryBean extends AbstractComponentFactory<EnrichedErrorMapping> {
+
+  private static final Logger LOGGER = getLogger(EnrichedErrorMappingsFactoryBean.class);
 
   public static final String CORE_ERROR_NS = CORE_PREFIX.toUpperCase();
 
@@ -51,14 +60,22 @@ public class EnrichedErrorMappingsFactoryBean extends AbstractComponentFactory<E
 
   private ErrorType resolveErrorType(String representation) {
     ComponentIdentifier errorIdentifier = parserErrorType(representation);
+    final Optional<ErrorType> lookupErrorType = errorTypeRepository.lookupErrorType(errorIdentifier);
     if (CORE_ERROR_NS.equals(errorIdentifier.getNamespace())) {
-      return errorTypeRepository.lookupErrorType(errorIdentifier)
+      return lookupErrorType
           .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
                                                                                  errorIdentifier.getName()))));
     }
-    return errorTypeRepository.lookupErrorType(errorIdentifier)
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find synthetic error '%s' in registry",
-                                                                        errorIdentifier)));
+
+    if (lookupErrorType.isPresent()) {
+      return lookupErrorType.get();
+    } else if (getBoolean(MULE_LAX_ERROR_TYPES)) {
+      LOGGER.warn("Could not find synthetic error '{}' in registry", errorIdentifier);
+      return errorTypeRepository.addErrorType(errorIdentifier, errorTypeRepository.getAnyErrorType());
+    } else {
+      throw new MuleRuntimeException(createStaticMessage("Could not find synthetic error '%s' in registry",
+                                                         errorIdentifier));
+    }
   }
 
   public static ComponentIdentifier parserErrorType(String representation) {

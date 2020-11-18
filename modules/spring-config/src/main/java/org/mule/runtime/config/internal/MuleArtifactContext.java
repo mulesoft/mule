@@ -58,11 +58,13 @@ import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.ValidationResult;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
@@ -71,6 +73,7 @@ import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -427,16 +430,20 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private void registerErrorTypes() {
     Set<String> syntheticErrorNamespaces = new HashSet<>();
 
-    applicationModel.recursiveStream()
+    applicationModel.topLevelComponentsStream()
         .forEach(componentModel -> resolveErrorTypes(componentModel, syntheticErrorNamespaces));
   }
 
   private void resolveErrorTypes(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {
-    componentModel.directChildrenStream()
-        .forEach(innerComponent -> {
-          processRaiseError(innerComponent, syntheticErrorNamespaces);
-          resolveErrorTypes(innerComponent, syntheticErrorNamespaces);
-        });
+    if (componentModel.getModel(OperationModel.class)
+        .map(om -> !om.getModelProperty(OperationComponentModelModelProperty.class).isPresent())
+        .orElse(true)) {
+      componentModel.directChildrenStream()
+          .forEach(innerComponent -> {
+            processRaiseError(innerComponent, syntheticErrorNamespaces);
+            resolveErrorTypes(innerComponent, syntheticErrorNamespaces);
+          });
+    }
 
     registerErrorMappings(componentModel, syntheticErrorNamespaces);
   }
@@ -456,12 +463,15 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   private void processRaiseError(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {
     if (componentModel.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
-      String representation = componentModel.getRawParameterValue("type").orElse(null);
-      if (isEmpty(representation) && disableXmlValidations) {
-        // We can just ignore this as we should allow an empty value here
-        return;
+      final ComponentParameterAst parameter = componentModel.getParameter("type");
+
+      if (parameter != null) {
+        parameter.getValue().getValue()
+            .map(r -> (String) r)
+            // We can just ignore this as we should allow an empty value here
+            .filter(representation -> !isEmpty(representation) || !disableXmlValidations)
+            .ifPresent(representation -> resolveErrorType(representation, syntheticErrorNamespaces, !disableXmlValidations));
       }
-      resolveErrorType(representation, syntheticErrorNamespaces, !disableXmlValidations);
     }
   }
 
