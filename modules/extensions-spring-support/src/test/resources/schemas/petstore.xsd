@@ -878,8 +878,7 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="useWatermark"></xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="idempotent"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="awaitOnItem"></xs:attribute>
         <xs:attribute type="mule:substitutableName" use="optional" name="pets"></xs:attribute>
         <xs:attribute type="mule:substitutableName" use="optional" name="watermarks"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="required" name="itemsPerPoll"></xs:attribute>

@@ -200,9 +200,11 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       DefaultPollContext pollContext = new DefaultPollContext(sourceCallback, getCurrentWatermark(), getUpdatedWatermark());
       try {
         delegate.poll(pollContext);
-        pollContext.getUpdatedWatermark()
-            .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator(),
-                                            pollContext.getMinimumRejectedByLimitPassingWatermark().orElse(null)));
+        if (!isRequestedToStop()) {
+          pollContext.getUpdatedWatermark()
+              .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator(),
+                                              pollContext.getMinimumRejectedByLimitPassingWatermark().orElse(null)));
+        }
       } catch (Throwable t) {
         LOGGER.error(format("Found exception trying to process item on source at flow '%s'. %s",
                             flowName, t.getMessage()),
@@ -271,14 +273,14 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       PollItemStatus status = ACCEPTED;
       boolean currentPollItemLimitApplied = false;
-      if (!acquireItem(pollItem, callbackContext)) {
+      if (isRequestedToStop()) {
+        status = SOURCE_STOPPING;
+      } else if (!acquireItem(pollItem, callbackContext)) {
         status = ALREADY_IN_PROCESS;
       } else {
         WatermarkStatus watermarkStatus = passesWatermark(pollItem);
         if (watermarkStatus == REJECT) {
           status = FILTERED_BY_WATERMARK;
-        } else if (isRequestedToStop()) {
-          status = SOURCE_STOPPING;
         } else if (currentPollItems < maxItemsPerPoll) {
           currentPollItems++;
           sourceCallback.handle(pollItem.getResult(), callbackContext);
