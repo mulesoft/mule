@@ -14,7 +14,7 @@ package org.mule.runtime.core.api.config;
  */
 public interface FeatureFlaggingService {
 
-  String FEATURE_FLAGGING_SERVICE_KEY = "_featureFlaggingService";
+  String FEATURE_FLAGGING_SERVICE_KEY = "core.featureFlaggingService";
 
   boolean isEnabled(String feature);
 }
