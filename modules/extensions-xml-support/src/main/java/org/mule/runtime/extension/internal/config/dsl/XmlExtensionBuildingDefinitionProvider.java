@@ -11,7 +11,6 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
@@ -173,10 +172,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
       if (parameterModel.getDslConfiguration().allowsInlineDefinition()) {
         paramsDefinitions.add(newBuilder()
             .withKey(parameterModel.getName())
-            .withAttributeDefinition(fromChildConfiguration(String.class)
-                .withIdentifier(dslSyntaxResolver.resolve(parameterModel)
-                    .getElementName())
-                .withDefaultValue(parameterModel.getDefaultValue()).build())
+            .withAttributeDefinition(fromSimpleParameter(parameterModel.getName()).build())
             .build());
 
         definitions.add(baseDefinition
@@ -186,10 +182,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
       } else {
         paramsDefinitions.add(newBuilder()
             .withKey(parameterModel.getName())
-            .withAttributeDefinition(fromSimpleParameter(dslSyntaxResolver.resolve(parameterModel)
-                .getAttributeName())
-                    .withDefaultValue(parameterModel.getDefaultValue())
-                    .build())
+            .withAttributeDefinition(fromSimpleParameter(parameterModel.getName()).build())
             .build());
       }
     }
