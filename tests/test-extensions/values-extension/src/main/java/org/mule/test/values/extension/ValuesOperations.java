@@ -20,6 +20,7 @@ import org.mule.test.values.extension.resolver.WithOptionalParametersValueProvid
 import org.mule.test.values.extension.resolver.WithOptionalParametersWithDefaultValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredAndOptionalParametersValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider;
 import org.mule.test.values.extension.resolver.WithMuleContextValueProvider;
 
@@ -74,6 +75,9 @@ public class ValuesOperations {
 
   public void withComplexActingParameter(@Optional @OfValues(WithComplexActingParameter.class) String providedParameter,
                                          ComplexActingParameter complexActingParameter) {}
+
+  public void withRequiredParameter(@OfValues(WithRequiredParameterValueProvider.class) String providedParameters,
+                                    String requiredValue) {}
 
   public void withRequiredParameterAndOptionalParameterAsRequired(@OfValues(WithRequiredAndOptionalParametersValueProvider.class) String providedParameters,
                                                                   String requiredValue, String optionalValue) {}

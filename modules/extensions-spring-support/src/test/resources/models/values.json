@@ -11384,6 +11384,280 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
+        "type": "WITH_REQUIRED_PARAMETER",
+        "namespace": "VALUES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VALUES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "valueProviderModel": {
+                "actingParameters": [
+                  "requiredValue"
+                ],
+                "parameters": [
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": true,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "requiredValue",
+                    "description": "",
+                    "modelProperties": {}
+                  }
+                ],
+                "partOrder": 1,
+                "providerName": "providedParameters",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterValueProvider",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
+              },
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "name": "providedParameters",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "allowedStereotypeModels": [],
+              "name": "requiredValue",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "description": {
+                    "value": "Determines that an error thrown by this operation should be mapped to another"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": false
+                  }
+                },
+                "item": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "errorMapping"
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "source"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeMatcher",
+                          "enum": {
+                            "type": "[Ljava.lang.String;",
+                            "values": [
+                              "ANY",
+                              "REDELIVERY_EXHAUSTED",
+                              "TRANSFORMATION",
+                              "EXPRESSION",
+                              "SECURITY",
+                              "CLIENT_SECURITY",
+                              "SERVER_SECURITY",
+                              "ROUTING",
+                              "CONNECTIVITY",
+                              "RETRY_EXHAUSTED",
+                              "TIMEOUT"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "target",
+                        "required": "true"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeDefinition"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Error Mapping"
+              },
+              "allowedStereotypeModels": [],
+              "name": "errorMappings",
+              "description": "Set of error mappings",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "error-mapping",
+                    "prefix": "mule"
+                  }
+                },
+                "sinceMuleVersion": {
+                  "version": "4.4.0"
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 12
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
+          "showInDsl": false,
+          "name": "Error Mappings",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "withRequiredParameter",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
         "type": "WITH_REQUIRED_PARAMETER_AND_OPTIONAL_PARAMETER_AS_REQUIRED",
         "namespace": "VALUES",
         "parent": {
