@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.staticMethodAddedToInterface",
+          "new": "method org.mule.runtime.core.api.config.DynamicConfigExpiration org.mule.runtime.core.api.config.DynamicConfigExpiration::getDefault(org.mule.runtime.api.time.TimeSupplier)",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "DynamicConfigExpiration",
+          "methodName": "getDefault",
+          "elementKind": "method",
+          "justification": "Needed for setting the correct time supplier"
+        },
+        {
           "code": "java.method.finalMethodAddedToNonFinalClass",
           "new": "method java.lang.Object org.mule.runtime.core.api.streaming.bytes.factory.AbstractCursorStreamProviderFactory::of(org.mule.runtime.api.event.EventContext, java.io.InputStream, org.mule.runtime.api.component.location.ComponentLocation)",
           "package": "org.mule.runtime.core.api.streaming.bytes.factory",
