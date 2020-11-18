@@ -85,6 +85,6 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
     assertThat(policy, instanceOf(ImmutableExpirationPolicy.class));
     // This is done so that the timeSupplier is invoked.
     configuration.getDynamicConfigExpiration().getExpirationPolicy().isExpired(0L, DAYS);
-    verify(timeSupplier).getAsLong();
+    verify(timeSupplier).get();
   }
 }
