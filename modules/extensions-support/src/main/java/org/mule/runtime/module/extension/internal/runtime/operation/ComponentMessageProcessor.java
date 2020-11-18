@@ -409,7 +409,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                       () -> errorSwitchSinkSinkRef.complete(),
                                       t -> errorSwitchSinkSinkRef.error(t),
                                       outerFluxTerminationTimeout,
-                                      outerFluxCompletionScheduler));
+                                      outerFluxCompletionScheduler,
+                                      getDslSource()));
     }
   }
 

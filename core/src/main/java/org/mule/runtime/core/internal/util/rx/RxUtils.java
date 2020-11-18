@@ -181,13 +181,15 @@ public class RxUtils {
    * @param completionTimeoutMillis how long to wait for pending items to finish processing before actually propagating the
    *        completion or cancellation downstream.
    * @param delayedExecutor the executor that will delay the completion or cancellation propagation when there are pending items
+   * @param dslSource DSL source of the caller object. It's logged when the propagation is done by the delayedExecutor
    * @return an enriched downstream where items and events will be triggered according to the rules defined for this method.
    */
   public static <T, U> Publisher<T> propagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
                                                         Function<Publisher<U>, Publisher<T>> transformer,
                                                         CheckedRunnable completionCallback,
                                                         CheckedConsumer<Throwable> errorCallback,
-                                                        long completionTimeoutMillis, ScheduledExecutorService delayedExecutor) {
+                                                        long completionTimeoutMillis, ScheduledExecutorService delayedExecutor,
+                                                        final String dslSource) {
     requireNonNull(upstream, "'upstream' must not be null");
     requireNonNull(downstream, "'downstream' must not be null");
     requireNonNull(transformer, "'transformer' must not be null");
@@ -200,8 +202,11 @@ public class RxUtils {
 
     return doPropagateCompletion(upstream, downstream, transformer,
                                  new AtomicInteger(0), completer, errorForwarder,
-                                 () -> delayedExecutor.schedule(() -> completer.runOnce(), completionTimeoutMillis,
-                                                                MILLISECONDS));
+                                 () -> delayedExecutor.schedule(() -> {
+                                   LOGGER.warn("Propagating completion after {} milliseconds\nDSL Source:\n{}",
+                                               completionTimeoutMillis, dslSource);
+                                   completer.runOnce();
+                                 }, completionTimeoutMillis, MILLISECONDS));
   }
 
   private static <T, U> Publisher<T> doPropagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
