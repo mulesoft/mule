@@ -24,9 +24,22 @@ import org.mule.test.data.sample.extension.provider.ConfigAwareTestSampleDataPro
 import org.mule.test.data.sample.extension.provider.ConnectedTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.GroupTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.MuleContextAwareSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.OptionalTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ParameterizedTestSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.SimplestTestSampleDataProvider;
 
 public class SampleDataOperations {
+
+  @SampleData(SimplestTestSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
+  public Result<String, String> parameterLess() {
+    return Result.<String, String>builder()
+        .output("")
+        .mediaType(APPLICATION_JSON)
+        .attributes(NULL_VALUE)
+        .attributesMediaType(APPLICATION_XML)
+        .build();
+  }
 
   @SampleData(ParameterizedTestSampleDataProvider.class)
   @MediaType(TEXT_PLAIN)
@@ -97,5 +110,16 @@ public class SampleDataOperations {
   @MediaType(TEXT_PLAIN)
   public Result<String, String> complexActingParameter(ComplexActingParameter complex) {
     return connectionLess(complex.getPayload(), complex.getAttributes());
+  }
+
+  @SampleData(OptionalTestSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
+  public Result<String, String> optionalParameters(@Optional(defaultValue = "[]") String payload, @Optional String attributes) {
+    return Result.<String, String>builder()
+        .output(payload)
+        .mediaType(APPLICATION_JSON)
+        .attributes(attributes != null ? attributes : NULL_VALUE)
+        .attributesMediaType(APPLICATION_XML)
+        .build();
   }
 }
