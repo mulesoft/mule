@@ -262,8 +262,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
         status = ALREADY_IN_PROCESS;
       } else if (!passesWatermark(pollItem)) {
         status = FILTERED_BY_WATERMARK;
-      } else if (isRequestedToStop()) {
-        status = SOURCE_STOPPING;
       } else {
         sourceCallback.handle(pollItem.getResult(), callbackContext);
         status = ACCEPTED;
