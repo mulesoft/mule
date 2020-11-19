@@ -8,6 +8,7 @@ package org.mule.test.functional;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.core.Is.is;
 
@@ -110,6 +111,13 @@ public class ModuleJsonCustomTypeTestCase extends AbstractCeXmlExtensionMuleArti
       assertThat((Map<String, Object>) muleEvent.getMessage().getPayload().getValue(),
                  hasEntry(entry.getKey(), entry.getValue()));
     }
+  }
+
+  @Test
+  public void testJoinStringArray() throws Exception {
+    CoreEvent event = flowRunner("testJoinStringArray").run();
+    String content = (String) event.getMessage().getPayload().getValue();
+    assertThat(content, equalTo("1-2_a-b"));
   }
 
   /**

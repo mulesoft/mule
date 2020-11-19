@@ -81,4 +81,17 @@
         </body>
         <output type="boolean"/>
     </operation>
+
+    <operation name="join-string-array">
+        <parameters>
+            <parameter name="behaviourArray" type="TypeStringArray"/>
+            <parameter name="contentArray" type="TypeStringArray" role="CONTENT"/>
+        </parameters>
+        <body>
+            <mule:set-variable variableName="behaviourAsString" value="#[output application/java  --- vars.behaviourArray joinBy '-']" />
+            <mule:set-variable variableName="contentAsString" value="#[output application/java  --- vars.contentArray joinBy '-']" />
+            <mule:set-payload value="#[vars.behaviourAsString ++ '_' ++ vars.contentAsString]"/>
+        </body>
+        <output type="string"/>
+    </operation>
 </module>
