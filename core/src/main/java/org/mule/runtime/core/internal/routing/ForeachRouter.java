@@ -110,7 +110,7 @@ class ForeachRouter {
             completeRouterIfNecessary();
           }
 
-          TypedValue currentValue = owner.setCurrentValue(batchSize, foreachContext);
+          TypedValue currentValue = owner.setCurrentValue(batchSize, foreachContext, event);
           return createTypedValuePartToProcess(owner, event, foreachContext, currentValue);
 
         })

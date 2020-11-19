@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -155,14 +156,15 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     return result;
   }
 
-  TypedValue setCurrentValue(int batchSize, ForeachContext foreachContext) {
+  TypedValue setCurrentValue(int batchSize, ForeachContext foreachContext, CoreEvent event) {
     TypedValue currentValue;
     Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
     if (batchSize > 1) {
       int counter = 0;
       List currentBatch = new ArrayList<>();
       while (iterator.hasNext() && counter < batchSize) {
-        currentBatch.add(iterator.next());
+        TypedValue managedValue = updateTypedValueForStreaming(iterator.next(), event, streamingManager);
+        currentBatch.add(managedValue);
         counter++;
       }
 
