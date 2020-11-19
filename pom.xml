@@ -165,7 +165,7 @@
         <commonsBeanUtilsVersion>1.9.4</commonsBeanUtilsVersion>
         <commonsExecVersion>1.2</commonsExecVersion>
         <commonsCliVersion>1.2</commonsCliVersion>
-        <commonsCodecVersion>1.13</commonsCodecVersion>
+        <commonsCodecVersion>1.15</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <commonsDbcpVersion>1.4</commonsDbcpVersion>
         <commonsDbUtilsVersion>1.7</commonsDbUtilsVersion>
