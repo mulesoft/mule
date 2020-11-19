@@ -49,6 +49,8 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   // any properties not set by the user.
   private DefaultMuleConfiguration config = new DefaultMuleConfiguration();
 
+  private boolean explicitDynamicConfigExpiration;
+
   @Override
   public boolean isEagerInit() {
     return true;
@@ -109,6 +111,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   }
 
   public void setDynamicConfigExpiration(DynamicConfigExpiration dynamicConfigExpiration) {
+    explicitDynamicConfigExpiration = true;
     config.setDynamicConfigExpiration(dynamicConfigExpiration);
   }
 
@@ -145,7 +148,15 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
     }
   }
 
+  // This has to be done because the mule context object supplier has to be
+  // used as a default if not dynamic configuration expiration is set in the app.
+  // But this is accessible only after the mule context is started
+  // (after the defaults for this class are resolved)
   private DynamicConfigExpiration resolveDynamicConfigExpiration() {
+    if (explicitDynamicConfigExpiration) {
+      return config.getDynamicConfigExpiration();
+    }
+
     return registry.lookupByName(OBJECT_TIME_SUPPLIER)
         .map(ts -> DynamicConfigExpiration.getDefault((TimeSupplier) ts)).orElse(config.getDynamicConfigExpiration());
   }
