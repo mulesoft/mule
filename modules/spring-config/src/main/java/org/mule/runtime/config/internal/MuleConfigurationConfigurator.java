@@ -8,10 +8,15 @@ package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
@@ -20,11 +25,6 @@ import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
@@ -47,6 +47,8 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   // We instantiate DefaultMuleConfiguration to make sure we get the default values for
   // any properties not set by the user.
   private DefaultMuleConfiguration config = new DefaultMuleConfiguration();
+
+  private boolean explicitDynamicConfigExpiration;
 
   @Override
   public boolean isEagerInit() {
@@ -108,6 +110,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   }
 
   public void setDynamicConfigExpiration(DynamicConfigExpiration dynamicConfigExpiration) {
+    explicitDynamicConfigExpiration = true;
     config.setDynamicConfigExpiration(dynamicConfigExpiration);
   }
 
@@ -129,7 +132,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
       defaultConfig.setDefaultErrorHandlerName(config.getDefaultErrorHandlerName());
       defaultConfig.addExtensions(config.getExtensions());
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
-      defaultConfig.setDynamicConfigExpiration(config.getDynamicConfigExpiration());
+      defaultConfig.setDynamicConfigExpiration(resolveDynamicConfigExpiration());
       applyDefaultIfNoObjectSerializerSet(defaultConfig);
 
       return configuration;
@@ -137,6 +140,19 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
       throw new ConfigurationException(createStaticMessage("Unable to set properties on read-only MuleConfiguration: "
           + configuration.getClass()));
     }
+  }
+
+  // This has to be done because the mule context object supplier has to be
+  // used as a default if not dynamic configuration expiration is set in the app.
+  // But this is accessible only after the mule context is started
+  // (after the defaults for this class are resolved)
+  private DynamicConfigExpiration resolveDynamicConfigExpiration() {
+    if (explicitDynamicConfigExpiration) {
+      return config.getDynamicConfigExpiration();
+    }
+
+    return registry.lookupByName(OBJECT_TIME_SUPPLIER)
+        .map(ts -> DynamicConfigExpiration.getDefault((TimeSupplier) ts)).orElse(config.getDynamicConfigExpiration());
   }
 
 }
