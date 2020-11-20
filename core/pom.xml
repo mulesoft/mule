@@ -83,11 +83,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-dsl-api</artifactId>
+            <artifactId>mule-runtime-extension-model</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-extensions-api</artifactId>
+            <artifactId>mule-module-dsl-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
