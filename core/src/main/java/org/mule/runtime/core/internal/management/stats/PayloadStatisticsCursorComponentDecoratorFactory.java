@@ -40,6 +40,10 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
 
   @Override
   public <T> Collection<T> decorateInput(Collection<T> decorated, String correlationId) {
+    if (decorated == null) {
+      return decorated;
+    }
+
     if (payloadStatistics.isEnabled()) {
       if (decorated instanceof List) {
         return new PayloadStatisticsList((List) decorated, payloadStatistics::addInputObjectCount);
@@ -55,6 +59,10 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
 
   @Override
   public <T> Iterator<T> decorateInput(Iterator<T> decorated, String correlationId) {
+    if (decorated == null) {
+      return decorated;
+    }
+
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsIterator(decorated, payloadStatistics::addInputObjectCount);
     } else {
@@ -64,6 +72,10 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
 
   @Override
   public InputStream decorateInput(InputStream decorated, String correlationId) {
+    if (decorated == null) {
+      return decorated;
+    }
+
     if (payloadStatistics.isEnabled()) {
       if (decorated instanceof CursorStream) {
         return new PayloadStatisticsCursorStream((CursorStream) decorated, payloadStatistics::addInputByteCount);
@@ -77,6 +89,10 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
 
   @Override
   public <C, T> PagingProvider<C, T> decorateOutput(PagingProvider<C, T> decorated, String correlationId) {
+    if (decorated == null) {
+      return decorated;
+    }
+
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsPagingProvider<>(decorated, payloadStatistics::addOutputObjectCount);
     } else {
@@ -86,6 +102,10 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
 
   @Override
   public <T> Iterator<T> decorateOutput(Iterator<T> decorated, String correlationId) {
+    if (decorated == null) {
+      return decorated;
+    }
+
     if (payloadStatistics.isEnabled()) {
       return new PayloadStatisticsIterator(decorated, payloadStatistics::addOutputObjectCount);
     } else {
@@ -95,6 +115,10 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
 
   @Override
   public InputStream decorateOutput(InputStream decorated, String correlationId) {
+    if (decorated == null) {
+      return decorated;
+    }
+
     if (payloadStatistics.isEnabled()) {
       if (decorated instanceof CursorStream) {
         return new PayloadStatisticsCursorStream((CursorStream) decorated, payloadStatistics::addOutputByteCount);
@@ -108,6 +132,10 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
 
   @Override
   public <T> Collection<T> decorateOutputCollection(Collection<T> decorated, String correlationId) {
+    if (decorated == null) {
+      return decorated;
+    }
+
     if (payloadStatistics.isEnabled()) {
       payloadStatistics.addOutputObjectCount(decorated.size());
       return decorated.stream()
@@ -120,6 +148,10 @@ class PayloadStatisticsCursorComponentDecoratorFactory implements CursorComponen
 
   @Override
   public <T> Iterator<T> decorateOutputIterator(Iterator<T> decorated, String correlationId) {
+    if (decorated == null) {
+      return decorated;
+    }
+
     if (payloadStatistics.isEnabled()) {
       return decorateOutput(new AbstractIteratorDecorator(decorated) {
 

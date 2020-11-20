@@ -13,6 +13,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
@@ -25,8 +26,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
@@ -172,6 +173,17 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     assertThat(statistics.getInputObjectCount(), is(0L));
     assertThat(statistics.getOutputByteCount(), is(0L));
     assertThat(statistics.getOutputObjectCount(), is(0L));
+  }
+
+  @Test
+  public void decorateInputStreamNull() throws IOException {
+    final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1)
+        .decorateInput((InputStream) null, CORR_ID);
+
+    final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
+    assertThat(statistics.getInputByteCount(), is(0L));
+
+    assertThat(decorator, nullValue());
   }
 
   @Test
@@ -434,6 +446,17 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     assertThat(statistics.getInputByteCount(), is(0L));
     assertThat(statistics.getInputObjectCount(), is(0L));
     assertThat(statistics.getOutputObjectCount(), is(0L));
+  }
+
+  @Test
+  public void decorateOutputStreamNull() throws IOException {
+    final InputStream decorator = decoratorFactory.componentDecoratorFactory(component1)
+        .decorateOutput((InputStream) null, CORR_ID);
+
+    final PayloadStatistics statistics = getStatistics().getPayloadStatistics(component1.getLocation().getLocation());
+    assertThat(statistics.getOutputByteCount(), is(0L));
+
+    assertThat(decorator, nullValue());
   }
 
   @Test
