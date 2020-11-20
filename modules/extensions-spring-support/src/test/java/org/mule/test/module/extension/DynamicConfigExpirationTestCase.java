@@ -66,6 +66,13 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     config = null;
   }
 
+  @Override
+  protected void doTearDown() throws Exception {
+    disposedStatuses = new ArrayList<>();
+    config = null;
+    super.doTearDown();
+  }
+
   @Test
   public void expireDynamicConfig() throws Exception {
     HeisenbergExtension config = invokeDynamicConfig("dynamic", "heisenberg", "Walt");
@@ -121,23 +128,13 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   @Test
   public void dynamicConfigIsExpiredBeforeFlowEnds() throws Exception {
     flowRunner("dynamicConfigIsExpiredBeforeFlowEnds").withPayload("Walter Blanco").run();
-    check(PROBER_TIMEOUT, POLLING_FREQUENCY, () -> {
-      synchronized (disposedStatuses) {
-        return disposedStatuses.size() == 2;
-      }
-    });
-    assertThat(disposedStatuses, contains(0, 1));
+    assertDisposedStatuses();
   }
 
   @Test
   public void dynamicConfigIsExpiredBeforeFlowEndsWhenOperationFails() throws Exception {
     flowRunner("dynamicConfigIsExpiredBeforeFlowEndsWhenOperationFails").run();
-    check(PROBER_TIMEOUT, POLLING_FREQUENCY, () -> {
-      synchronized (disposedStatuses) {
-        return disposedStatuses.size() == 2;
-      }
-    });
-    assertThat(disposedStatuses, contains(0, 1));
+    assertDisposedStatuses();
   }
 
   private void assertInitialised(HeisenbergExtension config) {
@@ -152,6 +149,15 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
       assertThat(config.getDispose(), is(1));
       return true;
     }, "config was not stopped or disposed"));
+  }
+
+  private void assertDisposedStatuses() {
+    check(PROBER_TIMEOUT, POLLING_FREQUENCY, () -> {
+      synchronized (disposedStatuses) {
+        return disposedStatuses.size() >= 2;
+      }
+    });
+    assertThat(disposedStatuses, contains(0, 1));
   }
 
   private HeisenbergExtension invokeDynamicConfig(String flowName, String configName, String payload) throws Exception {
