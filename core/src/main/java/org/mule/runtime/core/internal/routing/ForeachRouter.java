@@ -12,7 +12,6 @@ import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
@@ -221,6 +220,8 @@ class ForeachRouter {
     Optional<ItemSequenceInfo> itemSequenceInfo = of(ItemSequenceInfo.of(foreachContext.getElementNumber().get()));
     // For each TypedValue part process the nested chain using the event from the previous part.
     CoreEvent.Builder partEventBuilder = CoreEvent.builder(event).itemSequenceInfo(itemSequenceInfo);
+    // Update type value for streaming
+    TypedValue managedValue = owner.manageTypeValueForStreaming(currentValue, event);
     if (currentValue.getValue() instanceof EventBuilderConfigurer) {
       // Support EventBuilderConfigurer currently used by Batch Module
       EventBuilderConfigurer configurer = (EventBuilderConfigurer) currentValue.getValue();
@@ -232,11 +233,9 @@ class ForeachRouter {
     } else if (currentValue.getValue() instanceof Message) {
       // If value is a Message then use it directly conserving attributes and properties.
       Message message = (Message) currentValue.getValue();
-      TypedValue managedValue = updateTypedValueForStreaming(message.getPayload(), event, streamingManager);
       partEventBuilder.message(Message.builder(message).payload(managedValue).build());
     } else {
       // Otherwise create a new message
-      TypedValue managedValue = updateTypedValueForStreaming(currentValue, event, streamingManager);
       partEventBuilder.message(Message.builder().payload(managedValue).build());
     }
     return partEventBuilder

@@ -165,16 +165,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
       int counter = 0;
       List currentBatch = new ArrayList<>();
       while (iterator.hasNext() && counter < batchSize) {
-        TypedValue managedValue;
-        TypedValue<?> typedValue = iterator.next();
-        if (typedValue.getValue() instanceof EventBuilderConfigurer) {
-          managedValue = typedValue;
-        } else if (typedValue.getValue() instanceof Message) {
-          Message message = (Message) typedValue.getValue();
-          managedValue = updateTypedValueForStreaming(message.getPayload(), event, streamingManager);
-        } else {
-          managedValue = updateTypedValueForStreaming(typedValue, event, streamingManager);
-        }
+        TypedValue managedValue = manageTypeValueForStreaming(iterator.next(), event);
         currentBatch.add(managedValue);
         counter++;
       }
@@ -188,6 +179,20 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
     return currentValue;
   }
+
+  protected TypedValue manageTypeValueForStreaming(TypedValue typedValue, CoreEvent event) {
+    TypedValue managedValue;
+    if (typedValue.getValue() instanceof EventBuilderConfigurer) {
+      managedValue = typedValue;
+    } else if (typedValue.getValue() instanceof Message) {
+      Message message = (Message) typedValue.getValue();
+      managedValue = updateTypedValueForStreaming(message.getPayload(), event, streamingManager);
+    } else {
+      managedValue = updateTypedValueForStreaming(typedValue, event, streamingManager);
+    }
+    return managedValue;
+  }
+
 
   private static class EventBuilderConfigurerIteratorWrapper implements Iterator<TypedValue<?>> {
 
