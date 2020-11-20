@@ -20,6 +20,7 @@ import com.google.common.collect.Iterators;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
 import org.mule.runtime.core.privileged.processor.Scope;
@@ -163,7 +165,16 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
       int counter = 0;
       List currentBatch = new ArrayList<>();
       while (iterator.hasNext() && counter < batchSize) {
-        TypedValue managedValue = updateTypedValueForStreaming(iterator.next(), event, streamingManager);
+        TypedValue managedValue;
+        TypedValue<?> typedValue = iterator.next();
+        if (typedValue.getValue() instanceof EventBuilderConfigurer) {
+          managedValue = typedValue;
+        } else if (typedValue.getValue() instanceof Message) {
+          Message message = (Message) typedValue.getValue();
+          managedValue = updateTypedValueForStreaming(message.getPayload(), event, streamingManager);
+        } else {
+          managedValue = updateTypedValueForStreaming(typedValue, event, streamingManager);
+        }
         currentBatch.add(managedValue);
         counter++;
       }
