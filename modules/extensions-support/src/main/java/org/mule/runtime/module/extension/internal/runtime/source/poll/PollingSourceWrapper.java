@@ -185,8 +185,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       DefaultPollContext pollContext = new DefaultPollContext(sourceCallback, getCurrentWatermark(), getUpdatedWatermark());
       try {
         delegate.poll(pollContext);
-        pollContext.getUpdatedWatermark()
-            .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator()));
+        if (!isRequestedToStop()) {
+          pollContext.getUpdatedWatermark()
+              .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator()));
+        }
       } catch (Throwable t) {
         LOGGER.error(format("Found exception trying to process item on source at flow '%s'. %s",
                             flowName, t.getMessage()),
@@ -249,12 +251,12 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       pollItem.validate();
 
       PollItemStatus status;
-      if (!acquireItem(pollItem, callbackContext)) {
+      if (isRequestedToStop()) {
+        status = SOURCE_STOPPING;
+      } else if (!acquireItem(pollItem, callbackContext)) {
         status = ALREADY_IN_PROCESS;
       } else if (!passesWatermark(pollItem)) {
         status = FILTERED_BY_WATERMARK;
-      } else if (isRequestedToStop()) {
-        status = SOURCE_STOPPING;
       } else {
         sourceCallback.handle(pollItem.getResult(), callbackContext);
         status = ACCEPTED;

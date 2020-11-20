@@ -11,6 +11,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
+import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.resetSource;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -52,6 +53,7 @@ public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalT
   @Override
   protected void doTearDown() throws Exception {
     ADOPTION_EVENTS.clear();
+    resetSource();
   }
 
   @Override
