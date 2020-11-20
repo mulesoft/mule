@@ -68,7 +68,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
 
   @Override
   protected void doTearDown() throws Exception {
-    disposedStatuses = new ArrayList<>();
+    disposedStatuses = null;
     config = null;
     super.doTearDown();
   }
