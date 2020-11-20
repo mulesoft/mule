@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <flow name="unprocessedItemsAreProcessedWhenSourceIsRestartedMidPoll" initialState="stopped">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="5" awaitOnItem="3">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+            <petstore:pets>
+                <petstore:pet value="Anibal" />
+                <petstore:pet value="Barbara" />
+                <petstore:pet value="Colonel Meow" />
+                <petstore:pet value="Daphne" />
+                <petstore:pet value="Elsa" />
+                <petstore:pet value="Colonel Meow" />
+                <petstore:pet value="Daphne" />
+                <petstore:pet value="Elsa" />
+            </petstore:pets>
+            <petstore:watermarks>
+                <petstore:watermark value="8" />
+                <petstore:watermark value="9" />
+                <petstore:watermark value="10" />
+                <petstore:watermark value="7" />
+                <petstore:watermark value="6" />
+                <petstore:watermark value="10" />
+                <petstore:watermark value="7" />
+                <petstore:watermark value="6" />
+            </petstore:watermarks>
+        </petstore:watermarking-pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="processedItemsWithSameWatermarkAreNotReprocessedWhenSourceIsRestartedMidPoll" initialState="stopped">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="3" awaitOnItem="3">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+            <petstore:pets>
+                <petstore:pet value="Anibal" />
+                <petstore:pet value="Barbara" />
+                <petstore:pet value="Colonel Meow" />
+                <petstore:pet value="ANIBAL" />
+                <petstore:pet value="BARBARA" />
+            </petstore:pets>
+            <petstore:watermarks>
+                <petstore:watermark value="1" />
+                <petstore:watermark value="5" />
+                <petstore:watermark value="4" />
+                <petstore:watermark value="1" />
+                <petstore:watermark value="5" />
+            </petstore:watermarks>
+        </petstore:watermarking-pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="processedItemsWithNewWatermarkAreReprocessedWhenSourceIsRestartedMidPoll" initialState="stopped">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="3" awaitOnItem="3">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+            <petstore:pets>
+                <petstore:pet value="Anibal" />
+                <petstore:pet value="Barbara" />
+                <petstore:pet value="Colonel Meow" />
+                <petstore:pet value="ANIBAL" />
+                <petstore:pet value="BARBARA" />
+                <petstore:pet value="Colonel Meow" />
+            </petstore:pets>
+            <petstore:watermarks>
+                <petstore:watermark value="4" />
+                <petstore:watermark value="5" />
+                <petstore:watermark value="2" />
+                <petstore:watermark value="9" />
+                <petstore:watermark value="10" />
+                <petstore:watermark value="2" />
+            </petstore:watermarks>
+        </petstore:watermarking-pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="adopt">
+        <test:processor class="org.mule.test.module.extension.source.PollingSourceRestartingTestCase$AdoptionProcessor"/>
+    </flow>
+</mule>
