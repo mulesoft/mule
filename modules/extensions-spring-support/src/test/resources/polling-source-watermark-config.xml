@@ -17,7 +17,7 @@
     </flow>
 
     <flow name="repeatedItemInNewPollSetsUpdatedWatermark" initialState="stopped">
-        <petstore:watermarking-pet-adoption-source itemsPerPoll="1" useWatermark="true" idempotent="true">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="1">
             <scheduling-strategy>
                 <fixed-frequency frequency="100"/>
             </scheduling-strategy>
@@ -36,7 +36,7 @@
     </flow>
 
     <flow name="repeatedItemInNewPollDoesNotSetUpdatedWatermark" initialState="stopped">
-        <petstore:watermarking-pet-adoption-source itemsPerPoll="2" useWatermark="true" idempotent="true">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="2">
             <scheduling-strategy>
                 <fixed-frequency frequency="100"/>
             </scheduling-strategy>
