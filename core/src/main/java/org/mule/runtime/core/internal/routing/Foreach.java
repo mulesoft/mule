@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
@@ -159,13 +160,20 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         // If batchSize > 1 then buffer sequence into List<TypedValue<T>> and convert to
         // TypedValue<List<TypedValue<T>>>.
         .transform(p -> batchSize > 1
-            ? from(p).buffer(batchSize).map(list -> new TypedValue<>(list, fromObject(list)))
+            ? from(p).buffer(batchSize).map(batch -> {
+              List<TypedValue> managedTypedValues =
+                  batch.stream().map(typedValue -> manageTypeValueForStreaming(typedValue, currentEvent.get())).collect(toList());
+              return new TypedValue<>(managedTypedValues, fromObject(managedTypedValues));
+            })
             : p)
         // For each TypedValue part process the nested chain using the event from the previous part.
         .flatMapSequential(typedValue -> {
           BaseEventContext childContext = newChildContext(currentEvent.get(), ofNullable(getLocation()));
 
           Builder partEventBuilder = builder(currentEvent.get());
+
+          // Update type value for streaming
+          TypedValue managedValue = manageTypeValueForStreaming(typedValue, currentEvent.get());
           if (typedValue.getValue() instanceof EventBuilderConfigurer) {
             // Support EventBuilderConfigurer currently used by Batch Module
             EventBuilderConfigurer configurer = (EventBuilderConfigurer) typedValue.getValue();
@@ -177,11 +185,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
           } else if (typedValue.getValue() instanceof Message) {
             // If value is a Message then use it directly conserving attributes and properties.
             Message message = (Message) typedValue.getValue();
-            TypedValue managedValue = updateTypedValueForStreaming(message.getPayload(), currentEvent.get(), streamingManager);
             partEventBuilder.message(Message.builder(message).payload(managedValue).build());
           } else {
             // Otherwise create a new message
-            TypedValue managedValue = updateTypedValueForStreaming(typedValue, currentEvent.get(), streamingManager);
             partEventBuilder.message(Message.builder().payload(managedValue).build());
           }
 
@@ -223,6 +229,19 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     } else {
       return splittingStrategy.split(request);
     }
+  }
+
+  private TypedValue manageTypeValueForStreaming(TypedValue typedValue, CoreEvent event) {
+    TypedValue managedValue;
+    if (typedValue.getValue() instanceof EventBuilderConfigurer) {
+      managedValue = typedValue;
+    } else if (typedValue.getValue() instanceof Message) {
+      Message message = (Message) typedValue.getValue();
+      managedValue = updateTypedValueForStreaming(message.getPayload(), event, streamingManager);
+    } else {
+      managedValue = updateTypedValueForStreaming(typedValue, event, streamingManager);
+    }
+    return managedValue;
   }
 
   @Override
