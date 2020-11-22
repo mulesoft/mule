@@ -56,6 +56,31 @@
         </heisenberg:known-addresses>
     </heisenberg:config>
 
+    <heisenberg:config name="heisenbergWithShortExpiration"
+                       myName="#[payload]"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="100000"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER">
+        <heisenberg:connection saulPhoneNumber="123-12-3">
+        </heisenberg:connection>
+        <expiration-policy maxIdleTime="2" timeUnit="SECONDS"/>
+        <heisenberg:enemies>
+            <heisenberg:enemy value="Gustavo Fring"/>
+            <heisenberg:enemy value="Hank"/>
+        </heisenberg:enemies>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+    </heisenberg:config>
+
     <heisenberg:config name="heisenbergWithCustomExpirationForSource"
                        myName="#['Walter Blanco']"
                        age="50"
@@ -112,6 +137,28 @@
 
     <flow name="dynamicWithCustomExpiration">
         <heisenberg:say-my-name config-ref="heisenbergWithCustomExpiration"/>
+    </flow>
+
+
+    <flow name="dynamicWithShortExpirationForPagedOperation">
+        <heisenberg:get-paged-personal-info config-ref="heisenbergWithShortExpiration"/>
+        <foreach collection="#[payload]">
+            <logger level="ERROR" message="#[payload.name]" />
+            <logger level="ERROR" message="#[%dw 2.0
+                            import * from dw::Runtime
+                            output application/json
+                            ---
+                            'Waiting for 3000 milliseconds' wait 3000]"/>
+        </foreach>
+        <logger level="ERROR" message="#[%dw 2.0
+                            import * from dw::Runtime
+                            output application/json
+                            ---
+                            'Waiting for 6000 milliseconds' wait 6000]"/>
+        <set-payload value="Pepito" />
+        <heisenberg:say-my-name config-ref="heisenberg"/>
+        <logger level="ERROR" message="#[payload]"/>
+        <heisenberg:die config-ref="heisenberg"/>
     </flow>
 
 </mule>
