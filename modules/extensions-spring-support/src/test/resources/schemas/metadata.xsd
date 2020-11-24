@@ -1079,6 +1079,44 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PartialMultiLevelKeyShowInDslResolverType" substitutionGroup="mule:abstract-operator" name="partial-multi-level-key-show-in-dsl-resolver"></xs:element>
+  <xs:complexType name="PartialMultiLevelKeyShowInDslResolverType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="key-show-in-dsl">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence></xs:sequence>
+                  <xs:attribute type="mule:expressionString" use="optional" name="continent"></xs:attribute>
+                  <xs:attribute type="mule:expressionString" use="optional" name="country"></xs:attribute>
+                  <xs:attribute type="mule:expressionString" use="optional" name="city"></xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShouldInheritOperationParentResolversType" substitutionGroup="mule:abstract-operator" name="should-inherit-operation-parent-resolvers"></xs:element>
   <xs:complexType name="ShouldInheritOperationParentResolversType">
     <xs:complexContent>
@@ -1160,6 +1198,33 @@
         <xs:attribute type="xs:string" use="optional" name="continent"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="country"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="city"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MetadataSourceWithPartialMultiLevelShowInDslType" substitutionGroup="mule:abstract-message-source" name="metadata-source-with-partial-multi-level-show-in-dsl"></xs:element>
+  <xs:complexType name="MetadataSourceWithPartialMultiLevelShowInDslType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="location">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence></xs:sequence>
+                  <xs:attribute type="xs:string" use="optional" name="continent"></xs:attribute>
+                  <xs:attribute type="xs:string" use="optional" name="country"></xs:attribute>
+                  <xs:attribute type="xs:string" use="optional" name="city"></xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
