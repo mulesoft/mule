@@ -72,7 +72,7 @@ public class ProxyServiceServingWsdlMule4092TestCase extends AbstractServiceAndF
      */
     private void setupExpectedWsdlFileName()
     {
-        if (SystemUtils.isSunJDK() || SystemUtils.isAppleJDK())
+        if (SystemUtils.isSunJDK() || SystemUtils.isAppleJDK() || SystemUtils.isAdoptOpenJDK())
         {
             expectedWsdlFileName = "test.wsdl";
         }
