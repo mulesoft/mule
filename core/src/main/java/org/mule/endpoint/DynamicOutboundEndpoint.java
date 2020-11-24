@@ -10,6 +10,7 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
@@ -28,6 +29,10 @@ import org.mule.api.transport.DispatchException;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.ObjectNameHelper;
+
+import static java.lang.Integer.getInteger;
+import static java.util.Collections.synchronizedMap;
+import static org.mule.api.config.MuleProperties.DYNAMIC_OUTBOUND_STATIC_ENDPOINT_SIZE;
 
 import java.util.Collections;
 import java.util.List;
@@ -59,7 +64,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     private final OutboundEndpoint prototypeEndpoint;
 
     // Caches resolved static endpoints to improve performance
-    private final Map<String, OutboundEndpoint> staticEndpoints = Collections.synchronizedMap(new LRUMap(64));
+    private final Map<String, OutboundEndpoint> staticEndpoints;
 
     private final DynamicURIBuilder dynamicURIBuilder;
     
@@ -69,6 +74,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     {
         this.endpointBuilder = endpointBuilder;
         this.dynamicURIBuilder = dynamicURIBuilder;
+        this.staticEndpoints = synchronizedMap(new LRUMap(getStaticEndpointsMapSize()));;
 
         try
         {
@@ -327,5 +333,10 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
     {
         this.exceptionHandler = messagingExceptionHandler;
+    }
+    
+    private Integer getStaticEndpointsMapSize()
+    {
+        return getInteger(DYNAMIC_OUTBOUND_STATIC_ENDPOINT_SIZE, 64);
     }
 }

@@ -107,6 +107,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     protected ObjectNameHelper objectNameHelper;
 
     protected transient Log logger = LogFactory.getLog(getClass());
+    private boolean fromDynamicEndpoint;
 
     public InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException
     {
@@ -230,15 +231,28 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     {
 
         String uri = uriBuilder.getConstructor();
-        if(muleContext.getExpressionManager().isExpression(uri))
+        boolean isDynamicEndpoint = muleContext.getExpressionManager().isExpression(uri);
+
+        if (isDynamicEndpoint)
         {
             if (muleContext.getExpressionManager().isValidExpression(uri))
             {
+                fromDynamicEndpoint = isDynamicEndpoint;
                 String dynamicAddress = getDynamicUriFrom(uri);
                 URIBuilder originalBuilder = uriBuilder;
                 uriBuilder = new URIBuilder(dynamicAddress, muleContext);
 
-                return new DynamicOutboundEndpoint(this, new DynamicURIBuilder(originalBuilder));
+                EndpointBuilder endpointBuilder;
+                try
+                {
+                    endpointBuilder = (EndpointBuilder) this.clone();
+                    return new DynamicOutboundEndpoint(endpointBuilder, new DynamicURIBuilder(originalBuilder));
+                }
+                catch (CloneNotSupportedException e)
+                {
+                    // This cannot happen, because we implement Cloneable
+                    throw new IllegalStateException("Unable to clone endpoint builder");
+                }
             }
             else
             {
@@ -251,8 +265,8 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
         EndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
 
-        List<MessageProcessor> mergedProcessors = addTransformerProcessors(endpointURI);
-        List<MessageProcessor> mergedResponseProcessors = addResponseTransformerProcessors(endpointURI);
+        List<MessageProcessor> mergedProcessors = addTransformerProcessors(endpointURI, !fromDynamicEndpoint);
+        List<MessageProcessor> mergedResponseProcessors = addResponseTransformerProcessors(endpointURI, !fromDynamicEndpoint);
 
         Connector connector = getConnector();
         if (connector != null && !connector.supportsProtocol(getScheme()))
@@ -296,14 +310,21 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
         return dynamicProtocol + "://dynamic";
     }
 
-    
     protected List<MessageProcessor> addTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException
+    {
+        return addTransformerProcessors(endpointURI, true);
+    }
+
+    protected List<MessageProcessor> addTransformerProcessors(EndpointURI endpointURI, boolean registerMessageProcessors) throws TransportFactoryException
     {
         List<MessageProcessor> tempProcessors = new LinkedList<MessageProcessor>(messageProcessors);
         tempProcessors.addAll(getTransformersFromUri(endpointURI));
         tempProcessors.addAll(transformers);
 
-        registerMessageProcessors(endpointURI, tempProcessors);
+        if (registerMessageProcessors)
+        {
+            registerMessageProcessors(endpointURI, tempProcessors);
+        }
 
         return tempProcessors;
     }
@@ -334,15 +355,23 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
         muleContext.getRegistry().registerObject(name, component);
     }
 
-    protected List<MessageProcessor> addResponseTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException
+    protected List<MessageProcessor> addResponseTransformerProcessors(EndpointURI endpointURI, boolean registerMessageProcessors) throws TransportFactoryException
     {
         List<MessageProcessor> tempResponseProcessors = new LinkedList<MessageProcessor>(
             responseMessageProcessors);
         tempResponseProcessors.addAll(getResponseTransformersFromUri(endpointURI));
         tempResponseProcessors.addAll(responseTransformers);
 
-        registerMessageProcessors(endpointURI, tempResponseProcessors);
+        if (registerMessageProcessors)
+        {
+            registerMessageProcessors(endpointURI, tempResponseProcessors);
+        }
         return tempResponseProcessors;
+    }
+
+    protected List<MessageProcessor> addResponseTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException
+    {
+        return addResponseTransformerProcessors(endpointURI, true);
     }
 
     protected void prepareToBuildEndpoint()
@@ -901,10 +930,10 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     @Override
     public int hashCode()
     {
-        return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector, 
-            deleteUnacceptedMessages, encoding, uriBuilder, initialState, name, properties,
-            responseTimeout, responseMessageProcessors, synchronous,
-            messageExchangePattern, transactionConfig, messageProcessors, disableTransportTransformer, mimeType});
+        return ClassUtils.hash(new Object[] {retryPolicyTemplate, connector, createConnector,
+                                             deleteUnacceptedMessages, encoding, uriBuilder, initialState, name, properties,
+                                             responseTimeout, responseMessageProcessors, synchronous,
+                                             messageExchangePattern, transactionConfig, messageProcessors, disableTransportTransformer, mimeType});
     }
 
     @Override
