@@ -214,5 +214,6 @@ public class MuleProperties
     public static final String MULE_MAX_ATTRIBUTE_SIZE = SYSTEM_PROPERTY_PREFIX + "xml.maxAttributeSize";
     public static final String MULE_ENABLE_BYTE_ARRAY_TO_INPUT_STREAM = SYSTEM_PROPERTY_PREFIX + "transformer.byteArrayToInputStream.enable";
     public static final String MULE_XML_JSON_MAX_DEPTH_SIZE = SYSTEM_PROPERTY_PREFIX + "xml.json.maxDepthSize";
+    public static final String DYNAMIC_OUTBOUND_STATIC_ENDPOINT_SIZE = SYSTEM_PROPERTY_PREFIX + "dynamic.outbound.static.endpoint.size";
 
 }
