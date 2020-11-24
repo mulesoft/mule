@@ -88,6 +88,7 @@
             <artifactId>jackson-xc</artifactId>
             <version>${jacksonVersion}</version>
         </dependency>
+        <!-- In case this version is changed, please verify shaded classes added due to MULE-18817 -->
         <dependency>
             <groupId>de.odysseus.staxon</groupId>
             <artifactId>staxon</artifactId>
@@ -136,12 +137,21 @@
                     <groupId>javax.mail</groupId>
                     <artifactId>mailapi</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.mozilla</groupId>
+                    <artifactId>rhino</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson2Version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <version>${rhinoVersion}</version>
         </dependency>
 
         <!-- test dependencies -->

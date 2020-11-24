@@ -30,6 +30,12 @@
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
             <version>${ognlVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
          <dependency>
             <groupId>jboss</groupId>

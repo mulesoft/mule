@@ -28,6 +28,7 @@ import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -345,10 +346,10 @@ public final class TlsConfiguration
             boolean keyAliasFound = false;
 
             Enumeration<String> aliases = keyStore.aliases();
-            while (aliases.hasMoreElements())
+            // Transform alias Enumeration into List because PKCS12KeyStore wrap 'alias' using 'Collections.enumeration'
+            // to avoid java.util.ConcurrentModificationException when trying to remove an entry
+            for (String alias : Collections.list(aliases))
             {
-                String alias = aliases.nextElement();
-
                 if (alias.equals(keyAlias))
                 {
                     // if alias is found all is valid but continue processing to strip out all

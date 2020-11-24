@@ -144,26 +144,26 @@
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
         <activemqVersion>5.15.0</activemqVersion>
-        <antVersion>1.10.8</antVersion>
+        <antVersion>1.10.9</antVersion>
         <antlrVersion>3.5.2</antlrVersion>
 
         <asmVersion>7.1</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
         <asyncHttpClientVersion>1.14-MULE-019</asyncHttpClientVersion>
         <bshVersion>2.0b4</bshVersion>
-        <bouncycastleVersion>1.66</bouncycastleVersion>
+        <bouncycastleVersion>1.67</bouncycastleVersion>
         <c3p0Version>0.9.5.4</c3p0Version>
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.4</commonsBeanUtilsVersion>
         <commonsExecVersion>1.2</commonsExecVersion>
         <commonsCliVersion>1.2</commonsCliVersion>
-        <commonsCodecVersion>1.13</commonsCodecVersion>
+        <commonsCodecVersion>1.15</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <commonsDbcpVersion>1.4</commonsDbcpVersion>
         <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
         <commonsHttpClientVersion>3.1-14-MULE-001</commonsHttpClientVersion>
-        <commonsIoVersion>2.6</commonsIoVersion>
+        <commonsIoVersion>2.8.0</commonsIoVersion>
         <commonsJxpathVersion>1.3</commonsJxpathVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
         <commonsLang3Version>3.6</commonsLang3Version>
@@ -183,7 +183,7 @@
         <hamcrestVersion>1.3</hamcrestVersion>
         <hk2Version>2.3.0-b05</hk2Version>
         <jacksonVersion>1.9.14-MULE-002</jacksonVersion>
-        <jackson2Version>2.10.0</jackson2Version>
+        <jackson2Version>2.11.3</jackson2Version>
         <javax.inject.version>1</javax.inject.version>
         <javax.transaction.version>1.2</javax.transaction.version>
         <jerseyVersion>2.11</jerseyVersion>
@@ -197,7 +197,7 @@
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.1.3</jdomVersion>
         <jdom2Version>2.0.6</jdom2Version>
-        <jettyVersion>9.4.31.v20200723</jettyVersion>
+        <jettyVersion>9.4.34.v20201102</jettyVersion>
         <jodaTimeVersion>2.9.7</jodaTimeVersion>
         <jschVersion>0.1.54</jschVersion>
         <jsonSchemaValidatorVersion>2.2.8</jsonSchemaValidatorVersion>
@@ -228,12 +228,13 @@
         <saxonVersion>9.7.0-21</saxonVersion>
         <slf4jVersion>1.7.24</slf4jVersion>
         <smackVersion>3.4.1</smackVersion>
-        <springVersion>4.3.28.RELEASE</springVersion>
+        <springVersion>4.3.29.RELEASE</springVersion>
         <springSecurityVersion>4.2.18.RELEASE</springSecurityVersion>
         <springLdapVersion>2.3.2.RELEASE</springLdapVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <staxApiVersion>3.1.4</staxApiVersion>
+        <!-- In case this version is changed, please verify shaded classes added due to MULE-18817 -->
         <staxonVersion>1.2</staxonVersion>
         <sxcVersion>0.7.3</sxcVersion>
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
@@ -244,6 +245,7 @@
         <xmlSecurityVersion>1.5.8</xmlSecurityVersion>
         <xstreamVersion>1.4.11.1</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
+        <openSamlVersion>2.6.6</openSamlVersion>
     </properties>
 
     <dependencies>
@@ -1166,7 +1168,7 @@
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-ext-jdk15on</artifactId>
+                <artifactId>bcprov-ext-jdk15to18</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
             <dependency>
@@ -1292,6 +1294,10 @@
                     <exclusion>
                         <groupId>org.codehaus.jackson</groupId>
                         <artifactId>jackson-jaxrs</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.jackson</groupId>
+                        <artifactId>jackson-mapper-asl</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -1598,7 +1604,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>3.2</version>
+                    <version>3.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1734,6 +1740,7 @@
 
                             <exclude>**/org/apache/**</exclude>
                             <exclude>**/org/springframework/**</exclude>
+                            <exclude>**/de/odysseus/staxon/**</exclude>
                             <exclude>**/org/glassfish/jersey/**</exclude>
                             <exclude>**/HttpTransactionContext.java</exclude>
                             <exclude>**/HttpConnection.java</exclude>
