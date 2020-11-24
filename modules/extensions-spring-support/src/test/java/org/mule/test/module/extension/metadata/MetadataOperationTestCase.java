@@ -676,6 +676,18 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     assertThat(dessertOrder.getName(), is("dessertOrder"));
   }
 
+  @Test
+  public void partialMultiLevelKeyShowInDslResolver() throws Exception {
+    location = Location.builder().globalName("partialMultiLevelKeyShowInDslResolver").addProcessorsPart().addIndexPart(0).build();
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
+    assertSuccessResult(metadataKeysResult);
+    final Set<MetadataKey> continents = getKeysFromContainer(metadataKeysResult.get());
+    assertThat(continents, hasSize(1));
+
+    assertThat(continents, hasItem(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT)));
+    assertThat(continents, not(hasItem(metadataKeyWithId(EUROPE).withDisplayName(EUROPE).withPartName(CONTINENT))));
+  }
+
   private MetadataType getResolvedTypeFromList() {
     final MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = metadataService.getOperationMetadata(location);
     assertSuccessResult(result);
