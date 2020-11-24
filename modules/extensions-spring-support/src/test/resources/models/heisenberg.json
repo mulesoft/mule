@@ -4664,6 +4664,212 @@
         },
         {
           "blocking": true,
+          "executionType": "CPU_LITE",
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "@ref:org.mule.test.heisenberg.extension.HeisenbergExtension"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": false,
+          "supportsStreaming": false,
+          "notifications": [],
+          "nestedComponents": [],
+          "errors": [],
+          "stereotype": {
+            "type": "HEISENBERG-EMPIRE",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          },
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": "false",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "fail",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONFIG",
+                      "namespace": "HEISENBERG",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "target",
+                  "displayModel": {
+                    "displayName": "Target Variable"
+                  },
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "REQUIRED",
+                  "defaultValue": "#[payload]",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "targetValue",
+                  "displayModel": {
+                    "displayName": "Target Value"
+                  },
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "showInDsl": false,
+              "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "getConfig",
+          "description": "",
+          "modelProperties": {},
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
           "executionType": "BLOCKING",
           "output": {
             "type": {
