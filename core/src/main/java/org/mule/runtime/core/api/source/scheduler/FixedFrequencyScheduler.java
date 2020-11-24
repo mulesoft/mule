@@ -10,6 +10,7 @@ package org.mule.runtime.core.api.source.scheduler;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.FixedFrequencySchedulerConfiguration;
@@ -24,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Implementation of {@link PeriodicScheduler} for a fixed-frequency job.
  */
-@Alias("fixed-frequency")
+@Alias(FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER)
 public final class FixedFrequencyScheduler extends PeriodicScheduler implements FixedFrequencySchedulerConfiguration {
 
   @Parameter
