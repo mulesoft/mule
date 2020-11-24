@@ -207,5 +207,6 @@ public class MuleProperties
     public static final String DISABLE_ERROR_COUNT_ON_ERROR_NOTIFICATION_DISABLED = SYSTEM_PROPERTY_PREFIX + "disable.error.count.on.error.notifications.disabled";
     public static final String MULE_MAX_ATTRIBUTE_SIZE = SYSTEM_PROPERTY_PREFIX + "xml.maxAttributeSize";
     public static final String MULE_XML_JSON_MAX_DEPTH_SIZE = SYSTEM_PROPERTY_PREFIX + "xml.json.maxDepthSize";
+    public static final String DYNAMIC_OUTBOUND_STATIC_ENDPOINT_SIZE = SYSTEM_PROPERTY_PREFIX + "dynamic.outbound.static.endpoint.size";
 
 }
