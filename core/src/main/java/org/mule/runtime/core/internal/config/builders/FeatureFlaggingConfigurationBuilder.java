@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.artifact;
+package org.mule.runtime.core.internal.config.builders;
 
 import static org.mule.runtime.core.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 
 /**
- * {@link ConfigurationBuilder} that registers a {@link FeatureFlaggingService} as {@link CustomService} with per-application
- * feature flags.
+ * {@link ConfigurationBuilder} that registers a {@link FeatureFlaggingService} as {@link CustomService} with the registered
+ * per-application feature flags.
  *
  * @see FeatureFlaggingRegistry
  * @see FeatureFlaggingService
@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
  */
 public final class FeatureFlaggingConfigurationBuilder extends AbstractConfigurationBuilder {
 
+
   private static final Logger LOGGER = getLogger(FeatureFlaggingConfigurationBuilder.class);
 
   @Override
@@ -40,16 +41,18 @@ public final class FeatureFlaggingConfigurationBuilder extends AbstractConfigura
     FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
 
     Map<String, Boolean> features = new HashMap<>();
+    LOGGER.debug("Configuring feature flags...");
     ffRegistry.getFeatureConfigurations().forEach((featureName, p) -> {
       boolean enabled = p.test(muleContext);
 
-      LOGGER.info("Configuring feature {} = {}", featureName, enabled);
+      LOGGER.debug("Setting feature {} = {}", featureName, enabled);
 
       features.put(featureName, enabled);
     });
 
     muleContext.getCustomizationService()
-        .registerCustomServiceImpl(FEATURE_FLAGGING_SERVICE_KEY, new DefaultFeatureFlaggingService(features));
+        .overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY, new DefaultFeatureFlaggingService(features));
+
   }
 
 }

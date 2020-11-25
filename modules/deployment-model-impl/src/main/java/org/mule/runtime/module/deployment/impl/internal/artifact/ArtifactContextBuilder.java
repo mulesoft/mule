@@ -183,7 +183,7 @@ public class ArtifactContextBuilder {
   }
 
   /**
-   * @param artifactDeclaration The artifact declaration to set.
+   * @param artifactDeclaration Artifact declaration.
    * @return
    */
   public ArtifactContextBuilder setArtifactDeclaration(ArtifactDeclaration artifactDeclaration) {
@@ -461,8 +461,6 @@ public class ArtifactContextBuilder {
             // Nothing to do
           }
         });
-        builders.add(new FeatureFlaggingConfigurationBuilder());
-
         DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         if (muleContextListener != null) {
           muleContextFactory.addListener(muleContextListener);
