@@ -263,7 +263,9 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
         .filter(param -> paramsInfo.containsKey(param.getName()))
         .map(param -> new ImmutableParameterModel(param.getName(), param.getDescription(), param.getType(),
                                                   param.hasDynamicType(), paramsInfo.get(param.getName()),
-                                                  param.isConfigOverride(), param.isComponentId(), null, null, null,
+                                                  param.isConfigOverride(), param.isComponentId(), param.getExpressionSupport(),
+                                                  param.getDefaultValue(),
+                                                  param.getRole(),
                                                   param.getDslConfiguration(), null, null, null, emptyList(), emptySet()))
         .collect(toList());
   }

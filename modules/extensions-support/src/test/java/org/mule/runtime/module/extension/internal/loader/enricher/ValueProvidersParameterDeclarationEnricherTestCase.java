@@ -17,9 +17,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 
+import org.hamcrest.Matcher;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -125,8 +128,8 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
     assertThat(parameter.isDeprecated(), is(false));
     assertThat(parameter.getDisplayModel().isPresent(), is(false));
     assertThat(parameter.getDescription(), is(""));
-    assertThat(parameter.getExpressionSupport(), nullValue());
-    assertThat(parameter.getRole(), nullValue());
+    assertThat(parameter.getExpressionSupport(), is(SUPPORTED));
+    assertThat(parameter.getRole(), is(BEHAVIOUR));
     assertThat(parameter.getAllowedStereotypes(), hasSize(0));
     assertThat(parameter.getModelProperties(), hasSize(0));
     assertThat(parameter.getDslConfiguration(), notNullValue());
@@ -138,11 +141,14 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
 
   @Test
   public void verifyDefaultValueOfValueProviderWithOptionalParameter() {
-    assertDefaultValueOfParameter(getParameterByOperationAndName("withOptionalParameter", "providedParameters"));
-    assertDefaultValueOfParameter(getParameterByOperationAndName("withOptionalParameterWithDefault", "providedParameters"));
+    assertDefaultValueOfParameter(getParameterByOperationAndName("withOptionalParameter", "providedParameters"), nullValue());
+    assertDefaultValueOfParameter(getParameterByOperationAndName("withOptionalParameterWithDefault", "providedParameters"),
+                                  is("OPERATION_DEFAULT_VALUE"));
     assertDefaultValueOfParameter(getParameterByOperationAndName("withVPOptionalParameterWithDefaultValue",
-                                                                 "providedParameters"));
-    assertDefaultValueOfParameter(getParameterByOperationAndName("withOptionalParameterAsRequired", "providedParameters"));
+                                                                 "providedParameters"),
+                                  is("OPERATION_DEFAULT_VALUE"));
+    assertDefaultValueOfParameter(getParameterByOperationAndName("withOptionalParameterAsRequired", "providedParameters"),
+                                  nullValue());
   }
 
   private void assertWithRequiredParameter(ParameterDeclaration parameterDeclaration, String parameterName) {
@@ -155,11 +161,12 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
     assertThat(parameterDeclaration.getValueProviderModel().getParameters(), contains(item(parameterName, true)));
   }
 
-  private void assertDefaultValueOfParameter(ParameterDeclaration parameterDeclaration) {
+  private void assertDefaultValueOfParameter(ParameterDeclaration parameterDeclaration, Matcher<Object> matcher) {
     assertThat(parameterDeclaration, notNullValue());
     assertThat(parameterDeclaration.getValueProviderModel(), notNullValue());
     assertThat(parameterDeclaration.getValueProviderModel().getParameters(), hasSize(1));
-    assertThat(parameterDeclaration.getValueProviderModel().getParameters(), contains(hasProperty("defaultValue", nullValue())));
+    assertThat(parameterDeclaration.getValueProviderModel().getParameters(),
+               contains(hasProperty("defaultValue", matcher)));
   }
 
   private ParameterDeclaration getParameterByOperationAndName(String operationName, String parameterName) {

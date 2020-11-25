@@ -79,6 +79,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -98,6 +100,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -696,6 +700,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -1319,6 +1325,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -3139,6 +3147,8 @@
                         "required": true,
                         "isConfigOverride": false,
                         "isComponentId": false,
+                        "expressionSupport": "SUPPORTED",
+                        "role": "BEHAVIOUR",
                         "dslConfiguration": {
                           "allowsInlineDefinition": true,
                           "allowsReferences": true,
@@ -3158,6 +3168,8 @@
                         "required": true,
                         "isConfigOverride": false,
                         "isComponentId": false,
+                        "expressionSupport": "SUPPORTED",
+                        "role": "BEHAVIOUR",
                         "dslConfiguration": {
                           "allowsInlineDefinition": true,
                           "allowsReferences": true,
@@ -3532,6 +3544,8 @@
                         "required": true,
                         "isConfigOverride": false,
                         "isComponentId": false,
+                        "expressionSupport": "SUPPORTED",
+                        "role": "BEHAVIOUR",
                         "dslConfiguration": {
                           "allowsInlineDefinition": true,
                           "allowsReferences": true,
@@ -3931,6 +3945,8 @@
                         "required": true,
                         "isConfigOverride": false,
                         "isComponentId": false,
+                        "expressionSupport": "SUPPORTED",
+                        "role": "BEHAVIOUR",
                         "dslConfiguration": {
                           "allowsInlineDefinition": true,
                           "allowsReferences": true,
@@ -4616,6 +4632,8 @@
                         "required": true,
                         "isConfigOverride": false,
                         "isComponentId": false,
+                        "expressionSupport": "SUPPORTED",
+                        "role": "BEHAVIOUR",
                         "dslConfiguration": {
                           "allowsInlineDefinition": true,
                           "allowsReferences": true,
@@ -6646,6 +6664,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -7996,6 +8016,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -8324,6 +8346,8 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -8346,6 +8370,9 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "false",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -8380,6 +8407,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -8420,6 +8449,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -8842,6 +8873,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -9089,6 +9122,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -9415,6 +9450,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -9689,6 +9726,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -9961,6 +10000,8 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -10233,6 +10274,8 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -10505,6 +10548,9 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "OPERATION_DEFAULT_VALUE",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -10780,6 +10826,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -10799,6 +10847,8 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -11100,6 +11150,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -11119,6 +11171,9 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "OPERATION_DEFAULT_VALUE",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -11421,6 +11476,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -11695,6 +11752,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -11714,6 +11773,8 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -12013,6 +12074,9 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "OPERATION_DEFAULT_VALUE",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -13271,6 +13335,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "NOT_SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -13876,6 +13942,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "NOT_SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -14329,6 +14397,8 @@
                     "required": false,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "NOT_SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -14351,6 +14421,9 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "NOT_SUPPORTED",
+                    "defaultValue": "false",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -14385,6 +14458,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "NOT_SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
@@ -14425,6 +14500,8 @@
                     "required": true,
                     "isConfigOverride": false,
                     "isComponentId": false,
+                    "expressionSupport": "NOT_SUPPORTED",
+                    "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
                       "allowsReferences": true,
