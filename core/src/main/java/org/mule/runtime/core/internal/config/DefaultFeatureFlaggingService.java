@@ -12,6 +12,7 @@ import java.util.Map;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.FeatureFlaggingService;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 /**
@@ -20,6 +21,10 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 public class DefaultFeatureFlaggingService implements FeatureFlaggingService {
 
   private final Map<String, Boolean> features;
+
+  public DefaultFeatureFlaggingService() {
+    this(emptyMap());
+  }
 
   public DefaultFeatureFlaggingService(Map<String, Boolean> features) {
     this.features = features;
