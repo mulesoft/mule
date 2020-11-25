@@ -52,7 +52,6 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PetStoreOperations {
@@ -69,7 +68,7 @@ public class PetStoreOperations {
 
   @Inject
   @Named(FEATURE_FLAGGING_SERVICE_KEY)
-  protected FeatureFlaggingService ffService;
+  private FeatureFlaggingService ffService;
 
   public static boolean shouldFailWithConnectionException;
   public static AtomicInteger operationExecutionCounter = new AtomicInteger(0);
