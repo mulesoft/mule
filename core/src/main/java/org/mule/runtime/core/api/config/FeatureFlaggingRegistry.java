@@ -19,8 +19,25 @@ import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 /**
- * @TODO document
- *
+ * Service used to register feature flags which will be evaluated at deployment time. For example:
+ * 
+ * <code>
+ *     // register a feature always "on"
+ *     FeatureFlaggingRegistry.getInstance().registerFeature("some feature", c -> true);
+ * </code>
+ * 
+ * <code>
+ *    &#64;Inject
+ *    &#64;Named(FEATURE_FLAGGING_SERVICE_KEY)
+ *    private FeatureFlaggingService featureFlaggingService;
+ *    // ....
+ *    
+ *    if (featureFlaggingService.isEnabled("some feature")) {
+ *        // ...
+ *    }
+ * </code>
+ * 
+ * @see FeatureFlaggingRegistry
  * @since 4.4.0
  */
 public class FeatureFlaggingRegistry {

@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 
 /**
- * {@link ConfigurationBuilder} that registers a {@link FeatureFlaggingService} as {@link CustomService} with the registered
- * per-application feature flags.
+ * {@link ConfigurationBuilder} that registers a {@link FeatureFlaggingService} as a {@link CustomService} exposing the registered
+ * feature flags.
  *
  * @see FeatureFlaggingRegistry
  * @see FeatureFlaggingService

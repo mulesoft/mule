@@ -8,8 +8,11 @@
 package org.mule.runtime.core.api.config;
 
 /**
- * @TODO document
+ * This service exposes the features that were flagged based on the configurations registered through the
+ * {@link FeatureFlaggingRegistry}. These configurations will be evaluated when an application is deployed, which means that each
+ * application will have its own set of flags independently of the rest of the applications deployed in a given runtime.
  * 
+ * @see FeatureFlaggingRegistry
  * @since 4.4.0
  */
 public interface FeatureFlaggingService {
