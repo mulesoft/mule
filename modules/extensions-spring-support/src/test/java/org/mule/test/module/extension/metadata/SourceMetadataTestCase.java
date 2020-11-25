@@ -94,6 +94,20 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
   }
 
   @Test
+  public void getSourceMetadataKeysMultiLevelShowInDsl() {
+    Location location = builder().globalName(SOURCE_METADATA_WITH_PARTIAL_MULTILEVEL_SHOW_IN_DSL).addSourcePart().build();
+
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService
+        .getMetadataKeys(location);
+    assertThat(metadataKeysResult, isSuccess());
+    final Set<MetadataKey> continents = getKeysFromContainer(metadataKeysResult.get());
+    assertThat(continents, hasSize(1));
+
+    assertThat(continents, hasItem(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT)));
+    assertThat(continents, not(hasItem(metadataKeyWithId(EUROPE).withDisplayName(EUROPE).withPartName(CONTINENT))));
+  }
+
+  @Test
   public void twoLevelPartialMultilevelSourceMetadataKeysExplicitResolution() throws Exception {
     Location location = builder().globalName(SOURCE_METADATA_WITH_PARTIAL_MULTILEVEL).addSourcePart().build();
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService

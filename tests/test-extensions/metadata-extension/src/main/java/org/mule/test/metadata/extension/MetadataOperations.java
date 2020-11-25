@@ -315,6 +315,13 @@ public class MetadataOperations {
     };
   }
 
+  public LocationKey partialMultiLevelKeyShowInDslResolver(@Connection MetadataConnection connection,
+                                                           @ParameterGroup(name = "keyShowInDsl",
+                                                               showInDsl = true) @MetadataKeyId(TestPartialMultiLevelKeyResolver.class) LocationKey locationKeyShowInDslParam,
+                                                           @Content @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {
+    return locationKeyShowInDslParam;
+  }
+
   private <T> PagingProvider<MetadataConnection, T> generateDummyPagingProvider() {
     return new PagingProvider<MetadataConnection, T>() {
 
