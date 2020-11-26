@@ -38,7 +38,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
  * </code>
  * 
  * @see FeatureFlaggingRegistry
- * @since 4.4.0
+ * @since 4.4.0, 4.3.0, 4.2.3
  */
 public class FeatureFlaggingRegistry {
 
@@ -46,12 +46,27 @@ public class FeatureFlaggingRegistry {
 
   private static final FeatureFlaggingRegistry INSTANCE = new FeatureFlaggingRegistry();
 
-  public static final FeatureFlaggingRegistry getInstance() {
+  /**
+   * Returns a single instance of this service.
+   * 
+   * @return A unique instance of the service
+   */
+  public static FeatureFlaggingRegistry getInstance() {
     return INSTANCE;
   }
 
   private FeatureFlaggingRegistry() {}
 
+  /**
+   * Registers a {@link Predicate} associated with an String which represents a given feature. The {@link Predicate} will be
+   * evaluated at deployment time, exposing all the features through a per-application overridden {@link FeatureFlaggingService}
+   * 
+   * @see FeatureFlaggingService
+   * 
+   * @param feature Name representing the registered feature
+   * @param condition This predicate will be evaluated at deployment time. The {@link MuleContext} corresponds to the context that
+   *        is being created for this application.
+   */
   public void registerFeature(String feature, Predicate<MuleContext> condition) {
     if (isNullOrEmpty(feature)) {
       throw new MuleRuntimeException(createStaticMessage("Invalid feature name"));
@@ -67,10 +82,18 @@ public class FeatureFlaggingRegistry {
     }
   }
 
+  /**
+   * Returns all the configurations that were registered by using {@link #registerFeature(String, Predicate)}
+   * 
+   * @return An unmodifiable map with the registered features.
+   */
   public Map<String, Predicate<MuleContext>> getFeatureConfigurations() {
     return unmodifiableMap(configurations);
   }
 
+  /**
+   * Cleans up all the previously registered configurations. This method is meant to be used just for test purposes.
+   */
   protected void clearFeatureConfigurations() {
     configurations.clear();
   }
