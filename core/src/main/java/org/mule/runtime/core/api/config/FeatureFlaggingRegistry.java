@@ -58,7 +58,7 @@ public class FeatureFlaggingRegistry {
   private FeatureFlaggingRegistry() {}
 
   /**
-   * Registers a {@link Predicate} associated with an String which represents a given feature. The {@link Predicate} will be
+   * Registers a {@link Predicate} associated with a String which represents a given feature. The {@link Predicate} will be
    * evaluated at deployment time, exposing all the features through a per-application overridden {@link FeatureFlaggingService}
    * 
    * @see FeatureFlaggingService
