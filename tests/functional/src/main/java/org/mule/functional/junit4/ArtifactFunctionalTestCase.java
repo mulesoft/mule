@@ -310,10 +310,11 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   }
 
   /**
-   * if this return {@code true} a new {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory} instance will be used by tests.
-   * It's useful when same test class load different extensions through tests.
+   * if this return {@code true} a new {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory}
+   * instance will be used by tests. It's useful when same test class load different extensions through tests.
    *
-   * @return whether the tests on this class need for {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory} to be generated again.
+   * @return whether the tests on this class need for
+   *         {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory} to be generated again.
    */
   protected boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
     return false;

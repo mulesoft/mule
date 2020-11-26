@@ -10,7 +10,7 @@ import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.util.MuleSystemProperties.*;
+import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
@@ -58,6 +58,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.deployment.impl.internal.application.PolicyMuleContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainMuleContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
@@ -109,7 +110,7 @@ public class ArtifactContextBuilder {
   private MuleContextListener muleContextListener;
   private String defaultEncoding;
   private ServiceRepository serviceRepository = Collections::emptyList;
-  private ExtensionModelLoaderRepository extensionModelLoaderRepository = (loaderDescriber) -> empty();
+  private ExtensionModelLoaderRepository extensionModelLoaderRepository = loaderDescriber -> empty();
   private boolean enableLazyInit;
   private boolean disableXmlValidations;
   private List<ConfigurationBuilder> additionalBuilders = emptyList();
@@ -117,7 +118,7 @@ public class ArtifactContextBuilder {
   private PolicyProvider policyProvider;
   private final List<ServiceConfigurator> serviceConfigurators = new ArrayList<>();
   private ExtensionManagerFactory extensionManagerFactory;
-  private DeployableArtifact parentArtifact;
+  private DeployableArtifact<?> parentArtifact;
   private Optional<Properties> properties = empty();
   private String dataFolderName;
   private LockFactory runtimeLockFactory;
@@ -182,7 +183,7 @@ public class ArtifactContextBuilder {
   }
 
   /**
-   * @param artifactDeclaration
+   * @param artifactDeclaration Artifact declaration.
    * @return
    */
   public ArtifactContextBuilder setArtifactDeclaration(ArtifactDeclaration artifactDeclaration) {
@@ -197,7 +198,7 @@ public class ArtifactContextBuilder {
    * @param parentArtifact artifact parent of the one being created.
    * @return the builder
    */
-  public ArtifactContextBuilder setParentArtifact(DeployableArtifact parentArtifact) {
+  public ArtifactContextBuilder setParentArtifact(DeployableArtifact<?> parentArtifact) {
     this.parentArtifact = parentArtifact;
     return this;
   }
@@ -319,7 +320,7 @@ public class ArtifactContextBuilder {
    *
    * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact
    *        components from the configuration will be created on demand when requested. For instance, when using
-   *        {@link ArtifactContext#getConnectivityTestingService()} and then invoking
+   *        {@link DefaultMuleApplication#getConnectivityTestingService()} and then invoking
    *        {@link ConnectivityTestingService#testConnection(Location)} will cause the creation of the component requested to do
    *        test connectivity, if it was not already created. when false, the application will be created completely at startup.
    * @return the builder
@@ -379,8 +380,7 @@ public class ArtifactContextBuilder {
       return properties;
     }
 
-    Map<String, String> mergedProperties = new HashMap<>();
-    mergedProperties.putAll(properties);
+    Map<String, String> mergedProperties = new HashMap<>(properties);
     for (Map.Entry<Object, Object> entry : deploymentProperties.entrySet()) {
       mergedProperties.put(entry.getKey().toString(), entry.getValue().toString());
     }
@@ -400,8 +400,7 @@ public class ArtifactContextBuilder {
                ONLY_APPLICATIONS_OR_POLICIES_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT);
     try {
       return withContextClassLoader(executionClassLoader, () -> {
-        List<ConfigurationBuilder> builders = new LinkedList<>();
-        builders.addAll(additionalBuilders);
+        List<ConfigurationBuilder> builders = new LinkedList<>(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
         boolean hasEmptyParentDomain = isConfigLess(parentArtifact);
         if (extensionManagerFactory == null) {
