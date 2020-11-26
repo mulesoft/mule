@@ -40,6 +40,8 @@ import java.util.List;
  */
 public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
 
+  private static final int MAX_REFRESH_ATTEMPTS = 2;
+
   public OAuthOperationMessageProcessor(ExtensionModel extensionModel,
                                         OperationModel operationModel,
                                         ConfigurationProvider configurationProvider,
@@ -68,6 +70,8 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
   private ExecutorCallback refreshable(ExecutionContextAdapter<OperationModel> operationContext, ExecutorCallback callback) {
     return new ExecutorCallback() {
 
+      private int attempts = 0;
+
       @Override
       public void complete(Object value) {
         callback.complete(value);
@@ -76,8 +80,8 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
       @Override
       public void error(Throwable e) {
         try {
-          if (refreshTokenIfNecessary(operationContext, e)) {
-            OAuthOperationMessageProcessor.super.executeOperation(operationContext, callback);
+          if (++attempts <= MAX_REFRESH_ATTEMPTS && refreshTokenIfNecessary(operationContext, e)) {
+            OAuthOperationMessageProcessor.super.executeOperation(operationContext, this);
           } else {
             callback.error(e);
           }
