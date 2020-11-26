@@ -6,6 +6,7 @@
  */
 package org.mule.test.petstore.extension;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
 import static org.mule.runtime.core.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
@@ -92,7 +93,7 @@ public class PetStoreOperations {
   @MediaType(TEXT_PLAIN)
   public String featureFlaggedEcho(String message) {
     if (ffService.isEnabled(LEGACY_BEHAVIOUR)) {
-      return String.format("%s [old way]", message);
+      return format("%s [old way]", message);
     }
     return message;
   }
