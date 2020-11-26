@@ -324,45 +324,22 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     });
   }
 
-  protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer_orig() {
-    FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
-
-    return pub -> from(propagateCompletion(pub,
-                                           sinkRecorder.flux(),
-                                           innerEventPub -> routeThroughProcessingStrategyTransformerInnerFlux(sinkRecorder,
-                                                                                                               innerEventPub),
-                                           () -> sinkRecorder.complete(), t -> sinkRecorder.error(t),
-                                           60000,
-                                           completionCallbackScheduler, getDslSource()))
-                                               .map(result -> {
-                                                 result.applyLeft(t -> {
-                                                   throw propagate(t);
-                                                 });
-                                                 return result.getRight();
-                                               });
-  }
-
   protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> pipelineOutlet = new FluxSinkRecorder<>();
-    Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> routePipeline = eventPublisher -> routeThroughProcessingStrategyTransformerInnerFlux(pipelineOutlet,
-            eventPublisher);
-    return eventPublisher -> from(eventPublisher).compose(nonRoutedFlux -> subscriberContext().flatMapMany(reactorContext -> {
-      if(reactorContext.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
-        return from(propagateCompletion(eventPublisher, pipelineOutlet.flux(), routePipeline, pipelineOutlet::complete, pipelineOutlet::error))
-                .map(result -> {
-                  result.applyLeft(t -> {
-                    throw propagate(t);
-                  });
-                  return result.getRight();
-                });
+    Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> splicePipelineWithPipelineOutlet =
+        eventPublisher -> routeThroughProcessingStrategyTransformerInnerFlux(pipelineOutlet,
+                                                                             eventPublisher);
+    return eventPublisher -> from(eventPublisher).compose(unroutedFlux -> subscriberContext().flatMapMany(reactorContext -> {
+      if (reactorContext.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
+        return handlePipelineError(from(propagateCompletion(eventPublisher, pipelineOutlet.flux(),
+                                                            splicePipelineWithPipelineOutlet, pipelineOutlet::complete,
+                                                            pipelineOutlet::error)));
       } else {
-        return from(propagateCompletion(eventPublisher, pipelineOutlet.flux(), routePipeline, pipelineOutlet::complete, pipelineOutlet::error, muleContext.getConfiguration().getShutdownTimeout(), completionCallbackScheduler))
-                .map(result -> {
-                  result.applyLeft(t -> {
-                    throw propagate(t);
-                  });
-                  return result.getRight();
-                });
+        return handlePipelineError(from(propagateCompletion(eventPublisher, pipelineOutlet.flux(),
+                                                            splicePipelineWithPipelineOutlet, pipelineOutlet::complete,
+                                                            pipelineOutlet::error,
+                                                            muleContext.getConfiguration().getShutdownTimeout(),
+                                                            completionCallbackScheduler, getDslSource())));
       }
     }));
   }
@@ -388,6 +365,16 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             ? event -> sink.accept(event)
             : event -> sinkEmit(event))
         .map(e -> Either.empty());
+  }
+
+  private Flux<CoreEvent> handlePipelineError(Flux<Either<Throwable, CoreEvent>> flux) {
+    return flux
+        .map(result -> {
+          result.applyLeft(t -> {
+            throw propagate(t);
+          });
+          return result.getRight();
+        });
   }
 
   private void sinkEmit(CoreEvent event) {
