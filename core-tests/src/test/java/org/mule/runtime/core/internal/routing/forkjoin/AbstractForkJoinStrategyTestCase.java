@@ -39,9 +39,11 @@ import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.junit.runner.RunWith;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -60,6 +62,8 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.List;
@@ -79,6 +83,7 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 
 @Feature(FORK_JOIN_STRATEGIES)
+@RunWith(FlakinessDetectorTestRunner.class)
 public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleContextTestCase {
 
   @Rule
@@ -125,6 +130,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   @Test
+  @FlakyTest(times = 10000)
   @Description("When a route timeout occurs all routes are still executed and  a CompositeRoutingException is thrown with details of timeout error and successful routes in RoutingResult.")
   public void timeoutDelayed() throws Throwable {
     strategy = createStrategy(processingStrategy, 1, true, 50);
@@ -347,7 +353,19 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   private CompositeRoutingException assertCompositeRoutingException(Throwable throwable, int errors) {
     assertThat(throwable, instanceOf(CompositeRoutingException.class));
     CompositeRoutingException compositeRoutingException = (CompositeRoutingException) throwable;
-    assertThat(compositeRoutingException.getErrors().size(), is(errors));
+
+    try {
+      assertThat(compositeRoutingException.getErrors().size(), is(errors));
+    } catch (AssertionError e) {
+
+      for (Error error : compositeRoutingException.getErrors()) {
+        System.out.println(error.getDescription());
+
+        error.getCause().printStackTrace();
+      }
+      throw e;
+    }
+
     return compositeRoutingException;
   }
 
