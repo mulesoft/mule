@@ -32,10 +32,12 @@ import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInter
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.ON_NEXT_FAILURE_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -322,7 +324,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     });
   }
 
-  protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
+  protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer_orig() {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
 
     return pub -> from(propagateCompletion(pub,
@@ -338,6 +340,31 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                                  });
                                                  return result.getRight();
                                                });
+  }
+
+  protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
+    FluxSinkRecorder<Either<Throwable, CoreEvent>> pipelineOutlet = new FluxSinkRecorder<>();
+    Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> routePipeline = eventPublisher -> routeThroughProcessingStrategyTransformerInnerFlux(pipelineOutlet,
+            eventPublisher);
+    return eventPublisher -> from(eventPublisher).compose(nonRoutedFlux -> subscriberContext().flatMapMany(reactorContext -> {
+      if(reactorContext.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
+        return from(propagateCompletion(eventPublisher, pipelineOutlet.flux(), routePipeline, pipelineOutlet::complete, pipelineOutlet::error))
+                .map(result -> {
+                  result.applyLeft(t -> {
+                    throw propagate(t);
+                  });
+                  return result.getRight();
+                });
+      } else {
+        return from(propagateCompletion(eventPublisher, pipelineOutlet.flux(), routePipeline, pipelineOutlet::complete, pipelineOutlet::error, muleContext.getConfiguration().getShutdownTimeout(), completionCallbackScheduler))
+                .map(result -> {
+                  result.applyLeft(t -> {
+                    throw propagate(t);
+                  });
+                  return result.getRight();
+                });
+      }
+    }));
   }
 
   private Flux<Either<Throwable, CoreEvent>> routeThroughProcessingStrategyTransformerInnerFlux(FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder,
