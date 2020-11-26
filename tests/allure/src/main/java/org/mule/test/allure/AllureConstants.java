@@ -116,6 +116,11 @@ public interface AllureConstants {
 
     }
 
+    interface FeatureFlaggingStory {
+
+      String FEATURE_FLAGGING = "Feature Flagging";
+    }
+
   }
 
   interface EmailFeature {

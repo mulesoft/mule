@@ -11,7 +11,11 @@ import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -21,6 +25,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
+@Feature(DEPLOYMENT_CONFIGURATION)
+@Story(FEATURE_FLAGGING)
 public class FeatureFlaggingRegistryTestCase {
 
   private static final String SOME_FEATURE = "SOME_FEATURE";

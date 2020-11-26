@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.internal.config;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,8 +28,12 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
 @RunWith(Parameterized.class)
+@Feature(DEPLOYMENT_CONFIGURATION)
+@Story(FEATURE_FLAGGING)
 public class DefaultFeatureFlaggingServiceTestCase {
 
   private static final String FEATURE_ENABLED = "FEATURE A";
