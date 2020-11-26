@@ -15,6 +15,7 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.tryToMutateConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.isPartOfActiveTransaction;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
@@ -32,11 +33,14 @@ import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -63,6 +67,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   private final RetryPolicyTemplate retryPolicy;
   private final boolean supportsOAuth;
   private boolean isFirstPage = true;
+  private AtomicBoolean alreadyClosed = new AtomicBoolean(false);
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
@@ -83,6 +88,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     this.supportsOAuth = supportsOAuth;
     retryPolicy = (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
     connectionSupplierFactory = createConnectionSupplierFactory();
+    tryToMutateConfigurationStats(config, (MutableConfigurationStats::addActiveComponent));
   }
 
   /**
@@ -141,6 +147,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       return function.apply(connection);
     } catch (Exception caughtException) {
       if (isFirstPage) {
+        tryToMutateConfigurationStats(config, (MutableConfigurationStats::discountActiveComponent));
         safely(() -> delegate.close(connection), e -> LOGGER.error("Found exception closing paging provider", e));
       } else if (refreshOAuth) {
         boolean tokenRefreshed;
@@ -187,6 +194,9 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     } finally {
       if (connectionSupplier != null) {
         safely(connectionSupplier::close, e -> LOGGER.debug("Found exception closing the connection supplier", e));
+      }
+      if (alreadyClosed.compareAndSet(false, true)) {
+        tryToMutateConfigurationStats(config, (MutableConfigurationStats::discountActiveComponent));
       }
       connectionSupplierFactory.dispose();
     }

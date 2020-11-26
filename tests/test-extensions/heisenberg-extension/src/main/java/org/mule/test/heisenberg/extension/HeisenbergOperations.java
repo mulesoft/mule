@@ -9,7 +9,6 @@ package org.mule.test.heisenberg.extension;
 import static java.lang.String.format;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.metadata.TypedValue.of;
@@ -22,7 +21,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KN
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKING_DOOR;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -611,10 +609,25 @@ public class HeisenbergOperations implements Disposable {
     };
   }
 
-  public HeisenbergExtension getConfig(@Config HeisenbergExtension config, @Optional(defaultValue = "false") boolean fail) {
-    if (fail) {
-      throw new MuleRuntimeException(createStaticMessage("Failed returning the config"));
-    }
-    return config;
+  @MediaType(value = TEXT_PLAIN, strict = false)
+  public InputStream nameAsStreamConnected(@Config HeisenbergExtension config, @Connection HeisenbergConnection connection) {
+    return new InputStream() {
+
+      private int timesRead = 0;
+      private byte[] name = config.getPersonalInfo().getName().getBytes();
+
+      @Override
+      public int read() {
+        if (config.getDispose() == 0) {
+          if (timesRead < name.length) {
+            timesRead++;
+            return name[timesRead - 1];
+          }
+          return -1;
+        } else {
+          throw new RuntimeException("Config is disposed.");
+        }
+      }
+    };
   }
 }

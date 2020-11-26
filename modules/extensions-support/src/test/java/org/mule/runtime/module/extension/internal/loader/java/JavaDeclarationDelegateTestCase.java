@@ -535,8 +535,8 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, "callGusFringNonBlocking", "");
     assertOperation(withOperationsDeclaration, "pagedOperationWithExtensionClassLoader", "");
     assertOperation(withOperationsDeclaration, "getDrugs", "");
-    assertOperation(withOperationsDeclaration, "failAtClosePagedOperation", "");
-    assertOperation(withOperationsDeclaration, "getConfig", "");
+    assertOperation(withOperationsDeclaration, "failingConnectivityPagedOperation", "");
+    assertOperation(withOperationsDeclaration, "nameAsStreamConnected", "");
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));

@@ -212,8 +212,8 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public java.util.Optional<Integer> getTotalResults(HeisenbergConnection heisenbergConnection) {
-        return java.util.Optional.empty();
+      public Optional<Integer> getTotalResults(HeisenbergConnection heisenbergConnection) {
+        return empty();
       }
 
       @Override
@@ -223,7 +223,9 @@ public class MoneyLaunderingOperation {
     };
   }
 
-  public PagingProvider<HeisenbergConnection, Integer> failAtClosePagedOperation(Integer failOn) {
+  public PagingProvider<HeisenbergConnection, Integer> failingConnectivityPagedOperation(Integer failOn,
+                                                                                         @org.mule.runtime.extension.api.annotation.param.Optional(
+                                                                                             defaultValue = "true") boolean failAtClose) {
     return new PagingProvider<HeisenbergConnection, Integer>() {
 
       @Override
@@ -232,7 +234,7 @@ public class MoneyLaunderingOperation {
         if (getPageCalls == failOn) {
           throw new ModuleException(CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
         }
-        if (getPageCalls > 2) {
+        if (getPageCalls > 3) {
           return emptyList();
         }
         return singletonList(0);
@@ -246,7 +248,9 @@ public class MoneyLaunderingOperation {
       @Override
       public void close(HeisenbergConnection connection) {
         closePagingProviderCalls++;
-        throw new IllegalArgumentException("Failed to close Paging Provider.");
+        if (failAtClose) {
+          throw new IllegalArgumentException("Failed to close Paging Provider.");
+        }
       }
     };
   }

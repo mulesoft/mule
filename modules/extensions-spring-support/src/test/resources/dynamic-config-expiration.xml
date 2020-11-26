@@ -8,7 +8,7 @@
       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <configuration>
-        <dynamic-config-expiration frequency="1000" timeUnit="MILLISECONDS">
+        <dynamic-config-expiration frequency="500" timeUnit="MILLISECONDS">
             <expiration-policy maxIdleTime="100" timeUnit="MILLISECONDS" />
         </dynamic-config-expiration>
     </configuration>
@@ -45,6 +45,34 @@
                        initialHealth="CANCER"
                        finalHealth="CANCER">
         <expiration-policy maxIdleTime="5" timeUnit="SECONDS"/>
+        <heisenberg:enemies>
+            <heisenberg:enemy value="Gustavo Fring"/>
+            <heisenberg:enemy value="Hank"/>
+        </heisenberg:enemies>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+    </heisenberg:config>
+
+    <heisenberg:config name="heisenbergWithShortExpiration"
+                       myName="#['Walter White']"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="100000"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER">
+        <heisenberg:connection saulPhoneNumber="123-12-3">
+            <reconnection >
+                <reconnect count="3" frequency="200"/>
+            </reconnection>
+        </heisenberg:connection>
+        <expiration-policy maxIdleTime="3" timeUnit="SECONDS"/>
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
@@ -117,7 +145,7 @@
     </flow>
 
     <flow name="dynamicConfigIsExpiredBeforeFlowEnds">
-        <heisenberg:get-config config-ref="heisenbergWithCustomExpiration"/>
+        <heisenberg:say-my-name config-ref="heisenbergWithShortExpiration"/>
         <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
         <logger level="ERROR" message="#[ import * from dw::Runtime --- 'Waiting for 10000ms' wait 10000]"/>
         <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
@@ -125,11 +153,9 @@
 
     <flow name="dynamicConfigIsExpiredBeforeFlowEndsWhenOperationFails">
         <try>
-            <set-payload value="Walter Blanco"/>
-            <heisenberg:get-config config-ref="heisenbergWithCustomExpiration"/>
+            <heisenberg:say-my-name config-ref="heisenbergWithShortExpiration"/>
             <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
-            <set-payload value="Walter Blanco"/>
-            <heisenberg:get-config config-ref="heisenbergWithCustomExpiration" fail="true"/>
+            <heisenberg:failing-paged-operation config-ref="heisenbergWithShortExpiration"/>
             <error-handler>
                 <on-error-continue>
                     <logger level="ERROR" message="#[ import * from dw::Runtime --- 'Waiting for 10000ms' wait 10000]"/>
@@ -138,6 +164,44 @@
             </error-handler>
         </try>
         <logger level="ERROR" message="#[ import * from dw::Runtime --- 'Waiting for 10000ms' wait 10000]"/>
+    </flow>
+
+    <flow name="dynamicWithShortExpirationForPagedOperation">
+        <heisenberg:failing-connectivity-paged-operation failOn="#[vars.failOn]" failAtClose="false" config-ref="heisenbergWithShortExpiration"/>
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor"/>
+        <foreach collection="#[payload]">
+            <logger level="ERROR" message="#[payload]" />
+            <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor"/>
+            <logger level="ERROR" message="#[%dw 2.0
+                            import * from dw::Runtime
+                            output application/json
+                            ---
+                            'Waiting for 5000 milliseconds' wait 5000]"/>
+        </foreach>
+        <logger level="ERROR" message="#[%dw 2.0
+                            import * from dw::Runtime
+                            output application/json
+                            ---
+                            'Waiting for 5000 milliseconds' wait 5000]"/>
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor"/>
+    </flow>
+
+    <flow name="dynamicWithShortExpirationForStreamingOperation">
+        <heisenberg:name-as-stream-connected config-ref="heisenbergWithShortExpiration" />
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor"/>
+        <logger level="ERROR" message="#[%dw 2.0
+                            import * from dw::Runtime
+                            output application/json
+                            ---
+                            'Waiting for 5000 milliseconds' wait 5000]"/>
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor"/>
+        <logger level="ERROR" message="#[payload]"/>
+        <logger level="ERROR" message="#[%dw 2.0
+                            import * from dw::Runtime
+                            output application/json
+                            ---
+                            'Waiting for 5000 milliseconds' wait 5000]"/>
+        <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor"/>
     </flow>
 
 </mule>
