@@ -17,8 +17,9 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import java.util.Optional;
 
 /**
- * Configuration info. which can be set when creating the MuleContext but becomes immutable after startup. TODO MULE-13121 Cleanup
- * MuleConfiguration removing redundant config in Mule 4
+ * Configuration info. which can be set when creating the MuleContext but becomes immutable after startup.
+ * <p/>
+ * TODO MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
  */
 @NoImplement
 public interface MuleConfiguration {
