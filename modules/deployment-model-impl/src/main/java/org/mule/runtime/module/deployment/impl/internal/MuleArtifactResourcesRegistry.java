@@ -140,7 +140,7 @@ public class MuleArtifactResourcesRegistry {
     domainManager = new DefaultDomainManager();
     this.domainClassLoaderFactory = trackDeployableArtifactClassLoaderFactory(
                                                                               new DomainClassLoaderFactory(containerClassLoader
-                                                                                  .getClassLoader()));
+                                                                                  .getClassLoader(), new DefaultNativeLibraryFinderFactory()));
 
     this.artifactPluginClassLoaderFactory =
         trackArtifactClassLoaderFactory(new ArtifactPluginClassLoaderFactory());
