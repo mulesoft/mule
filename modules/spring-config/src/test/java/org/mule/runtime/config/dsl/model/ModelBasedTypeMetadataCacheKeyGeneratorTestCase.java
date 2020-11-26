@@ -9,8 +9,11 @@ package org.mule.runtime.config.dsl.model;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
@@ -150,6 +153,47 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
+  }
+
+  @Test
+  public void operationsInputHashIdStructure() throws Exception {
+    Map<String, String> parameterResolversNames = new HashMap<>();
+    parameterResolversNames.put(CONTENT_NAME, CONTENT_NAME);
+    mockTypeResolversInformationModelPropertyWithInputTypes(operation, "category", parameterResolversNames);
+    MetadataCacheId keyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, CONTENT_NAME);
+    LOGGER.debug(keyParts.toString());
+
+    assertThat(keyParts.getParts(), hasSize(6));
+    assertThat(keyParts.getParts().get(2).getSourceElementName().get(), startsWith("category:"));
+    assertThat(keyParts.getParts().get(3).getSourceElementName().get(), startsWith("resolver:"));
+    assertThat(keyParts.getParts().get(4).getSourceElementName().get(), equalTo("Input"));
+    assertThat(keyParts.getParts().get(5).getSourceElementName().get(), equalTo("metadataKeyValues"));
+  }
+
+  @Test
+  public void operationsOutputHashIdStructure() throws Exception {
+    mockTypeResolversInformationModelPropertyWithOutputType(operation, "category", "outputResolverName");
+    MetadataCacheId keyParts = getIdForComponentOutputMetadata(getBaseApp(), OPERATION_LOCATION);
+    LOGGER.debug(keyParts.toString());
+
+    assertThat(keyParts.getParts(), hasSize(6));
+    assertThat(keyParts.getParts().get(2).getSourceElementName().get(), startsWith("category:"));
+    assertThat(keyParts.getParts().get(3).getSourceElementName().get(), startsWith("resolver:"));
+    assertThat(keyParts.getParts().get(4).getSourceElementName().get(), equalTo("Output"));
+    assertThat(keyParts.getParts().get(5).getSourceElementName().get(), equalTo("metadataKeyValues"));
+  }
+
+  @Test
+  public void operationsOutputAttributesHashIdStructure() throws Exception {
+    mockTypeResolversInformationModelPropertyWithAttributeType(operation, "category", "outputAttributesResolverName");
+    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(getBaseApp(), OPERATION_LOCATION);
+    LOGGER.debug(keyParts.toString());
+
+    assertThat(keyParts.getParts(), hasSize(6));
+    assertThat(keyParts.getParts().get(2).getSourceElementName().get(), startsWith("category:"));
+    assertThat(keyParts.getParts().get(3).getSourceElementName().get(), startsWith("resolver:"));
+    assertThat(keyParts.getParts().get(4).getSourceElementName().get(), equalTo("Attributes"));
+    assertThat(keyParts.getParts().get(5).getSourceElementName().get(), equalTo("metadataKeyValues"));
   }
 
   @Test
@@ -487,7 +531,8 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
                            declarer.newOperation(OPERATION_NAME)
                                .withConfig(MY_CONFIG)
                                .withParameterGroup(g -> g
-                                   .withParameter(CONTENT_NAME, "nonKey"))
+                                   .withParameter(CONTENT_NAME, "nonKey")
+                                   .withParameter(KEY_NAME, "keyA"))
                                .getDeclaration())
             .getDeclaration())
         .withGlobalElement(ElementDeclarer.forExtension(MULE_NAME)
@@ -506,7 +551,8 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
                            declarer.newOperation(ANOTHER_OPERATION_NAME)
                                .withConfig(MY_CONFIG)
                                .withParameterGroup(g -> g
-                                   .withParameter(ANOTHER_CONTENT_NAME, "anotherNonKey"))
+                                   .withParameter(ANOTHER_CONTENT_NAME, "anotherNonKey")
+                                   .withParameter(KEY_NAME, "keyA"))
                                .getDeclaration())
             .getDeclaration())
         .withGlobalElement(declarer.newGlobalParameter("complexType")
