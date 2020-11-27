@@ -326,17 +326,18 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> pipelineOutlet = new FluxSinkRecorder<>();
-    Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> splicePipelineWithPipelineOutlet =
-        eventPublisher -> routeThroughProcessingStrategyTransformerInnerFlux(pipelineOutlet,
-                                                                             eventPublisher);
     return eventPublisher -> from(eventPublisher).compose(unroutedFlux -> subscriberContext().flatMapMany(reactorContext -> {
       if (reactorContext.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
         return handlePipelineError(from(propagateCompletion(eventPublisher, pipelineOutlet.flux(),
-                                                            splicePipelineWithPipelineOutlet, pipelineOutlet::complete,
+                                                            pipelineInlet -> splicePipeline(pipelineOutlet,
+                                                                                            pipelineInlet, true),
+                                                            pipelineOutlet::complete,
                                                             pipelineOutlet::error)));
       } else {
         return handlePipelineError(from(propagateCompletion(eventPublisher, pipelineOutlet.flux(),
-                                                            splicePipelineWithPipelineOutlet, pipelineOutlet::complete,
+                                                            pipelineInlet -> splicePipeline(pipelineOutlet,
+                                                                                            pipelineInlet, false),
+                                                            pipelineOutlet::complete,
                                                             pipelineOutlet::error,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
                                                             completionCallbackScheduler, getDslSource())));
@@ -344,17 +345,22 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }));
   }
 
-  private Flux<Either<Throwable, CoreEvent>> routeThroughProcessingStrategyTransformerInnerFlux(FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder,
-                                                                                                Publisher<CoreEvent> innerEventPub) {
+  private Flux<Either<Throwable, CoreEvent>> splicePipeline(FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder,
+                                                            Publisher<CoreEvent> innerEventPub, boolean isWithinProcessToApply) {
     return from(innerEventPub)
         // Retrieve response publisher before error is communicated Subscribe the rest of reactor chain to response publisher,
-        // through which errors and responses will be emitted
+        // through which errors and responses will be emitted.
         .doOnNext(event -> ((BaseEventContext) event.getContext())
             .onResponse((e, t) -> {
               if (t != null) {
                 sinkRecorder.next(left(t, CoreEvent.class));
               } else if (e != null) {
                 sinkRecorder.next(right(Throwable.class, e));
+              }
+              if (isWithinProcessToApply) {
+                // When the event that entered the pipeline has been emitted by a Mono, the pipeline downstream can be safely completed,
+                // in order to cover the case of both error and event being null (see BaseEventContext.success()).
+                sinkRecorder.complete();
               }
             }))
 
