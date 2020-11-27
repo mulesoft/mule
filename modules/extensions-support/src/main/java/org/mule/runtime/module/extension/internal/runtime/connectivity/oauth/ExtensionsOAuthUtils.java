@@ -66,6 +66,7 @@ import org.slf4j.Logger;
 public final class ExtensionsOAuthUtils {
 
   private static final Logger LOGGER = getLogger(ExtensionsOAuthUtils.class);
+  public static final int MAX_REFRESH_ATTEMPTS = 2;
 
   public static AuthorizationCodeState toAuthorizationCodeState(AuthorizationCodeConfig config,
                                                                 ResourceOwnerOAuthContext context) {
@@ -222,19 +223,24 @@ public final class ExtensionsOAuthUtils {
    */
   public static <T> T withRefreshToken(Supplier<ConnectionProvider> connectionProviderSupplier, CheckedSupplier<T> supplier)
       throws Exception {
+    return withRefreshToken(connectionProviderSupplier, supplier, MAX_REFRESH_ATTEMPTS);
+  }
+
+  //  public static <T> T withRefreshToken(ExecutionContextAdapter operationContext, CheckedSupplier<T> supplier)
+  //          throws Exception {
+  //    return withRefreshToken(() -> getOAuthConnectionProvider(operationContext), supplier, MAX_REFRESH_ATTEMPTS);
+  //  }
+
+  public static <T> T withRefreshToken(Supplier<ConnectionProvider> connectionProviderSupplier,
+                                       CheckedSupplier<T> supplier,
+                                       int attempts)
+      throws Exception {
     try {
       return supplier.getChecked();
     } catch (Throwable e) {
-      if (refreshTokenIfNecessary(connectionProviderSupplier, e)) {
-        try {
-          return supplier.getChecked();
-        } catch (Exception exception) {
-          throw exception;
-        } catch (Throwable throwable) {
-          return supplier.handleException(throwable);
-        }
-      }
-      if (e instanceof Exception) {
+      if (attempts > 0 && refreshTokenIfNecessary(connectionProviderSupplier, e)) {
+        return withRefreshToken(connectionProviderSupplier, supplier, --attempts);
+      } else if (e instanceof Exception) {
         throw (Exception) e;
       } else {
         return supplier.handleException(e);

@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionExc
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.MAX_REFRESH_ATTEMPTS;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.isPartOfActiveTransaction;
@@ -112,7 +113,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    */
   private <R> R performWithConnection(Function<Object, R> function) {
     if (retryPolicy.isEnabled()) {
-      CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function, supportsOAuth)),
+      CompletableFuture<R> future = retryPolicy.applyPolicy(
+                                                            () -> completedFuture(withConnection(function)),
                                                             e -> !isFirstPage && !delegate.useStickyConnections()
                                                                 && shouldRetry(e, executionContext),
                                                             NULL_THROWABLE_CONSUMER,
@@ -130,11 +132,19 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
         throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
       }
     } else {
-      return withConnection(function, supportsOAuth);
+      return withConnection(function);
     }
   }
 
-  private <R> R withConnection(Function<Object, R> function, boolean refreshOAuth) {
+  private int getMaxOAuthRefreshAttempts() {
+    return supportsOAuth ? MAX_REFRESH_ATTEMPTS : 0;
+  }
+
+  private <R> R withConnection(Function<Object, R> function) {
+    return withConnection(function, getMaxOAuthRefreshAttempts());
+  }
+
+  private <R> R withConnection(Function<Object, R> function, int maxOAuthRefreshAttempts) {
     ConnectionSupplier connectionSupplier = getConnectionSupplier();
     Object connection = getConnection(connectionSupplier);
     try {
@@ -142,7 +152,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     } catch (Exception caughtException) {
       if (isFirstPage) {
         safely(() -> delegate.close(connection), e -> LOGGER.error("Found exception closing paging provider", e));
-      } else if (refreshOAuth) {
+      } else if (maxOAuthRefreshAttempts > 0) {
         boolean tokenRefreshed;
         try {
           tokenRefreshed = refreshTokenIfNecessary(executionContext, caughtException);
@@ -151,7 +161,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
         }
 
         if (tokenRefreshed) {
-          return withConnection(function, false);
+          return withConnection(function, --maxOAuthRefreshAttempts);
         }
       }
 

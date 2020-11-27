@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.MAX_REFRESH_ATTEMPTS;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -39,8 +40,6 @@ import java.util.List;
  * @since 4.0
  */
 public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
-
-  private static final int MAX_REFRESH_ATTEMPTS = 2;
 
   public OAuthOperationMessageProcessor(ExtensionModel extensionModel,
                                         OperationModel operationModel,
