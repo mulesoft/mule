@@ -121,7 +121,7 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
   @Test
   public void pagingProviderIsClosedSafelyAfterDataSourceIsFullyConsumed() throws Exception {
     resetCounters();
-    flowRunner("consumeFailAtClosePagedOperation").withPayload(4).run();
+    flowRunner("consumeFailAtClosePagedOperation").withPayload(-1).run();
     assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
   }
 
