@@ -3,6 +3,42 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.util.SystemUtils::isAdoptOpenJDK()",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "SystemUtils",
+          "methodName": "isAdoptOpenJDK",
+          "elementKind": "method",
+          "justification": "MULE-16890: AdoptJdk shown as un unsupported vendor"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.util.SystemUtils::isAmazonJDK()",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "SystemUtils",
+          "methodName": "isAmazonJDK",
+          "elementKind": "method",
+          "justification": "MULE-16890: AdoptJdk shown as un unsupported vendor"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.util.SystemUtils::isAzulJDK()",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "SystemUtils",
+          "methodName": "isAzulJDK",
+          "elementKind": "method",
+          "justification": "MULE-16890: AdoptJdk shown as un unsupported vendor"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.util.SystemUtils::isOpenJDK()",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "SystemUtils",
+          "methodName": "isOpenJDK",
+          "elementKind": "method",
+          "justification": "MULE-16890: AdoptJdk shown as un unsupported vendor"
+        },
+        {
           "code": "java.field.addedStaticField",
           "new": "field org.mule.runtime.core.api.config.MuleProperties.DOMAIN_HOME_DIRECTORY_PROPERTY",
           "package": "org.mule.runtime.core.api.config",
