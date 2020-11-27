@@ -8,6 +8,7 @@ package org.mule.runtime.config.api.dsl.model.metadata;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparingInt;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -163,6 +164,8 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
       typeInformation.getResolverName()
           .ifPresent(resolverName -> keyParts.add(createResolverMetadataCacheId(resolverName)));
 
+      keyParts.add(typeInformation.getComponentTypeMetadataCacheId());
+
       component.getModel(ComponentModel.class)
           .flatMap(cmpModel -> resolveMetadataKeyParts(component, cmpModel,
                                                        typeInformation.shouldIncludeConfiguredMetadataKeys()))
@@ -174,9 +177,9 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
       component.getModel(ConfigurationModel.class)
           .flatMap(cfgModel -> resolveGlobalElement(component))
           .ifPresent(keyParts::add);
-    }
 
-    keyParts.add(typeInformation.getComponentTypeMetadataCacheId());
+      keyParts.add(typeInformation.getComponentTypeMetadataCacheId());
+    }
 
     return of(new MetadataCacheId(keyParts,
                                   typeInformation.getComponentTypeMetadataCacheId().getSourceElementName()
@@ -270,9 +273,10 @@ public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheI
       List<MetadataCacheId> keyParts = elementModel.getParameters()
           .stream()
           .filter(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+          .sorted(comparingInt(p -> p.getModel().getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder()))
           .map(p -> resolveKeyFromSimpleValue(elementModel, p))
           .collect(toList());
-      return keyParts.isEmpty() ? empty() : of(new MetadataCacheId(keyParts, "metadataKey"));
+      return keyParts.isEmpty() ? empty() : of(new MetadataCacheId(keyParts, "metadataKeyValues"));
     }
 
     return empty();

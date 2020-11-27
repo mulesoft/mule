@@ -8,6 +8,7 @@ package org.mule.runtime.config.api.dsl.model.metadata;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparingInt;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -38,6 +39,7 @@ import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -161,6 +163,8 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
       typeInformation.getResolverName()
           .ifPresent(resolverName -> keyParts.add(createResolverMetadataCacheId(resolverName)));
 
+      keyParts.add(typeInformation.getComponentTypeMetadataCacheId());
+
       Object model = component.getModel();
       if (model instanceof ComponentModel) {
         resolveMetadataKeyParts(component, (ComponentModel) model, typeInformation.shouldIncludeConfiguredMetadataKeys())
@@ -172,9 +176,9 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
         resolveGlobalElement(component)
             .ifPresent(keyParts::add);
       }
-    }
 
-    keyParts.add(typeInformation.getComponentTypeMetadataCacheId());
+      keyParts.add(typeInformation.getComponentTypeMetadataCacheId());
+    }
 
     return of(new MetadataCacheId(keyParts,
                                   typeInformation.getComponentTypeMetadataCacheId().getSourceElementName()
@@ -268,6 +272,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
     if (isPartialFetching || resolveAllKeys) {
       componentModel.getAllParameterModels().stream()
           .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+          .sorted(comparingInt(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder()))
           .map(metadataKeyPart -> elementModel.findElement(metadataKeyPart.getName()))
           .filter(Optional::isPresent)
           .map(Optional::get)
@@ -275,7 +280,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
           .forEach(partElement -> resolveKeyFromSimpleValue(partElement).ifPresent(keyParts::add));
     }
 
-    return keyParts.isEmpty() ? empty() : of(new MetadataCacheId(keyParts, "metadataKey"));
+    return keyParts.isEmpty() ? empty() : of(new MetadataCacheId(keyParts, "metadataKeyValues"));
   }
 
   private Optional<MetadataCacheId> resolveKeyFromSimpleValue(DslElementModel<?> element) {

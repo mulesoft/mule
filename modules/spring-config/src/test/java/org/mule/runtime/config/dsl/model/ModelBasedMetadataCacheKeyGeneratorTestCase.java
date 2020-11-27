@@ -11,8 +11,10 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -71,6 +73,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.hamcrest.Matchers;
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.creation.MockSettingsImpl;
@@ -480,6 +484,37 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   }
 
   @Test
+  public void metadataKeyHashIdStructure() throws Exception {
+    mockMultiLevelMetadataKeyId(operation);
+    setPartialFetchingMock(operation);
+    mockTypeResolversInformationModelProperty(operation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
+                                              "keysResolver", true);
+
+    ArtifactDeclaration declaration = getBaseApp();
+    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
+        .getComponents().get(0);
+
+    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
+    operationDeclaration.addParameterGroup(keyGroup);
+
+    ParameterElementDeclaration partTwo = newParam(METADATA_KEY_PART_2, "8080");
+    keyGroup.addParameter(partTwo);
+
+    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
+
+    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
+
+    MetadataCacheId original = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    LOGGER.debug(original.toString());
+
+    assertThat(original.getParts(), hasSize(6));
+    assertThat(original.getParts().get(2).getSourceElementName().get(), startsWith("category:"));
+    assertThat(original.getParts().get(3).getSourceElementName().get(), startsWith("resolver:"));
+    assertThat(original.getParts().get(4).getSourceElementName().get(), equalTo("metadataKey"));
+    assertThat(original.getParts().get(5).getSourceElementName().get(), equalTo("metadataKeyValues"));
+  }
+
+  @Test
   public void partialFetchingMultiLevelPartValueModifiesHashForKeys() throws Exception {
     mockMultiLevelMetadataKeyId(operation);
     setPartialFetchingMock(operation);
@@ -493,12 +528,12 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
     operationDeclaration.addParameterGroup(keyGroup);
 
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
-
     ParameterElementDeclaration partTwo = newParam(METADATA_KEY_PART_2, "8080");
     keyGroup.addParameter(partTwo);
 
     keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
+
+    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
 
     MetadataCacheId original = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
     LOGGER.debug(original.toString());

@@ -15,6 +15,7 @@ import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mockito.junit.MockitoJUnit.rule;
@@ -51,10 +52,12 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.error.ErrorMapping;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -82,6 +85,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   protected static final String NAMESPACE = "mockns";
   protected static final String NAMESPACE_URI = "http://www.mulesoft.org/schema/mule/mockns";
   protected static final String SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/mockns/current/mule-mockns.xsd";
+  protected static final String KEY_NAME = "metadataKeyParameter";
   protected static final String CONTENT_NAME = "myCamelCaseName";
   protected static final String BEHAVIOUR_NAME = "otherName";
   protected static final String LIST_NAME = "listName";
@@ -118,6 +122,9 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
 
   @Mock(lenient = true)
   protected ParameterModel contentParameter;
+
+  @Mock(lenient = true)
+  protected ParameterModel keyParameter;
 
   @Mock(lenient = true)
   protected ParameterModel anotherContentParameter;
@@ -211,6 +218,20 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(contentParameter.getLayoutModel()).thenReturn(empty());
     when(contentParameter.getRole()).thenReturn(CONTENT);
 
+    when(keyParameter.getName()).thenReturn(KEY_NAME);
+    when(keyParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
+    when(keyParameter.getModelProperty(any())).thenReturn(empty());
+    when(keyParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
+    when(keyParameter.getLayoutModel()).thenReturn(empty());
+    when(keyParameter.getRole()).thenReturn(BEHAVIOUR);
+    MetadataKeyPartModelProperty keyParameterMetadataKeyPartModelProperty = mock(MetadataKeyPartModelProperty.class);
+    when(keyParameterMetadataKeyPartModelProperty.getName()).thenReturn("keyResolver");
+    when(keyParameterMetadataKeyPartModelProperty.getOrder()).thenReturn(1);
+    when(keyParameterMetadataKeyPartModelProperty.isPublic()).thenReturn(true);
+    when(keyParameterMetadataKeyPartModelProperty.isProvidedByKeyResolver()).thenReturn(true);
+    when(keyParameter.getModelProperty(MetadataKeyPartModelProperty.class))
+        .thenReturn(of(keyParameterMetadataKeyPartModelProperty));
+
     when(anotherContentParameter.getName()).thenReturn(ANOTHER_CONTENT_NAME);
     when(anotherContentParameter.getExpressionSupport()).thenReturn(ExpressionSupport.SUPPORTED);
     when(anotherContentParameter.getModelProperty(any())).thenReturn(empty());
@@ -218,13 +239,15 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(anotherContentParameter.getLayoutModel()).thenReturn(empty());
     when(anotherContentParameter.getRole()).thenReturn(CONTENT);
 
+    when(keyParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
+
     ObjectTypeBuilder type = TYPE_BUILDER.objectType();
     type.addField().key("field").value(TYPE_LOADER.load(String.class)).build();
     when(contentParameter.getType()).thenReturn(type.build());
     when(anotherContentParameter.getType()).thenReturn(type.build());
 
     this.defaultGroupParameterModels =
-        asList(nameParameter, configRefParameter, contentParameter, behaviourParameter, listParameter);
+        asList(nameParameter, configRefParameter, contentParameter, behaviourParameter, listParameter, keyParameter);
     when(parameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(parameterGroupModel.isShowInDsl()).thenReturn(false);
     when(parameterGroupModel.getParameterModels()).thenReturn(defaultGroupParameterModels);
@@ -232,6 +255,8 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
         .then(invocation -> {
           String paramName = invocation.getArgument(0);
           switch (paramName) {
+            case KEY_NAME:
+              return of(keyParameter);
             case CONTENT_NAME:
               return of(contentParameter);
             case LIST_NAME:
@@ -242,7 +267,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
           return Optional.empty();
         });
 
-    this.anotherDefaultGroupParameterModels = asList(anotherContentParameter, listParameter, configRefParameter);
+    this.anotherDefaultGroupParameterModels = asList(anotherContentParameter, listParameter, configRefParameter, keyParameter);
     when(anotherParameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(anotherParameterGroupModel.isShowInDsl()).thenReturn(false);
     when(anotherParameterGroupModel.getParameterModels()).thenReturn(anotherDefaultGroupParameterModels);
@@ -250,6 +275,8 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
         .then(invocation -> {
           String paramName = invocation.getArgument(0);
           switch (paramName) {
+            case KEY_NAME:
+              return of(keyParameter);
             case ANOTHER_CONTENT_NAME:
               return of(anotherContentParameter);
             case LIST_NAME:
