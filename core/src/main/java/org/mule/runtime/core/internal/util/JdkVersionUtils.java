@@ -9,7 +9,8 @@ package org.mule.runtime.core.internal.util;
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.util.SystemUtils;
 
