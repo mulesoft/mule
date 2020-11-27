@@ -3,6 +3,24 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.core.api.exception.Errors",
+          "new": "class org.mule.runtime.core.api.exception.Errors",
+          "superClass": "org.mule.runtime.core.api.error.Errors",
+          "package": "org.mule.runtime.core.api.exception",
+          "classSimpleName": "Errors",
+          "elementKind": "class",
+          "justification": "MULE-18992: Moved to another module."
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.extension.CoreRuntimeExtensionModelProvider",
+          "package": "org.mule.runtime.core.api.extension",
+          "classSimpleName": "CoreRuntimeExtensionModelProvider",
+          "elementKind": "class",
+          "justification": "MULE-18992: Moved to another module."
+        },
+        {
           "code": "java.method.removed",
           "old": "method boolean org.mule.runtime.core.api.config.DefaultMuleConfiguration::isThreadLoggingEnabled()",
           "package": "org.mule.runtime.core.api.config",

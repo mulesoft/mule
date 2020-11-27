@@ -42,7 +42,7 @@ public class ClassLoaderResourceProviderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void absolutePathResourceGetsLoaded() {
-    File file = FileUtils.toFile(getClass().getClassLoader().getResource("META-INF/mule-core.xsd"));
+    File file = FileUtils.toFile(getClass().getClassLoader().getResource("META-INF/mule-module.properties"));
     verifyResourceGetsLoadedSuccessfully(file.getAbsolutePath());
   }
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.exception;
+package org.mule.runtime.core.api.error;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.ANY_IDENTIFIER;
@@ -34,21 +34,23 @@ import static org.mule.runtime.core.api.error.Errors.Identifiers.TIMEOUT_ERROR_I
 import static org.mule.runtime.core.api.error.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.VALIDATION_ERROR_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 
 /**
  * Provides the constants for the core error types
- *
- * @deprecated Use org.mule.runtime.core.api.error.Errors instead.
  */
-@Deprecated
-public abstract class Errors extends org.mule.runtime.core.api.error.Errors {
+@NoExtend
+public abstract class Errors {
 
-  /**
-   * @deprecated Use org.mule.runtime.core.api.error.Errors.Identifiers instead.
-   */
-  @Deprecated
+  public static final String CORE_NAMESPACE_NAME = CORE_PREFIX.toUpperCase();
+
+  protected Errors() {
+
+  }
+
   public static final class Identifiers {
 
     // HANDLEABLE
@@ -196,16 +198,8 @@ public abstract class Errors extends org.mule.runtime.core.api.error.Errors {
     public static final String FATAL_ERROR_IDENTIFIER = "FATAL_JVM_ERROR";
   }
 
-  /**
-   * @deprecated Use org.mule.runtime.core.api.error.Errors.ComponentIdentifiers instead.
-   */
-  @Deprecated
   public static final class ComponentIdentifiers {
 
-    /**
-     * @deprecated Use org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable instead.
-     */
-    @Deprecated
     public static final class Handleable {
 
       public static final ComponentIdentifier ANY =
@@ -258,10 +252,6 @@ public abstract class Errors extends org.mule.runtime.core.api.error.Errors {
 
     }
 
-    /**
-     * @deprecated Use org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable instead.
-     */
-    @Deprecated
     public static final class Unhandleable {
 
       public static final ComponentIdentifier CRITICAL =
