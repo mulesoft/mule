@@ -326,15 +326,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> pipelineOutlet = new FluxSinkRecorder<>();
-    return eventPublisher -> from(eventPublisher).compose(unroutedFlux -> subscriberContext().flatMapMany(reactorContext -> {
+    return eventPublisher -> from(eventPublisher).compose(pipelineUpstream -> subscriberContext().flatMapMany(reactorContext -> {
       if (reactorContext.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
-        return handlePipelineError(from(propagateCompletion(eventPublisher, pipelineOutlet.flux(),
+        return handlePipelineError(from(propagateCompletion(pipelineUpstream, pipelineOutlet.flux(),
                                                             pipelineInlet -> splicePipeline(pipelineOutlet,
                                                                                             pipelineInlet, true),
                                                             pipelineOutlet::complete,
                                                             pipelineOutlet::error)));
       } else {
-        return handlePipelineError(from(propagateCompletion(eventPublisher, pipelineOutlet.flux(),
+        return handlePipelineError(from(propagateCompletion(pipelineUpstream, pipelineOutlet.flux(),
                                                             pipelineInlet -> splicePipeline(pipelineOutlet,
                                                                                             pipelineInlet, false),
                                                             pipelineOutlet::complete,
