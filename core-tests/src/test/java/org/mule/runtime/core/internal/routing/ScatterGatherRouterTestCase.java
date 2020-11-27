@@ -196,8 +196,8 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     router.initialise();
 
     verify(mockForkJoinStrategyFactory).createForkJoinStrategy(any(ProcessingStrategy.class), eq(concurrency), eq(true),
-            eq(timeout),
-            any(Scheduler.class), any(ErrorType.class));
+                                                               eq(timeout),
+                                                               any(Scheduler.class), any(ErrorType.class));
   }
 
 
@@ -244,7 +244,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
     muleContext.getInjector().inject(router);
     router.setRoutes(asList(newChain(empty(), contextPropagationCheckerA),
-            newChain(empty(), contextPropagationCheckerB)));
+                            newChain(empty(), contextPropagationCheckerB)));
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     router.initialise();
 
