@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static java.lang.Boolean.getBoolean;
+import static java.lang.System.getProperty;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.util.SystemUtils;
 
@@ -21,6 +25,7 @@ import org.slf4j.LoggerFactory;
 public class JdkVersionUtils {
 
   public static final String JAVA_VERSION_PROPERTY = "java.version";
+  private static final String MULE_JDK_DEBUG = SYSTEM_PROPERTY_PREFIX + "jdkDebug";
 
   public static class JdkVersion implements Comparable<JdkVersion> {
 
@@ -195,7 +200,7 @@ public class JdkVersionUtils {
       throw new IllegalArgumentException("Version range doesn't match pattern: " + VersionRange.VERSION_RANGES.pattern());
     }
 
-    List<JdkVersionRange> versions = new ArrayList<JdkVersionRange>();
+    List<JdkVersionRange> versions = new ArrayList<>();
     do {
       versions.add(new JdkVersionRange(m.group(1)));
     } while (m.find());
@@ -204,7 +209,7 @@ public class JdkVersionUtils {
   }
 
   public static JdkVersion getJdkVersion() {
-    return new JdkVersion(System.getProperty(JAVA_VERSION_PROPERTY));
+    return new JdkVersion(getProperty(JAVA_VERSION_PROPERTY));
   }
 
   public static String getSupportedJdks() {
@@ -212,7 +217,13 @@ public class JdkVersionUtils {
   }
 
   public static boolean isSupportedJdkVendor() {
-    return SystemUtils.isSunJDK() || SystemUtils.isAppleJDK() || SystemUtils.isIbmJDK();
+    return SystemUtils.isSunJDK() ||
+        SystemUtils.isAdoptOpenJDK() ||
+        SystemUtils.isOpenJDK() ||
+        SystemUtils.isAmazonJDK() ||
+        SystemUtils.isAzulJDK() ||
+        SystemUtils.isAppleJDK() ||
+        SystemUtils.isIbmJDK();
   }
 
   public static String getRecommendedJdks() {
@@ -272,6 +283,8 @@ public class JdkVersionUtils {
     if (!isSupportedJdkVendor()) {
       logger.info("You're executing with a JDK made by a vendor that is not on the recommended list of vendors. Vendor: "
           + JAVA_VENDOR + " Please consider changing to a recommended JDK vendor.");
+    } else if (getBoolean(MULE_JDK_DEBUG)) {
+      logger.warn("You're executing with a JDK made by a recommended vendor.");
     }
   }
 }
