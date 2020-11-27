@@ -576,7 +576,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         .build();
   }
 
-  public static <T> T sleepFor(T payload, long millis) {
+  public static Object sleepFor(Object payload, long millis) {
     try {
       sleep(millis);
     } catch (InterruptedException e) {
