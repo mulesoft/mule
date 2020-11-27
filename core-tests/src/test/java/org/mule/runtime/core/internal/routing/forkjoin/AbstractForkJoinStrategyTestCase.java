@@ -357,18 +357,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   private CompositeRoutingException assertCompositeRoutingException(Throwable throwable, int errors) {
     assertThat(throwable, instanceOf(CompositeRoutingException.class));
     CompositeRoutingException compositeRoutingException = (CompositeRoutingException) throwable;
-
-    try {
-      assertThat(compositeRoutingException.getErrors().size(), greaterThanOrEqualTo(errors));
-    } catch (AssertionError e) {
-
-      for (Error error : compositeRoutingException.getErrors()) {
-        System.out.println(error.getDescription());
-
-        error.getCause().printStackTrace();
-      }
-      throw e;
-    }
+    assertThat(compositeRoutingException.getErrors().size(), greaterThanOrEqualTo(errors));
 
     return compositeRoutingException;
   }
