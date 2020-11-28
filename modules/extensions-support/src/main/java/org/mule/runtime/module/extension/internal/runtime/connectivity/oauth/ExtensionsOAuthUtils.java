@@ -66,6 +66,11 @@ import org.slf4j.Logger;
 public final class ExtensionsOAuthUtils {
 
   private static final Logger LOGGER = getLogger(ExtensionsOAuthUtils.class);
+
+  /**
+   * Default max number of times that a refresh token and retry workflow should be executed for a component failing with
+   * {@link AccessTokenExpiredException}
+   */
   public static final int MAX_REFRESH_ATTEMPTS = 2;
 
   public static AuthorizationCodeState toAuthorizationCodeState(AuthorizationCodeConfig config,
@@ -211,7 +216,8 @@ public final class ExtensionsOAuthUtils {
 
   /**
    * Gets the value provided by a {@link CheckedSupplier}, if that fails and the reason is that a token refresh is needed,
-   * the refresh is performed and the supplier is prompted to provide the value one more time.
+   * the refresh is performed up to {@link #MAX_REFRESH_ATTEMPTS} times and the supplier is prompted to provide the value
+   * again.
    *
    * @param connectionProviderSupplier  a supplier of the connection provider that created a connection used in the given
    *                                    supplier to provide a value.
@@ -226,20 +232,31 @@ public final class ExtensionsOAuthUtils {
     return withRefreshToken(connectionProviderSupplier, supplier, MAX_REFRESH_ATTEMPTS);
   }
 
-  //  public static <T> T withRefreshToken(ExecutionContextAdapter operationContext, CheckedSupplier<T> supplier)
-  //          throws Exception {
-  //    return withRefreshToken(() -> getOAuthConnectionProvider(operationContext), supplier, MAX_REFRESH_ATTEMPTS);
-  //  }
-
+  /**
+   * Gets the value provided by a {@link CheckedSupplier}, if that fails and the reason is that a token refresh is needed,
+   * the refresh is performed up to {@code maxRefreshAttempts} times and the supplier is prompted to provide the value
+   * again.
+   * <p>
+   * If {@code maxRefreshAttempts} is lower than 1, no refresh or retries are performed
+   *
+   * @param connectionProviderSupplier a supplier of the connection provider that created a connection used in the given
+   *                                   supplier to provide a value.
+   * @param supplier                   a supplier that depends on an oauth based connection to provide a value.
+   * @param maxRefreshAttempts         max amount of times that the refresh token operation should be executed and the operation retried.
+   * @param <T>                        the type of the value to be provided
+   * @return the value the supplier gives
+   * @throws Exception
+   * @since 4.4.0
+   */
   public static <T> T withRefreshToken(Supplier<ConnectionProvider> connectionProviderSupplier,
                                        CheckedSupplier<T> supplier,
-                                       int attempts)
+                                       int maxRefreshAttempts)
       throws Exception {
     try {
       return supplier.getChecked();
     } catch (Throwable e) {
-      if (attempts > 0 && refreshTokenIfNecessary(connectionProviderSupplier, e)) {
-        return withRefreshToken(connectionProviderSupplier, supplier, --attempts);
+      if (maxRefreshAttempts > 0 && refreshTokenIfNecessary(connectionProviderSupplier, e)) {
+        return withRefreshToken(connectionProviderSupplier, supplier, --maxRefreshAttempts);
       } else if (e instanceof Exception) {
         throw (Exception) e;
       } else {
