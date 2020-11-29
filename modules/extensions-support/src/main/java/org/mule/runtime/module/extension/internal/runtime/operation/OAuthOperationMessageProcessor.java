@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.MAX_REFRESH_ATTEMPTS;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -68,6 +69,8 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
   private ExecutorCallback refreshable(ExecutionContextAdapter<OperationModel> operationContext, ExecutorCallback callback) {
     return new ExecutorCallback() {
 
+      private int attempts = 0;
+
       @Override
       public void complete(Object value) {
         callback.complete(value);
@@ -76,8 +79,8 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
       @Override
       public void error(Throwable e) {
         try {
-          if (refreshTokenIfNecessary(operationContext, e)) {
-            OAuthOperationMessageProcessor.super.executeOperation(operationContext, callback);
+          if (++attempts <= MAX_REFRESH_ATTEMPTS && refreshTokenIfNecessary(operationContext, e)) {
+            OAuthOperationMessageProcessor.super.executeOperation(operationContext, this);
           } else {
             callback.error(e);
           }
