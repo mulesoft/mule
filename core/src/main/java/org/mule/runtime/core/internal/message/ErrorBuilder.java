@@ -20,6 +20,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.internal.exception.SuppressedMuleException;
@@ -122,7 +123,11 @@ public final class ErrorBuilder {
           ((MessagingException) suppressedException).getEvent().getError().ifPresent(error -> {
             suppressions.add(error);
             // First suppressed error cause needs to be set in order to maintain backwards compatibility
-            exception = error.getCause();
+            // with the exception of the RetryPolicyExhaustedException, because
+            // UntilSuccessfulRouter was removing the underlying MessagingException until 4.2.2
+            if (!(muleException instanceof RetryPolicyExhaustedException)) {
+              exception = error.getCause();
+            }
           });
         }
       }
