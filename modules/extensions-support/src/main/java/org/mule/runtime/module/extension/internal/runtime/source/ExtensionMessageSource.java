@@ -70,6 +70,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
+import org.mule.runtime.extension.api.runtime.connectivity.Reconnectable;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
@@ -298,12 +299,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                        sourceAdapter.getName(), getLocation().getRootContainerName()),
                 exception);
 
+    if (!(sourceAdapter.getDelegate() instanceof Reconnectable)) {
+      exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
+    }
+
     retryScheduler.execute(() -> {
       Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
           .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
           .orElseGet(() -> create(sink -> {
             try {
-              exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
               restart();
               sink.success();
             } catch (Exception e) {
