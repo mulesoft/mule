@@ -19,9 +19,12 @@ import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 
 import org.mule.extension.test.extension.reconnection.FallibleReconnectableSource;
+import org.mule.extension.test.extension.reconnection.LongDisconnectionConnectionProvider;
 import org.mule.extension.test.extension.reconnection.NonReconnectableSource;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
+import org.mule.extension.test.extension.reconnection.SynchronizableConnection;
+import org.mule.extension.test.extension.reconnection.SynchronizableSource;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -232,6 +235,13 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     }
   }
 
+  @Test
+  public void connectionInvalidatedOnCallback() throws Exception {
+    resetCounters();
+    ((Startable) getFlowConstruct("synchronizableSource")).start();
+    check(TIMEOUT, POLL_DELAY, () -> SynchronizableConnection.disconnectionWaitedFullTimeout);
+  }
+
   private void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
     assertThat(template.isAsync(), is(async));
 
@@ -259,6 +269,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     closePagingProviderCalls = 0;
     getPageCalls = 0;
     disconnectCalls = 0;
+    SynchronizableSource.first = true;
   }
 
   private void clear(List<CoreEvent> list) {
