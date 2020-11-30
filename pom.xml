@@ -237,7 +237,7 @@
         <muleMavenClientImpl>1.4.0-HF-SNAPSHOT</muleMavenClientImpl>
         <muleMavenClientTest>1.4.0-HF-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.2.0-HF-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.2.1-HF-SNAPSHOT</muleApiVersion>
+        <muleApiVersion>1.2.1-20201130</muleApiVersion>
         <muleMetadataModelVersion>1.2.1-HF-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
