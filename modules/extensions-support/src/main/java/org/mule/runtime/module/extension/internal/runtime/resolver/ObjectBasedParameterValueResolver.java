@@ -56,6 +56,7 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
       if (field.isPresent()) {
         return getFieldValue(object, parameterName, reflectionCache);
       } else {
+        Object returnValue = null;
         for (ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
           Optional<ParameterGroupModelProperty> modelProperty =
               parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class);
@@ -69,7 +70,13 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
             if (desiredField.isPresent()) {
               return getFieldValue(parameterGroup, parameterName, reflectionCache);
             }
+            if (parameterGroupModel.isShowInDsl() && parameterGroupModel.getName().equals(parameterName)) {
+              returnValue = parameterGroup;
+            }
           }
+        }
+        if (returnValue != null) {
+          return returnValue;
         }
       }
     } catch (Exception e) {

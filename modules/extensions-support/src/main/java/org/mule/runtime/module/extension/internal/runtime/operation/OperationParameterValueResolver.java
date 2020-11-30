@@ -8,10 +8,13 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getShowInDslParameters;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -60,7 +63,18 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
   public Object getParameterValue(String parameterName) throws ValueResolvingException {
     try {
       return getParameterGroup(parameterName)
-          .map(group -> new ParameterGroupArgumentResolver<>(group, reflectionCache, expressionManager).resolve(executionContext))
+          .map(pair -> {
+            if (!pair.getSecond().isShowInDsl()) {
+              return new ParameterGroupArgumentResolver<>(pair.getFirst(), reflectionCache, expressionManager)
+                  .resolve(executionContext);
+            } else {
+              String parameterGroupContainerName = getContainerName(pair.getFirst().getContainer());
+              if (parameterGroupContainerName != null && executionContext.hasParameter(parameterGroupContainerName)) {
+                return executionContext.getParameter(parameterGroupContainerName);
+              }
+              return null;
+            }
+          })
           .orElseGet(() -> {
             String showInDslGroupName = showInDslParameters.get(parameterName);
 
@@ -88,16 +102,18 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
     }
   }
 
-  private Optional<ParameterGroupDescriptor> getParameterGroup(String parameterGroupName) {
+  private Optional<Pair<ParameterGroupDescriptor, ParameterGroupModel>> getParameterGroup(String parameterGroupName) {
     return operationModel.getParameterGroupModels().stream()
-        // when resolving an inline group, we need to obtain it from the executionContext
-        // and avoid its resolution using the ParameterGroupArgumentResolver
-        // thus we filter all the groups that are shown in the dsl
-        .filter(group -> group.getName().equals(parameterGroupName) && !group.isShowInDsl())
+        .filter(parameterGroupModel -> parameterGroupModel.getName().equals(parameterGroupName))
         .findFirst()
-        .map(group -> group.getModelProperty(ParameterGroupModelProperty.class))
-        .filter(Optional::isPresent)
-        .map(group -> group.get().getDescriptor());
+        .map(parameterGroupModel -> {
+          Optional<ParameterGroupModelProperty> parameterGroupModelModelProperty =
+              parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class);
+          if (!parameterGroupModelModelProperty.isPresent()) {
+            return null;
+          }
+          return new Pair(parameterGroupModelModelProperty.get().getDescriptor(), parameterGroupModel);
+        });
   }
 
   private Object getShowInDslParameterValue(String parameterName, String showInDslGroupName) {

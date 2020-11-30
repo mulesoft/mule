@@ -8,8 +8,11 @@ package org.mule.test.module.extension.metadata;
 
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
@@ -18,8 +21,11 @@ import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.STARTED_CONNECTION_PROVIDER_KEY_MASK;
 import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.STARTED_SOURCE_KEY_MASK;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.EUROPE;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
 
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -67,6 +73,20 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
     assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR),
                                       metadataKeyWithId(HOUSE), metadataKeyWithId(EXPECTED_STARTED_SOURCE_KEY_ID),
                                       metadataKeyWithId(EXPECTED_STARTED_CONNECTION_PROVIDER_KEY_ID)));
+  }
+
+  @Test
+  public void getSourceMetadataKeysMultiLevelShowInDsl() {
+    Location location = builder().globalName(SOURCE_METADATA_WITH_PARTIAL_MULTILEVEL_SHOW_IN_DSL).addSourcePart().build();
+
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService
+        .getMetadataKeys(location);
+    assertThat(metadataKeysResult, isSuccess());
+    final Set<MetadataKey> continents = getKeysFromContainer(metadataKeysResult.get());
+    assertThat(continents, hasSize(1));
+
+    assertThat(continents, hasItem(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT)));
+    assertThat(continents, not(hasItem(metadataKeyWithId(EUROPE).withDisplayName(EUROPE).withPartName(CONTINENT))));
   }
 
   @Test

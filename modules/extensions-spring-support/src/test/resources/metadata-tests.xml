@@ -275,4 +275,17 @@
         <logger/>
     </flow>
 
+    <flow name="partialMultiLevelKeyShowInDslResolver">
+        <metadata:partial-multi-level-key-show-in-dsl-resolver config-ref="config">
+            <metadata:key-show-in-dsl continent="AMERICA"/>
+        </metadata:partial-multi-level-key-show-in-dsl-resolver>
+    </flow>
+
+    <flow name="sourceMetadataWithPartialMultiLevelShowInDsl" initialState="stopped">
+        <metadata:metadata-source-with-partial-multi-level-show-in-dsl>
+            <metadata:location continent="AMERICA"/>
+        </metadata:metadata-source-with-partial-multi-level-show-in-dsl>
+        <logger/>
+    </flow>
+
 </mule>
