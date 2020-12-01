@@ -19,6 +19,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atMost;
@@ -63,7 +64,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.List;
@@ -240,12 +240,12 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     Processor processorSpy2 = createProcessorSpy(of(2));
     Processor processorSpy3 = createProcessorSpy(of(3));
 
-    CoreEvent orignial = testEvent();
+    CoreEvent original = testEvent();
     RuntimeException exception = new IllegalStateException();
-    RoutingPair failingPair = of(orignial, createFailingRoutingPair(exception));
-    RoutingPair okPair = of(orignial, createChain(processorSpy));
-    RoutingPair okPair2 = of(orignial, createChain(processorSpy2));
-    RoutingPair okPair3 = of(orignial, createChain(processorSpy3));
+    RoutingPair failingPair = of(original, createFailingRoutingPair(exception));
+    RoutingPair okPair = of(original, createChain(processorSpy));
+    RoutingPair okPair2 = of(original, createChain(processorSpy2));
+    RoutingPair okPair3 = of(original, createChain(processorSpy3));
 
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expectCause(is(exception));
@@ -365,8 +365,8 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   private RoutingResult assertRoutingResult(CompositeRoutingException compositeRoutingException, int results, int errors) {
     assertThat(compositeRoutingException.getErrorMessage().getPayload().getValue(), instanceOf(RoutingResult.class));
     RoutingResult routingResult = (RoutingResult) compositeRoutingException.getErrorMessage().getPayload().getValue();
-    assertThat(routingResult.getResults().size(), Matchers.lessThanOrEqualTo(results));
-    assertThat(routingResult.getFailures().size(), Matchers.greaterThanOrEqualTo(errors));
+    assertThat(routingResult.getResults().size(), lessThanOrEqualTo(results));
+    assertThat(routingResult.getFailures().size(), greaterThanOrEqualTo(errors));
     assertThat(routingResult.getFailures().size() + routingResult.getResults().size(), is(results + errors));
     return routingResult;
   }
