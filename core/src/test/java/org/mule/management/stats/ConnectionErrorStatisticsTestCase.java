@@ -51,7 +51,6 @@ public class ConnectionErrorStatisticsTestCase
     @Test
     public void connectionErrorsAreComputedAsExecutionErrors() throws Exception
     {
-
         List<Connector> connectors = new ArrayList<>();
 
         RetryPolicyTemplate retryPolicyTemplate = addConnectorWithRetryPolicy(connectors);
@@ -103,7 +102,6 @@ public class ConnectionErrorStatisticsTestCase
             return retryPolicy;
         }
     }
-
 
     /**
      * An static class to enable the computation of connection errors for testing
