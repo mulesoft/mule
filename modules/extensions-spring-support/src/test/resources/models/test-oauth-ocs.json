@@ -4349,7 +4349,6 @@
           "notifications": [],
           "sampleDataProviderModel": {
             "actingParameters": [],
-            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -5666,7 +5665,6 @@
                   "isComponentId": false,
                   "valueProviderModel": {
                     "actingParameters": [],
-                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "parameter",
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
@@ -13781,7 +13779,6 @@
           "notifications": [],
           "sampleDataProviderModel": {
             "actingParameters": [],
-            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -15098,7 +15095,6 @@
                   "isComponentId": false,
                   "valueProviderModel": {
                     "actingParameters": [],
-                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "parameter",
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
@@ -20316,7 +20312,6 @@
           "notifications": [],
           "sampleDataProviderModel": {
             "actingParameters": [],
-            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -21633,7 +21628,6 @@
                   "isComponentId": false,
                   "valueProviderModel": {
                     "actingParameters": [],
-                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "parameter",
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
@@ -27704,7 +27698,6 @@
           "notifications": [],
           "sampleDataProviderModel": {
             "actingParameters": [],
-            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -29021,7 +29014,6 @@
                   "isComponentId": false,
                   "valueProviderModel": {
                     "actingParameters": [],
-                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "parameter",
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
