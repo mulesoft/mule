@@ -16,6 +16,14 @@
         </reconnection:connection>
     </reconnection:config>
 
+    <reconnection:sync-config name="sync_Config">
+        <reconnection:long-disconnection>
+            <reconnection>
+                <reconnect-forever />
+            </reconnection>
+        </reconnection:long-disconnection>
+    </reconnection:sync-config>
+
     <flow name="reconnectForever" initialState="stopped">
         <reconnection:reconection-source config-ref="reconnection_Config">
             <reconnect-forever />
@@ -57,6 +65,15 @@
         <reconnection:get-retry-policy-template config-ref="reconnection_Config">
             <reconnect count="30" frequency="50" blocking="false"/>
         </reconnection:get-retry-policy-template>
+    </flow>
+
+    <flow name="synchronizableSource" initialState="stopped">
+        <reconnection:sync-source config-ref="sync_Config">
+            <scheduling-strategy >
+                <fixed-frequency />
+            </scheduling-strategy>
+        </reconnection:sync-source>
+        <logger message="#[payload]" />
     </flow>
     
 </mule>
