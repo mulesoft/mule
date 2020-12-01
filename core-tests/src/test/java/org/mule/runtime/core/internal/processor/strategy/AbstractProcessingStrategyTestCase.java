@@ -294,7 +294,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @After
   public void after() throws MuleException {
-    if (flow != null) {
+    if (flow != null && (!flow.getLifecycleState().isStopped() || !flow.getLifecycleState().isStopping()
+        || !flow.getLifecycleState().isDisposing() || !flow.getLifecycleState().isDisposed())) {
       flow.stop();
       flow.dispose();
     }
