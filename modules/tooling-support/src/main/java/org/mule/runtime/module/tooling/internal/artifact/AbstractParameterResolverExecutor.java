@@ -42,7 +42,7 @@ public class AbstractParameterResolverExecutor {
   protected final ReflectionCache reflectionCache;
   protected final ArtifactHelper artifactHelper;
 
-  public static final String INVALID_PARAMETER_VALUE = "INVALID_PARAMETER_VALUE";
+  public static final String INVALID_ACTING_PARAMETER_VALUE = "INVALID_ACTING_PARAMETER_VALUE";
 
   public AbstractParameterResolverExecutor(MuleContext muleContext, ExpressionManager expressionManager,
                                            ReflectionCache reflectionCache, ArtifactHelper artifactHelper) {

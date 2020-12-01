@@ -79,8 +79,8 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
     } catch (ValueResolvingException e) {
       return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
     } catch (ExpressionNotSupportedException e) {
-      return resultFrom(newFailure(new ValueResolvingException(e.getMessage(), INVALID_PARAMETER_VALUE))
-          .withFailureCode(INVALID_PARAMETER_VALUE).build());
+      return resultFrom(newFailure(new ValueResolvingException(e.getMessage(), INVALID_ACTING_PARAMETER_VALUE))
+          .withFailureCode(INVALID_ACTING_PARAMETER_VALUE).build());
     } catch (ExecutorExceptionWrapper e) {
       Throwable cause = e.getCause();
       ResolvingFailure.Builder failureBuilder = newFailure(cause);
