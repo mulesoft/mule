@@ -22,6 +22,7 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
+import org.reactivestreams.Publisher;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
@@ -74,6 +75,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
+import org.mule.runtime.extension.api.runtime.connectivity.Reconnectable;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
@@ -311,12 +313,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                        sourceAdapter.getName(), getLocation().getRootContainerName()),
                 exception);
 
+    Optional<Publisher<Void>> action = sourceAdapter.getReconnectionAction(exception);
+    if (!action.isPresent()) {
+      exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
+    }
+
     retryScheduler.execute(() -> {
-      Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
+      Mono<Void> reconnectionAction = action
           .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
           .orElseGet(() -> create(sink -> {
             try {
-              exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
               restart();
               sink.success();
             } catch (Exception e) {
