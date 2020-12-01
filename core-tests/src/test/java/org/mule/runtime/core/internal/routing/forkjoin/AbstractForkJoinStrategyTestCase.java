@@ -16,8 +16,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atMost;
@@ -39,9 +41,11 @@ import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.hamcrest.Matchers;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -125,25 +129,31 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   @Test
-  @Description("When a route timeout occurs all routes are still executed and  a CompositeRoutingException is thrown with details of timeout error and successful routes in RoutingResult.")
+  @Description("When a route timeout occurs all routes are still executed and a CompositeRoutingException is thrown with details of timeout error and successful routes in RoutingResult.")
   public void timeoutDelayed() throws Throwable {
     strategy = createStrategy(processingStrategy, 1, true, 50);
 
     Message pair2Result = of(2);
-    Processor pair2Processor = createProcessorSpy(pair2Result);
-    RoutingPair pair2 = of(testEvent(), createChain(pair2Processor));
+    Processor spyProcessor = createProcessorSpy(pair2Result);
 
     expectedException.expect(instanceOf(CompositeRoutingException.class));
 
-    invokeStrategyBlocking(strategy, testEvent(), asList(createRoutingPairWithSleep(of(1), 250), pair2),
-                           throwable -> {
-                             verify(pair2Processor, times(1)).process(any(CoreEvent.class));
-                             CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
-                             RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 1, 1);
-                             assertThat(routingResult.getFailures().get("0").getCause(),
-                                        instanceOf(TimeoutException.class));
-                             assertThat(routingResult.getResults().get("1"), is(pair2Result));
-                           });
+    RoutingPair routingPairWithSleep = createRoutingPairWithSleep(of(1), 250);
+    RoutingPair routingPairWithSpyProcessor = of(testEvent(), createChain(spyProcessor));
+
+    List<RoutingPair> routingPairs = asList(routingPairWithSleep, routingPairWithSpyProcessor);
+
+    CheckedConsumer<Throwable> verifyOnError = throwable -> {
+      verify(spyProcessor, times(1)).process(any(CoreEvent.class));
+      CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
+      RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 1, 1);
+
+      for (Error failure : routingResult.getFailures().values()) {
+        assertThat(failure.getCause(), instanceOf(TimeoutException.class));
+      }
+    };
+
+    invokeStrategyBlocking(strategy, testEvent(), routingPairs, verifyOnError);
   }
 
   @Test
@@ -230,12 +240,12 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     Processor processorSpy2 = createProcessorSpy(of(2));
     Processor processorSpy3 = createProcessorSpy(of(3));
 
-    CoreEvent orignial = testEvent();
+    CoreEvent original = testEvent();
     RuntimeException exception = new IllegalStateException();
-    RoutingPair failingPair = of(orignial, createFailingRoutingPair(exception));
-    RoutingPair okPair = of(orignial, createChain(processorSpy));
-    RoutingPair okPair2 = of(orignial, createChain(processorSpy2));
-    RoutingPair okPair3 = of(orignial, createChain(processorSpy3));
+    RoutingPair failingPair = of(original, createFailingRoutingPair(exception));
+    RoutingPair okPair = of(original, createChain(processorSpy));
+    RoutingPair okPair2 = of(original, createChain(processorSpy2));
+    RoutingPair okPair3 = of(original, createChain(processorSpy3));
 
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expectCause(is(exception));
@@ -347,15 +357,17 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   private CompositeRoutingException assertCompositeRoutingException(Throwable throwable, int errors) {
     assertThat(throwable, instanceOf(CompositeRoutingException.class));
     CompositeRoutingException compositeRoutingException = (CompositeRoutingException) throwable;
-    assertThat(compositeRoutingException.getErrors().size(), is(errors));
+    assertThat(compositeRoutingException.getErrors().size(), greaterThanOrEqualTo(errors));
+
     return compositeRoutingException;
   }
 
   private RoutingResult assertRoutingResult(CompositeRoutingException compositeRoutingException, int results, int errors) {
     assertThat(compositeRoutingException.getErrorMessage().getPayload().getValue(), instanceOf(RoutingResult.class));
     RoutingResult routingResult = (RoutingResult) compositeRoutingException.getErrorMessage().getPayload().getValue();
-    assertThat(routingResult.getResults().size(), is(results));
-    assertThat(routingResult.getFailures().size(), is(errors));
+    assertThat(routingResult.getResults().size(), lessThanOrEqualTo(results));
+    assertThat(routingResult.getFailures().size(), greaterThanOrEqualTo(errors));
+    assertThat(routingResult.getFailures().size() + routingResult.getResults().size(), is(results + errors));
     return routingResult;
   }
 
