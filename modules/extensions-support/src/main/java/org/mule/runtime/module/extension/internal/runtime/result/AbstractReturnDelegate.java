@@ -150,9 +150,11 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
           resultValue = resultValue
-              .copy().output(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler,
-                                                             getIncrementActiveComponent(operationContext),
-                                                             getDecrementActiveComponent(operationContext)))
+              .copy().output(componentDecoratorFactory
+                  .decorateOutput(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler,
+                                                                  getIncrementActiveComponent(operationContext),
+                                                                  getDecrementActiveComponent(operationContext)),
+                                  event.getCorrelationId()))
               .build();
         }
       }

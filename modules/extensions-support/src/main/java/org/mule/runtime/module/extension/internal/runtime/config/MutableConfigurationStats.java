@@ -27,7 +27,7 @@ public interface MutableConfigurationStats extends ConfigurationStats {
    *
    * @return the new value
    *
-   * @deprecated Use {@link #discountActiveComponent()} instead.
+   * @deprecated Use {@link #addActiveComponent()} instead.
    */
   @Deprecated
   int addInflightOperation();
@@ -48,7 +48,7 @@ public interface MutableConfigurationStats extends ConfigurationStats {
    * @return the new value
    * @since 4.1.6 4.2.2 4.3.0
    *
-   * @deprecated Use {@link #discountActiveComponent()} instead.
+   * @deprecated Use {@link #addActiveComponent()} instead.
    */
   @Deprecated
   int addRunningSource();

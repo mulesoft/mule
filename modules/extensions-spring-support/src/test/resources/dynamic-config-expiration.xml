@@ -72,7 +72,7 @@
                 <reconnect count="3" frequency="200"/>
             </reconnection>
         </heisenberg:connection>
-        <expiration-policy maxIdleTime="3" timeUnit="SECONDS"/>
+        <expiration-policy maxIdleTime="2" timeUnit="SECONDS"/>
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
@@ -176,13 +176,13 @@
                             import * from dw::Runtime
                             output application/json
                             ---
-                            'Waiting for 5000 milliseconds' wait 5000]"/>
+                            'Waiting for 5000 milliseconds' wait 4000]"/>
         </foreach>
         <logger level="ERROR" message="#[%dw 2.0
                             import * from dw::Runtime
                             output application/json
                             ---
-                            'Waiting for 5000 milliseconds' wait 5000]"/>
+                            'Waiting for 5000 milliseconds' wait 4000]"/>
         <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor"/>
     </flow>
 
@@ -193,14 +193,14 @@
                             import * from dw::Runtime
                             output application/json
                             ---
-                            'Waiting for 5000 milliseconds' wait 5000]"/>
+                            'Waiting for 5000 milliseconds' wait 4000]"/>
         <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor"/>
         <logger level="ERROR" message="#[payload]"/>
         <logger level="ERROR" message="#[%dw 2.0
                             import * from dw::Runtime
                             output application/json
                             ---
-                            'Waiting for 5000 milliseconds' wait 5000]"/>
+                            'Waiting for 5000 milliseconds' wait 4000]"/>
         <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor"/>
     </flow>
 

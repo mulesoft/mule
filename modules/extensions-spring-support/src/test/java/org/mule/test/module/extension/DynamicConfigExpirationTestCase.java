@@ -10,7 +10,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.check;
-import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closePagingProviderCalls;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.getPageCalls;
 
@@ -35,7 +34,7 @@ import org.junit.Test;
 
 public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctionalTestCase {
 
-  private static final int PROBER_TIMEOUT = 30000;
+  private static final int PROBER_TIMEOUT = 20000;
   private static final int POLLING_FREQUENCY = 2500;
 
   @Inject

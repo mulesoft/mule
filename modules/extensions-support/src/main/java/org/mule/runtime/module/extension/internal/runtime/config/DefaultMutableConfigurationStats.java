@@ -80,7 +80,7 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
   @Override
   public int addInflightOperation() {
     updateLastUsed();
-    activeComponents.incrementAndGet();
+    addActiveComponent();
     return inflightOperations.incrementAndGet();
   }
 
@@ -90,7 +90,7 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
   @Override
   public int discountInflightOperation() {
     updateLastUsed();
-    activeComponents.decrementAndGet();
+    discountActiveComponent();
     return inflightOperations.decrementAndGet();
   }
 
@@ -100,7 +100,7 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
   @Override
   public int addRunningSource() {
     updateLastUsed();
-    activeComponents.incrementAndGet();
+    addActiveComponent();
     return runningSources.incrementAndGet();
   }
 
@@ -110,7 +110,7 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
   @Override
   public int discountRunningSource() {
     updateLastUsed();
-    activeComponents.decrementAndGet();
+    discountActiveComponent();
     return runningSources.decrementAndGet();
   }
 
