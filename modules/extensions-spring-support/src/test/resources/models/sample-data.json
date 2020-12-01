@@ -289,6 +289,7 @@
               "aliasedPayload",
               "aliasedAttributes"
             ],
+            "parameters": [],
             "providerId": "ParameterizedTestSampleDataProvider",
             "requiresConfiguration": false,
             "requiresConnection": false
@@ -880,6 +881,7 @@
               "payload",
               "attributes"
             ],
+            "parameters": [],
             "providerId": "ConnectedTestSampleDataProvider",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -1455,6 +1457,7 @@
             "actingParameters": [
               "groupParameter"
             ],
+            "parameters": [],
             "providerId": "GroupTestSampleDataProvider",
             "requiresConfiguration": false,
             "requiresConnection": false
@@ -2045,6 +2048,7 @@
             "actingParameters": [
               "groupParameter"
             ],
+            "parameters": [],
             "providerId": "GroupTestSampleDataProvider",
             "requiresConfiguration": false,
             "requiresConnection": false
@@ -2636,6 +2640,7 @@
               "payload",
               "attributes"
             ],
+            "parameters": [],
             "providerId": "ConfigAwareTestSampleDataProvider",
             "requiresConfiguration": true,
             "requiresConnection": true
@@ -3212,6 +3217,7 @@
               "payload",
               "attributes"
             ],
+            "parameters": [],
             "providerId": "ConnectedTestSampleDataProvider",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -4030,6 +4036,7 @@
               "payload",
               "attributes"
             ],
+            "parameters": [],
             "providerId": "ConfigAwareTestSampleDataProvider",
             "requiresConfiguration": true,
             "requiresConnection": true
@@ -4577,6 +4584,7 @@
               "payload",
               "attributes"
             ],
+            "parameters": [],
             "providerId": "ConnectedTestSampleDataProvider",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -5137,6 +5145,7 @@
         "actingParameters": [
           "complex"
         ],
+        "parameters": [],
         "providerId": "ComplexActingParameterSampleDataProvider",
         "requiresConfiguration": false,
         "requiresConnection": false
@@ -5445,6 +5454,7 @@
           "payload",
           "attributes"
         ],
+        "parameters": [],
         "providerId": "ParameterizedTestSampleDataProvider",
         "requiresConfiguration": false,
         "requiresConnection": false
@@ -5780,6 +5790,7 @@
           "payload",
           "attributes"
         ],
+        "parameters": [],
         "providerId": "MuleContextAwareSampleDataProvider",
         "requiresConfiguration": false,
         "requiresConnection": false
@@ -6359,6 +6370,7 @@
           "aliasedPayload",
           "aliasedAttributes"
         ],
+        "parameters": [],
         "providerId": "ParameterizedTestSampleDataProvider",
         "requiresConfiguration": false,
         "requiresConnection": false
@@ -6682,6 +6694,7 @@
         "actingParameters": [
           "complex"
         ],
+        "parameters": [],
         "providerId": "ComplexActingParameterSampleDataProvider",
         "requiresConfiguration": false,
         "requiresConnection": false
@@ -6964,6 +6977,7 @@
           "payload",
           "attributes"
         ],
+        "parameters": [],
         "providerId": "ParameterizedTestSampleDataProvider",
         "requiresConfiguration": false,
         "requiresConnection": false
@@ -7273,6 +7287,7 @@
           "payload",
           "attributes"
         ],
+        "parameters": [],
         "providerId": "MuleContextAwareSampleDataProvider",
         "requiresConfiguration": false,
         "requiresConnection": false
@@ -7581,6 +7596,7 @@
         "actingParameters": [
           "groupParameter"
         ],
+        "parameters": [],
         "providerId": "GroupTestSampleDataProvider",
         "requiresConfiguration": false,
         "requiresConnection": false
@@ -7904,6 +7920,7 @@
         "actingParameters": [
           "groupParameter"
         ],
+        "parameters": [],
         "providerId": "GroupTestSampleDataProvider",
         "requiresConfiguration": false,
         "requiresConnection": false

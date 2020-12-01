@@ -69,6 +69,7 @@
                   "required1",
                   "required2"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValueProvider",
@@ -646,6 +647,7 @@
                 "actingParameters": [
                   "anyParameter"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "valueParam",
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
@@ -852,6 +854,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "Simple value provider",
@@ -1247,6 +1250,7 @@
                 "actingParameters": [
                   "anyParameter"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "valueParam",
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
@@ -1453,6 +1457,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "Simple value provider",
@@ -2138,6 +2143,7 @@
                   "isComponentId": false,
                   "valueProviderModel": {
                     "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
                     "providerId": "org.mule.test.values.extension.resolver.WithConfigValueProvider",
@@ -2603,6 +2609,7 @@
                   "isComponentId": false,
                   "valueProviderModel": {
                     "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
                     "providerId": "Value provider with connection",
@@ -3043,6 +3050,7 @@
                       "required1",
                       "required2"
                     ],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
                     "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValueProvider",
@@ -3396,6 +3404,7 @@
                     "actingParameters": [
                       "anyParameter"
                     ],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "valueParam",
                     "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
@@ -3447,6 +3456,7 @@
                   "isComponentId": false,
                   "valueProviderModel": {
                     "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
                     "providerId": "Simple value provider",
@@ -3773,6 +3783,7 @@
                     "actingParameters": [
                       "anyParameter"
                     ],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "valueParam",
                     "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
@@ -3824,6 +3835,7 @@
                   "isComponentId": false,
                   "valueProviderModel": {
                     "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
                     "providerId": "Simple value provider",
@@ -4436,6 +4448,7 @@
                     "actingParameters": [
                       "errorCode"
                     ],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "values",
                     "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
@@ -4759,6 +4772,7 @@
                   "isComponentId": false,
                   "valueProviderModel": {
                     "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
                     "providerId": "Simple value provider",
@@ -5089,6 +5103,7 @@
                   "isComponentId": false,
                   "valueProviderModel": {
                     "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
                     "providerId": "org.mule.test.values.extension.resolver.WithConfigValueProvider",
@@ -5423,6 +5438,7 @@
                   "isComponentId": false,
                   "valueProviderModel": {
                     "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
                     "providerId": "Value provider with connection",
@@ -5920,6 +5936,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
                 "providerId": "Simple value provider",
@@ -6441,6 +6458,7 @@
                 "actingParameters": [
                   "errorCode"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "values",
                 "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
@@ -6761,6 +6779,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "values",
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
@@ -6798,6 +6817,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 2,
                 "providerName": "values",
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
@@ -6835,6 +6855,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 3,
                 "providerName": "values",
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
@@ -7063,6 +7084,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
                 "providerId": "org.mule.test.values.extension.resolver.WithMuleContextValueProvider",
@@ -7287,6 +7309,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "Simple value provider",
@@ -7511,6 +7534,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "Simple value provider",
@@ -7764,6 +7788,7 @@
                 "actingParameters": [
                   "anyParameter"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "values",
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
@@ -7815,6 +7840,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "Simple value provider",
@@ -8070,6 +8096,7 @@
                   "requiredBoolean",
                   "strings"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider",
@@ -8471,6 +8498,7 @@
                 "actingParameters": [
                   "superString"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterWithAliasValueProvider",
@@ -8697,6 +8725,7 @@
                 "actingParameters": [
                   "anyParameter"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "values",
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
@@ -8748,6 +8777,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "Simple value provider",
@@ -9001,6 +9031,7 @@
                 "actingParameters": [
                   "complexActingParameter"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "providedParameter",
                 "providerId": "org.mule.test.values.extension.resolver.WithComplexActingParameter",
@@ -9254,6 +9285,7 @@
                 "actingParameters": [
                   "errorCode"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "values",
                 "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
@@ -9516,6 +9548,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
                 "providerId": "Simple value provider",
@@ -9798,6 +9831,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "hasBeenStarted",
                 "providerId": "org.mule.test.values.extension.resolver.TrueFalseValueProvider",
@@ -10302,6 +10336,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "values",
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
@@ -10339,6 +10374,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 2,
                 "providerName": "values",
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
@@ -10376,6 +10412,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 3,
                 "providerName": "values",
                 "providerId": "org.mule.test.values.extension.resolver.MultiLevelValueProvider",
@@ -10485,6 +10522,7 @@
                 "actingParameters": [
                   "anyParameter"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "values",
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
@@ -10715,6 +10753,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "Simple value provider",
@@ -11068,6 +11107,7 @@
                 "actingParameters": [
                   "superString"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterWithAliasValueProvider",
@@ -11365,6 +11405,7 @@
               "isComponentId": false,
               "valueProviderModel": {
                 "actingParameters": [],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "Simple value provider",
@@ -11499,6 +11540,7 @@
                   "requiredBoolean",
                   "strings"
                 ],
+                "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
                 "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider",
