@@ -14,6 +14,7 @@ import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryNotifier;
 import org.mule.api.retry.RetryPolicy;
 import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.management.stats.AllStatistics;
 import org.mule.retry.DefaultRetryContext;
 import org.mule.retry.PolicyStatus;
 import org.mule.retry.RetryPolicyExhaustedException;
@@ -81,6 +82,14 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
                 catch (Exception e)
                 {
                     cause = e;
+                    
+                    AllStatistics statistics = muleContext.getStatistics();
+                    
+                    if (statistics != null && statistics.isEnabled())
+                    {
+                        statistics.getApplicationStatistics().incConnectionErrors();
+                    }
+                    
                     if (logger.isDebugEnabled())
                     {
                         logger.debug(cause);

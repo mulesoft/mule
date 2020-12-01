@@ -9,13 +9,20 @@ package org.mule.management.stats;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.api.config.MuleProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 public class FlowConstructStatistics extends AbstractFlowConstructStatistics implements QueueStatistics
 {
     private static final long serialVersionUID = 5337576392583767442L;
+    
+    private boolean computeConnectionErrorsInApplicationStats = getBoolean(COMPUTE_CONNECTION_ERRORS_IN_STATS);
+        
     private final AtomicLong executionError = new AtomicLong(0);
     private final AtomicLong fatalError = new AtomicLong(0);
+    private final AtomicLong connectionErrors = new AtomicLong(0);
     private int threadPoolSize = 0;
     protected final ComponentStatistics flowStatistics = new ComponentStatistics();
     
@@ -140,7 +147,12 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
     {
         return fatalError.get();
     }
-
+    
+    public long getConnectionErrors()
+    {
+        return connectionErrors.get();
+    }
+    
     public int getThreadPoolSize()
     {
         return threadPoolSize;
@@ -165,6 +177,20 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
     public synchronized long getAverageQueueSize()
     {
         return averageQueueSize;
+    }
+
+    public void incConnectionErrors()
+    {
+        connectionErrors.addAndGet(1);
+    }
+
+    protected boolean computeConnectionErrors()
+    {
+        return computeConnectionErrorsInApplicationStats;
+    }
+    
+    protected void setComputeConnectionErrors(boolean computeConnectionErrorsInApplicationStats) {
+        this.computeConnectionErrorsInApplicationStats = computeConnectionErrorsInApplicationStats;
     }
 
 }
