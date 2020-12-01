@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -22,7 +20,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -31,7 +29,7 @@ import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarat
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
+import org.mule.runtime.extension.api.model.parameter.ImmutableActingParameterModel;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
@@ -112,11 +110,10 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
 
     declaration.addModelProperty(propertyBuilder.build());
 
-    return new SampleDataProviderModel(
+    return new SampleDataProviderModel(getActingParametersModel(resolverParameters, parameterNames, allParameters),
                                        getSampleDataProviderId(resolverClass),
                                        requiresConfiguration.get(),
-                                       requiresConnection.get(),
-                                       getParametersModel(resolverParameters, parameterNames, allParameters));
+                                       requiresConnection.get());
   }
 
   /**
@@ -161,17 +158,15 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
     return empty();
   }
 
-  private List<ParameterModel> getParametersModel(List<ExtensionParameter> parameterDeclarations,
-                                                  Map<String, String> parameterNames,
-                                                  List<ParameterDeclaration> allParameters) {
+  private List<ActingParameterModel> getActingParametersModel(List<ExtensionParameter> parameterDeclarations,
+                                                              Map<String, String> parameterNames,
+                                                              List<ParameterDeclaration> allParameters) {
     Map<String, Boolean> paramsInfo = parameterDeclarations.stream()
         .collect(toMap(param -> parameterNames.getOrDefault(param.getName(), param.getName()), ExtensionParameter::isRequired));
     return allParameters.stream()
         .filter(param -> paramsInfo.containsKey(param.getName()))
-        .map(param -> new ImmutableParameterModel(param.getName(), param.getDescription(), param.getType(),
-                                                  param.hasDynamicType(), paramsInfo.get(param.getName()),
-                                                  param.isConfigOverride(), param.isComponentId(), null, null, null,
-                                                  param.getDslConfiguration(), null, null, null, emptyList(), emptySet()))
+        .map(param -> new ImmutableActingParameterModel(param.getName(), paramsInfo.get(param.getName()),
+                                                        param.getDefaultValue()))
         .collect(toList());
   }
 

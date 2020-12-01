@@ -285,48 +285,14 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [
-              "aliasedPayload",
-              "aliasedAttributes"
-            ],
             "parameters": [
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "aliasedPayload",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               },
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "aliasedAttributes",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               }
             ],
             "providerId": "ParameterizedTestSampleDataProvider",
@@ -916,48 +882,14 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [
-              "payload",
-              "attributes"
-            ],
             "parameters": [
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "payload",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               },
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "attributes",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               }
             ],
             "providerId": "ConnectedTestSampleDataProvider",
@@ -1532,47 +1464,14 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [
-              "groupParameter"
-            ],
             "parameters": [
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "groupParameter",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               },
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": false,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "optionalParameter",
-                "description": "",
-                "modelProperties": {}
+                "required": false
               }
             ],
             "providerId": "GroupTestSampleDataProvider",
@@ -2162,47 +2061,14 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [
-              "groupParameter"
-            ],
             "parameters": [
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "groupParameter",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               },
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": false,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "optionalParameter",
-                "description": "",
-                "modelProperties": {}
+                "required": false
               }
             ],
             "providerId": "GroupTestSampleDataProvider",
@@ -2792,48 +2658,14 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [
-              "payload",
-              "attributes"
-            ],
             "parameters": [
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "payload",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               },
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "attributes",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               }
             ],
             "providerId": "ConfigAwareTestSampleDataProvider",
@@ -3408,48 +3240,14 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [
-              "payload",
-              "attributes"
-            ],
             "parameters": [
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "payload",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               },
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "attributes",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               }
             ],
             "providerId": "ConnectedTestSampleDataProvider",
@@ -4266,48 +4064,14 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [
-              "payload",
-              "attributes"
-            ],
             "parameters": [
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "payload",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               },
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "attributes",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               }
             ],
             "providerId": "ConfigAwareTestSampleDataProvider",
@@ -4853,48 +4617,14 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [
-              "payload",
-              "attributes"
-            ],
             "parameters": [
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "payload",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               },
               {
-                "type": {
-                  "format": "java",
-                  "type": "String"
-                },
-                "hasDynamicType": false,
-                "required": true,
-                "isConfigOverride": false,
-                "isComponentId": false,
-                "dslConfiguration": {
-                  "allowsInlineDefinition": true,
-                  "allowsReferences": true,
-                  "allowTopLevelDefinition": false
-                },
-                "allowedStereotypeModels": [],
                 "name": "attributes",
-                "description": "",
-                "modelProperties": {}
+                "required": true
               }
             ],
             "providerId": "ConnectedTestSampleDataProvider",
@@ -5454,28 +5184,10 @@
       "supportsStreaming": false,
       "notifications": [],
       "sampleDataProviderModel": {
-        "actingParameters": [
-          "complex"
-        ],
         "parameters": [
           {
-            "type": {
-              "format": "java",
-              "type": "@ref:org.mule.test.data.sample.extension.ComplexActingParameter"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "complex",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           }
         ],
         "providerId": "ComplexActingParameterSampleDataProvider",
@@ -5782,48 +5494,14 @@
       "supportsStreaming": false,
       "notifications": [],
       "sampleDataProviderModel": {
-        "actingParameters": [
-          "payload",
-          "attributes"
-        ],
         "parameters": [
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "payload",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           },
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "attributes",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           }
         ],
         "providerId": "ParameterizedTestSampleDataProvider",
@@ -6157,48 +5835,14 @@
       "supportsStreaming": false,
       "notifications": [],
       "sampleDataProviderModel": {
-        "actingParameters": [
-          "payload",
-          "attributes"
-        ],
         "parameters": [
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "payload",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           },
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "attributes",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           }
         ],
         "providerId": "MuleContextAwareSampleDataProvider",
@@ -6532,45 +6176,15 @@
       "supportsStreaming": false,
       "notifications": [],
       "sampleDataProviderModel": {
-        "actingParameters": [],
         "parameters": [
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": false,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "payload",
-            "description": "",
-            "modelProperties": {}
+            "required": false,
+            "defaultValue": "[]"
           },
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": false,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "attributes",
-            "description": "",
-            "modelProperties": {}
+            "required": false
           }
         ],
         "providerId": "OptionalTestSampleDataProvider",
@@ -6905,7 +6519,6 @@
       "supportsStreaming": false,
       "notifications": [],
       "sampleDataProviderModel": {
-        "actingParameters": [],
         "parameters": [],
         "providerId": "SimplestTestSampleDataProvider",
         "requiresConfiguration": false,
@@ -7413,48 +7026,14 @@
       "supportsStreaming": false,
       "notifications": [],
       "sampleDataProviderModel": {
-        "actingParameters": [
-          "aliasedPayload",
-          "aliasedAttributes"
-        ],
         "parameters": [
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "aliasedPayload",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           },
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "aliasedAttributes",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           }
         ],
         "providerId": "ParameterizedTestSampleDataProvider",
@@ -7777,28 +7356,10 @@
       "supportsStreaming": false,
       "notifications": [],
       "sampleDataProviderModel": {
-        "actingParameters": [
-          "complex"
-        ],
         "parameters": [
           {
-            "type": {
-              "format": "java",
-              "type": "@ref:org.mule.test.data.sample.extension.ComplexActingParameter"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "complex",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           }
         ],
         "providerId": "ComplexActingParameterSampleDataProvider",
@@ -8079,48 +7640,14 @@
       "supportsStreaming": false,
       "notifications": [],
       "sampleDataProviderModel": {
-        "actingParameters": [
-          "payload",
-          "attributes"
-        ],
         "parameters": [
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "payload",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           },
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "attributes",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           }
         ],
         "providerId": "ParameterizedTestSampleDataProvider",
@@ -8428,48 +7955,14 @@
       "supportsStreaming": false,
       "notifications": [],
       "sampleDataProviderModel": {
-        "actingParameters": [
-          "payload",
-          "attributes"
-        ],
         "parameters": [
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "payload",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           },
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "attributes",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           }
         ],
         "providerId": "MuleContextAwareSampleDataProvider",
@@ -8777,47 +8270,14 @@
       "supportsStreaming": false,
       "notifications": [],
       "sampleDataProviderModel": {
-        "actingParameters": [
-          "groupParameter"
-        ],
         "parameters": [
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "groupParameter",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           },
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": false,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "optionalParameter",
-            "description": "",
-            "modelProperties": {}
+            "required": false
           }
         ],
         "providerId": "GroupTestSampleDataProvider",
@@ -9140,47 +8600,14 @@
       "supportsStreaming": false,
       "notifications": [],
       "sampleDataProviderModel": {
-        "actingParameters": [
-          "groupParameter"
-        ],
         "parameters": [
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": true,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "groupParameter",
-            "description": "",
-            "modelProperties": {}
+            "required": true
           },
           {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "required": false,
-            "isConfigOverride": false,
-            "isComponentId": false,
-            "dslConfiguration": {
-              "allowsInlineDefinition": true,
-              "allowsReferences": true,
-              "allowTopLevelDefinition": false
-            },
-            "allowedStereotypeModels": [],
             "name": "optionalParameter",
-            "description": "",
-            "modelProperties": {}
+            "required": false
           }
         ],
         "providerId": "GroupTestSampleDataProvider",

@@ -71,46 +71,12 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "required1",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   },
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "required2",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -692,25 +658,8 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "anyParameter",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -1317,25 +1266,8 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "anyParameter",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -3139,46 +3071,12 @@
                     ],
                     "parameters": [
                       {
-                        "type": {
-                          "format": "java",
-                          "type": "String"
-                        },
-                        "hasDynamicType": false,
-                        "required": true,
-                        "isConfigOverride": false,
-                        "isComponentId": false,
-                        "expressionSupport": "SUPPORTED",
-                        "role": "BEHAVIOUR",
-                        "dslConfiguration": {
-                          "allowsInlineDefinition": true,
-                          "allowsReferences": true,
-                          "allowTopLevelDefinition": false
-                        },
-                        "allowedStereotypeModels": [],
                         "name": "required1",
-                        "description": "",
-                        "modelProperties": {}
+                        "required": true
                       },
                       {
-                        "type": {
-                          "format": "java",
-                          "type": "String"
-                        },
-                        "hasDynamicType": false,
-                        "required": true,
-                        "isConfigOverride": false,
-                        "isComponentId": false,
-                        "expressionSupport": "SUPPORTED",
-                        "role": "BEHAVIOUR",
-                        "dslConfiguration": {
-                          "allowsInlineDefinition": true,
-                          "allowsReferences": true,
-                          "allowTopLevelDefinition": false
-                        },
-                        "allowedStereotypeModels": [],
                         "name": "required2",
-                        "description": "",
-                        "modelProperties": {}
+                        "required": true
                       }
                     ],
                     "partOrder": 1,
@@ -3536,25 +3434,8 @@
                     ],
                     "parameters": [
                       {
-                        "type": {
-                          "format": "java",
-                          "type": "String"
-                        },
-                        "hasDynamicType": false,
-                        "required": true,
-                        "isConfigOverride": false,
-                        "isComponentId": false,
-                        "expressionSupport": "SUPPORTED",
-                        "role": "BEHAVIOUR",
-                        "dslConfiguration": {
-                          "allowsInlineDefinition": true,
-                          "allowsReferences": true,
-                          "allowTopLevelDefinition": false
-                        },
-                        "allowedStereotypeModels": [],
                         "name": "anyParameter",
-                        "description": "",
-                        "modelProperties": {}
+                        "required": true
                       }
                     ],
                     "partOrder": 1,
@@ -3937,25 +3818,8 @@
                     ],
                     "parameters": [
                       {
-                        "type": {
-                          "format": "java",
-                          "type": "String"
-                        },
-                        "hasDynamicType": false,
-                        "required": true,
-                        "isConfigOverride": false,
-                        "isComponentId": false,
-                        "expressionSupport": "SUPPORTED",
-                        "role": "BEHAVIOUR",
-                        "dslConfiguration": {
-                          "allowsInlineDefinition": true,
-                          "allowsReferences": true,
-                          "allowTopLevelDefinition": false
-                        },
-                        "allowedStereotypeModels": [],
                         "name": "anyParameter",
-                        "description": "",
-                        "modelProperties": {}
+                        "required": true
                       }
                     ],
                     "partOrder": 1,
@@ -4624,25 +4488,8 @@
                     ],
                     "parameters": [
                       {
-                        "type": {
-                          "format": "java",
-                          "type": "String"
-                        },
-                        "hasDynamicType": false,
-                        "required": true,
-                        "isConfigOverride": false,
-                        "isComponentId": false,
-                        "expressionSupport": "SUPPORTED",
-                        "role": "BEHAVIOUR",
-                        "dslConfiguration": {
-                          "allowsInlineDefinition": true,
-                          "allowsReferences": true,
-                          "allowTopLevelDefinition": false
-                        },
-                        "allowedStereotypeModels": [],
                         "name": "errorCode",
-                        "description": "",
-                        "modelProperties": {}
+                        "required": true
                       }
                     ],
                     "partOrder": 1,
@@ -6656,25 +6503,8 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "errorCode",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -8008,25 +7838,8 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "anyParameter",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -8338,128 +8151,21 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "requiredString",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": false
                   },
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "Boolean",
-                      "annotations": {
-                        "typeId": "boolean"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "false",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "requiredBoolean",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true,
+                    "defaultValue": "false"
                   },
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "Number",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "int",
-                          "hasDefaultConstructor": false,
-                          "isInterface": false,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": true,
-                          "implementedInterfaces": [],
-                          "parent": "",
-                          "genericTypes": [],
-                          "isMap": false
-                        },
-                        "int": {}
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "requiredInteger",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   },
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "Array",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "java.util.List",
-                          "hasDefaultConstructor": false,
-                          "isInterface": true,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
-                          "parent": "",
-                          "genericTypes": [
-                            "java.lang.String"
-                          ],
-                          "isMap": false
-                        }
-                      },
-                      "item": {
-                        "type": "String"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "strings",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -8865,25 +8571,8 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "superString",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -9114,25 +8803,8 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "anyParameter",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -9442,25 +9114,8 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "@ref:org.mule.test.values.extension.ComplexActingParameter"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "complexActingParameter",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -9718,25 +9373,8 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "errorCode",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -9992,25 +9630,8 @@
                 "actingParameters": [],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "optionalValue",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": false
                   }
                 ],
                 "partOrder": 1,
@@ -10266,25 +9887,8 @@
                 "actingParameters": [],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "optionalValue",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": false
                   }
                 ],
                 "partOrder": 1,
@@ -10540,26 +10144,9 @@
                 "actingParameters": [],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "OPERATION_DEFAULT_VALUE",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "optionalValue",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": false,
+                    "defaultValue": "OPERATION_DEFAULT_VALUE"
                   }
                 ],
                 "partOrder": 1,
@@ -10818,46 +10405,12 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "requiredValue",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   },
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "optionalValue",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": false
                   }
                 ],
                 "partOrder": 1,
@@ -11142,47 +10695,13 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "requiredValue",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   },
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "OPERATION_DEFAULT_VALUE",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "optionalValue",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": false,
+                    "defaultValue": "OPERATION_DEFAULT_VALUE"
                   }
                 ],
                 "partOrder": 1,
@@ -11468,25 +10987,8 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "requiredValue",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -11744,46 +11246,12 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "requiredValue",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   },
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "optionalValue",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": false
                   }
                 ],
                 "partOrder": 1,
@@ -12066,26 +11534,9 @@
                 "actingParameters": [],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "OPERATION_DEFAULT_VALUE",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "optionalValue",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": false,
+                    "defaultValue": "OPERATION_DEFAULT_VALUE"
                   }
                 ],
                 "partOrder": 1,
@@ -13327,25 +12778,8 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "anyParameter",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -13934,25 +13368,8 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "superString",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,
@@ -14389,128 +13806,21 @@
                 ],
                 "parameters": [
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "requiredString",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": false
                   },
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "Boolean",
-                      "annotations": {
-                        "typeId": "boolean"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "defaultValue": "false",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "requiredBoolean",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true,
+                    "defaultValue": "false"
                   },
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "Number",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "int",
-                          "hasDefaultConstructor": false,
-                          "isInterface": false,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": true,
-                          "implementedInterfaces": [],
-                          "parent": "",
-                          "genericTypes": [],
-                          "isMap": false
-                        },
-                        "int": {}
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "requiredInteger",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   },
                   {
-                    "type": {
-                      "format": "java",
-                      "type": "Array",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "java.util.List",
-                          "hasDefaultConstructor": false,
-                          "isInterface": true,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
-                          "parent": "",
-                          "genericTypes": [
-                            "java.lang.String"
-                          ],
-                          "isMap": false
-                        }
-                      },
-                      "item": {
-                        "type": "String"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "isComponentId": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "allowedStereotypeModels": [],
                     "name": "strings",
-                    "description": "",
-                    "modelProperties": {}
+                    "required": true
                   }
                 ],
                 "partOrder": 1,

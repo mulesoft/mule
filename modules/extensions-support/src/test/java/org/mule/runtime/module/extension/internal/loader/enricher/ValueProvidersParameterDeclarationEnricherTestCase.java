@@ -14,21 +14,17 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 
 import org.hamcrest.Matcher;
-import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -118,25 +114,11 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
     assertThat(parameterDeclaration.getValueProviderModel(), notNullValue());
     assertThat(parameterDeclaration.getValueProviderModel().getParameters(), hasSize(1));
 
-    ParameterModel parameter = parameterDeclaration.getValueProviderModel().getParameters().get(0);
+    ActingParameterModel parameter = parameterDeclaration.getValueProviderModel().getParameters().get(0);
     assertThat(parameter, notNullValue());
     assertThat(parameter.getName(), is("requiredValue"));
     assertThat(parameter.isRequired(), is(true));
-    assertThat(parameter.hasDynamicType(), is(false));
-    assertThat(parameter.isComponentId(), is(false));
-    assertThat(parameter.isOverrideFromConfig(), is(false));
-    assertThat(parameter.isDeprecated(), is(false));
-    assertThat(parameter.getDisplayModel().isPresent(), is(false));
-    assertThat(parameter.getDescription(), is(""));
-    assertThat(parameter.getExpressionSupport(), is(SUPPORTED));
-    assertThat(parameter.getRole(), is(BEHAVIOUR));
-    assertThat(parameter.getAllowedStereotypes(), hasSize(0));
-    assertThat(parameter.getModelProperties(), hasSize(0));
-    assertThat(parameter.getDslConfiguration(), notNullValue());
     assertThat(parameter.getDefaultValue(), nullValue());
-    assertThat(parameter.getValueProviderModel().isPresent(), is(false));
-    assertThat(parameter.getDeprecationModel().isPresent(), is(false));
-    assertThat(parameter.getType(), instanceOf(StringType.class));
   }
 
   @Test

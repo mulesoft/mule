@@ -4396,7 +4396,6 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [],
             "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
@@ -13908,7 +13907,6 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [],
             "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
@@ -20523,7 +20521,6 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [],
             "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
@@ -27991,7 +27988,6 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [],
             "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,

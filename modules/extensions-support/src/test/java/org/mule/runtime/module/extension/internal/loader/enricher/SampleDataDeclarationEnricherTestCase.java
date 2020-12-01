@@ -17,18 +17,16 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 
-import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -36,6 +34,7 @@ import org.mule.test.data.sample.extension.SampleDataExtension;
 
 import java.util.Optional;
 
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -59,7 +58,6 @@ public class SampleDataDeclarationEnricherTestCase {
     assertThat(operationDeclaration, notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel(), notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel().isPresent(), is(true));
-    assertThat(operationDeclaration.getSampleDataProviderModel().get().getActingParameters(), hasSize(0));
     assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(), hasSize(0));
   }
 
@@ -96,7 +94,6 @@ public class SampleDataDeclarationEnricherTestCase {
     assertThat(operationDeclaration, notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel(), notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel().isPresent(), is(true));
-    assertThat(operationDeclaration.getSampleDataProviderModel().get().getActingParameters(), hasSize(0));
     assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(), hasSize(2));
     assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(),
                contains(item("payload", false), item("attributes", false)));
@@ -110,8 +107,6 @@ public class SampleDataDeclarationEnricherTestCase {
     assertThat(operationDeclaration, notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel(), notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel().isPresent(), is(true));
-    assertThat(operationDeclaration.getSampleDataProviderModel().get().getActingParameters(), hasSize(1));
-    assertThat(operationDeclaration.getSampleDataProviderModel().get().getActingParameters(), contains("groupParameter"));
     assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(), hasSize(2));
     assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(),
                contains(item("groupParameter", true), item("optionalParameter", false)));
@@ -126,41 +121,25 @@ public class SampleDataDeclarationEnricherTestCase {
     assertThat(operationDeclaration.getSampleDataProviderModel().get(), notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(), hasSize(2));
 
-    ParameterModel parameter = operationDeclaration.getSampleDataProviderModel().get().getParameters().get(0);
+    ActingParameterModel parameter = operationDeclaration.getSampleDataProviderModel().get().getParameters().get(0);
     assertThat(parameter, notNullValue());
     assertThat(parameter.getName(), is("payload"));
     assertThat(parameter.isRequired(), is(true));
-    assertThat(parameter.hasDynamicType(), is(false));
-    assertThat(parameter.isComponentId(), is(false));
-    assertThat(parameter.isOverrideFromConfig(), is(false));
-    assertThat(parameter.isDeprecated(), is(false));
-    assertThat(parameter.getDisplayModel().isPresent(), is(false));
-    assertThat(parameter.getDescription(), is(""));
-    assertThat(parameter.getExpressionSupport(), nullValue());
-    assertThat(parameter.getRole(), nullValue());
-    assertThat(parameter.getAllowedStereotypes(), hasSize(0));
-    assertThat(parameter.getModelProperties(), hasSize(0));
-    assertThat(parameter.getDslConfiguration(), notNullValue());
     assertThat(parameter.getDefaultValue(), nullValue());
-    assertThat(parameter.getValueProviderModel().isPresent(), is(false));
-    assertThat(parameter.getDeprecationModel().isPresent(), is(false));
-    assertThat(parameter.getType(), instanceOf(StringType.class));
   }
 
   @Test
   public void verifyDefaultValueOfValueProviderWithOptionalParameter() {
-    assertDefaultValueOfParameter(getNamedObject(this.declaration.getOperations(), "optionalParameters"), "payload");
-    assertDefaultValueOfParameter(getNamedObject(this.declaration.getOperations(), "optionalParameters"), "attributes");
+    assertDefaultValueOfParameter(getNamedObject(this.declaration.getOperations(), "optionalParameters"), "payload", nullValue());
+    assertDefaultValueOfParameter(getNamedObject(this.declaration.getOperations(), "optionalParameters"), "attributes", is("[]"));
     assertDefaultValueOfParameter(getNamedObject(this.declaration.getConfigurations().get(0).getOperations(), "parameterGroup"),
-                                  "optionalParameter");
+                                  "optionalParameter", nullValue());
   }
 
   private void assertWithRequiredParameter(OperationDeclaration operationDeclaration, String[] parametersName) {
     assertThat(operationDeclaration, notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel(), notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel().isPresent(), is(true));
-    assertThat(operationDeclaration.getSampleDataProviderModel().get().getActingParameters(), hasSize(2));
-    assertThat(operationDeclaration.getSampleDataProviderModel().get().getActingParameters(), contains(parametersName));
     assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(), hasSize(2));
     for (String parameterName : parametersName) {
       assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(),
@@ -168,15 +147,16 @@ public class SampleDataDeclarationEnricherTestCase {
     }
   }
 
-  private void assertDefaultValueOfParameter(OperationDeclaration operationDeclaration, String parameterName) {
+  private void assertDefaultValueOfParameter(OperationDeclaration operationDeclaration, String parameterName,
+                                             Matcher<Object> matcher) {
     assertThat(operationDeclaration, notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel().isPresent(), is(true));
     assertThat(operationDeclaration.getSampleDataProviderModel().get(), notNullValue());
     assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(), hasSize(greaterThan(0)));
-    Optional<ParameterModel> parameter = operationDeclaration.getSampleDataProviderModel().get().getParameters().stream()
+    Optional<ActingParameterModel> parameter = operationDeclaration.getSampleDataProviderModel().get().getParameters().stream()
         .filter(item -> !item.getName().equals(parameterName)).findFirst();
     assertThat(parameter.isPresent(), is(true));
-    assertThat(parameter.get(), hasProperty("defaultValue", nullValue()));
+    assertThat(parameter.get(), hasProperty("defaultValue", matcher));
   }
 
   private ParameterDeclaration getParameterByOperationAndName(String operationName, String parameterName) {
