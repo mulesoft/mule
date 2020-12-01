@@ -39,15 +39,18 @@ import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.junit.Before;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -61,13 +64,20 @@ import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 
@@ -84,6 +94,7 @@ import org.reactivestreams.Publisher;
 
 import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 @RunWith(Parameterized.class)
 public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
@@ -94,6 +105,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   private DefaultFlowBuilder.DefaultFlow stoppedFlow;
   private SensingNullMessageProcessor sensingMessageProcessor;
   private final BiFunction<Processor, CoreEvent, CoreEvent> triggerFunction;
+  private ExecutorService executor;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -147,6 +159,11 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     return stoppedFlow;
   }
 
+  @Before
+  public void before() {
+    executor = Executors.newSingleThreadExecutor();
+  }
+
   @After
   public void after() throws MuleException {
     if (flow.isStarted()) {
@@ -160,6 +177,8 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     if (stoppedFlow.getLifecycleState().isInitialised()) {
       stoppedFlow.dispose();
     }
+
+    executor.shutdown();
   }
 
   @Test
@@ -503,7 +522,30 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     assertThat(nonExpectedError.get(), is(false));
   }
 
-  private void startFlow() throws InitialisationException, MuleException {
+  @Test
+  @Issue("MULE-18873")
+  public void flowInsideProcessWithChildContextMustNotDropEvents()
+      throws MuleException, ExecutionException, InterruptedException {
+    CoreEvent testEvent = testEvent();
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .source(flow.getSource())
+        .processors(singletonList(new BlockMessageProcessor()))
+        .processingStrategyFactory(new ProactorStreamEmitterProcessingStrategyFactory())
+        .build();
+    startFlow();
+    Flux<CoreEvent> flowProcessing = Flux
+        .from(MessageProcessors.processWithChildContext(testEvent, flow, Optional.of(from(FLOW_NAME))));
+    Future validation = executor.submit(() -> StepVerifier.create(flowProcessing)
+        .expectNext(testEvent)
+        .expectComplete()
+        .verifyThenAssertThat()
+        .hasNotDroppedElements());
+    validation.get();
+  }
+
+
+
+  private void startFlow() throws MuleException {
     flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     flow.initialise();
     flow.start();
@@ -524,4 +566,18 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
           });
     }
   }
+
+  public static class BlockMessageProcessor extends AbstractComponent implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      return sleepFor(event, muleContext.getConfiguration().getShutdownTimeout() * 2);
+    }
+
+    @Override
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPublisher) {
+      return Flux.from(eventPublisher).map(event -> sleepFor(event, muleContext.getConfiguration().getShutdownTimeout() * 2));
+    }
+  }
+
 }
