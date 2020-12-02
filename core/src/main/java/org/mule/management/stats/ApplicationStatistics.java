@@ -7,7 +7,7 @@
 package org.mule.management.stats;
 
 /**
- * Aggregate statistics for all services and flows in an application.   Do this by looping through all of the
+ * Aggregate statistics for all services and flows in an application. Do this by looping through all of the
  * applications' FlowConstructStatistics that aren;t themselves aggregators.
  */
 public class ApplicationStatistics extends FlowConstructStatistics
@@ -113,6 +113,14 @@ public class ApplicationStatistics extends FlowConstructStatistics
                 total += stats.getExecutionErrors();
             }
         }
+
+        // MULE-19020: this is enabled by a flag so that connection errors
+        // are able to trigger alerts.
+        if (computeConnectionErrors())
+        {
+            total += getConnectionErrors();
+        }
+
         return total;
     }
 
