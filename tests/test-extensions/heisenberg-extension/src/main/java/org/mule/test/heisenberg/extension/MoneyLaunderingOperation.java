@@ -223,15 +223,41 @@ public class MoneyLaunderingOperation {
     };
   }
 
-  public PagingProvider<HeisenbergConnection, Integer> failingConnectivityPagedOperation(Integer failOn,
-                                                                                         @org.mule.runtime.extension.api.annotation.param.Optional(
-                                                                                             defaultValue = "true") boolean failAtClose) {
+  public PagingProvider<HeisenbergConnection, Integer> failAtClosePagedOperation(Integer failOn) {
     return new PagingProvider<HeisenbergConnection, Integer>() {
 
       @Override
       public List<Integer> getPage(HeisenbergConnection connection) {
         getPageCalls++;
         if (getPageCalls == failOn) {
+          throw new ModuleException(CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
+        }
+        if (getPageCalls > 2) {
+          return emptyList();
+        }
+        return singletonList(0);
+      }
+
+      @Override
+      public Optional<Integer> getTotalResults(HeisenbergConnection connection) {
+        return empty();
+      }
+
+      @Override
+      public void close(HeisenbergConnection connection) {
+        closePagingProviderCalls++;
+        throw new IllegalArgumentException("Failed to close Paging Provider.");
+      }
+    };
+  }
+
+  public PagingProvider<HeisenbergConnection, Integer> failingConnectivityPagedOperation(Integer failOn) {
+    return new PagingProvider<HeisenbergConnection, Integer>() {
+
+      @Override
+      public List<Integer> getPage(HeisenbergConnection connection) {
+        getPageCalls++;
+        if (getPageCalls.equals(failOn)) {
           throw new ModuleException(CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
         }
         if (getPageCalls > 3) {
@@ -248,9 +274,6 @@ public class MoneyLaunderingOperation {
       @Override
       public void close(HeisenbergConnection connection) {
         closePagingProviderCalls++;
-        if (failAtClose) {
-          throw new IllegalArgumentException("Failed to close Paging Provider.");
-        }
       }
     };
   }

@@ -53,16 +53,16 @@
     </flow>
 
     <flow name="consumeFailAtClosePagedOperation">
-        <heisenberg:failing-connectivity-paged-operation failOn="#[payload]" config-ref="heisenberg"/>
+        <heisenberg:fail-at-close-paged-operation failOn="#[payload]" config-ref="heisenberg"/>
         <foreach collection="#[payload]">
             <logger level="ERROR" message="#[payload]"/>
         </foreach>
     </flow>
 
     <flow name="failAtClosePagedOperation">
-        <heisenberg:failing-connectivity-paged-operation failOn="#[payload]" config-ref="heisenberg">
+        <heisenberg:fail-at-close-paged-operation failOn="#[payload]" config-ref="heisenberg">
             <reconnect count="3" frequency="1000"/>
-        </heisenberg:failing-connectivity-paged-operation>
+        </heisenberg:fail-at-close-paged-operation>
     </flow>
 
 </mule>

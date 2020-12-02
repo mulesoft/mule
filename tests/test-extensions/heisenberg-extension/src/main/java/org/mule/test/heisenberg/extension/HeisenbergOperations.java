@@ -613,15 +613,15 @@ public class HeisenbergOperations implements Disposable {
   public InputStream nameAsStreamConnected(@Config HeisenbergExtension config, @Connection HeisenbergConnection connection) {
     return new InputStream() {
 
-      private int timesRead = 0;
+      private int bytesRead = 0;
       private byte[] name = config.getPersonalInfo().getName().getBytes();
 
       @Override
       public int read() {
         if (config.getDispose() == 0) {
-          if (timesRead < name.length) {
-            timesRead++;
-            return name[timesRead - 1];
+          if (bytesRead < name.length) {
+            bytesRead++;
+            return name[bytesRead - 1];
           }
           return -1;
         } else {

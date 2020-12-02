@@ -167,7 +167,7 @@
     </flow>
 
     <flow name="dynamicWithShortExpirationForPagedOperation">
-        <heisenberg:failing-connectivity-paged-operation failOn="#[vars.failOn]" failAtClose="false" config-ref="heisenbergWithShortExpiration"/>
+        <heisenberg:failing-connectivity-paged-operation failOn="#[vars.failOn]" config-ref="heisenbergWithShortExpiration"/>
         <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor"/>
         <foreach collection="#[payload]">
             <logger level="ERROR" message="#[payload]" />

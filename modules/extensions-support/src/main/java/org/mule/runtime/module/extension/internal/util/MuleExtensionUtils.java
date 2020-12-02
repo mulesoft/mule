@@ -553,20 +553,4 @@ public class MuleExtensionUtils {
       return null;
     }
   }
-
-  /**
-   * Calls a consumer of the {@link MutableConfigurationStats} for a given {@link ConfigurationInstance}
-   *
-   * @param configurationInstance the {@link ConfigurationInstance} from where to extract the stats
-   * @param mutableConfigurationStatsConsumer the {@link MutableConfigurationStats} consumer
-   *
-   * @since 4.2.3 4.3.1 4.4.0
-   */
-  public static void tryToMutateConfigurationStats(ConfigurationInstance configurationInstance,
-                                                   Consumer<MutableConfigurationStats> mutableConfigurationStatsConsumer) {
-    ConfigurationStats configurationStats = configurationInstance.getStatistics();
-    if (configurationStats instanceof MutableConfigurationStats) {
-      mutableConfigurationStatsConsumer.accept((MutableConfigurationStats) configurationStats);
-    }
-  }
 }
