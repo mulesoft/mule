@@ -6,7 +6,6 @@
  */
 package org.mule.test.module.extension;
 
-import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
@@ -15,9 +14,7 @@ import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closeP
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.getPageCalls;
 
 import static java.util.Arrays.asList;
-import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
@@ -35,7 +32,6 @@ import javax.inject.Named;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
 
 public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctionalTestCase {
 
