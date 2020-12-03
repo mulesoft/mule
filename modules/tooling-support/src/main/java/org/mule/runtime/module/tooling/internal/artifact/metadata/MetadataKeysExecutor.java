@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact.metadata;
 
-import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
@@ -24,12 +25,16 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
 
 public class MetadataKeysExecutor extends MetadataExecutor {
+
+  private static final FailureCode INVALID_PARAMETER_VALUE =
+      new FailureCode(AbstractParameterResolverExecutor.INVALID_PARAMETER_VALUE);
 
   public MetadataKeysExecutor(ConnectionManager connectionManager, ReflectionCache reflectionCache,
                               ArtifactHelper artifactHelper) {
@@ -55,7 +60,7 @@ public class MetadataKeysExecutor extends MetadataExecutor {
                                     () -> withMetadataContext(metadataContext, () -> metadataMediator
                                         .getMetadataKeys(metadataContext, metadataKey, reflectionCache)));
     } catch (ExpressionNotSupportedException e) {
-      return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(INVALID_METADATA_KEY).onKeys());
+      return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(INVALID_PARAMETER_VALUE).onKeys());
     } catch (MetadataResolvingException e) {
       return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(e.getFailure()).onKeys());
     } catch (Exception e) {
