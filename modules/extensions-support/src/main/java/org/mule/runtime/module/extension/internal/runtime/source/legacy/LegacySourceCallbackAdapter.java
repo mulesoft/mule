@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.source.legacy;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.internal.util.message.SdkResultAdapter;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
@@ -22,12 +21,12 @@ public class LegacySourceCallbackAdapter<T, A> implements SourceCallback<T, A> {
 
   @Override
   public void handle(Result<T, A> result) {
-    delegate.handle(SdkResultAdapter.from(result));
+    delegate.handle(LegacySdkResultAdapter.from(result));
   }
 
   @Override
   public void handle(Result<T, A> result, SourceCallbackContext context) {
-
+    delegate.handle(LegacySdkResultAdapter.from(result), new SdkToLegacySourceCallbackContextAdapter(context));
   }
 
   @Override

@@ -32,8 +32,17 @@ public class LegacySourceAdapter<T, A> extends Source<T, A> {
 
   @Override
   public void onStart(SourceCallback<T, A> sourceCallback) throws MuleException {
-//    delegate.onStart(sourceCallback);
-
+    delegate.onStart(new SdkToLegacySourceCallbackAdapter(sourceCallback));
+/**
+ * Suppose that I here do delegate.OnStart(new SourceCallbackAdapter(sourceCallback);
+ *  The problem that i hit is that I am adapting from the new API to the old one now.
+ *
+ *  Then, when implementing this adapter, which implements the old api.
+ *
+ *  And for example need to implement oldApi SourceCallbackContext createContext(); using a source callback from the new API.
+ *  then I need to create an adapter which implements the new Old api, from a context that implements the new API.
+ *
+ */
   }
 
   @Override
@@ -51,7 +60,7 @@ public class LegacySourceAdapter<T, A> extends Source<T, A> {
 
     @Override
     protected void doStart() throws MuleException {
-      delegate.onStart();
+      delegate.onStart(null);
     }
 
     @Override
@@ -61,12 +70,12 @@ public class LegacySourceAdapter<T, A> extends Source<T, A> {
 
     @Override
     public void poll(PollContext<T, A> pollContext) {
-      delegate.poll(pollContext);
+      delegate.poll(new SdkToLegacyPollContextAdapter<>(pollContext));
     }
 
     @Override
     public void onRejectedItem(Result<T, A> result, SourceCallbackContext callbackContext) {
-      delegate.onRejectedItem(result, callbackContext);
+      delegate.onRejectedItem(LegacySdkResultAdapter.from(result), new SdkToLegacySourceCallbackContextAdapter(callbackContext));
     }
   }
 }

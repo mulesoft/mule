@@ -59,7 +59,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
    *
    * @param sourceCallback the owning {@link SourceCallbackAdapter}
    */
-  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback) {
+     DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback) {
     this.sourceCallback = sourceCallback;
   }
 
