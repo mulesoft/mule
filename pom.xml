@@ -239,7 +239,7 @@
         <muleExtensionsApiVersion>1.4.0-20201202</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.4.0-20201202</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.6.0-20201202</muleMavenClientApi>
-        <muleMavenClientImpl>1.6.0-SNAPSHOT</muleMavenClientImpl>
+        <muleMavenClientImpl>1.6.0-20201202</muleMavenClientImpl>
         <muleMavenClientTest>1.6.0-20201202</muleMavenClientTest>
         <mulePolicyApiVersion>1.4.0-20201202</mulePolicyApiVersion>
         <muleApiVersion>1.4.0-20201202</muleApiVersion>
