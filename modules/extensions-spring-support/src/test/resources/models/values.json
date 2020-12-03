@@ -65,10 +65,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "required1",
-                  "required2"
-                ],
                 "parameters": [
                   {
                     "name": "required1",
@@ -653,9 +649,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "anyParameter"
-                ],
                 "parameters": [
                   {
                     "name": "anyParameter",
@@ -867,7 +860,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
@@ -1261,9 +1253,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "anyParameter"
-                ],
                 "parameters": [
                   {
                     "name": "anyParameter",
@@ -1475,7 +1464,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
@@ -2161,7 +2149,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
                     "parameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
@@ -2627,7 +2614,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
                     "parameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
@@ -3065,10 +3051,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [
-                      "required1",
-                      "required2"
-                    ],
                     "parameters": [
                       {
                         "name": "required1",
@@ -3429,9 +3411,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [
-                      "anyParameter"
-                    ],
                     "parameters": [
                       {
                         "name": "anyParameter",
@@ -3488,7 +3467,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
                     "parameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
@@ -3813,9 +3791,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [
-                      "anyParameter"
-                    ],
                     "parameters": [
                       {
                         "name": "anyParameter",
@@ -3872,7 +3847,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
                     "parameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
@@ -4483,9 +4457,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [
-                      "errorCode"
-                    ],
                     "parameters": [
                       {
                         "name": "errorCode",
@@ -4814,7 +4785,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
                     "parameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
@@ -5145,7 +5115,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
                     "parameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
@@ -5480,7 +5449,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
                     "parameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
@@ -5978,7 +5946,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
@@ -6498,9 +6465,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "errorCode"
-                ],
                 "parameters": [
                   {
                     "name": "errorCode",
@@ -6826,7 +6790,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "values",
@@ -6864,7 +6827,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 2,
                 "providerName": "values",
@@ -6902,7 +6864,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 3,
                 "providerName": "values",
@@ -7131,7 +7092,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
@@ -7356,7 +7316,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
@@ -7581,7 +7540,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
@@ -7833,9 +7791,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "anyParameter"
-                ],
                 "parameters": [
                   {
                     "name": "anyParameter",
@@ -7892,7 +7847,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
@@ -8144,11 +8098,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "requiredBoolean",
-                  "requiredInteger",
-                  "strings"
-                ],
                 "parameters": [
                   {
                     "name": "requiredString",
@@ -8566,9 +8515,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "superString"
-                ],
                 "parameters": [
                   {
                     "name": "superString",
@@ -8798,9 +8744,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "anyParameter"
-                ],
                 "parameters": [
                   {
                     "name": "anyParameter",
@@ -8857,7 +8800,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
@@ -9109,9 +9051,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "complexActingParameter"
-                ],
                 "parameters": [
                   {
                     "name": "complexActingParameter",
@@ -9368,9 +9307,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "errorCode"
-                ],
                 "parameters": [
                   {
                     "name": "errorCode",
@@ -9627,7 +9563,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [
                   {
                     "name": "optionalValue",
@@ -9884,7 +9819,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [
                   {
                     "name": "optionalValue",
@@ -10141,7 +10075,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [
                   {
                     "name": "optionalValue",
@@ -10400,9 +10333,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "requiredValue"
-                ],
                 "parameters": [
                   {
                     "name": "requiredValue",
@@ -10690,9 +10620,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "requiredValue"
-                ],
                 "parameters": [
                   {
                     "name": "requiredValue",
@@ -10982,9 +10909,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "requiredValue"
-                ],
                 "parameters": [
                   {
                     "name": "requiredValue",
@@ -11241,9 +11165,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "requiredValue"
-                ],
                 "parameters": [
                   {
                     "name": "requiredValue",
@@ -11531,7 +11452,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [
                   {
                     "name": "optionalValue",
@@ -11801,7 +11721,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
@@ -12084,7 +12003,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "hasBeenStarted",
@@ -12589,7 +12507,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "values",
@@ -12627,7 +12544,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 2,
                 "providerName": "values",
@@ -12665,7 +12581,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 3,
                 "providerName": "values",
@@ -12773,9 +12688,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "anyParameter"
-                ],
                 "parameters": [
                   {
                     "name": "anyParameter",
@@ -13011,7 +12923,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
@@ -13363,9 +13274,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "superString"
-                ],
                 "parameters": [
                   {
                     "name": "superString",
@@ -13668,7 +13576,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [],
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channels",
@@ -13799,11 +13706,6 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "valueProviderModel": {
-                "actingParameters": [
-                  "requiredBoolean",
-                  "requiredInteger",
-                  "strings"
-                ],
                 "parameters": [
                   {
                     "name": "requiredString",
