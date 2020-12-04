@@ -46,7 +46,7 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
   public final T openCursor() {
     T cursor = delegate.openCursor();
     T managedCursor = managedCursor(cursor);
-    cursors.add(managedCursor);
+    cursors.add(cursor);
 
     statistics.incrementOpenCursors();
     return managedCursor;
