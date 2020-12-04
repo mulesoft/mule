@@ -10,6 +10,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -37,13 +38,14 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -61,6 +63,7 @@ import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
@@ -84,6 +87,7 @@ import org.reactivestreams.Publisher;
 
 import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 @RunWith(Parameterized.class)
 public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
@@ -503,7 +507,27 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     assertThat(nonExpectedError.get(), is(false));
   }
 
-  private void startFlow() throws InitialisationException, MuleException {
+  @Test
+  @Issue("MULE-18873")
+  public void flowInsideProcessWithChildContextMustNotDropEvents()
+      throws MuleException {
+    CoreEvent testEvent = testEvent();
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .source(flow.getSource())
+        .processors(singletonList(new BlockMessageProcessor()))
+        .processingStrategyFactory(new ProactorStreamEmitterProcessingStrategyFactory())
+        .build();
+    startFlow();
+    Flux<CoreEvent> flowProcessing = Flux
+        .from(processWithChildContext(testEvent, flow, of(fromSingleComponent(FLOW_NAME))));
+    StepVerifier.create(flowProcessing)
+        .expectNext(testEvent)
+        .expectComplete()
+        .verifyThenAssertThat()
+        .hasNotDroppedElements();
+  }
+
+  private void startFlow() throws MuleException {
     flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     flow.initialise();
     flow.start();
@@ -524,4 +548,18 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
           });
     }
   }
+
+  public static class BlockMessageProcessor extends AbstractComponent implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      return sleepFor(event, muleContext.getConfiguration().getShutdownTimeout() * 2);
+    }
+
+    @Override
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPublisher) {
+      return Flux.from(eventPublisher).map(event -> sleepFor(event, muleContext.getConfiguration().getShutdownTimeout() * 2));
+    }
+  }
+
 }
