@@ -41,15 +41,7 @@ public abstract class BaseOAuthConnectionProviderWrapper<C> extends Reconnectabl
 
   @Override
   public ConnectionValidationResult validate(C connection) {
-    ConnectionValidationResult connectionValidationResult = null;
-    for (int attempt = 0; attempt < MAX_REFRESH_ATTEMPTS; attempt++) {
-      connectionValidationResult = validateOAuthConnection(getDelegate(), connection, getContext());
-      if (!connectionValidationResult.isValid() && refreshTokenIfNecessary(this, connectionValidationResult.getException())) {
-        continue;
-      }
-      break;
-    }
-    return connectionValidationResult;
+    return validateOAuthConnection(this, connection, getContext());
   }
 
   @Override

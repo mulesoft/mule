@@ -129,7 +129,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
 
   @Override
   public ConnectionValidationResult validate(C connection) {
-    return validateOAuthConnection(getDelegate(), connection, getContext());
+    return validateOAuthConnection(this, connection, getContext());
   }
 
   @Override

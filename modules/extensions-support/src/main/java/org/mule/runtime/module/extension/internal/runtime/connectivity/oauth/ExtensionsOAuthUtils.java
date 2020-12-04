@@ -192,6 +192,37 @@ public final class ExtensionsOAuthUtils {
    * returns a non {@code null} value for the {@link ResourceOwnerOAuthContext#getAccessToken()} method. A failure result is
    * returned otherwise
    *
+   * @param oAuthConnectionProviderWrapper  a {@link OAuthConnectionProviderWrapper}
+   * @param connection                      a connection object
+   * @param context                         a {@link ResourceOwnerOAuthContext}
+   * @param <C>                             the connection's generic type
+   * @return a {@link ConnectionValidationResult}
+   * @since 4.3.0
+   */
+  public static <C> ConnectionValidationResult validateOAuthConnection(OAuthConnectionProviderWrapper<C> oAuthConnectionProviderWrapper,
+                                                                       C connection,
+                                                                       ResourceOwnerOAuthContext context) {
+    return validateOAuthConnection(oAuthConnectionProviderWrapper, connection, context, MAX_REFRESH_ATTEMPTS);
+  }
+
+  private static <C> ConnectionValidationResult validateOAuthConnection(OAuthConnectionProviderWrapper<C> oAuthConnectionProviderWrapper,
+                                                                        C connection,
+                                                                        ResourceOwnerOAuthContext context,
+                                                                        int maxRefreshAttempts) {
+    ConnectionValidationResult connectionValidationResult =
+        validateOAuthConnection(oAuthConnectionProviderWrapper.getDelegate(), connection, context);
+    if (!connectionValidationResult.isValid() && maxRefreshAttempts > 0
+        && refreshTokenIfNecessary(oAuthConnectionProviderWrapper, connectionValidationResult.getException())) {
+      return validateOAuthConnection(oAuthConnectionProviderWrapper, connection, context, --maxRefreshAttempts);
+    }
+    return connectionValidationResult;
+  }
+
+  /**
+   * Invokes {@link ConnectionProvider#validate(Object)} on the {@code connectionProvider} only if the given {@code context}
+   * returns a non {@code null} value for the {@link ResourceOwnerOAuthContext#getAccessToken()} method. A failure result is
+   * returned otherwise
+   *
    * @param connectionProvider a {@link ConnectionProvider}
    * @param connection         a connection object
    * @param context            a {@link ResourceOwnerOAuthContext}
