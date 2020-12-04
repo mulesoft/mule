@@ -45,6 +45,7 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
         }
         else
         {
+            key = removeQuotes(key);
             Object previousValue = get(key);
             message.setProperty(key, value, propertyScope);
             return previousValue;
@@ -97,5 +98,13 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
             map.put(key, value);
         }
         return map.toString();
+    }
+
+    private String removeQuotes(String expression) {
+        if(expression.charAt(0) == '\'' && expression.charAt(expression.length() - 1) == '\'' )
+        {
+            return expression.substring(1,expression.length() - 1);
+        }
+        return expression;
     }
 }
