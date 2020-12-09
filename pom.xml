@@ -187,7 +187,7 @@
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <greenmailVersion>1.5.0</greenmailVersion>
-        <groovyVersion>3.0.2</groovyVersion>
+        <groovyVersion>3.0.7</groovyVersion>
         <guavaVersion>25.1-jre</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <jacksonVersion>1.9.14-MULE-002</jacksonVersion>
