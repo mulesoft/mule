@@ -53,22 +53,25 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_3.0_spec</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
+            <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>grizzly-framework</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
+            <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>grizzly-http-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
+            <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>connection-pool</artifactId>
+            <version>${grizzly.version}</version>
         </dependency>
+ 
         <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
+            <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>tls-sni</artifactId>
-            <version>${grizzlyVersion}</version>
+            <version>${grizzly.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -76,17 +79,11 @@
             <artifactId>mail</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ning</groupId>
-            <artifactId>async-http-client</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.mule.glassfish.grizzly</groupId>
+            <artifactId>grizzly-http-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
+            <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>grizzly-websockets</artifactId>
         </dependency>
         <dependency>
