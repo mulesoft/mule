@@ -446,6 +446,7 @@
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/yagi-1.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/validation-api-1.1.0.Final.jar
+/mule-standalone-${productVersion}/lib/opt/velocity-1.7.jar
 /mule-standalone-${productVersion}/lib/shared
 /mule-standalone-${productVersion}/lib/shared/README.txt
 /mule-standalone-${productVersion}/lib/user
