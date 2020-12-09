@@ -25,6 +25,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
@@ -41,8 +42,9 @@ import javax.annotation.Nonnull;
 public class MetadataComponentExecutor extends MetadataExecutor {
 
   public MetadataComponentExecutor(ConnectionManager connectionManager, ReflectionCache reflectionCache,
-                                   ArtifactHelper artifactHelper) {
-    super(connectionManager, reflectionCache, artifactHelper);
+                                   ExpressionManager expressionManager, ArtifactHelper artifactHelper) {
+    super(connectionManager, reflectionCache, expressionManager, artifactHelper);
+    this.expressionManager = expressionManager;
   }
 
   public MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentModel componentModel,
@@ -52,7 +54,7 @@ public class MetadataComponentExecutor extends MetadataExecutor {
           getConfigurationInstance(componentModel, componentElementDeclaration);
 
       MetadataKeyResult metadataKeyResult =
-          new MetadataKeyDeclarationResolver(componentModel, componentElementDeclaration).resolveKeyResult();
+          new MetadataKeyDeclarationResolver(componentModel, componentElementDeclaration, expressionManager).resolveKeyResult();
       if (!metadataKeyResult.isComplete()) {
         return failure(newFailure()
             .withMessage(metadataKeyResult.getPartialReason())

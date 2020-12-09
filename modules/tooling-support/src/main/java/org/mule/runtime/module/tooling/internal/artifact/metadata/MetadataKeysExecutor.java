@@ -21,6 +21,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
@@ -37,8 +38,8 @@ public class MetadataKeysExecutor extends MetadataExecutor {
       new FailureCode(AbstractParameterResolverExecutor.INVALID_PARAMETER_VALUE);
 
   public MetadataKeysExecutor(ConnectionManager connectionManager, ReflectionCache reflectionCache,
-                              ArtifactHelper artifactHelper) {
-    super(connectionManager, reflectionCache, artifactHelper);
+                              ExpressionManager expressionManager, ArtifactHelper artifactHelper) {
+    super(connectionManager, reflectionCache, expressionManager, artifactHelper);
   }
 
   public MetadataResult<MetadataKeysContainer> resolveMetadataKeys(ComponentModel componentModel,
@@ -47,7 +48,8 @@ public class MetadataKeysExecutor extends MetadataExecutor {
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(componentModel, componentElementDeclaration);
 
-      MetadataKey metadataKey = new MetadataKeyDeclarationResolver(componentModel, componentElementDeclaration).resolveKey();
+      MetadataKey metadataKey =
+          new MetadataKeyDeclarationResolver(componentModel, componentElementDeclaration, expressionManager).resolvePartialKey();
 
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
 

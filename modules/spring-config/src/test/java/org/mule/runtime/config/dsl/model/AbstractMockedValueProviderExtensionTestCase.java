@@ -265,6 +265,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
     when(actingParameter.getName()).thenReturn(ACTING_PARAMETER_NAME);
     when(actingParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
+    when(actingParameter.getDefaultValue()).thenReturn(ACTING_PARAMETER_DEFAULT_VALUE);
     when(actingParameter.getModelProperty(any())).thenReturn(empty());
     when(actingParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(actingParameter.getLayoutModel()).thenReturn(empty());

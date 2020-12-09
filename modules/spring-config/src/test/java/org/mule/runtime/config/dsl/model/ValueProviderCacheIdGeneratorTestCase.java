@@ -138,6 +138,17 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
         .orElseThrow(() -> new RuntimeException("Location not found"));
   }
 
+  private void removeParameter(ArtifactDeclaration artifactDeclaration,
+                               String ownerLocation,
+                               String parameterName) {
+    if (!getParameterElementDeclaration(artifactDeclaration, ownerLocation)
+        .map(owner -> owner.getParameterGroups().stream()
+            .filter(pg -> pg.getParameters().removeIf(p -> p.getName().equals(parameterName))).findAny())
+        .orElseThrow(() -> new RuntimeException("Location not found")).isPresent()) {
+      throw new RuntimeException("Could not remove parameter from component");
+    }
+  }
+
   @Test
   public void idForParameterWithNoProviderInConfig() throws Exception {
     ArtifactDeclaration app = getBaseApp();
@@ -207,6 +218,17 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
     assertThat(opId.isPresent(), is(true));
     modifyParameter(app, OPERATION_LOCATION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
     checkIdsAreDifferent(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+
+  @Test
+  public void idForConfiglessAndConnectionlessOperationDefaultValueHashIdShouldBeSameWithExplicitValueOnActingParameter()
+      throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(opId.isPresent(), is(true));
+    removeParameter(app, OPERATION_LOCATION, ACTING_PARAMETER_NAME);
+    checkIdsAreEqual(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test

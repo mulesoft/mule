@@ -13,8 +13,10 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterSimpleValueExtractor.extractSimpleValue;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -25,6 +27,8 @@ import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterGroupElementDeclaration;
+import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
@@ -33,6 +37,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resolver that creates a {@link MetadataKey} from a {@link ComponentElementDeclaration}.
@@ -43,8 +50,11 @@ import java.util.Map;
  */
 public class MetadataKeyDeclarationResolver {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetadataKeyDeclarationResolver.class);
+
   private ComponentModel componentModel;
   private ComponentElementDeclaration componentElementDeclaration;
+  private ExpressionManager expressionManager;
 
   public MetadataKeyDeclarationResolver(ComponentModel componentModel,
                                         ComponentElementDeclaration componentElementDeclaration) {
@@ -52,11 +62,22 @@ public class MetadataKeyDeclarationResolver {
     this.componentElementDeclaration = componentElementDeclaration;
   }
 
-  public MetadataKey resolveKey() {
-    return resolveKeyResult().getMetadataKey();
+  public MetadataKeyDeclarationResolver(ComponentModel componentModel,
+                                        ComponentElementDeclaration componentElementDeclaration,
+                                        ExpressionManager expressionManager) {
+    this(componentModel, componentElementDeclaration);
+    this.expressionManager = expressionManager;
+  }
+
+  public MetadataKey resolvePartialKey() {
+    return metadataKeyResult(true).getMetadataKey();
   }
 
   public MetadataKeyResult resolveKeyResult() {
+    return metadataKeyResult(false);
+  }
+
+  public MetadataKeyResult metadataKeyResult(boolean partialKey) {
     List<MetadataKeyInfo> keyPartModelsInfo = getMetadataKeyPartsInfo(componentModel);
 
     if (keyPartModelsInfo.isEmpty()) {
@@ -68,15 +89,31 @@ public class MetadataKeyDeclarationResolver {
     Map<String, String> keyPartValues =
         getMetadataKeyPartsValuesFromComponentDeclaration(componentElementDeclaration, componentModel);
     for (MetadataKeyInfo keyInfo : keyPartModelsInfo) {
-      String id;
+      String id = null;
+      boolean isNullValue = false;
       if (keyPartValues.containsKey(keyInfo.parameterModel.getName())) {
         id = keyPartValues.get(keyInfo.parameterModel.getName());
+        isNullValue = id == null;
+      } else if (!partialKey && keyInfo.parameterModel.getDefaultValue() != null) {
+        String defaultValue = keyInfo.parameterModel.getDefaultValue().toString();
+        if (expressionManager != null && isExpression(defaultValue)) {
+          try {
+            id = expressionManager.evaluate(defaultValue, STRING).getValue().toString();
+          } catch (ExpressionRuntimeException e) {
+            LOGGER
+                .warn(format("Couldn't resolve expression default value for parameter: '%s' which is defined as MetadataKeyPart",
+                             keyInfo.parameterModel.getName()),
+                      e);
+          }
+        } else {
+          id = defaultValue;
+        }
       } else {
         // It is only supported to defined parts in order
         break;
       }
 
-      if (id != null) {
+      if (id != null || isNullValue) {
         if (metadataKeyBuilder == null) {
           metadataKeyBuilder = MetadataKeyBuilder.newKey(id).withPartName(keyInfo.parameterModel.getName());
           rootMetadataKeyBuilder = metadataKeyBuilder;
@@ -89,9 +126,8 @@ public class MetadataKeyDeclarationResolver {
       }
     }
 
-    //TODO MULE-18680 remove `keyPartModels.size() > 1` once bug is fixed to accept optionals in multi-level keys
     List<MetadataKeyInfo> missingPartsInfo = keyPartModelsInfo.stream()
-        .filter(ki -> (keyPartModelsInfo.size() > 1 || ki.parameterModel.isRequired())
+        .filter(ki -> ki.parameterModel.isRequired()
             && !keyPartValues.containsKey(ki.parameterModel.getName()))
         .collect(toList());
     String partialMessage = null;

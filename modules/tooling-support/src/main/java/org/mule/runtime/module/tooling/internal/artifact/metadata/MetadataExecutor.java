@@ -16,6 +16,7 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.internal.metadata.cache.DefaultMetadataCache;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -30,11 +31,14 @@ public abstract class MetadataExecutor {
 
   protected ConnectionManager connectionManager;
   protected ReflectionCache reflectionCache;
+  protected ExpressionManager expressionManager;
   protected ArtifactHelper artifactHelper;
 
-  public MetadataExecutor(ConnectionManager connectionManager, ReflectionCache reflectionCache, ArtifactHelper artifactHelper) {
+  public MetadataExecutor(ConnectionManager connectionManager, ReflectionCache reflectionCache,
+                          ExpressionManager expressionManager, ArtifactHelper artifactHelper) {
     this.connectionManager = connectionManager;
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
     this.artifactHelper = artifactHelper;
   }
 
