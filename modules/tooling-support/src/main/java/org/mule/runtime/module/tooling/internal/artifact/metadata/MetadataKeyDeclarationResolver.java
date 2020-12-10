@@ -16,6 +16,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterSimpleValueExtractor.extractSimpleValue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Resolver that creates a {@link MetadataKey} from a {@link ComponentElementDeclaration}.
@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MetadataKeyDeclarationResolver {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MetadataKeyDeclarationResolver.class);
+  private static final Logger LOGGER = getLogger(MetadataKeyDeclarationResolver.class);
 
   private ComponentModel componentModel;
   private ComponentElementDeclaration componentElementDeclaration;
