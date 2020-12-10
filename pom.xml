@@ -1665,7 +1665,7 @@
                     <artifactId>mule-assembly-verifier</artifactId>
                     <version>1.4</version>
                     <configuration>
-                        <skip>${skipDistributions}</skip>
+                        <skip>${skipAssemblyVerifier}</skip>
                     </configuration>
                     <dependencies>
                         <!--
