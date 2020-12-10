@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="${port}"/>
+    <http:request-config name="HTTP_Request_Configuration" host="localhost" port="${port}"/>
+
+    <flow name="test-http-response-targetFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/test"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/service" method="GET" target="#[flowVars.'my complex variable']"/>
+        <set-payload value="#[flowVars.'my complex variable']"/>
+    </flow>
+
+    <flow name="server">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/service"/>
+        <set-payload value="dummy"/>
+    </flow>
+</mule>
