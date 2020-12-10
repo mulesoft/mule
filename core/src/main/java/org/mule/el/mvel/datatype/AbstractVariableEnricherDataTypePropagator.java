@@ -83,11 +83,15 @@ public class AbstractVariableEnricherDataTypePropagator extends AbstractEnricher
                             propertyName = (String) ((MapAccessor) nextNode).getProperty();
                         }
 
-                        if (propertyName != null && message.getPropertyNames(scope).contains(propertyName))
+                        if (propertyName != null )
                         {
-                            propertyName = getUnescapedPropertyName(propertyName);
-                            message.setProperty(propertyName, typedValue.getValue(), scope, typedValue.getDataType());
-                            return true;
+                            propertyName = removeQuotes(propertyName);
+                            if(message.getPropertyNames(scope).contains(propertyName))
+                            {
+                                propertyName = getUnescapedPropertyName(propertyName);
+                                message.setProperty(propertyName, typedValue.getValue(), scope, typedValue.getDataType());
+                                return true;
+                            }
                         }
                     }
                 }
@@ -130,5 +134,13 @@ public class AbstractVariableEnricherDataTypePropagator extends AbstractEnricher
         {
             throw new IllegalStateException(e);
         }
+    }
+
+    private String removeQuotes(String expression) {
+        if(expression.charAt(0) == '\'' && expression.charAt(expression.length() - 1) == '\'' )
+        {
+            return expression.substring(1,expression.length() - 1);
+        }
+        return expression;
     }
 }
