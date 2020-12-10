@@ -32,6 +32,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENT
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
+import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.configurePropertiesResolverFeatureFlag;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -141,6 +142,10 @@ import org.springframework.core.io.UrlResource;
  */
 public class MuleArtifactContext extends AbstractRefreshableConfigApplicationContext {
 
+  static {
+    configurePropertiesResolverFeatureFlag();
+  }
+
   private static final Logger LOGGER = getLogger(MuleArtifactContext.class);
 
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
@@ -216,7 +221,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
 
-    this.applicationModel = createApplicationModel(artifactDeclaration, artifactConfigResources);
+    this.applicationModel = createApplicationModel(artifactDeclaration, artifactConfigResources, featureFlaggingService);
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -233,7 +238,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private ApplicationModel createApplicationModel(ArtifactDeclaration artifactDeclaration,
-                                                  ConfigResource[] artifactConfigResources) {
+                                                  ConfigResource[] artifactConfigResources,
+                                                  FeatureFlaggingService featureFlaggingService) {
     try {
       final ArtifactAst artifactAst;
 
@@ -303,7 +309,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return (ApplicationModel) validateModel(new ApplicationModel(artifactAst,
                                                                    artifactProperties, parentConfigurationProperties,
                                                                    new ClassLoaderResourceProvider(muleContext
-                                                                       .getExecutionClassLoader())));
+                                                                       .getExecutionClassLoader()),
+                                                                   featureFlaggingService));
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {

@@ -651,7 +651,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
 
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(toArtifactast(declaration, extensions), emptyMap(), empty(),
-                                uri -> getClass().getResourceAsStream(uri));
+                                uri -> getClass().getResourceAsStream(uri), getFeatureFlaggingService());
   }
 
   private String collectLog(ValueProviderCacheId valueProviderCacheId, int level) {
