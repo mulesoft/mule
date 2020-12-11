@@ -30,6 +30,10 @@ import java.util.List;
 
 import org.apache.commons.collections.Transformer;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+import static org.mule.api.config.MuleProperties.MULE_DISABLE_COMPOUND_CORRELATION_ID;
+
 /**
  * Base implementation of a {@link MuleMessage} splitter, that converts its payload in a {@link MessageSequence}, and
  * process each element of it. Implementations must implement {@link #splitMessageIntoSequence(MuleEvent)} and determine
@@ -50,6 +54,8 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     protected MessageInfoMapping messageInfoMapping;
     protected int batchSize;
     protected String counterVariableName;
+
+    private boolean compoundCorrelationIdDisabled = parseBoolean(getProperty(MULE_DISABLE_COMPOUND_CORRELATION_ID, "false"));
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -180,7 +186,16 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
     protected void setMessageCorrelationId(MuleMessage message, String correlationId, int correlationSequence)
     {
-        message.setCorrelationId(correlationId);
+        if (!compoundCorrelationIdDisabled)
+        {
+            //Default behaviour
+            message.setCorrelationId(correlationId);
+        }
+        else
+        {
+            // Old behaviour
+            message.setCorrelationId(correlationId + (this.isSequential() ? ("-" + correlationSequence) : ""));
+        }
     }
 
     protected MuleMessage createMessage(Object payload, MuleMessage originalMessage)
