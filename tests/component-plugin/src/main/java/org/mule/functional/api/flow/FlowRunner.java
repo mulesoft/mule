@@ -18,6 +18,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -38,6 +39,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import org.hamcrest.Matcher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
 /**
  * Provides a fluent API for running events through flows.
@@ -212,14 +215,46 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   }
 
   private ExecutionCallback<CoreEvent> getFlowRunCallback() {
-    // TODO MULE-13053 Update and improve FlowRunner to support non-blocking flow execution and assertions.
-    return () -> flow.process(getOrBuildEvent());
+    return () -> {
+      Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>(null);
+
+      CoreEvent result;
+      try {
+        result = Flux.<CoreEvent>create(fluxSink -> {
+          fluxSink.next(getOrBuildEvent());
+          sinkReference.set(fluxSink);
+        }).transform(flow::apply).blockFirst();
+      } catch (RuntimeException ex) {
+        if (ex.getCause() instanceof MuleException) {
+          throw (MuleException) ex.getCause();
+        } else {
+          throw ex;
+        }
+      }
+
+      sinkReference.get().complete();
+      return result;
+    };
   }
 
   private ExecutionCallback<CoreEvent> getFlowDispatchCallback() {
     return () -> {
-      // TODO MULE-13053 Update and improve FlowRunner to support non-blocking flow execution and assertions.
-      flow.process(getOrBuildEvent());
+      Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>(null);
+
+      try {
+        Flux.<CoreEvent>create(fluxSink -> {
+          fluxSink.next(getOrBuildEvent());
+          sinkReference.set(fluxSink);
+        }).transform(flow::apply).blockFirst();
+      } catch (RuntimeException ex) {
+        if (ex.getCause() instanceof MuleException) {
+          throw (MuleException) ex.getCause();
+        } else {
+          throw ex;
+        }
+      }
+
+      sinkReference.get().complete();
       return null;
     };
   }
