@@ -1183,7 +1183,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * @param event the event that must be copied
      * @return the copied event
      */
-    public static MuleEvent copyAndSetSynchronicity(MuleEvent event, boolean synchronous)
+    public static MuleEvent copyWithSynchronicity(MuleEvent event, boolean synchronous)
     {
         MuleMessage messageCopy = (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy();
         DefaultMuleEvent eventCopy = new DefaultMuleEvent(messageCopy, event, new DefaultMuleSession(

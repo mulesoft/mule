@@ -52,7 +52,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
 
         if(event instanceof DefaultMuleEvent)
         {
-            event = DefaultMuleEvent.copyAndSetSynchronicity(event, true);
+            event = DefaultMuleEvent.copyWithSynchronicity(event, true);
         }
 
         try
