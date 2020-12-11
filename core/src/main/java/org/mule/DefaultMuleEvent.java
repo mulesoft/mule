@@ -544,7 +544,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     {
         return transacted
                || isFlowConstructSynchronous()
-               || exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy()
+               || (exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy())
                || message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
                                       PropertyScope.INBOUND, Boolean.FALSE);
     }
@@ -1174,6 +1174,32 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         return eventCopy;
     }
 
+    /**
+     * This method does a complete deep copy of the event and set the Synchronicity.
+     *
+     * This method should be used whenever the event is going to be executed
+     * in a different context and changes to that event must not effect the source event.
+     *
+     * @param event the event that must be copied
+     * @return the copied event
+     */
+    public static MuleEvent copyAndSetSynchronicity(MuleEvent event, boolean synchronous)
+    {
+        MuleMessage messageCopy = (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy();
+        DefaultMuleEvent eventCopy = new DefaultMuleEvent(messageCopy, event, new DefaultMuleSession(
+                event.getSession()), synchronous);
+        eventCopy.flowVariables = ((DefaultMuleEvent) event).flowVariables.clone();
+        ((DefaultMuleMessage) messageCopy).setInvocationProperties(eventCopy.flowVariables);
+        ((DefaultMuleMessage) messageCopy).resetAccessControl();
+        return eventCopy;
+    }
+
+    public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, MuleSession session, boolean synchronous)
+    {
+        this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), session, synchronous);
+
+    }
+
     @Override
     public Set<String> getFlowVariableNames()
     {
@@ -1433,4 +1459,5 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     {
         return processorsTrace;
     }
+
 }
