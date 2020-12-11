@@ -209,4 +209,5 @@ public class MuleProperties
     public static final String MULE_XML_JSON_MAX_DEPTH_SIZE = SYSTEM_PROPERTY_PREFIX + "xml.json.maxDepthSize";
     public static final String DYNAMIC_OUTBOUND_STATIC_ENDPOINT_SIZE = SYSTEM_PROPERTY_PREFIX + "dynamic.outbound.static.endpoint.size";
     public static final String COMPUTE_CONNECTION_ERRORS_IN_STATS = SYSTEM_PROPERTY_PREFIX + "compute.connection.errors.in.stats";;
+    public static final String MULE_DISABLE_COMPOUND_CORRELATION_ID = SYSTEM_PROPERTY_PREFIX + "compoundCorrelationId.disable";
 }
