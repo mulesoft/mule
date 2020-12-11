@@ -296,6 +296,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     private static class CollectionMapSplitter extends CollectionSplitter
     {
 
+        private boolean compoundCorrelationIdDisabled = parseBoolean(getProperty(MULE_DISABLE_COMPOUND_CORRELATION_ID, "false"));
+
         @Override
         protected MessageSequence<?> splitMessageIntoSequence(MuleEvent event)
         {
@@ -318,7 +320,16 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         @Override
         protected void setMessageCorrelationId(MuleMessage message, String correlationId, int correlationSequence)
         {
-            message.setCorrelationId(correlationId + "-" + correlationSequence);
+            if (!compoundCorrelationIdDisabled)
+            {
+                //Default behaviour
+                message.setCorrelationId(correlationId + "-" + correlationSequence);
+            }
+            else
+            {
+                // Old behaviour
+                message.setCorrelationId(correlationId + (this.isSequential() ? ("-" + correlationSequence) : ""));
+            }
         }
 
     }
