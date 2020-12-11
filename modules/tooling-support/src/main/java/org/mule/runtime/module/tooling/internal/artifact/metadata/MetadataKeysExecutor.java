@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -66,7 +67,7 @@ public class MetadataKeysExecutor extends MetadataExecutor {
     } catch (MetadataResolvingException e) {
       return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(e.getFailure()).onKeys());
     } catch (Exception e) {
-      return failure(MetadataFailure.Builder.newFailure(e).onKeys());
+      throw new MuleRuntimeException(e);
     }
   }
 

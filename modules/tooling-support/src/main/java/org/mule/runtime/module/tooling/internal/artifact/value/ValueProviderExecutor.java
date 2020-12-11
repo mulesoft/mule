@@ -14,6 +14,8 @@ import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.ResolvingFailure;
@@ -87,9 +89,9 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       if (cause instanceof ValueResolvingException) {
         failureBuilder.withFailureCode(((ValueResolvingException) cause).getFailureCode());
       }
-      return resultFrom(failureBuilder.build());
+      throw new MuleRuntimeException(cause);
     } catch (Exception e) {
-      return resultFrom(newFailure(e).build());
+      throw new MuleRuntimeException(e);
     }
   }
 

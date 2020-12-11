@@ -14,6 +14,8 @@ import static org.mule.runtime.api.sampledata.SampleDataResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -81,9 +83,9 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
       if (cause instanceof SampleDataException) {
         failureBuilder.withFailureCode(((SampleDataException) cause).getFailureCode());
       }
-      return resultFrom(failureBuilder.build());
+      throw new MuleRuntimeException(cause);
     } catch (Exception e) {
-      return resultFrom(newFailure(e).build());
+      throw new MuleRuntimeException(e);
     }
   }
 
