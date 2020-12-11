@@ -149,8 +149,11 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
           resultValue = resultValue.copy()
-              .output(componentDecoratorFactory.decorateOutput(              new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler,
-                      getDecrementActiveComponentTask(operationContext)), event.getCorrelationId())).build();
+              .output(componentDecoratorFactory
+                  .decorateOutput(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler,
+                                                                  getDecrementActiveComponentTask(operationContext)),
+                                  event.getCorrelationId()))
+              .build();
         }
       }
       return isSpecialHandling && returnHandler.handles(resultValue.getOutput())
@@ -223,9 +226,11 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
       if (result.getOutput() instanceof InputStream) {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
-          result = result.copy().output(StreamingUtils.streamingContent(new ConnectedInputStreamWrapper(componentDecoratorFactory.decorateOutput((InputStream) result.getOutput(),
-                  event.getCorrelationId()),
-                          connectionHandler, getDecrementActiveComponentTask(operationContext)), cursorProviderFactory, event,
+          result = result.copy().output(StreamingUtils.streamingContent(new ConnectedInputStreamWrapper(componentDecoratorFactory
+              .decorateOutput((InputStream) result.getOutput(), event.getCorrelationId()),
+                                                                                                        connectionHandler,
+                                                                                                        getDecrementActiveComponentTask(operationContext)),
+                                                                        cursorProviderFactory, event,
                                                                         operationContext.getComponent().getLocation()))
               .build();
         }
@@ -255,7 +260,8 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
       ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
       if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
         value = componentDecoratorFactory.decorateOutput(new ConnectedInputStreamWrapper((InputStream) value, connectionHandler,
-                getDecrementActiveComponentTask(operationContext)), correlationId);
+                                                                                         getDecrementActiveComponentTask(operationContext)),
+                                                         correlationId);
       }
     }
 

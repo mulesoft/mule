@@ -10,8 +10,6 @@ import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
-import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
@@ -20,7 +18,6 @@ import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -31,7 +28,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
@@ -107,7 +103,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
     final MutableConfigurationStats stats = getMutableConfigurationStats(context);
     if (stats != null) {
-      stats.addActiveComponent();
       stats.addInflightOperation();
     }
 
@@ -160,9 +155,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
         // Race conditions appear otherwise, specially in connection pooling scenarios.
         if (stats != null) {
           stats.discountInflightOperation();
-          if (!isConnectedStreamingOperation(context)) {
-            stats.discountActiveComponent();
-          }
         }
         try {
           interceptorChain.onSuccess(context, value);
@@ -183,7 +175,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
         } finally {
           if (stats != null) {
             stats.discountInflightOperation();
-            stats.discountActiveComponent();
           }
           executorCallback.error(t);
         }
@@ -196,16 +187,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     } else {
       executeCommand(executor, context, callbackDelegate);
     }
-  }
-
-  private Boolean isConnectedStreamingOperation(ExecutionContextAdapter operationContext) {
-    if (operationModel instanceof ConnectableComponentModel) {
-      ConnectableComponentModel connectableComponentModel = (ConnectableComponentModel) operationModel;
-      return (connectableComponentModel.requiresConnection()
-          && (connectableComponentModel.supportsStreaming()
-              || connectableComponentModel.getModelProperty(PagedOperationModelProperty.class).isPresent()));
-    }
-    return false;
   }
 
   private void executeCommand(CompletableComponentExecutor<M> executor,

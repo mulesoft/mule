@@ -182,19 +182,19 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   }
 
   @Test
-  public void doNotExpireConfigWhenConnectedStreamingOperationFailsObtainingTheStream() throws Exception {
+  public void doNotExpireConfigWhenConnectedStreamingOperationWithReconnectionFailsObtainingTheStream() throws Exception {
     flowRunner("dynamicWithShortExpirationForConnectedStreamingOperation").withVariable("failOn", 0).run();
     assertDisposedStatuses(asList(0, 0, 1));
   }
 
   @Test
-  public void doNotExpireConfigWhenConnectedStreamingOperationFailsObtainingTheStreamWithoutReconnection() throws Exception {
+  public void doNotExpireConfigWhenConnectedStreamingOperationWithoutReconnectionFailsObtainingTheStream() throws Exception {
     flowRunner("dynamicWithShortExpirationForConnectedStreamingOperationWithoutReconnection").withVariable("failOn", 0).run();
     assertDisposedStatuses(asList(0, 1));
   }
 
   @Test
-  public void doNotExpireConfigWhenConnectedStreamingOperationFailsReadingTheStreamWithoutReconnection() throws Exception {
+  public void doNotExpireConfigWhenConnectedStreamingOperationWithoutReconnectionFailsReadingTheStream() throws Exception {
     flowRunner("dynamicWithShortExpirationForConnectedStreamingOperationWithoutReconnection").withVariable("failOn", 1).run();
     assertDisposedStatuses(asList(0, 0, 0));
     assertConfigIsExpiredAfterFlowIsDisposed();
