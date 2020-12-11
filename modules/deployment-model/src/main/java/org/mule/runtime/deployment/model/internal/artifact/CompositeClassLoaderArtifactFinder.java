@@ -17,15 +17,18 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
  */
 public class CompositeClassLoaderArtifactFinder {
 
+  private CompositeClassLoaderArtifactFinder() {
+    // Private constructor to hide the implicit public one.
+  }
+
   public static ClassLoader findClassLoader(CompositeClassLoader compositeClassLoader) {
-    ClassLoader firstClassLoader = compositeClassLoader.getDelegates().get(0);
-    // Obtains the first artifact class loader that is not a plugin
+    // Obtains the first artifact class loader that is not a plugin.
     for (ClassLoader delegate : compositeClassLoader.getDelegates()) {
       if (delegate instanceof ArtifactClassLoader && !isPluginClassLoader(delegate)) {
         return delegate;
       }
     }
-    return firstClassLoader;
+    return compositeClassLoader.getDelegates().get(0);
   }
 
   private static boolean isPluginClassLoader(ClassLoader loggerClassLoader) {
