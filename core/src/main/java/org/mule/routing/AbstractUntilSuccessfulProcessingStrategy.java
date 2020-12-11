@@ -7,6 +7,8 @@
 package org.mule.routing;
 
 import static org.mule.util.ClassUtils.isConsumable;
+
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
@@ -43,10 +45,16 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
      * @return the response from the route if there's no ack expression. If there's ack expression
      * then a message with the response event but with a payload defined by the ack expression.
      */
-    protected MuleEvent processEvent(final MuleEvent event)
+    protected MuleEvent processEvent(MuleEvent event)
     {
         MuleEvent returnEvent;
         boolean inputEventHasExceptionPayload = event.getMessage().getExceptionPayload() != null;
+
+        if(event instanceof DefaultMuleEvent)
+        {
+            event = DefaultMuleEvent.copyWithSynchronicity(event, true);
+        }
+
         try
         {
             returnEvent = untilSuccessfulConfiguration.getRoute().process(event);
