@@ -9,7 +9,7 @@ package org.mule.routing;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
-import static org.mule.api.config.MuleProperties.MULE_ENABLE_COMPOUND_CORRELATION_ID;
+import static org.mule.api.config.MuleProperties.MULE_DISABLE_COMPOUND_CORRELATION_ID;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
@@ -74,7 +74,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     private boolean xpathCollection;
     private volatile boolean messageProcessorInitialized;
 
-    private boolean compoundCorrelationIdEnabled = parseBoolean(getProperty(MULE_ENABLE_COMPOUND_CORRELATION_ID, "true"));
+    private boolean compoundCorrelationIdDisabled = parseBoolean(getProperty(MULE_DISABLE_COMPOUND_CORRELATION_ID, "false"));
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -197,16 +197,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             expressionConfig.setExpression(collectionExpression);
             checkEvaluator(expressionConfig);
 
-            if (compoundCorrelationIdEnabled) {
-                splitter = new ExpressionSplitter(expressionConfig) {
-                    @Override
-                    protected void setMessageCorrelationId(MuleMessage message, String correlationId, int correlationSequence) {
-                        message.setCorrelationId(correlationId + "-" + correlationSequence);
-                    }
-                };
-            } else {
-                splitter = new ExpressionSplitter(expressionConfig);
-            }
+            initExpressionSplitter(expressionConfig);
 
             if (expressionConfig.getEvaluator() != null && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX))
             {
@@ -247,6 +238,25 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             throw new InitialisationException(e, this);
         }
         super.initialise();
+    }
+
+    private void initExpressionSplitter(final ExpressionConfig expressionConfig) {
+        if (!compoundCorrelationIdDisabled)
+        {
+            //Default behaviour
+            splitter = new ExpressionSplitter(expressionConfig)
+            {
+                @Override
+                protected void setMessageCorrelationId(MuleMessage message, String correlationId, int correlationSequence)
+                {
+                    message.setCorrelationId(correlationId + "-" + correlationSequence);
+                }
+            };
+        }
+        else
+        {
+            splitter = new ExpressionSplitter(expressionConfig);
+        }
     }
 
     private boolean isXPathExpression(String expression)
