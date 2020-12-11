@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.api.config;
 
+import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 
@@ -14,7 +15,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
@@ -42,7 +42,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
  */
 public class FeatureFlaggingRegistry {
 
-  private final Map<String, Predicate<MuleContext>> configurations = new ConcurrentHashMap<>();
+  private final Map<Feature, Predicate<MuleContext>> configurations = new ConcurrentHashMap<>();
 
   private static final FeatureFlaggingRegistry INSTANCE = new FeatureFlaggingRegistry();
 
@@ -67,9 +67,9 @@ public class FeatureFlaggingRegistry {
    * @param condition This predicate will be evaluated at deployment time. The {@link MuleContext} corresponds to the context that
    *        is being created for this application.
    */
-  public void registerFeature(String feature, Predicate<MuleContext> condition) {
-    if (isNullOrEmpty(feature)) {
-      throw new MuleRuntimeException(createStaticMessage("Invalid feature name"));
+  public void registerFeature(Feature feature, Predicate<MuleContext> condition) {
+    if (feature == null) {
+      throw new MuleRuntimeException(createStaticMessage("Feature can not be null"));
     }
 
     if (condition == null) {
@@ -83,11 +83,11 @@ public class FeatureFlaggingRegistry {
   }
 
   /**
-   * Returns all the configurations that were registered by using {@link #registerFeature(String, Predicate)}
+   * Returns all the configurations that were registered by using {@link #registerFeature(Feature, Predicate)}
    * 
    * @return An unmodifiable map with the registered features.
    */
-  public Map<String, Predicate<MuleContext>> getFeatureConfigurations() {
+  public Map<Feature, Predicate<MuleContext>> getFeatureConfigurations() {
     return unmodifiableMap(configurations);
   }
 

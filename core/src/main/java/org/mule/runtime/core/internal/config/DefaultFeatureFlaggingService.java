@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.config;
 
 import java.util.Map;
 
+import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.FeatureFlaggingService;
 
@@ -20,18 +21,18 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
  */
 public class DefaultFeatureFlaggingService implements FeatureFlaggingService {
 
-  private final Map<String, Boolean> features;
+  private final Map<Feature, Boolean> features;
 
   public DefaultFeatureFlaggingService() {
     this(emptyMap());
   }
 
-  public DefaultFeatureFlaggingService(Map<String, Boolean> features) {
+  public DefaultFeatureFlaggingService(Map<Feature, Boolean> features) {
     this.features = features;
   }
 
   @Override
-  public boolean isEnabled(String feature) {
+  public boolean isEnabled(Feature feature) {
     if (!features.containsKey(feature)) {
       throw new MuleRuntimeException(createStaticMessage("Feature %s not registered", feature));
     }

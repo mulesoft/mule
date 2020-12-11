@@ -7,15 +7,14 @@
 
 package org.mule.runtime.core.internal.config;
 
-import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.FeatureFlaggingService;
 
@@ -23,56 +22,48 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mule.runtime.api.config.Feature.TESTING_FEATURE;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
 @RunWith(Parameterized.class)
-@Feature(DEPLOYMENT_CONFIGURATION)
+@io.qameta.allure.Feature(DEPLOYMENT_CONFIGURATION)
 @Story(FEATURE_FLAGGING)
 public class DefaultFeatureFlaggingServiceTestCase {
 
-  private static final String FEATURE_ENABLED = "FEATURE A";
-  private static final String FEATURE_DISABLED = "FEATURE B";
-  private static final String FEATURE_INVALID = "FEATURE INVALID";
+  private final FeatureFlaggingService featureFlaggingService;
 
-  private FeatureFlaggingService featureFlaggingService;
-
-  private final String featureName;
+  private final Feature feature;
   private final boolean enabled;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  @Before
-  public void setUp() {
-    Map<String, Boolean> features = new HashMap<>();
-    features.put(FEATURE_ENABLED, true);
-    features.put(FEATURE_DISABLED, false);
-
-    featureFlaggingService = new DefaultFeatureFlaggingService(features);
-  }
-
-  @Parameters(name = "Feature \"{0}\" should be {1}")
+  @Parameters(name = "Feature \"{1}\" should be {2}")
   public static List<Object[]> parameters() {
     return asList(
-                  new Object[] {FEATURE_DISABLED, false, null},
-                  new Object[] {FEATURE_ENABLED, true, null},
-                  new Object[] {FEATURE_INVALID, false, (Consumer<ExpectedException>) (e -> {
+                  new Object[] {getSetUp(TESTING_FEATURE, false), TESTING_FEATURE, false, null},
+                  new Object[] {getSetUp(TESTING_FEATURE, true), TESTING_FEATURE, true, null},
+                  new Object[] {getSetUp(), TESTING_FEATURE, false, (Consumer<ExpectedException>) (e -> {
                     e.expect(MuleRuntimeException.class);
-                    e.expectMessage(format("Feature %s not registered", FEATURE_INVALID));
+                    e.expectMessage(format("Feature %s not registered", TESTING_FEATURE.name()));
                   })});
 
   }
 
-  public DefaultFeatureFlaggingServiceTestCase(String featureName, boolean enabled,
+  public DefaultFeatureFlaggingServiceTestCase(Supplier<Map<Feature, Boolean>> setUp, Feature feature, boolean enabled,
                                                Consumer<ExpectedException> configureExpected) {
-    this.featureName = featureName;
+
+    this.feature = feature;
     this.enabled = enabled;
+
+    featureFlaggingService = new DefaultFeatureFlaggingService(setUp.get());
     if (configureExpected != null) {
       configureExpected.accept(expectedException);
     }
@@ -80,6 +71,20 @@ public class DefaultFeatureFlaggingServiceTestCase {
 
   @Test
   public void testCase() {
-    assertThat(featureFlaggingService.isEnabled(featureName), is(enabled));
+    assertThat(featureFlaggingService.isEnabled(feature), is(enabled));
   }
+
+  private static Supplier<Map<Feature, Boolean>> getSetUp(Object... values) {
+    assertThat("Values must be even", values.length % 2, is(0));
+
+    Map<Feature, Boolean> m = new HashMap<>();
+
+    for (int i = 0; i < values.length; i += 2) {
+      m.put((Feature) values[i], (Boolean) values[i + 1]);
+    }
+
+    return () -> m;
+  }
+
 }
+
