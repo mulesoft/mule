@@ -91,9 +91,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     ConfigurationStats configurationStats = config.getStatistics();
     mutableStats =
         configurationStats instanceof MutableConfigurationStats ? (MutableConfigurationStats) configurationStats : null;
-    if (mutableStats != null) {
-      mutableStats.addActiveComponent();
-    }
   }
 
   /**
@@ -152,9 +149,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       return function.apply(connection);
     } catch (Exception caughtException) {
       if (isFirstPage) {
-        if (mutableStats != null) {
-          mutableStats.discountActiveComponent();
-        }
         safely(() -> delegate.close(connection), e -> LOGGER.error("Found exception closing paging provider", e));
       } else if (refreshOAuth) {
         boolean tokenRefreshed;

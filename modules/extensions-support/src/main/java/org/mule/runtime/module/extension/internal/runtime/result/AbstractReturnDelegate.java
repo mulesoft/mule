@@ -148,12 +148,9 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
       if (resultValue.getOutput() instanceof InputStream) {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
-          ConnectedInputStreamWrapper streamWrapper =
-              new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler,
-                                              getDecrementActiveComponentTask(operationContext));
-          incrementActiveComponent(operationContext);
           resultValue = resultValue.copy()
-              .output(componentDecoratorFactory.decorateOutput(streamWrapper, event.getCorrelationId())).build();
+              .output(componentDecoratorFactory.decorateOutput(              new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler,
+                      getDecrementActiveComponentTask(operationContext)), event.getCorrelationId())).build();
         }
       }
       return isSpecialHandling && returnHandler.handles(resultValue.getOutput())
@@ -226,12 +223,9 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
       if (result.getOutput() instanceof InputStream) {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
-          ConnectedInputStreamWrapper streamWrapper =
-              new ConnectedInputStreamWrapper(componentDecoratorFactory.decorateOutput((InputStream) result.getOutput(),
-                                                                                       event.getCorrelationId()),
-                                              connectionHandler, getDecrementActiveComponentTask(operationContext));
-          incrementActiveComponent(operationContext);
-          result = result.copy().output(StreamingUtils.streamingContent(streamWrapper, cursorProviderFactory, event,
+          result = result.copy().output(StreamingUtils.streamingContent(new ConnectedInputStreamWrapper(componentDecoratorFactory.decorateOutput((InputStream) result.getOutput(),
+                  event.getCorrelationId()),
+                          connectionHandler, getDecrementActiveComponentTask(operationContext)), cursorProviderFactory, event,
                                                                         operationContext.getComponent().getLocation()))
               .build();
         }
@@ -260,11 +254,8 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
     if (value instanceof InputStream) {
       ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
       if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
-        ConnectedInputStreamWrapper streamWrapper =
-            new ConnectedInputStreamWrapper((InputStream) value, connectionHandler,
-                                            getDecrementActiveComponentTask(operationContext));
-        incrementActiveComponent(operationContext);
-        value = componentDecoratorFactory.decorateOutput(streamWrapper, correlationId);
+        value = componentDecoratorFactory.decorateOutput(new ConnectedInputStreamWrapper((InputStream) value, connectionHandler,
+                getDecrementActiveComponentTask(operationContext)), correlationId);
       }
     }
 
@@ -300,13 +291,6 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
     }
 
     return contextMimeType.withCharset(contextEncoding);
-  }
-
-  private void incrementActiveComponent(ExecutionContextAdapter executionContext) {
-    MutableConfigurationStats mutableStats = getMutableConfigurationStats(executionContext);
-    if (mutableStats != null) {
-      mutableStats.addActiveComponent();
-    }
   }
 
   private Runnable getDecrementActiveComponentTask(ExecutionContextAdapter executionContext) {
