@@ -138,6 +138,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     assertDisposedStatuses(asList(0, 1));
   }
 
+  @Test
   public void dynamicConfigIsExpiredBeforeFlowEndsWhenOperationFails() throws Exception {
     flowRunner("dynamicConfigIsExpiredBeforeFlowEndsWhenOperationFails").run();
     assertDisposedStatuses(asList(0, 1));
