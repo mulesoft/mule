@@ -151,6 +151,20 @@
         <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
     </flow>
 
+    <flow name="dynamicConfigIsExpiredBeforeFlowEndsWhenOperationFails">
+        <try>
+            <heisenberg:get-barber-preferences config-ref="heisenbergWithShortExpiration"/>
+            <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
+            <heisenberg:failing-paged-operation config-ref="heisenbergWithShortExpiration"/>
+            <error-handler>
+                <on-error-continue>
+                    <test:processor waitTime="4000"/>
+                    <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor" />
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+
     <flow name="dynamicWithShortExpirationForPagedOperation">
         <heisenberg:failing-connectivity-paged-operation failOn="#[vars.failOn]" config-ref="heisenbergWithShortExpiration"/>
         <test:processor class="org.mule.test.module.extension.DynamicConfigExpirationTestCase$CaptureProcessor"/>
