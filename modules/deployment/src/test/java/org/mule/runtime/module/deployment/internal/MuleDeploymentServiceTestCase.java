@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.module.deployment.api.StartupListener;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
