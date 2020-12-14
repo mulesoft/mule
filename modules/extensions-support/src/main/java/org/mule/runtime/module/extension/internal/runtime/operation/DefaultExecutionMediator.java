@@ -60,7 +60,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final ResultTransformer resultTransformer;
   private final ClassLoader extensionClassLoader;
-  private final ComponentModel operationModel;
 
 
   @FunctionalInterface
@@ -84,7 +83,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.resultTransformer = resultTransformer;
-    this.operationModel = operationModel;
     extensionClassLoader = getClassLoader(extensionModel);
   }
 
