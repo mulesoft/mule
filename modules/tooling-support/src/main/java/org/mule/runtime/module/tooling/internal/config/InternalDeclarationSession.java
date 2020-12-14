@@ -84,10 +84,11 @@ public class InternalDeclarationSession implements DeclarationSession {
         new LazyValue<>(() -> new ValueProviderExecutor(muleContext, connectionManager, expressionManager, reflectionCache,
                                                         artifactHelper()));
     this.metadataKeysExecutorLazyValue =
-        new LazyValue<>(() -> new MetadataKeysExecutor(connectionManager, reflectionCache, artifactHelper()));
+        new LazyValue<>(() -> new MetadataKeysExecutor(connectionManager, reflectionCache, expressionManager, artifactHelper()));
 
     this.metadataComponentExecutorLazyValue =
-        new LazyValue<>(() -> new MetadataComponentExecutor(connectionManager, reflectionCache, artifactHelper()));
+        new LazyValue<>(() -> new MetadataComponentExecutor(connectionManager, reflectionCache, expressionManager,
+                                                            artifactHelper()));
 
     this.sampleDataExecutorLazyValue =
         new LazyValue<>(() -> new SampleDataExecutor(muleContext, connectionManager, expressionManager, sampleDataService,
