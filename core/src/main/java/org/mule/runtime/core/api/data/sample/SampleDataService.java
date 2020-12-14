@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.data.sample;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Message;
@@ -20,9 +21,12 @@ import java.util.function.Supplier;
 /**
  * Provides the capability of obtaining sample data for any component in a Mule app which supports providing sample data.
  *
+ * <b>NOTE:</b> Experimental feature. Backwards compatibility not guaranteed.
+ *
  * @since 4.4.0
  */
 @NoImplement
+@Experimental
 public interface SampleDataService {
 
   /**
