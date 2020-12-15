@@ -185,7 +185,7 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
       ParameterizedTypeImpl parameterizedType = (ParameterizedTypeImpl) type;
       return parameterizedType.getRawType().getName() + asGenericSignature(asList(parameterizedType.getActualTypeArguments()));
     } else {
-      return type.getTypeName();
+      return type != null ? type.getTypeName() : Object.class.getName();
     }
   }
 
