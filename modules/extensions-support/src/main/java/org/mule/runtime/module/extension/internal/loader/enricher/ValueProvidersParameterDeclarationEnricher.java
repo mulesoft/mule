@@ -259,8 +259,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
         .collect(toMap(param -> parameterNames.getOrDefault(param.getName(), param.getName()), ExtensionParameter::isRequired));
     return allParameters.stream()
         .filter(param -> paramsInfo.containsKey(param.getName()))
-        .map(param -> new ImmutableActingParameterModel(param.getName(), paramsInfo.get(param.getName()),
-                                                        param.getDefaultValue()))
+        .map(param -> new ImmutableActingParameterModel(param.getName(), paramsInfo.get(param.getName())))
         .collect(toList());
   }
 

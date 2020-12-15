@@ -8105,8 +8105,7 @@
                   },
                   {
                     "name": "requiredBoolean",
-                    "required": true,
-                    "defaultValue": "false"
+                    "required": true
                   },
                   {
                     "name": "requiredInteger",
@@ -10078,8 +10077,7 @@
                 "parameters": [
                   {
                     "name": "optionalValue",
-                    "required": false,
-                    "defaultValue": "OPERATION_DEFAULT_VALUE"
+                    "required": false
                   }
                 ],
                 "partOrder": 1,
@@ -10627,8 +10625,7 @@
                   },
                   {
                     "name": "optionalValue",
-                    "required": false,
-                    "defaultValue": "OPERATION_DEFAULT_VALUE"
+                    "required": false
                   }
                 ],
                 "partOrder": 1,
@@ -11455,8 +11452,7 @@
                 "parameters": [
                   {
                     "name": "optionalValue",
-                    "required": false,
-                    "defaultValue": "OPERATION_DEFAULT_VALUE"
+                    "required": false
                   }
                 ],
                 "partOrder": 1,
@@ -13713,8 +13709,7 @@
                   },
                   {
                     "name": "requiredBoolean",
-                    "required": true,
-                    "defaultValue": "false"
+                    "required": true
                   },
                   {
                     "name": "requiredInteger",

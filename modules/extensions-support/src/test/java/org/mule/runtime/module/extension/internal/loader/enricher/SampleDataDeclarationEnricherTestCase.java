@@ -13,11 +13,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
@@ -34,7 +32,6 @@ import org.mule.test.data.sample.extension.SampleDataExtension;
 
 import java.util.Optional;
 
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -125,15 +122,6 @@ public class SampleDataDeclarationEnricherTestCase {
     assertThat(parameter, notNullValue());
     assertThat(parameter.getName(), is("payload"));
     assertThat(parameter.isRequired(), is(true));
-    assertThat(parameter.getDefaultValue(), nullValue());
-  }
-
-  @Test
-  public void verifyDefaultValueOfValueProviderWithOptionalParameter() {
-    assertDefaultValueOfParameter(getNamedObject(this.declaration.getOperations(), "optionalParameters"), "payload", nullValue());
-    assertDefaultValueOfParameter(getNamedObject(this.declaration.getOperations(), "optionalParameters"), "attributes", is("[]"));
-    assertDefaultValueOfParameter(getNamedObject(this.declaration.getConfigurations().get(0).getOperations(), "parameterGroup"),
-                                  "optionalParameter", nullValue());
   }
 
   private void assertWithRequiredParameter(OperationDeclaration operationDeclaration, String[] parametersName) {
@@ -145,23 +133,6 @@ public class SampleDataDeclarationEnricherTestCase {
       assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(),
                  hasItem(both(hasProperty("name", is(parameterName))).and(hasProperty("required", is(true)))));
     }
-  }
-
-  private void assertDefaultValueOfParameter(OperationDeclaration operationDeclaration, String parameterName,
-                                             Matcher<Object> matcher) {
-    assertThat(operationDeclaration, notNullValue());
-    assertThat(operationDeclaration.getSampleDataProviderModel().isPresent(), is(true));
-    assertThat(operationDeclaration.getSampleDataProviderModel().get(), notNullValue());
-    assertThat(operationDeclaration.getSampleDataProviderModel().get().getParameters(), hasSize(greaterThan(0)));
-    Optional<ActingParameterModel> parameter = operationDeclaration.getSampleDataProviderModel().get().getParameters().stream()
-        .filter(item -> !item.getName().equals(parameterName)).findFirst();
-    assertThat(parameter.isPresent(), is(true));
-    assertThat(parameter.get(), hasProperty("defaultValue", matcher));
-  }
-
-  private ParameterDeclaration getParameterByOperationAndName(String operationName, String parameterName) {
-    OperationDeclaration operationDeclaration = getNamedObject(this.declaration.getOperations(), operationName);
-    return getNamedObject(operationDeclaration.getAllParameters(), parameterName);
   }
 
   private org.hamcrest.Matcher<Object> item(String name, boolean required) {
