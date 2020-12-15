@@ -12,15 +12,18 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty.builder;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
@@ -31,6 +34,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -46,7 +50,9 @@ import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.tck.size.SmallTest;
 
 import java.util.List;
+import java.util.Map;
 
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,7 +76,7 @@ public class SampleDataProviderModelValidatorTestCase {
   @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
-  @Mock(lenient = true)
+  @Mock(lenient = true, answer = RETURNS_DEEP_STUBS)
   private OperationModel operationModel;
 
   @Mock(lenient = true)
@@ -85,10 +91,12 @@ public class SampleDataProviderModelValidatorTestCase {
   @Mock(lenient = true)
   private ParameterGroupModel configurationParameterGroupModel;
 
-  @Mock(lenient = true)
+  @Mock(lenient = true, answer = RETURNS_DEEP_STUBS)
   private SourceModel sourceModel;
 
   private SampleDataProviderFactoryModelPropertyBuilder providerBuilder;
+
+  private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   @Before
   public void setUp() {
@@ -120,10 +128,22 @@ public class SampleDataProviderModelValidatorTestCase {
     when(parameterModel.getModelProperty(DeclaringMemberModelProperty.class)).thenReturn(empty());
     when(parameterModel.getName()).thenReturn("someName");
     when(parameterModel.getType()).thenReturn(STRING_TYPE);
+
+    mockOutput(operationModel);
+    mockOutput(sourceModel);
+  }
+
+  private void mockOutput(ConnectableComponentModel model) {
+    when(model.getOutput().getType()).thenReturn(typeLoader.load(String.class));
+    when(model.getOutputAttributes().getType()).thenReturn(typeLoader.load(String.class));
   }
 
   private void mockOperationProvider() {
     mockComponent(operationModel, providerBuilder, ConnectedSampleDataProvider.class.getSimpleName());
+  }
+
+  private void mockSourceProvider() {
+    mockComponent(sourceModel, builder(ConnectedSampleDataProvider.class), ConfigAwareSampleDataProvider.class.getSimpleName());
   }
 
   @After
@@ -204,10 +224,48 @@ public class SampleDataProviderModelValidatorTestCase {
   @Test
   public void legalComponent() {
     mockOperationProvider();
-    mockComponent(sourceModel, builder(ConnectedSampleDataProvider.class), ConfigAwareSampleDataProvider.class.getSimpleName());
+    mockSourceProvider();
 
     validate();
     assertNoErrors();
+  }
+
+  @Test
+  public void operationWithWrongPayloadTypeSampleDataProvider() {
+    assertWrongGenerics(operationModel,
+                        MapSampleDataProvider.class,
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] was expecting to define '<java.lang.String,java.lang.String>' generics signature but '<java.util.Map<java.lang.String,java.lang.String>,java.lang.String>' was found instead");
+  }
+
+  @Test
+  public void operationWithWrongAttributesTypeSampleDataProvider() {
+    assertWrongGenerics(operationModel,
+                        MapAttributesSampleDataProvider.class,
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] was expecting to define '<java.lang.String,java.lang.String>' generics signature but '<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>' was found instead");
+  }
+
+  @Test
+  public void sourceWithWrongPayloadTypeSampleDataProvider() {
+    assertWrongGenerics(sourceModel,
+                        MapSampleDataProvider.class,
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] was expecting to define '<java.lang.String,java.lang.String>' generics signature but '<java.util.Map<java.lang.String,java.lang.String>,java.lang.String>' was found instead");
+  }
+
+  @Test
+  public void sourceWithWrongAttributesTypeSampleDataProvider() {
+    assertWrongGenerics(sourceModel,
+                        MapAttributesSampleDataProvider.class,
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] was expecting to define '<java.lang.String,java.lang.String>' generics signature but '<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>' was found instead");
+  }
+
+  private void assertWrongGenerics(ConnectableComponentModel model,
+                                   Class<? extends SampleDataProvider> providerClass,
+                                   String expectedError) {
+
+    mockComponent(model, builder(providerClass), providerClass.getSimpleName());
+
+    validate();
+    assertErrorMessages(equalTo(expectedError));
   }
 
   private void assertProblems(String errorMessage) {
@@ -219,6 +277,14 @@ public class SampleDataProviderModelValidatorTestCase {
   private void assertNoErrors() {
     List<Problem> errors = problemsReporter.getErrors();
     assertThat(errors, hasSize(0));
+  }
+
+  private void assertErrorMessages(Matcher<String>... matchers) {
+    List<Problem> errors = problemsReporter.getErrors();
+    assertThat(errors, hasSize(matchers.length));
+    for (int i = 0; i < matchers.length; i++) {
+      assertThat(errors.get(i).getMessage(), matchers[i]);
+    }
   }
 
   private void validate() {
@@ -263,5 +329,31 @@ public class SampleDataProviderModelValidatorTestCase {
   public static class NonInstantiableProvider extends TestSampleDataProvider {
 
     private NonInstantiableProvider() {}
+  }
+
+  public static class MapSampleDataProvider implements SampleDataProvider<Map<String, String>, String> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<Map<String, String>, String> getSample() throws SampleDataException {
+      return null;
+    }
+  }
+
+  public static class MapAttributesSampleDataProvider implements SampleDataProvider<String, Map<String, String>> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<String, Map<String, String>> getSample() throws SampleDataException {
+      return null;
+    }
   }
 }
