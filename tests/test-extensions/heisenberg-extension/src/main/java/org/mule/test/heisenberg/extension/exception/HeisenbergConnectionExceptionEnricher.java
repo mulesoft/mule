@@ -16,7 +16,8 @@ public class HeisenbergConnectionExceptionEnricher extends ExceptionHandler {
 
   @Override
   public Exception enrichException(Exception e) {
-    if (e instanceof MuleFatalException) {
+    if (e instanceof MuleFatalException
+        || e.getClass().getName().equals("org.mule.runtime.core.internal.exception.MessagingException")) {
       return e;
     }
     return new ConnectionException(ENRICHED_MESSAGE + e.getMessage(), e);

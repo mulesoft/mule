@@ -18,6 +18,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyVararg;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.clearInvocations;
@@ -31,6 +32,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
+import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
@@ -41,6 +44,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static reactor.core.Exceptions.unwrap;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -49,6 +53,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ImmutableErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Reference;
@@ -101,9 +106,19 @@ import com.google.common.collect.ImmutableList;
 @RunWith(Parameterized.class)
 public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCase {
 
-  public static final int RETRY_COUNT = 10;
-  private static final String DUMMY_NAME = "dummyName";
+  public static final int RETRY_COUNT = 5;
+  private static final String EXTENSION_NAME = "testExtension";
+  public static final String EXTENSION_PREFIX = "test-extension";
+  private static final String EXTENSION_ERROR_NAMESPACE = EXTENSION_PREFIX.toUpperCase();
   private static final String ERROR = "Error";
+  private static final String MULE_ERROR_NAMESPACE = "MULE";
+  private static final ErrorModel MULE_CONNECTIVITY_ERROR =
+      newError(CONNECTIVITY_ERROR_IDENTIFIER, MULE_ERROR_NAMESPACE)
+          .build();
+  private static final ErrorModel extensionConnectivityError =
+      newError(CONNECTIVITY_ERROR_IDENTIFIER, EXTENSION_ERROR_NAMESPACE)
+          .withParent(MULE_CONNECTIVITY_ERROR)
+          .build();
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
@@ -170,14 +185,22 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private List<Interceptor> orderedInterceptors;
   private ExecutionMediator mediator;
   private InterceptorChain interceptorChain;
+  private final ComponentIdentifier extensionConnectivityErrorType =
+      ComponentIdentifier.builder().namespace(EXTENSION_ERROR_NAMESPACE).name(CONNECTIVITY_ERROR_IDENTIFIER).build();
+  private final ComponentIdentifier muleConnectivityErrorType =
+      ComponentIdentifier.builder().namespace(MULE_ERROR_NAMESPACE).name(CONNECTIVITY_ERROR_IDENTIFIER).build();
 
   @Before
   public void before() throws Exception {
+    muleContext.getErrorTypeRepository()
+        .addErrorType(extensionConnectivityErrorType,
+                      muleContext.getErrorTypeRepository().lookupErrorType(muleConnectivityErrorType).get());
     when(configurationInstance.getStatistics()).thenReturn(configurationStats);
-    when(configurationInstance.getName()).thenReturn(DUMMY_NAME);
+    when(configurationInstance.getName()).thenReturn(EXTENSION_NAME);
     when(configurationInstance.getModel()).thenReturn(configurationModel);
-    when(extensionModel.getName()).thenReturn(DUMMY_NAME);
+    when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
     when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(empty());
+    when(operationModel.getErrorModels()).thenReturn(singleton(extensionConnectivityError));
     mockExceptionEnricher(extensionModel, null);
     mockExceptionEnricher(operationModel, null);
 
@@ -190,7 +213,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(operationContext.getRetryPolicyTemplate()).thenReturn(ofNullable(retryPolicy));
     when(operationContext.getCurrentScheduler()).thenReturn(IMMEDIATE_SCHEDULER);
 
-    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
+    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix(EXTENSION_PREFIX).build());
 
     interceptorChain = InterceptorChain.builder()
         .addInterceptor(interceptor1)
@@ -238,8 +261,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   public void interceptorsInvokedOnError() throws Throwable {
     stubException();
     assertException(e -> {
-      assertThat(e, is(instanceOf(ConnectionException.class)));
-
+      assertErrorIsCausedByConnectionException(e);
       try {
         assertBefore();
       } catch (Exception e2) {
@@ -254,7 +276,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   public void decoratedException() throws Throwable {
     stubException();
     assertException(e -> {
-      assertThat(e, is(sameInstance(connectionException)));
+      assertThat(e.getCause(), is(sameInstance(connectionException)));
       assertAfter(null);
     });
   }
@@ -408,8 +430,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     try {
       execute();
     } catch (Exception e) {
-      assertThat(e, is(instanceOf(ConnectionException.class)));
-      assertThat(e.getMessage(), is("Connection failure"));
+      assertErrorIsCausedByConnectionException(e);
       verify(failingTransformer, times(1)).apply(any(), any());
       verify(operationContext, times(expectedRetries)).getVariable(DO_NOT_RETRY);
     }
@@ -437,7 +458,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
         : 1;
 
     assertException(exception -> {
-      assertThat(exception, instanceOf(ConnectionException.class));
+      assertErrorIsCausedByConnectionException(exception);
       try {
         verify(interceptor1, times(expectedRetries)).before(operationContext);
         verify(interceptor2, times(expectedRetries)).before(operationContext);
@@ -450,6 +471,12 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
       verify(interceptor2, times(expectedRetries)).onError(same(operationContext), anyVararg());
       verify(interceptor2, times(expectedRetries)).after(operationContext, null);
     });
+  }
+
+  private void assertErrorIsCausedByConnectionException(Throwable exception) {
+    assertThat(exception, instanceOf(TypedException.class));
+    assertThat(exception.getMessage(), is("org.mule.runtime.api.connection.ConnectionException: Connection failure"));
+    assertThat(exception.getCause(), instanceOf(ConnectionException.class));
   }
 
   private void assertException(Consumer<Throwable> assertion) throws Throwable {
@@ -490,7 +517,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   private void assertOnError(VerificationMode verificationMode) {
     verifyInOrder(interceptor -> {
-      interceptor.onError(same(operationContext), same(connectionException));
+      interceptor.onError(same(operationContext), argThat(argument -> argument.getCause() == connectionException));
       interceptor.after(operationContext, null);
     },
                   verificationMode);
@@ -505,7 +532,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   }
 
   private void stubException() throws Exception {
-    stubFailingComponentExecutor(operationExecutor, connectionException);
+    stubFailingComponentExecutor(operationExecutor, new ModuleException(ERROR, CONNECTIVITY, connectionException));
   }
 
   private void defineOrder(Interceptor... interceptors) {

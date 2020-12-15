@@ -191,7 +191,7 @@
     </flow>
 
     <flow name="callGus">
-        <heisenberg:call-gus-fring/>
+        <heisenberg:call-gus-fring config-ref="heisenberg"/>
     </flow>
 
     <flow name="cureCancer">

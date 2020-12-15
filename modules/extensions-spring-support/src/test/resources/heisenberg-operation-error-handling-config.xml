@@ -39,7 +39,7 @@
     </flow>
 
     <flow name="connectionFails">
-        <heisenberg:call-gus-fring/>
+        <heisenberg:call-gus-fring config-ref="heisenberg"/>
     </flow>
 
     <flow name="unrecognizedException">

@@ -25,7 +25,6 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -80,15 +79,6 @@ public class ExceptionHandlerManagerTestCase {
     assertThat(throwable, is(not(sameInstance(connectionException))));
     assertThat(throwable, is(instanceOf(HeisenbergException.class)));
     assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
-  }
-
-  @Test
-  public void handleConnectionException() {
-    ConnectionException rootCause = new ConnectionException(ERROR_MESSAGE, new Exception());
-    Throwable throwable = manager.handleThrowable(new Throwable(new RuntimeException(new ExecutionException(rootCause))));
-    assertThat(throwable, is(instanceOf(ConnectionException.class)));
-    assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
-    assertThat(throwable, is(sameInstance(rootCause)));
   }
 
   @Test

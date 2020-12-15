@@ -11,11 +11,13 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,6 +30,7 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVIT
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -42,6 +45,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.util.NameUtils;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -95,10 +99,10 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
   private ExtensionModel extensionModel;
 
   @Mock(lenient = true)
-  private OperationModel operationWithError;
+  private OperationModel operationWithConnectivityError;
 
   @Mock(lenient = true)
-  private OperationModel operationWithoutErrors;
+  private OperationModel operationWithoutError;
 
   @Rule
   public ExpectedException exception = none();
@@ -122,19 +126,21 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     errorsRegistrant = new ExtensionErrorsRegistrant(muleContext.getErrorTypeRepository(),
                                                      ((PrivilegedMuleContext) muleContext).getErrorTypeLocator());
 
-    when(extensionModel.getOperationModels()).thenReturn(asList(operationWithError, operationWithoutErrors));
+    when(extensionModel.getOperationModels()).thenReturn(asList(operationWithConnectivityError, operationWithoutError));
     when(extensionModel.getXmlDslModel()).thenReturn(xmlDslModel);
     when(extensionModel.getName()).thenReturn(TEST_EXTENSION_NAME);
 
-    when(operationWithError.getErrorModels()).thenReturn(singleton(extensionConnectivityError));
-    when(operationWithError.getName()).thenReturn(OPERATION_NAME);
-    when(operationWithError.getModelProperty(any())).thenReturn(empty());
+    when(operationWithConnectivityError.getErrorModels()).thenReturn(singleton(extensionConnectivityError));
 
-    when(operationWithoutErrors.getName()).thenReturn("operationWithoutError");
-    when(operationWithoutErrors.getErrorModels()).thenReturn(emptySet());
-    when(operationWithoutErrors.getModelProperty(any())).thenReturn(empty());
+    when(operationWithConnectivityError.getName()).thenReturn(OPERATION_NAME);
+    when(operationWithConnectivityError.getModelProperty(eq(ConnectivityModelProperty.class)))
+        .thenReturn(of(mock(ConnectivityModelProperty.class)));
 
-    visitableMock(operationWithError, operationWithoutErrors);
+    when(operationWithoutError.getName()).thenReturn("operationWithoutError");
+    when(operationWithoutError.getErrorModels()).thenReturn(emptySet());
+    when(operationWithoutError.getModelProperty(any())).thenReturn(empty());
+
+    visitableMock(operationWithConnectivityError, operationWithoutError);
   }
 
   @Test
@@ -176,7 +182,7 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
 
   @Test
   public void operationWithoutErrorsDoesntGenerateComponentMapper() {
-    when(extensionModel.getOperationModels()).thenReturn(singletonList(operationWithoutErrors));
+    when(extensionModel.getOperationModels()).thenReturn(singletonList(operationWithoutError));
     ErrorTypeLocator mockTypeLocator = mock(ErrorTypeLocator.class);
     errorsRegistrant = new ExtensionErrorsRegistrant(typeRepository, mockTypeLocator);
 
@@ -189,8 +195,8 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     ErrorTypeRepository repository = mock(ErrorTypeRepository.class);
     when(repository.getErrorType(any())).then((e) -> typeRepository.getErrorType(((ComponentIdentifier) e.getArguments()[0])));
     ErrorModel internalRepeatedError = ErrorModelBuilder.newError(SOURCE_RESPONSE_GENERATE).build();
-    when(operationWithError.getErrorModels()).thenReturn(singleton(internalRepeatedError));
-    when(extensionModel.getOperationModels()).thenReturn(singletonList(operationWithError));
+    when(operationWithConnectivityError.getErrorModels()).thenReturn(singleton(internalRepeatedError));
+    when(extensionModel.getOperationModels()).thenReturn(singletonList(operationWithConnectivityError));
     when(extensionModel.getErrorModels()).thenReturn(singleton(internalRepeatedError));
     ErrorTypeLocator mockTypeLocator = mock(ErrorTypeLocator.class);
     errorsRegistrant = new ExtensionErrorsRegistrant(typeRepository, mockTypeLocator);
@@ -203,7 +209,7 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     exception.expect(MuleRuntimeException.class);
     exception.expectMessage("The extension [" + TEST_EXTENSION_NAME
         + "] tried to register the [MULE:CUSTOM] error with [MULE] namespace, which is not allowed");
-    when(operationWithError.getErrorModels()).thenReturn(singleton(customErrorModel));
+    when(operationWithConnectivityError.getErrorModels()).thenReturn(singleton(customErrorModel));
     when(extensionModel.getErrorModels()).thenReturn(singleton(customErrorModel));
     errorsRegistrant.registerErrors(extensionModel);
   }
