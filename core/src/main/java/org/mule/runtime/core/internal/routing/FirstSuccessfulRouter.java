@@ -19,6 +19,7 @@ import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -67,6 +68,10 @@ class FirstSuccessfulRouter {
   // deferring the downstream publisher completion until all events have evacuated the scope.
   private final AtomicInteger inflightEvents = new AtomicInteger(0);
   private final AtomicBoolean completeDeferred = new AtomicBoolean(false);
+
+  private boolean isOriginalError(Error newError, Optional<Error> originalError) {
+    return originalError.map(error -> error.equals(newError)).orElse(false);
+  }
 
   public FirstSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
     this.owner = owner;
@@ -171,8 +176,11 @@ class FirstSuccessfulRouter {
         .doOnNext(successfulEvent -> {
           // If event finishes with error, then it must be treated as an error
           if (successfulEvent.getError().isPresent()) {
-            executeNext(next, successfulEvent, successfulEvent.getError().get().getCause());
-            return;
+            CoreEvent originalEvent = nextExecutionContextResolver.getCurrentContextFromEvent(successfulEvent).peek();
+            if (!isOriginalError(successfulEvent.getError().get(), originalEvent.getError())) {
+              executeNext(next, successfulEvent, successfulEvent.getError().get().getCause());
+              return;
+            }
           }
           // Scope execution was successful
           inflightEvents.decrementAndGet();
