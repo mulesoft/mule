@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -67,6 +68,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   private final Optional<MutableConfigurationStats> stats;
   private final boolean supportsOAuth;
   private boolean isFirstPage = true;
+  private AtomicBoolean alreadyClosed = new AtomicBoolean(false);
+  private final Optional<MutableConfigurationStats> mutableStats;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
@@ -88,6 +91,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     retryPolicy = (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
     stats = getMutableConfigurationStats(executionContext);
     connectionSupplierFactory = createConnectionSupplierFactory();
+    mutableStats = getMutableConfigurationStats(executionContext);
   }
 
   /**
@@ -192,6 +196,9 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     } finally {
       if (connectionSupplier != null) {
         safely(connectionSupplier::close, e -> LOGGER.debug("Found exception closing the connection supplier", e));
+      }
+      if (mutableStats.isPresent() && alreadyClosed.compareAndSet(false, true)) {
+        mutableStats.get().discountActiveComponent();
       }
       connectionSupplierFactory.dispose();
     }

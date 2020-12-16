@@ -26,14 +26,20 @@ public interface MutableConfigurationStats extends ConfigurationStats {
    * Increments the return value of {@link #getInflightOperations()} by one
    *
    * @return the new value
+   *
+   * @deprecated Use {@link #addActiveComponent()} instead.
    */
+  @Deprecated
   int addInflightOperation();
 
   /**
    * Decrements the return value of {@link #getInflightOperations()} by one
    *
    * @return the new value
+   *
+   * @deprecated Use {@link #discountActiveComponent()} instead.
    */
+  @Deprecated
   int discountInflightOperation();
 
   /**
@@ -41,7 +47,10 @@ public interface MutableConfigurationStats extends ConfigurationStats {
    *
    * @return the new value
    * @since 4.1.6 4.2.2 4.3.0
+   *
+   * @deprecated Use {@link #addActiveComponent()} instead.
    */
+  @Deprecated
   int addRunningSource();
 
   /**
@@ -49,6 +58,25 @@ public interface MutableConfigurationStats extends ConfigurationStats {
    *
    * @return the new value
    * @since 4.1.6 4.2.2 4.3.0
+   *
+   * @deprecated Use {@link #discountActiveComponent()} instead.
    */
+  @Deprecated
   int discountRunningSource();
+
+  /**
+   * Increments the return value of {@link #getActiveComponents()} by one
+   *
+   * @return the new value
+   * @since 4.2.3 4.3.1 4.4.0
+   */
+  int addActiveComponent();
+
+  /**
+   * Decrements the return value of {@link #getActiveComponents()} by one
+   *
+   * @return the new value
+   * @since 4.2.3 4.3.1 4.4.0
+   */
+  int discountActiveComponent();
 }

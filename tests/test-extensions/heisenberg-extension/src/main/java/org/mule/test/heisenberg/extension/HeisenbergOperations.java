@@ -19,6 +19,8 @@ import static org.mule.runtime.extension.api.client.DefaultOperationParameters.b
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKED_DOOR;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKING_DOOR;
+
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
@@ -113,6 +115,7 @@ public class HeisenbergOperations implements Disposable {
   public static final String OPERATION_PARAMETER_EXAMPLE = "Hello my friend!";
 
   public static boolean disposed = false;
+  public static Integer streamRead = -1;
 
   @Inject
   private ExtensionManager extensionManager;
@@ -548,5 +551,33 @@ public class HeisenbergOperations implements Disposable {
         .put("object", object)
         .put("serializable", serializable)
         .build();
+  }
+
+  @MediaType(value = TEXT_PLAIN, strict = false)
+  public InputStream nameAsStreamConnected(@Config HeisenbergExtension config, @Connection HeisenbergConnection connection,
+                                           Integer failOn)
+      throws ConnectionException {
+    streamRead++;
+    if (streamRead.equals(failOn)) {
+      throw new ConnectionException("Failed to return the InputStream");
+    }
+    return new InputStream() {
+
+      private int bytesRead = 0;
+      private byte[] name = config.getPersonalInfo().getName().getBytes();
+
+      @Override
+      public int read() {
+        streamRead++;
+        if (streamRead.equals(failOn)) {
+          throw new RuntimeException("Failed to read the stream");
+        }
+        if (bytesRead < name.length) {
+          bytesRead++;
+          return name[bytesRead - 1];
+        }
+        return -1;
+      }
+    };
   }
 }
