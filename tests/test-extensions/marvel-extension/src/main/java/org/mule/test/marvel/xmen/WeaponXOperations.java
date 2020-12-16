@@ -72,11 +72,19 @@ public class WeaponXOperations {
     }
   }
 
+  public void gambitReluctantCharge(@Content @Optional InputStream input) {
+    // do nothing
+  }
+
   public void gambitChargeItems(@Content @Optional(defaultValue = "#[payload]") TypedValue<Iterator> items) {
     final Iterator iter = items.getValue();
     while (iter.hasNext()) {
       Object value = iter.next();
     }
+  }
+
+  public void gambitReluctantChargeItems(@Content @Optional TypedValue<Iterator> items) {
+    // do nothing
   }
 
   /**
