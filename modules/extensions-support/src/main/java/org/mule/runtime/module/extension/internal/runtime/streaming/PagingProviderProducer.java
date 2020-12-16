@@ -15,6 +15,7 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.isPartOfActiveTransaction;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
@@ -30,7 +31,6 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
@@ -88,9 +88,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     this.supportsOAuth = supportsOAuth;
     retryPolicy = (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
     connectionSupplierFactory = createConnectionSupplierFactory();
-    ConfigurationStats configurationStats = config.getStatistics();
-    mutableStats =
-        configurationStats instanceof MutableConfigurationStats ? (MutableConfigurationStats) configurationStats : null;
+    mutableStats = getMutableConfigurationStats(config);
   }
 
   /**

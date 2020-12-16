@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isConnectedStreamingOperation;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 
@@ -60,7 +61,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final ResultTransformer resultTransformer;
   private final ClassLoader extensionClassLoader;
-
+  private final ComponentModel operationModel;
 
   @FunctionalInterface
   public interface ResultTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
@@ -83,6 +84,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.resultTransformer = resultTransformer;
+    this.operationModel = operationModel;
     extensionClassLoader = getClassLoader(extensionModel);
   }
 
@@ -101,6 +103,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
     final MutableConfigurationStats stats = getMutableConfigurationStats(context);
     if (stats != null) {
+      stats.addActiveComponent();
       stats.addInflightOperation();
     }
 
@@ -152,6 +155,9 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
         // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
         // Race conditions appear otherwise, specially in connection pooling scenarios.
         if (stats != null) {
+          if (!isConnectedStreamingOperation(operationModel)) {
+            stats.discountActiveComponent();
+          }
           stats.discountInflightOperation();
         }
         try {
@@ -173,6 +179,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
         } finally {
           if (stats != null) {
             stats.discountInflightOperation();
+            stats.discountActiveComponent();
           }
           executorCallback.error(t);
         }

@@ -46,14 +46,12 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -74,7 +72,6 @@ import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -113,7 +110,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -122,7 +118,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
@@ -574,42 +569,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   protected void executeOperation(ExecutionContextAdapter<T> operationContext, ExecutorCallback callback) {
-    final MutableConfigurationStats stats = getMutableConfigurationStats(operationContext);
-    if (stats != null) {
-      stats.addActiveComponent();
-      executionMediator.execute(componentExecutor, operationContext, trackable(callback, stats));
-    } else {
-      executionMediator.execute(componentExecutor, operationContext, callback);
-    }
-  }
-
-  private ExecutorCallback trackable(ExecutorCallback callback, MutableConfigurationStats stats) {
-    return new ExecutorCallback() {
-
-      @Override
-      public void complete(Object value) {
-        if (!isConnectedStreamingOperation()) {
-          stats.discountActiveComponent();
-        }
-        callback.complete(value);
-      }
-
-      @Override
-      public void error(Throwable e) {
-        stats.discountActiveComponent();
-        callback.error(e);
-      }
-    };
-  }
-
-  private Boolean isConnectedStreamingOperation() {
-    if (componentModel instanceof ConnectableComponentModel) {
-      ConnectableComponentModel connectableComponentModel = (ConnectableComponentModel) componentModel;
-      return (connectableComponentModel.requiresConnection()
-          && (connectableComponentModel.supportsStreaming()
-              || connectableComponentModel.getModelProperty(PagedOperationModelProperty.class).isPresent()));
-    }
-    return false;
+    executionMediator.execute(componentExecutor, operationContext, callback);
   }
 
   private ExecutionContextAdapter<T> createExecutionContext(Optional<ConfigurationInstance> configuration,

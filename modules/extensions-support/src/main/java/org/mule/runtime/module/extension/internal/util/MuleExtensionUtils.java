@@ -31,6 +31,7 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -59,6 +60,8 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
@@ -68,6 +71,7 @@ import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
+import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
@@ -549,5 +553,30 @@ public class MuleExtensionUtils {
     } else {
       return null;
     }
+  }
+
+  /**
+   * @return the {@link MutableConfigurationStats} for a given {@link ConfigurationInstance}
+   *
+   * @since 4.2.3 - 4.3.0
+   */
+  public static MutableConfigurationStats getMutableConfigurationStats(ConfigurationInstance config) {
+    ConfigurationStats configurationStats = config.getStatistics();
+    return configurationStats instanceof MutableConfigurationStats ? (MutableConfigurationStats) configurationStats : null;
+  }
+
+  /**
+   * @return whether the {@link ComponentModel} defines a streaming operation that uses a connection.
+   *
+   * @since 4.2.3 - 4.3.0
+   */
+  public static Boolean isConnectedStreamingOperation(ComponentModel componentModel) {
+    if (componentModel instanceof ConnectableComponentModel) {
+      ConnectableComponentModel connectableComponentModel = (ConnectableComponentModel) componentModel;
+      return (connectableComponentModel.requiresConnection()
+          && (connectableComponentModel.supportsStreaming()
+              || connectableComponentModel.getModelProperty(PagedOperationModelProperty.class).isPresent()));
+    }
+    return false;
   }
 }
