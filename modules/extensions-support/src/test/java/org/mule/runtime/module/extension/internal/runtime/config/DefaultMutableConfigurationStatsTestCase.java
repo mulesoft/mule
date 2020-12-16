@@ -54,4 +54,13 @@ public class DefaultMutableConfigurationStatsTestCase extends AbstractMuleTestCa
     assertThat(stats.discountRunningSource(), is(0));
     assertThat(stats.getRunningSources(), is(0));
   }
+
+  @Test
+  public void activeComponents() {
+    assertThat(stats.getActiveComponents(), is(0));
+    assertThat(stats.addActiveComponent(), is(1));
+    assertThat(stats.getActiveComponents(), is(1));
+    assertThat(stats.discountActiveComponent(), is(0));
+    assertThat(stats.getActiveComponents(), is(0));
+  }
 }
