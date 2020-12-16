@@ -60,8 +60,6 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
@@ -560,7 +558,7 @@ public class MuleExtensionUtils {
    *
    * @since 4.2.3 - 4.3.0
    */
-  public static Boolean isConnectedStreamingOperation(ComponentModel componentModel) {
+  public static boolean isConnectedStreamingOperation(ComponentModel componentModel) {
     if (componentModel instanceof ConnectableComponentModel) {
       ConnectableComponentModel connectableComponentModel = (ConnectableComponentModel) componentModel;
       return (connectableComponentModel.requiresConnection()
