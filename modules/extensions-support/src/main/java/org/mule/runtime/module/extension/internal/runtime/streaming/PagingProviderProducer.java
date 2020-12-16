@@ -88,7 +88,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     this.supportsOAuth = supportsOAuth;
     retryPolicy = (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
     connectionSupplierFactory = createConnectionSupplierFactory();
-    mutableStats = getMutableConfigurationStats(config);
+    mutableStats = getMutableConfigurationStats(executionContext);
   }
 
   /**

@@ -556,16 +556,6 @@ public class MuleExtensionUtils {
   }
 
   /**
-   * @return the {@link MutableConfigurationStats} for a given {@link ConfigurationInstance}
-   *
-   * @since 4.2.3 - 4.3.0
-   */
-  public static MutableConfigurationStats getMutableConfigurationStats(ConfigurationInstance config) {
-    ConfigurationStats configurationStats = config.getStatistics();
-    return configurationStats instanceof MutableConfigurationStats ? (MutableConfigurationStats) configurationStats : null;
-  }
-
-  /**
    * @return whether the {@link ComponentModel} defines a streaming operation that uses a connection.
    *
    * @since 4.2.3 - 4.3.0
