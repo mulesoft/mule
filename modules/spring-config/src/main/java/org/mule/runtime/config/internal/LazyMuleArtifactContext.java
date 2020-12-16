@@ -29,6 +29,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
+import static org.mule.runtime.config.internal.AstValidator.validateAst;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
@@ -349,6 +350,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
               comp.getLocation().getLocation().equals(locationOptional.get().toString()));
 
       final ArtifactAst minimalApplicationModel = buildMinimalApplicationModel(basePredicate);
+      validateAst(minimalApplicationModel);
 
       if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
           .noneMatch(comp -> comp.getLocation() != null

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.newSetFromMap;
@@ -15,7 +15,6 @@ import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
@@ -25,16 +24,17 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
-import static org.mule.runtime.ast.api.util.MuleAstUtils.validate;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
+import static org.mule.runtime.config.internal.AstValidator.validateAst;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.configurePropertiesResolverFeatureFlag;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
@@ -67,10 +67,9 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.ast.api.validation.ValidationResult;
-import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
@@ -108,7 +107,6 @@ import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
@@ -176,16 +174,17 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
    * registry implementation to wraps the spring ApplicationContext
    *
-   * @param muleContext the {@link MuleContext} that own this context
-   * @param artifactConfigResources
-   * @param artifactDeclaration the mule configuration defined programmatically
-   * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *        org.mule.runtime.config.internal.SpringRegistry
+   * @param muleContext                                the {@link MuleContext} that own this context
+   * @param artifactConfigResources                    holds the url description (or location) of the resources
+   * @param artifactDeclaration                        the mule configuration defined programmatically
+   * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
+   *                                                   org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties
    * @param artifactProperties
-   * @param artifactType
-   * @param disableXmlValidations {@code true} when loading XML configs it will not apply validations.
-   * @param componentBuildingDefinitionRegistryFactory
+   * @param artifactType                               the {@link ArtifactType} to use
+   * @param disableXmlValidations                      {@code true} when loading XML configs it will not apply validations.
+   * @param componentBuildingDefinitionRegistryFactory to create instances of {@link ComponentBuildingDefinitionRegistry}
+   *
    * @since 3.7.0
    */
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -242,47 +241,46 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                   FeatureFlaggingService featureFlaggingService) {
     try {
       final ArtifactAst artifactAst;
+      DefaultConfigurationPropertiesResolver propertyResolver =
+          new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
 
+            ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
+
+            @Override
+            public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
+              final String propertyValue = artifactProperties.get(configurationAttributeKey);
+
+              if (propertyValue == null) {
+                return parentProvider.provide(configurationAttributeKey);
+              }
+              return of(new ConfigurationProperty() {
+
+                @Override
+                public Object getSource() {
+                  return this;
+                }
+
+                @Override
+                public String getValue() {
+                  return propertyValue;
+                }
+
+                @Override
+                public String getKey() {
+                  return configurationAttributeKey;
+                }
+              });
+            }
+
+            @Override
+            public String getDescription() {
+              return "Deployment properties";
+            }
+          });
       if (artifactDeclaration == null) {
         if (artifactConfigResources.length == 0) {
           artifactAst = emptyArtifact();
         } else {
-          DefaultConfigurationPropertiesResolver propertyResolver =
-              new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
-
-                ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
-
-                @Override
-                public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
-                  final String propertyValue = artifactProperties.get(configurationAttributeKey);
-
-                  if (propertyValue == null) {
-                    return parentProvider.provide(configurationAttributeKey);
-                  }
-                  return of(new ConfigurationProperty() {
-
-                    @Override
-                    public Object getSource() {
-                      return this;
-                    }
-
-                    @Override
-                    public String getValue() {
-                      return propertyValue;
-                    }
-
-                    @Override
-                    public String getKey() {
-                      return configurationAttributeKey;
-                    }
-                  });
-                }
-
-                @Override
-                public String getDescription() {
-                  return "Deployment properties";
-                }
-              });
           Builder builder = AstXmlParser.builder()
               .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
               .withExtensionModels(getExtensions());
@@ -305,40 +303,20 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         artifactAst = toArtifactast(artifactDeclaration, getExtensions());
       }
 
+      ApplicationModel applicationModel = new ApplicationModel(artifactAst,
+                                                               artifactProperties, parentConfigurationProperties,
+                                                               new ClassLoaderResourceProvider(muleContext
+                                                                   .getExecutionClassLoader()));
+      if (getBoolean(propertyResolver.resolveValue(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).toString())) {
+        return applicationModel;
+      }
       // TODO validate the AST instead of the model
-      return (ApplicationModel) validateModel(new ApplicationModel(artifactAst,
-                                                                   artifactProperties, parentConfigurationProperties,
-                                                                   new ClassLoaderResourceProvider(muleContext
-                                                                       .getExecutionClassLoader()),
-                                                                   featureFlaggingService));
+      return (ApplicationModel) validateAst(applicationModel);
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
-  }
-
-  private String compToLoc(ComponentAst component) {
-    return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
-        + component.getMetadata().getStartLine().orElse(-1) + "]";
-  }
-
-  private ArtifactAst validateModel(ArtifactAst appModel) {
-    final ValidationResult validation = validate(appModel);
-
-    final Collection<ValidationResultItem> items = validation.getItems();
-    if (!items.isEmpty()) {
-
-      final String allMessages = validation.getItems()
-          .stream()
-          .map(v -> compToLoc(v.getComponent()) + ": " + v.getMessage())
-          .collect(joining(lineSeparator()));
-
-
-      throw new MuleRuntimeException(createStaticMessage(allMessages));
-    }
-
-    return appModel;
   }
 
   public void initialize() {
