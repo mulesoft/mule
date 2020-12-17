@@ -13,12 +13,16 @@ import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
 import org.mule.test.values.extension.resolver.WithComplexActingParameter;
-import org.mule.test.values.extension.resolver.WithConfigValueProvider;
 import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
+import org.mule.test.values.extension.resolver.WithConfigValueProvider;
 import org.mule.test.values.extension.resolver.WithErrorValueProvider;
-import org.mule.test.values.extension.resolver.WithMuleContextValueProvider;
+import org.mule.test.values.extension.resolver.WithOptionalParametersValueProvider;
+import org.mule.test.values.extension.resolver.WithOptionalParametersWithDefaultValueProvider;
+import org.mule.test.values.extension.resolver.WithRequiredAndOptionalParametersValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider;
+import org.mule.test.values.extension.resolver.WithMuleContextValueProvider;
 
 import java.util.List;
 
@@ -71,4 +75,29 @@ public class ValuesOperations {
 
   public void withComplexActingParameter(@Optional @OfValues(WithComplexActingParameter.class) String providedParameter,
                                          ComplexActingParameter complexActingParameter) {}
+
+  public void withRequiredParameter(@OfValues(WithRequiredParameterValueProvider.class) String providedParameters,
+                                    String requiredValue) {}
+
+  public void withRequiredParameterAndOptionalParameterAsRequired(@OfValues(WithRequiredAndOptionalParametersValueProvider.class) String providedParameters,
+                                                                  String requiredValue, String optionalValue) {}
+
+  public void withRequiredAndOptionalParameters(@OfValues(WithRequiredAndOptionalParametersValueProvider.class) String providedParameters,
+                                                String requiredValue, @Optional String optionalValue) {}
+
+  public void withRequiredAndOptionalWithDefaultParameters(@OfValues(WithRequiredAndOptionalParametersValueProvider.class) String providedParameters,
+                                                           String requiredValue, @Optional(
+                                                               defaultValue = "OPERATION_DEFAULT_VALUE") String optionalValue) {}
+
+  public void withOptionalParameterAsRequired(@OfValues(WithOptionalParametersValueProvider.class) String providedParameters,
+                                              String optionalValue) {}
+
+  public void withOptionalParameter(@OfValues(WithOptionalParametersValueProvider.class) String providedParameters,
+                                    @Optional String optionalValue) {}
+
+  public void withOptionalParameterWithDefault(@OfValues(WithOptionalParametersValueProvider.class) String providedParameters,
+                                               @Optional(defaultValue = "OPERATION_DEFAULT_VALUE") String optionalValue) {}
+
+  public void withVPOptionalParameterWithDefaultValue(@OfValues(WithOptionalParametersWithDefaultValueProvider.class) String providedParameters,
+                                                      @Optional(defaultValue = "OPERATION_DEFAULT_VALUE") String optionalValue) {}
 }

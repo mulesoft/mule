@@ -4396,7 +4396,7 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [],
+            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -5736,7 +5736,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "parameter",
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
@@ -13906,7 +13906,7 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [],
+            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -15246,7 +15246,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "parameter",
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
@@ -20519,7 +20519,7 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [],
+            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -21859,7 +21859,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "parameter",
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
@@ -27985,7 +27985,7 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [],
+            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -29325,7 +29325,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "parameter",
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
@@ -34995,7 +34995,7 @@
           "supportsStreaming": false,
           "notifications": [],
           "sampleDataProviderModel": {
-            "actingParameters": [],
+            "parameters": [],
             "providerId": "OAuth sample data",
             "requiresConfiguration": false,
             "requiresConnection": true
@@ -36335,7 +36335,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "valueProviderModel": {
-                    "actingParameters": [],
+                    "parameters": [],
                     "partOrder": 1,
                     "providerName": "parameter",
                     "providerId": "org.mule.test.oauth.OAuthValuesProvider",
