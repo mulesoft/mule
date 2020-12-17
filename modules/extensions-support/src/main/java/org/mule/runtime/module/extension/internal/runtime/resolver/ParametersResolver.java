@@ -90,27 +90,28 @@ import com.google.common.base.Joiner;
  */
 public final class ParametersResolver implements ObjectTypeParametersResolver {
 
-  private final Boolean lazyInitEnabled;
+  private final Boolean disableValidations;
   private final MuleContext muleContext;
   private final Map<String, ?> parameters;
   private final ReflectionCache reflectionCache;
   private final ExpressionManager expressionManager;
   private final String parameterOwner;
 
-  private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters, boolean lazyInitEnabled,
+  private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters, boolean disableValidations,
                              ReflectionCache reflectionCache, ExpressionManager expressionManager, String parameterOwner) {
     this.muleContext = muleContext;
     this.parameters = parameters;
-    this.lazyInitEnabled = lazyInitEnabled;
+    this.disableValidations = disableValidations;
     this.reflectionCache = reflectionCache;
     this.expressionManager = expressionManager;
     this.parameterOwner = parameterOwner;
   }
 
-  public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext, boolean lazyInitEnabled,
+  public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext, boolean disableValidations,
                                               ReflectionCache reflectionCache, ExpressionManager expressionManager,
                                               String parameterOwner) {
-    return new ParametersResolver(muleContext, parameters, lazyInitEnabled, reflectionCache, expressionManager, parameterOwner);
+    return new ParametersResolver(muleContext, parameters, disableValidations, reflectionCache, expressionManager,
+                                  parameterOwner);
   }
 
   public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel, MuleContext muleContext,
@@ -224,7 +225,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
           ValueResolver<?> resolver = getParameterValueResolver(p);
           if (resolver != null) {
             resolverSet.add(parameterName, resolver);
-          } else if (p.isRequired() && !lazyInitEnabled) {
+          } else if (p.isRequired() && !disableValidations) {
             throw new RequiredParameterNotSetException(p);
           }
         });
@@ -323,7 +324,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     if (groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).isPresent()) {
       return new ExclusiveParameterGroupObjectBuilder(type,
                                                       groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).get(),
-                                                      lazyInitEnabled,
+                                                      disableValidations,
                                                       reflectionCache);
     }
 
@@ -393,7 +394,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         } catch (InitialisationException e) {
           throw new MuleRuntimeException(e);
         }
-      } else if (field.isRequired() && !isFlattenedParameterGroup(field) && !lazyInitEnabled) {
+      } else if (field.isRequired() && !isFlattenedParameterGroup(field) && !disableValidations) {
         throw new RequiredParameterNotSetException(objectField.getName());
       }
     });
@@ -410,7 +411,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                                List<ParameterGroupModel> groups,
                                                Set<String> resolverKeys)
       throws ConfigurationException {
-    if (lazyInitEnabled) {
+    if (disableValidations) {
       return;
     }
 

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isDslDeclarationValidationEnabled;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.isChildKey;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.unwrapChildKey;
@@ -92,7 +93,8 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
   }
 
   private ParametersResolver parametersResolverFromValues(MuleContext muleContext) {
-    return ParametersResolver.fromValues(parameters, muleContext, isLazyInitMode(properties), reflectionCache, expressionManager,
+    return ParametersResolver.fromValues(parameters, muleContext, isLazyInitMode(properties)
+        && !isDslDeclarationValidationEnabled(properties), reflectionCache, expressionManager,
                                          this.getRepresentation());
   }
 
