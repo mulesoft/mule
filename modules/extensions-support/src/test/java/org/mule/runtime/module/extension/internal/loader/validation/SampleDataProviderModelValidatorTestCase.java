@@ -117,11 +117,13 @@ public class SampleDataProviderModelValidatorTestCase {
     when(parameterGroupModel.getParameterModels()).thenReturn(asList(parameterModel));
 
     when(extensionModel.getOperationModels()).thenReturn(singletonList(operationModel));
+    when(operationModel.getName()).thenReturn("myOp");
     when(operationModel.getAllParameterModels()).thenReturn(asList(parameterModel));
     when(operationModel.getName()).thenReturn("superOperation");
     when(operationModel.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
     when(operationModel.requiresConnection()).thenReturn(true);
 
+    when(sourceModel.getName()).thenReturn("listener");
     when(sourceModel.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
 
     when(parameterModel.getModelProperty(ImplementingParameterModelProperty.class)).thenReturn(empty());
@@ -234,28 +236,50 @@ public class SampleDataProviderModelValidatorTestCase {
   public void operationWithWrongPayloadTypeSampleDataProvider() {
     assertWrongGenerics(operationModel,
                         MapSampleDataProvider.class,
-                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] was expecting to define '<java.lang.String,java.lang.String>' generics signature but '<java.util.Map<java.lang.String,java.lang.String>,java.lang.String>' was found instead");
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] is used at component 'superOperation' which outputs a Result<java.lang.String,java.lang.String>, but the provider generic signature is '<java.util.Map<java.lang.String,java.lang.String>,java.lang.String>'");
   }
 
   @Test
   public void operationWithWrongAttributesTypeSampleDataProvider() {
     assertWrongGenerics(operationModel,
                         MapAttributesSampleDataProvider.class,
-                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] was expecting to define '<java.lang.String,java.lang.String>' generics signature but '<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>' was found instead");
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] is used at component 'superOperation' which outputs a Result<java.lang.String,java.lang.String>, but the provider generic signature is '<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>'");
   }
 
   @Test
   public void sourceWithWrongPayloadTypeSampleDataProvider() {
     assertWrongGenerics(sourceModel,
                         MapSampleDataProvider.class,
-                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] was expecting to define '<java.lang.String,java.lang.String>' generics signature but '<java.util.Map<java.lang.String,java.lang.String>,java.lang.String>' was found instead");
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] is used at component 'listener' which outputs a Result<java.lang.String,java.lang.String>, but the provider generic signature is '<java.util.Map<java.lang.String,java.lang.String>,java.lang.String>'");
   }
 
   @Test
   public void sourceWithWrongAttributesTypeSampleDataProvider() {
     assertWrongGenerics(sourceModel,
                         MapAttributesSampleDataProvider.class,
-                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] was expecting to define '<java.lang.String,java.lang.String>' generics signature but '<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>' was found instead");
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] is used at component 'listener' which outputs a Result<java.lang.String,java.lang.String>, but the provider generic signature is '<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>'");
+  }
+
+  @Test
+  public void operationWithBoxedVoidAttributes() {
+    mockComponent(operationModel, builder(VoidAttributesSampledataProvider.class),
+                  VoidAttributesSampledataProvider.class.getSimpleName());
+
+    when(operationModel.getOutputAttributes().getType()).thenReturn(typeLoader.load(Void.class));
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void operationWithNativeVoidAttributes() {
+    mockComponent(operationModel, builder(VoidAttributesSampledataProvider.class),
+                  VoidAttributesSampledataProvider.class.getSimpleName());
+
+    when(operationModel.getOutputAttributes().getType()).thenReturn(typeLoader.load(void.class));
+
+    validate();
+    assertNoErrors();
   }
 
   private void assertWrongGenerics(ConnectableComponentModel model,
@@ -353,6 +377,19 @@ public class SampleDataProviderModelValidatorTestCase {
 
     @Override
     public Result<String, Map<String, String>> getSample() throws SampleDataException {
+      return null;
+    }
+  }
+
+  public static class VoidAttributesSampledataProvider implements SampleDataProvider<String, Void> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<String, Void> getSample() throws SampleDataException {
       return null;
     }
   }

@@ -164,8 +164,9 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
 
     if (!Objects.equals(providerGenerics, outputGenerics)) {
       problemsReporter.addError(new Problem(model, format(
-                                                          "SampleDataProvider [%s] was expecting to define '%s' generics signature but '%s' was found instead",
-                                                          providerClass.getName(), outputGenerics, providerGenerics)));
+                                                          "SampleDataProvider [%s] is used at component '%s' which outputs a Result%s, but the provider generic signature is '%s'",
+                                                          providerClass.getName(), model.getName(), outputGenerics,
+                                                          providerGenerics)));
     }
   }
 
@@ -184,8 +185,12 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
     if (type instanceof ParameterizedTypeImpl) {
       ParameterizedTypeImpl parameterizedType = (ParameterizedTypeImpl) type;
       return parameterizedType.getRawType().getName() + asGenericSignature(asList(parameterizedType.getActualTypeArguments()));
+    } else if (type == null) {
+      return Object.class.getName();
+    } else if (Void.class.equals(type) || void.class.equals(type)) {
+      return void.class.getName();
     } else {
-      return type != null ? type.getTypeName() : Object.class.getName();
+      return type.getTypeName();
     }
   }
 
