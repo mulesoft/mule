@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact.value;
 
+import static com.google.common.base.Throwables.propagateIfPossible;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -14,6 +15,8 @@ import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.ResolvingFailure;
@@ -83,13 +86,16 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
           .withFailureCode(INVALID_PARAMETER_VALUE).build());
     } catch (ExecutorExceptionWrapper e) {
       Throwable cause = e.getCause();
-      ResolvingFailure.Builder failureBuilder = newFailure(cause);
       if (cause instanceof ValueResolvingException) {
+        ResolvingFailure.Builder failureBuilder = newFailure(cause);
         failureBuilder.withFailureCode(((ValueResolvingException) cause).getFailureCode());
+        return resultFrom(failureBuilder.build());
       }
-      return resultFrom(failureBuilder.build());
+      propagateIfPossible(cause, MuleRuntimeException.class);
+      throw new MuleRuntimeException(cause);
     } catch (Exception e) {
-      return resultFrom(newFailure(e).build());
+      propagateIfPossible(e, MuleRuntimeException.class);
+      throw new MuleRuntimeException(e);
     }
   }
 

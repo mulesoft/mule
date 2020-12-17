@@ -7,12 +7,15 @@
 package org.mule.runtime.module.tooling.internal;
 
 import static com.google.common.base.Throwables.getCausalChain;
+import static com.google.common.base.Throwables.propagateIfPossible;
 import static java.lang.System.currentTimeMillis;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.eclipse.aether.resolution.ArtifactResolutionException;
@@ -44,11 +47,15 @@ public abstract class AbstractArtifactAgnosticService {
                        currentTimeMillis() - startTime);
         }
       } catch (Exception e) {
-        throw getCausalChain(e).stream()
+        Optional<RuntimeException> bundleNotFoundException = getCausalChain(e).stream()
             .filter(exception -> exception.getClass().equals(ArtifactNotFoundException.class)
                 || exception.getClass().equals(ArtifactResolutionException.class))
-            .findFirst().map(exception -> (RuntimeException) new BundleNotFoundException(exception))
-            .orElse(new MuleRuntimeException(e));
+            .findFirst().map(exception -> new BundleNotFoundException(exception));
+        if (bundleNotFoundException.isPresent()) {
+          throw bundleNotFoundException.get();
+        }
+        propagateIfPossible(e, MuleRuntimeException.class);
+        throw new MuleRuntimeException(e);
       }
       try {
         startTime = currentTimeMillis();
@@ -116,7 +123,7 @@ public abstract class AbstractArtifactAgnosticService {
       super(cause);
     }
 
-    private Exception getCauseException() {
+    public Exception getCauseException() {
       return (Exception) this.getCause();
     }
   }
