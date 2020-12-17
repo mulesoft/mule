@@ -28,7 +28,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
   protected ReturnDelegate createReturnDelegate() {
     return new TargetReturnDelegate(TARGET, "#[message]", componentModel, muleContext.getExpressionManager(),
                                     componentDecoratorFactory, getCursorProviderFactory(),
-                                    muleContext);
+                                    muleContext, streamingManager);
   }
 
   @After
