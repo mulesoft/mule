@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.value;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
@@ -158,7 +159,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
     return valueSet.stream()
         .map(option -> cloneAndEnrichValue(option, parameters))
         .map(ValueBuilder::build)
-        .collect(Collectors.toCollection(LinkedHashSet::new));
+        .collect(toCollection(LinkedHashSet::new));
   }
 
   /**
