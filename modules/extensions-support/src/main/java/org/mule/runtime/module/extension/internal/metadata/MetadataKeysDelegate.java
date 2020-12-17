@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.Collections.singleton;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.CONNECTION_FAILURE;
@@ -37,10 +38,12 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -94,7 +97,7 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
 
       final Set<MetadataKey> enrichedMetadataKeys = metadataKeys.stream()
           .map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partsByOrder))
-          .map(MetadataKeyBuilder::build).collect(toSet());
+          .map(MetadataKeyBuilder::build).collect(toCollection(LinkedHashSet::new));
       keysContainer.add(componentResolverName, enrichedMetadataKeys);
 
       return success(keysContainer.build());

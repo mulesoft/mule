@@ -28,9 +28,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.ValueProv
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Resolves a parameter's {@link Value values} by coordinating the several moving parts that are affected by the
@@ -156,7 +158,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
     return valueSet.stream()
         .map(option -> cloneAndEnrichValue(option, parameters))
         .map(ValueBuilder::build)
-        .collect(toSet());
+        .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   /**
