@@ -1087,7 +1087,7 @@ public final class IntrospectionUtils {
     return expressionAnnotation != null ? expressionAnnotation.value() : SUPPORTED;
   }
 
-  public static String getSourceName(Class<? extends Source> sourceType) {
+  public static String getSourceName(Class<?> sourceType) {
     Alias alias = sourceType.getAnnotation(Alias.class);
     if (alias != null) {
       return alias.value();

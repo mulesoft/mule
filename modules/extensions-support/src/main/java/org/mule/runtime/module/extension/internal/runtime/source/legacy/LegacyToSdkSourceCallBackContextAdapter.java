@@ -1,16 +1,25 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.runtime.module.extension.internal.runtime.source.legacy;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.module.extension.internal.runtime.source.SourceCallbackContextAdapter;
 import org.mule.sdk.api.notification.NotificationActionDefinition;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.tx.TransactionHandle;
 
+import java.util.List;
 import java.util.Optional;
 
-public class LegacyToSdkSourceCallBackContextAdapter implements org.mule.sdk.api.runtime.source.SourceCallbackContext {
+public class LegacyToSdkSourceCallBackContextAdapter implements SourceCallbackContextAdapter {
 
   private final SourceCallbackContext delegate;
 
@@ -60,11 +69,26 @@ public class LegacyToSdkSourceCallBackContextAdapter implements org.mule.sdk.api
 
   @Override
   public <T, A> SourceCallback<T, A> getSourceCallback() {
-    return  new LegacySourceCallbackAdapter<>(delegate.getSourceCallback());
+    return new LegacySourceCallbackAdapter<>(delegate.getSourceCallback());
   }
 
   @Override
   public void fireOnHandle(NotificationActionDefinition<?> notificationActionDefinition, TypedValue<?> typedValue) {
     delegate.fireOnHandle(new SdkToLegacyNotificationActionDefinitionAdapter(notificationActionDefinition), typedValue);
+  }
+
+  @Override
+  public void releaseConnection() {
+
+  }
+
+  @Override
+  public void dispatched() {
+
+  }
+
+  @Override
+  public List<NotificationFunction> getNotificationsFunctions() {
+    return null;
   }
 }

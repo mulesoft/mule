@@ -23,13 +23,13 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
-import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
-import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.notification.DefaultExtensionNotification;
 import org.mule.runtime.module.extension.internal.runtime.transaction.DefaultTransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.transaction.NullTransactionHandle;
+import org.mule.sdk.api.notification.NotificationActionDefinition;
+import org.mule.sdk.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +59,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
    *
    * @param sourceCallback the owning {@link SourceCallbackAdapter}
    */
-     DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback) {
+  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback) {
     this.sourceCallback = sourceCallback;
   }
 

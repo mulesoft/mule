@@ -14,7 +14,7 @@ import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
-public class LegacySourceAdapter<T, A> extends Source<T, A> {
+public class LegacySourceAdapter<T, A> extends Source<T, A> implements LegacySourceWrapper {
 
   private final org.mule.runtime.extension.api.runtime.source.Source<T, A> delegate;
 
@@ -33,16 +33,6 @@ public class LegacySourceAdapter<T, A> extends Source<T, A> {
   @Override
   public void onStart(SourceCallback<T, A> sourceCallback) throws MuleException {
     delegate.onStart(new SdkToLegacySourceCallbackAdapter(sourceCallback));
-/**
- * Suppose that I here do delegate.OnStart(new SourceCallbackAdapter(sourceCallback);
- *  The problem that i hit is that I am adapting from the new API to the old one now.
- *
- *  Then, when implementing this adapter, which implements the old api.
- *
- *  And for example need to implement oldApi SourceCallbackContext createContext(); using a source callback from the new API.
- *  then I need to create an adapter which implements the new Old api, from a context that implements the new API.
- *
- */
   }
 
   @Override
@@ -50,7 +40,12 @@ public class LegacySourceAdapter<T, A> extends Source<T, A> {
     delegate.onStop();
   }
 
-  private static class LegacyPollingSourceAdapter<T, A> extends PollingSource<T, A> {
+  @Override
+  public org.mule.runtime.extension.api.runtime.source.Source getDelegate() {
+    return delegate;
+  }
+
+  private static class LegacyPollingSourceAdapter<T, A> extends PollingSource<T, A> implements LegacySourceWrapper {
 
     private final org.mule.runtime.extension.api.runtime.source.PollingSource<T, A> delegate;
 
@@ -76,6 +71,11 @@ public class LegacySourceAdapter<T, A> extends Source<T, A> {
     @Override
     public void onRejectedItem(Result<T, A> result, SourceCallbackContext callbackContext) {
       delegate.onRejectedItem(LegacySdkResultAdapter.from(result), new SdkToLegacySourceCallbackContextAdapter(callbackContext));
+    }
+
+    @Override
+    public org.mule.runtime.extension.api.runtime.source.Source getDelegate() {
+      return delegate;
     }
   }
 }

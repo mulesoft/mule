@@ -14,6 +14,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -84,14 +85,15 @@ public class SourceAdapterFactory {
                                      Component component,
                                      SourceConnectionManager connectionManager,
                                      boolean restarting) {
-    Source source = getSdkSourceFactory(sourceModel).createMessageSource();
+    Either<Source, org.mule.runtime.extension.api.runtime.source.Source> source =
+        getSdkSourceFactory(sourceModel).createMessageSource();
     try {
       SourceConfigurer sourceConfigurer = new SourceConfigurer(sourceModel, component.getLocation(), sourceParameters,
                                                                expressionManager, properties, muleContext, restarting);
-      source = sourceConfigurer.configure(source, configurationInstance);
+      Source sdkSource = sourceConfigurer.configure(source.getValue().get(), configurationInstance);
       return new SourceAdapter(extensionModel,
                                sourceModel,
-                               source,
+                               sdkSource,
                                configurationInstance,
                                cursorProviderFactory,
                                sourceCallbackFactory,

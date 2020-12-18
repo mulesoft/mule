@@ -9,9 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
+import org.mule.sdk.api.runtime.source.Source;
+import org.mule.sdk.api.runtime.source.SourceCallback;
 
 import javax.transaction.TransactionManager;
 

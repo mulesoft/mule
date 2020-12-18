@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.operation.Result;
 
 import java.util.List;
 import java.util.Map;
@@ -55,7 +55,8 @@ public abstract class FlowProcessingTemplate implements FlowProcessTemplate {
   @Override
   public SourceResultAdapter getSourceMessage() {
     // payloadMediaTypeResolver is not needed since transmitted results is not a collection. Also, the cursorProviderFactory isn't
-    // needed either since no value is being communicated bu the ResultAdapter. This implies that no content is needed to be
+    // needed either since no value is be
+    // ing communicated bu the ResultAdapter. This implies that no content is needed to be
     // streamed.
     return new SourceResultAdapter(Result.builder().build(), null, ANY, false,
                                    empty(), null);

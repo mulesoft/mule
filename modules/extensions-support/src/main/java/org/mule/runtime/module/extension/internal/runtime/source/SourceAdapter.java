@@ -19,13 +19,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.FAIL;
 import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.NONE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
-import static org.mule.sdk.api.runtime.source.BackPressureAction.FAIL;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -49,6 +49,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.tx.TransactionType;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -65,6 +66,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.connectivity.Reconnectable;
+import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
 import org.mule.runtime.extension.internal.property.TransactionalTypeModelProperty;
@@ -75,11 +77,11 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySourceWrapper;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.RestartContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.Restartable;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
-import org.mule.sdk.api.runtime.source.BackPressureAction;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 
@@ -125,7 +127,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
   private final SourceConnectionManager connectionManager;
   private final MessagingExceptionResolver exceptionResolver;
   private final BackPressureAction backPressureAction;
-  private final Supplier<Source> sourceInvokationTarget;
+  private final Supplier<Object> sourceInvokationTarget;
 
   private ErrorType flowBackPressueErrorType;
   private boolean initialised = false;
@@ -165,9 +167,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
     this.source = source;
-    sourceInvokationTarget = source instanceof PollingSourceWrapper
-        ? () -> ((SourceWrapper<Object, Object>) source).getDelegate()
-        : () -> source;
+    sourceInvokationTarget = new LazyValue<>(() -> unwrapSource(source));
     this.cursorProviderFactory = cursorProviderFactory;
     this.configurationInstance = configurationInstance;
     this.sourceCallbackFactory = sourceCallbackFactory;
@@ -180,6 +180,15 @@ public class SourceAdapter implements Lifecycle, Restartable {
     this.configurationSetter = fetchConfigurationField();
     this.connectionSetter = fetchConnectionProviderField();
     this.backPressureAction = backPressureAction.orElse(FAIL);
+  }
+
+  private Object unwrapSource(Source source) {
+    if (source instanceof SourceWrapper) {
+      return unwrapSource(((SourceWrapper) source).getDelegate());
+    } else if (source instanceof LegacySourceWrapper) {
+      return ((LegacySourceWrapper) source).getDelegate();
+    }
+    return source;
   }
 
   private SourceCallback createSourceCallback() {
@@ -421,7 +430,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
     }
   }
 
-  private void injectComponentLocation(Source source) {
+  private void injectComponentLocation(Object source) {
     // ComponentLocationModelValidator assures that there's at most one field
     List<Field> fields = getFieldsOfType(source.getClass(), ComponentLocation.class);
     if (fields.isEmpty()) {
@@ -517,7 +526,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
     return getSourceName(sourceInvokationTarget.get().getClass());
   }
 
-  public Source getDelegate() {
+  public Object getDelegate() {
     return sourceInvokationTarget.get();
   }
 

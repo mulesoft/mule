@@ -33,6 +33,7 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.Resolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.runtime.source.legacy.SdkSourceAdapterFactory;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
 import org.mule.sdk.api.runtime.source.PollingSource;
 import org.mule.sdk.api.runtime.source.Source;
@@ -101,18 +102,18 @@ public final class SourceConfigurer {
    * @return the configured instance
    * @throws MuleException
    */
-  public Source configure(Source source, Optional<ConfigurationInstance> config) {
-    ResolverSetBasedObjectBuilder<Source> builder =
-        new ResolverSetBasedObjectBuilder<Source>(source.getClass(), model, resolverSet, expressionManager, muleContext) {
+  public Source configure(Object source, Optional<ConfigurationInstance> config) {
+    ResolverSetBasedObjectBuilder<Object> builder =
+        new ResolverSetBasedObjectBuilder<Object>(source.getClass(), model, resolverSet, expressionManager, muleContext) {
 
           @Override
-          protected Source instantiateObject() {
+          protected Object instantiateObject() {
             return source;
           }
 
           @Override
-          public Source build(ValueResolvingContext context) throws MuleException {
-            Source source = build(resolverSet.resolve(context));
+          public Object build(ValueResolvingContext context) throws MuleException {
+            Object source = build(resolverSet.resolve(context));
             injectDefaultEncoding(model, source, muleContext.getConfiguration().getDefaultEncoding());
             injectComponentLocation(source, componentLocation);
             config.ifPresent(c -> injectRefName(source, c.getName(), getReflectionCache()));
@@ -126,9 +127,11 @@ public final class SourceConfigurer {
     try {
       initialiserEvent = getNullEvent(muleContext);
       context = ValueResolvingContext.builder(initialiserEvent, expressionManager).withConfig(config).build();
-      Source configuredSource = builder.build(context);
+      Object configuredSource = builder.build(context);
 
-      if (configuredSource instanceof PollingSource) {
+      Source sdkSource = SdkSourceAdapterFactory.createAdapter(configuredSource);
+
+      if (sdkSource instanceof PollingSource) {
         ValueResolver<?> valueResolver = resolverSet.getResolvers().get(SCHEDULING_STRATEGY_PARAMETER_NAME);
         if (valueResolver == null) {
           if (!isLazyInitMode(properties)) {
@@ -137,13 +140,13 @@ public final class SourceConfigurer {
         } else {
           context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
           SchedulingStrategy scheduler = (SchedulingStrategy) valueResolver.resolve(context);
-          configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler,
-                                                        resolverMaxItemsPerPoll(resolverSet, context, initialiserEvent),
-                                                        muleContext.getExceptionListener());
+          sdkSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler,
+                                                 resolverMaxItemsPerPoll(resolverSet, context, initialiserEvent),
+                                                 muleContext.getExceptionListener());
         }
       }
 
-      return configuredSource;
+      return sdkSource;
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Exception was found trying to configure source of type "
           + source.getClass().getName()), e);
