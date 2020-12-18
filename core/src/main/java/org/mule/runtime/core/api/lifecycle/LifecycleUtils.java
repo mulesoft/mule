@@ -12,6 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleException;
@@ -287,6 +288,21 @@ public class LifecycleUtils {
    */
   public static boolean isLazyInitMode(ConfigurationProperties properties) {
     return properties != null && properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
+  }
+
+  /**
+   * Checks if the {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY} property
+   * has been set on the given {@code properties}.
+   * <p>
+   * If {@code properties} is {@code null} then {@code false} is returned.
+   *
+   * @param properties the current properties
+   * @return Whether the DSL declaration validation property has been set
+   * @since 4.3.0
+   */
+  public static boolean isDslDeclarationValidationEnabled(ConfigurationProperties properties) {
+    return properties != null
+        && properties.resolveBooleanProperty(MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY).orElse(false);
   }
 
   /**

@@ -17,6 +17,8 @@ public class MuleDeploymentProperties {
   public static final String MULE_LAZY_INIT_DEPLOYMENT_PROPERTY = DEPLOYMENT_PROPERTY_PREFIX + ".lazyInit";
   public static final String MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY =
       MULE_LAZY_INIT_DEPLOYMENT_PROPERTY + ".enableXmlValidations";
+  public static final String MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY =
+      MULE_LAZY_INIT_DEPLOYMENT_PROPERTY + ".enableDslDeclarationValidations";
   public static final String MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY = DEPLOYMENT_PROPERTY_PREFIX + ".lazyConnections";
 
   public static final String MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY = DEPLOYMENT_PROPERTY_PREFIX + ".lazyInit.forceLog";
