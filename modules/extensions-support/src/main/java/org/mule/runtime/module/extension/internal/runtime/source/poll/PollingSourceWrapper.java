@@ -203,8 +203,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
         delegate.poll(pollContext);
       } catch (RuntimeException e) {
         LOGGER.error(format("Found exception trying to process item on source at flow '%s'. %s",
-                flowName, e.getMessage()),
-                e);
+                            flowName, e.getMessage()),
+                     e);
         systemExceptionHandler.handleException(e);
         return;
       }

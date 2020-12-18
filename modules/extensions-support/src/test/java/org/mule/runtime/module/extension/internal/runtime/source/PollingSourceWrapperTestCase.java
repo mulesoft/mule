@@ -65,7 +65,8 @@ public class PollingSourceWrapperTestCase {
 
   @InjectMocks
   private PollingSourceWrapper<Object, Object> pollingSourceWrapper =
-      new PollingSourceWrapper<Object, Object>(mock(PollingSource.class), mock(SchedulingStrategy.class), Integer.MAX_VALUE, mock(SystemExceptionHandler.class));
+      new PollingSourceWrapper<Object, Object>(mock(PollingSource.class), mock(SchedulingStrategy.class), Integer.MAX_VALUE,
+                                               mock(SystemExceptionHandler.class));
 
   @Before
   public void setUp() throws Exception {
