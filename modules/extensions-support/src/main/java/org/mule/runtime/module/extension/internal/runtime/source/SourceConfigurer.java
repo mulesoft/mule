@@ -138,7 +138,8 @@ public final class SourceConfigurer {
           context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
           SchedulingStrategy scheduler = (SchedulingStrategy) valueResolver.resolve(context);
           configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler,
-                                                        resolverMaxItemsPerPoll(resolverSet, context, initialiserEvent));
+                                                        resolverMaxItemsPerPoll(resolverSet, context, initialiserEvent),
+                                                        muleContext.getExceptionListener());
         }
       }
 

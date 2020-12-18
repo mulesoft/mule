@@ -44,6 +44,7 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.PollContext;
@@ -90,6 +91,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   private final PollingSource<T, A> delegate;
   private final SchedulingStrategy scheduler;
   private final int maxItemsPerPoll;
+  private final SystemExceptionHandler systemExceptionHandler;
 
   @Inject
   private LockFactory lockFactory;
@@ -113,15 +115,13 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   private AtomicBoolean restarting = new AtomicBoolean(false);
   private DelegateRunnable delegateRunnable;
 
-  public PollingSourceWrapper(PollingSource<T, A> delegate, SchedulingStrategy scheduler) {
-    this(delegate, scheduler, Integer.MAX_VALUE);
-  }
-
-  public PollingSourceWrapper(PollingSource<T, A> delegate, SchedulingStrategy scheduler, int maxItemsPerPoll) {
+  public PollingSourceWrapper(PollingSource<T, A> delegate, SchedulingStrategy scheduler, int maxItemsPerPoll,
+                              SystemExceptionHandler systemExceptionHandler) {
     super(delegate);
     this.delegate = delegate;
     this.scheduler = scheduler;
     this.maxItemsPerPoll = maxItemsPerPoll;
+    this.systemExceptionHandler = systemExceptionHandler;
   }
 
   @Override
@@ -198,8 +198,18 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
     withWatermarkLock(() -> {
       DefaultPollContext pollContext = new DefaultPollContext(sourceCallback, getCurrentWatermark(), getUpdatedWatermark());
+
       try {
         delegate.poll(pollContext);
+      } catch (RuntimeException e) {
+        LOGGER.error(format("Found exception trying to process item on source at flow '%s'. %s",
+                flowName, e.getMessage()),
+                e);
+        systemExceptionHandler.handleException(e);
+        return;
+      }
+
+      try {
         if (!isRequestedToStop()) {
           pollContext.getUpdatedWatermark()
               .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator(),
