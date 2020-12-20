@@ -8,13 +8,17 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -26,6 +30,7 @@ import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
@@ -35,10 +40,14 @@ import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.data.sample.SampleDataProvider;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 /**
  * {@link ExtensionModelValidator} for the correct usage of {@link SampleDataProviderModel} and
@@ -89,10 +98,14 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
                                 ReflectionCache reflectionCache,
                                 Delegate delegate) {
     Class<? extends SampleDataProvider> providerClass = modelProperty.getSampleDataProviderClass();
+
+    validateGenerics(model, problemsReporter, providerClass);
+
     String providerName = providerClass.getSimpleName();
     Optional<SampleDataProviderModel> providerModel = model.getSampleDataProviderModel();
     if (!providerModel.isPresent()) {
-      throw new IllegalStateException(format("Component %s should have an associated SampleDataProviderModel.", model.getName()));
+      throw new IllegalModelDefinitionException(format("Component %s should have an associated SampleDataProviderModel.",
+                                                       model.getName()));
     } else {
       delegate.addInfo(
                        new SampleDataProviderInfo(providerModel.get(), model, providerClass.getName()));
@@ -141,6 +154,43 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
       problemsReporter.addError(new Problem(model,
                                             format("The SampleDataProvider [%s] defines that it requires a config, but is used in the %s '%s' which is config less",
                                                    providerName, modelTypeName, modelName)));
+    }
+  }
+
+  private void validateGenerics(ConnectableComponentModel model, ProblemsReporter problemsReporter,
+                                Class<? extends SampleDataProvider> providerClass) {
+    String providerGenerics = asGenericSignature(getInterfaceGenerics(providerClass, SampleDataProvider.class));
+    String outputGenerics = asGenericSignature(getOutputTypes(model, providerClass.getClassLoader()));
+
+    if (!Objects.equals(providerGenerics, outputGenerics)) {
+      problemsReporter.addError(new Problem(model, format(
+                                                          "SampleDataProvider [%s] is used at component '%s' which outputs a Result%s, but the provider generic signature is '%s'",
+                                                          providerClass.getName(), model.getName(), outputGenerics,
+                                                          providerGenerics)));
+    }
+  }
+
+  private List<Type> getOutputTypes(ConnectableComponentModel model, ClassLoader classLoader) {
+    return asList(JavaTypeUtils.getType(model.getOutput().getType(), classLoader),
+                  JavaTypeUtils.getType(model.getOutputAttributes().getType(), classLoader));
+  }
+
+  private String asGenericSignature(List<Type> types) {
+    return "<" + types.stream()
+        .map(this::asString)
+        .collect(joining(",")) + ">";
+  }
+
+  private String asString(Type type) {
+    if (type instanceof ParameterizedTypeImpl) {
+      ParameterizedTypeImpl parameterizedType = (ParameterizedTypeImpl) type;
+      return parameterizedType.getRawType().getName() + asGenericSignature(asList(parameterizedType.getActualTypeArguments()));
+    } else if (type == null) {
+      return Object.class.getName();
+    } else if (Void.class.equals(type) || void.class.equals(type)) {
+      return void.class.getName();
+    } else {
+      return type.getTypeName();
     }
   }
 

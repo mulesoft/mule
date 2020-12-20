@@ -14,7 +14,7 @@ import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.sdk.api.data.sample.SampleDataProvider;
 import org.mule.sdk.api.runtime.operation.Result;
 
-public class RefreshedOAuthSampleDataProvider implements SampleDataProvider {
+public class RefreshedOAuthSampleDataProvider implements SampleDataProvider<String, String> {
 
   public static final String SAMPLE_PAYLOAD_VALUE = "Sample payload!";
   public static final String SAMPLE_ATTRIBUTES_VALUE = "Sample Attributes!";
