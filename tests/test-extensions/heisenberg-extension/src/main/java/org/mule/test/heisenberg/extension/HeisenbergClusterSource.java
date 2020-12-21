@@ -26,5 +26,5 @@ import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 @MediaType(TEXT_PLAIN)
 @BackPressure(defaultMode = FAIL, supportedModes = {FAIL, DROP})
 @ClusterSupport(DEFAULT_PRIMARY_NODE_ONLY)
-public class HeisenbergClusterSource extends HeisenbergSource {
+public class HeisenbergClusterSource extends SdkHeisenbergSource {
 }

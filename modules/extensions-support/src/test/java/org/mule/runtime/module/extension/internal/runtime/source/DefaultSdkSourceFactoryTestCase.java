@@ -31,7 +31,8 @@ public class DefaultSdkSourceFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void create() {
-    assertThat(new DefaultSdkSourceFactory(HeisenbergSource.class).createMessageSource(), is(instanceOf(HeisenbergSource.class)));
+    assertThat(new DefaultSdkSourceFactory(HeisenbergSource.class).createMessageSource().getValue().get(),
+               is(instanceOf(HeisenbergSource.class)));
   }
 
   @Test

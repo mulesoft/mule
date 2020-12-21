@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source.legacy;
 
+import static java.util.Collections.emptyList;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.tx.TransactionException;
@@ -16,6 +18,7 @@ import org.mule.sdk.api.notification.NotificationActionDefinition;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.tx.TransactionHandle;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,18 +80,27 @@ public class LegacyToSdkSourceCallBackContextAdapter implements SourceCallbackCo
     delegate.fireOnHandle(new SdkToLegacyNotificationActionDefinitionAdapter(notificationActionDefinition), typedValue);
   }
 
+  //RESOLVE THIS
+
   @Override
   public void releaseConnection() {
-
+    if (delegate instanceof LegacySourceCallbackContextAdapter) {
+      ((LegacySourceCallbackContextAdapter) delegate).releaseConnection();
+    }
   }
 
   @Override
   public void dispatched() {
-
+    if (delegate instanceof LegacySourceCallbackContextAdapter) {
+      ((LegacySourceCallbackContextAdapter) delegate).dispatched();
+    }
   }
 
   @Override
   public List<NotificationFunction> getNotificationsFunctions() {
-    return null;
+    if (delegate instanceof LegacySourceCallbackContextAdapter) {
+      return ((LegacySourceCallbackContextAdapter) delegate).getNotificationsFunctions();
+    }
+    return emptyList();
   }
 }

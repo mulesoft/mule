@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.LEGACY_SOURCE_CALLBACK_CONTEXT_PARAM;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_CALLBACK_CONTEXT_PARAM;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -26,6 +27,6 @@ public class SourceCallbackContextArgumentResolver implements ArgumentResolver<S
 
   @Override
   public SourceCallbackContext resolve(ExecutionContext executionContext) {
-    return ((ExecutionContextAdapter<ComponentModel>) executionContext).getVariable(SOURCE_CALLBACK_CONTEXT_PARAM);
+    return ((ExecutionContextAdapter<ComponentModel>) executionContext).getVariable(LEGACY_SOURCE_CALLBACK_CONTEXT_PARAM);
   }
 }

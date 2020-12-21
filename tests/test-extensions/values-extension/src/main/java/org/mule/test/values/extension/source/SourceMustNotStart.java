@@ -12,11 +12,11 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
-import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.test.values.extension.resolver.TrueFalseValueProvider;
 
 @MediaType(TEXT_PLAIN)
-public class SourceMustNotStart extends AbstractSource {
+public class SourceMustNotStart extends AbstractSdkSource {
 
   public static boolean isStarted = false;
 

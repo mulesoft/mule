@@ -14,7 +14,7 @@ import org.mule.test.values.extension.GroupAsMultiLevelValue;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
 
 @MediaType(TEXT_PLAIN)
-public class SourceWithMultiLevelValue extends AbstractSource {
+public class SourceWithMultiLevelValue extends AbstractSdkSource {
 
   @OfValues(MultiLevelValueProvider.class)
   @ParameterGroup(name = "values")

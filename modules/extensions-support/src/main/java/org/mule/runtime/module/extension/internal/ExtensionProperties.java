@@ -33,6 +33,11 @@ public class ExtensionProperties {
   public static final String SOURCE_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "SOURCE_CALLBACK_CONTEXT_PARAM";
 
   /**
+   * The key of an execution context variable on which a {@link SourceCallbackContext} was set
+   */
+  public static final String LEGACY_SOURCE_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "LEGACY_SOURCE_CALLBACK_CONTEXT_PARAM";
+
+  /**
    * The key of an execution context variable on which a {@link SourceCompletionCallback} was set
    */
   public static final String SOURCE_COMPLETION_CALLBACK_PARAM = PROPERTY_PREFIX + "SOURCE_COMPLETION_CALLBACK_PARAM";

@@ -9,7 +9,10 @@ package org.mule.runtime.module.extension.internal.runtime.source.legacy;
 import static org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacyPollItemStatusUtils.from;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.core.internal.util.message.SdkResultAdapter;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.PollContext;
+import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -26,7 +29,7 @@ public class SdkToLegacyPollContextAdapter<T, A> implements PollContext<T, A> {
 
   @Override
   public PollItemStatus accept(Consumer<PollItem<T, A>> consumer) {
-    return from(delegate.accept(consumer));
+    return from(delegate.accept(new PollItemConsumerAdapter(consumer)));
   }
 
   @Override
@@ -47,5 +50,52 @@ public class SdkToLegacyPollContextAdapter<T, A> implements PollContext<T, A> {
   @Override
   public void onConnectionException(ConnectionException e) {
     delegate.onConnectionException(e);
+  }
+
+  private static class PollItemConsumerAdapter<T, A>
+      implements Consumer<org.mule.sdk.api.runtime.source.PollContext.PollItem<T, A>> {
+
+    Consumer<PollItem<T, A>> delegate;
+
+    PollItemConsumerAdapter(Consumer<PollItem<T, A>> delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public void accept(org.mule.sdk.api.runtime.source.PollContext.PollItem pollItem) {
+      delegate.accept(new SdkToLegacyPollItemAdapter(pollItem));
+    }
+
+    private static class SdkToLegacyPollItemAdapter implements PollContext.PollItem {
+
+      org.mule.sdk.api.runtime.source.PollContext.PollItem delegate;
+
+      public SdkToLegacyPollItemAdapter(org.mule.sdk.api.runtime.source.PollContext.PollItem delegate) {
+        this.delegate = delegate;
+      }
+
+      @Override
+      public SourceCallbackContext getSourceCallbackContext() {
+        return new SdkToLegacySourceCallbackContextAdapter(delegate.getSourceCallbackContext());
+      }
+
+      @Override
+      public PollItem setResult(Result result) {
+        delegate.setResult(SdkResultAdapter.from(result));
+        return this;
+      }
+
+      @Override
+      public PollItem setWatermark(Serializable watermark) {
+        delegate.setWatermark(watermark);
+        return this;
+      }
+
+      @Override
+      public PollItem setId(String id) {
+        delegate.setId(id);
+        return this;
+      }
+    }
   }
 }

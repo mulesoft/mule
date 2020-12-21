@@ -18,7 +18,8 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  */
 @ConnectionProviders(ReconnectableConnectionProvider.class)
 @Operations(ReconnectionOperations.class)
-@Sources({ReconectionSource.class, FallibleReconnectableSource.class, NonReconnectableSource.class})
+@Sources({ReconectionSource.class})
+@org.mule.sdk.api.annotation.Sources({FallibleReconnectableSource.class, NonReconnectableSource.class})
 @Configuration(name = "config")
 public class ReconnectionConfiguration {
 

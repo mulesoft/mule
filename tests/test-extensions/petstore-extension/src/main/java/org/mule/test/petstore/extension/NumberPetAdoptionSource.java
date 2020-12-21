@@ -6,7 +6,6 @@
  */
 package org.mule.test.petstore.extension;
 
-import static java.lang.Math.min;
 import static java.util.Arrays.asList;
 import static java.util.Comparator.naturalOrder;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
@@ -17,10 +16,10 @@ import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.source.PollContext;
-import org.mule.runtime.extension.api.runtime.source.PollingSource;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.source.PollContext;
+import org.mule.sdk.api.runtime.source.PollingSource;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.util.ArrayList;
 import java.util.List;

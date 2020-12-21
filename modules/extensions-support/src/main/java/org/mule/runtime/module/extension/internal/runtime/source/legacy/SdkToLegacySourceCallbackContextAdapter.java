@@ -6,17 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source.legacy;
 
+import static java.util.Collections.emptyList;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
+import org.mule.runtime.module.extension.internal.runtime.source.SourceCallbackContextAdapter;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
-public class SdkToLegacySourceCallbackContextAdapter implements SourceCallbackContext {
+public class SdkToLegacySourceCallbackContextAdapter implements LegacySourceCallbackContextAdapter {
 
   private final org.mule.sdk.api.runtime.source.SourceCallbackContext delegate;
 
@@ -73,4 +79,27 @@ public class SdkToLegacySourceCallbackContextAdapter implements SourceCallbackCo
   public void fireOnHandle(NotificationActionDefinition<?> action, TypedValue<?> data) {
     delegate.fireOnHandle(action, data);
   }
+
+  @Override
+  public void releaseConnection() {
+    if (delegate instanceof SourceCallbackContextAdapter) {
+      ((SourceCallbackContextAdapter) delegate).releaseConnection();
+    }
+  }
+
+  @Override
+  public void dispatched() {
+    if (delegate instanceof SourceCallbackContextAdapter) {
+      ((SourceCallbackContextAdapter) delegate).dispatched();
+    }
+  }
+
+  @Override
+  public List<NotificationFunction> getNotificationsFunctions() {
+    if (delegate instanceof SourceCallbackContextAdapter) {
+      return ((SourceCallbackContextAdapter) delegate).getNotificationsFunctions();
+    }
+    return emptyList();
+  }
+
 }

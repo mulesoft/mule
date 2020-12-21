@@ -11,10 +11,10 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.source.PollContext;
-import org.mule.runtime.extension.api.runtime.source.PollingSource;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.source.PollContext;
+import org.mule.sdk.api.runtime.source.PollingSource;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.util.List;
 

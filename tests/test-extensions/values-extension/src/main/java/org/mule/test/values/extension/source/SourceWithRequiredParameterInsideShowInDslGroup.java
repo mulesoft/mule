@@ -15,7 +15,7 @@ import org.mule.test.values.extension.GroupWithValuesParameter;
 import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider;
 
 @MediaType(TEXT_PLAIN)
-public class SourceWithRequiredParameterInsideShowInDslGroup extends AbstractSource {
+public class SourceWithRequiredParameterInsideShowInDslGroup extends AbstractSdkSource {
 
   @OfValues(WithRequiredParameterFromGroupValueProvider.class)
   @Parameter

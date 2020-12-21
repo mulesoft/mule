@@ -14,19 +14,19 @@ import java.util.OptionalLong;
 
 public class LegacySdkResultAdapter<T, A> extends org.mule.runtime.extension.api.runtime.operation.Result<T, A> {
 
-  private final org.mule.runtime.extension.api.runtime.operation.Result<T, A> delegate;
+  private final Result<T, A> delegate;
 
   public static <T, A> org.mule.runtime.extension.api.runtime.operation.Result<T, A> from(Object value) {
     if (value instanceof org.mule.runtime.extension.api.runtime.operation.Result) {
       return (org.mule.runtime.extension.api.runtime.operation.Result<T, A>) value;
     } else if (value instanceof Result) {
-      return new LegacySdkResultAdapter((org.mule.runtime.extension.api.runtime.operation.Result<T, A>) value);
+      return new LegacySdkResultAdapter((Result<T, A>) value);
     } else {
       throw new IllegalArgumentException("Unsupported type: " + value.getClass());
     }
   }
 
-  public LegacySdkResultAdapter(org.mule.runtime.extension.api.runtime.operation.Result<T, A> delegate) {
+  public LegacySdkResultAdapter(Result<T, A> delegate) {
     this.delegate = delegate;
   }
 
