@@ -55,8 +55,7 @@ public abstract class FlowProcessingTemplate implements FlowProcessTemplate {
   @Override
   public SourceResultAdapter getSourceMessage() {
     // payloadMediaTypeResolver is not needed since transmitted results is not a collection. Also, the cursorProviderFactory isn't
-    // needed either since no value is be
-    // ing communicated bu the ResultAdapter. This implies that no content is needed to be
+    // needed either since no value is being communicated to the ResultAdapter. This implies that no content is needed to be
     // streamed.
     return new SourceResultAdapter(Result.builder().build(), null, ANY, false,
                                    empty(), null);

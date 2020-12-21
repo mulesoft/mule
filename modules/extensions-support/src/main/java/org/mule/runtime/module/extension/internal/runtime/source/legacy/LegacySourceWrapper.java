@@ -15,6 +15,11 @@ import org.mule.runtime.extension.api.runtime.source.Source;
  */
 public interface LegacySourceWrapper {
 
+  /**
+   * This method provide the instance of the legacy {@link Source} in with this implementation is delegating behavior.
+   *
+   * @return the delegate {@link Source} instance.
+   */
   Source getDelegate();
 
 }

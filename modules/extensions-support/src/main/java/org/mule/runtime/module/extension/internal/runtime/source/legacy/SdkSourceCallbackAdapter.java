@@ -38,11 +38,11 @@ public class SdkSourceCallbackAdapter<T, A> implements SourceCallback<T, A> {
 
   @Override
   public void onConnectionException(ConnectionException e) {
-
+    delegate.onConnectionException(e);
   }
 
   @Override
   public SourceCallbackContext createContext() {
-    return null;
+    return new SdkSourceCallBackContextAdapter(delegate.createContext());
   }
 }
