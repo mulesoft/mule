@@ -7,8 +7,12 @@
 package org.mule.test.module.extension.source;
 
 import static java.lang.Thread.sleep;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
@@ -19,15 +23,20 @@ import static org.mule.test.petstore.extension.PetAdoptionSource.STARTED_POLLS;
 import static org.mule.test.petstore.extension.PetFailingPollingSource.POLL_INVOCATIONS;
 import static org.mule.test.petstore.extension.PetFailingPollingSource.STARTED_SOURCES;
 
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.notification.ExceptionNotification;
+import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetAdoptionSource;
 import org.mule.test.petstore.extension.PetFailingPollingSource;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,6 +46,8 @@ import org.junit.Test;
 
 public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
+  private static final int TIMEOUT = 5000;
+  private static final int DELAY = 100;
   private static final List<CoreEvent> ADOPTION_EVENTS = new LinkedList<>();
 
   public static class AdoptionProcessor implements Processor {
@@ -73,7 +84,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
     startFlow("vanilla");
     assertAllPetsAdopted();
 
-    check(5000, 200, () -> {
+    check(TIMEOUT, DELAY * 2, () -> {
       synchronized (ADOPTION_EVENTS) {
         return PetAdoptionSource.COMPLETED_POLLS > 1 &&
             PetAdoptionSource.ADOPTED_PET_COUNT >= ADOPTION_EVENTS.size();
@@ -84,7 +95,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   @Test
   public void idempotentPoll() throws Exception {
     startFlow("idempotent");
-    check(5000, 100, () -> {
+    check(TIMEOUT, DELAY, () -> {
       synchronized (ADOPTION_EVENTS) {
         return PetAdoptionSource.REJECTED_ADOPTIONS >= ALL_PETS.size() &&
             ALL_PETS.containsAll(ADOPTION_EVENTS.stream()
@@ -114,7 +125,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   @Test
   public void failingPoll() throws Exception {
     startFlow("failingPoll");
-    check(5000, 100, () -> FAILED_ADOPTION_COUNT >= ALL_PETS.size());
+    check(TIMEOUT, DELAY, () -> FAILED_ADOPTION_COUNT >= ALL_PETS.size());
   }
 
   @Test
@@ -156,15 +167,100 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
     assertPetFailingSourcePollsFromDifferentSources(2);
   }
 
+  @Test
+  public void sourcePollFailWithConnectionException() throws Exception {
+    final Latch latch = new Latch();
+    final List<ExceptionNotification> notifications = new ArrayList<>();
+    final ExceptionNotificationListener listener = notification -> {
+      notifications.add(notification);
+      latch.release();
+    };
+    muleContext.getNotificationManager().addListener(listener);
+    try {
+      startFlow("pet-tiger");
+      latch.await(TIMEOUT, MILLISECONDS);
+      assertThat(notifications.size(), greaterThanOrEqualTo(1));
+      assertThat(notifications.get(0).getInfo(), notNullValue());
+      assertThat(notifications.get(0).getInfo().getException(), notNullValue());
+      assertThat(notifications.get(0).getInfo().getException(), instanceOf(RuntimeException.class));
+      assertThat(notifications.get(0).getInfo().getException().getCause(), instanceOf(ConnectionException.class));
+      assertThat(notifications.get(0).getInfo().getException().getCause().getMessage(), is("A tiger cannot be petted."));
+    } finally {
+      muleContext.getNotificationManager().removeListener(listener);
+    }
+  }
+
+  @Test
+  public void sourcePollFailWithException() throws Exception {
+    final Latch latch = new Latch();
+    final List<ExceptionNotification> notifications = new ArrayList<>();
+    final ExceptionNotificationListener listener = notification -> {
+      notifications.add(notification);
+      latch.release();
+    };
+    muleContext.getNotificationManager().addListener(listener);
+    try {
+      startFlow("pet-whale");
+      latch.await(TIMEOUT, MILLISECONDS);
+      assertThat(notifications.size(), greaterThanOrEqualTo(1));
+      assertThat(notifications.get(0).getInfo(), notNullValue());
+      assertThat(notifications.get(0).getInfo().getException(), notNullValue());
+      assertThat(notifications.get(0).getInfo().getException(), instanceOf(RuntimeException.class));
+      assertThat(notifications.get(0).getInfo().getException().getMessage(), is("Why do you want to pet a whale?"));
+    } finally {
+      muleContext.getNotificationManager().removeListener(listener);
+    }
+  }
+
+  @Test
+  public void sourcePollReportConnectionException() throws Exception {
+    final Latch latch = new Latch();
+    final List<ExceptionNotification> notifications = new ArrayList<>();
+    final ExceptionNotificationListener listener = notification -> {
+      notifications.add(notification);
+      latch.release();
+    };
+    muleContext.getNotificationManager().addListener(listener);
+    try {
+      startFlow("pet-dinosaur");
+      latch.await(TIMEOUT, MILLISECONDS);
+      assertThat(notifications.size(), greaterThanOrEqualTo(1));
+      assertThat(notifications.get(0).getInfo(), notNullValue());
+      assertThat(notifications.get(0).getInfo().getException(), notNullValue());
+      assertThat(notifications.get(0).getInfo().getException(), instanceOf(ConnectionException.class));
+      assertThat(notifications.get(0).getInfo().getException().getMessage(), is("Dinosaurs no longer exist."));
+    } finally {
+      muleContext.getNotificationManager().removeListener(listener);
+    }
+  }
+
+  @Test
+  public void noExceptionNotificationSended() throws Exception {
+    final Latch latch = new Latch();
+    final List<ExceptionNotification> notifications = new ArrayList<>();
+    final ExceptionNotificationListener listener = notification -> {
+      notifications.add(notification);
+      latch.release();
+    };
+    muleContext.getNotificationManager().addListener(listener);
+    try {
+      startFlow("pet-dog");
+      boolean timeout = !latch.await(TIMEOUT, MILLISECONDS);
+      assertThat(timeout, is(true));
+    } finally {
+      muleContext.getNotificationManager().removeListener(listener);
+    }
+  }
+
   private void assertStartedPolls(int polls) {
-    check(5000, 200, () -> {
+    check(TIMEOUT, DELAY * 2, () -> {
       assertThat(STARTED_POLLS, is(polls));
       return true;
     });
   }
 
   private void assertPetFailingSourcePollsFromDifferentSources(int polls) {
-    check(5000, 200, () -> {
+    check(TIMEOUT, DELAY * 2, () -> {
       assertThat(PetFailingPollingSource.STARTED_POLLS, is(polls));
       return true;
     });
@@ -173,7 +269,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   private void assertIdempotentAdoptions() {
-    checkNot(5000, 100, () -> {
+    checkNot(TIMEOUT, DELAY, () -> {
       synchronized (ADOPTION_EVENTS) {
         return ADOPTION_EVENTS.size() > ALL_PETS.size();
       }
@@ -181,7 +277,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   private void assertAllPetsAdopted() {
-    check(5000, 200, () -> {
+    check(TIMEOUT, DELAY * 2, () -> {
       synchronized (ADOPTION_EVENTS) {
         return ADOPTION_EVENTS.size() >= ALL_PETS.size() &&
             ADOPTION_EVENTS.stream().map(e -> e.getMessage().getPayload().getValue().toString()).collect(toList())
@@ -191,7 +287,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   private void assertAllNumbersAdoptedExactlyOnce() {
-    check(5000, 200, () -> {
+    check(TIMEOUT, DELAY * 2, () -> {
       synchronized (ADOPTION_EVENTS) {
         return ADOPTION_EVENTS.size() == ALL_NUMBERS.size() &&
             ADOPTION_EVENTS.stream().map(e -> e.getMessage().getPayload().getValue().toString()).collect(toList())
