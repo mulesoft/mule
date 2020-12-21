@@ -31,6 +31,7 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
@@ -41,6 +42,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeMuleContextDeploymentListener;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 
 import java.io.File;
@@ -85,7 +87,20 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   public void setMuleContextListener(MuleContextListener muleContextListener) {
     checkArgument(muleContextListener != null, "muleContextListener cannot be null");
 
+    if (this.muleContextListener != null) {
+      CompositeMuleContextDeploymentListener compositeMuleContextDeploymentListener =
+          new CompositeMuleContextDeploymentListener(this.muleContextListener);
+      compositeMuleContextDeploymentListener.addDeploymentListener(muleContextListener);
+      muleContextListener = compositeMuleContextDeploymentListener;
+      ((DefaultMuleContext) artifactContext.getMuleContext()).removeListener(this.muleContextListener);
+      ((DefaultMuleContext) artifactContext.getMuleContext()).addListener(muleContextListener);
+    }
+
     this.muleContextListener = muleContextListener;
+  }
+
+  public MuleContextListener getMuleContextListener() {
+    return muleContextListener;
   }
 
   public String getName() {

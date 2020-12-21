@@ -43,6 +43,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.logging.LogUtil;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
@@ -61,6 +62,7 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeMuleContextDeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
@@ -128,7 +130,20 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   public void setMuleContextListener(MuleContextListener muleContextListener) {
     checkArgument(muleContextListener != null, "setMuleContextListener cannot be null");
 
+    if (this.muleContextListener != null) {
+      CompositeMuleContextDeploymentListener compositeMuleContextDeploymentListener =
+          new CompositeMuleContextDeploymentListener(this.muleContextListener);
+      compositeMuleContextDeploymentListener.addDeploymentListener(muleContextListener);
+      muleContextListener = compositeMuleContextDeploymentListener;
+      ((DefaultMuleContext) artifactContext.getMuleContext()).removeListener(this.muleContextListener);
+      ((DefaultMuleContext) artifactContext.getMuleContext()).addListener(muleContextListener);
+    }
+
     this.muleContextListener = muleContextListener;
+  }
+
+  public MuleContextListener getMuleContextListener() {
+    return muleContextListener;
   }
 
   @Override
