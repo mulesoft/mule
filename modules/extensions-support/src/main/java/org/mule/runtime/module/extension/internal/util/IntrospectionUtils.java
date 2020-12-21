@@ -331,7 +331,7 @@ public final class IntrospectionUtils {
   public static MetadataType getReturnType(Type returnType) {
     Type type = returnType;
 
-    if (returnType.isAssignableTo(Result.class)) {
+    if (returnType.isAssignableTo(Result.class) || returnType.isAssignableTo(org.mule.sdk.api.runtime.operation.Result.class)) {
       List<TypeGeneric> generics = returnType.getGenerics();
       if (generics.isEmpty()) {
         return ANY_TYPE;
@@ -347,7 +347,7 @@ public final class IntrospectionUtils {
     if (isPagingProvider(returnType)) {
       Type itemType = getPagingProviderTypes(returnType).getSecond();
 
-      if (itemType.isSameType(Result.class)) {
+      if (itemType.isSameType(Result.class) || itemType.isSameType(org.mule.sdk.api.runtime.operation.Result.class)) {
         return returnListOfMessagesType(returnType, itemType);
       } else {
         return typeBuilder().arrayType()
@@ -365,7 +365,7 @@ public final class IntrospectionUtils {
 
     if (isCollection(returnType) && !returnType.getGenerics().isEmpty()) {
       Type itemType = returnType.getGenerics().get(0).getConcreteType();
-      if (itemType.isAssignableTo(Result.class)) {
+      if (itemType.isAssignableTo(Result.class) || itemType.isAssignableTo(org.mule.sdk.api.runtime.operation.Result.class)) {
         return returnListOfMessagesType(returnType, itemType);
       }
     }
