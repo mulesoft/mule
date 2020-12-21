@@ -23,9 +23,16 @@ import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import org.slf4j.Logger;
 
-public class LegacySourceAdapter<T, A> extends Source<T, A> implements LegacySourceWrapper, Initialisable, Disposable {
+/**
+ * Adapts a legacy {@link org.mule.runtime.extension.api.runtime.source.Source} into a {@link Source}
+ *
+ * @param <T> the generic type of the output value
+ * @param <A> the generic type of the message attributes
+ * @since 4.4.0
+ */
+public class SdkSourceAdapter<T, A> extends Source<T, A> implements LegacySourceWrapper, Initialisable, Disposable {
 
-  private static final Logger LOGGER = getLogger(LegacySourceAdapter.class);
+  private static final Logger LOGGER = getLogger(SdkSourceAdapter.class);
 
   private final org.mule.runtime.extension.api.runtime.source.Source<T, A> delegate;
 
@@ -34,16 +41,16 @@ public class LegacySourceAdapter<T, A> extends Source<T, A> implements LegacySou
       return new LegacyPollingSourceAdapter<>((org.mule.runtime.extension.api.runtime.source.PollingSource) delegate);
     }
 
-    return new LegacySourceAdapter<>(delegate);
+    return new SdkSourceAdapter<>(delegate);
   }
 
-  private LegacySourceAdapter(org.mule.runtime.extension.api.runtime.source.Source<T, A> delegate) {
+  private SdkSourceAdapter(org.mule.runtime.extension.api.runtime.source.Source<T, A> delegate) {
     this.delegate = delegate;
   }
 
   @Override
   public void onStart(SourceCallback<T, A> sourceCallback) throws MuleException {
-    delegate.onStart(new SdkToLegacySourceCallbackAdapter(sourceCallback));
+    delegate.onStart(new LegacySourceCallbackAdapter(sourceCallback));
   }
 
   @Override
@@ -89,12 +96,12 @@ public class LegacySourceAdapter<T, A> extends Source<T, A> implements LegacySou
 
     @Override
     public void poll(PollContext<T, A> pollContext) {
-      delegate.poll(new SdkToLegacyPollContextAdapter<>(pollContext));
+      delegate.poll(new LegacyPollContextAdapter<>(pollContext));
     }
 
     @Override
     public void onRejectedItem(Result<T, A> result, SourceCallbackContext callbackContext) {
-      delegate.onRejectedItem(LegacySdkResultAdapter.from(result), new SdkToLegacySourceCallbackContextAdapter(callbackContext));
+      delegate.onRejectedItem(LegacyResultAdapter.from(result), new LegacySourceCallbackContextAdapterAdapter(callbackContext));
     }
 
     @Override

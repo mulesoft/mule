@@ -36,7 +36,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedMethodComponentExecutor;
-import org.mule.runtime.module.extension.internal.runtime.source.legacy.SdkToLegacySourceCallbackContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySourceCallbackContextAdapterAdapter;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.lang.reflect.Method;
@@ -154,7 +154,7 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
 
     executionContext.setVariable(SOURCE_CALLBACK_CONTEXT_PARAM, callbackContext);
     executionContext.setVariable(LEGACY_SOURCE_CALLBACK_CONTEXT_PARAM,
-                                 new SdkToLegacySourceCallbackContextAdapter(callbackContext));
+                                 new LegacySourceCallbackContextAdapterAdapter(callbackContext));
     if (sourceCompletionCallback != null) {
       executionContext.setVariable(SOURCE_COMPLETION_CALLBACK_PARAM, sourceCompletionCallback);
     }

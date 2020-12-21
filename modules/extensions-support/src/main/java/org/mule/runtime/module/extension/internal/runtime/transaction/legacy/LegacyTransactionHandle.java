@@ -4,16 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.source.legacy;
+package org.mule.runtime.module.extension.internal.runtime.transaction.legacy;
 
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 
-public class SdkToLegacyTransactionHandle implements TransactionHandle {
+/**
+ * Adapts a {@link org.mule.sdk.api.tx.TransactionHandle} into a legacy {@link TransactionHandle}
+ *
+ * @since 4.4.0
+ */
+public class LegacyTransactionHandle implements TransactionHandle {
 
   private final org.mule.sdk.api.tx.TransactionHandle delegate;
 
-  public SdkToLegacyTransactionHandle(org.mule.sdk.api.tx.TransactionHandle delegate) {
+  public LegacyTransactionHandle(org.mule.sdk.api.tx.TransactionHandle delegate) {
     this.delegate = delegate;
   }
 

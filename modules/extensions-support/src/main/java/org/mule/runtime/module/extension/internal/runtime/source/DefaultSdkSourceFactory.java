@@ -15,7 +15,6 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
-import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySourceAdapter;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.runtime.source.Source;
 

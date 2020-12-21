@@ -14,25 +14,29 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceCallbackContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.transaction.legacy.LegacyTransactionHandle;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class SdkToLegacySourceCallbackContextAdapter implements LegacySourceCallbackContextAdapter {
+/**
+ * Adapts a {@link SourceCallbackContext} into a legacy {@link org.mule.runtime.extension.api.runtime.source.SourceCallbackContext}
+ *
+ * @since 4.4.0
+ */
+public class LegacySourceCallbackContextAdapterAdapter implements LegacySourceCallbackContextAdapter {
 
   private final org.mule.sdk.api.runtime.source.SourceCallbackContext delegate;
 
-  public SdkToLegacySourceCallbackContextAdapter(org.mule.sdk.api.runtime.source.SourceCallbackContext delegate) {
+  public LegacySourceCallbackContextAdapterAdapter(org.mule.sdk.api.runtime.source.SourceCallbackContext delegate) {
     this.delegate = delegate;
   }
 
   @Override
   public TransactionHandle bindConnection(Object connection) throws ConnectionException, TransactionException {
-    return new SdkToLegacyTransactionHandle(delegate.bindConnection(connection));
+    return new LegacyTransactionHandle(delegate.bindConnection(connection));
   }
 
   @Override
@@ -42,7 +46,7 @@ public class SdkToLegacySourceCallbackContextAdapter implements LegacySourceCall
 
   @Override
   public TransactionHandle getTransactionHandle() {
-    return new SdkToLegacyTransactionHandle(delegate.getTransactionHandle());
+    return new LegacyTransactionHandle(delegate.getTransactionHandle());
   }
 
   @Override
@@ -72,7 +76,7 @@ public class SdkToLegacySourceCallbackContextAdapter implements LegacySourceCall
 
   @Override
   public <T, A> SourceCallback<T, A> getSourceCallback() {
-    return new SdkToLegacySourceCallbackAdapter<>(delegate.getSourceCallback());
+    return new LegacySourceCallbackAdapter<>(delegate.getSourceCallback());
   }
 
   @Override

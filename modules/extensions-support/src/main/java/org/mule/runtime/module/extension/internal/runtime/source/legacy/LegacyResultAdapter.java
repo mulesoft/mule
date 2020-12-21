@@ -12,7 +12,14 @@ import org.mule.sdk.api.runtime.operation.Result;
 import java.util.Optional;
 import java.util.OptionalLong;
 
-public class LegacySdkResultAdapter<T, A> extends org.mule.runtime.extension.api.runtime.operation.Result<T, A> {
+/**
+ * Adapts a {@link Result} into a legacy {@link org.mule.runtime.extension.api.runtime.operation.Result}
+ *
+ * @param <T> the generic type of the output value
+ * @param <A> the generic type of the message attributes
+ * @since 4.4.0
+ */
+public class LegacyResultAdapter<T, A> extends org.mule.runtime.extension.api.runtime.operation.Result<T, A> {
 
   private final Result<T, A> delegate;
 
@@ -20,13 +27,13 @@ public class LegacySdkResultAdapter<T, A> extends org.mule.runtime.extension.api
     if (value instanceof org.mule.runtime.extension.api.runtime.operation.Result) {
       return (org.mule.runtime.extension.api.runtime.operation.Result<T, A>) value;
     } else if (value instanceof Result) {
-      return new LegacySdkResultAdapter((Result<T, A>) value);
+      return new LegacyResultAdapter((Result<T, A>) value);
     } else {
       throw new IllegalArgumentException("Unsupported type: " + value.getClass());
     }
   }
 
-  public LegacySdkResultAdapter(Result<T, A> delegate) {
+  public LegacyResultAdapter(Result<T, A> delegate) {
     this.delegate = delegate;
   }
 

@@ -19,11 +19,18 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class SdkToLegacyPollContextAdapter<T, A> implements PollContext<T, A> {
+/**
+ * Adapts a {@link org.mule.sdk.api.runtime.source.PollContext} into a legacy {@link PollContext}
+ *
+ * @param <T> the generic type of the output value
+ * @param <A> the generic type of the message attributes
+ * @since 4.4.0
+ */
+public class LegacyPollContextAdapter<T, A> implements PollContext<T, A> {
 
   private final org.mule.sdk.api.runtime.source.PollContext delegate;
 
-  public SdkToLegacyPollContextAdapter(org.mule.sdk.api.runtime.source.PollContext<T, A> delegate) {
+  public LegacyPollContextAdapter(org.mule.sdk.api.runtime.source.PollContext<T, A> delegate) {
     this.delegate = delegate;
   }
 
@@ -76,7 +83,7 @@ public class SdkToLegacyPollContextAdapter<T, A> implements PollContext<T, A> {
 
       @Override
       public SourceCallbackContext getSourceCallbackContext() {
-        return new SdkToLegacySourceCallbackContextAdapter(delegate.getSourceCallbackContext());
+        return new LegacySourceCallbackContextAdapterAdapter(delegate.getSourceCallbackContext());
       }
 
       @Override

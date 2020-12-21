@@ -11,7 +11,12 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.util.List;
 
-// ADD JDOC
+/**
+ * Augments the legacy {@link SourceCallbackContext} contract with internal behavior we don't want exposed
+ * on the public API
+ *
+ * @since 4.4.0
+ */
 public interface LegacySourceCallbackContextAdapter extends SourceCallbackContext {
 
   /**
