@@ -6,9 +6,10 @@
  */
 package org.mule.test.module.extension.reconnection;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.disconnectCalls;
@@ -31,9 +32,9 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
-import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicy;
@@ -108,23 +109,22 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Test
   public void sendNotificationOnReconnection() throws Exception {
+    final Latch latch = new Latch();
     final List<ExceptionNotification> notifications = new ArrayList<>();
-    ExceptionNotificationListener listener = new ExceptionNotificationListener() {
-
-      @Override
-      public void onNotification(ExceptionNotification notification) {
-        notifications.add(notification);
-      }
+    final ExceptionNotificationListener listener = notification -> {
+      notifications.add(notification);
+      latch.release();
     };
-    muleContext.getNotificationManager().addListener(listener);
+    notificationListenerRegistry.registerListener(listener);
     try {
       this.reconnectSource();
-      assertThat(notifications, hasSize(1));
+      latch.await(TIMEOUT, MILLISECONDS);
+      assertThat(notifications.size(), greaterThanOrEqualTo(1));
       assertThat(notifications.get(0).getInfo(), notNullValue());
       assertThat(notifications.get(0).getInfo().getException(), notNullValue());
       assertThat(notifications.get(0).getInfo().getException(), instanceOf(ConnectionException.class));
     } finally {
-      muleContext.getNotificationManager().removeListener(listener);
+      notificationListenerRegistry.unregisterListener(listener);
     }
   }
 

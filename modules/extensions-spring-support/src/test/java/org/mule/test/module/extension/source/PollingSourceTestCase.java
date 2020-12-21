@@ -175,7 +175,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       notifications.add(notification);
       latch.release();
     };
-    muleContext.getNotificationManager().addListener(listener);
+    notificationListenerRegistry.registerListener(listener);
     try {
       startFlow("pet-tiger");
       latch.await(TIMEOUT, MILLISECONDS);
@@ -186,7 +186,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(notifications.get(0).getInfo().getException().getCause(), instanceOf(ConnectionException.class));
       assertThat(notifications.get(0).getInfo().getException().getCause().getMessage(), is("A tiger cannot be petted."));
     } finally {
-      muleContext.getNotificationManager().removeListener(listener);
+      notificationListenerRegistry.unregisterListener(listener);
     }
   }
 
@@ -198,7 +198,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       notifications.add(notification);
       latch.release();
     };
-    muleContext.getNotificationManager().addListener(listener);
+    notificationListenerRegistry.registerListener(listener);
     try {
       startFlow("pet-whale");
       latch.await(TIMEOUT, MILLISECONDS);
@@ -208,7 +208,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(notifications.get(0).getInfo().getException(), instanceOf(RuntimeException.class));
       assertThat(notifications.get(0).getInfo().getException().getMessage(), is("Why do you want to pet a whale?"));
     } finally {
-      muleContext.getNotificationManager().removeListener(listener);
+      notificationListenerRegistry.unregisterListener(listener);
     }
   }
 
@@ -220,7 +220,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       notifications.add(notification);
       latch.release();
     };
-    muleContext.getNotificationManager().addListener(listener);
+    notificationListenerRegistry.registerListener(listener);
     try {
       startFlow("pet-dinosaur");
       latch.await(TIMEOUT, MILLISECONDS);
@@ -230,7 +230,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(notifications.get(0).getInfo().getException(), instanceOf(ConnectionException.class));
       assertThat(notifications.get(0).getInfo().getException().getMessage(), is("Dinosaurs no longer exist."));
     } finally {
-      muleContext.getNotificationManager().removeListener(listener);
+      notificationListenerRegistry.unregisterListener(listener);
     }
   }
 
@@ -242,13 +242,13 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       notifications.add(notification);
       latch.release();
     };
-    muleContext.getNotificationManager().addListener(listener);
+    notificationListenerRegistry.registerListener(listener);
     try {
       startFlow("pet-dog");
       boolean timeout = !latch.await(TIMEOUT, MILLISECONDS);
       assertThat(timeout, is(true));
     } finally {
-      muleContext.getNotificationManager().removeListener(listener);
+      notificationListenerRegistry.unregisterListener(listener);
     }
   }
 
