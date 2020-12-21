@@ -111,11 +111,6 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     ExceptionNotificationListener listener = new ExceptionNotificationListener() {
 
       @Override
-      public boolean isBlocking() {
-        return true;
-      }
-
-      @Override
       public void onNotification(ExceptionNotification notification) {
         notifications.add(notification);
       }
