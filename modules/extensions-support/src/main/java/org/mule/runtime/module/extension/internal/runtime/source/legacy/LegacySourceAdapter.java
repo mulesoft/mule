@@ -6,7 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source.legacy;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.source.PollContext;
 import org.mule.sdk.api.runtime.source.PollingSource;
@@ -14,7 +21,11 @@ import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
-public class LegacySourceAdapter<T, A> extends Source<T, A> implements LegacySourceWrapper {
+import org.slf4j.Logger;
+
+public class LegacySourceAdapter<T, A> extends Source<T, A> implements LegacySourceWrapper, Initialisable, Disposable {
+
+  private static final Logger LOGGER = getLogger(LegacySourceAdapter.class);
 
   private final org.mule.runtime.extension.api.runtime.source.Source<T, A> delegate;
 
@@ -45,7 +56,20 @@ public class LegacySourceAdapter<T, A> extends Source<T, A> implements LegacySou
     return delegate;
   }
 
-  private static class LegacyPollingSourceAdapter<T, A> extends PollingSource<T, A> implements LegacySourceWrapper {
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(delegate);
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(delegate, LOGGER);
+  }
+
+  private static class LegacyPollingSourceAdapter<T, A> extends PollingSource<T, A>
+      implements LegacySourceWrapper, Initialisable, Disposable {
+
+    private static final Logger LOGGER = getLogger(LegacyPollingSourceAdapter.class);
 
     private final org.mule.runtime.extension.api.runtime.source.PollingSource<T, A> delegate;
 
@@ -76,6 +100,16 @@ public class LegacySourceAdapter<T, A> extends Source<T, A> implements LegacySou
     @Override
     public org.mule.runtime.extension.api.runtime.source.Source getDelegate() {
       return delegate;
+    }
+
+    @Override
+    public void initialise() throws InitialisationException {
+      initialiseIfNeeded(delegate);
+    }
+
+    @Override
+    public void dispose() {
+      disposeIfNeeded(delegate, LOGGER);
     }
   }
 }
