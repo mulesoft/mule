@@ -7,6 +7,7 @@
 package org.mule.test.module.extension.reconnection;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.disconnectCalls;
@@ -19,7 +20,6 @@ import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 
 import org.mule.extension.test.extension.reconnection.FallibleReconnectableSource;
-import org.mule.extension.test.extension.reconnection.LongDisconnectionConnectionProvider;
 import org.mule.extension.test.extension.reconnection.NonReconnectableSource;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
@@ -28,6 +28,9 @@ import org.mule.extension.test.extension.reconnection.SynchronizableSource;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.notification.ExceptionNotification;
+import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -39,6 +42,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -99,6 +103,30 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
             .isPresent();
       }
     });
+  }
+
+  @Test
+  public void sendNotificationOnReconnection() throws Exception {
+    final List<ExceptionNotification> notifications = new ArrayList<>();
+    ExceptionNotificationListener listener = new ExceptionNotificationListener() {
+
+      @Override
+      public boolean isBlocking() {
+        return true;
+      }
+
+      @Override
+      public void onNotification(ExceptionNotification notification) {
+        notifications.add(notification);
+      }
+    };
+    this.notificationListenerRegistry.registerListener(listener);
+    try {
+      this.reconnectSource();
+      assertThat(notifications, hasSize(1));
+    } finally {
+      this.notificationListenerRegistry.unregisterListener(listener);
+    }
   }
 
   @Test
