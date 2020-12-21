@@ -7,6 +7,7 @@
 package org.mule.test.module.extension.reconnection;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
@@ -115,12 +116,15 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
         notifications.add(notification);
       }
     };
-    this.notificationListenerRegistry.registerListener(listener);
+    muleContext.getNotificationManager().addListener(listener);
     try {
       this.reconnectSource();
       assertThat(notifications, hasSize(1));
+      assertThat(notifications.get(0).getInfo(), notNullValue());
+      assertThat(notifications.get(0).getInfo().getException(), notNullValue());
+      assertThat(notifications.get(0).getInfo().getException(), instanceOf(ConnectionException.class));
     } finally {
-      this.notificationListenerRegistry.unregisterListener(listener);
+      muleContext.getNotificationManager().removeListener(listener);
     }
   }
 
