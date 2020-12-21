@@ -29458,6 +29458,38 @@
             {
               "type": {
                 "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "outputMimeType",
+              "description": "The mime type of the payload that this operation outputs.",
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "Boolean"
               },
               "hasDynamicType": false,
@@ -29476,7 +29508,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4,
+                "order": 5,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -29615,7 +29647,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 4,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -29756,7 +29788,63 @@
             }
           },
           "item": {
-            "type": "@ref:org.mule.sdk.api.runtime.operation.Result"
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.runtime.api.message.Message",
+              "classInformation": {
+                "classname": "org.mule.runtime.api.message.Message",
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "java.io.Serializable"
+                ],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "payload",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              },
+              {
+                "key": {
+                  "name": "attributes",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "classname": "java.lang.Object",
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    },
+                    "typeAlias": {
+                      "value": "Object"
+                    }
+                  },
+                  "fields": []
+                }
+              }
+            ]
           }
         },
         "hasDynamicType": false,
@@ -30722,256 +30810,6 @@
   ],
   "modelProperties": {},
   "types": [
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.sdk.api.runtime.operation.Result",
-        "classInformation": {
-          "classname": "org.mule.sdk.api.runtime.operation.Result",
-          "hasDefaultConstructor": false,
-          "isInterface": false,
-          "isInstantiable": false,
-          "isAbstract": false,
-          "isFinal": false,
-          "implementedInterfaces": [],
-          "parent": "",
-          "genericTypes": [
-            "java.lang.String",
-            "java.lang.Object"
-          ],
-          "isMap": false
-        },
-        "typeAlias": {
-          "value": "Result"
-        }
-      },
-      "fields": [
-        {
-          "key": {
-            "name": "attributes"
-          },
-          "model": {
-            "type": "Object",
-            "annotations": {
-              "typeId": "java.util.Optional",
-              "classInformation": {
-                "classname": "java.util.Optional",
-                "hasDefaultConstructor": false,
-                "isInterface": false,
-                "isInstantiable": false,
-                "isAbstract": false,
-                "isFinal": true,
-                "implementedInterfaces": [],
-                "parent": "",
-                "genericTypes": [
-                  "java.lang.Object"
-                ],
-                "isMap": false
-              },
-              "typeAlias": {
-                "value": "Optional"
-              }
-            },
-            "fields": [
-              {
-                "key": {
-                  "name": "present"
-                },
-                "model": {
-                  "type": "Boolean",
-                  "annotations": {
-                    "typeId": "boolean"
-                  }
-                },
-                "annotations": {
-                  "visibility": "READ_ONLY"
-                }
-              }
-            ]
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
-          }
-        },
-        {
-          "key": {
-            "name": "attributesMediaType"
-          },
-          "model": {
-            "type": "Object",
-            "annotations": {
-              "typeId": "java.util.Optional",
-              "classInformation": {
-                "classname": "java.util.Optional",
-                "hasDefaultConstructor": false,
-                "isInterface": false,
-                "isInstantiable": false,
-                "isAbstract": false,
-                "isFinal": true,
-                "implementedInterfaces": [],
-                "parent": "",
-                "genericTypes": [
-                  "org.mule.runtime.api.metadata.MediaType"
-                ],
-                "isMap": false
-              },
-              "typeAlias": {
-                "value": "Optional"
-              }
-            },
-            "fields": [
-              {
-                "key": {
-                  "name": "present"
-                },
-                "model": {
-                  "type": "Boolean",
-                  "annotations": {
-                    "typeId": "boolean"
-                  }
-                },
-                "annotations": {
-                  "visibility": "READ_ONLY"
-                }
-              }
-            ]
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
-          }
-        },
-        {
-          "key": {
-            "name": "byteLength"
-          },
-          "model": {
-            "type": "Object",
-            "annotations": {
-              "typeId": "java.util.OptionalLong",
-              "classInformation": {
-                "classname": "java.util.OptionalLong",
-                "hasDefaultConstructor": false,
-                "isInterface": false,
-                "isInstantiable": false,
-                "isAbstract": false,
-                "isFinal": true,
-                "implementedInterfaces": [],
-                "parent": "",
-                "genericTypes": [],
-                "isMap": false
-              },
-              "typeAlias": {
-                "value": "OptionalLong"
-              }
-            },
-            "fields": [
-              {
-                "key": {
-                  "name": "asLong"
-                },
-                "model": {
-                  "type": "Number",
-                  "annotations": {
-                    "classInformation": {
-                      "classname": "long",
-                      "hasDefaultConstructor": false,
-                      "isInterface": false,
-                      "isInstantiable": false,
-                      "isAbstract": true,
-                      "isFinal": true,
-                      "implementedInterfaces": [],
-                      "parent": "",
-                      "genericTypes": [],
-                      "isMap": false
-                    },
-                    "int": {}
-                  }
-                },
-                "annotations": {
-                  "visibility": "READ_ONLY"
-                }
-              },
-              {
-                "key": {
-                  "name": "present"
-                },
-                "model": {
-                  "type": "Boolean",
-                  "annotations": {
-                    "typeId": "boolean"
-                  }
-                },
-                "annotations": {
-                  "visibility": "READ_ONLY"
-                }
-              }
-            ]
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
-          }
-        },
-        {
-          "key": {
-            "name": "mediaType"
-          },
-          "model": {
-            "type": "Object",
-            "annotations": {
-              "typeId": "java.util.Optional",
-              "classInformation": {
-                "classname": "java.util.Optional",
-                "hasDefaultConstructor": false,
-                "isInterface": false,
-                "isInstantiable": false,
-                "isAbstract": false,
-                "isFinal": true,
-                "implementedInterfaces": [],
-                "parent": "",
-                "genericTypes": [
-                  "org.mule.runtime.api.metadata.MediaType"
-                ],
-                "isMap": false
-              },
-              "typeAlias": {
-                "value": "Optional"
-              }
-            },
-            "fields": [
-              {
-                "key": {
-                  "name": "present"
-                },
-                "model": {
-                  "type": "Boolean",
-                  "annotations": {
-                    "typeId": "boolean"
-                  }
-                },
-                "annotations": {
-                  "visibility": "READ_ONLY"
-                }
-              }
-            ]
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
-          }
-        },
-        {
-          "key": {
-            "name": "output"
-          },
-          "model": {
-            "type": "String"
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
-          }
-        }
-      ]
-    },
     {
       "format": "java",
       "type": "Object",
