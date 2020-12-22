@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal;
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
@@ -31,11 +31,6 @@ public class ExtensionProperties {
    * The key of an execution context variable on which a {@link SourceCallbackContext} was set
    */
   public static final String SOURCE_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "SOURCE_CALLBACK_CONTEXT_PARAM";
-
-  /**
-   * The key of an execution context variable on which a {@link SourceCallbackContext} was set
-   */
-  public static final String LEGACY_SOURCE_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "LEGACY_SOURCE_CALLBACK_CONTEXT_PARAM";
 
   /**
    * The key of an execution context variable on which a {@link SourceCompletionCallback} was set

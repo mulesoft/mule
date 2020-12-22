@@ -112,6 +112,7 @@ public class ConfigurationInjectionLifecycleTestCase extends ExtensionFunctional
   @OnException(HeisenbergConnectionExceptionEnricher.class)
   @ConnectionProviders({HeisenbergConnectionProvider.class, SecureHeisenbergConnectionProvider.class})
   @Sources({HeisenbergSource.class, DEARadioSource.class, AsyncHeisenbergSource.class})
+  @org.mule.sdk.api.annotation.Sources({ReconnectableHeisenbergSource.class})
   @Export(classes = {HeisenbergExtension.class, HeisenbergException.class}, resources = "methRecipe.json")
   @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
   @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
