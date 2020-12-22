@@ -79,4 +79,12 @@
         <metadata:content-and-output-cache-resolver config-ref="alternative-config" type="PERSON"/>
     </flow>
 
+    <flow name="operationWithOptionalPrimitiveByteParameter">
+        <metadata:operation-with-optional-primitive-byte-parameter />
+    </flow>
+
+    <flow name="operationWithOptionalByteParameter">
+        <metadata:operation-with-optional-byte-parameter />
+    </flow>
+
 </mule>

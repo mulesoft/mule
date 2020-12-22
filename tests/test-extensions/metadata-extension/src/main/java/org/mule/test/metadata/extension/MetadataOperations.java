@@ -62,6 +62,8 @@ import java.util.Map;
 
 public class MetadataOperations {
 
+  public static final String BYTE_DEFAULT_VALUE = "1";
+
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
   @MediaType(value = ANY, strict = false)
   public Object contentMetadataWithKeyId(@Config Object object, @Connection MetadataConnection connection,
@@ -320,6 +322,14 @@ public class MetadataOperations {
                                                                showInDsl = true) @MetadataKeyId(TestPartialMultiLevelKeyResolver.class) LocationKey locationKeyShowInDslParam,
                                                            @Content @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {
     return locationKeyShowInDslParam;
+  }
+
+  public Byte operationWithOptionalByteParameter(@Optional(defaultValue = BYTE_DEFAULT_VALUE) Byte value) {
+    return value;
+  }
+
+  public byte operationWithOptionalPrimitiveByteParameter(@Optional(defaultValue = BYTE_DEFAULT_VALUE) byte value) {
+    return value;
   }
 
   private <T> PagingProvider<MetadataConnection, T> generateDummyPagingProvider() {

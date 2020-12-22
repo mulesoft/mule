@@ -6,12 +6,16 @@
  */
 package org.mule.test.module.extension.metadata;
 
+import static java.lang.Byte.valueOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
+import static org.mule.test.metadata.extension.MetadataOperations.BYTE_DEFAULT_VALUE;
 import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.NATIVE_QUERY;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
@@ -24,6 +28,7 @@ import org.mule.test.metadata.extension.model.animals.AnimalClade;
 
 import java.util.List;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
 public class RuntimeMetadataTestCase extends AbstractMetadataOperationTestCase {
@@ -45,6 +50,18 @@ public class RuntimeMetadataTestCase extends AbstractMetadataOperationTestCase {
   @Override
   protected String getConfigFile() {
     return RUNTIME_METADATA_CONFIG;
+  }
+
+  @Test
+  @Issue("MULE-19074")
+  public void operationWithOptionalPrimitiveByteParameter() throws Exception {
+    assertOperationWithByteParameter(OPERATION_WITH_OPTIONAL_PRIMITIVE_BYTE_FLOW, valueOf(BYTE_DEFAULT_VALUE));
+  }
+
+  @Test
+  @Issue("MULE-19074")
+  public void operationWithOptionalByteParameter() throws Exception {
+    assertOperationWithByteParameter(OPERATION_WITH_OPTIONAL_BYTE_FLOW, valueOf(BYTE_DEFAULT_VALUE));
   }
 
   @Test
@@ -120,4 +137,12 @@ public class RuntimeMetadataTestCase extends AbstractMetadataOperationTestCase {
     flow.start();
     flow.stop();
   }
+
+  private void assertOperationWithByteParameter(String flowName, Number expectedValue) throws Exception {
+    Object payload = flowRunner(flowName).run().getMessage().getPayload().getValue();
+    assertNotNull(payload);
+    assertThat(payload, is(instanceOf(expectedValue.getClass())));
+    assertThat(payload, is(expectedValue));
+  }
+
 }
