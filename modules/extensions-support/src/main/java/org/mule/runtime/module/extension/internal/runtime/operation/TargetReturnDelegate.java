@@ -8,15 +8,18 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
@@ -33,6 +36,7 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
 
   private final String target;
   private final CompiledExpression targetValue;
+  private final StreamingManager streamingManager;
 
   /**
    * {@inheritDoc}
@@ -45,20 +49,26 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
                        ExpressionManager expressionManager,
                        CursorComponentDecoratorFactory componentDecoratorFactory,
                        CursorProviderFactory cursorProviderFactory,
-                       MuleContext muleContext) {
+                       MuleContext muleContext,
+                       StreamingManager streamingManager) {
     super(componentModel, componentDecoratorFactory, cursorProviderFactory, muleContext);
     this.expressionManager = expressionManager;
     this.target = target;
     this.targetValue = expressionManager.compile(targetValue, getTargetBindingContext(of("")));
+    this.streamingManager = streamingManager;
   }
 
   @Override
   public CoreEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
     try (ExpressionLanguageSession session =
         expressionManager.openSession(getTargetBindingContext(toMessage(value, operationContext)))) {
-      return CoreEvent.builder(operationContext.getEvent())
+      CoreEvent event = operationContext.getEvent();
+      TypedValue<?> typedValue = session.evaluate(targetValue);
+      TypedValue managedTypedValue = updateTypedValueForStreaming(typedValue, event, streamingManager);
+
+      return CoreEvent.builder(event)
           .securityContext(operationContext.getSecurityContext())
-          .addVariable(target, session.evaluate(targetValue))
+          .addVariable(target, managedTypedValue)
           .build();
     }
   }

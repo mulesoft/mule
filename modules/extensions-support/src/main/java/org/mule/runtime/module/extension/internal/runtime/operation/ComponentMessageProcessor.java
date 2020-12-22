@@ -960,7 +960,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
     return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager,
                                     componentDecoratorFactory, cursorProviderFactory,
-                                    muleContext);
+                                    muleContext, streamingManager);
   }
 
   protected ValueReturnDelegate getValueReturnDelegate() {
