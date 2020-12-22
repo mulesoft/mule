@@ -29,7 +29,7 @@ public class RemoveFlowVariableProcessor extends AbstractRemoveVariablePropertyP
     if (event.getVariables().containsKey(propertyName)) {
       return PrivilegedEvent.builder(event).removeVariable(propertyName).build();
     } else {
-      LOGGER.warn("There is no variable named '%s'. Check the 'variableName' parameter in the remove-variable component at %s",
+      LOGGER.warn("There is no variable named '%s'. Check the 'variableName' parameter in the 'remove-variable' component at %s",
                   propertyName, this.getLocation().getLocation());
       return event;
     }
