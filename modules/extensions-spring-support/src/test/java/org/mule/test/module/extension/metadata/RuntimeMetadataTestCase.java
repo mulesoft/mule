@@ -60,6 +60,12 @@ public class RuntimeMetadataTestCase extends AbstractMetadataOperationTestCase {
 
   @Test
   @Issue("MULE-19074")
+  public void operationWithOptionalPrimitiveByteParameterAndNotDefaultValue() throws Exception {
+    assertOperationWithByteParameter(OPERATION_WITH_OPTIONAL_PRIMITIVE_BYTE_NOT_DEFAULT_VALUE_FLOW, (byte) 9);
+  }
+
+  @Test
+  @Issue("MULE-19074")
   public void operationWithOptionalByteParameter() throws Exception {
     assertOperationWithByteParameter(OPERATION_WITH_OPTIONAL_BYTE_FLOW, valueOf(BYTE_DEFAULT_VALUE));
   }

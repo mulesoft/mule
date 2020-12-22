@@ -125,6 +125,8 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final String OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID = "outputAndMultipleInputWithKeyId";
   protected static final String OPERATION_WITH_OPTIONAL_PRIMITIVE_BYTE_FLOW = "operationWithOptionalPrimitiveByteParameter";
   protected static final String OPERATION_WITH_OPTIONAL_BYTE_FLOW = "operationWithOptionalByteParameter";
+  protected static final String OPERATION_WITH_OPTIONAL_PRIMITIVE_BYTE_NOT_DEFAULT_VALUE_FLOW =
+      "operationWithOptionalPrimitiveByteParameterAndNotDefaultValue";
 
   protected static final String CONTINENT = "continent";
   protected static final String COUNTRY = "country";
