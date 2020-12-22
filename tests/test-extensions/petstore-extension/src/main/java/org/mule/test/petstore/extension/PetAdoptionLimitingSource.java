@@ -27,7 +27,7 @@ public class PetAdoptionLimitingSource extends PollingSource<String, Integer> {
   @Parameter
   private List<String> pets;
 
-  @Parameter
+  @org.mule.sdk.api.annotation.param.Parameter
   private List<Integer> watermarks;
 
   @Override

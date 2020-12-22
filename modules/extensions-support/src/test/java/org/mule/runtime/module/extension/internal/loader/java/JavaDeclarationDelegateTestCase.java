@@ -172,7 +172,8 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String GET_MEDICAL_HISTORY = "getMedicalHistory";
   private static final String APPROVE_INVESTMENT = "approve";
   private static final String IGNORED_OPERATION = "ignoredOperation";
-  private static final String IGNORED_SOURCE = "ignoredOperation";
+  private static final String IGNORED_SOURCE = "ignored";
+  private static final String IGNORED_SDK_SOURCE = "sdk-ignored";
   private static final String OTHER_HEISENBERG = "OtherHeisenberg";
   private static final String PROCESS_WEAPON = "processWeapon";
   private static final String PROCESS_WEAPON_LIST = "processWeaponList";
@@ -393,7 +394,21 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(getOperation(extensionDeclaration, IGNORED_OPERATION), is(notNullValue()));
 
     List<SourceDeclaration> ignoredSources = extensionDeclaration.getMessageSources().stream()
-        .filter(s -> s.getName().toLowerCase().contains("ignore"))
+        .filter(s -> s.getName().toLowerCase().equals(IGNORED_SOURCE))
+        .collect(toList());
+
+    assertThat(ignoredSources, hasSize(1));
+  }
+
+  @Test
+  public void disableSdkIgnore() {
+    DefaultExtensionLoadingContext loadingContext = createLoadingContext();
+    loadingContext.addParameter(DISABLE_COMPONENT_IGNORE, true);
+    ExtensionDeclarer declarer = declareExtension(loadingContext);
+    ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
+
+    List<SourceDeclaration> ignoredSources = extensionDeclaration.getMessageSources().stream()
+        .filter(s -> s.getName().toLowerCase().equals(IGNORED_SDK_SOURCE))
         .collect(toList());
 
     assertThat(ignoredSources, hasSize(1));

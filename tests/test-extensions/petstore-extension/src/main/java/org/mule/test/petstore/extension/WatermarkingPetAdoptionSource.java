@@ -39,7 +39,7 @@ public class WatermarkingPetAdoptionSource extends PollingSource<String, Integer
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "0")
   protected Integer awaitOnItem;
 
-  @Parameter
+  @org.mule.sdk.api.annotation.param.Parameter
   protected List<String> pets;
 
   @Parameter

@@ -40,7 +40,7 @@ public class PartialPetAdoptionSource extends PollingSource<String, Void> {
   private List<String> pets;
 
 
-  @Parameter
+  @org.mule.sdk.api.annotation.param.Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
   private boolean watermark;
 
