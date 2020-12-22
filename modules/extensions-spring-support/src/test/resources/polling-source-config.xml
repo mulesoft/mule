@@ -108,4 +108,40 @@
     <flow name="adopt">
         <test:processor class="org.mule.test.module.extension.source.PollingSourceTestCase$AdoptionProcessor"/>
     </flow>
+
+    <flow name="pet-tiger" initialState="stopped">
+        <petstore:pet-filter-source filter="tiger">
+            <scheduling-strategy>
+                <fixed-frequency startDelay="200" frequency="100000"/>
+            </scheduling-strategy>
+        </petstore:pet-filter-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+    <flow name="pet-whale" initialState="stopped">
+        <petstore:pet-filter-source filter="whale">
+            <scheduling-strategy>
+                <fixed-frequency startDelay="200" frequency="100000"/>
+            </scheduling-strategy>
+        </petstore:pet-filter-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+    <flow name="pet-dinosaur" initialState="stopped">
+        <petstore:pet-filter-source filter="dinosaur">
+            <scheduling-strategy>
+                <fixed-frequency startDelay="200" frequency="100000"/>
+            </scheduling-strategy>
+        </petstore:pet-filter-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+    <flow name="pet-dog" initialState="stopped">
+        <petstore:pet-filter-source filter="dog">
+            <scheduling-strategy>
+                <fixed-frequency startDelay="200" frequency="100000"/>
+            </scheduling-strategy>
+        </petstore:pet-filter-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
 </mule>

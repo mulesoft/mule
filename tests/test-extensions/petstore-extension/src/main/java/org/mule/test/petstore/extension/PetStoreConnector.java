@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Sources({PetStoreSource.class, FailingPetStoreSource.class, SentientSource.class, PetAdoptionSource.class,
     PetStoreStreamSource.class, PetStoreListSource.class, PartialPetAdoptionSource.class, NumberPetAdoptionSource.class,
     ConnectedPetAdoptionSource.class, PetFailingPollingSource.class, WatermarkingPetAdoptionSource.class,
-    PetAdoptionLimitingSource.class})
+    PetAdoptionLimitingSource.class, PetFilterPollingSource.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/petstore", prefix = "petstore")
 public class PetStoreConnector {
 
