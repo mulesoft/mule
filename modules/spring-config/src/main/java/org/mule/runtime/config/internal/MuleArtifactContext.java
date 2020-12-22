@@ -214,7 +214,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         .configurations(ffRegistry.getFeatureConfigurations())
         .build();
 
-
     muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
 
     this.applicationModel = createApplicationModel(artifactDeclaration, artifactConfigResources);

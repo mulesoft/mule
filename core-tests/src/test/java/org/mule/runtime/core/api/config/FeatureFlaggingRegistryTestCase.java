@@ -11,21 +11,24 @@ import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.api.config.Feature.TESTING_FEATURE;
+import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.CONDITION_CAN_NOT_BE_NULL;
+import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.FEATURE_ALREADY_REGISTERED;
+import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.FEATURE_CAN_NOT_BE_NULL;
+import static org.mule.runtime.core.api.config.TestingFeatures.TESTING_FEATURE;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
-@io.qameta.allure.Feature(DEPLOYMENT_CONFIGURATION)
+@Feature(DEPLOYMENT_CONFIGURATION)
 @Story(FEATURE_FLAGGING)
 public class FeatureFlaggingRegistryTestCase {
 
@@ -61,24 +64,24 @@ public class FeatureFlaggingRegistryTestCase {
 
   @Test
   public void failIfInvalidConfig() {
-    expectedException.expect(MuleRuntimeException.class);
-    expectedException.expectMessage(format("Error registering %s: condition must not be null", TESTING_FEATURE.name()));
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(format(CONDITION_CAN_NOT_BE_NULL, TESTING_FEATURE.name()));
 
     featureFlaggingRegistry.registerFeature(TESTING_FEATURE, null);
   }
 
   @Test
   public void failIfInvalidFeature() {
-    expectedException.expect(MuleRuntimeException.class);
-    expectedException.expectMessage("Feature can not be null");
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(FEATURE_CAN_NOT_BE_NULL);
 
     featureFlaggingRegistry.registerFeature(null, c -> true);
   }
 
   @Test
   public void failWhenRegisterFeatureTwice() {
-    expectedException.expect(MuleRuntimeException.class);
-    expectedException.expectMessage(format("Feature %s already registered", TESTING_FEATURE.name()));
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(format(FEATURE_ALREADY_REGISTERED, TESTING_FEATURE.name()));
 
     featureFlaggingRegistry.registerFeature(TESTING_FEATURE, c -> true);
     featureFlaggingRegistry.registerFeature(TESTING_FEATURE, c -> false);

@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.config;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -44,7 +44,7 @@ public final class FeatureFlaggingServiceBuilder {
   }
 
   public FeatureFlaggingService build() {
-    Map<Feature, Boolean> features = new EnumMap<>(Feature.class);
+    Map<Feature, Boolean> features = new HashMap<>();
     LOGGER.debug("Configuring feature flags...");
 
     final String id = context.getConfiguration().getId();

@@ -22,13 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.api.config.Feature.TESTING_FEATURE;
+import static org.mule.runtime.core.api.config.TestingFeatures.TESTING_FEATURE;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
@@ -48,22 +47,22 @@ public class DefaultFeatureFlaggingServiceTestCase {
   @Parameters(name = "Feature \"{1}\" should be {2}")
   public static List<Object[]> parameters() {
     return asList(
-                  new Object[] {getSetUp(TESTING_FEATURE, false), TESTING_FEATURE, false, null},
-                  new Object[] {getSetUp(TESTING_FEATURE, true), TESTING_FEATURE, true, null},
-                  new Object[] {getSetUp(), TESTING_FEATURE, false, (Consumer<ExpectedException>) (e -> {
+                  new Object[] {buildFeatureConfigurations(TESTING_FEATURE, false), TESTING_FEATURE, false, null},
+                  new Object[] {buildFeatureConfigurations(TESTING_FEATURE, true), TESTING_FEATURE, true, null},
+                  new Object[] {buildFeatureConfigurations(), TESTING_FEATURE, false, (Consumer<ExpectedException>) (e -> {
                     e.expect(MuleRuntimeException.class);
                     e.expectMessage(format("Feature %s not registered", TESTING_FEATURE.name()));
                   })});
 
   }
 
-  public DefaultFeatureFlaggingServiceTestCase(Supplier<Map<Feature, Boolean>> setUp, Feature feature, boolean enabled,
+  public DefaultFeatureFlaggingServiceTestCase(Map<Feature, Boolean> featureConfigurations, Feature feature, boolean enabled,
                                                Consumer<ExpectedException> configureExpected) {
 
     this.feature = feature;
     this.enabled = enabled;
 
-    featureFlaggingService = new DefaultFeatureFlaggingService(setUp.get());
+    featureFlaggingService = new DefaultFeatureFlaggingService(featureConfigurations);
     if (configureExpected != null) {
       configureExpected.accept(expectedException);
     }
@@ -74,7 +73,7 @@ public class DefaultFeatureFlaggingServiceTestCase {
     assertThat(featureFlaggingService.isEnabled(feature), is(enabled));
   }
 
-  private static Supplier<Map<Feature, Boolean>> getSetUp(Object... values) {
+  private static Map<Feature, Boolean> buildFeatureConfigurations(Object... values) {
     assertThat("Values must be even", values.length % 2, is(0));
 
     Map<Feature, Boolean> m = new HashMap<>();
@@ -83,7 +82,7 @@ public class DefaultFeatureFlaggingServiceTestCase {
       m.put((Feature) values[i], (Boolean) values[i + 1]);
     }
 
-    return () -> m;
+    return m;
   }
 
 }
