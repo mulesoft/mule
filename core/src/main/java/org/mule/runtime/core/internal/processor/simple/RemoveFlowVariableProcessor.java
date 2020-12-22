@@ -8,12 +8,15 @@ package org.mule.runtime.core.internal.processor.simple;
 
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
 public class RemoveFlowVariableProcessor extends AbstractRemoveVariablePropertyProcessor {
 
   private static final String FLOW_VAR_NAME = "flow variables";
+  private static final Logger LOGGER = LoggerFactory.getLogger(RemoveFlowVariableProcessor.class);
 
   @Override
   protected Set<String> getPropertyNames(PrivilegedEvent event) {
@@ -22,7 +25,13 @@ public class RemoveFlowVariableProcessor extends AbstractRemoveVariablePropertyP
 
   @Override
   protected PrivilegedEvent removeProperty(PrivilegedEvent event, String propertyName) {
-    return PrivilegedEvent.builder(event).removeVariable(propertyName).build();
+    if (event.getVariables().containsKey(propertyName)) {
+      return PrivilegedEvent.builder(event).removeVariable(propertyName).build();
+    } else {
+      LOGGER.warn("There is no variable named '%s'. You might want to check the expression in remove-variable component in: %s",
+                  propertyName, this.getLocation().getLocation());
+      return event;
+    }
   }
 
   @Override
