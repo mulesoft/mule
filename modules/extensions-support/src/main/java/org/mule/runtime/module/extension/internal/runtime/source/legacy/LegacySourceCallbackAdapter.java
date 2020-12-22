@@ -45,6 +45,6 @@ public class LegacySourceCallbackAdapter<T, A>
 
   @Override
   public SourceCallbackContext createContext() {
-    return new LegacySourceCallbackContextAdapterAdapter(sourceCallback.createContext());
+    return new LegacySourceCallbackContextAdapter(sourceCallback.createContext());
   }
 }

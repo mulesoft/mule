@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
-import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySourceCallbackContextAdapterAdapter;
+import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySourceCallbackContextAdapter;
 
 /**
  * An {@link ArgumentResolver} which returns a {@link SourceCallbackContext} which is and adapted
@@ -28,7 +28,8 @@ public class SourceCallbackContextArgumentResolver implements ArgumentResolver<S
 
   @Override
   public SourceCallbackContext resolve(ExecutionContext executionContext) {
-    return new LegacySourceCallbackContextAdapterAdapter(((ExecutionContextAdapter<ComponentModel>) executionContext)
-        .getVariable(SOURCE_CALLBACK_CONTEXT_PARAM));
+    org.mule.sdk.api.runtime.source.SourceCallbackContext context = ((ExecutionContextAdapter<ComponentModel>) executionContext)
+        .getVariable(SOURCE_CALLBACK_CONTEXT_PARAM);
+    return context == null ? null : new LegacySourceCallbackContextAdapter(context);
   }
 }

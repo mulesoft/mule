@@ -87,22 +87,22 @@ public class SdkSourceCallBackContextAdapter implements SourceCallbackContextAda
 
   @Override
   public void releaseConnection() {
-    if (delegate instanceof LegacySourceCallbackContextAdapter) {
-      ((LegacySourceCallbackContextAdapter) delegate).releaseConnection();
+    if (delegate instanceof AugmentedLegacySourceCallbackContext) {
+      ((AugmentedLegacySourceCallbackContext) delegate).releaseConnection();
     }
   }
 
   @Override
   public void dispatched() {
-    if (delegate instanceof LegacySourceCallbackContextAdapter) {
-      ((LegacySourceCallbackContextAdapter) delegate).dispatched();
+    if (delegate instanceof AugmentedLegacySourceCallbackContext) {
+      ((AugmentedLegacySourceCallbackContext) delegate).dispatched();
     }
   }
 
   @Override
   public List<NotificationFunction> getNotificationsFunctions() {
-    if (delegate instanceof LegacySourceCallbackContextAdapter) {
-      return ((LegacySourceCallbackContextAdapter) delegate).getNotificationsFunctions();
+    if (delegate instanceof AugmentedLegacySourceCallbackContext) {
+      return ((AugmentedLegacySourceCallbackContext) delegate).getNotificationsFunctions();
     }
     return emptyList();
   }

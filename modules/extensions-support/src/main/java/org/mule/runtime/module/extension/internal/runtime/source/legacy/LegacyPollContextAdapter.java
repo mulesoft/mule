@@ -83,7 +83,7 @@ public class LegacyPollContextAdapter<T, A> implements PollContext<T, A> {
 
       @Override
       public SourceCallbackContext getSourceCallbackContext() {
-        return new LegacySourceCallbackContextAdapterAdapter(delegate.getSourceCallbackContext());
+        return new LegacySourceCallbackContextAdapter(delegate.getSourceCallbackContext());
       }
 
       @Override

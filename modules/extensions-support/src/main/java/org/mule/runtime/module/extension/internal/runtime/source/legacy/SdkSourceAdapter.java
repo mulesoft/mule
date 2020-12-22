@@ -101,7 +101,7 @@ public class SdkSourceAdapter<T, A> extends Source<T, A> implements LegacySource
 
     @Override
     public void onRejectedItem(Result<T, A> result, SourceCallbackContext callbackContext) {
-      delegate.onRejectedItem(LegacyResultAdapter.from(result), new LegacySourceCallbackContextAdapterAdapter(callbackContext));
+      delegate.onRejectedItem(LegacyResultAdapter.from(result), new LegacySourceCallbackContextAdapter(callbackContext));
     }
 
     @Override

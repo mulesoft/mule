@@ -33,7 +33,7 @@ public class SdkSourceCallbackAdapter<T, A> implements SourceCallback<T, A> {
 
   @Override
   public void handle(Result<T, A> result, SourceCallbackContext context) {
-    delegate.handle(LegacyResultAdapter.from(result), new LegacySourceCallbackContextAdapterAdapter(context));
+    delegate.handle(LegacyResultAdapter.from(result), new LegacySourceCallbackContextAdapter(context));
   }
 
   @Override
