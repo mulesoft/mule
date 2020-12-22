@@ -10,16 +10,30 @@ import org.mule.runtime.api.config.Feature;
 
 public enum TestingFeatures implements Feature {
 
-  TESTING_FEATURE("Testing feature");
+  TESTING_FEATURE("Testing feature", "MULE-123", "4.4.0");
 
   private final String description;
+  private final String issue;
+  private final String since;
 
-  TestingFeatures(String description) {
+  TestingFeatures(String description, String issue, String since) {
     this.description = description;
+    this.issue = issue;
+    this.since = since;
   }
 
   @Override
   public String getDescription() {
     return description;
+  }
+
+  @Override
+  public String getIssue() {
+    return issue;
+  }
+
+  @Override
+  public String getSince() {
+    return since;
   }
 }

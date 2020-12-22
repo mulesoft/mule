@@ -10,16 +10,31 @@ import org.mule.runtime.api.config.Feature;
 
 public enum PetStoreFeatures implements Feature {
 
-  LEGACY_FEATURE("Feature legacy, just for testing");
+  LEGACY_FEATURE("Feature legacy, just for testing", "MULE-123", "4.4.0");
+
+  private final String issue;
+  private final String since;
 
   private final String description;
 
-  PetStoreFeatures(String description) {
+  PetStoreFeatures(String description, String issue, String since) {
     this.description = description;
+    this.issue = issue;
+    this.since = since;
   }
 
   @Override
   public String getDescription() {
     return description;
+  }
+
+  @Override
+  public String getIssue() {
+    return issue;
+  }
+
+  @Override
+  public String getSince() {
+    return since;
   }
 }
