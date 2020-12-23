@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.api.config;
 
+import org.mule.runtime.api.config.Feature;
+
 /**
  * This service exposes the features that were flagged based on the configurations registered through the
  * {@link FeatureFlaggingRegistry}. These configurations will be evaluated when an application is deployed, which means that each
@@ -29,5 +31,5 @@ public interface FeatureFlaggingService {
    * 
    * @return a boolean indicating if the features is enabled for the current execution context
    */
-  boolean isEnabled(String feature);
+  boolean isEnabled(Feature feature);
 }
