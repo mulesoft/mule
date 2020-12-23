@@ -31,6 +31,7 @@ import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
+import org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.io.File;

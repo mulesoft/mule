@@ -23,7 +23,6 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.text.html.Option;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -88,7 +87,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   private final File domainsDir;
   protected volatile boolean dirty;
   private ScheduledExecutorService artifactDirMonitorTimer;
-  private final List<ApplicationStoppedDeploymentListener> applicationStoppedDeploymentListeners;
+  private final List<ArtifactStoppedDeploymentListener> artifactStoppedDeploymentListeners;
 
   public DeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
                                     final ArchiveDeployer<Domain> domainArchiveDeployer,
@@ -122,7 +121,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     this.schedulerServiceSupplier = schedulerServiceSupplier;
     this.applicationTimestampListener = new ArtifactTimestampListener(applications);
     this.domainTimestampListener = new ArtifactTimestampListener(domains);
-    this.applicationStoppedDeploymentListeners = new ArrayList<>();
+    this.artifactStoppedDeploymentListeners = new ArrayList<>();
   }
 
   private static int getChangesCheckIntervalMs() {
@@ -221,7 +220,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   private void notifyStopListeners() {
-    applicationStoppedDeploymentListeners.forEach(ApplicationStoppedDeploymentListener::onStopDoNotPersist);
+    artifactStoppedDeploymentListeners.forEach(ArtifactStoppedDeploymentListener::onStopDoNotPersist);
   }
 
   private void scheduleChangeMonitor() {
@@ -496,11 +495,11 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   private void addApplicationStoppedDeploymentListener(DeployableArtifact deployableArtifact) {
-    ApplicationStoppedDeploymentListener applicationStoppedDeploymentListener = new ApplicationStoppedDeploymentListener();
+    ArtifactStoppedDeploymentListener artifactStoppedDeploymentListener = new ArtifactStoppedDeploymentListener();
     MuleContextDeploymentListener muleContextListener =
-        new MuleContextDeploymentListener(deployableArtifact.getArtifactName(), applicationStoppedDeploymentListener);
+        new MuleContextDeploymentListener(deployableArtifact.getArtifactName(), artifactStoppedDeploymentListener);
     deployableArtifact.setMuleContextListener(muleContextListener);
-    applicationStoppedDeploymentListeners.add(applicationStoppedDeploymentListener);
+    artifactStoppedDeploymentListeners.add(artifactStoppedDeploymentListener);
   }
 
   private void stopAppDirMonitorTimer() {
