@@ -14,7 +14,7 @@ import static org.mockito.Mockito.inOrder;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Map;

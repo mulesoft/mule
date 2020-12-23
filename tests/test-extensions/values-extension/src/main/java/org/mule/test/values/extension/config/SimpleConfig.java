@@ -37,8 +37,9 @@ import java.util.List;
 })
 @Operations({ValuesOperations.class})
 @Sources({SourceWithConfiguration.class, SourceWithConnection.class, SourceWithValuesWithRequiredParameters.class,
-    SourceWithValuesWithRequiredParameterInsideParamGroup.class,
-    SourceWithRequiredParameterWithAlias.class, SourceWithRequiredParameterInsideShowInDslGroup.class,
+    SourceWithValuesWithRequiredParameterInsideParamGroup.class})
+@org.mule.sdk.api.annotation.Sources({SourceWithRequiredParameterWithAlias.class,
+    SourceWithRequiredParameterInsideShowInDslGroup.class,
     SourceWithMultiLevelValue.class, SourceMustNotStart.class})
 public class SimpleConfig {
 

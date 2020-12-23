@@ -75,7 +75,8 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
       @Override
       protected void onSource(SourceDeclaration source) {
         extractType(source).ifPresent(type -> {
-          if (type.isAssignableTo(PollingSource.class)) {
+          if (type.isAssignableTo(PollingSource.class)
+              || type.isAssignableTo(org.mule.sdk.api.runtime.source.PollingSource.class)) {
 
             source.setRunsOnPrimaryNodeOnly(true);
 

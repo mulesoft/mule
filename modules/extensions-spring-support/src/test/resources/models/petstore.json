@@ -29750,7 +29750,7 @@
               ],
               "parent": "",
               "genericTypes": [
-                "org.mule.runtime.extension.api.runtime.operation.Result"
+                "org.mule.sdk.api.runtime.operation.Result"
               ],
               "isMap": false
             }

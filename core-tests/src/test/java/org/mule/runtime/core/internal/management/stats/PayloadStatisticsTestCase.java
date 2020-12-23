@@ -786,7 +786,7 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
     // set the result to a collection of something other that Result to manifest the bug
     FlowProcessTemplate template = mock(FlowProcessTemplate.class);
     SourceResultAdapter resultAdapter = mock(SourceResultAdapter.class);
-    when(resultAdapter.getResult()).thenReturn(org.mule.runtime.extension.api.runtime.operation.Result.builder()
+    when(resultAdapter.getResult()).thenReturn(Result.builder()
         .output(singleton(new TypedValue<>("Hello World", STRING)))
         .build());
     when(resultAdapter.getMediaType()).thenReturn(ANY);

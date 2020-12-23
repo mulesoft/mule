@@ -524,8 +524,7 @@ public class FlowProcessMediator implements Initialisable {
         createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, adapter.getCorrelationId().orElse(null));
 
     return eventBuilder.message(eventCtx -> {
-      // TODO: the adapter should return a new Result in the first place. Adaptation shouldn't happen here
-      final Result<?, ?> result = new SdkResultAdapter<>(adapter.getResult());
+      final Result<?, ?> result = adapter.getResult();
       final Object resultValue = result.getOutput();
 
       Message eventMessage;

@@ -24,9 +24,9 @@ import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.extension.api.runtime.source.PollingSource;
-import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
+import org.mule.sdk.api.runtime.source.PollingSource;
+import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;

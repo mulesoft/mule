@@ -37,10 +37,10 @@ import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
+import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -147,7 +147,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       return this;
     }
 
-    public SourceCallback<T, A> build() {
+    public org.mule.sdk.api.runtime.source.SourceCallback<T, A> build() {
       checkArgument(product.listener, "listener");
       checkArgument(product.exceptionCallback, "exceptionCallback");
       checkArgument(product.messageProcessingManager, "messageProcessingManager");

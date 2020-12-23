@@ -27,7 +27,6 @@ import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
@@ -35,10 +34,10 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithMessageSources;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
-import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
+import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -122,7 +121,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     sourceType.getDeclaringClass()
         .ifPresent(clazz -> sourceDeclarer
-            .withModelProperty(new SourceFactoryModelProperty(new DefaultSourceFactory((Class<? extends Source>) clazz)))
+            .withModelProperty(new SdkSourceFactoryModelProperty(new DefaultSdkSourceFactory(clazz)))
             .withModelProperty(new ImplementingTypeModelProperty(clazz)));
 
     processMimeType(sourceDeclarer, sourceType);

@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 
 /**
@@ -16,24 +17,24 @@ import org.mule.runtime.extension.api.runtime.source.SourceFactory;
  *
  * @since 4.0
  */
-public final class SourceFactoryModelProperty implements ModelProperty {
+public final class SdkSourceFactoryModelProperty implements ModelProperty {
 
-  private final SourceFactory sourceFactory;
+  private final SdkSourceFactory sdkSourceFactory;
 
   /**
    * Creates a new instance
    *
-   * @param sourceFactory a {@link SourceFactory}
+   * @param sdkSourceFactory a {@link SourceFactory}
    */
-  public SourceFactoryModelProperty(SourceFactory sourceFactory) {
-    this.sourceFactory = sourceFactory;
+  public SdkSourceFactoryModelProperty(SdkSourceFactory sdkSourceFactory) {
+    this.sdkSourceFactory = sdkSourceFactory;
   }
 
   /**
    * @return a {@link SourceFactory}
    */
-  public SourceFactory getSourceFactory() {
-    return sourceFactory;
+  public SdkSourceFactory getMessageSourceFactory() {
+    return sdkSourceFactory;
   }
 
   /**
@@ -41,7 +42,7 @@ public final class SourceFactoryModelProperty implements ModelProperty {
    */
   @Override
   public String getName() {
-    return "sourceFactory";
+    return "sdkSourceFactory";
   }
 
   /**

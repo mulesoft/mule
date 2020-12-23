@@ -13,8 +13,8 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
-import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.runtime.source.Source;
+import org.mule.sdk.api.runtime.source.SourceCallback;
 
 @Alias("ignored")
 @EmitsResponse

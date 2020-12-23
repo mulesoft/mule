@@ -14,6 +14,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.MethodDocumentation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -77,6 +78,11 @@ final class SourcesDescriptionDocumenter extends AbstractDescriptionDocumenter {
   }
 
   private List<TypeElement> getSourceClasses(ProcessingEnvironment processingEnv, Element element) {
-    return processor.getArrayClassAnnotationValue(element, Sources.class, VALUE_PROPERTY, processingEnv);
+    List<TypeElement> elements = new ArrayList<>();
+    elements.addAll(processor.getArrayClassAnnotationValue(element, Sources.class, VALUE_PROPERTY, processingEnv));
+    elements.addAll(processor.getArrayClassAnnotationValue(element, org.mule.sdk.api.annotation.Sources.class, VALUE_PROPERTY,
+                                                           processingEnv));
+
+    return elements;
   }
 }

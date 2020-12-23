@@ -36,7 +36,8 @@ public class PetAdoptionSource extends PollingSource<String, Void> {
   public static int STARTED_POLLS;
   protected List<String> pets;
 
-  @Parameter
+  //Using this annotation in order to mix the legacy and the new api and test all code flows.
+  @org.mule.sdk.api.annotation.param.Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
   protected boolean watermark;
 

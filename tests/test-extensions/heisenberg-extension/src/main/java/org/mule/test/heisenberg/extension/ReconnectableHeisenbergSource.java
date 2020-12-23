@@ -22,7 +22,7 @@ import org.mule.runtime.extension.api.runtime.connectivity.ReconnectionCallback;
 @Fires(SourceNotificationProvider.class)
 @Streaming
 @MediaType(TEXT_PLAIN)
-public class ReconnectableHeisenbergSource extends HeisenbergSource implements Reconnectable {
+public class ReconnectableHeisenbergSource extends SdkHeisenbergSource implements Reconnectable {
 
   public static int succesfulReconnections = 0;
   public static int failedReconnections = 0;

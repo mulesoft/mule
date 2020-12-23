@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import org.mule.runtime.core.internal.execution.NotificationFunction;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.util.List;
 

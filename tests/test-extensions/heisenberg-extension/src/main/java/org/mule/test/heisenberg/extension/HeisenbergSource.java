@@ -123,7 +123,8 @@ public class HeisenbergSource extends Source<String, Object> {
   @Optional(defaultValue = "1")
   private int corePoolSize;
 
-  @Parameter
+  //Using this annotation in order to mix the legacy and the new api and test all code flows.
+  @org.mule.sdk.api.annotation.param.Parameter
   @Optional(defaultValue = "500")
   private long frequency;
 
@@ -135,7 +136,8 @@ public class HeisenbergSource extends Source<String, Object> {
   @NullSafe
   private Map<String, Object> debtProperties;
 
-  @Parameter
+  //Using this annotation in order to mix the legacy and the new api and test all code flows.
+  @org.mule.sdk.api.annotation.param.Parameter
   @Optional
   @NullSafe
   private Map<String, Weapon> usableWeapons;
