@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -15,6 +16,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
@@ -33,6 +35,7 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
 
   private final String target;
   private final String targetValue;
+  private final StreamingManager streamingManager;
 
   /**
    * {@inheritDoc}
@@ -44,20 +47,24 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
                        ComponentModel componentModel,
                        ExpressionManager expressionManager,
                        CursorProviderFactory cursorProviderFactory,
-                       MuleContext muleContext) {
+                       MuleContext muleContext,
+                       StreamingManager streamingManager) {
     super(componentModel, cursorProviderFactory, muleContext);
     this.expressionManager = expressionManager;
     this.target = target;
     this.targetValue = targetValue;
+    this.streamingManager = streamingManager;
   }
 
   @Override
   public CoreEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    TypedValue result = expressionManager
+    CoreEvent event = operationContext.getEvent();
+    TypedValue typedValue = expressionManager
         .evaluate(targetValue, getTargetBindingContext(toMessage(value, operationContext)));
-    return CoreEvent.builder(operationContext.getEvent())
+    TypedValue managedTypedValue = updateTypedValueForStreaming(typedValue, event, streamingManager);
+    return CoreEvent.builder(event)
         .securityContext(operationContext.getSecurityContext())
-        .addVariable(this.target, result.getValue(), result.getDataType())
+        .addVariable(this.target, managedTypedValue.getValue(), managedTypedValue.getDataType())
         .build();
   }
 }
