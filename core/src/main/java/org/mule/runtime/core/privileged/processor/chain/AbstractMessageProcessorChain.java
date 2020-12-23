@@ -561,4 +561,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     disposeIfNeeded(getMessageProcessorsForLifecycle(), LOGGER);
   }
 
+  FlowExceptionHandler getMessagingExceptionHandler() {
+    return messagingExceptionHandler;
+  }
 }
