@@ -19,13 +19,17 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.core.api.util.ClassUtils.getMethod;
 import static org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty.builder;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -38,6 +42,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty.SampleDataProviderFactoryModelPropertyBuilder;
@@ -47,8 +52,11 @@ import org.mule.sdk.api.annotation.param.Connection;
 import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.sdk.api.data.sample.SampleDataProvider;
 import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.streaming.PagingProvider;
 import org.mule.tck.size.SmallTest;
 
+import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -262,8 +270,8 @@ public class SampleDataProviderModelValidatorTestCase {
 
   @Test
   public void operationWithBoxedVoidAttributes() {
-    mockComponent(operationModel, builder(VoidAttributesSampledataProvider.class),
-                  VoidAttributesSampledataProvider.class.getSimpleName());
+    mockComponent(operationModel, builder(VoidAttributesSampleDataProvider.class),
+                  VoidAttributesSampleDataProvider.class.getSimpleName());
 
     when(operationModel.getOutputAttributes().getType()).thenReturn(typeLoader.load(Void.class));
 
@@ -273,10 +281,29 @@ public class SampleDataProviderModelValidatorTestCase {
 
   @Test
   public void operationWithNativeVoidAttributes() {
-    mockComponent(operationModel, builder(VoidAttributesSampledataProvider.class),
-                  VoidAttributesSampledataProvider.class.getSimpleName());
+    mockComponent(operationModel, builder(VoidAttributesSampleDataProvider.class),
+                  VoidAttributesSampleDataProvider.class.getSimpleName());
 
     when(operationModel.getOutputAttributes().getType()).thenReturn(typeLoader.load(void.class));
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void pagingOperationWithInputStreamPayload() {
+    MetadataType type = create(JAVA).arrayType()
+            .with(new ClassInformationAnnotation(PagingProvider.class, asList(Object.class, InputStream.class)))
+            .of(typeLoader.load(InputStream.class))
+            .build();
+
+    Method method = getMethod(PagedInputStreamOperationStub.class, "paged", new Class[]{});
+    when(operationModel.getModelProperty(ImplementingMethodModelProperty.class))
+            .thenReturn(of(new ImplementingMethodModelProperty(method)));
+
+
+    when(operationModel.getOutput().getType()).thenReturn(type);
+    mockComponent(operationModel, builder(PagedInputStreamSampleDataProvider.class), PagedInputStreamSampleDataProvider.class.getSimpleName());
 
     validate();
     assertNoErrors();
@@ -323,6 +350,13 @@ public class SampleDataProviderModelValidatorTestCase {
     when(componentModel.getModelProperty(DeclaringMemberModelProperty.class)).thenReturn(empty());
     when(componentModel.getSampleDataProviderModel())
         .thenReturn(of(new SampleDataProviderModel(emptyList(), providerId, true, true)));
+  }
+
+  public static class PagedInputStreamOperationStub {
+
+    public PagingProvider<Object, InputStream> paged() {
+      return null;
+    }
   }
 
   public static class TestSampleDataProvider implements SampleDataProvider<String, String> {
@@ -381,7 +415,7 @@ public class SampleDataProviderModelValidatorTestCase {
     }
   }
 
-  public static class VoidAttributesSampledataProvider implements SampleDataProvider<String, Void> {
+  public static class VoidAttributesSampleDataProvider implements SampleDataProvider<String, Void> {
 
     @Override
     public String getId() {
@@ -390,6 +424,19 @@ public class SampleDataProviderModelValidatorTestCase {
 
     @Override
     public Result<String, Void> getSample() throws SampleDataException {
+      return null;
+    }
+  }
+
+  public static class PagedInputStreamSampleDataProvider implements SampleDataProvider<List<InputStream>, Void> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<List<InputStream>, Void> getSample() throws SampleDataException {
       return null;
     }
   }

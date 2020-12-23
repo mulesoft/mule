@@ -30,6 +30,7 @@ import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
@@ -39,8 +40,10 @@ import org.mule.runtime.module.extension.internal.loader.java.property.SampleDat
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.data.sample.SampleDataProvider;
+import org.mule.sdk.api.runtime.streaming.PagingProvider;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +102,7 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
                                 Delegate delegate) {
     Class<? extends SampleDataProvider> providerClass = modelProperty.getSampleDataProviderClass();
 
-    validateGenerics(model, problemsReporter, providerClass);
+    validateGenerics(model, providerClass, problemsReporter);
 
     String providerName = providerClass.getSimpleName();
     Optional<SampleDataProviderModel> providerModel = model.getSampleDataProviderModel();
@@ -157,21 +160,38 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
     }
   }
 
-  private void validateGenerics(ConnectableComponentModel model, ProblemsReporter problemsReporter,
-                                Class<? extends SampleDataProvider> providerClass) {
-    String providerGenerics = asGenericSignature(getInterfaceGenerics(providerClass, SampleDataProvider.class));
-    String outputGenerics = asGenericSignature(getOutputTypes(model, providerClass.getClassLoader()));
+  private void validateGenerics(ConnectableComponentModel model,
+                                Class<? extends SampleDataProvider> providerClass,
+                                ProblemsReporter problemsReporter) {
 
-    if (!Objects.equals(providerGenerics, outputGenerics)) {
-      problemsReporter.addError(new Problem(model, format(
-                                                          "SampleDataProvider [%s] is used at component '%s' which outputs a Result%s, but the provider generic signature is '%s'",
-                                                          providerClass.getName(), model.getName(), outputGenerics,
-                                                          providerGenerics)));
+    Pair<Type, Type> providerGenericTypes = getProviderGenerics(providerClass);
+    if (providerGenericTypes.getFirst() == null) {
+      problemsReporter.addError(new Problem(model, format("SampleDataProvider [%s] does not specify generics definition", providerClass.getName())));
+      return;
     }
+
+    Pair<Type, Type> outputGenericTypes = getOutputTypes(model, providerClass.getClassLoader());
+    if (!validateIfPaged(model, providerClass, outputGenericTypes, providerGenericTypes, problemsReporter)) {
+      String providerGenerics = asGenericSignature(getInterfaceGenerics(providerClass, SampleDataProvider.class));
+      String outputGenerics = asGenericSignature(outputGenericTypes);
+
+      if (!Objects.equals(providerGenerics, outputGenerics)) {
+        problemsReporter.addError(new Problem(model, format(
+                "SampleDataProvider [%s] is used at component '%s' which outputs a Result%s, but the provider generic signature is '%s'",
+                providerClass.getName(), model.getName(), outputGenerics,
+                providerGenerics)));
+      }
+    }
+
   }
 
-  private List<Type> getOutputTypes(ConnectableComponentModel model, ClassLoader classLoader) {
-    return asList(JavaTypeUtils.getType(model.getOutput().getType(), classLoader),
+  private Pair<Type, Type> getProviderGenerics(Class<? extends SampleDataProvider> providerClass) {
+    List<Type> generics = getInterfaceGenerics(providerClass, SampleDataProvider.class);
+    return generics.isEmpty() ? new Pair<>(null, null) : new Pair<>(generics.get(0), generics.get(1));
+  }
+
+  private Pair<Type, Type> getOutputTypes(ConnectableComponentModel model, ClassLoader classLoader) {
+    return new Pair<>(JavaTypeUtils.getType(model.getOutput().getType(), classLoader),
                   JavaTypeUtils.getType(model.getOutputAttributes().getType(), classLoader));
   }
 
@@ -181,13 +201,81 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
         .collect(joining(",")) + ">";
   }
 
+  private String asGenericSignature(Pair<Type, Type> types) {
+    return "<" + asString(types.getFirst()) + "," + asString(types.getSecond()) + ">";
+  }
+
+  private boolean validateIfPaged(ConnectableComponentModel component,
+                                  Class<? extends SampleDataProvider> providerClass,
+                                  Pair<Type, Type> outputGenericTypes,
+                               Pair<Type, Type> sampleDataProviderGenericTypes,
+                                  ProblemsReporter reporter) {
+    if (!isAssignableFrom(PagingProvider.class, outputGenericTypes.getFirst())) {
+      return false;
+    }
+
+    final List<Type> pagingProviderGenerics = getInterfaceGenerics(outputGenericTypes.getFirst(), PagingProvider.class);
+    final Type pageItemsType = pagingProviderGenerics.size() < 2 || pagingProviderGenerics.get(1) == null
+            ? Object.class
+            : pagingProviderGenerics.get(1);
+
+    Type sampleDataPayloadType = sampleDataProviderGenericTypes.getFirst();
+
+      if (!isAssignableFrom(Collection.class, sampleDataPayloadType)) {
+                reporter.addError(new Problem(component, format(
+                        "SampleDataProvider [%s] is used on component '%s' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<%s>'. '%s' was found instead",
+                        providerClass.getName(), component.getName(), asString(pageItemsType), asString(sampleDataPayloadType))));
+        return true;
+      }
+
+      List<Type> sampleDataCollectionGeneric = getInterfaceGenerics(sampleDataPayloadType, Collection.class);
+      if (sampleDataCollectionGeneric.isEmpty() || sampleDataCollectionGeneric.get(0) == null) {
+        reporter.addError(new Problem(component, format(
+                "SampleDataProvider [%s] is used on component '%s' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<%s>', but an unbounded Collection was found instead. Please provide a generic",
+                providerClass.getName(), component.getName(), asString(pageItemsType))));
+        return true;
+      }
+
+      final Type sampleProviderCollectionType = sampleDataCollectionGeneric.get(0);
+
+      if (!pageItemsType.equals(sampleProviderCollectionType)) {
+        reporter.addError(new Problem(component, format(
+                "SampleDataProvider [%s] is used on component '%s' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<%s>', but an unbounded Collection was found instead. Please provide a generic",
+                providerClass.getName(), component.getName(), asString(pageItemsType))));
+        return true;
+      }
+
+      // validate attributes
+      return true;
+  }
+
+//  private Pair<Type, Type> getPagingProviderGenerics(OperationModel model) {
+//    model.getModelProperty(ImplementingMethodModelProperty.class)
+//            .map(mp -> mp.getMethod().getGenericReturnType())
+//  }
+
+
+  private boolean isVoid(Type componentType) {
+    return Void.class.equals(componentType) || void.class.equals(componentType);
+  }
+
+  private boolean isAssignableFrom(Class base, Type target) {
+    if (target instanceof Class) {
+      return base.isAssignableFrom((Class) target);
+    } else if (target instanceof ParameterizedTypeImpl) {
+      return base.isAssignableFrom(((ParameterizedTypeImpl) target).getRawType());
+    }
+
+    return false;
+  }
+
   private String asString(Type type) {
     if (type instanceof ParameterizedTypeImpl) {
       ParameterizedTypeImpl parameterizedType = (ParameterizedTypeImpl) type;
       return parameterizedType.getRawType().getName() + asGenericSignature(asList(parameterizedType.getActualTypeArguments()));
     } else if (type == null) {
       return Object.class.getName();
-    } else if (Void.class.equals(type) || void.class.equals(type)) {
+    } else if (isVoid(type)) {
       return void.class.getName();
     } else {
       return type.getTypeName();
