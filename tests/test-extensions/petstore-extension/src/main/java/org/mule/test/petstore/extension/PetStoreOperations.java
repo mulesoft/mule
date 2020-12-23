@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstan
 import static org.mule.runtime.core.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+import static org.mule.test.petstore.extension.PetStoreFeatures.LEGACY_FEATURE;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -57,12 +58,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class PetStoreOperations {
 
-  public static final String LEGACY_BEHAVIOUR = "petStore.legacy";
-
   static {
     // Register a feature that behaves differently with runtime versions older than 4.2.2
+    // noinspection deprecation
     getInstance()
-        .registerFeature(LEGACY_BEHAVIOUR,
+        .registerFeature(LEGACY_FEATURE,
                          c -> c.getConfiguration().getMinMuleVersion().isPresent()
                              && !c.getConfiguration().getMinMuleVersion().get().newerThan("4.2.2"));
   }
@@ -92,7 +92,8 @@ public class PetStoreOperations {
 
   @MediaType(TEXT_PLAIN)
   public String featureFlaggedEcho(String message) {
-    if (ffService.isEnabled(LEGACY_BEHAVIOUR)) {
+    // noinspection deprecation
+    if (ffService.isEnabled(LEGACY_FEATURE)) {
       return format("%s [old way]", message);
     }
     return message;

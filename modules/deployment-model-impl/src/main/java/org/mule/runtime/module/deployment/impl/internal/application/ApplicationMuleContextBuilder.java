@@ -37,8 +37,10 @@ public class ApplicationMuleContextBuilder extends SupportsPropertiesMuleContext
     if (!isBlank(encoding)) {
       configuration.setDefaultEncoding(encoding);
     }
-    configuration
-        .setMinMuleVersion(((MuleApplicationClassLoader) executionClassLoader).getArtifactDescriptor().getMinMuleVersion());
+    if (executionClassLoader instanceof MuleApplicationClassLoader) {
+      configuration
+          .setMinMuleVersion(((MuleApplicationClassLoader) executionClassLoader).getArtifactDescriptor().getMinMuleVersion());
+    }
     return configuration;
   }
 }

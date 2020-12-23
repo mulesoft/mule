@@ -7,16 +7,15 @@
 
 package org.mule.runtime.core.api.config;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 /**
  * Service used to register feature flags which will be evaluated at deployment time. For example:
@@ -42,7 +41,11 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
  */
 public class FeatureFlaggingRegistry {
 
-  private final Map<String, Predicate<MuleContext>> configurations = new ConcurrentHashMap<>();
+  public static final String FEATURE_CAN_NOT_BE_NULL = "Feature can not be null";
+  public static final String FEATURE_ALREADY_REGISTERED = "Feature %s already registered";
+  public static final String CONDITION_CAN_NOT_BE_NULL = "Error registering %s: condition can not be null";
+
+  private final Map<Feature, Predicate<MuleContext>> configurations = new ConcurrentHashMap<>();
 
   private static final FeatureFlaggingRegistry INSTANCE = new FeatureFlaggingRegistry();
 
@@ -67,27 +70,27 @@ public class FeatureFlaggingRegistry {
    * @param condition This predicate will be evaluated at deployment time. The {@link MuleContext} corresponds to the context that
    *        is being created for this application.
    */
-  public void registerFeature(String feature, Predicate<MuleContext> condition) {
-    if (isNullOrEmpty(feature)) {
-      throw new MuleRuntimeException(createStaticMessage("Invalid feature name"));
+  public void registerFeature(Feature feature, Predicate<MuleContext> condition) {
+    if (feature == null) {
+      throw new IllegalArgumentException(FEATURE_CAN_NOT_BE_NULL);
     }
 
     if (condition == null) {
-      throw new MuleRuntimeException(createStaticMessage("Error registering %s: condition must not be null", feature));
+      throw new IllegalArgumentException(format(CONDITION_CAN_NOT_BE_NULL, feature));
     }
 
     Predicate<MuleContext> added = configurations.putIfAbsent(feature, condition);
     if (added != null) {
-      throw new MuleRuntimeException(createStaticMessage("Feature %s already registered", feature));
+      throw new IllegalArgumentException(format(FEATURE_ALREADY_REGISTERED, feature));
     }
   }
 
   /**
-   * Returns all the configurations that were registered by using {@link #registerFeature(String, Predicate)}
+   * Returns all the configurations that were registered by using {@link #registerFeature(Feature, Predicate)}
    * 
    * @return An unmodifiable map with the registered features.
    */
-  public Map<String, Predicate<MuleContext>> getFeatureConfigurations() {
+  public Map<Feature, Predicate<MuleContext>> getFeatureConfigurations() {
     return unmodifiableMap(configurations);
   }
 

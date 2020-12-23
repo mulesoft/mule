@@ -21,7 +21,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.internal.config.builders.AutoConfigurationBuilder;
-import org.mule.runtime.core.internal.config.builders.FeatureFlaggingConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 
 import java.util.Collections;
@@ -187,8 +186,6 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
     try {
       configurator.configure(muleContext);
 
-      // Configure Feature Flagging, see MULE-18976
-      new FeatureFlaggingConfigurationBuilder().configure(muleContext);
       muleContext.initialise();
     } catch (ConfigurationException e) {
       if (muleContext != null && !muleContext.isDisposed()) {
