@@ -87,7 +87,8 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
 
   private TargetReturnDelegate createDelegate(String expression) {
     return new TargetReturnDelegate(TARGET, expression, componentModel, expressionManager,
-                                    componentDecoratorFactory, getDefaultCursorStreamProviderFactory(), muleContext);
+                                    componentDecoratorFactory, getDefaultCursorStreamProviderFactory(), muleContext,
+                                    streamingManager);
   }
 
   @Test

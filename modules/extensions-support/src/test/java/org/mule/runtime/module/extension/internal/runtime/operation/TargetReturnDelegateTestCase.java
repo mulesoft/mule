@@ -6,18 +6,32 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
+import io.qameta.allure.Issue;
+import org.apache.commons.io.IOUtils;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
+import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.After;
 import org.junit.Test;
+import org.mule.weave.v2.el.ByteArrayBasedCursorStreamProvider;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 @SmallTest
 public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
@@ -28,7 +42,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
   protected ReturnDelegate createReturnDelegate() {
     return new TargetReturnDelegate(TARGET, "#[message]", componentModel, muleContext.getExpressionManager(),
                                     componentDecoratorFactory, getCursorProviderFactory(),
-                                    muleContext);
+                                    muleContext, streamingManager);
   }
 
   @After
@@ -55,5 +69,29 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
     CoreEvent resultEvent = delegate.asReturnValue(event, operationContext);
     Message resultMessage = getOutputMessage(resultEvent);
     assertThat(resultMessage.getPayload().getValue(), is(payload));
+  }
+
+
+  @Test
+  @Issue("MULE-19068")
+  public void targetReturnDelegateShouldManageCursorStreamProvider() throws IOException {
+    when(componentModel.supportsStreaming()).thenReturn(true);
+
+    delegate = new TargetReturnDelegate(TARGET, "#[payload.token]", componentModel, muleContext.getExpressionManager(),
+                                        componentDecoratorFactory, getCursorProviderFactory(), muleContext,
+                                        streamingManager);
+
+    MediaType mediaType = APPLICATION_JSON.withCharset(Charset.defaultCharset());
+    Result<Object, Object> value = Result.builder()
+        .output(IOUtils.toInputStream("{\"token\": \"test-token\", \"id\": \"sampleid\"}")).mediaType(mediaType).build();
+
+    CoreEvent result = delegate.asReturnValue(value, operationContext);
+
+    assertThat(result.getVariables().get(TARGET).getValue(), is(instanceOf(ManagedCursorProvider.class)));
+    ManagedCursorStreamProvider cursorStreamProvider =
+        (ManagedCursorStreamProvider) result.getVariables().get(TARGET).getValue();
+    assertThat(unwrap(cursorStreamProvider), is(instanceOf(ByteArrayBasedCursorStreamProvider.class)));
+    InputStream inputStream = cursorStreamProvider.openCursor();
+    assertThat(IOUtils.toString(inputStream), is("\"test-token\""));
   }
 }
