@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
+import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -84,8 +85,9 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         if (i + 1 < processors.size()) {
           // Wrap processors in chain, unless single processor that is already a chain
           final MessageProcessorChain innerChain =
-              createSimpleChain(tempList, interceptingProcessor.isBlocking() ? of(BLOCKING_PROCESSING_STRATEGY_INSTANCE)
-                  : ofNullable(processingStrategy));
+              createSimpleInterceptedChain(tempList,
+                                           interceptingProcessor.isBlocking() ? of(BLOCKING_PROCESSING_STRATEGY_INSTANCE)
+                                               : ofNullable(processingStrategy));
           processorsForLifecycle.addFirst(innerChain);
           interceptingProcessor.setListener(innerChain);
         }
@@ -121,11 +123,23 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     }
   }
 
+  private MessageProcessorChain createSimpleInterceptedChain(List<Processor> tempList,
+                                                             Optional<ProcessingStrategy> processingStrategyOptional) {
+    if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
+      return (MessageProcessorChain) tempList.get(0);
+    } else {
+      return new DefaultMessageProcessorChain(name != null ? "(chain) of " + name : "(chain)",
+                                              processingStrategyOptional,
+                                              new ArrayList<>(tempList),
+                                              NullExceptionHandler.getInstance());
+    }
+  }
+
   protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
                                                           List<Processor> processorsForLifecycle) {
     return new InterceptingMessageProcessorChain(name != null ? "(intercepting chain) of " + name : "(intercepting chain)",
                                                  ofNullable(processingStrategy), head,
-                                                 processors, processorsForLifecycle, messagingExceptionHandler);
+                                                 processors, processorsForLifecycle, NullExceptionHandler.getInstance());
   }
 
   @Override
