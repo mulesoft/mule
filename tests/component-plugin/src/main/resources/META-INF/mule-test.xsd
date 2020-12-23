@@ -186,23 +186,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="assert-intercepting" substitutionGroup="mule:abstract-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Assertion processor used to assert an expression, invocation count and thread of request and response.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="assertType">
-                    <xsd:attribute name="responseExpression" />
-                    <xsd:attribute name="responseCount" type="xsd:string"/>
-                    <xsd:attribute name="responseSameTask" type="xsd:string" default="true"/>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
     <xsd:element name="lifecycle-tracker" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
