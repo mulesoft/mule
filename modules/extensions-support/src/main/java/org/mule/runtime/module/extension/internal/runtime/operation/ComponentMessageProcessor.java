@@ -457,7 +457,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
 
   protected TargetReturnDelegate getTargetReturnDelegate() {
-    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, cursorProviderFactory, muleContext);
+    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, cursorProviderFactory, muleContext,
+                                    streamingManager);
   }
 
   protected ValueReturnDelegate getValueReturnDelegate() {
