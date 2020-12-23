@@ -29,7 +29,7 @@ public enum PetStoreFeatures implements Feature {
   }
 
   @Override
-  public String getIssue() {
+  public String getIssueId() {
     return issue;
   }
 
