@@ -7,8 +7,10 @@
 package org.mule.exception;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -115,9 +117,15 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
     @Test
     public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception
     {
+        when((Class<String>) mockMuleEvent.getMessage().getDataType().getType()).thenReturn(String.class);
         MuleEvent lastEventCreated = mock(MuleEvent.class,Answers.RETURNS_DEEP_STUBS.get());
-        catchMessagingExceptionStrategy.setMessageProcessors(asList(createChagingEventMessageProcessor(mock(MuleEvent.class,Answers.RETURNS_DEEP_STUBS.get())), createChagingEventMessageProcessor(lastEventCreated)));
+
+        MuleEvent eventCreated = mock(MuleEvent.class, RETURNS_DEEP_STUBS.get());
+        when((Class<String>) eventCreated.getMessage().getDataType().getType()).thenReturn(String.class);
+
+        catchMessagingExceptionStrategy.setMessageProcessors(asList(createChagingEventMessageProcessor(eventCreated), createChagingEventMessageProcessor(lastEventCreated)));
         catchMessagingExceptionStrategy.initialise();
+
         MuleEvent exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
         assertThat(exceptionHandlingResult.getId(), is(lastEventCreated.getId()));
         assertThat(exceptionHandlingResult.getMessage().getUniqueId(), is(lastEventCreated.getMessage().getUniqueId()));
@@ -130,13 +138,24 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
     @Test
     public void testMessageToStringNotCalledOnFailure() throws Exception
     {
+        when((Class<String>) mockMuleEvent.getMessage().getDataType().getType()).thenReturn(String.class);
+
         MuleEvent lastEventCreated = mock(MuleEvent.class,Answers.RETURNS_DEEP_STUBS.get());
-        catchMessagingExceptionStrategy.setMessageProcessors(asList(createFailingEventMessageProcessor(mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get())), createFailingEventMessageProcessor(lastEventCreated)));
+
+        MuleEvent eventCreated = mock(MuleEvent.class, RETURNS_DEEP_STUBS.get());
+        when((Class<String>) eventCreated.getMessage().getDataType().getType()).thenReturn(String.class);
+
+        catchMessagingExceptionStrategy.setMessageProcessors(asList(createFailingEventMessageProcessor(eventCreated), createFailingEventMessageProcessor(lastEventCreated)));
         catchMessagingExceptionStrategy.initialise();
 
         when(mockMuleEvent.getMessage().toString()).thenThrow(new RuntimeException("MuleMessage.toString() should not be called"));
 
-        MuleEvent exceptionHandlingResult = exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
+        try {
+            MuleEvent exceptionHandlingResult = exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
+            fail();
+        } catch (Exception e){
+            assertThat(e.getMessage(), not(is("MuleMessage.toString() should not be called")));
+        }
     }
 
     private MuleEvent createNonBlockingTestEvent() throws Exception

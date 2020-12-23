@@ -76,7 +76,7 @@ public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
     public static class HelloWorldImpl implements HelloWorld
     {
 
-        public String sayHi(String text)
+        public String sayHi(Object text)
         {
             throw new RuntimeException(ERROR_MESSAGE);
         }
