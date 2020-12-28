@@ -6,25 +6,14 @@
  */
 package org.mule.module.cxf.example;
 
-import org.mule.util.IOUtils;
-
 import javax.jws.WebService;
-import java.io.IOException;
 
 @WebService(endpointInterface = "org.mule.module.cxf.example.HelloWorld", serviceName = "HelloWorld")
 public class HelloWorldImpl implements HelloWorld
 {
 
-    public String sayHi(Object text)
+    public String sayHi(String text)
     {
-        if("[B".equals(text.getClass().getName())){
-            try {
-                return "Hello\u2297 " + IOUtils.toString((byte[]) text);
-            }catch (IOException e){
-                return "Hello";
-            }
-        }
-
         return "Hello\u2297 " + text;
     }
 }

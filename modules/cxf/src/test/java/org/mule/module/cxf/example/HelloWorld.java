@@ -11,5 +11,5 @@ import javax.jws.WebService;
 @WebService
 public interface HelloWorld
 {
-    String sayHi(Object text);
+    String sayHi(String text);
 }

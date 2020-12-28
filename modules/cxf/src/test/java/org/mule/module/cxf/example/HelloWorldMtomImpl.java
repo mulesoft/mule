@@ -14,7 +14,7 @@ import javax.xml.ws.soap.MTOM;
 public class HelloWorldMtomImpl implements HelloWorld {
 
   @Override
-  public String sayHi(Object text) {
-    return "Hello\u2297 " + text.toString();
+  public String sayHi(String text) {
+    return "Hello\u2297 " + text;
   }
 }
