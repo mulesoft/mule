@@ -472,7 +472,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(extensionDeclaration.getOperations(), hasSize(57));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(21));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(23));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, NAME_AS_STREAM, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
@@ -509,6 +509,8 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, "callGusFringNonBlocking", "");
     assertOperation(withOperationsDeclaration, "pagedOperationWithExtensionClassLoader", "");
     assertOperation(withOperationsDeclaration, "failAtClosePagedOperation", "");
+    assertOperation(withOperationsDeclaration, "failingConnectivityPagedOperation", "");
+    assertOperation(withOperationsDeclaration, "nameAsStreamConnected", "");
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));

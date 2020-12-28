@@ -30,6 +30,7 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -67,6 +68,7 @@ import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
+import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -523,4 +525,18 @@ public class MuleExtensionUtils {
         .map(s -> (MutableConfigurationStats) s);
   }
 
+  /**
+   * @return whether the {@link ComponentModel} defines a streaming operation that uses a connection.
+   *
+   * @since 4.2.3 - 4.3.0
+   */
+  public static boolean isConnectedStreamingOperation(ComponentModel componentModel) {
+    if (componentModel instanceof ConnectableComponentModel) {
+      ConnectableComponentModel connectableComponentModel = (ConnectableComponentModel) componentModel;
+      return (connectableComponentModel.requiresConnection()
+          && (connectableComponentModel.supportsStreaming()
+              || connectableComponentModel.getModelProperty(PagedOperationModelProperty.class).isPresent()));
+    }
+    return false;
+  }
 }
