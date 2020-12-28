@@ -8,18 +8,30 @@ package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.api.config.Feature;
 
+import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
+
 public enum TestingFeatures implements Feature {
 
-  TESTING_FEATURE("Testing feature", "MULE-123", "4.4.0");
+  TESTING_FEATURE("Testing feature", "MULE-123", "4.4.0"),
+
+  TESTING_FEATURE_OVERRIDDEN_WITH_SYSTEM_PROPERTY("Testing feature", "MULE-123", "4.4.0", "mule.testing.feature-flagging");
 
   private final String description;
   private final String issue;
   private final String since;
+  private final String overridingSystemPropertyName;
 
   TestingFeatures(String description, String issue, String since) {
+    this(description, issue, since, null);
+  }
+
+  TestingFeatures(String description, String issue, String since, String overridingSystemPropertyName) {
     this.description = description;
     this.issue = issue;
     this.since = since;
+    this.overridingSystemPropertyName = overridingSystemPropertyName;
   }
 
   @Override
@@ -35,5 +47,10 @@ public enum TestingFeatures implements Feature {
   @Override
   public String getSince() {
     return since;
+  }
+
+  @Override
+  public Optional<String> getOverridingSystemPropertyName() {
+    return ofNullable(overridingSystemPropertyName);
   }
 }
