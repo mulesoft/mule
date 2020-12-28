@@ -32,9 +32,11 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -42,6 +44,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.data.sample.SampleDataProvider;
 import org.mule.sdk.api.runtime.streaming.PagingProvider;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
@@ -166,7 +169,9 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
 
     Pair<Type, Type> providerGenericTypes = getProviderGenerics(providerClass);
     if (providerGenericTypes.getFirst() == null) {
-      problemsReporter.addError(new Problem(model, format("SampleDataProvider [%s] does not specify generics definition", providerClass.getName())));
+      problemsReporter
+          .addError(new Problem(model,
+                                format("SampleDataProvider [%s] does not specify generics definition", providerClass.getName())));
       return;
     }
 
@@ -177,9 +182,9 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
 
       if (!Objects.equals(providerGenerics, outputGenerics)) {
         problemsReporter.addError(new Problem(model, format(
-                "SampleDataProvider [%s] is used at component '%s' which outputs a Result%s, but the provider generic signature is '%s'",
-                providerClass.getName(), model.getName(), outputGenerics,
-                providerGenerics)));
+                                                            "SampleDataProvider [%s] is used at component '%s' which outputs a Result%s, but the provider generic signature is '%s'",
+                                                            providerClass.getName(), model.getName(), outputGenerics,
+                                                            providerGenerics)));
       }
     }
 
@@ -192,7 +197,7 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
 
   private Pair<Type, Type> getOutputTypes(ConnectableComponentModel model, ClassLoader classLoader) {
     return new Pair<>(JavaTypeUtils.getType(model.getOutput().getType(), classLoader),
-                  JavaTypeUtils.getType(model.getOutputAttributes().getType(), classLoader));
+                      JavaTypeUtils.getType(model.getOutputAttributes().getType(), classLoader));
   }
 
   private String asGenericSignature(List<Type> types) {
@@ -208,51 +213,65 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
   private boolean validateIfPaged(ConnectableComponentModel component,
                                   Class<? extends SampleDataProvider> providerClass,
                                   Pair<Type, Type> outputGenericTypes,
-                               Pair<Type, Type> sampleDataProviderGenericTypes,
+                                  Pair<Type, Type> sampleDataProviderGenericTypes,
                                   ProblemsReporter reporter) {
     if (!isAssignableFrom(PagingProvider.class, outputGenericTypes.getFirst())) {
       return false;
     }
 
-    final List<Type> pagingProviderGenerics = getInterfaceGenerics(outputGenericTypes.getFirst(), PagingProvider.class);
-    final Type pageItemsType = pagingProviderGenerics.size() < 2 || pagingProviderGenerics.get(1) == null
-            ? Object.class
-            : pagingProviderGenerics.get(1);
+    final Type pageItemsType = getPagingProviderGenerics(component).getSecond();
 
     Type sampleDataPayloadType = sampleDataProviderGenericTypes.getFirst();
 
-      if (!isAssignableFrom(Collection.class, sampleDataPayloadType)) {
-                reporter.addError(new Problem(component, format(
-                        "SampleDataProvider [%s] is used on component '%s' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<%s>'. '%s' was found instead",
-                        providerClass.getName(), component.getName(), asString(pageItemsType), asString(sampleDataPayloadType))));
-        return true;
-      }
-
-      List<Type> sampleDataCollectionGeneric = getInterfaceGenerics(sampleDataPayloadType, Collection.class);
-      if (sampleDataCollectionGeneric.isEmpty() || sampleDataCollectionGeneric.get(0) == null) {
-        reporter.addError(new Problem(component, format(
-                "SampleDataProvider [%s] is used on component '%s' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<%s>', but an unbounded Collection was found instead. Please provide a generic",
-                providerClass.getName(), component.getName(), asString(pageItemsType))));
-        return true;
-      }
-
-      final Type sampleProviderCollectionType = sampleDataCollectionGeneric.get(0);
-
-      if (!pageItemsType.equals(sampleProviderCollectionType)) {
-        reporter.addError(new Problem(component, format(
-                "SampleDataProvider [%s] is used on component '%s' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<%s>', but an unbounded Collection was found instead. Please provide a generic",
-                providerClass.getName(), component.getName(), asString(pageItemsType))));
-        return true;
-      }
-
-      // validate attributes
+    if (!isAssignableFrom(Collection.class, sampleDataPayloadType)) {
+      reporter.addError(new Problem(component, format(
+                                                      "SampleDataProvider [%s] is used on component '%s' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<%s>' but it returns a payload of type '%s' instead",
+                                                      providerClass.getName(), component.getName(), asString(pageItemsType),
+                                                      asString(sampleDataPayloadType))));
       return true;
+    }
+
+    List<Type> sampleDataCollectionGeneric = getInterfaceGenerics(sampleDataPayloadType, Collection.class);
+    if (sampleDataCollectionGeneric.isEmpty() || sampleDataCollectionGeneric.get(0) == null) {
+      reporter.addError(new Problem(component, format(
+                                                      "SampleDataProvider [%s] is used on component '%s' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<%s>', but an unbounded Collection was found instead. Please provide the proper generic",
+                                                      providerClass.getName(), component.getName(), asString(pageItemsType))));
+      return true;
+    }
+
+    final Type sampleProviderCollectionType = sampleDataCollectionGeneric.get(0);
+
+    if (!pageItemsType.equals(sampleProviderCollectionType)) {
+      reporter.addError(new Problem(component, format(
+                                                      "SampleDataProvider [%s] is used on component '%s' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<%s>', but a Collection<%s> was found instead.",
+                                                      providerClass.getName(), component.getName(), asString(pageItemsType),
+                                                      asString(sampleProviderCollectionType))));
+      return true;
+    }
+
+    String componentAttributesSignature = asString(outputGenericTypes.getSecond());
+    String providerAttributesSignature = asString(sampleDataProviderGenericTypes.getSecond());
+
+    if (!componentAttributesSignature.equals(providerAttributesSignature)) {
+      reporter.addError(new Problem(component, format(
+                                                      "SampleDataProvider [%s] is used on component '%s' which is paged. The SampleDataProvider is thus expected to provide attributes of type '%s' but it returns attributes of type '%s' instead",
+                                                      providerClass.getName(), component.getName(), componentAttributesSignature,
+                                                      providerAttributesSignature)));
+      return true;
+    }
+
+    return true;
   }
 
-//  private Pair<Type, Type> getPagingProviderGenerics(OperationModel model) {
-//    model.getModelProperty(ImplementingMethodModelProperty.class)
-//            .map(mp -> mp.getMethod().getGenericReturnType())
-//  }
+  private Pair<Type, Type> getPagingProviderGenerics(ConnectableComponentModel model) {
+    return model.getModelProperty(ImplementingMethodModelProperty.class)
+        .map(mp -> {
+          ParameterizedType type = (ParameterizedType) mp.getMethod().getGenericReturnType();
+          return new Pair<>(type.getActualTypeArguments()[0], type.getActualTypeArguments()[1]);
+        }).orElseThrow(() -> new IllegalOperationModelDefinitionException(format(
+                                                                                 "Operation '%s' is missing PagingProvider metadata",
+                                                                                 model.getName())));
+  }
 
 
   private boolean isVoid(Type componentType) {

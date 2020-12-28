@@ -292,21 +292,60 @@ public class SampleDataProviderModelValidatorTestCase {
 
   @Test
   public void pagingOperationWithInputStreamPayload() {
-    MetadataType type = create(JAVA).arrayType()
-            .with(new ClassInformationAnnotation(PagingProvider.class, asList(Object.class, InputStream.class)))
-            .of(typeLoader.load(InputStream.class))
-            .build();
+    Method method = getPagedOperationMethod();
+    mockInputStreamPaging(method);
 
-    Method method = getMethod(PagedInputStreamOperationStub.class, "paged", new Class[]{});
-    when(operationModel.getModelProperty(ImplementingMethodModelProperty.class))
-            .thenReturn(of(new ImplementingMethodModelProperty(method)));
-
-
-    when(operationModel.getOutput().getType()).thenReturn(type);
-    mockComponent(operationModel, builder(PagedInputStreamSampleDataProvider.class), PagedInputStreamSampleDataProvider.class.getSimpleName());
+    mockComponent(operationModel, builder(PagedInputStreamSampleDataProvider.class),
+                  PagedInputStreamSampleDataProvider.class.getSimpleName());
 
     validate();
     assertNoErrors();
+  }
+
+  @Test
+  public void pagingOperationWithSampleProviderWhichDoesNotReturnCollection() {
+    Method method = getPagedOperationMethod();
+    mockInputStreamPaging(method);
+
+    mockComponent(operationModel, builder(TestSampleDataProvider.class), TestSampleDataProvider.class.getSimpleName());
+
+    validate();
+    assertErrorMessages(equalTo("SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$TestSampleDataProvider] is used on component 'superOperation' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<java.io.InputStream>' but it returns a payload of type 'java.lang.String' instead"));
+  }
+
+  @Test
+  public void pagingOperationWithSampleProviderWhichReturnsCollectionOfWrongType() {
+    Method method = getPagedOperationMethod();
+    mockInputStreamPaging(method);
+    mockComponent(operationModel, builder(PagedStringSampleDataProvider.class),
+                  PagedStringSampleDataProvider.class.getSimpleName());
+
+    validate();
+    assertErrorMessages(equalTo("SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$PagedStringSampleDataProvider] is used on component 'superOperation' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<java.io.InputStream>', but a Collection<java.lang.String> was found instead."));
+  }
+
+  @Test
+  public void pagingOperationWithUnboundedSampleProvider() {
+    Method method = getPagedOperationMethod();
+    mockInputStreamPaging(method);
+
+    mockComponent(operationModel, builder(UnboundedPagingSampleDataProvider.class),
+                  UnboundedPagingSampleDataProvider.class.getSimpleName());
+
+    validate();
+    assertErrorMessages(equalTo("SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$UnboundedPagingSampleDataProvider] is used on component 'superOperation' which is paged. The SampleDataProvider is thus expected to provide a payload of type 'Collection<java.io.InputStream>', but an unbounded Collection was found instead. Please provide the proper generic"));
+  }
+
+  @Test
+  public void pagingOperationWithSampleProviderWhichReturnsAttributesOfWrongType() {
+    Method method = getPagedOperationMethod();
+    mockInputStreamPaging(method);
+
+    mockComponent(operationModel, builder(PagingSampleDataProviderWithWrongAttributesType.class),
+                  PagingSampleDataProviderWithWrongAttributesType.class.getSimpleName());
+
+    validate();
+    assertErrorMessages(equalTo("SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$PagingSampleDataProviderWithWrongAttributesType] is used on component 'superOperation' which is paged. The SampleDataProvider is thus expected to provide attributes of type 'java.lang.String' but it returns attributes of type 'void' instead"));
   }
 
   private void assertWrongGenerics(ConnectableComponentModel model,
@@ -350,6 +389,26 @@ public class SampleDataProviderModelValidatorTestCase {
     when(componentModel.getModelProperty(DeclaringMemberModelProperty.class)).thenReturn(empty());
     when(componentModel.getSampleDataProviderModel())
         .thenReturn(of(new SampleDataProviderModel(emptyList(), providerId, true, true)));
+  }
+
+  /**
+   * The {@code method} is received as an argument instead of just being fetched internally here because the
+   * {@link Method#getGenericReturnType()} method internally relies on a {@link java.lang.ref.WeakReference}. If the
+   * {@code method} is not held in a variable for the duration of the test, it becomes flaky and randomly fails with NPE.
+   */
+  private void mockInputStreamPaging(Method method) {
+    MetadataType type = create(JAVA).arrayType()
+        .with(new ClassInformationAnnotation(PagingProvider.class, asList(Object.class, InputStream.class)))
+        .of(typeLoader.load(InputStream.class))
+        .build();
+
+    when(operationModel.getModelProperty(ImplementingMethodModelProperty.class))
+        .thenReturn(of(new ImplementingMethodModelProperty(method)));
+    when(operationModel.getOutput().getType()).thenReturn(type);
+  }
+
+  private Method getPagedOperationMethod() {
+    return getMethod(PagedInputStreamOperationStub.class, "paged", new Class[] {});
   }
 
   public static class PagedInputStreamOperationStub {
@@ -428,7 +487,46 @@ public class SampleDataProviderModelValidatorTestCase {
     }
   }
 
-  public static class PagedInputStreamSampleDataProvider implements SampleDataProvider<List<InputStream>, Void> {
+  public static class PagedInputStreamSampleDataProvider implements SampleDataProvider<List<InputStream>, String> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<List<InputStream>, String> getSample() throws SampleDataException {
+      return null;
+    }
+  }
+
+  public static class PagedStringSampleDataProvider implements SampleDataProvider<List<String>, String> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<List<String>, String> getSample() throws SampleDataException {
+      return null;
+    }
+  }
+
+  public static class UnboundedPagingSampleDataProvider implements SampleDataProvider<List, String> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<List, String> getSample() throws SampleDataException {
+      return null;
+    }
+  }
+
+  public static class PagingSampleDataProviderWithWrongAttributesType implements SampleDataProvider<List<InputStream>, Void> {
 
     @Override
     public String getId() {
