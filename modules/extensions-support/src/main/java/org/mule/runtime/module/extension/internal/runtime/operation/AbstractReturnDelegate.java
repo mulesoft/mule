@@ -19,6 +19,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENC
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler.nullHandler;
 import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -41,6 +42,7 @@ import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.CollectionReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.MapReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler;
@@ -53,6 +55,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.input.AutoCloseInputStream;
 
@@ -127,7 +130,8 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
           resultValue = resultValue.copy()
-              .output(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler))
+              .output(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler,
+                                                      getDecrementActiveComponentTask(operationContext)))
               .build();
         }
       }
@@ -182,7 +186,8 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
           value = value.copy()
-              .output(new ConnectedInputStreamWrapper((InputStream) value.getOutput(), connectionHandler))
+              .output(new ConnectedInputStreamWrapper((InputStream) value.getOutput(), connectionHandler,
+                                                      getDecrementActiveComponentTask(operationContext)))
               .build();
         }
 
@@ -213,7 +218,8 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     if (value instanceof InputStream) {
       ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
       if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
-        value = new ConnectedInputStreamWrapper((InputStream) value, connectionHandler);
+        value = new ConnectedInputStreamWrapper((InputStream) value, connectionHandler,
+                                                getDecrementActiveComponentTask(operationContext));
       }
     }
 
@@ -244,13 +250,21 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     return contextMimeType.orElse(mediaType).withCharset(contextEncoding.orElse(existingEncoding));
   }
 
+  private Runnable getDecrementActiveComponentTask(ExecutionContextAdapter executionContext) {
+    Optional<MutableConfigurationStats> mutableStats = getMutableConfigurationStats(executionContext);
+    return mutableStats.isPresent() ? mutableStats.get()::discountActiveComponent : null;
+  }
+
   protected class ConnectedInputStreamWrapper extends AutoCloseInputStream {
 
     private final ConnectionHandler<?> connectionHandler;
+    private final Runnable onClose;
+    private AtomicBoolean alreadyClosed = new AtomicBoolean(false);
 
-    private ConnectedInputStreamWrapper(InputStream delegate, ConnectionHandler<?> connectionHandler) {
+    private ConnectedInputStreamWrapper(InputStream delegate, ConnectionHandler<?> connectionHandler, Runnable onClose) {
       super(delegate);
       this.connectionHandler = connectionHandler;
+      this.onClose = onClose;
     }
 
     @Override
@@ -258,7 +272,13 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       try {
         super.close();
       } finally {
-        connectionHandler.release();
+        try {
+          connectionHandler.release();
+        } finally {
+          if (onClose != null && alreadyClosed.compareAndSet(false, true)) {
+            onClose.run();
+          }
+        }
       }
     }
 
