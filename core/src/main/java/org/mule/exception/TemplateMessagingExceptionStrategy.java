@@ -42,10 +42,12 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
 
     final public MuleEvent handleException(Exception exception, MuleEvent event)
     {
-        try {
+        try
+        {
             return new ExceptionMessageProcessor(exception, muleContext, event.getFlowConstruct()).process(event);
         }
-        catch (MuleException e) {
+        catch (MuleException e)
+        {
             throw new RuntimeException(e);
         }
     }
