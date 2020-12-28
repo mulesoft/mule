@@ -8,6 +8,7 @@ package org.mule.endpoint;
 
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -105,6 +106,12 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
         else
         {
+            if(getTransactionConfig().getFactory() != null)
+            {
+                throw new DefaultMuleException("Request-reply in a transactional context " +
+                        "will never commit the transaction when waiting for the reply in that transaction. " +
+                        "Either use no-transaction or one-way");
+            }
             return result;
         }
     }
