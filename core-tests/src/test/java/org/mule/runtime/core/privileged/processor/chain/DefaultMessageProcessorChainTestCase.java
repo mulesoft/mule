@@ -67,6 +67,8 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
+import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -84,6 +86,8 @@ import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.InterceptingMessageProcessorChain;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -104,6 +108,7 @@ import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -611,17 +616,17 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   public void testNoneIntercepting() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestNonIntercepting(), new TestNonIntercepting(), new TestNonIntercepting());
-    CoreEvent restul = process(builder.build(), getTestEventUsingFlow(""));
-    assertEquals("MessageProcessorMessageProcessorMessageProcessor", restul.getMessage().getPayload().getValue());
+    CoreEvent result = process(builder.build(), getTestEventUsingFlow(""));
+    assertEquals("MessageProcessorMessageProcessorMessageProcessor", result.getMessage().getPayload().getValue());
   }
 
   @Test
   public void testAllIntercepting() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestIntercepting(), new TestIntercepting(), new TestIntercepting());
-    CoreEvent restul = process(builder.build(), getTestEventUsingFlow(""));
+    CoreEvent result = process(builder.build(), getTestEventUsingFlow(""));
     assertEquals("InterceptingMessageProcessorInterceptingMessageProcessorInterceptingMessageProcessor",
-                 restul.getMessage().getPayload().getValue());
+                 result.getMessage().getPayload().getValue());
   }
 
   @Test
@@ -629,20 +634,40 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestIntercepting(), new TestNonIntercepting(), new TestNonIntercepting(), new TestIntercepting(),
                   new TestNonIntercepting(), new TestNonIntercepting());
-    CoreEvent restul = process(builder.build(), getTestEventUsingFlow(""));
+    CoreEvent result = process(builder.build(), getTestEventUsingFlow(""));
     assertEquals("InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor",
-                 restul.getMessage().getPayload().getValue());
+                 result.getMessage().getPayload().getValue());
   }
 
   @Test
-  public void testMixStaticFactoryt() throws Exception {
+  @Issue("MULE-19085")
+  public void testMixErrorHandlerSetOnce() throws Exception {
+    final FlowExceptionHandler errorHandler = mock(FlowExceptionHandler.class);
+
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    builder.chain(new TestIntercepting(), new TestNonIntercepting())
+        .setMessagingExceptionHandler(errorHandler);
+    final InterceptingMessageProcessorChain chain = (InterceptingMessageProcessorChain) builder.build();
+
+    final DefaultMessageProcessorChain intercepting =
+        (DefaultMessageProcessorChain) chain.getMessageProcessorsForLifecycle().get(0);
+    final DefaultMessageProcessorChain nonIntercepting =
+        (DefaultMessageProcessorChain) chain.getMessageProcessorsForLifecycle().get(1);
+
+    assertThat(chain.getMessagingExceptionHandler(), is(NullExceptionHandler.getInstance()));
+    assertThat(intercepting.getMessagingExceptionHandler(), is(errorHandler));
+    assertThat(nonIntercepting.getMessagingExceptionHandler(), is(NullExceptionHandler.getInstance()));
+  }
+
+  @Test
+  public void testMixStaticFactory() throws Exception {
     MessageProcessorChain chain =
         newChain(empty(), new TestIntercepting(), new TestNonIntercepting(),
                  new TestNonIntercepting(), new TestIntercepting(), new TestNonIntercepting(),
                  new TestNonIntercepting());
-    CoreEvent restul = process(chain, getTestEventUsingFlow(""));
+    CoreEvent result = process(chain, getTestEventUsingFlow(""));
     assertEquals("InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor",
-                 restul.getMessage().getPayload().getValue());
+                 result.getMessage().getPayload().getValue());
   }
 
   @Test
@@ -650,9 +675,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestNonIntercepting(), new TestIntercepting(), new TestNonIntercepting(), new TestNonIntercepting(),
                   new TestNonIntercepting(), new TestIntercepting());
-    CoreEvent restul = process(builder.build(), getTestEventUsingFlow(""));
+    CoreEvent result = process(builder.build(), getTestEventUsingFlow(""));
     assertEquals("MessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
-                 restul.getMessage().getPayload().getValue());
+                 result.getMessage().getPayload().getValue());
   }
 
   @Test
