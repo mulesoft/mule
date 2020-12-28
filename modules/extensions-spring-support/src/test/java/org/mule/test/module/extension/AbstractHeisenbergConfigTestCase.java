@@ -23,11 +23,6 @@ import com.google.common.collect.ImmutableSet;
 public abstract class AbstractHeisenbergConfigTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-  }
-
-  @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     final Map<String, Object> objects = new HashMap<>();
 

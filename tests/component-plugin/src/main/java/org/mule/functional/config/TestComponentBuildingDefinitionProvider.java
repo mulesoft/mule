@@ -28,7 +28,6 @@ import org.mule.functional.api.component.LifecycleTrackerScope;
 import org.mule.functional.api.component.LifecycleTrackerSource;
 import org.mule.functional.api.component.LogChecker;
 import org.mule.functional.api.component.OnErrorCheckLogHandler;
-import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
 import org.mule.functional.api.component.SharedConfig;
 import org.mule.functional.api.component.SharedSource;
 import org.mule.functional.api.component.SkeletonSource;
@@ -139,14 +138,6 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("invocation-counter")
         .withTypeDefinition(fromType(InvocationCountMessageProcessor.class))
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition
-        .withIdentifier("assert-intercepting")
-        .withTypeDefinition(fromType(ResponseAssertionMessageProcessor.class))
-        .withSetterParameterDefinition("responseExpression", fromSimpleParameter("responseExpression").build())
-        .withSetterParameterDefinition("responseCount", fromSimpleParameter("responseCount").build())
-        .withSetterParameterDefinition("responseSameTask", fromSimpleParameter("responseSameTask").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition

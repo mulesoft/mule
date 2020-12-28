@@ -69,7 +69,8 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
   public void failingNonBlockingConnectedOperation() throws Exception {
     expectedException.expectFailingComponent(is(locator
         .find(Location.builder().globalName("fireMissile").addProcessorsPart()
-            // TODO MULE-18565 adjust accordingly
+            .addIndexPart(0)
+            .addProcessorsPart()
             .addIndexPart(0)
             .build())
         .get()));

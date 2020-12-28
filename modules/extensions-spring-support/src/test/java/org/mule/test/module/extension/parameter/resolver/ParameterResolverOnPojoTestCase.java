@@ -9,6 +9,7 @@ package org.mule.test.module.extension.parameter.resolver;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
+
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 
@@ -17,8 +18,8 @@ import org.junit.Test;
 public class ParameterResolverOnPojoTestCase extends AbstractParameterResolverTestCase {
 
   @Override
-  protected String[] getConfigFiles() {
-    return new String[] {"parameter-resolver-on-pojo-config.xml"};
+  protected String getConfigFile() {
+    return "parameter-resolver-on-pojo-config.xml";
   }
 
   @Test
