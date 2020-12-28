@@ -27,6 +27,7 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.processor.AbstractRedeliveryPolicy;
+import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.StringUtils;
 
@@ -106,11 +107,12 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
         else
         {
-            if(getTransactionConfig().getFactory() != null)
+            if(getTransactionConfig().getFactory() != null &&
+                    (getTransactionConfig().getFactory() instanceof XaTransactionFactory))
             {
                 throw new DefaultMuleException("Request-reply in a transactional context " +
-                        "will never commit the transaction when waiting for the reply in that transaction. " +
-                        "Either use no-transaction or one-way");
+                        "will never commit the transaction. " +
+                        "Either use no-transaction or one-way.");
             }
             return result;
         }
