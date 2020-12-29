@@ -1750,6 +1750,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  @Issue("MULE-18159")
   public void pluginDeclaredInDomainIsAbleToLoadClassesExportedByTheAppWhereItIsUsed() throws Exception {
     // Given a plugin which loads classes.
     final ArtifactPluginFileBuilder pluginWhichLoadsClasses = loadClassExtensionPlugin;
