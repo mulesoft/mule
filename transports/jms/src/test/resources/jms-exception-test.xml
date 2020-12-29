@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:amq="http://activemq.apache.org/schema/core"
+      xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+    http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+    http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
+    http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+  <spring:beans>
+    <amq:broker id="amq-broker" useJmx="false" persistent="false" restartAllowed="false" useShutdownHook="true"
+                startAsync="true">
+      <amq:destinationPolicy>
+        <amq:policyMap>
+          <amq:policyEntries>
+            <amq:policyEntry queue=">" producerFlowControl="true" memoryLimit="100mb">
+              <amq:deadLetterStrategy>
+                <amq:sharedDeadLetterStrategy processNonPersistent="true" />
+              </amq:deadLetterStrategy>
+            </amq:policyEntry>
+          </amq:policyEntries>
+        </amq:policyMap>
+      </amq:destinationPolicy>
+
+      <amq:systemUsage>
+        <amq:systemUsage>
+          <amq:memoryUsage>
+            <amq:memoryUsage limit="200mb" />
+          </amq:memoryUsage>
+        </amq:systemUsage>
+      </amq:systemUsage>
+
+      <amq:transportConnectors>
+        <amq:transportConnector name="vm" uri="vm://localhost" />
+        <amq:transportConnector name="openwire" uri="tcp://localhost:61619?maximumConnections=50&amp;wireFormat.maxFrameSize=100000000">
+        </amq:transportConnector>
+      </amq:transportConnectors>
+    </amq:broker>
+
+    <spring:bean name="amq-connection-factory" class="org.apache.activemq.ActiveMQConnectionFactory"
+                 depends-on="amq-broker">
+      <spring:property name="brokerURL" value="vm://localhost?create=false" />
+    </spring:bean>
+  </spring:beans>
+
+  <jms:activemq-connector name="connector1" specification="1.1" maxRedelivery="1" brokerURL="tcp://localhost:61619" validateConnections="true">
+    <reconnect-forever frequency="10000" />
+  </jms:activemq-connector>
+
+  <flow name="queue-usescase-with-exception-handler">
+    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-in">
+      <jms:transaction action="ALWAYS_BEGIN" />
+    </jms:inbound-endpoint>
+    <append-string-transformer message=", world!"/>
+    <custom-transformer class="org.mule.transport.jms.FlowTransformer"/>
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-out">
+      <jms:transaction action="ALWAYS_BEGIN" />
+    </jms:outbound-endpoint>
+    <catch-exception-strategy>
+      <set-payload value="An error occurred!"/>
+      <custom-transformer class="org.mule.transport.jms.ErrorTransformer"/>
+      <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-error">
+        <jms:transaction action="ALWAYS_BEGIN" />
+      </jms:outbound-endpoint>
+    </catch-exception-strategy>
+  </flow>
+
+  <flow name="queue-usescase">
+    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-in-simple">
+      <jms:transaction action="ALWAYS_BEGIN" />
+    </jms:inbound-endpoint>
+    <append-string-transformer message=", world!"/>
+    <custom-transformer class="org.mule.transport.jms.FlowTransformer"/>
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-out-simple">
+      <jms:transaction action="ALWAYS_BEGIN" />
+    </jms:outbound-endpoint>
+  </flow>
+
+  <flow name="queue-flowref-usescase">
+    <jms:inbound-endpoint queue="test-queue-in-flowref" connector-ref="connector1">
+      <jms:transaction action="ALWAYS_BEGIN" />
+    </jms:inbound-endpoint>
+    <append-string-transformer message=", world!"/>
+    <flow-ref name="flowref-usecase"/>
+    <jms:outbound-endpoint queue="test-queue-out-simple" connector-ref="connector1">
+      <jms:transaction action="ALWAYS_BEGIN" />
+    </jms:outbound-endpoint>
+  </flow>
+  <flow name="flowref-usecase">
+    <custom-transformer class="org.mule.transport.jms.FlowTransformer"/>
+    <catch-exception-strategy>
+      <set-payload value="An error occurred!"/>
+      <custom-transformer class="org.mule.transport.jms.ErrorTransformer"/>
+      <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-error">
+        <jms:transaction action="ALWAYS_BEGIN" />
+      </jms:outbound-endpoint>
+    </catch-exception-strategy>
+  </flow>
+
+  <!-- Test flows -->
+
+  <flow name="write-to-queue">
+    <vm:inbound-endpoint exchange-pattern="one-way" path="in" />
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in" />
+  </flow>
+
+  <flow name="write-to-flowref-queue">
+    <vm:inbound-endpoint exchange-pattern="one-way" path="in-flowref" />
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in-flowref" />
+  </flow>
+
+  <flow name="read-from-out-queue">
+    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-out" />
+    <vm:outbound-endpoint exchange-pattern="one-way" path="out"/>
+  </flow>
+
+  <flow name="read-from-error-queue">
+    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-error" />
+    <set-property propertyName="error" value="#[message.inboundProperties.error]"/>
+    <vm:outbound-endpoint exchange-pattern="one-way" path="error"/>
+  </flow>
+
+  <flow name="read-from-dead-letter-queue">
+    <jms:inbound-endpoint connector-ref="connector1" queue="ActiveMQ.DLQ" />
+    <vm:outbound-endpoint exchange-pattern="one-way" path="dead-letter"/>
+  </flow>
+
+  <flow name="write-to-queue-simple">
+    <vm:inbound-endpoint exchange-pattern="one-way" path="in-simple"/>
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in-simple" />
+  </flow>
+
+  <flow name="read-from-out-queue-simple">
+    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-out-simple" />
+    <vm:outbound-endpoint exchange-pattern="one-way" path="out-simple"/>
+  </flow>
+
+
+</mule>
