@@ -6,6 +6,26 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
+import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.DeploymentStartException;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
+import org.mule.runtime.module.deployment.internal.util.ObservableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.*;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -22,34 +42,6 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
-import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.api.DeploymentStartException;
-import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.module.deployment.api.DeploymentListener;
-import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
-import org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils;
-import org.mule.runtime.module.deployment.internal.util.ObservableList;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
-import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Deployer of an artifact within mule container. - Keeps track of deployed artifacts - Avoid already deployed artifacts to be
  * redeployed - Deploys, undeploys, redeploys packaged and exploded artifacts
@@ -59,18 +51,18 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String JAR_FILE_SUFFIX = ".jar";
   public static final String ZIP_FILE_SUFFIX = ".zip";
-  private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
   static final String START_ARTIFACT_ON_DEPLOYMENT_PROPERTY = "startArtifactOnDeployment";
-
+  private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
   private final ArtifactDeployer<T> deployer;
   private final ArtifactArchiveInstaller artifactArchiveInstaller;
   private final Map<String, ZombieArtifact> artifactZombieMap = new HashMap<>();
   private final File artifactDir;
   private final ObservableList<T> artifacts;
   private final ArtifactDeploymentTemplate deploymentTemplate;
+  private final MuleContextListenerFactory muleContextListenerFactory;
+  private final List<ArtifactStoppedDeploymentListener> artifactStoppedDeploymentListeners = new ArrayList<>();
   private AbstractDeployableArtifactFactory<T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
-  private final MuleContextListenerFactory muleContextListenerFactory;
 
 
   public DefaultArchiveDeployer(final ArtifactDeployer deployer,
@@ -85,6 +77,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     this.artifactDir = artifactFactory.getArtifactDir();
     this.artifactArchiveInstaller = new ArtifactArchiveInstaller(artifactDir);
     this.muleContextListenerFactory = muleContextListenerFactory;
+  }
+
+  private static boolean allResourcesExist(File[] resourceFiles) {
+    return stream(resourceFiles).allMatch(File::exists);
   }
 
   @Override
@@ -189,6 +185,11 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     logRequestToUndeployArtifact(artifact);
     try {
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
+      artifactStoppedDeploymentListeners.forEach(l -> {
+        if (l.getArtifactName().equals(artifact.getArtifactName())) {
+          l.onStopDoNotPersist();
+        }
+      });
       deployer.undeploy(artifact);
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
     } catch (DeploymentException e) {
@@ -298,6 +299,11 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
 
       artifacts.remove(artifact);
+      artifactStoppedDeploymentListeners.forEach(l -> {
+        if (l.getArtifactName().equals(artifact.getArtifactName())) {
+          l.onStopDoNotPersist();
+        }
+      });
       deployer.undeploy(artifact);
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
@@ -340,37 +346,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     return artifact;
   }
 
-  private static boolean allResourcesExist(File[] resourceFiles) {
-    return stream(resourceFiles).allMatch(File::exists);
-  }
-
-  private static class ZombieArtifact {
-
-    Map<File, Long> initialResourceFiles = new HashMap<>();
-
-    private ZombieArtifact(File[] resourceFiles) {
-      // Is exploded artifact
-      for (File resourceFile : resourceFiles) {
-        initialResourceFiles.put(resourceFile, resourceFile.lastModified());
-      }
-    }
-
-    public boolean isFor(URI uri) {
-      return initialResourceFiles.entrySet().stream().anyMatch((entry) -> entry.getKey().toURI().equals(uri));
-    }
-
-    public boolean updatedZombieApp() {
-      return initialResourceFiles.entrySet().stream()
-          .anyMatch((entry) -> !entry.getValue().equals(entry.getKey().lastModified()));
-    }
-
-    // Returns true only if all the files exist
-    public boolean exists() {
-      return allResourcesExist(initialResourceFiles.keySet().toArray(new File[initialResourceFiles.size()]));
-    }
-
-  }
-
   @Override
   public T deployPackagedArtifact(String zip, Optional<Properties> deploymentProperties) throws DeploymentException {
     URI uri;
@@ -409,6 +384,11 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     if (!artifactZombieMap.containsKey(artifactName)) {
       deploymentListener.onUndeploymentStart(artifactName);
       try {
+        artifactStoppedDeploymentListeners.forEach(l -> {
+          if (l.getArtifactName().equals(artifactName)) {
+            l.onStopDoNotPersist();
+          }
+        });
         deployer.undeploy(artifact);
         artifact = null;
         deploymentListener.onUndeploymentSuccess(artifactName);
@@ -438,6 +418,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       trackArtifact(artifact);
 
       deployer.deploy(artifact);
+      addArtifactStoppedDeploymentListenerToArtifact(artifact);
       artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
       deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
       deploymentTemplate.postRedeploy(artifact);
@@ -579,5 +560,46 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     return deployExplodedApp(artifactDir, deploymentProperties);
+  }
+
+  public void addArtifactStoppedDeploymentListener(ArtifactStoppedDeploymentListener artifactStoppedDeploymentListener) {
+    this.artifactStoppedDeploymentListeners.add(artifactStoppedDeploymentListener);
+  }
+
+  private void addArtifactStoppedDeploymentListenerToArtifact(T artifact){
+    Optional<ArtifactStoppedDeploymentListener> optionalArtifactStoppedDeploymentListener =
+        artifactStoppedDeploymentListeners.stream().filter(l -> l.getArtifactName().equals(artifact.getArtifactName())).findAny();
+    if (optionalArtifactStoppedDeploymentListener.isPresent()) {
+      MuleContextDeploymentListener muleContextListener =
+          new MuleContextDeploymentListener(artifact.getArtifactName(), optionalArtifactStoppedDeploymentListener.get());
+      artifact.setMuleContextListener(muleContextListener);
+    }
+  }
+
+  private static class ZombieArtifact {
+
+    Map<File, Long> initialResourceFiles = new HashMap<>();
+
+    private ZombieArtifact(File[] resourceFiles) {
+      // Is exploded artifact
+      for (File resourceFile : resourceFiles) {
+        initialResourceFiles.put(resourceFile, resourceFile.lastModified());
+      }
+    }
+
+    public boolean isFor(URI uri) {
+      return initialResourceFiles.entrySet().stream().anyMatch((entry) -> entry.getKey().toURI().equals(uri));
+    }
+
+    public boolean updatedZombieApp() {
+      return initialResourceFiles.entrySet().stream()
+          .anyMatch((entry) -> !entry.getValue().equals(entry.getKey().lastModified()));
+    }
+
+    // Returns true only if all the files exist
+    public boolean exists() {
+      return allResourcesExist(initialResourceFiles.keySet().toArray(new File[initialResourceFiles.size()]));
+    }
+
   }
 }

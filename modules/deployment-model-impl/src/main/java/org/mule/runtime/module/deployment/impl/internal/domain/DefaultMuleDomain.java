@@ -99,10 +99,6 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
     this.muleContextListener = muleContextListener;
   }
 
-  public MuleContextListener getMuleContextListener() {
-    return muleContextListener;
-  }
-
   public String getName() {
     return descriptor.getName();
   }
@@ -298,5 +294,4 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   protected File getArtifactInstallationDirectory() {
     return descriptor.getArtifactLocation();
   }
-
 }

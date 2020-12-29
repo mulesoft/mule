@@ -142,10 +142,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     this.muleContextListener = muleContextListener;
   }
 
-  public MuleContextListener getMuleContextListener() {
-    return muleContextListener;
-  }
-
   @Override
   public void install() {
     withContextClassLoader(null, () -> {
@@ -443,5 +439,4 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
     return domainRepository.getCompatibleDomain(domainBundleDescriptor.get());
   }
-
 }

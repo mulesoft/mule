@@ -23,8 +23,10 @@ public class ArtifactStoppedDeploymentListener implements DeploymentListener {
 
   private transient final Logger logger = LoggerFactory.getLogger(getClass());
   private AtomicBoolean shouldPersist;
+  private String artifactName;
 
-  public ArtifactStoppedDeploymentListener() {
+  public ArtifactStoppedDeploymentListener(String artifactName) {
+    this.artifactName = artifactName;
     shouldPersist = new AtomicBoolean(true);
   }
 
@@ -57,5 +59,9 @@ public class ArtifactStoppedDeploymentListener implements DeploymentListener {
 
   public void onStopDoNotPersist() {
     shouldPersist.set(false);
+  }
+
+  public String getArtifactName() {
+    return this.artifactName;
   }
 }

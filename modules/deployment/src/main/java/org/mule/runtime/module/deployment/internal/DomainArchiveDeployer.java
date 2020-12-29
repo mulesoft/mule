@@ -16,10 +16,7 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory
 
 import java.io.File;
 import java.net.URI;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
@@ -132,5 +129,9 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   @Override
   public Domain deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties) {
     return domainDeployer.deployExplodedArtifact(artifactDir, deploymentProperties);
+  }
+
+  public void addArtifactStoppedDeploymentListener(ArtifactStoppedDeploymentListener artifactStoppedDeploymentListener) {
+    this.domainDeployer.addArtifactStoppedDeploymentListener(artifactStoppedDeploymentListener);
   }
 }

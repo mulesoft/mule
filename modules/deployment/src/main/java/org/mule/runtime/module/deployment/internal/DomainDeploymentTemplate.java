@@ -16,13 +16,9 @@ import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Utility to hook callbacks just before and after a domain zip is redeployed in Mule.
@@ -34,6 +30,7 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
   private final DefaultArchiveDeployer<Application> applicationDeployer;
   private final DeploymentService deploymentservice;
   private final CompositeDeploymentListener applicationDeploymentListener;
+  private final List<ArtifactStoppedDeploymentListener> artifactStoppedDeploymentListeners = new ArrayList<>();
 
   public DomainDeploymentTemplate(DefaultArchiveDeployer<Application> applicationDeployer, DeploymentService deploymentservice,
                                   CompositeDeploymentListener applicationDeploymentListener) {

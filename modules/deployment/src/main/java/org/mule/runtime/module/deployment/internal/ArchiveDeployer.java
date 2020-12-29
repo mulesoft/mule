@@ -53,4 +53,6 @@ public interface ArchiveDeployer<T extends Artifact> {
   void deployArtifact(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException;
 
   T deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties);
+
+  void addArtifactStoppedDeploymentListener(ArtifactStoppedDeploymentListener artifactStoppedDeploymentListener);
 }
