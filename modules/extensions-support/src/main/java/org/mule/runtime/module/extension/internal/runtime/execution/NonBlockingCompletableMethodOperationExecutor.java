@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static java.lang.Thread.currentThread;
-import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -34,44 +32,8 @@ public class NonBlockingCompletableMethodOperationExecutor<M extends ComponentMo
   @Override
   protected void doExecute(ExecutionContext<M> executionContext, ExecutorCallback callback) {
     final ExecutionContextAdapter<M> context = (ExecutionContextAdapter<M>) executionContext;
-    context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM,
-                        new ExecutorCompletionCallbackAdapter(new PreservingClassLoaderExecutorCallback(callback)));
+    context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, new ExecutorCompletionCallbackAdapter(callback));
 
     executor.execute(executionContext);
-  }
-
-  private static class PreservingClassLoaderExecutorCallback implements ExecutorCallback {
-
-    final ExecutorCallback delegate;
-    final ClassLoader classLoader;
-
-    private PreservingClassLoaderExecutorCallback(ExecutorCallback delegate) {
-      this.delegate = delegate;
-      this.classLoader = currentThread().getContextClassLoader();
-    }
-
-    @Override
-    public void complete(Object value) {
-      Thread currentThread = currentThread();
-      ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-      setContextClassLoader(currentThread, currentClassLoader, classLoader);
-      try {
-        delegate.complete(value);
-      } finally {
-        setContextClassLoader(currentThread, classLoader, currentClassLoader);
-      }
-    }
-
-    @Override
-    public void error(Throwable e) {
-      Thread currentThread = currentThread();
-      ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-      setContextClassLoader(currentThread, currentClassLoader, classLoader);
-      try {
-        delegate.error(e);
-      } finally {
-        setContextClassLoader(currentThread, classLoader, currentClassLoader);
-      }
-    }
   }
 }
