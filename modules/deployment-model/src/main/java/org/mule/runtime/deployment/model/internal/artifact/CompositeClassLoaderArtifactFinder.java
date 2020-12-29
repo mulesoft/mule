@@ -13,7 +13,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 /**
  * Finds the first {@link ClassLoader} in an {@link CompositeClassLoader} that should be used when loading classes and resources
  *
- * @since 4.3
+ * @since 4.4, 4.3.1, 4.2.3
  */
 public class CompositeClassLoaderArtifactFinder {
 

@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 public class LoadClassOperation {
-  
+
   @MediaType(value = TEXT_PLAIN, strict = false)
   public void tryLoadClass(@Alias("class") String clazz) throws ClassNotFoundException {
     currentThread().getContextClassLoader().loadClass(clazz);
