@@ -230,19 +230,9 @@ public class PropertiesResolverUtils {
           }));
     }
 
-    Optional<CompositeConfigurationPropertiesProvider> configurationAttributesProvider = empty();
-
-    DefaultConfigurationPropertiesResolver systemPropertiesResolver;
-    if (configurationAttributesProvider.isPresent()) {
-      DefaultConfigurationPropertiesResolver configurationPropertiesResolver =
-          new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
-                                                     configurationAttributesProvider.get());
-      systemPropertiesResolver = new DefaultConfigurationPropertiesResolver(of(configurationPropertiesResolver),
-                                                                            environmentPropertiesConfigurationProvider);
-    } else {
-      systemPropertiesResolver = new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
-                                                                            environmentPropertiesConfigurationProvider);
-    }
+    DefaultConfigurationPropertiesResolver systemPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
+                                                   environmentPropertiesConfigurationProvider);
 
     DefaultConfigurationPropertiesResolver externalPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(deploymentPropertiesConfigurationProperties != null
