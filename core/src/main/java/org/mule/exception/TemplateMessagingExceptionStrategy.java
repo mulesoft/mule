@@ -23,6 +23,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.transport.NonBlockingReplyToHandler;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.message.DefaultExceptionPayload;
@@ -178,7 +179,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         return enableNotifications || !disableErrorCountOnErrorNotificationsDisabled;
     }
 
-    protected MuleEvent route(MuleEvent event, Exception t)
+    protected MuleEvent route(MuleEvent event, Exception t) throws MessagingException
     {
         if (!getMessageProcessors().isEmpty())
         {
@@ -191,12 +192,11 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             catch (Exception e)
             {
                 logFatal(event, e);
-                throw new RuntimeException(e);
+                throw new MessagingException(CoreMessages.createStaticMessage("There was an error processing the catch strategy"), event, e);
             }
         }
         return event;
     }
-
 
     @Override
     protected void doInitialise(MuleContext muleContext) throws InitialisationException
