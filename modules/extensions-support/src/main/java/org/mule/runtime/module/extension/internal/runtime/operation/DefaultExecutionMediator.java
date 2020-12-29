@@ -15,6 +15,8 @@ import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
+
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isConnectedStreamingOperation;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
@@ -79,6 +81,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final List<ValueTransformer> valueTransformers;
+  private final ComponentModel operationModel;
 
   @FunctionalInterface
   public interface ValueTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
@@ -94,6 +97,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.valueTransformers = valueTransformers != null ? asList(valueTransformers) : emptyList();
+    this.operationModel = operationModel;
   }
 
 
@@ -108,7 +112,10 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   @Override
   public Publisher<Object> execute(ComponentExecutor<T> executor, ExecutionContextAdapter<T> context) {
     final Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(context);
-    stats.ifPresent(s -> s.addInflightOperation());
+    stats.ifPresent(s -> {
+      s.addInflightOperation();
+      s.addActiveComponent();
+    });
 
     try {
       return (Mono<Object>) getExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context)
@@ -148,7 +155,12 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
       result.map(value -> transform(context, value))
           .doOnSuccess(value -> {
             onSuccess(context, value, interceptors);
-            stats.ifPresent(s -> s.discountInflightOperation());
+            stats.ifPresent(s -> {
+              s.discountInflightOperation();
+              if (!isConnectedStreamingOperation(operationModel)) {
+                s.discountActiveComponent();
+              }
+            });
             sink.success(value);
           }).onErrorMap(t -> mapError(context, interceptors, t))
           .subscribe(v -> {
@@ -164,7 +176,10 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
         .transform(pub -> context.getRetryPolicyTemplate()
             .map(retryPolicy -> from(retryPolicy.applyPolicy(pub,
                                                              e -> shouldRetry(e, context),
-                                                             e -> stats.ifPresent(s -> s.discountInflightOperation()),
+                                                             e -> stats.ifPresent(s -> {
+                                                               s.discountInflightOperation();
+                                                               s.discountActiveComponent();
+                                                             }),
                                                              identity(),
                                                              context.getCurrentScheduler())))
             .orElse(pub));

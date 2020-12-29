@@ -7,22 +7,38 @@
 package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+
+import static org.mule.tck.probe.PollingProber.check;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.streamRead;
+import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closePagingProviderCalls;
+import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.getPageCalls;
+
+import static java.util.Arrays.asList;
 
 import org.mule.functional.api.flow.FlowRunner;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.junit.Before;
 import org.junit.Test;
 
 public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctionalTestCase {
+
+  private static final int PROBER_TIMEOUT = 20000;
+  private static final int POLLING_FREQUENCY = 2500;
 
   @Inject
   @Named("sourceWithDynamicConfig")
@@ -31,6 +47,38 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   @Override
   protected String getConfigFile() {
     return "dynamic-config-expiration.xml";
+  }
+
+  private static List<Integer> disposedStatuses;
+  private static HeisenbergExtension config;
+
+  public static class CaptureProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      synchronized (disposedStatuses) {
+        if (config == null) {
+          config = (HeisenbergExtension) muleContext.getExtensionManager()
+              .getConfiguration("heisenbergWithShortExpiration", event).getValue();
+        }
+        disposedStatuses.add(config.getDispose());
+      }
+      return event;
+    }
+  }
+
+  @Before
+  public void setUp() {
+    disposedStatuses = new ArrayList<>();
+    config = null;
+    resetCounters();
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    disposedStatuses = null;
+    config = null;
+    super.doTearDown();
   }
 
   @Test
@@ -85,6 +133,82 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     doNotExpireDynamicConfigWithCustomExpirationUsedBySource();
   }
 
+  @Test
+  public void dynamicConfigIsExpiredBeforeFlowEnds() throws Exception {
+    flowRunner("dynamicConfigIsExpiredBeforeFlowEnds").run();
+    assertDisposedStatuses(asList(0, 1));
+  }
+
+  @Test
+  public void dynamicConfigIsExpiredBeforeFlowEndsWhenOperationFails() throws Exception {
+    flowRunner("dynamicConfigIsExpiredBeforeFlowEndsWhenOperationFails").run();
+    assertDisposedStatuses(asList(0, 1));
+  }
+
+  @Test
+  public void doNotExpireConfigUsedByPagedOperation() throws Exception {
+    flowRunner("dynamicWithShortExpirationForPagedOperation").withVariable("failOn", -1).run();
+    assertDisposedStatuses(asList(0, 0, 0, 0, 1));
+  }
+
+  @Test
+  public void doNotExpireConfigWhenPagedOperationWithReconnectionFailsOnFirstPage() throws Exception {
+    flowRunner("dynamicWithShortExpirationForPagedOperation").withVariable("failOn", 1).run();
+    assertDisposedStatuses(asList(0, 0, 0, 1));
+  }
+
+  @Test
+  public void doNotExpireConfigWhenPagedOperationWithReconnectionFailsOnSecondPage() throws Exception {
+    flowRunner("dynamicWithShortExpirationForPagedOperation").withVariable("failOn", 2).run();
+    assertDisposedStatuses(asList(0, 0, 0, 1));
+  }
+
+  @Test
+  public void expireConfigBeforeFlowEndsWhenPagedOperationWithoutReconnectionFailsOnFirstPage() throws Exception {
+    flowRunner("dynamicWithShortExpirationForPagedOperationWithoutReconnection").withVariable("failOn", 1).run();
+    assertDisposedStatuses(asList(0, 1));
+  }
+
+  @Test
+  public void expireConfigBeforeFlowEndsWhenPagedOperationWithoutReconnectionFailsOnSecondPage() throws Exception {
+    flowRunner("dynamicWithShortExpirationForPagedOperationWithoutReconnection").withVariable("failOn", 2).run();
+    assertDisposedStatuses(asList(0, 0));
+    assertConfigIsExpiredAfterFlowIsDisposed();
+  }
+
+  @Test
+  public void expireConfigBeforeFlowEndsWhenUsedByStreamingOperation() throws Exception {
+    flowRunner("dynamicWithShortExpirationForStreamingOperation").run();
+    assertDisposedStatuses(asList(0, 1, 1));
+  }
+
+  @Test
+  public void doNotExpireConfigUsedByConnectedStreamingOperation() throws Exception {
+    flowRunner("dynamicWithShortExpirationForConnectedStreamingOperation").withVariable("failOn", -1).run();
+    assertDisposedStatuses(asList(0, 0, 0));
+    assertConfigIsExpiredAfterFlowIsDisposed();
+  }
+
+  @Test
+  public void doNotExpireConfigWhenConnectedStreamingOperationWithReconnectionFailsObtainingTheStream() throws Exception {
+    flowRunner("dynamicWithShortExpirationForConnectedStreamingOperation").withVariable("failOn", 0).run();
+    assertDisposedStatuses(asList(0, 0, 0));
+    assertConfigIsExpiredAfterFlowIsDisposed();
+  }
+
+  @Test
+  public void doNotExpireConfigWhenConnectedStreamingOperationWithoutReconnectionFailsObtainingTheStream() throws Exception {
+    flowRunner("dynamicWithShortExpirationForConnectedStreamingOperationWithoutReconnection").withVariable("failOn", 0).run();
+    assertDisposedStatuses(asList(0, 1));
+  }
+
+  @Test
+  public void doNotExpireConfigWhenConnectedStreamingOperationWithoutReconnectionFailsReadingTheStream() throws Exception {
+    flowRunner("dynamicWithShortExpirationForConnectedStreamingOperationWithoutReconnection").withVariable("failOn", 1).run();
+    assertDisposedStatuses(asList(0, 0, 0));
+    assertConfigIsExpiredAfterFlowIsDisposed();
+  }
+
   private void assertInitialised(HeisenbergExtension config) {
     assertThat(config.getInitialise(), is(1));
     assertThat(config.getStart(), is(1));
@@ -97,6 +221,18 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
       assertThat(config.getDispose(), is(1));
       return true;
     }, "config was not stopped or disposed"));
+  }
+
+  private void assertDisposedStatuses(List<Integer> statuses) {
+    assertThat(disposedStatuses, contains(statuses.toArray()));
+  }
+
+  private void assertConfigIsExpiredAfterFlowIsDisposed() {
+    check(PROBER_TIMEOUT, POLLING_FREQUENCY, () -> {
+      synchronized (disposedStatuses) {
+        return config.getDispose() == 1;
+      }
+    });
   }
 
   private HeisenbergExtension invokeDynamicConfig(String flowName, String configName, String payload) throws Exception {
@@ -113,5 +249,11 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     assertThat(config.getPersonalInfo().getName(), is(payload));
 
     return config;
+  }
+
+  public static void resetCounters() {
+    closePagingProviderCalls = 0;
+    getPageCalls = 0;
+    streamRead = -1;
   }
 }
