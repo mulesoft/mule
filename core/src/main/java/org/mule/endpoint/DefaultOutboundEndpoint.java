@@ -107,8 +107,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
         else
         {
-            if(getTransactionConfig().getFactory() != null &&
-                    (getTransactionConfig().getFactory() instanceof XaTransactionFactory))
+            if(!getConnector().canRunOutboundTransacted())
             {
                 throw new DefaultMuleException("Request-reply in a transactional context " +
                         "will never commit the transaction. " +
