@@ -25,9 +25,9 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transport.RequestResponseOutboundEndpointCantRunTransacted;
 import org.mule.api.transport.Connector;
 import org.mule.processor.AbstractRedeliveryPolicy;
-import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.StringUtils;
 
@@ -107,7 +107,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
         else
         {
-            if(!getConnector().canRunOutboundTransacted())
+            if(getConnector() instanceof RequestResponseOutboundEndpointCantRunTransacted)
             {
                 throw new DefaultMuleException("Request-reply in a transactional context " +
                         "will never commit the transaction. " +

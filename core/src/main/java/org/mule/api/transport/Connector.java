@@ -212,12 +212,4 @@ public interface Connector extends Lifecycle, NameableObject, Connectable, Lifec
      * @return the canonical representation of the given uri as a {@link java.lang.String}
      */
     public String getCanonicalURI(EndpointURI uri);
-
-    /**
-     * @return if the outbound endpoint can run transacted.
-     */
-    default boolean canRunOutboundTransacted()
-    {
-        return true;
-    }
 }
