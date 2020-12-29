@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.config.internal.model.properties;
 
-import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.ServiceLoader.load;
@@ -18,7 +16,6 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.HONOUR_RESERVED_PROPERTIES_PROPERTY;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 
 import org.mule.runtime.api.component.Component;
@@ -26,7 +23,6 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
@@ -354,17 +350,9 @@ public class PropertiesResolverUtils {
     if (!configured.getAndSet(true)) {
       FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
 
-      ffRegistry.registerFeature(HONOUR_RESERVED_PROPERTIES, muleContext -> {
-        Optional<MuleVersion> minMuleVersion = muleContext.getConfiguration().getMinMuleVersion();
-
-        // If system property is set, then take this value and ignore minMuleVersion
-        if (getProperty(HONOUR_RESERVED_PROPERTIES_PROPERTY) != null) {
-          return getBoolean(HONOUR_RESERVED_PROPERTIES_PROPERTY);
-        } else if (minMuleVersion.isPresent()) {
-          return minMuleVersion.get().newerThan("4.2.2");
-        }
-        return false;
-      });
+      ffRegistry.registerFeature(HONOUR_RESERVED_PROPERTIES,
+                                 ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
+                                     && ctx.getConfiguration().getMinMuleVersion().get().newerThan("4.2.2"));
     }
   }
 
