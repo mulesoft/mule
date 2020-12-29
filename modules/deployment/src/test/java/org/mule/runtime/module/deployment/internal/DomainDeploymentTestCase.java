@@ -1750,11 +1750,16 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  public void appDependingOnDomainContainingPluginPreservesClassLoader() throws Exception {
+  public void pluginDeclaredInDomainIsAbleToLoadClassesExportedByTheAppWhereItIsUsed() throws Exception {
+    // Given a plugin which loads classes.
+    final ArtifactPluginFileBuilder pluginWhichLoadsClasses = loadClassExtensionPlugin;
+
+    // Given a domain depending on the plugin.
     DomainFileBuilder domainFileBuilder = new DomainFileBuilder("domain-with-test-plugin")
         .definedBy("empty-domain-config.xml")
-        .dependingOn(loadClassExtensionPlugin);
+        .dependingOn(pluginWhichLoadsClasses);
 
+    // Given an app depending on the domain and exporting a class.
     final ApplicationFileBuilder applicationFileBuilder =
         new ApplicationFileBuilder("app-with-load-class-operation").definedBy("app-with-load-class-operation.xml")
             .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
@@ -1769,7 +1774,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    executeApplicationFlow("main");
+    // When the app uses the plugin in order to load the exported class, then it doesn't raise any error.
+    executeApplicationFlow("flowWhichTriesToLoadTheClass");
   }
 
   protected ApplicationFileBuilder appFileBuilder(final String artifactId) {

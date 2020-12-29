@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                           http://www.mulesoft.org/schema/mule/load-class http://www.mulesoft.org/schema/mule/load-class/current/mule-load-class.xsd">
 
-    <flow name="main">
+    <flow name="flowWhichTriesToLoadTheClass">
         <load-class:try-load-class class="org.foo.EchoTest" />
     </flow>
 
