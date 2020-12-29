@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -45,6 +46,8 @@ public class StreamPerEventSink implements Sink {
     just(event)
         .doOnNext(request -> eventConsumer.accept(request))
         .transform(processor)
+        // Make inner chains behave correctly in the context of this mono
+        .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true))
         .subscribe(null, exception::set);
     if (exception.get() != null) {
       if (exception.get() instanceof RuntimeException) {

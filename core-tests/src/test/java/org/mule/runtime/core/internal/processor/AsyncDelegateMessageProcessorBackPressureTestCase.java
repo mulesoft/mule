@@ -7,19 +7,19 @@
 package org.mule.runtime.core.internal.processor;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.AsyncStory.ASYNC;
+import static reactor.core.publisher.Mono.subscriberContext;
 
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
-import org.junit.Assert;
-import org.junit.Test;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -34,7 +34,14 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.Test;
+
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+import reactor.core.publisher.Flux;
 
 @Story(ASYNC)
 public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractAsyncDelegateMessageProcessorTestCase {
@@ -71,31 +78,50 @@ public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractA
     ((BaseEventContext) request.getContext()).success(result1);
     ((BaseEventContext) request.getContext()).success(result2);
 
-    Assert.assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(false));
+    assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(false));
 
     // Permit async processing now we have already asserted that response alone is not enough to complete event context.
     asyncEntryLatch.countDown();
 
-    Assert.assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
+    assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
 
     // Block until async completes, not just target processor.
     while (!((BaseEventContext) target.sensedEvent.getContext()).isTerminated()) {
       park100ns();
     }
-    Assert.assertThat(target.sensedEvent, notNullValue());
+    assertThat(target.sensedEvent, notNullValue());
 
     // Block to ensure async fully completes before testing state
     while (!((BaseEventContext) request.getContext()).isTerminated()) {
       park100ns();
     }
 
-    Assert.assertThat(((BaseEventContext) target.sensedEvent.getContext()).isTerminated(), is(true));
-    Assert.assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(true));
+    assertThat(((BaseEventContext) target.sensedEvent.getContext()).isTerminated(), is(true));
+    assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(true));
 
     assertTargetEvent(request);
     assertResponse(result1);
     assertResponse(result2);
     assertThat(service.getExecutions(), is(1));
+  }
+
+  @Test
+  @Issue("MULE-19091")
+  public void streamPerEventSinkMonoFlagged() throws MuleException {
+    AtomicBoolean withinProcessToApply = new AtomicBoolean();
+
+    final StreamPerEventSink streamPerEventSink = new StreamPerEventSink(pub -> subscriberContext()
+        .flatMapMany(ctx -> Flux.from(pub)
+            .map(p -> {
+              withinProcessToApply.set(ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false));
+              return p;
+            })),
+                                                                         event -> {
+                                                                         });
+
+    streamPerEventSink.accept(testEvent());
+
+    assertThat(withinProcessToApply.get(), is(true));
   }
 
   private class BackPressureGeneratorProcessingStrategy implements ProcessingStrategy {
@@ -128,8 +154,8 @@ public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractA
 
   private class FixingBackPressureSchedulerService extends SimpleUnitTestSupportSchedulerService {
 
-    private BackPressureGeneratorProcessingStrategy strategy;
-    private AtomicReference<Integer> executions = new AtomicReference<>(0);
+    private final BackPressureGeneratorProcessingStrategy strategy;
+    private final AtomicReference<Integer> executions = new AtomicReference<>(0);
 
     public FixingBackPressureSchedulerService(BackPressureGeneratorProcessingStrategy strategy) {
       this.strategy = strategy;
