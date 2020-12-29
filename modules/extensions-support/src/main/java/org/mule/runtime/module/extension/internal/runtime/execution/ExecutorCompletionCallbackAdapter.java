@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static java.lang.Thread.currentThread;
-import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -20,32 +18,18 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 public class ExecutorCompletionCallbackAdapter implements CompletionCallback<Object, Object> {
 
   private final ExecutorCallback executorCallback;
-  private final ClassLoader classLoader;
 
   public ExecutorCompletionCallbackAdapter(ExecutorCallback executorCallback) {
     this.executorCallback = executorCallback;
-    this.classLoader = currentThread().getContextClassLoader();
   }
 
   @Override
   public void success(Result<Object, Object> result) {
-    Thread currentThread = currentThread();
-    ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-    try {
-      executorCallback.complete(result);
-    } finally {
-      setContextClassLoader(currentThread, currentClassLoader, classLoader);
-    }
+    executorCallback.complete(result);
   }
 
   @Override
   public void error(Throwable e) {
-    Thread currentThread = currentThread();
-    ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-    try {
-      executorCallback.error(e);
-    } finally {
-      setContextClassLoader(currentThread, currentClassLoader, classLoader);
-    }
+    executorCallback.error(e);
   }
 }
