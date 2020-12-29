@@ -8,6 +8,7 @@ package org.mule.exception;
 
 import static java.lang.Boolean.getBoolean;
 import static org.mule.api.config.MuleProperties.DISABLE_ERROR_COUNT_ON_ERROR_NOTIFICATION_DISABLED;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
@@ -192,7 +193,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             catch (Exception e)
             {
                 logFatal(event, e);
-                throw new MessagingException(CoreMessages.createStaticMessage("There was an error processing the catch strategy"), event, e);
+                throw new MessagingException(createStaticMessage("There was an error processing the catch strategy"), event, e);
             }
         }
         return event;
