@@ -38,7 +38,6 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
@@ -69,13 +68,12 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Properties;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 
 /**
  * Contains test for domain deployment
@@ -1751,6 +1749,29 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     }
   }
 
+  @Test
+  public void appDependingOnDomainContainingPluginPreservesClassLoader() throws Exception {
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("domain-with-test-plugin")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(loadClassExtensionPlugin);
+
+    final ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("app-with-load-class-operation").definedBy("app-with-load-class-operation.xml")
+            .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+            .configuredWith(EXPORTED_PACKAGES, "org.foo")
+            .dependingOn(domainFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
   protected ApplicationFileBuilder appFileBuilder(final String artifactId) {
     return new ApplicationFileBuilder(artifactId);
   }
@@ -1871,7 +1892,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertDeploymentFailure(domainDeploymentListener, domainBundleNonExistentConfigResource.getId());
   }
-
 
   private void deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(Action deployArtifactAction) throws Exception {
     Action verifyAnchorFileDoesNotExists = () -> assertDomainAnchorFileDoesNotExists(waitDomainFileBuilder.getId());

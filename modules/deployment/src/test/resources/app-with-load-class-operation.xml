@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:load-class="http://www.mulesoft.org/schema/mule/load-class"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                          http://www.mulesoft.org/schema/mule/load-class http://www.mulesoft.org/schema/mule/load-class/current/mule-load-class.xsd">
+
+    <flow name="main">
+        <load-class:try-load-class class="org.foo.EchoTest" />
+    </flow>
+
+</mule>
