@@ -9,4 +9,14 @@
         <load-class:try-load-class class="org.foo.EchoTest" />
     </flow>
 
+    <flow name="flowWhichSavesTheCallbackAndLoadsClassesInErrorHandler">
+        <load-class:save-completion-callback callback-key="SavedCallback" />
+        <error-handler>
+            <on-error-continue>
+                <logger level="WARN" message="AQUI!!!" />
+                <load-class:try-load-class class="org.foo.EchoTest" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
 </mule>

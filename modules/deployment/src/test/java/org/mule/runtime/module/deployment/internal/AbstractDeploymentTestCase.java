@@ -326,6 +326,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     loadClassExtensionJarFile = new ExtensionCompiler()
         .compiling(getResourceFile("/org/foo/classloading/LoadClassExtension.java"),
                    getResourceFile("/org/foo/classloading/LoadClassOperation.java"))
+        .including(getResourceFile("/org/foo/classloading/registry-bootstrap.properties"),
+                   "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
         .compile("mule-module-classloading-1.0.0.jar", "1.0.0");
 
     oracleExtensionJarFile = new ExtensionCompiler()
