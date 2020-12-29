@@ -7,10 +7,13 @@
 
 package org.mule.runtime.core.internal.config;
 
+import static java.lang.Boolean.getBoolean;
+import static java.lang.System.getProperty;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.mule.runtime.api.config.Feature;
@@ -49,9 +52,17 @@ public final class FeatureFlaggingServiceBuilder {
 
     final String id = context.getConfiguration().getId();
     configurations.forEach((feature, p) -> {
-      boolean enabled = p.test(context);
+      boolean enabled;
 
-      LOGGER.debug("Setting feature {} = {} for artifact [{}]", feature, enabled, id);
+      Optional<String> systemPropertyName = feature.getOverridingSystemPropertyName();
+      if (systemPropertyName.isPresent() && getProperty(systemPropertyName.get()) != null) {
+        enabled = getBoolean(systemPropertyName.get());
+        LOGGER.debug("Setting feature {} = {} for artifact [{}] because of System Property '{}'", feature, enabled, id,
+                     systemPropertyName);
+      } else {
+        enabled = p.test(context);
+        LOGGER.debug("Setting feature {} = {} for artifact [{}]", feature, enabled, id);
+      }
 
       features.put(feature, enabled);
     });
