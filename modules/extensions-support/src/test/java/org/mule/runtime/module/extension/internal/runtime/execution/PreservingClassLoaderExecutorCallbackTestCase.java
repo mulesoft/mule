@@ -15,11 +15,14 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.mockito.Mock;
 
+@Issue("MULE-19097")
 public class PreservingClassLoaderExecutorCallbackTestCase extends AbstractMuleTestCase {
 
   @Mock
@@ -66,7 +69,7 @@ public class PreservingClassLoaderExecutorCallbackTestCase extends AbstractMuleT
 
     ClassLoader anotherClassLoader = mock(ClassLoader.class);
     withContextClassLoader(anotherClassLoader, () -> {
-      preservingClassLoaderExecutorCallbackReference.get().complete(new NullPointerException());
+      preservingClassLoaderExecutorCallbackReference.get().complete(null);
     });
 
     assertThat(onCompleteClassLoaderRef.get(), is(onCreationClassLoader));
