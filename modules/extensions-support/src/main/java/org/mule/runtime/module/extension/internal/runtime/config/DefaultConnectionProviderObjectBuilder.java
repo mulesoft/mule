@@ -158,8 +158,8 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     enhancer.setCallbacks(callbackHelper.getCallbacks());
 
     if (Enhancer.class.getClassLoader() != extensionClassLoader) {
-      enhancer.setClassLoader(new CompositeClassLoader(DefaultConnectionProviderObjectBuilder.class.getClassLoader(),
-                                                       extensionClassLoader));
+      enhancer.setClassLoader(new CompositeClassLoader(extensionClassLoader,
+                                                       DefaultConnectionProviderObjectBuilder.class.getClassLoader()));
       enhancer.setUseCache(false);
     }
 
