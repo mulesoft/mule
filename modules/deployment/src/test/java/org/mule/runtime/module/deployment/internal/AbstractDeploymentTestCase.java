@@ -235,6 +235,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private static File defaultFooServiceJarFile;
 
   protected static File helloExtensionV1JarFile;
+  protected static File loadClassExtensionJarFile;
 
   private static File helloExtensionV2JarFile;
 
@@ -278,6 +279,13 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                    "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
         .compile("mule-module-hello-1.0.0.jar", "1.0.0");
 
+    loadClassExtensionJarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/classloading/LoadClassExtension.java"),
+                   getResourceFile("/org/foo/classloading/LoadClassOperation.java"))
+        .including(getResourceFile("/org/foo/classloading/registry-bootstrap.properties"),
+                   "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
+        .compile("mule-module-classloading-1.0.0.jar", "1.0.0");
+
     helloExtensionV2JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
                                                                 getResourceFile("/org/foo/hello/HelloOperation.java"))
         .compile("mule-module-hello-2.0.0.jar", "2.0.0");
@@ -311,6 +319,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       .dependingOn(new JarFileBuilder("echoTestJar", echoTestJarFile));
   protected final ArtifactPluginFileBuilder helloExtensionV1Plugin = createHelloExtensionV1PluginFileBuilder();
   protected final ArtifactPluginFileBuilder helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
+  protected final ArtifactPluginFileBuilder loadClassExtensionPlugin = createLoadClassExtensionPluginFileBuilder();
 
   protected final ArtifactPluginFileBuilder exceptionThrowingPlugin = createExceptionThrowingPluginFileBuilder();
 
@@ -1415,6 +1424,21 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .addProperty("version", "1.0.0");
     return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0.0")
         .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
+        .describedBy((mulePluginModelBuilder.build()));
+  }
+
+  private ArtifactPluginFileBuilder createLoadClassExtensionPluginFileBuilder() {
+    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("loadClassExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("loadClassExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.classloading.LoadClassExtension")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("loadClassExtensionPlugin-1.0.0")
+        .dependingOn(new JarFileBuilder("loadClassExtension", loadClassExtensionJarFile))
         .describedBy((mulePluginModelBuilder.build()));
   }
 
