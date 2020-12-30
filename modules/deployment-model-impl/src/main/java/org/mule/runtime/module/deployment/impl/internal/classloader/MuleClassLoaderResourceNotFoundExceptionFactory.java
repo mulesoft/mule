@@ -12,6 +12,7 @@ import static java.lang.System.lineSeparator;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getClassNotFoundErrorMessage;
 import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getResourceNotFoundErrorMessage;
+import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -22,6 +23,7 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.container.internal.FilteringContainerClassLoader;
 import org.mule.runtime.core.api.exception.ResourceNotFoundException;
 import org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
@@ -86,6 +88,9 @@ public class MuleClassLoaderResourceNotFoundExceptionFactory implements ClassLoa
                                         BiFunction<String, ClassLoader, T> genericExceptionProviderFunction,
                                         BiFunction<String, ClassLoaderNode, T> detailedExceptionProviderFunction) {
     ClassLoader contextClassLoader = classLoader;
+    if (contextClassLoader instanceof CompositeClassLoader) {
+      contextClassLoader = findClassLoader((CompositeClassLoader) contextClassLoader);
+    }
     if (contextClassLoader instanceof ArtifactClassLoader) {
       ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) contextClassLoader;
       ClassLoaderNode classLoaderNode = createClassLoaderNode(artifactClassLoader);
