@@ -47,7 +47,7 @@ public class AbstractCompletableMethodOperationExecutorTestCase extends Abstract
           protected void doExecute(ExecutionContext<ComponentModel> executionContext, ExecutorCallback callback) {
             final ExecutionContextAdapter context = (ExecutionContextAdapter) executionContext;
             context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM,
-                                new ExecutorCompletionCallbackAdapter(new PreservingClassLoaderExecutorCallback(callback)));
+                                new ExecutorCompletionCallbackAdapter(new PreservingThreadContextExecutorCallback(callback)));
 
             throw expected;
           }
