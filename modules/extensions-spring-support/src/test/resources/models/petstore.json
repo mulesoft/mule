@@ -31903,6 +31903,114 @@
         },
         {
           "key": {
+            "name": "muleVersion"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.runtime.api.meta.MuleVersion",
+              "classInformation": {
+                "classname": "org.mule.runtime.api.meta.MuleVersion",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "typeAlias": {
+                "value": "MuleVersion"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "major"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "int",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": true,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    },
+                    "int": {}
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "minor"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "int",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": true,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    },
+                    "int": {}
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "revision"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "int",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": true,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    },
+                    "int": {}
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "suffix"
+                },
+                "model": {
+                  "type": "String"
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
             "name": "openingDate"
           },
           "model": {
