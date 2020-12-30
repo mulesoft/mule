@@ -9,6 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -18,6 +21,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 import static reactor.core.publisher.Mono.from;
@@ -27,6 +31,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -119,6 +124,22 @@ public class OperationExecutorFactoryWrapperTestCase extends AbstractMuleTestCas
     when(constructModel.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(empty());
     wrapper.createExecutor(constructModel, emptyMap()).execute(ctx);
     verify(ctx, never()).setVariable(eq(COMPLETION_CALLBACK_CONTEXT_PARAM), any());
+  }
+
+  @Test
+  public void preserveClassLoaderOnComplete() {
+    setupJava();
+    when(executor.execute(any())).thenAnswer((Answer<Publisher<Object>>) invocationOnMock -> {
+      ExecutionContextAdapter ctx = invocationOnMock.getArgument(0);
+      CompletionCallback completionCallback = ((CompletionCallback) ctx.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM));
+      completionCallback.success(mock(Result.class));
+      assertThat(completionCallback, instanceOf(PreservingThreadContextCompletionCallback.class));
+      return Mono.empty();
+    });
+
+    from(wrapper.createExecutor(mockOperation(false), emptyMap()).execute(ctx)).block();
+    verify(executor).execute(ctx);
+    verify(ctx, times(1)).setVariable(eq(COMPLETION_CALLBACK_CONTEXT_PARAM), any());
   }
 
   private void assertOperation(boolean java, boolean blocking) {
