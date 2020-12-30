@@ -186,8 +186,8 @@
         <jackson2Version>2.11.3</jackson2Version>
         <javax.inject.version>1</javax.inject.version>
         <javax.transaction.version>1.2</javax.transaction.version>
-        <jerseyVersion>2.11</jerseyVersion>
-        <javassistVersion>3.7.ga</javassistVersion>
+        <jerseyVersion>2.33</jerseyVersion>
+        <javassistVersion>3.25.0-GA</javassistVersion>
         <jakartaMailVersion>1.6.4</jakartaMailVersion>
         <javaXmlBindVersion>2.3.1-MULE-001</javaXmlBindVersion>
         <javaXmlWsVersion>2.2.1</javaXmlWsVersion>
@@ -216,7 +216,7 @@
         <muleMvelVersion>2.1.9-MULE-025</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
-        <ognlVersion>3.0.12</ognlVersion>
+        <ognlVersion>3.1.28</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
         <powermockVersion>1.6.6</powermockVersion>
         <quartzVersion>2.3.2</quartzVersion>
@@ -261,9 +261,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>1.2</version>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>1.3.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -1231,7 +1231,7 @@
             </dependency>
 
             <dependency>
-                <groupId>jboss</groupId>
+                <groupId>org.javassist</groupId>
                 <artifactId>javassist</artifactId>
                 <version>${javassistVersion}</version>
             </dependency>
@@ -1322,6 +1322,11 @@
                         <artifactId>stax-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.inject</groupId>
+                <artifactId>jersey-hk2</artifactId>
+                <version>${jerseyVersion}</version>
             </dependency>
 
             <dependency>
