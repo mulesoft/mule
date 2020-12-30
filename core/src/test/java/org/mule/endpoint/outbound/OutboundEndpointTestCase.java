@@ -16,7 +16,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,6 +33,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
@@ -341,11 +341,11 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         MuleEvent event = mock(MuleEvent.class);
         MessageProcessor messageProcessor = mock(MessageProcessor.class);
 
-        when(outboundEndpoint.getMessageProcessorChain(anyObject())).thenReturn(messageProcessor);
-        when(messageProcessor.process(anyObject())).thenReturn(event);
+        when(outboundEndpoint.getMessageProcessorChain(any(FlowConstruct.class))).thenReturn(messageProcessor);
+        when(messageProcessor.process(any(MuleEvent.class))).thenReturn(event);
         when(outboundEndpoint.getConnector()).thenReturn(new NotTransactedTestConnector(muleContext));
         when(outboundEndpoint.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
-        when(outboundEndpoint.process(anyObject())).thenCallRealMethod();
+        when(outboundEndpoint.process(any(MuleEvent.class))).thenCallRealMethod();
 
         outboundEndpoint.process(event);
     }
