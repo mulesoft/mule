@@ -9,10 +9,13 @@ package org.mule.runtime.module.launcher.log4j2;
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Thread.currentThread;
+import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
+import org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -116,7 +119,7 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
 
   private static ClassLoader getLoggerClassLoader(ClassLoader loggerClassLoader) {
     if (loggerClassLoader instanceof CompositeClassLoader) {
-      return getLoggerClassLoader(((CompositeClassLoader) loggerClassLoader).getDelegates().get(0));
+      return getLoggerClassLoader(findClassLoader((CompositeClassLoader) loggerClassLoader));
     }
 
     // Obtains the first artifact class loader in the hierarchy
