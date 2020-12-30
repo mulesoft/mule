@@ -7,6 +7,10 @@
 
 package org.mule.module.jersey;
 
+import static java.lang.System.getProperty;
+import static org.glassfish.jersey.message.MessageProperties.XML_SECURITY_DISABLE;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.JavaComponent;
@@ -113,7 +117,6 @@ public class JerseyResourcesComponent extends AbstractComponent
         {
             throw new IllegalStateException("There must be at least one component in the Jersey resources.");
         }
-
         initializeOtherResources(exceptionMappers, resources);
         initializeOtherResources(contextResolvers, resources);
 
@@ -154,9 +157,8 @@ public class JerseyResourcesComponent extends AbstractComponent
         {
             properties.put(ServerProperties.PROCESSING_RESPONSE_ERRORS_ENABLED, true);
         }
-
+        properties.put(XML_SECURITY_DISABLE, getProperty(EXPAND_ENTITIES_PROPERTY, "false"));
         resourceConfig = new ResourceConfig();
-
         initializeResources(resourceConfig);
 
         for (String pkg : packages)
