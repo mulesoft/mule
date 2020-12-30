@@ -8,9 +8,10 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
-import static org.mule.runtime.extension.api.ExtensionConstants.POLLING_SOURCE_LIMIT_PARAMETER_NAME;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.extension.api.ExtensionConstants.POLLING_SOURCE_LIMIT_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
@@ -27,7 +28,6 @@ import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -117,7 +117,7 @@ public final class SourceConfigurer {
           @Override
           public Object build(ValueResolvingContext context) throws MuleException {
             Object source = build(resolverSet.resolve(context));
-            MuleVersion muleVersion = new MuleVersion(MuleExtensionModelProvider.MULE_VERSION);
+            MuleVersion muleVersion = new MuleVersion(MULE_VERSION);
             injectDefaultEncoding(model, source, muleContext.getConfiguration().getDefaultEncoding());
             injectRuntimeVersion(model, source, muleVersion);
             injectComponentLocation(source, componentLocation);

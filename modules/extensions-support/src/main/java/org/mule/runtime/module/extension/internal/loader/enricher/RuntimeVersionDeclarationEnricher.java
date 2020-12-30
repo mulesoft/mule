@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
@@ -78,20 +79,21 @@ public class RuntimeVersionDeclarationEnricher implements DeclarationEnricher {
       }
 
       if (fields.size() > 1) {
-        throw new IllegalConfigurationModelDefinitionException(String
-            .format("Only one field is allowed to be annotated with @%s, but class '%s' has %d fields "
-                + "with such annotation. Offending fields are: [%s]", RuntimeVersion.class.getSimpleName(),
-                    typeProperty.getType().getName(),
-                    fields.size(), Joiner.on(", ").join(fields.stream().map(Field::getName).collect(toList()))));
+        throw new IllegalConfigurationModelDefinitionException(format("Only one field is allowed to be annotated with @%s, but class '%s' has %d fields "
+            + "with such annotation. Offending fields are: [%s]", RuntimeVersion.class.getSimpleName(),
+                                                                      typeProperty.getType().getName(),
+                                                                      fields.size(), Joiner.on(", ").join(fields.stream()
+                                                                          .map(Field::getName).collect(toList()))));
       }
 
       final Field runtimeVersionField = fields.iterator().next();
       if (!MuleVersion.class.equals(runtimeVersionField.getType())) {
-        throw new IllegalConfigurationModelDefinitionException(String
-            .format("Class '%s' declares the field '%s' which is annotated with @%s and is of type '%s'. Only "
-                + "fields of type String are allowed to carry such annotation", typeProperty.getType().getName(),
-                    runtimeVersionField.getName(), RuntimeVersion.class.getSimpleName(),
-                    runtimeVersionField.getType().getName()));
+        throw new IllegalConfigurationModelDefinitionException(format("Class '%s' declares the field '%s' which is annotated with @%s and is of type '%s'. Only "
+            + "fields of type %s are allowed to carry such annotation", typeProperty.getType().getName(),
+                                                                      runtimeVersionField.getName(),
+                                                                      RuntimeVersion.class.getSimpleName(),
+                                                                      runtimeVersionField.getType().getName(),
+                                                                      MuleVersion.class));
       }
 
       declaration.addModelProperty(new RuntimeVersionModelProperty(runtimeVersionField));

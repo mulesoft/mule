@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.property;
 
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 
 import java.lang.reflect.Field;
 
 /**
- * A custom model property used to indicate that the class implementing a {@link ConfigurationModel} has a {@link Field}
+ * {@link ModelProperty} used to indicate that the class implementing a {@link ConfigurationModel} has a {@link Field}
  * on which the {@link org.mule.runtime.api.meta.MuleVersion} should be injected.
  *
  * @see RuntimeVersion
