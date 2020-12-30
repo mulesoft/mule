@@ -8,9 +8,7 @@
 
 <!--    <jms:activemq-connector name="connector1"/>-->
 
-    <jms:activemq-connector name="connector1" specification="1.1" maxRedelivery="1" validateConnections="true">
-        <reconnect-forever frequency="10000" />
-    </jms:activemq-connector>
+    <jms:activemq-connector name="connector1" specification="1.1" maxRedelivery="1" validateConnections="true"/>
 
     <jms:endpoint name="dlq" queue="dlq" exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_JOIN"/>
