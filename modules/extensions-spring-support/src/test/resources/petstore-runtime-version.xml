@@ -36,5 +36,10 @@
         <petstore:get-client config-ref="config"/>
         <flow-ref name="testProcessor"/>
     </flow>
+
+    <flow name="operationClassWithRuntimeVersion" initialState="stopped">
+        <petstore:get-mule-version/>
+        <flow-ref name="testProcessor"/>
+    </flow>
     
 </mule>

@@ -17,6 +17,7 @@ import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_E
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.security.SecurityException;
@@ -45,6 +46,7 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.stereotype.ValidatorStereotype;
+import org.mule.sdk.api.annotation.param.RuntimeVersion;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -57,6 +59,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PetStoreOperations {
+
+  @RuntimeVersion
+  MuleVersion muleVersion;
 
   static {
     // Register a feature that behaves differently with runtime versions older than 4.2.2
@@ -249,6 +254,10 @@ public class PetStoreOperations {
   @MediaType(ANY)
   public Class spellClass(Class clazz) {
     return clazz;
+  }
+
+  public MuleVersion getMuleVersion() {
+    return muleVersion;
   }
 
   public static class CorrelationInfoOutputResolver implements OutputTypeResolver<CorrelationInfo> {

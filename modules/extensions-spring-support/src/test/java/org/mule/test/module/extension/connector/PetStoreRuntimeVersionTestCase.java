@@ -44,7 +44,7 @@ public class PetStoreRuntimeVersionTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
-  public void configRuntimeVersion() throws Exception {
+  public void configWithRuntimeVersionFieldRuntimeVersion() throws Exception {
     PetStoreConnector config =
         (PetStoreConnector) flowRunner("configWithRuntimeVersion").run().getMessage().getPayload().getValue();
 
@@ -52,7 +52,7 @@ public class PetStoreRuntimeVersionTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
-  public void sourceRuntimeVersion() throws Exception {
+  public void sourceRuntimeVersionWithRuntimeVersionField() throws Exception {
     startFlow("sourceWithRuntimeVersion");
     MuleVersion muleVersion = (MuleVersion) ((Map) listen().getAttributes().getValue()).get("muleRuntime");
 
@@ -60,11 +60,19 @@ public class PetStoreRuntimeVersionTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
-  public void connectionProviderRuntimeVersion() throws Exception {
+  public void connectionProviderWithRuntimeVersionField() throws Exception {
     PetStoreClient petStoreClient =
         (PetStoreClient) flowRunner("connectionProviderWithRuntimeVersion").run().getMessage().getPayload().getValue();
 
     assertRuntimeVersion(petStoreClient.getMuleVersion());
+  }
+
+  @Test
+  public void operationClassWithRuntimeVersionField() throws Exception {
+    MuleVersion muleVersion =
+        (MuleVersion) flowRunner("operationClassWithRuntimeVersion").run().getMessage().getPayload().getValue();
+
+    assertRuntimeVersion(muleVersion);
   }
 
   private void assertRuntimeVersion(MuleVersion muleVersion) {
