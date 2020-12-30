@@ -740,8 +740,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     if (shouldUsePrecalculatedContext(operationEvent)) {
       operationContext = getPrecalculatedContext(operationEvent);
       operationContext.setCurrentScheduler(currentScheduler);
-      // copy the context to the operationEvent
-      ((InternalEvent) operationContext.getEvent()).setSdkInternalContext(sdkInternalContext);
+      operationContext.changeEvent(event);
     } else {
       operationContext = createExecutionContext(configuration,
                                                 parameters,

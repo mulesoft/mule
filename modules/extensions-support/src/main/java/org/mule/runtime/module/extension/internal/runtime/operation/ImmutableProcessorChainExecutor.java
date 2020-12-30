@@ -101,6 +101,10 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
     return chain.getMessageProcessors();
   }
 
+  public CoreEvent getOriginalEvent() {
+    return originalEvent;
+  }
+
   private static final class Executor {
 
     private final CoreEvent event;
