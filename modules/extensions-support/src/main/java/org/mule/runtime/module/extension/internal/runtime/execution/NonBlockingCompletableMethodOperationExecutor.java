@@ -32,8 +32,10 @@ public class NonBlockingCompletableMethodOperationExecutor<M extends ComponentMo
   @Override
   protected void doExecute(ExecutionContext<M> executionContext, ExecutorCallback callback) {
     final ExecutionContextAdapter<M> context = (ExecutionContextAdapter<M>) executionContext;
-    context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, new ExecutorCompletionCallbackAdapter(callback));
+    context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM,
+                        new ExecutorCompletionCallbackAdapter(new PreservingThreadContextExecutorCallback(callback)));
 
     executor.execute(executionContext);
   }
+
 }
