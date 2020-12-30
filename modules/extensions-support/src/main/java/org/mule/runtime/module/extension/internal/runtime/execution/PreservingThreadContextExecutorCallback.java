@@ -59,8 +59,8 @@ public class PreservingThreadContextExecutorCallback implements ExecutorCallback
       outerClassLoader = currentThread.getContextClassLoader();
       outerMDC = MDC.getCopyOfContextMap();
 
-      setContextClassLoader(currentThread, outerClassLoader, innerClassLoader);
       MDC.setContextMap(innerMDC);
+      setContextClassLoader(currentThread, outerClassLoader, innerClassLoader);
     }
 
     @Override
