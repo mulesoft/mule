@@ -10,13 +10,10 @@ import org.junit.Test;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.transport.jms.ErrorTransformer;
-import org.mule.transport.jms.FlowTransformer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mule.tck.functional.FlowAssert.verify;
 
 /**
  * Tests the correct propagation of the correlation id property within the JMS transport. This test is related to MULE-6577.
@@ -35,12 +32,10 @@ public class JmsTransactionAndErrorHandlingTestCase extends AbstractJmsFunctiona
 
     @Test
     public void testEverythingWorks() throws Exception {
-        FlowTransformer.crash = false;
-
         MuleClient client =  new MuleClient(muleContext);
 
         MuleMessage message = new DefaultMuleMessage("Hello", muleContext);
-        client.dispatch("vm://in", message);
+        client.dispatch("vm://in-everything-works", message);
         MuleMessage result = client.request("vm://out", MID_TIMEOUT);
         assertNull(client.request("vm://error", SHORT_TIMEOUT));
         String payload = result.getPayloadAsString();
@@ -52,12 +47,10 @@ public class JmsTransactionAndErrorHandlingTestCase extends AbstractJmsFunctiona
 
     @Test
     public void testEverythingWorksSimple() throws Exception {
-        FlowTransformer.crash = false;
-
         MuleClient client =  new MuleClient(muleContext);
 
         MuleMessage message = new DefaultMuleMessage("Hello", muleContext);
-        client.dispatch("vm://in-simple", message);
+        client.dispatch("vm://in-everything-works-simple", message);
         MuleMessage result = client.request("vm://out-simple", MID_TIMEOUT);
         assertNull(client.request("vm://error", LONG_TIMEOUT));
         String payload = result.getPayloadAsString();
@@ -69,13 +62,10 @@ public class JmsTransactionAndErrorHandlingTestCase extends AbstractJmsFunctiona
 
     @Test
     public void testErrorInUseCase() throws Exception {
-        FlowTransformer.crash = true;
-        ErrorTransformer.crash = false;
-
         MuleClient client =  new MuleClient(muleContext);
 
         MuleMessage message = new DefaultMuleMessage("Hello", muleContext);
-        client.dispatch("vm://in", message);
+        client.dispatch("vm://in-error-in-use-case", message);
         assertNull(client.request("vm://out", MID_TIMEOUT));
         MuleMessage result = client.request("vm://error", SHORT_TIMEOUT);
         String payload = result.getPayloadAsString();
@@ -91,12 +81,10 @@ public class JmsTransactionAndErrorHandlingTestCase extends AbstractJmsFunctiona
      */
     @Test
     public void testErrorInUseCaseSimple() throws Exception {
-        FlowTransformer.crash = true;
-
         MuleClient client =  new MuleClient(muleContext);
 
         MuleMessage message = new DefaultMuleMessage("Hello", muleContext);
-        client.dispatch("vm://in-simple", message);
+        client.dispatch("vm://in-error-in-use-case-simple", message);
         assertNull(client.request("vm://out-simple", MID_TIMEOUT));
 
         // The transaction was rolled back
@@ -109,13 +97,10 @@ public class JmsTransactionAndErrorHandlingTestCase extends AbstractJmsFunctiona
      */
     @Test
     public void testErrorInUseCaseAndInExceptionHandler() throws Exception {
-        FlowTransformer.crash = true;
-        ErrorTransformer.crash = true;
-
         MuleClient client =  new MuleClient(muleContext);
 
         MuleMessage message = new DefaultMuleMessage("Hello", muleContext);
-        client.dispatch("vm://in", message);
+        client.dispatch("vm://in-error-in-use-case-and-eh", message);
         assertNull(client.request("vm://out", SHORT_TIMEOUT));
 
         // The transaction was rolled back
@@ -128,13 +113,10 @@ public class JmsTransactionAndErrorHandlingTestCase extends AbstractJmsFunctiona
      */
     @Test
     public void testErrorInUseCaseThroughFlowrefAndInExceptionHandler() throws Exception {
-        FlowTransformer.crash = true;
-        ErrorTransformer.crash = true;
-
         MuleClient client =  new MuleClient(muleContext);
 
         MuleMessage message = new DefaultMuleMessage("Hello", muleContext);
-        client.dispatch("vm://in-flowref", message);
+        client.dispatch("vm://in-error-in-use-case-and-eh-flowref", message);
         assertNull(client.request("vm://out", SHORT_TIMEOUT));
 
         // The transaction was rolled back

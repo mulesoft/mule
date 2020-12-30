@@ -16,43 +16,141 @@
     http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
     http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-  <flow name="queue-usescase-with-exception-handler">
-    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-in">
+  <!--  Everything works-->
+
+  <flow name="write-to-queue-everything-works">
+    <vm:inbound-endpoint exchange-pattern="one-way" path="in-everything-works" />
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in-everything-works" />
+  </flow>
+
+  <flow name="everything-works">
+    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-in-everything-works">
       <jms:transaction action="BEGIN_OR_JOIN" />
     </jms:inbound-endpoint>
     <jms:outbound-endpoint connector-ref="connector1" queue="queued-before-flow-transformer">
       <jms:transaction action="BEGIN_OR_JOIN" />
     </jms:outbound-endpoint>
     <append-string-transformer message=", world!"/>
-    <custom-transformer class="org.mule.transport.jms.FlowTransformer"/>
+    <test:component throwException="false"/>
     <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-out">
       <jms:transaction action="BEGIN_OR_JOIN" />
     </jms:outbound-endpoint>
     <catch-exception-strategy>
       <set-payload value="An error occurred!"/>
-      <custom-transformer class="org.mule.transport.jms.ErrorTransformer"/>
+      <test:component throwException="false"/>
       <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-error">
         <jms:transaction action="BEGIN_OR_JOIN" />
       </jms:outbound-endpoint>
     </catch-exception-strategy>
   </flow>
 
-  <flow name="queue-usescase">
-    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-in-simple">
+  <!--  Everything works simple-->
+
+  <flow name="write-to-queue-everything-works-simple">
+    <vm:inbound-endpoint exchange-pattern="one-way" path="in-everything-works-simple"/>
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in-everything-works-simple" />
+  </flow>
+
+  <flow name="everything-works-simple">
+    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-in-everything-works-simple">
       <jms:transaction action="BEGIN_OR_JOIN" />
     </jms:inbound-endpoint>
     <jms:outbound-endpoint connector-ref="connector1" queue="queued-before-flow-transformer">
       <jms:transaction action="BEGIN_OR_JOIN" />
     </jms:outbound-endpoint>
     <append-string-transformer message=", world!"/>
-    <custom-transformer class="org.mule.transport.jms.FlowTransformer"/>
+    <test:component throwException="false"/>
     <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-out-simple">
       <jms:transaction action="BEGIN_OR_JOIN" />
     </jms:outbound-endpoint>
   </flow>
 
-  <flow name="queue-flowref-usescase">
-    <jms:inbound-endpoint queue="test-queue-in-flowref" connector-ref="connector1">
+  <!--  Error in use case-->
+
+  <flow name="write-to-queue-error-in-use-case">
+    <vm:inbound-endpoint exchange-pattern="one-way" path="in-error-in-use-case" />
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in-error-in-use-case" />
+  </flow>
+
+  <flow name="error-in-usecase">
+    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-in-error-in-use-case">
+      <jms:transaction action="BEGIN_OR_JOIN" />
+    </jms:inbound-endpoint>
+    <jms:outbound-endpoint connector-ref="connector1" queue="queued-before-flow-transformer">
+      <jms:transaction action="BEGIN_OR_JOIN" />
+    </jms:outbound-endpoint>
+    <append-string-transformer message=", world!"/>
+    <test:component throwException="true"/>
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-out">
+      <jms:transaction action="BEGIN_OR_JOIN" />
+    </jms:outbound-endpoint>
+    <catch-exception-strategy>
+      <set-payload value="An error occurred!"/>
+      <test:component throwException="false"/>
+      <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-error">
+        <jms:transaction action="BEGIN_OR_JOIN" />
+      </jms:outbound-endpoint>
+    </catch-exception-strategy>
+  </flow>
+
+  <!--  Error in use case simple-->
+
+  <flow name="write-to-queue-error-use-case-simple">
+    <vm:inbound-endpoint exchange-pattern="one-way" path="in-error-in-use-case-simple"/>
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in-error-use-case-simple" />
+  </flow>
+
+  <flow name="error-use-case-simple">
+    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-in-error-use-case-simple">
+      <jms:transaction action="BEGIN_OR_JOIN" />
+    </jms:inbound-endpoint>
+    <jms:outbound-endpoint connector-ref="connector1" queue="queued-before-flow-transformer">
+      <jms:transaction action="BEGIN_OR_JOIN" />
+    </jms:outbound-endpoint>
+    <append-string-transformer message=", world!"/>
+    <test:component throwException="true"/>
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-out-simple">
+      <jms:transaction action="BEGIN_OR_JOIN" />
+    </jms:outbound-endpoint>
+  </flow>
+
+  <!--  Error in use case and in exception handler-->
+
+  <flow name="write-to-queue-error-in-use-case-and-eh">
+    <vm:inbound-endpoint exchange-pattern="one-way" path="in-error-in-use-case-and-eh" />
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in-error-in-use-case-and-eh" />
+  </flow>
+
+  <flow name="error-in-usecase-and-eh">
+    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-in-error-in-use-case-and-eh">
+      <jms:transaction action="BEGIN_OR_JOIN" />
+    </jms:inbound-endpoint>
+    <jms:outbound-endpoint connector-ref="connector1" queue="queued-before-flow-transformer">
+      <jms:transaction action="BEGIN_OR_JOIN" />
+    </jms:outbound-endpoint>
+    <append-string-transformer message=", world!"/>
+    <test:component throwException="true"/>
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-out">
+      <jms:transaction action="BEGIN_OR_JOIN" />
+    </jms:outbound-endpoint>
+    <catch-exception-strategy>
+      <set-payload value="An error occurred!"/>
+      <test:component throwException="true"/>
+      <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-error">
+        <jms:transaction action="BEGIN_OR_JOIN" />
+      </jms:outbound-endpoint>
+    </catch-exception-strategy>
+  </flow>
+
+  <!--  Error in use case and in exception handler flowref -->
+
+  <flow name="write-to-queue-error-in-use-case-and-eh-flowref">
+    <vm:inbound-endpoint exchange-pattern="one-way" path="in-error-in-use-case-and-eh-flowref" />
+    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in-error-in-use-case-and-eh-flowref" />
+  </flow>
+
+  <flow name="error-in-usecase-and-eh-flowref">
+    <jms:inbound-endpoint queue="test-queue-in-error-in-use-case-and-eh-flowref" connector-ref="connector1">
       <jms:transaction action="BEGIN_OR_JOIN" />
     </jms:inbound-endpoint>
     <jms:outbound-endpoint connector-ref="connector1" queue="queued-before-flow-transformer">
@@ -66,32 +164,17 @@
   </flow>
 
   <flow name="flowref-usecase">
-    <custom-transformer class="org.mule.transport.jms.FlowTransformer"/>
+    <test:component throwException="true"/>
     <catch-exception-strategy>
       <set-payload value="An error occurred!"/>
-      <custom-transformer class="org.mule.transport.jms.ErrorTransformer"/>
+      <test:component throwException="true"/>
       <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-error">
         <jms:transaction action="BEGIN_OR_JOIN" />
       </jms:outbound-endpoint>
     </catch-exception-strategy>
   </flow>
 
-  <!-- Test flows -->
-
-  <flow name="write-to-queue">
-    <vm:inbound-endpoint exchange-pattern="one-way" path="in" />
-    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in" />
-  </flow>
-
-  <flow name="write-to-flowref-queue">
-    <vm:inbound-endpoint exchange-pattern="one-way" path="in-flowref" />
-    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in-flowref" />
-  </flow>
-
-  <flow name="read-from-out-queue">
-    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-out" />
-    <vm:outbound-endpoint exchange-pattern="one-way" path="out"/>
-  </flow>
+  <!--  Output -->
 
   <flow name="read-from-error-queue">
     <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-error" />
@@ -99,14 +182,9 @@
     <vm:outbound-endpoint exchange-pattern="one-way" path="error"/>
   </flow>
 
-  <flow name="read-from-dead-letter-queue">
-    <jms:inbound-endpoint connector-ref="connector1" queue="dlq" />
-    <vm:outbound-endpoint exchange-pattern="one-way" path="dead-letter"/>
-  </flow>
-
-  <flow name="write-to-queue-simple">
-    <vm:inbound-endpoint exchange-pattern="one-way" path="in-simple"/>
-    <jms:outbound-endpoint connector-ref="connector1" queue="test-queue-in-simple" />
+  <flow name="read-from-out-queue">
+    <jms:inbound-endpoint connector-ref="connector1" queue="test-queue-out" />
+    <vm:outbound-endpoint exchange-pattern="one-way" path="out"/>
   </flow>
 
   <flow name="read-from-out-queue-simple">
