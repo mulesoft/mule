@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -22,33 +21,26 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
-import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.lang.reflect.Method;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 public class CompletableOperationExecutorFactoryTestCase extends AbstractMuleTestCase {
 
-  private CompletableOperationExecutorFactory<String, ComponentModel> factory;
-  CompletableComponentExecutor<ComponentModel> executor;
-  ExecutionContextAdapter<ComponentModel> executionContext;
-  CompletableComponentExecutor.ExecutorCallback callback;
-  Reference<CompletionCallback<Object, Object>> completionCallbackRef;
-  Reference<ClassLoader> onErrorClassLoaderRef;
-  Reference<ClassLoader> onCompleteClassLoaderRef;
+  private CompletableComponentExecutor<ComponentModel> executor;
+  private ExecutionContextAdapter<ComponentModel> executionContext;
+  private CompletableComponentExecutor.ExecutorCallback callback;
+  private Reference<CompletionCallback<Object, Object>> completionCallbackRef;
+  private Reference<ClassLoader> onErrorClassLoaderRef;
+  private Reference<ClassLoader> onCompleteClassLoaderRef;
 
   @Before
   public void setup() {
-    factory = new CompletableOperationExecutorFactory<>(String.class, String.class.getMethods()[0]);
+    CompletableOperationExecutorFactory<String, ComponentModel> factory =
+        new CompletableOperationExecutorFactory<>(String.class, String.class.getMethods()[0]);
     executor = factory.createExecutor(mock(OperationModel.class), emptyMap());
 
     executionContext = mock(ExecutionContextAdapter.class);
