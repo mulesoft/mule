@@ -14,6 +14,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -36,9 +37,9 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.sdk.api.annotation.param.RuntimeVersion;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -64,7 +65,7 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
     final Set<Class<?>> validatedTypes = new HashSet<>();
     //TODO - MULE-14401 - Make InjectedFieldsModelValidator work in AST Mode
-    Boolean isASTMode = !extensionModel.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+    boolean isASTMode = !extensionModel.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
         .map(mp -> mp.getType().getDeclaringClass().isPresent())
         .orElse(false);
 
@@ -74,14 +75,17 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
 
           @Override
           protected void onSource(HasSourceModels owner, SourceModel model) {
-            validateFields(model, getImplementingType(model), DefaultEncoding.class);
+            Optional<Class> implementingType = getImplementingType(model);
+            validateFields(model, implementingType, DefaultEncoding.class, String.class);
+            validateFields(model, implementingType, RuntimeVersion.class, MuleVersion.class);
           }
 
           @Override
           protected void onConfiguration(ConfigurationModel model) {
             Optional<Class> implementingType = getImplementingType(model);
-            validateFields(model, implementingType, DefaultEncoding.class);
-            validateFields(model, implementingType, RefName.class);
+            validateFields(model, implementingType, DefaultEncoding.class, String.class);
+            validateFields(model, implementingType, RefName.class, String.class);
+            validateFields(model, implementingType, RuntimeVersion.class, MuleVersion.class);
           }
 
           @Override
@@ -92,8 +96,10 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
 
           @Override
           protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-            validateFields(model, getImplementingType(model), DefaultEncoding.class);
-            validateFields(model, getImplementingType(model), RefName.class);
+            Optional<Class> implementingType = getImplementingType(model);
+            validateFields(model, implementingType, DefaultEncoding.class, String.class);
+            validateFields(model, implementingType, RefName.class, String.class);
+            validateFields(model, implementingType, RuntimeVersion.class, MuleVersion.class);
           }
 
           @Override
@@ -107,7 +113,7 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
                     try {
                       Class<?> type = getType(objectType, classLoaderModelProperty.getClassLoader());
                       if (validatedTypes.add(type)) {
-                        validateType(model, type, DefaultEncoding.class);
+                        validateType(model, type, DefaultEncoding.class, String.class);
                       }
                     } catch (Exception e) {
                       problemsReporter.addWarning(new Problem(model, "Could not validate Class: " + e.getMessage()));
@@ -148,13 +154,12 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
           }
 
           private void validateFields(NamedObject model, Optional<Class> implementingType,
-                                      Class<? extends Annotation> annotationClass) {
-            implementingType.ifPresent(type -> {
-              validateType(model, type, annotationClass);
-            });
+                                      Class<? extends Annotation> annotationClass, Class implementingClass) {
+            implementingType.ifPresent(type -> validateType(model, type, annotationClass, implementingClass));
           }
 
-          private void validateType(NamedObject model, Class<?> type, Class<? extends Annotation> annotationClass) {
+          private void validateType(NamedObject model, Class<?> type, Class<? extends Annotation> annotationClass,
+                                    Class implementingClass) {
             List<Field> fields = getAnnotatedFields(type, annotationClass);
             if (fields.isEmpty()) {
               return;
@@ -166,12 +171,13 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
             }
 
             Field field = fields.get(0);
-            if (!String.class.equals(field.getType())) {
+            if (!implementingClass.equals(field.getType())) {
               problemsReporter
                   .addError(new Problem(model,
                                         format("Class '%s' declares the field '%s' which is annotated with @%s and is of type '%s'. Only "
-                                            + "fields of type String are allowed to carry such annotation", type.getName(),
-                                               field.getName(), annotationClass.getSimpleName(), field.getType().getName())));
+                                            + "fields of type %s are allowed to carry such annotation", type.getName(),
+                                               field.getName(), annotationClass.getSimpleName(), field.getType().getName(),
+                                               implementingClass)));
             }
           }
         }.walk(extensionModel);

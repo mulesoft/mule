@@ -14,12 +14,14 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
@@ -182,7 +184,9 @@ public final class ConfigurationInstanceFactory<T> {
   private Pair<T, ResolverSetResult> createConfigurationInstance(String name, ResolverSetResult resolverSetResult)
       throws MuleException {
     Pair<T, ResolverSetResult> config = configurationObjectBuilder.build(resolverSetResult);
-    injectFields(configurationModel, config.getFirst(), name, muleContext.getConfiguration().getDefaultEncoding());
+    MuleVersion muleVersion = new MuleVersion(MuleExtensionModelProvider.MULE_VERSION);
+    injectFields(configurationModel, config.getFirst(), name, muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
+
 
     return config;
   }
@@ -190,7 +194,9 @@ public final class ConfigurationInstanceFactory<T> {
   private Pair<T, ResolverSetResult> createConfigurationInstance(String name, CoreEvent event) throws MuleException {
     try (ValueResolvingContext context = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build()) {
       Pair<T, ResolverSetResult> config = configurationObjectBuilder.build(context);
-      injectFields(configurationModel, config.getFirst(), name, muleContext.getConfiguration().getDefaultEncoding());
+      String muleversion = MuleExtensionModelProvider.MULE_VERSION;
+      MuleVersion muleVersion = new MuleVersion(muleversion);
+      injectFields(configurationModel, config.getFirst(), name, muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
       return config;
     }
   }

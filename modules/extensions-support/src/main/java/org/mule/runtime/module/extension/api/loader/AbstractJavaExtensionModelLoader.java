@@ -53,6 +53,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.PollingSourceD
 import org.mule.runtime.module.extension.internal.loader.enricher.RedeliveryPolicyDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RequiredForMetadataDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.RuntimeVersionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SampleDataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
@@ -121,6 +122,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new BooleanParameterDeclarationEnricher(),
                                                                                                new RefNameDeclarationEnricher(),
                                                                                                new DefaultEncodingDeclarationEnricher(),
+                                                                                               new RuntimeVersionDeclarationEnricher(),
                                                                                                new DeprecationModelDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
                                                                                                new NotificationsDeclarationEnricher(),

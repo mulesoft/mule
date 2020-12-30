@@ -6,6 +6,7 @@
  */
 package org.mule.test.petstore.extension;
 
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
@@ -20,8 +21,8 @@ public class TransactionalPetStoreClient extends PetStoreClient implements Trans
 
   public TransactionalPetStoreClient(String username, String password, TlsContextFactory tlsContextFactory,
                                      String configName, Date openingDate, List<Date> closedForHolidays,
-                                     List<LocalDateTime> discountDates) {
-    super(username, password, tlsContextFactory, configName, openingDate, closedForHolidays, discountDates);
+                                     List<LocalDateTime> discountDates, MuleVersion muleVersion) {
+    super(username, password, tlsContextFactory, configName, openingDate, closedForHolidays, discountDates, muleVersion);
   }
 
   @Override

@@ -15,12 +15,15 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
+import org.mule.sdk.api.annotation.param.RuntimeVersion;
+
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -59,6 +62,9 @@ public abstract class PetStoreConnectionProvider<T extends PetStoreClient> imple
   @Parameter
   protected List<LocalDateTime> discountDates;
 
+  @RuntimeVersion
+  protected MuleVersion muleVersion;
+
   private int initialise, start, stop, dispose = 0;
 
   @Override
@@ -66,7 +72,8 @@ public abstract class PetStoreConnectionProvider<T extends PetStoreClient> imple
     if (!username.equals(USERNAME)) {
       throw new ConnectionException("We only know john");
     }
-    return (T) new PetStoreClient(username, password, tls, configName, openingDate, closedForHolidays, discountDates);
+    return (T) new PetStoreClient(username, password, tls, configName, openingDate, closedForHolidays, discountDates,
+                                  muleVersion);
   }
 
   @Override

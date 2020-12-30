@@ -59,6 +59,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -114,8 +115,9 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectedFieldModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
+import org.mule.runtime.module.extension.internal.loader.java.property.RuntimeVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.sdk.api.runtime.source.Source;
+import org.mule.sdk.api.annotation.param.RuntimeVersion;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -1407,7 +1409,7 @@ public final class IntrospectionUtils {
     return empty();
   }
 
-  private static void injectFieldFromModelProperty(Object target, String value,
+  private static void injectFieldFromModelProperty(Object target, Object value,
                                                    Optional<? extends InjectedFieldModelProperty> modelProperty,
                                                    Class<? extends Annotation> annotationClass) {
     if (value == null || modelProperty == null) {
@@ -1458,9 +1460,11 @@ public final class IntrospectionUtils {
    * @param configName to be injected into the {@link String} field annotated with {@link RefName}
    * @param encoding   to be injected into the {@link String} field annotated with {@link DefaultEncoding}
    */
-  public static void injectFields(EnrichableModel model, Object target, String configName, String encoding) {
+  public static void injectFields(EnrichableModel model, Object target, String configName, String encoding,
+                                  MuleVersion muleVersion) {
     injectFieldFromModelProperty(target, configName, model.getModelProperty(RequireNameField.class), RefName.class);
     injectDefaultEncoding(model, target, encoding);
+    injectRuntimeVersion(model, target, muleVersion);
   }
 
   /**
@@ -1474,6 +1478,11 @@ public final class IntrospectionUtils {
   public static void injectDefaultEncoding(EnrichableModel model, Object target, String encoding) {
     injectFieldFromModelProperty(target, encoding, model.getModelProperty(DefaultEncodingModelProperty.class),
                                  DefaultEncoding.class);
+  }
+
+  public static void injectRuntimeVersion(EnrichableModel model, Object target, MuleVersion muleVersion) {
+    injectFieldFromModelProperty(target, muleVersion, model.getModelProperty(RuntimeVersionModelProperty.class),
+                                 RuntimeVersion.class);
   }
 
   /**

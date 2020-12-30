@@ -15,16 +15,19 @@ import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRAT
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRefName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRuntimeVersion;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -114,7 +117,9 @@ public final class SourceConfigurer {
           @Override
           public Object build(ValueResolvingContext context) throws MuleException {
             Object source = build(resolverSet.resolve(context));
+            MuleVersion muleVersion = new MuleVersion(MuleExtensionModelProvider.MULE_VERSION);
             injectDefaultEncoding(model, source, muleContext.getConfiguration().getDefaultEncoding());
+            injectRuntimeVersion(model, source, muleVersion);
             injectComponentLocation(source, componentLocation);
             config.ifPresent(c -> injectRefName(source, c.getName(), getReflectionCache()));
             return source;
