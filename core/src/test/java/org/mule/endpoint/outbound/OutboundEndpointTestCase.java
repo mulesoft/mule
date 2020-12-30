@@ -45,12 +45,10 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.RequestResponseOutboundEndpointCantRunTransacted;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.context.notification.Event1;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.endpoint.DefaultOutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.security.TestSecurityFilter;
 import org.mule.tck.testmodels.mule.TestConnector;
@@ -61,8 +59,6 @@ import org.mule.transformer.simple.ResponseAppendTransformer;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.CoreMatchers;
