@@ -150,6 +150,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
    */
   public static final String LOCAL_OBJECT_STORE_MANAGER_KEY = LOCAL_OBJECT_STORE_MANAGER;
   public static final String LOCAL_QUEUE_MANAGER_KEY = "_localQueueManager";
+  public static final String ARTIFACT_STOPPED_LISTENER = "artifactStoppedListener";
 
   public static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
 
@@ -357,6 +358,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       fireNotification(new MuleContextNotification(this, CONTEXT_STARTED));
       final org.mule.runtime.api.artifact.Registry apiRegistry = getApiRegistry();
       listeners.forEach(l -> l.onStart(this, apiRegistry));
+      Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
+          Optional.ofNullable(getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER));
+      optionalArtifactStoppedListener.ifPresent(ArtifactStoppedListener::onStart);
 
       startLatch.release();
 
@@ -414,6 +418,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       final org.mule.runtime.api.artifact.Registry apiRegistry = getApiRegistry();
       listeners.forEach(l -> l.onStop(this, apiRegistry));
+      Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
+          Optional.ofNullable(getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER));
+      optionalArtifactStoppedListener.ifPresent(ArtifactStoppedListener::onStop);
     }
   }
 

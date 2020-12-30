@@ -130,8 +130,4 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   public Domain deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties) {
     return domainDeployer.deployExplodedArtifact(artifactDir, deploymentProperties);
   }
-
-  public void addArtifactStoppedDeploymentListener(ArtifactStoppedDeploymentListener artifactStoppedDeploymentListener) {
-    this.domainDeployer.addArtifactStoppedDeploymentListener(artifactStoppedDeploymentListener);
-  }
 }

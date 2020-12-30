@@ -8,6 +8,9 @@ package org.mule.runtime.module.deployment.internal;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+import org.mule.runtime.core.internal.context.ArtifactStoppedListener;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -16,6 +19,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.slf4j.Logger;
@@ -38,6 +42,7 @@ import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
@@ -60,7 +65,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   private final ObservableList<T> artifacts;
   private final ArtifactDeploymentTemplate deploymentTemplate;
   private final MuleContextListenerFactory muleContextListenerFactory;
-  private final List<ArtifactStoppedDeploymentListener> artifactStoppedDeploymentListeners = new ArrayList<>();
   private AbstractDeployableArtifactFactory<T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
 
@@ -185,11 +189,9 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     logRequestToUndeployArtifact(artifact);
     try {
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
-      artifactStoppedDeploymentListeners.forEach(l -> {
-        if (l.getArtifactName().equals(artifact.getArtifactName())) {
-          l.onStopDoNotPersist();
-        }
-      });
+      Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
+          artifact.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER);
+      optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
       deployer.undeploy(artifact);
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
     } catch (DeploymentException e) {
@@ -299,11 +301,9 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
 
       artifacts.remove(artifact);
-      artifactStoppedDeploymentListeners.forEach(l -> {
-        if (l.getArtifactName().equals(artifact.getArtifactName())) {
-          l.onStopDoNotPersist();
-        }
-      });
+      Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
+          artifact.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER);
+      optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
       deployer.undeploy(artifact);
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
@@ -380,15 +380,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     deploymentListener.onRedeploymentStart(artifactName);
 
     deploymentTemplate.preRedeploy(artifact);
+    Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
+        artifact.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER);
 
     if (!artifactZombieMap.containsKey(artifactName)) {
       deploymentListener.onUndeploymentStart(artifactName);
+      optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
       try {
-        artifactStoppedDeploymentListeners.forEach(l -> {
-          if (l.getArtifactName().equals(artifactName)) {
-            l.onStopDoNotPersist();
-          }
-        });
         deployer.undeploy(artifact);
         artifact = null;
         deploymentListener.onUndeploymentSuccess(artifactName);
@@ -418,7 +416,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       trackArtifact(artifact);
 
       deployer.deploy(artifact);
-      addArtifactStoppedDeploymentListenerToArtifact(artifact);
+      addArtifactStoppedDeploymentListenerToArtifact(artifact, optionalArtifactStoppedListener);
       artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
       deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
       deploymentTemplate.postRedeploy(artifact);
@@ -562,18 +560,15 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     return deployExplodedApp(artifactDir, deploymentProperties);
   }
 
-  public void addArtifactStoppedDeploymentListener(ArtifactStoppedDeploymentListener artifactStoppedDeploymentListener) {
-    this.artifactStoppedDeploymentListeners.add(artifactStoppedDeploymentListener);
-  }
-
-  private void addArtifactStoppedDeploymentListenerToArtifact(T artifact){
-    Optional<ArtifactStoppedDeploymentListener> optionalArtifactStoppedDeploymentListener =
-        artifactStoppedDeploymentListeners.stream().filter(l -> l.getArtifactName().equals(artifact.getArtifactName())).findAny();
-    if (optionalArtifactStoppedDeploymentListener.isPresent()) {
-      MuleContextDeploymentListener muleContextListener =
-          new MuleContextDeploymentListener(artifact.getArtifactName(), optionalArtifactStoppedDeploymentListener.get());
-      artifact.setMuleContextListener(muleContextListener);
-    }
+  private void addArtifactStoppedDeploymentListenerToArtifact(T artifact,
+                                                              Optional<ArtifactStoppedListener> optionalArtifactStoppedDeploymentListener) {
+    optionalArtifactStoppedDeploymentListener.ifPresent(artifactStoppedDeploymentListener -> {
+      artifactStoppedDeploymentListener.mustPersist(true);
+      ArtifactFactoryUtils.withArtifactMuleContext(artifact, muleContext -> {
+        MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
+        muleRegistry.registerObject(ARTIFACT_STOPPED_LISTENER, artifactStoppedDeploymentListener);
+      });
+    });
   }
 
   private static class ZombieArtifact {

@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.core.internal.context.ArtifactStoppedListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 
-public class ArtifactStoppedDeploymentListener implements DeploymentListener {
+public class ArtifactStoppedDeploymentListener implements ArtifactStoppedListener {
 
   private transient final Logger logger = LoggerFactory.getLogger(getClass());
   private AtomicBoolean shouldPersist;
@@ -31,7 +30,7 @@ public class ArtifactStoppedDeploymentListener implements DeploymentListener {
   }
 
   @Override
-  public void onArtifactStarted(String artifactName, Registry registry) {
+  public void onStart() {
     Properties properties = new Properties();
     properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, String.valueOf(true));
     try {
@@ -43,7 +42,7 @@ public class ArtifactStoppedDeploymentListener implements DeploymentListener {
   }
 
   @Override
-  public void onArtifactStopped(String artifactName, Registry registry) {
+  public void onStop() {
     if (!shouldPersist.get()) {
       return;
     }
@@ -57,11 +56,8 @@ public class ArtifactStoppedDeploymentListener implements DeploymentListener {
     }
   }
 
-  public void onStopDoNotPersist() {
-    shouldPersist.set(false);
-  }
-
-  public String getArtifactName() {
-    return this.artifactName;
+  @Override
+  public void mustPersist(boolean doPersist) {
+    shouldPersist.set(doPersist);
   }
 }
