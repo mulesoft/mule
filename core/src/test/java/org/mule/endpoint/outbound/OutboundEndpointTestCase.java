@@ -16,6 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -26,12 +27,15 @@ import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.RequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.CompletionHandler;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.SecurityFilter;
@@ -39,12 +43,15 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageDispatcher;
+import org.mule.api.transport.RequestResponseOutboundEndpointCantRunTransacted;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
+import org.mule.endpoint.DefaultOutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.security.TestSecurityFilter;
+import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
 import org.mule.transformer.simple.OutboundAppendTransformer;
@@ -327,6 +334,22 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(endpoint, objectAware.endpoint);
     }
 
+    @Test(expected = DefaultMuleException.class)
+    public void testOutboundEndpointWithNotTransactedConnector() throws Exception
+    {
+        DefaultOutboundEndpoint outboundEndpoint = mock(DefaultOutboundEndpoint.class);
+        MuleEvent event = mock(MuleEvent.class);
+        MessageProcessor messageProcessor = mock(MessageProcessor.class);
+
+        when(outboundEndpoint.getMessageProcessorChain(anyObject())).thenReturn(messageProcessor);
+        when(messageProcessor.process(anyObject())).thenReturn(event);
+        when(outboundEndpoint.getConnector()).thenReturn(new NotTransactedTestConnector(muleContext));
+        when(outboundEndpoint.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
+        when(outboundEndpoint.process(anyObject())).thenCallRealMethod();
+
+        outboundEndpoint.process(event);
+    }
+
     protected MuleEvent assertMessageSent(boolean sync) throws MuleException
     {
         MuleEvent event;
@@ -439,6 +462,13 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
             sensedSendEvent = event;
             latch.countDown();
             super.doSendNonBlocking(event, completionHandler);
+        }
+    }
+
+    protected class NotTransactedTestConnector extends TestConnector implements RequestResponseOutboundEndpointCantRunTransacted
+    {
+        public NotTransactedTestConnector(MuleContext context) {
+            super(context);
         }
     }
 
