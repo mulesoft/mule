@@ -59,7 +59,7 @@ public final class ReactiveOperationExecutionWrapper<M extends ComponentModel>
     ExecutionContextAdapter<M> context = (ExecutionContextAdapter<M>) executionContext;
     return Mono.create(sink -> {
       ReactorCompletionCallback callback = new ReactorCompletionCallback(sink);
-      context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, callback);
+      context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, new PreservingThreadContextCompletionCallback<>(callback));
 
       try {
         delegate.execute(executionContext);
