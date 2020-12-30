@@ -6,5 +6,9 @@
  */
 package org.mule.api.transport;
 
+/*
+    Connector implementing this interface will throw an exception when a DefaultOutboundEndpoint with a transaction and
+    Request-Response exchange pattern is called.
+ */
 public interface RequestResponseOutboundEndpointCantRunTransacted {
 }
