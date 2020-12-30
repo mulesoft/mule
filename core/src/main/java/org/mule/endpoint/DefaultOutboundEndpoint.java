@@ -8,6 +8,7 @@ package org.mule.endpoint;
 
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -24,6 +25,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transport.RequestResponseOutboundEndpointCantRunTransacted;
 import org.mule.api.transport.Connector;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.AbstractConnector;
@@ -105,6 +107,12 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
         else
         {
+            if(getConnector() instanceof RequestResponseOutboundEndpointCantRunTransacted)
+            {
+                throw new DefaultMuleException("Request-reply in a transactional context " +
+                        "will never commit the transaction. " +
+                        "Either use no-transaction or one-way.");
+            }
             return result;
         }
     }
