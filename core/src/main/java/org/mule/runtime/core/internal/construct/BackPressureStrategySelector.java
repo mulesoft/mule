@@ -14,6 +14,8 @@ import static org.mule.runtime.core.internal.construct.FlowBackPressureException
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements the different backpressure handling strategies, and checks against a
@@ -23,6 +25,8 @@ import org.mule.runtime.core.api.source.MessageSource;
  * @Since 4.3
  */
 class BackPressureStrategySelector {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(BackPressureStrategySelector.class);
 
   private static int EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
@@ -41,11 +45,17 @@ class BackPressureStrategySelector {
   protected void checkWithWaitStrategy(CoreEvent event)
       throws FlowBackPressureException {
     boolean accepted = false;
+    boolean logException = true;
     while (!accepted) {
       try {
         abstractPipeline.getProcessingStrategy().checkBackpressureAccepting(event);
         accepted = true;
       } catch (FromFlowRejectedExecutionException ree) {
+    	if (logException) {
+    	  LOGGER.error("First FlowRejectedExecution", ree);
+    	  // avoid logging every 2ms
+    	  logException = false;
+    	}
         // TODO MULE-16106 Add a callback for WAIT back pressure applied on the source
         try {
           sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
