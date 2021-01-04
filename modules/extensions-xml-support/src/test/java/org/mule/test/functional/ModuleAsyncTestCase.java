@@ -6,15 +6,13 @@
  */
 package org.mule.test.functional;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.AsyncStory.ASYNC;
 
-import org.mule.tests.api.TestQueueManager;
+import org.mule.functional.api.component.TestConnectorQueueHandler;
 
-import javax.inject.Inject;
-
+import org.junit.Before;
 import org.junit.Test;
 
 import io.qameta.allure.Issue;
@@ -23,8 +21,7 @@ import io.qameta.allure.Story;
 @Story(ASYNC)
 public class ModuleAsyncTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
-  @Inject
-  private TestQueueManager queueManager;
+  private TestConnectorQueueHandler queueHandler;
 
   @Override
   protected String getModulePath() {
@@ -36,17 +33,20 @@ public class ModuleAsyncTestCase extends AbstractCeXmlExtensionMuleArtifactFunct
     return "flows/flows-using-module-async.xml";
   }
 
+  @Before
+  public void before() {
+    queueHandler = new TestConnectorQueueHandler(registry);
+  }
+
   @Test
   @Issue("MULE-19091")
   public void asyncWithNonBlockingOperation() throws Exception {
     flowRunner("asyncWithNonBlockingOperation").run();
-    assertThat(queueManager.read("asyncResponseQueue-module-async-default-config-global-element-suffix", RECEIVE_TIMEOUT,
-                                 MILLISECONDS),
+    assertThat(queueHandler.read("asyncResponseQueue", RECEIVE_TIMEOUT),
                notNullValue());
 
     flowRunner("asyncWithNonBlockingOperation").run();
-    assertThat(queueManager.read("asyncResponseQueue-module-async-default-config-global-element-suffix", RECEIVE_TIMEOUT,
-                                 MILLISECONDS),
+    assertThat(queueHandler.read("asyncResponseQueue", RECEIVE_TIMEOUT),
                notNullValue());
   }
 
