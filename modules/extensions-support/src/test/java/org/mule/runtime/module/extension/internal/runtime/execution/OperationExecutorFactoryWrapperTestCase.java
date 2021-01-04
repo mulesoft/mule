@@ -127,7 +127,7 @@ public class OperationExecutorFactoryWrapperTestCase extends AbstractMuleTestCas
   public void javaNonBlockingUsesPreservingThreadContextCompletionCallback() {
     setupJava();
     when(executor.execute(any())).thenAnswer((Answer<Publisher<Object>>) invocationOnMock -> {
-      ExecutionContextAdapter ctx = invocationOnMock.getArgument(0);
+      ExecutionContextAdapter ctx = (ExecutionContextAdapter) invocationOnMock.getArguments()[0];
       CompletionCallback completionCallback = ((CompletionCallback) ctx.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM));
       completionCallback.success(mock(Result.class));
       assertThat(completionCallback, instanceOf(PreservingThreadContextCompletionCallback.class));
