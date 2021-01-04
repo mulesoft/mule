@@ -97,11 +97,9 @@ public class PropertiesResolverUtils {
                                                    environmentPropertiesConfigurationProvider);
 
     // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
-    featureFlaggingService.ifPresent(ffService -> {
-      if (ffService.isEnabled(HONOUR_RESERVED_PROPERTIES)) {
-        localResolver.setRootResolver(parentLocalResolver);
-      }
-    });
+    if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
+      localResolver.setRootResolver(parentLocalResolver);
+    }
 
     artifactAst.updatePropertiesResolver(localResolver);
     List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
