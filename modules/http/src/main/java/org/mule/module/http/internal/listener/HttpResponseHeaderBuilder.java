@@ -62,7 +62,7 @@ public class HttpResponseHeaderBuilder
         }
         else
         {
-            if(headerValue == null)
+            if (headerValue == null)
             {
                 LOGGER.warn("The header " + headerName + " is null. Removing it from the response.");
                 return;
