@@ -68,7 +68,7 @@ public class PropertiesResolverUtils {
                                                                                                Optional<ConfigurationProperties> parentConfigurationProperties,
                                                                                                Map<String, String> deploymentProperties,
                                                                                                ResourceProvider externalResourceProvider,
-                                                                                               FeatureFlaggingService featureFlaggingService) {
+                                                                                               Optional<FeatureFlaggingService> featureFlaggingService) {
     ConfigurationPropertiesProvider deploymentPropertiesConfigurationProperties = null;
     if (!deploymentProperties.isEmpty()) {
       deploymentPropertiesConfigurationProperties =
@@ -97,9 +97,11 @@ public class PropertiesResolverUtils {
                                                    environmentPropertiesConfigurationProvider);
 
     // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
-    if (featureFlaggingService.isEnabled(HONOUR_RESERVED_PROPERTIES)) {
-      localResolver.setRootResolver(parentLocalResolver);
-    }
+    featureFlaggingService.ifPresent(ffService -> {
+      if (ffService.isEnabled(HONOUR_RESERVED_PROPERTIES)) {
+        localResolver.setRootResolver(parentLocalResolver);
+      }
+    });
 
     artifactAst.updatePropertiesResolver(localResolver);
     List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =

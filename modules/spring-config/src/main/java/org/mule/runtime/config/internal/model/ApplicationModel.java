@@ -125,13 +125,32 @@ public class ApplicationModel implements ArtifactAst {
   public ApplicationModel(ArtifactAst artifactAst,
                           Map<String, String> deploymentProperties,
                           Optional<ConfigurationProperties> parentConfigurationProperties,
+                          ResourceProvider externalResourceProvider) {
+    this(artifactAst, deploymentProperties, parentConfigurationProperties, externalResourceProvider, null);
+  }
+
+
+  /**
+   * Creates an {code ApplicationModel} from an {@link ArtifactAst}.
+   * <p/>
+   * A set of validations are applied that may make creation fail.
+   * 
+   * @param artifactAst
+   * @param deploymentProperties
+   * @param parentConfigurationProperties
+   * @param externalResourceProvider
+   * @param featureFlaggingService
+   */
+  public ApplicationModel(ArtifactAst artifactAst,
+                          Map<String, String> deploymentProperties,
+                          Optional<ConfigurationProperties> parentConfigurationProperties,
                           ResourceProvider externalResourceProvider,
                           FeatureFlaggingService featureFlaggingService) {
     this.originalAst = artifactAst;
 
     this.configurationProperties = createConfigurationAttributeResolver(originalAst, parentConfigurationProperties,
                                                                         deploymentProperties, externalResourceProvider,
-                                                                        featureFlaggingService);
+                                                                        ofNullable(featureFlaggingService));
     try {
       initialiseIfNeeded(configurationProperties.getConfigurationPropertiesResolver());
     } catch (InitialisationException e) {
