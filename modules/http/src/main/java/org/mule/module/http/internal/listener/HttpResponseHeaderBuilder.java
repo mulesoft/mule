@@ -62,6 +62,12 @@ public class HttpResponseHeaderBuilder
         }
         else
         {
+            if(headerValue == null)
+            {
+                LOGGER.warn("The header " + headerName + " is null. Removing it from the response.");
+                return;
+            }
+
             addSimpleValue(headerName, headerValue.toString());
         }
     }
