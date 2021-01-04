@@ -42,7 +42,6 @@ import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -106,7 +105,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private final MessageProcessorChainBuilder delegateBuilder;
   protected MessageProcessorChain delegate;
-  private reactor.core.scheduler.Scheduler reactorScheduler;
+  private Scheduler reactorScheduler;
   protected String name;
   private Integer maxConcurrency;
 
@@ -155,24 +154,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   }
 
   /**
-   * A fallback method for creating a {@link ProcessingStrategyFactory} to be used in case the user hasn't specified one, either
-   * through {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the {@link ProcessingStrategyFactory} class name
-   * system property
+   * A fallback method for creating a {@link ProcessingStrategyFactory}.
    *
    * @return a {@link DirectProcessingStrategyFactory}
    */
   protected ProcessingStrategyFactory createDefaultProcessingStrategyFactory() {
     return new DirectProcessingStrategyFactory();
-  }
-
-  private ProcessingStrategyFactory defaultProcessingStrategy() {
-    final ProcessingStrategyFactory defaultProcessingStrategyFactory =
-        getMuleContext().getConfiguration().getDefaultProcessingStrategyFactory();
-    if (defaultProcessingStrategyFactory == null) {
-      return createDefaultProcessingStrategyFactory();
-    } else {
-      return defaultProcessingStrategyFactory;
-    }
   }
 
   @Override
@@ -186,9 +173,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     final SchedulerConfig schedulerConfig =
         getMuleContext().getSchedulerBaseConfig().withName(name != null ? name : getLocation().getLocation());
-    reactorScheduler = fromExecutorService(processingStrategy.isSynchronous()
+    reactorScheduler = processingStrategy.isSynchronous()
         ? schedulerService.ioScheduler(schedulerConfig)
-        : schedulerService.cpuLightScheduler(schedulerConfig));
+        : schedulerService.cpuLightScheduler(schedulerConfig);
 
     startIfNeeded(backpressureHandler);
     super.start();
@@ -204,7 +191,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     stopIfNeeded(delegate);
 
     if (reactorScheduler != null) {
-      reactorScheduler.dispose();
+      reactorScheduler.stop();
       reactorScheduler = null;
     }
     stopIfNeeded(processingStrategy);
@@ -231,7 +218,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
               .map(event -> asyncEvent(event));
 
           if (isTransactionActive() && !processingStrategy.isSynchronous()) {
-            asyncPublisher = asyncPublisher.publishOn(reactorScheduler);
+            asyncPublisher = asyncPublisher.publishOn(fromExecutorService(reactorScheduler));
           }
 
           asyncPublisher
@@ -279,7 +266,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private ReactiveProcessor scheduleAsync(Processor delegate) {
     if (processingStrategy.isSynchronous()) {
       // schedule async processing using IO pool.
-      return publisher -> from(publisher).transform(delegate).subscribeOn(reactorScheduler);
+      return publisher -> from(publisher).transform(delegate).subscribeOn(fromExecutorService(reactorScheduler));
     } else {
       return delegate;
     }

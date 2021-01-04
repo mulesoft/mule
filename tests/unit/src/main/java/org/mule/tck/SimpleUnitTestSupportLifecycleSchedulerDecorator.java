@@ -243,7 +243,7 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
 
   @Override
   public String toString() {
-    return getName();
+    return getName() + " - " + decorated.toString();
   }
 
   public Scheduler getDecorated() {
