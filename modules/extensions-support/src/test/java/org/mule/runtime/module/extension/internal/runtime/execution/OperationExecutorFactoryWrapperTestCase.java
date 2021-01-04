@@ -48,6 +48,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMe
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -127,7 +128,8 @@ public class OperationExecutorFactoryWrapperTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void preserveClassLoaderOnComplete() {
+  @Issue("MULE-19097")
+  public void javaNonBlockingUsesPreservingThreadContextCompletionCallback() {
     setupJava();
     when(executor.execute(any())).thenAnswer((Answer<Publisher<Object>>) invocationOnMock -> {
       ExecutionContextAdapter ctx = invocationOnMock.getArgument(0);
