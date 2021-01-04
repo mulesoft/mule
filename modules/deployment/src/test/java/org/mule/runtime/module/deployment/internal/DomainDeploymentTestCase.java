@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
@@ -27,18 +28,20 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
@@ -50,12 +53,14 @@ import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.util.CompilerUtils;
 
 import java.io.ByteArrayInputStream;
@@ -67,15 +72,16 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 
 /**
  * Contains test for domain deployment
@@ -1719,6 +1725,87 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     }
   }
 
+  @Test
+  @Issue("MULE-18159")
+  public void pluginDeclaredInDomainIsAbleToLoadClassesExportedByTheAppWhereItIsUsed() throws Exception {
+    // Given a plugin which loads classes.
+    final ArtifactPluginFileBuilder pluginWhichLoadsClasses = loadClassExtensionPlugin;
+
+    // Given a domain depending on the plugin.
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("domain-with-test-plugin")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(pluginWhichLoadsClasses);
+
+    // Given an app depending on the domain and exporting a class.
+    final ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("app-with-load-class-operation").definedBy("app-with-load-class-operation.xml")
+            .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+            .configuredWith(EXPORTED_PACKAGES, "org.foo")
+            .dependingOn(domainFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    // When the app uses the plugin in order to load the exported class, then it doesn't raise any error.
+    executeApplicationFlow("flowWhichTriesToLoadTheClass");
+  }
+
+  @Test
+  @Issue("MULE-18159")
+  public void pluginDeclaredInDomainIsAbleToLoadClassesExportedByTheAppWhereItIsUsedOnNonBlockingCompletion() throws Exception {
+    // Given a plugin which loads classes.
+    final ArtifactPluginFileBuilder pluginWhichLoadsClasses = loadClassExtensionPlugin;
+
+    // Given a domain depending on the plugin.
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("domain-with-test-plugin")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(pluginWhichLoadsClasses);
+
+    // Given an app depending on the domain and exporting a class.
+    final ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("app-with-load-class-operation").definedBy("app-with-load-class-operation.xml")
+            .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+            .configuredWith(EXPORTED_PACKAGES, "org.foo")
+            .dependingOn(domainFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    ExecutorService executor = newSingleThreadExecutor();
+
+    // When the app uses the plugin in order to load the exported class on non-blocking completion (within error handler),
+    // then it doesn't raise any error.
+    executor.submit(() -> {
+      try {
+        executeApplicationFlow("flowWhichSavesTheCallbackAndLoadsClassesInErrorHandler");
+      } catch (Exception e) {
+        fail(e.getMessage());
+      }
+    });
+
+    CompletionCallback<Object, Object> completionCallback = getCompletionCallback("SavedCallback");
+    ClassLoader anotherClassLoader = mock(ClassLoader.class);
+    withContextClassLoader(anotherClassLoader, () -> completionCallback.error(new NullPointerException()));
+  }
+
+  private CompletionCallback<Object, Object> getCompletionCallback(String callbackName) {
+    Registry registry = deploymentService.getApplications().get(0).getRegistry();
+    Map<String, CompletionCallback<Object, Object>> callbacksMap =
+        (Map<String, CompletionCallback<Object, Object>>) registry.lookupByName("completion.callbacks").get();
+    PollingProber.probe(() -> callbacksMap.containsKey(callbackName));
+    return callbacksMap.get(callbackName);
+  }
+
   protected ApplicationFileBuilder appFileBuilder(final String artifactId) {
     return new ApplicationFileBuilder(artifactId);
   }
@@ -1839,7 +1926,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertDeploymentFailure(domainDeploymentListener, domainBundleNonExistentConfigResource.getId());
   }
-
 
   private void deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(Action deployArtifactAction) throws Exception {
     Action verifyAnchorFileDoesNotExists = () -> assertDomainAnchorFileDoesNotExists(waitDomainFileBuilder.getId());
