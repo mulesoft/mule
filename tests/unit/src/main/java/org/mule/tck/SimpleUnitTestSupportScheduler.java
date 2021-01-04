@@ -8,6 +8,7 @@ package org.mule.tck;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -27,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SimpleUnitTestSupportScheduler extends ScheduledThreadPoolExecutor implements Scheduler {
 
-  private AtomicInteger scheduledTasks = new AtomicInteger(0);
+  private final AtomicInteger scheduledTasks = new AtomicInteger(0);
 
   public SimpleUnitTestSupportScheduler(int corePoolSize,
                                         ThreadFactory threadFactory,
