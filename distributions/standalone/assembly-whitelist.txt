@@ -447,7 +447,7 @@
 /mule-standalone-${productVersion}/lib/shared
 /mule-standalone-${productVersion}/lib/shared/README.txt
 /mule-standalone-${productVersion}/lib/user
-/mule-standalone-${productVersion}/lib/user/junit-4.13.jar
+/mule-standalone-${productVersion}/lib/user/junit-4.13.1.jar
 /mule-standalone-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/user/README.txt
 /mule-standalone-${productVersion}/lib/user/xmlunit-1.6.jar
