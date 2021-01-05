@@ -83,7 +83,7 @@
             <processor-chain>
                 <script:component>
                     <script:script engine="groovy">
-                        return message.getOriginalPayload()
+                        return new String(message.getOriginalPayload())
                     </script:script>
                 </script:component>
                 <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorld" operation="sayHi"/>
