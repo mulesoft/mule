@@ -344,6 +344,7 @@
 /mule-standalone-${productVersion}/lib/opt/jetty-util-9.4.35.v20201120.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-webapp-9.4.35.v20201120.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-xml-9.4.35.v20201120.jar
+/mule-standalone-${productVersion}/lib/opt/jetty-util-ajax-9.4.35.v20201120.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-util-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/jetty-util5-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/jffi-1.2.22-native.jar
