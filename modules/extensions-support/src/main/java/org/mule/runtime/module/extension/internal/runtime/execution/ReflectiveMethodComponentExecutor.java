@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.stream;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
 
@@ -76,7 +78,9 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   }
 
   public Object execute(ExecutionContext<M> executionContext) {
-    return withContextClassLoader(extensionClassLoader,
+    final ClassLoader currentClassLoader = currentThread().getContextClassLoader();
+    final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
+    return withContextClassLoader(compositeClassLoader,
                                   () -> invokeMethod(method, componentInstance,
                                                      stream(getParameterValues(executionContext, method.getParameterTypes()))
                                                          .map(Supplier::get).toArray(Object[]::new)));
@@ -129,7 +133,9 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   @Override
   public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
-    return ec -> withContextClassLoader(extensionClassLoader,
+    ClassLoader currentClassLoader = currentThread().getContextClassLoader();
+    final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
+    return ec -> withContextClassLoader(compositeClassLoader,
                                         () -> {
                                           final Object[] resolved =
                                               getParameterValues(ec, method.getParameterTypes());
