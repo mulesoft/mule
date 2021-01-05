@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 public class HttpResponseHeaderBuilderTestCase {
 
     @Test
-    public void testNullHeader()
+    public void testNullHeaderValueIsIgnored()
     {
         HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
         httpResponseHeaderBuilder.addHeader("header", null);
