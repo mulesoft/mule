@@ -8,6 +8,7 @@ package org.mule.exception;
 
 import static java.lang.Boolean.getBoolean;
 import static org.mule.api.config.MuleProperties.DISABLE_ERROR_COUNT_ON_ERROR_NOTIFICATION_DISABLED;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
@@ -23,6 +24,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.transport.NonBlockingReplyToHandler;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.message.DefaultExceptionPayload;
@@ -178,7 +180,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         return enableNotifications || !disableErrorCountOnErrorNotificationsDisabled;
     }
 
-    protected MuleEvent route(MuleEvent event, Exception t)
+    protected MuleEvent route(MuleEvent event, Exception t) throws MessagingException
     {
         if (!getMessageProcessors().isEmpty())
         {
@@ -191,11 +193,11 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             catch (Exception e)
             {
                 logFatal(event, e);
+                throw new MessagingException(createStaticMessage("There was an error processing the catch strategy"), event, e);
             }
         }
         return event;
     }
-
 
     @Override
     protected void doInitialise(MuleContext muleContext) throws InitialisationException
