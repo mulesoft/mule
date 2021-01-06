@@ -7,9 +7,14 @@
 
 package org.mule.test.infrastructure.process;
 
+import static java.lang.String.format;
+import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.test.infrastructure.process.AbstractOSController.MuleProcessStatus.STARTED_STARTED;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,21 +31,30 @@ import org.slf4j.Logger;
 
 public abstract class AbstractOSController {
 
+  private static final long TIMEOUT_MILLIS = 5000;
+  private static final long POLL_DELAY_MILLIS = 200;
+  protected static final String START_CMD = "start";
+  protected static final String STOP_CMD = "stop";
+  protected static final String DUMP_CMD = "dump";
+  protected static final String RESTART_CMD = "restart";
+  protected static final String STATUS_CMD = "status";
+
   /**
    * These values represent the status returned by running `mule status` for the wrapper and Java processes respectively.
    */
   public enum MuleProcessStatus {
-    STARTING_STARTING, STARTED_STARTING, STARTED_STARTED,
+    STARTING_STARTING, STARTED_STARTING, STARTED_STARTED, STARTING_LAUNCH, STARTING_LAUNCHING
   }
 
-  private static Logger logger = getLogger(AbstractOSController.class);
+  private static final Logger logger = getLogger(AbstractOSController.class);
 
-  protected static final String STATUS_PID =
-      "Mule(?:\\sEnterprise Edition \\(standalone\\))? is running(?:\\s|:\\sPID:)?\\(?([0-9]+)\\)?.*";
-  protected static final Pattern STATUS_PID_PATTERN = Pattern.compile(STATUS_PID);
+  protected static final String STATUS_PID_GROUP_NAME = "pid";
+  protected static final String STATUS_WRAPPER_GROUP_NAME = "wrapper";
+  protected static final String STATUS_JAVA_GROUP_NAME = "java";
   protected static final String STATUS_LABELS =
-      "Mule(?:\\sEnterprise Edition \\(standalone\\))? is running:\\sPID:[0-9]+, Wrapper:(\\w+), Java:(\\w+)";
-  protected static final Pattern STATUS_LABELS_PATTERN = Pattern.compile(STATUS_LABELS);
+      format("Mule(?:(\\sEnterprise Edition)? \\(standalone\\))? is running:\\sPID:(?<%s>[0-9]+), Wrapper:(?<%s>\\w+), Java:(?<%s>\\w+)",
+             STATUS_PID_GROUP_NAME, STATUS_WRAPPER_GROUP_NAME, STATUS_JAVA_GROUP_NAME);
+  protected static final Pattern STATUS_LABELS_PATTERN = compile(STATUS_LABELS);
   private static final int DEFAULT_TIMEOUT = 30000;
   private static final String MULE_HOME_VARIABLE = "MULE_HOME";
   private static final String MULE_APP_VARIABLE = "MULE_APP";
@@ -77,20 +91,28 @@ public abstract class AbstractOSController {
   public abstract String getMuleBin();
 
   public void start(String... args) {
-    int error = runSync("start", args);
+    int error = runSync(START_CMD, args);
     if (error != 0) {
       throw new MuleControllerException("The mule instance couldn't be started. Errno: " + error);
     }
 
-    final MuleProcessStatus processesStatus = getProcessesStatus();
-    if (processesStatus != STARTED_STARTED) {
-      runSync("dump");
-      throw new MuleControllerException("The mule instance didn't start on time: " + processesStatus.toString());
-    }
+    new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new Probe() {
+
+      @Override
+      public boolean isSatisfied() {
+        return getProcessesStatus() != STARTED_STARTED;
+      }
+
+      @Override
+      public String describeFailure() {
+        runSync(DUMP_CMD);
+        return format("The mule instance didn't start on time: %s", getProcessesStatus());
+      }
+    });
   }
 
   public int stop(String... args) {
-    return runSync("stop", args);
+    return runSync(STOP_CMD, args);
   }
 
   public abstract int status(String... args);
@@ -104,7 +126,7 @@ public abstract class AbstractOSController {
   }
 
   public void restart(String... args) {
-    int error = runSync("restart", args);
+    int error = runSync(RESTART_CMD, args);
     if (error != 0) {
       throw new MuleControllerException("The mule instance couldn't be restarted");
     }
@@ -115,8 +137,7 @@ public abstract class AbstractOSController {
     return executeSyncCommand(command, args, newEnv, timeout);
   }
 
-  private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, int timeout)
-      throws MuleControllerException {
+  private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, int timeout) {
     CommandLine commandLine = new CommandLine(muleBin);
     commandLine.addArgument(command);
     commandLine.addArguments(args, false);
@@ -134,7 +155,7 @@ public abstract class AbstractOSController {
         paramsJoiner.add(cmdArg.replaceAll("(?<=\\.password=)(.*)", "****"));
       }
 
-      logger.info("Executing: " + paramsJoiner.toString());
+      logger.info("Executing: {}", paramsJoiner);
       return executor.execute(commandLine, env);
     } catch (ExecuteException e) {
       return e.getExitValue();
