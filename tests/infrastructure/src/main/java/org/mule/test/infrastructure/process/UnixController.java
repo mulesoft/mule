@@ -8,7 +8,7 @@
 package org.mule.test.infrastructure.process;
 
 import static java.lang.Integer.parseInt;
-import static java.lang.String.*;
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
 import java.io.ByteArrayOutputStream;
