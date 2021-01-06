@@ -12,6 +12,8 @@ import static org.mule.runtime.api.component.location.Location.builderFromString
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.BACKPRESSURE;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
@@ -19,6 +21,9 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.junit.Test;
 
+import io.qameta.allure.Story;
+
+@Story(BACKPRESSURE)
 public class BackPressureConfigTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
