@@ -15,6 +15,9 @@ import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.MessageSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Implements the different backpressure handling strategies, and checks against a
  * {@link org.mule.runtime.core.api.processor.strategy.ProcessingStrategy} whether or not backpressure is fired, before and event
@@ -23,6 +26,8 @@ import org.mule.runtime.core.api.source.MessageSource;
  * @Since 4.3
  */
 class BackPressureStrategySelector {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(BackPressureStrategySelector.class);
 
   private static int EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
@@ -46,6 +51,11 @@ class BackPressureStrategySelector {
         abstractPipeline.getProcessingStrategy().checkBackpressureAccepting(event);
         accepted = true;
       } catch (FromFlowRejectedExecutionException ree) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("waitStrategy - " + ree.getClass().getName() + " @ "
+              + event.getContext().getOriginatingLocation().getRootContainerName() + ": " + ree.getReason());
+        }
+
         // TODO MULE-16106 Add a callback for WAIT back pressure applied on the source
         try {
           sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
@@ -67,6 +77,11 @@ class BackPressureStrategySelector {
       throws FlowBackPressureException {
     final BackPressureReason reason = abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event);
     if (reason != null) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER
+            .debug("failDropStrategy - @ " + event.getContext().getOriginatingLocation().getRootContainerName() + ": " + reason);
+      }
+
       throw abstractPipeline.getBackPressureExceptions().get(reason);
     }
   }
