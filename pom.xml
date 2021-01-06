@@ -301,7 +301,7 @@
         <semver4jVersion>3.1.0</semver4jVersion>
         <powermockVersion>2.0.0</powermockVersion>
         <allure.maven.plugin.version>2.9</allure.maven.plugin.version>
-        <jacoco.version>0.8.2</jacoco.version>
+        <jacoco.version>0.8.6</jacoco.version>
         <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
