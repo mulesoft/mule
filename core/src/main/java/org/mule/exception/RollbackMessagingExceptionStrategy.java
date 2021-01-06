@@ -6,6 +6,7 @@
  */
 package org.mule.exception;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.api.MuleEvent;
@@ -87,7 +88,7 @@ public class RollbackMessagingExceptionStrategy extends TemplateMessagingExcepti
     }
 
     @Override
-    protected MuleEvent route(MuleEvent event, Exception t)
+    protected MuleEvent route(MuleEvent event, Exception t) throws MessagingException
     {
         MuleEvent resultEvent = event;
         if (isRedeliveryExhausted(t))
