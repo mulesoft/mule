@@ -134,7 +134,7 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
         .responseExpiresInExpr(grantType.getExpirationRegex())
         .responseAccessTokenExpr(grantType.getAccessTokenExpr())
         .withClientCredentialsIn(toCredentialsLocation(grantType.getCredentialsPlacement()))
-        .resourceOwnerIdTransformer(ownerId -> ownerId + "-" + config.getOwnerConfigName());
+        .resourceOwnerIdTransformer(ownerId -> ownerId + "-" + config.getConfigIdentifier());
 
     String scopes = config.getScope()
         .orElseGet(() -> grantType.getDefaultScopes().orElse(null));
