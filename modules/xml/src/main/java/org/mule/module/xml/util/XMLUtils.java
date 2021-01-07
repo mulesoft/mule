@@ -378,6 +378,11 @@ public class XMLUtils extends org.mule.util.XMLUtils
             src.nextTag();
         }
 
+        // Empty XMLStreamReader would throw an IllegalStateException
+        if(src.isEndElement()){
+            return null;
+        }
+
         return new StaxSource(src);
     }
 
