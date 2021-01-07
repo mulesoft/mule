@@ -13,12 +13,14 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
@@ -76,7 +78,9 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
 
   protected ConnectionProvider<C> doBuild(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = super.build(result).getFirst();
-    injectFields(providerModel, provider, ownerConfigName, muleContext.getConfiguration().getDefaultEncoding());
+    String muleversion = MuleExtensionModelProvider.MULE_VERSION;
+    MuleVersion muleVersion = new MuleVersion(muleversion);
+    injectFields(providerModel, provider, ownerConfigName, muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
     return provider;
   }
 

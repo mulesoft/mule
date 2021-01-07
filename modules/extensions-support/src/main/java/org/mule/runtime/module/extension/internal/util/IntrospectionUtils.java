@@ -59,6 +59,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -114,8 +115,9 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectedFieldModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
+import org.mule.runtime.module.extension.internal.loader.java.property.RuntimeVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.sdk.api.runtime.source.Source;
+import org.mule.sdk.api.annotation.param.RuntimeVersion;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -1407,7 +1409,7 @@ public final class IntrospectionUtils {
     return empty();
   }
 
-  private static void injectFieldFromModelProperty(Object target, String value,
+  private static void injectFieldFromModelProperty(Object target, Object value,
                                                    Optional<? extends InjectedFieldModelProperty> modelProperty,
                                                    Class<? extends Annotation> annotationClass) {
     if (value == null || modelProperty == null) {
@@ -1449,23 +1451,26 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Sets the {@code configName} into the field of the {@code target} annotated {@link RefName} (if it's present) and does the
-   * same for the {@code encoding} and the field annotated with {@link DefaultEncoding} if the {@code model} contains the
-   * {@link DeclaringMemberModelProperty}
+   * Sets the {@code configName}, {@code encoding} and {@link MuleVersion} into the fields of the target annotated with
+   * {@link RefName}, {@link DefaultEncoding} and {@link RuntimeVersion} respectively if present and the {@code model}
+   * contains the {@link DeclaringMemberModelProperty}.
    *
-   * @param model      enriched with {@link InjectedFieldModelProperty}
-   * @param target     object in which the fields are going to be set
-   * @param configName to be injected into the {@link String} field annotated with {@link RefName}
-   * @param encoding   to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   * @param model       enriched with {@link InjectedFieldModelProperty}
+   * @param target      object in which the fields are going to be set
+   * @param configName  to be injected into the {@link String} field annotated with {@link RefName}
+   * @param encoding    to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   * @param muleVersion to be injected into the {@link MuleVersion} field annotated with {@link RuntimeVersion}
    */
-  public static void injectFields(EnrichableModel model, Object target, String configName, String encoding) {
+  public static void injectFields(EnrichableModel model, Object target, String configName, String encoding,
+                                  MuleVersion muleVersion) {
     injectFieldFromModelProperty(target, configName, model.getModelProperty(RequireNameField.class), RefName.class);
     injectDefaultEncoding(model, target, encoding);
+    injectRuntimeVersion(model, target, muleVersion);
   }
 
   /**
-   * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} if the {@code model}
-   * contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
+   * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} if the
+   * {@code model} contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
    *
    * @param model    enriched with {@link DefaultEncodingModelProperty}
    * @param target   object in which the fields are going to be set
@@ -1477,18 +1482,36 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Sets the {@code configName} into the field of the {@code target} annotated {@link RefName} (if it's present) and does the
-   * same for the {@code encoding} and the field annotated with {@link DefaultEncoding}.
+   *  Sets the {@link MuleVersion} into the field of the {@code target} annotated {@link RuntimeVersion} if the
+   *  {@code model} contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
+   *
+   * @param model       enriched with {@link DefaultEncodingModelProperty}
+   * @param target      object in which the fields are going to be set
+   * @param muleVersion {@link MuleVersion} to be injected into the {@link MuleVersion} field annotated with
+   *                    {@link RuntimeVersion}
+   */
+  public static void injectRuntimeVersion(EnrichableModel model, Object target, MuleVersion muleVersion) {
+    injectFieldFromModelProperty(target, muleVersion, model.getModelProperty(RuntimeVersionModelProperty.class),
+                                 RuntimeVersion.class);
+  }
+
+  /**
+   * Sets the {@code configName}, {@code encoding} and {@link MuleVersion} into the fields of the target annotated with
+   * {@link RefName}, {@link DefaultEncoding} and {@link RuntimeVersion} respectively if present.
    *
    * @param target          object in which the fields are going to be set
    * @param configName      to be injected into the {@link String} field annotated with {@link RefName}
    * @param encoding        to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   * @param muleVersion     to be injected into the {@link MuleVersion} field annotated with {@link RuntimeVersion}
    * @param reflectionCache the cache for expensive reflection lookups
-   * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
+   * @throws IllegalModelDefinitionException if there is more than one field annotated with {@link DefaultEncoding} or
+   *                                         {@link RuntimeVersion}
    */
-  public static void injectFields(Object target, String configName, String encoding, ReflectionCache reflectionCache) {
-    injectDefaultEncoding(target, encoding, reflectionCache);
+  public static void injectFields(Object target, String configName, String encoding, MuleVersion muleVersion,
+                                  ReflectionCache reflectionCache) {
+    set(getDefaultEncodingFieldSetter(target, reflectionCache), target, encoding);
     set(getFieldSetterForAnnotatedField(target, RefName.class, reflectionCache), target, configName);
+    set(getFieldSetterForAnnotatedField(target, RuntimeVersion.class, reflectionCache), target, muleVersion);
   }
 
   /**
@@ -1504,18 +1527,6 @@ public final class IntrospectionUtils {
    */
   public static void injectRefName(Object target, String configName, ReflectionCache reflectionCache) {
     set(getFieldSetterForAnnotatedField(target, RefName.class, reflectionCache), target, configName);
-  }
-
-  /**
-   * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} (if present)
-   *
-   * @param target          object in which the fields are going to be set
-   * @param encoding        to be injected into the {@link String} field annotated with {@link DefaultEncoding}
-   * @param reflectionCache the cache for expensive reflection lookups
-   * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
-   */
-  public static void injectDefaultEncoding(Object target, String encoding, ReflectionCache reflectionCache) {
-    set(getDefaultEncodingFieldSetter(target, reflectionCache), target, encoding);
   }
 
   /**

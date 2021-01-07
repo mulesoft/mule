@@ -22,6 +22,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -38,6 +39,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
+import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -160,6 +162,45 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     validate(extensionModel, validator);
   }
 
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void repeatedRuntimeVersionPojoField() {
+    when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
+    when(sourceModel.getSuccessCallback()).thenReturn(java.util.Optional.empty());
+    when(sourceModel.getErrorCallback()).thenReturn(java.util.Optional.empty());
+    ParameterModel parameterModel = mock(ParameterModel.class);
+    when(parameterModel.getType()).thenReturn(toMetadataType(RepeatedRuntimeVersion.class));
+    mockParameters(sourceModel, parameterModel);
+
+    mockImplementingType(sourceModel, SourceRepeatedEncoding.class);
+    validate(extensionModel, validator);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void repeatedRuntimeVersionConfigField() {
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
+    mockImplementingType(configurationModel, RepeatedRuntimeVersion.class);
+
+    validate(extensionModel, validator);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void repeatedRuntimeVersionSourceField() {
+    when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
+    when(sourceModel.getSuccessCallback()).thenReturn(java.util.Optional.empty());
+    when(sourceModel.getErrorCallback()).thenReturn(java.util.Optional.empty());
+
+    mockImplementingType(sourceModel, SourceRepeatedRuntimeVersion.class);
+    validate(extensionModel, validator);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void runtimeVersionConfigFieldWrongType() {
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
+    mockImplementingType(configurationModel, ConfigRuntimeVersionWrongType.class);
+
+    validate(extensionModel, validator);
+  }
+
 
   public static class RepeatedEncoding {
 
@@ -234,6 +275,36 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
 
     @RefName
     private String refName2;
+  }
+
+  public static class RepeatedRuntimeVersion {
+
+    @RuntimeVersion
+    private MuleVersion muleVersion1;
+
+    @RuntimeVersion
+    private MuleVersion muleVersion2;
+  }
+
+  public static class SourceRepeatedRuntimeVersion extends Source<String, Object> {
+
+    @RuntimeVersion
+    private MuleVersion encoding1;
+
+    @RuntimeVersion
+    private MuleVersion encoding2;
+
+    @Override
+    public void onStart(SourceCallback sourceCallback) throws MuleException {}
+
+    @Override
+    public void onStop() {}
+  }
+
+  public static class ConfigRuntimeVersionWrongType {
+
+    @RuntimeVersion
+    private String runtimeVersion;
   }
 
   private void withMethod(OperationModel operationModel, String operationName) {

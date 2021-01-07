@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <object name="testProcessor" class="org.mule.test.module.extension.connector.PetStoreRuntimeVersionTestCase$TestProcessor"/>
+
+    <petstore:config name="config" cashierName="jim" pets="#[mel:[]]">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:cage>
+            <petstore:birds>
+                <petstore:bird key="mockingjay" value="15"/>
+                <petstore:bird key="mockingbird" value="10"/>
+            </petstore:birds>
+            <petstore:ammenities>
+                <petstore:ammenity value="spinning wheel"/>
+                <petstore:ammenity value="food can"/>
+            </petstore:ammenities>
+        </petstore:cage>
+    </petstore:config>
+
+    <flow name="configWithRuntimeVersion">
+        <petstore:get-config config-ref="config"/>
+    </flow>
+
+    <flow name="sourceWithRuntimeVersion" initialState="stopped">
+        <petstore:pet-source birds="Primate"/>
+        <flow-ref name="testProcessor"/>
+    </flow>
+
+    <flow name="connectionProviderWithRuntimeVersion" initialState="stopped">
+        <petstore:get-client config-ref="config"/>
+        <flow-ref name="testProcessor"/>
+    </flow>
+
+    <flow name="operationClassWithRuntimeVersion" initialState="stopped">
+        <petstore:get-mule-version/>
+        <flow-ref name="testProcessor"/>
+    </flow>
+    
+</mule>

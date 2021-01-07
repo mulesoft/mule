@@ -6,6 +6,7 @@
  */
 package org.mule.test.petstore.extension;
 
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -17,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.sdk.api.annotation.param.RuntimeVersion;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -65,6 +67,9 @@ public class PetStoreConnector {
   @DefaultEncoding
   String encoding;
 
+  @RuntimeVersion
+  MuleVersion runtimeVersion;
+
   public List<String> getPets() {
     return pets;
   }
@@ -107,5 +112,9 @@ public class PetStoreConnector {
 
   public Aquarium getAquarium() {
     return aquarium;
+  }
+
+  public MuleVersion getRuntimeVersion() {
+    return runtimeVersion;
   }
 }

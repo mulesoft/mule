@@ -10,6 +10,7 @@ package org.mule.test.petstore.extension;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
 import java.time.LocalDateTime;
@@ -26,11 +27,13 @@ public class PetStoreClient {
   private Date openingDate;
   private List<Date> closedForHolidays;
   private Long timeOfCreation;
+  private MuleVersion muleVersion;
 
   private List<LocalDateTime> discountDates;
 
   public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, String configName,
-                        Date openingDate, List<Date> closedForHolidays, List<LocalDateTime> discountDates) {
+                        Date openingDate, List<Date> closedForHolidays, List<LocalDateTime> discountDates,
+                        MuleVersion muleVersion) {
     this.username = username;
     this.password = password;
     this.tlsContext = tlsContextFactory;
@@ -39,6 +42,7 @@ public class PetStoreClient {
     this.closedForHolidays = closedForHolidays;
     this.discountDates = discountDates;
     this.timeOfCreation = System.currentTimeMillis();
+    this.muleVersion = muleVersion;
   }
 
   public List<String> getPets(String ownerName, PetStoreConnector config) {
@@ -89,5 +93,9 @@ public class PetStoreClient {
 
   public long getTimeOfCreation() {
     return timeOfCreation;
+  }
+
+  public MuleVersion getMuleVersion() {
+    return muleVersion;
   }
 }
