@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
-
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Error;
@@ -79,7 +78,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
    * @return A {@code boolean} indicating whether the parameter is a required or not
    */
   default boolean isRequired() {
-    return !(isAnnotatedWith(Optional.class));
+    return !(isAnnotatedWith(Optional.class) || isAnnotatedWith(org.mule.sdk.api.annotation.param.Optional.class));
   }
 
   /**
