@@ -6,24 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withAnnotation;
-
-import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 
 /**
  * A {@link DeclarationEnricher} which looks for configurations with fields annotated with {@link RefName}.
@@ -56,16 +49,17 @@ public final class RefNameDeclarationEnricher extends AbstractAnnotatedFieldDecl
   }
 
   @Override
-  protected void doEnrich(BaseDeclaration<?> declaration) {
-    declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(typeProperty -> {
-      Collection<Field> fields = getAllFields(typeProperty.getType(), withAnnotation(RefName.class));
-      if (isEmpty(fields)) {
-        return;
-      }
+  protected ModelProperty getModelProperty(Field field) {
+    return new RequireNameField(field);
+  }
 
-      validate(fields, typeProperty, RefName.class, String.class);
+  @Override
+  protected Class getAnnotation() {
+    return RefName.class;
+  }
 
-      declaration.addModelProperty(new RequireNameField(fields.iterator().next()));
-    });
+  @Override
+  protected Class getImplementingClass() {
+    return String.class;
   }
 }

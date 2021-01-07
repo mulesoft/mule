@@ -6,25 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withAnnotation;
-
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RuntimeVersionModelProperty;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 
 /**
  * {@link DeclarationEnricher} which looks at classes with fields annotated with {@link RuntimeVersion}. It validates
@@ -38,16 +27,17 @@ import java.util.Collection;
 public class RuntimeVersionDeclarationEnricher extends AbstractAnnotatedFieldDeclarationEnricher {
 
   @Override
-  protected void doEnrich(BaseDeclaration<?> declaration) {
-    declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(typeProperty -> {
-      Collection<Field> fields = getAllFields(typeProperty.getType(), withAnnotation(RuntimeVersion.class));
-      if (isEmpty(fields)) {
-        return;
-      }
+  protected ModelProperty getModelProperty(Field field) {
+    return new RuntimeVersionModelProperty(field);
+  }
 
-      validate(fields, typeProperty, RuntimeVersion.class, MuleVersion.class);
+  @Override
+  protected Class getAnnotation() {
+    return RuntimeVersion.class;
+  }
 
-      declaration.addModelProperty(new RuntimeVersionModelProperty(fields.iterator().next()));
-    });
+  @Override
+  protected Class getImplementingClass() {
+    return MuleVersion.class;
   }
 }

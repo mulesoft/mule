@@ -8,9 +8,13 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
+import static org.reflections.ReflectionUtils.getAllFields;
+import static org.reflections.ReflectionUtils.withAnnotation;
 
 import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -21,6 +25,7 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -61,6 +66,22 @@ public abstract class AbstractAnnotatedFieldDeclarationEnricher implements Decla
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
   }
 
+  protected void doEnrich(BaseDeclaration<?> declaration) {
+    Class annotationClass = getAnnotation();
+    Class implementingType = getImplementingClass();
+
+    declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(typeProperty -> {
+      Collection<Field> fields = getAllFields(typeProperty.getType(), withAnnotation(annotationClass));
+      if (isEmpty(fields)) {
+        return;
+      }
+
+      validate(fields, typeProperty, annotationClass, implementingType);
+
+      declaration.addModelProperty(getModelProperty(fields.iterator().next()));
+    });
+  }
+
   protected void validate(Collection<Field> fields, ImplementingTypeModelProperty typeProperty, Class annotation,
                           Class implementingClass) {
     if (fields.size() > 1) {
@@ -86,6 +107,10 @@ public abstract class AbstractAnnotatedFieldDeclarationEnricher implements Decla
     }
   }
 
-  protected abstract void doEnrich(BaseDeclaration<?> declaration);
+  protected abstract ModelProperty getModelProperty(Field field);
+
+  protected abstract Class getAnnotation();
+
+  protected abstract Class getImplementingClass();
 
 }

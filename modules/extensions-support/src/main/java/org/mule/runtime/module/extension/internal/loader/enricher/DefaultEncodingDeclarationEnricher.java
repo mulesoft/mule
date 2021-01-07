@@ -6,19 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withAnnotation;
-
-import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 
 /**
  * A {@link DeclarationEnricher} which looks classes with fields annotated with {@link DefaultEncoding}.
@@ -33,16 +27,15 @@ import java.util.Collection;
 public final class DefaultEncodingDeclarationEnricher extends AbstractAnnotatedFieldDeclarationEnricher {
 
   @Override
-  protected void doEnrich(BaseDeclaration<?> declaration) {
-    declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(typeProperty -> {
-      Collection<Field> fields = getAllFields(typeProperty.getType(), withAnnotation(DefaultEncoding.class));
-      if (isEmpty(fields)) {
-        return;
-      }
+  protected ModelProperty getModelProperty(Field field) {
+    return new DefaultEncodingModelProperty(field);
+  }
 
-      validate(fields, typeProperty, DefaultEncoding.class, String.class);
+  protected Class getAnnotation() {
+    return DefaultEncoding.class;
+  }
 
-      declaration.addModelProperty(new DefaultEncodingModelProperty(fields.iterator().next()));
-    });
+  protected Class getImplementingClass() {
+    return String.class;
   }
 }
