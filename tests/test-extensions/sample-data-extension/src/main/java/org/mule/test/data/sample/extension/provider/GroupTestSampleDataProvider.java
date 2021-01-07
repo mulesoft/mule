@@ -8,7 +8,7 @@ package org.mule.test.data.sample.extension.provider;
 
 import static org.mule.test.data.sample.extension.SampleDataExtension.adaptLegacy;
 
-import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.sdk.api.annotation.param.Optional;
 import org.mule.sdk.api.annotation.param.Parameter;
 import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.sdk.api.runtime.operation.Result;
