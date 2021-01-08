@@ -7,10 +7,11 @@
 package org.mule.module.xml.util;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
+import static org.mule.module.xml.util.XMLUtils.*;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.*;
 
-import javanet.staxutils.BaseXMLInputFactory;
-import org.hamcrest.Matchers;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
@@ -19,13 +20,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 
 import org.junit.Test;
-import org.mule.util.xmlsecurity.XMLSecureFactories;
 import org.xml.sax.InputSource;
 
 public class XmlUtilsTestCase extends AbstractMuleTestCase
@@ -100,35 +98,37 @@ public class XmlUtilsTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testConvertsToNullWhenXmlResourceIsEmpty() throws Exception {
+    public void testConvertsToNullWhenXmlResourceIsEmpty() throws Exception
+    {
         ByteArrayInputStream inputStream = new ByteArrayInputStream("<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tns=\"http://inbound.tpmtogglevalues.cocacola.com/\"><SOAP-ENV:Header/><SOAP-ENV:Body></SOAP-ENV:Body></SOAP-ENV:Envelope>".getBytes());
-        XMLStreamReader xmlStreamReader = XMLSecureFactories.createDefault().getXMLInputFactory().createXMLStreamReader(inputStream);
+        XMLStreamReader xmlStreamReader = createDefault().getXMLInputFactory().createXMLStreamReader(inputStream);
         xmlStreamReader.nextTag();
         xmlStreamReader.nextTag();
         xmlStreamReader.nextTag();
         xmlStreamReader.nextTag();
         xmlStreamReader.nextTag();
-        Source source = XMLUtils.toXmlSource(xmlStreamReader); // Here i am at the end of the soap body tag / beginning of closing envelope tag
-        assertThat(source, Matchers.nullValue());
+        Source source = toXmlSource(xmlStreamReader); // Here I am at the end of the soap body tag / beginning of closing envelope tag
+        assertThat(source, nullValue());
     }
 
     @Test
-    public void testConvertsWhenXmlResourceIsNotEmpty() throws Exception {
+    public void testConvertsWhenXmlResourceIsNotEmpty() throws Exception
+    {
         ByteArrayInputStream inputStream = new ByteArrayInputStream("<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tns=\"http://inbound.tpmtogglevalues.cocacola.com/\"><SOAP-ENV:Header/><SOAP-ENV:Body><test>somecontent</test></SOAP-ENV:Body></SOAP-ENV:Envelope>".getBytes());
-        XMLStreamReader xmlStreamReader = XMLSecureFactories.createDefault().getXMLInputFactory().createXMLStreamReader(inputStream);
+        XMLStreamReader xmlStreamReader = createDefault().getXMLInputFactory().createXMLStreamReader(inputStream);
         xmlStreamReader.nextTag();
         xmlStreamReader.nextTag();
         xmlStreamReader.nextTag();
         xmlStreamReader.nextTag();
         xmlStreamReader.nextTag();
-        Source source = XMLUtils.toXmlSource(xmlStreamReader); // Here i am at the text element inside the test tag
-        assertThat(source, Matchers.notNullValue());
+        Source source = toXmlSource(xmlStreamReader); // Here, I am at the text element inside the test tag
+        assertThat(source, notNullValue());
     }
 
     private void assertToW3cDocumentSuccessfullyConvertsPayload(Object payload) throws Exception
     {
-        org.w3c.dom.Document document = XMLUtils.toW3cDocument(payload);
-        String actualXml = XMLUtils.toXml(document);
+        org.w3c.dom.Document document = toW3cDocument(payload);
+        String actualXml = toXml(document);
         assertEquals(SIMPLE_XML_CONTENT, actualXml);
     }
 }
