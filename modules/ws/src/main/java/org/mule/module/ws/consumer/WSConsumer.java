@@ -8,6 +8,8 @@
 package org.mule.module.ws.consumer;
 
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
+
+import org.mule.AbstractAnnotatedObject;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -63,7 +65,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable, NonBlockingMessageProcessor
+public class WSConsumer extends AbstractAnnotatedObject implements MessageProcessor, Initialisable, MuleContextAware, Disposable, NonBlockingMessageProcessor
 {
 
     public static final String SOAP_HEADERS_PROPERTY_PREFIX = "soap.";
