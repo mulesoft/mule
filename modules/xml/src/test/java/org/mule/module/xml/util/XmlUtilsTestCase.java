@@ -7,10 +7,13 @@
 package org.mule.module.xml.util;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
-import static org.mule.module.xml.util.XMLUtils.*;
-import static org.mule.util.xmlsecurity.XMLSecureFactories.*;
+import static org.mule.module.xml.util.XMLUtils.toW3cDocument;
+import static org.mule.module.xml.util.XMLUtils.toXml;
+import static org.mule.module.xml.util.XMLUtils.toXmlSource;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.createDefault;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
@@ -24,6 +27,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 
 import org.junit.Test;
+import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 public class XmlUtilsTestCase extends AbstractMuleTestCase
@@ -43,7 +47,7 @@ public class XmlUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testConvertsToW3cDocumentFromW3cDocument() throws Exception
     {
-        org.w3c.dom.Document document = XMLTestUtils.toW3cDocument(SIMPLE_XML_RESOURCE);
+        Document document = XMLTestUtils.toW3cDocument(SIMPLE_XML_RESOURCE);
         assertToW3cDocumentSuccessfullyConvertsPayload(document);
     }
 
@@ -127,7 +131,7 @@ public class XmlUtilsTestCase extends AbstractMuleTestCase
 
     private void assertToW3cDocumentSuccessfullyConvertsPayload(Object payload) throws Exception
     {
-        org.w3c.dom.Document document = toW3cDocument(payload);
+        Document document = toW3cDocument(payload);
         String actualXml = toXml(document);
         assertEquals(SIMPLE_XML_CONTENT, actualXml);
     }
