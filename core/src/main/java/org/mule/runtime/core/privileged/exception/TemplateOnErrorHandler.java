@@ -147,7 +147,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
           .apply(onErrorFlux
               .onErrorContinue(MessagingException.class, onRoutingError())
               .map(afterRouting())
-              .doOnNext(TemplateOnErrorHandler.this::fireEndNotification)
+              .doOnNext(result -> {
+                ErrorHandlerContext errorHandlerContext = ErrorHandlerContextManager.from(TemplateOnErrorHandler.this, result);
+                fireEndNotification(errorHandlerContext.getOriginalEvent(), result, errorHandlerContext.getException());
+              })
               .doOnNext(result -> ErrorHandlerContextManager.resolveHandling(result, TemplateOnErrorHandler.this))))
           .doAfterTerminate(() -> fluxSinks.remove(sinkRef.getFluxSink()));
 
@@ -232,16 +235,15 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         logger.warn(ex.getMessage());
       }
       CoreEvent result = afterRouting().apply(((MessagingException) me).getEvent());
-      fireEndNotification(result);
-      ErrorHandlerContextManager.resolveHandling(result, this);
+      fireEndNotification(ErrorHandlerContextManager.from(this, ((MessagingException) me).getEvent()).getOriginalEvent(), result,
+                          me);
+      ErrorHandlerContextManager.failHandling((MessagingException) me, this);
     };
   }
 
-  private void fireEndNotification(CoreEvent result) {
-    final ErrorHandlerContext ctx = ErrorHandlerContextManager.from(this, result);
-    MessagingException messagingException = ctx.getException();
+  private void fireEndNotification(CoreEvent event, CoreEvent result, Throwable throwable) {
     notificationFirer.dispatch(new ErrorHandlerNotification(createInfo(result != null ? result
-        : ctx.getOriginalEvent(), messagingException,
+        : event, throwable instanceof MessagingException ? (MessagingException) throwable : null,
                                                                        configuredMessageProcessors),
                                                             location, PROCESS_END));
   }

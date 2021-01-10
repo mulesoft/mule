@@ -63,7 +63,7 @@ public class ErrorHandlerContextManager {
   }
 
   public static void resolveHandling(CoreEvent result, FlowExceptionHandler handler) {
-    ErrorHandlerContext errorHandlerContext = from(result).items.get(getParameterId(result, handler)).peekFirst();
+    ErrorHandlerContext errorHandlerContext = from(result).items.get(getParameterId(result, handler)).removeFirst();
     MessagingException exception = errorHandlerContext.getException();
     if (exception.handled()) {
       errorHandlerContext.getSuccessCallback().accept(result);
@@ -73,6 +73,12 @@ public class ErrorHandlerContextManager {
       }
       errorHandlerContext.getErrorCallback().accept(exception);
     }
+  }
+
+  public static void failHandling(MessagingException exception, FlowExceptionHandler handler) {
+    ErrorHandlerContext errorHandlerContext =
+        from(exception.getEvent()).items.get(getParameterId(exception.getEvent(), handler)).removeFirst();
+    errorHandlerContext.getErrorCallback().accept(exception);
   }
 
   public static class ErrorHandlerContext {
