@@ -57,7 +57,7 @@ public class ErrorHandlerContextManager {
       errorHandlerContextManager = new ErrorHandlerContextManager();
       originalEvent = quickCopy(originalEvent, of(ERROR_HANDLER_CONTEXT, errorHandlerContextManager));
     }
-    errorHandlerContextManager.items.getOrDefault(getParameterId(originalEvent, handler), new ArrayDeque<>(1))
+    errorHandlerContextManager.items.computeIfAbsent(getParameterId(originalEvent, handler), key -> new ArrayDeque<>(1))
         .addFirst(new ErrorHandlerContext(exception, originalEvent, successCallback, errorCallback));
     return originalEvent;
   }
