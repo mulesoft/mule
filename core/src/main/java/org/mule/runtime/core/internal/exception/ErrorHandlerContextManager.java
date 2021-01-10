@@ -66,19 +66,24 @@ public class ErrorHandlerContextManager {
     ErrorHandlerContext errorHandlerContext = from(result).items.get(getParameterId(result, handler)).removeFirst();
     MessagingException exception = errorHandlerContext.getException();
     if (exception.handled()) {
-      errorHandlerContext.getSuccessCallback().accept(result);
+      errorHandlerContext.successCallback.accept(result);
     } else {
       if (exception.getEvent() != result) {
         exception.setProcessedEvent(result);
       }
-      errorHandlerContext.getErrorCallback().accept(exception);
+      errorHandlerContext.errorCallback.accept(exception);
     }
   }
 
   public static void failHandling(MessagingException exception, FlowExceptionHandler handler) {
     ErrorHandlerContext errorHandlerContext =
         from(exception.getEvent()).items.get(getParameterId(exception.getEvent(), handler)).removeFirst();
-    errorHandlerContext.getErrorCallback().accept(exception);
+    errorHandlerContext.errorCallback.accept(exception);
+  }
+
+  private static String getParameterId(CoreEvent event, FlowExceptionHandler handler) {
+    final String id = event.getContext().getId();
+    return (id != null ? id : "(null)").concat("_").concat(handler.toString());
   }
 
   public static class ErrorHandlerContext {
@@ -103,20 +108,5 @@ public class ErrorHandlerContextManager {
     public CoreEvent getOriginalEvent() {
       return originalEvent;
     }
-
-    public Consumer<CoreEvent> getSuccessCallback() {
-      return successCallback;
-    }
-
-    public Consumer<Throwable> getErrorCallback() {
-      return errorCallback;
-    }
-
   }
-
-  private static String getParameterId(CoreEvent event, FlowExceptionHandler handler) {
-    final String id = event.getContext().getId();
-    return (id != null ? id : "(null)").concat("_").concat(handler.toString());
-  }
-
 }
