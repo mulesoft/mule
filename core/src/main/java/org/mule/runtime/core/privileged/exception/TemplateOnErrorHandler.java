@@ -51,6 +51,7 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
@@ -151,7 +152,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
                 ErrorHandlerContext errorHandlerContext = ErrorHandlerContextManager.from(TemplateOnErrorHandler.this, result);
                 fireEndNotification(errorHandlerContext.getOriginalEvent(), result, errorHandlerContext.getException());
               })
-              .doOnNext(result -> ErrorHandlerContextManager.resolveHandling(result, TemplateOnErrorHandler.this))))
+              .doOnNext(result -> ErrorHandlerContextManager.resolveHandling(TemplateOnErrorHandler.this, result))))
           .doAfterTerminate(() -> fluxSinks.remove(sinkRef.getFluxSink()));
 
       if (processingStrategy.isPresent()) {
@@ -196,9 +197,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       @Override
       public void accept(Exception error) {
         // All calling methods will end up transforming any error class other than MessagingException into that one
-        MessagingException messagingError = (MessagingException) error;
-        CoreEvent failureEvent = messagingError.getEvent();
-        fluxSink.next(addContext(TemplateOnErrorHandler.this, messagingError, failureEvent, continueCallback, propagateCallback));
+        fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, continueCallback, propagateCallback));
       }
     };
   }
@@ -237,7 +236,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       CoreEvent result = afterRouting().apply(((MessagingException) me).getEvent());
       fireEndNotification(ErrorHandlerContextManager.from(this, ((MessagingException) me).getEvent()).getOriginalEvent(), result,
                           me);
-      ErrorHandlerContextManager.failHandling((MessagingException) me, this);
+      ErrorHandlerContextManager.resolveHandling(this, (MessagingException) me);
     };
   }
 
