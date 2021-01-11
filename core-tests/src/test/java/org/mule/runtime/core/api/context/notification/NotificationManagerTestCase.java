@@ -11,6 +11,9 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.context.notification.Policy;
 import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -19,8 +22,13 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+
 @SmallTest
 public class NotificationManagerTestCase extends AbstractMuleTestCase {
+
+  private static final int CONCURRENCY = 1000;
 
   protected Listener1 listener1;
   protected Listener2 listener2;
@@ -165,6 +173,43 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase {
     manager.notifyListeners(new Event2(), (listener, nfn) -> listener.onNotification(nfn));
     assertTrue(listener1.isNotified());
     assertTrue(listener2.isNotified());
+  }
+
+  @Test
+  @Issue("MULE-19129")
+  @Description("Due to issue mentioned in MULE-19129 this test would be flaky without the proper fix")
+  public void testConcurrentNotifications() throws Exception {
+    manager.addInterfaceToType(Listener1.class, Event1.class);
+    manager.addInterfaceToType(Listener2.class, Event1.class);
+    registerDefaultListeners();
+
+    ArrayList<Thread> threads = new ArrayList<>();
+    Latch latch = new Latch();
+    CountDownLatch allstarted = new CountDownLatch(1000);
+    for (int i = 0; i < CONCURRENCY; i++) {
+      Thread t = new Thread(() -> {
+        try {
+          allstarted.countDown();
+          latch.await();
+          manager.notifyListeners(new Event1("id1"), (listener, nfn) -> listener.onNotification(nfn));
+        } catch (InterruptedException e) {
+
+        }
+      });
+      threads.add(t);
+      t.start();
+    }
+
+    allstarted.await();
+    latch.release();
+    for (Thread t : threads) {
+      t.join();
+    }
+    assertTrue(listener1.isNotified());
+    assertTrue(listener2.isNotified());
+    listener1.onNotification(null);
+    manager.notifyListeners(new Event1("id1"), (listener, nfn) -> listener.onNotification(nfn));
+    assertTrue(listener1.isNotified());
   }
 
   protected void assertNoListenersNotified() {
