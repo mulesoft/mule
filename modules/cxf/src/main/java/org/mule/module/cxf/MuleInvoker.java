@@ -205,8 +205,9 @@ public class MuleInvoker implements Invoker
             // First we have to verify if we have the resulting stream reader (in case the message
             // has been intercepted and changed, we have no list but the actual XMLStreamReader)        
             XMLStreamReader streamReader = cxfMessage.getContent(XMLStreamReader.class);
-            
-            if (streamReader != null)
+
+            // !streamReader.isEndElement() means it is not an empty SOAP:BODY
+            if (streamReader != null && !streamReader.isEndElement())
             {
                 return streamReader;
             }
