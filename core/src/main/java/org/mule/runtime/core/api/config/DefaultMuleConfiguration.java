@@ -22,6 +22,7 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.InternalComponent;
@@ -47,6 +48,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -64,6 +66,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
 
   private boolean lazyInit = false;
+
+  private MuleVersion minMuleVersion;
 
   /**
    * When true, each event will keep trace information of the flows and components it traverses to be shown as part of an
@@ -697,6 +701,15 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   @Override
   public boolean isInheritIterableRepeatability() {
     return inheritIterableRepeatability;
+  }
+
+  @Override
+  public Optional<MuleVersion> getMinMuleVersion() {
+    return Optional.ofNullable(minMuleVersion);
+  }
+
+  public void setMinMuleVersion(MuleVersion minMuleversion) {
+    this.minMuleVersion = minMuleversion;
   }
 
   @Override

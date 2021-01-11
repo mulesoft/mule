@@ -27,6 +27,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPP
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getExtensionModelsComponentBuildingDefinitions;
+import static org.mule.runtime.core.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
@@ -77,6 +78,8 @@ import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -85,6 +88,7 @@ import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
+import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
@@ -234,6 +238,15 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(), componentBuildingDefinitionRegistry,
                                   muleContext.getErrorTypeRepository());
+
+    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
+
+    FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
+        .context(muleContext)
+        .configurations(ffRegistry.getFeatureConfigurations())
+        .build();
+
+    muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
 
     this.applicationModel = createApplicationModel();
   }

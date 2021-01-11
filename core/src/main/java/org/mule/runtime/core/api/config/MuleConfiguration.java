@@ -7,14 +7,18 @@
 package org.mule.runtime.core.api.config;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
+import java.util.Optional;
+
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after startup.
+ * <p/>
  * TODO MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
  */
 @NoImplement
@@ -105,7 +109,7 @@ public interface MuleConfiguration {
 
   /**
    * @param extensionType class instance of the extension type
-   * @param <T>           type of the extension
+   * @param <T> type of the extension
    * @return extension configured of type extensionType, if there's no such extension then null.
    */
   <T> T getExtension(final Class<T> extensionType);
@@ -146,5 +150,13 @@ public interface MuleConfiguration {
    * @since 4.3
    */
   boolean isInheritIterableRepeatability();
+
+
+  /**
+   * @return The {@link MuleVersion} that the application has configured.
+   *
+   * @since 4.4.0
+   */
+  Optional<MuleVersion> getMinMuleVersion();
 
 }

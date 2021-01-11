@@ -3,6 +3,40 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method java.util.Optional<org.mule.runtime.api.meta.MuleVersion> org.mule.runtime.core.api.config.DefaultMuleConfiguration::getMinMuleVersion()",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "DefaultMuleConfiguration",
+          "methodName": "getMinMuleVersion",
+          "elementKind": "method",
+          "justification": "MULE-18976"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setMinMuleVersion(org.mule.runtime.api.meta.MuleVersion)",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "DefaultMuleConfiguration",
+          "methodName": "setMinMuleVersion",
+          "elementKind": "method",
+          "justification": "MULE-18976"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.core.api.config.FeatureFlaggingRegistry",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "FeatureFlaggingRegistry",
+          "elementKind": "class",
+          "justification": "MULE-18976"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.core.api.config.FeatureFlaggingService",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "FeatureFlaggingService",
+          "elementKind": "interface",
+          "justification": "MULE-18976"
+        },
+        {
           "code": "java.method.staticMethodAddedToInterface",
           "new": "method org.mule.runtime.core.api.config.DynamicConfigExpiration org.mule.runtime.core.api.config.DynamicConfigExpiration::getDefault(org.mule.runtime.api.time.TimeSupplier)",
           "package": "org.mule.runtime.core.api.config",
