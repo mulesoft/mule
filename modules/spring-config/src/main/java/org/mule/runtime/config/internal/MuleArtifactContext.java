@@ -24,6 +24,7 @@ import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.parserErrorType;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.configurePropertiesResolverFeatureFlag;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getExtensionModelsComponentBuildingDefinitions;
@@ -142,6 +143,9 @@ import org.xml.sax.EntityResolver;
 public class MuleArtifactContext extends AbstractRefreshableConfigApplicationContext implements ArtifactConfigResolverContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleArtifactContext.class);
+  static {
+    configurePropertiesResolverFeatureFlag();
+  }
 
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
@@ -177,16 +181,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
    * registry implementation to wraps the spring ApplicationContext
    *
-   * @param muleContext                                the {@link MuleContext} that own this context
-   * @param artifactDeclaration                        the mule configuration defined programmatically
-   * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *                                                   org.mule.runtime.config.internal.SpringRegistry
-   * @param pluginsClassLoaders                        the classloades of the plugins included in the artifact, on hwich contexts the parsers will
-   *                                                   process.
+   * @param muleContext the {@link MuleContext} that own this context
+   * @param artifactDeclaration the mule configuration defined programmatically
+   * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
+   *        org.mule.runtime.config.internal.SpringRegistry
+   * @param pluginsClassLoaders the classloades of the plugins included in the artifact, on hwich contexts the parsers will
+   *        process.
    * @param parentConfigurationProperties
-   * @param disableXmlValidations                      {@code true} when loading XML configs it will not apply validations.
+   * @param disableXmlValidations {@code true} when loading XML configs it will not apply validations.
    * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-   *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    * @since 3.7.0
    */
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -248,7 +252,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
 
-    this.applicationModel = createApplicationModel();
+    this.applicationModel = createApplicationModel(featureFlaggingService);
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -264,12 +268,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     });
   }
 
-  private ApplicationModel createApplicationModel() {
+  private ApplicationModel createApplicationModel(FeatureFlaggingService featureFlaggingService) {
     try {
       DefaultConfigurationPropertiesResolver propertyResolver =
           new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
 
-            ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
+            final ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
 
             @Override
             public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
@@ -350,7 +354,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return new ApplicationModel(artifactConfig, artifactDeclaration, getExtensions(),
                                   artifactProperties, parentConfigurationProperties,
                                   of(componentBuildingDefinitionRegistry),
-                                  externalResourceProvider, isRuntimeMode());
+                                  externalResourceProvider, isRuntimeMode(), featureFlaggingService);
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -359,8 +363,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   /**
-   * Defines if the context should be created for Runtime (execution) o not. This has impact on how the AST
-   * will be populated and created.
+   * Defines if the context should be created for Runtime (execution) o not. This has impact on how the AST will be populated and
+   * created.
    *
    * @since 4.3
    */
@@ -505,7 +509,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       errorMappingComponents.stream().forEach(innerComponent -> {
         Map<String, String> parameters = innerComponent.getRawParameters();
         ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
-            ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE)) : ANY;
+            ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE))
+            : ANY;
 
         if (!muleContext.getErrorTypeRepository().lookupErrorType(source).isPresent()) {
           throw new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source));
@@ -572,9 +577,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   /**
    * Creates the definition for all the objects to be created form the enabled components in the {@code applicationModel}.
    *
-   * @param beanFactory      the bean factory in which definition must be created.
+   * @param beanFactory the bean factory in which definition must be created.
    * @param applicationModel the artifact application model.
-   * @param mustBeRoot       if the component must be root to be created.
+   * @param mustBeRoot if the component must be root to be created.
    * @return an order list of the created bean names. The order must be respected for the creation of the objects.
    */
   protected List<Pair<String, ComponentAst>> createApplicationComponents(DefaultListableBeanFactory beanFactory,

@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.configurePropertiesResolverFeatureFlag;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
@@ -141,6 +142,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
+    configurePropertiesResolverFeatureFlag();
+
     if (isEmpty(artifactConfigResources) && artifactType == DOMAIN) {
       ((DefaultMuleContext) muleContext).setLifecycleStrategy(new NullDomainMuleContextLifecycleStrategy());
       return;
