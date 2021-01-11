@@ -12,6 +12,7 @@ import org.mule.api.MessagingException;
 import org.mule.construct.Flow;
 import org.mule.module.ws.consumer.WSConsumer;
 
+import javax.xml.namespace.QName;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -21,6 +22,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.text.IsEmptyString.isEmptyString;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
 
@@ -60,7 +62,12 @@ public class WSConsumerHttpRequesterFailureTestCase extends AbstractWSConsumerFu
 
             assertThat(element, not(nullValue()));
             assertThat(element, not(isEmptyString()));
+
             assertThat(ex.getFailingMessageProcessor(), is(instanceOf(WSConsumer.class)));
+
+            QName sourceFileLineQName =
+                    new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine");
+            assertTrue(flow.getAnnotations().containsKey(sourceFileLineQName));
         }
     }
 
