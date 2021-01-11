@@ -59,7 +59,7 @@ public class GlobalWeaveFunction implements Initialisable {
   }
 
   public List<Object> withTypedValues(@Alias("notObject") @Optional TypedValue<Object> object,
-                                      @Optional TypedValue<String> string,
+                                      @org.mule.sdk.api.annotation.param.Optional TypedValue<String> string,
                                       @Optional TypedValue<InputStream> stream,
                                       @Optional TypedValue<KnockeableDoor> door) {
     LinkedList<Object> values = new LinkedList<>();

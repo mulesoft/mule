@@ -57,7 +57,7 @@ public class DrStrangeBytesSource extends Source<InputStream, Void> {
   private int spellSize;
 
   @Parameter
-  @Optional
+  @org.mule.sdk.api.annotation.param.Optional
   @AllowedStereotypes(ReferableOperationStereotypeDefinition.class)
   private String nextOperationReference;
 

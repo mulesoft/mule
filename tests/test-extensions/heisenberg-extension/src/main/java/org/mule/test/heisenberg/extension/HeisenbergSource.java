@@ -179,7 +179,8 @@ public class HeisenbergSource extends Source<String, Object> {
   }
 
   @OnSuccess
-  public synchronized void onSuccess(@Optional(defaultValue = PAYLOAD) Long payment, @Optional String sameNameParameter,
+  public synchronized void onSuccess(@Optional(defaultValue = PAYLOAD) Long payment,
+                                     @org.mule.sdk.api.annotation.param.Optional String sameNameParameter,
                                      @ParameterGroup(name = RICIN_GROUP_NAME) @DisplayName("Dangerous Ricin") RicinGroup ricin,
                                      @ParameterGroup(name = "Success Info", showInDsl = true) PersonalInfo successInfo,
                                      @Optional boolean fail,
@@ -202,7 +203,7 @@ public class HeisenbergSource extends Source<String, Object> {
   public synchronized void onError(Error error, @Optional String sameNameParameter, @Optional Methylamine methylamine,
                                    @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
                                    @ParameterGroup(name = "Error Info", showInDsl = true) PersonalInfo infoError,
-                                   @Optional boolean propagateError,
+                                   @org.mule.sdk.api.annotation.param.Optional boolean propagateError,
                                    NotificationEmitter notificationEmitter) {
     gatheredMoney = -1;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
