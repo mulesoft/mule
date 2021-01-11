@@ -26,6 +26,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -170,7 +171,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         .flatMapSequential(typedValue -> {
           BaseEventContext childContext = newChildContext(currentEvent.get(), ofNullable(getLocation()));
 
-          Builder partEventBuilder = builder(currentEvent.get());
+          Builder partEventBuilder = builder(currentEvent.get())
+              .itemSequenceInfo(Optional.of(ItemSequenceInfo.of(count.get())));
 
           // Update type value for streaming
           TypedValue managedValue = manageTypeValueForStreaming(typedValue, currentEvent.get());
@@ -213,7 +215,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
           }
         }))
         .takeLast(1)
-        .map(s -> CoreEvent.builder(currentEvent.get()).message(request.getMessage()).build())
+        .map(s -> CoreEvent.builder(currentEvent.get()).message(request.getMessage())
+            .itemSequenceInfo(request.getItemSequenceInfo()).build())
         .onErrorStop();
   }
 
