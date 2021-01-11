@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
@@ -27,8 +26,7 @@ import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDC
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-import static org.mule.runtime.core.internal.exception.ErrorHandlerContext.ERROR_HANDLER_CONTEXT;
+import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -49,13 +47,15 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.exception.ErrorHandlerContext;
+import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
+import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -141,14 +141,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
               .onErrorContinue(MessagingException.class, onRoutingError())
               .map(afterRouting())
               .doOnNext(result -> {
-                final ErrorHandlerContext ctx = ErrorHandlerContext.from(result);
-                final String parameterId = getParameterId(result);
-                fireEndNotification(ctx.getOriginalEvent(parameterId), result, ctx.getException(parameterId));
+                ErrorHandlerContext errorHandlerContext = ErrorHandlerContextManager.from(TemplateOnErrorHandler.this, result);
+                fireEndNotification(errorHandlerContext.getOriginalEvent(), result, errorHandlerContext.getException());
               })
-              .doOnNext(TemplateOnErrorHandler.this::resolveHandling)))
-          .doAfterTerminate(() -> {
-            fluxSinks.remove(sinkRef.getFluxSink());
-          });
+              .doOnNext(result -> ErrorHandlerContextManager.resolveHandling(TemplateOnErrorHandler.this, result))))
+          .doAfterTerminate(() -> fluxSinks.remove(sinkRef.getFluxSink()));
 
       if (processingStrategy.isPresent()) {
         processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + getLocation().getLocation() + "'");
@@ -162,7 +159,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
     @Override
     public void dispose() {
-      fluxSinks.forEach(fs -> fs.complete());
+      fluxSinks.forEach(FluxSink::complete);
       fluxSinks.clear();
     }
   }
@@ -192,18 +189,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       @Override
       public void accept(Exception error) {
         // All calling methods will end up transforming any error class other than MessagingException into that one
-        MessagingException messagingError = (MessagingException) error;
-        CoreEvent failureEvent = messagingError.getEvent();
-
-        ErrorHandlerContext ctx = ErrorHandlerContext.from(failureEvent);
-
-        if (ctx == null) {
-          ctx = new ErrorHandlerContext();
-          failureEvent = quickCopy(failureEvent, of(ERROR_HANDLER_CONTEXT, ctx));
-        }
-
-        ctx.addContextItem(getParameterId(failureEvent), error, failureEvent, continueCallback, propagateCallback);
-        fluxSink.next(failureEvent);
+        fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, continueCallback, propagateCallback));
       }
     };
   }
@@ -227,34 +213,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     });
   }
 
-  private void resolveHandling(CoreEvent result) {
-    final ErrorHandlerContext ctx = ErrorHandlerContext.from(result);
-
-    final String parameterId = getParameterId(result);
-    Exception exception = ctx.getException(parameterId);
-    Consumer<CoreEvent> successfullyHandledConsumer = ctx.getSuccessCallback(parameterId);
-    Consumer<Throwable> errorConsumer = ctx.getRethrowCallback(parameterId);
-
-    if (exception instanceof MessagingException) {
-      final MessagingException messagingEx = (MessagingException) exception;
-      if (messagingEx.handled()) {
-        successfullyHandledConsumer.accept(result);
-      } else {
-        if (messagingEx.getEvent() != result) {
-          messagingEx.setProcessedEvent(result);
-        }
-        errorConsumer.accept(exception);
-      }
-    } else {
-      errorConsumer.accept(exception);
-    }
-  }
-
-  private String getParameterId(CoreEvent event) {
-    final String id = event.getContext().getId();
-    return (id != null ? id : "(null)").concat("_").concat(toString());
-  }
-
   private BiConsumer<Throwable, Object> onRoutingError() {
     return (me, event) -> {
       try {
@@ -268,12 +226,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         logger.warn(ex.getMessage());
       }
       CoreEvent result = afterRouting().apply(((MessagingException) me).getEvent());
-
-      final ErrorHandlerContext ctx = ErrorHandlerContext.from(result);
-
-      final String parameterId = getParameterId(result);
-      fireEndNotification(ctx.getOriginalEvent(parameterId), result, me);
-      ctx.getRethrowCallback(parameterId).accept(me);
+      fireEndNotification(ErrorHandlerContextManager.from(this, ((MessagingException) me).getEvent()).getOriginalEvent(), result,
+                          me);
+      ErrorHandlerContextManager.resolveHandling(this, (MessagingException) me);
     };
   }
 
@@ -470,7 +425,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   protected Exception getException(CoreEvent event) {
-    return ErrorHandlerContext.from(event).getException(getParameterId(event));
+    return ErrorHandlerContextManager.from(this, event).getException();
   }
 
   /**
