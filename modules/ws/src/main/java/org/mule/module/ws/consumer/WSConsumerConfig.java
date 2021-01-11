@@ -15,6 +15,7 @@ import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCES
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -48,7 +49,7 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 
-public class WSConsumerConfig implements MuleContextAware
+public class WSConsumerConfig extends AbstractAnnotatedObject implements MuleContextAware
 {
 
     private MuleContext muleContext;
