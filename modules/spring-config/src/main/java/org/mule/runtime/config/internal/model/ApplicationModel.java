@@ -28,9 +28,9 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
-import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.properties.api.ResourceProvider;
 
@@ -120,19 +120,37 @@ public class ApplicationModel implements ArtifactAst {
    * @param deploymentProperties values for replacement of properties in the DSL
    * @param parentConfigurationProperties the {@link ConfigurationProperties} of the parent artifact. For instance, application
    *        will receive the domain resolver.
-   * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
-   *        this model to their definitions expanded) false implies the mule is being created from a tooling perspective.
    * @param externalResourceProvider the provider for configuration properties files and ${file::name.txt} placeholders
-   * @throws Exception when the application configuration has semantic errors.
    */
   public ApplicationModel(ArtifactAst artifactAst,
                           Map<String, String> deploymentProperties,
                           Optional<ConfigurationProperties> parentConfigurationProperties,
                           ResourceProvider externalResourceProvider) {
+    this(artifactAst, deploymentProperties, parentConfigurationProperties, externalResourceProvider, null);
+  }
+
+
+  /**
+   * Creates an {code ApplicationModel} from an {@link ArtifactAst}.
+   * <p/>
+   * A set of validations are applied that may make creation fail.
+   * 
+   * @param artifactAst
+   * @param deploymentProperties
+   * @param parentConfigurationProperties
+   * @param externalResourceProvider
+   * @param featureFlaggingService
+   */
+  public ApplicationModel(ArtifactAst artifactAst,
+                          Map<String, String> deploymentProperties,
+                          Optional<ConfigurationProperties> parentConfigurationProperties,
+                          ResourceProvider externalResourceProvider,
+                          FeatureFlaggingService featureFlaggingService) {
     this.originalAst = artifactAst;
 
     this.configurationProperties = createConfigurationAttributeResolver(originalAst, parentConfigurationProperties,
-                                                                        deploymentProperties, externalResourceProvider);
+                                                                        deploymentProperties, externalResourceProvider,
+                                                                        ofNullable(featureFlaggingService));
     try {
       initialiseIfNeeded(configurationProperties.getConfigurationPropertiesResolver());
     } catch (InitialisationException e) {
@@ -155,7 +173,7 @@ public class ApplicationModel implements ArtifactAst {
   /**
    * Preprocesses the ArtifactAst so that it can be deployed to runtime.
    *
-   * @param extensionModels
+   * @param extensionModels Extension models to be used when macro expand the current {@link ApplicationModel}
    */
   public void prepareAstForRuntime(Set<ExtensionModel> extensionModels) {
     ast = processSourcesRedeliveryPolicy(ast);
@@ -167,9 +185,9 @@ public class ApplicationModel implements ArtifactAst {
    * it's responsibility of this object to properly initialize and expand every global element/operation into the concrete set of
    * message processors
    *
+   * @param ast
    * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to check if the element has to be
    *        expanded.
-   * @param postProcess a closure to be executed after the macroexpansion of an extension.
    */
   private ArtifactAst doXmlSdk1MacroExpansion(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
     return new MacroExpansionModulesModel(ast, extensionModels).expand();

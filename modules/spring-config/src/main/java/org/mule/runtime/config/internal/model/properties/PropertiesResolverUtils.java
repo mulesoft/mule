@@ -14,12 +14,14 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -32,6 +34,8 @@ import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationProper
 import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
+import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
@@ -43,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.namespace.QName;
 
@@ -52,6 +57,8 @@ import javax.xml.namespace.QName;
  */
 public class PropertiesResolverUtils {
 
+  private static final AtomicBoolean configured = new AtomicBoolean();
+
   private PropertiesResolverUtils() {
     // Nothing to do
   }
@@ -60,7 +67,8 @@ public class PropertiesResolverUtils {
   public static PropertiesResolverConfigurationProperties createConfigurationAttributeResolver(ArtifactAst artifactAst,
                                                                                                Optional<ConfigurationProperties> parentConfigurationProperties,
                                                                                                Map<String, String> deploymentProperties,
-                                                                                               ResourceProvider externalResourceProvider) {
+                                                                                               ResourceProvider externalResourceProvider,
+                                                                                               Optional<FeatureFlaggingService> featureFlaggingService) {
     ConfigurationPropertiesProvider deploymentPropertiesConfigurationProperties = null;
     if (!deploymentProperties.isEmpty()) {
       deploymentPropertiesConfigurationProperties =
@@ -87,7 +95,11 @@ public class PropertiesResolverUtils {
         new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(parentLocalResolver),
                                                                                                  globalPropertiesConfigurationAttributeProvider)),
                                                    environmentPropertiesConfigurationProvider);
-    localResolver.setRootResolver(parentLocalResolver);
+
+    // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
+    if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
+      localResolver.setRootResolver(parentLocalResolver);
+    }
 
     artifactAst.updatePropertiesResolver(localResolver);
     List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
@@ -218,19 +230,9 @@ public class PropertiesResolverUtils {
           }));
     }
 
-    Optional<CompositeConfigurationPropertiesProvider> configurationAttributesProvider = empty();
-
-    DefaultConfigurationPropertiesResolver systemPropertiesResolver;
-    if (configurationAttributesProvider.isPresent()) {
-      DefaultConfigurationPropertiesResolver configurationPropertiesResolver =
-          new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
-                                                     configurationAttributesProvider.get());
-      systemPropertiesResolver = new DefaultConfigurationPropertiesResolver(of(configurationPropertiesResolver),
-                                                                            environmentPropertiesConfigurationProvider);
-    } else {
-      systemPropertiesResolver = new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
-                                                                            environmentPropertiesConfigurationProvider);
-    }
+    DefaultConfigurationPropertiesResolver systemPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
+                                                   environmentPropertiesConfigurationProvider);
 
     DefaultConfigurationPropertiesResolver externalPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(deploymentPropertiesConfigurationProperties != null
@@ -324,6 +326,24 @@ public class PropertiesResolverUtils {
     });
 
     return providerFactoriesMap;
+  }
+
+  /**
+   * Configures {@link FeatureFlaggingService} to revert MULE-17659 for applications with <code>minMuleVersion</code> lesser than
+   * or equal to 4.2.2, or if system property {@link MuleRuntimeFeature#HONOUR_RESERVED_PROPERTIES} is set. See MULE-17659 and
+   * MULE-19038.
+   *
+   * @since 4.4.0 4.3.0
+   */
+  public static void configurePropertiesResolverFeatureFlag() {
+
+    if (!configured.getAndSet(true)) {
+      FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
+
+      ffRegistry.registerFeature(HONOUR_RESERVED_PROPERTIES,
+                                 ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
+                                     && ctx.getConfiguration().getMinMuleVersion().get().newerThan("4.2.2"));
+    }
   }
 
 }
