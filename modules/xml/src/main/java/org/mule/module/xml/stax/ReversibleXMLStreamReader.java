@@ -751,7 +751,8 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     @Override
     public boolean isEndElement()
     {
-        if (replay && current != null) {
+        if (replay && current != null)
+        {
             return current.isEndElement();
         }
 
