@@ -31,12 +31,14 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
 
 import javax.lang.model.element.VariableElement;
 
 import com.google.common.collect.ImmutableSet;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 
 /**
  * A contract for any kind of component from which an extension's parameter can be derived
@@ -85,16 +87,16 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
    * @return The {@link java.util.Optional} default value of the operation
    */
   default java.util.Optional<String> defaultValue() {
-    java.util.Optional<String> optionalDefaultValue = java.util.Optional.empty();
     final java.util.Optional<Optional> annotation = getAnnotation(Optional.class);
     if (annotation.isPresent()) {
-      final Optional optionalAnnotation = annotation.get();
-      final String defaultValue = optionalAnnotation.defaultValue();
-      if (!defaultValue.equals(Optional.NULL)) {
-        optionalDefaultValue = java.util.Optional.of(defaultValue);
-      }
+      return getDefaultValue(annotation.get());
     }
-    return optionalDefaultValue;
+    final java.util.Optional<org.mule.sdk.api.annotation.param.Optional> sdkAnnotation =
+        getAnnotation(org.mule.sdk.api.annotation.param.Optional.class);
+    if (sdkAnnotation.isPresent()) {
+      return getDefaultValue(sdkAnnotation.get());
+    }
+    return java.util.Optional.empty();
   }
 
   /**

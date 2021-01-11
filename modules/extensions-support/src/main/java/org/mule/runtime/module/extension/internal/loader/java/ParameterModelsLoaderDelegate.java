@@ -246,6 +246,15 @@ public final class ParameterModelsLoaderDelegate {
                                                                 groupParameter.getName()));
     }
 
+    if (groupParameter.isAnnotatedWith(org.mule.sdk.api.annotation.param.Optional.class)) {
+      throw new IllegalParameterModelDefinitionException(format(
+                                                                "@%s can not be applied alongside with @%s. Affected parameter is [%s].",
+                                                                org.mule.sdk.api.annotation.param.Optional.class
+                                                                    .getSimpleName(),
+                                                                ParameterGroup.class.getSimpleName(),
+                                                                groupParameter.getName()));
+    }
+
     ParameterGroupDeclarer declarer = component.onParameterGroup(groupName);
     if (declarer.getDeclaration().getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("Parameter group '%s' has already been declared on %s '%s'",
