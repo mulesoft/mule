@@ -6,8 +6,12 @@
  */
 package org.mule.test.petstore.extension;
 
+import static java.lang.String.format;
+import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
+import static org.mule.runtime.core.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+import static org.mule.test.petstore.extension.PetStoreFeatures.LEGACY_FEATURE;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -20,6 +24,7 @@ import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
@@ -41,6 +46,8 @@ import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.stereotype.ValidatorStereotype;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +57,19 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PetStoreOperations {
+
+  static {
+    // Register a feature that behaves differently with runtime versions older than 4.2.2
+    // noinspection deprecation
+    getInstance()
+        .registerFeature(LEGACY_FEATURE,
+                         c -> c.getConfiguration().getMinMuleVersion().isPresent()
+                             && !c.getConfiguration().getMinMuleVersion().get().newerThan("4.2.2"));
+  }
+
+  @Inject
+  @Named(FEATURE_FLAGGING_SERVICE_KEY)
+  private FeatureFlaggingService ffService;
 
   public static boolean shouldFailWithConnectionException;
   public static AtomicInteger operationExecutionCounter = new AtomicInteger(0);
@@ -68,6 +88,15 @@ public class PetStoreOperations {
   @MediaType(TEXT_PLAIN)
   public String echoWithSignature(String message) {
     return message + " echoed by Petstore";
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public String featureFlaggedEcho(String message) {
+    // noinspection deprecation
+    if (ffService.isEnabled(LEGACY_FEATURE)) {
+      return format("%s [old way]", message);
+    }
+    return message;
   }
 
   public List<String> getPets(@Connection PetStoreClient client,
@@ -234,4 +263,5 @@ public class PetStoreOperations {
       return "correlationInfo";
     }
   }
+
 }

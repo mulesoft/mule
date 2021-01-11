@@ -17,10 +17,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.InternalComponent;
@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after starting the MuleContext. TODO
@@ -62,6 +63,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
 
   private boolean lazyInit;
+
+  private MuleVersion minMuleVersion;
 
   /**
    * When true, each event will keep trace information of the flows and components it traverses to be shown as part of an
@@ -674,6 +677,15 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
       return Collections.emptyList();
     }
     return Collections.unmodifiableList(extensions);
+  }
+
+  @Override
+  public Optional<MuleVersion> getMinMuleVersion() {
+    return Optional.ofNullable(minMuleVersion);
+  }
+
+  public void setMinMuleVersion(MuleVersion minMuleversion) {
+    this.minMuleVersion = minMuleversion;
   }
 
   @Override
