@@ -38,7 +38,7 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
 
   protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleContextFactory.class);
 
-  private List<MuleContextListener> listeners = new LinkedList<>();
+  private final List<MuleContextListener> listeners = new LinkedList<>();
 
   /**
    * Creates a MuleContext using a default MuleContextBuilder
@@ -185,15 +185,16 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
 
     try {
       configurator.configure(muleContext);
+
       muleContext.initialise();
     } catch (ConfigurationException e) {
       if (muleContext != null && !muleContext.isDisposed()) {
         try {
           muleContext.dispose();
         } catch (Exception e1) {
-          logger.warn("Can not dispose context. " + getMessage(e1));
+          logger.warn("Can not dispose context. {}", getMessage(e1));
           if (logger.isDebugEnabled()) {
-            logger.debug("Can not dispose context. " + getStackTrace(e1));
+            logger.debug("Can not dispose context. {}", getStackTrace(e1));
           }
         }
       }
@@ -217,8 +218,8 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
     return listeners.remove(listener);
   }
 
-  private abstract class ContextConfigurator {
+  private interface ContextConfigurator {
 
-    public abstract void configure(MuleContext muleContext) throws ConfigurationException;
+    void configure(MuleContext muleContext) throws ConfigurationException;
   }
 }
