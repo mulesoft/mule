@@ -16,6 +16,7 @@ import static org.mule.runtime.config.internal.model.properties.PropertiesResolv
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -74,7 +75,7 @@ public class ApplicationModel implements ArtifactAst {
   public static final String DESCRIPTION_ELEMENT = "description";
   public static final String PROPERTIES_ELEMENT = "properties";
 
-  public static final String REDELIVERY_POLICY_ELEMENT = "redelivery-policy";
+  public static final String REDELIVERY_POLICY_ELEMENT = REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
   // TODO MULE-9638 Remove once all bean definitions parsers have been migrated
   public static final String TEST_NAMESPACE = "test";
   public static final String DOC_NAMESPACE = "doc";
@@ -134,7 +135,7 @@ public class ApplicationModel implements ArtifactAst {
    * Creates an {code ApplicationModel} from an {@link ArtifactAst}.
    * <p/>
    * A set of validations are applied that may make creation fail.
-   * 
+   *
    * @param artifactAst
    * @param deploymentProperties
    * @param parentConfigurationProperties
@@ -279,6 +280,11 @@ public class ApplicationModel implements ArtifactAst {
    */
   public ConfigurationProperties getConfigurationProperties() {
     return configurationProperties;
+  }
+
+  @Override
+  public Set<ExtensionModel> dependencies() {
+    return ast.dependencies();
   }
 
   @Override
