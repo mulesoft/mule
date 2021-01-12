@@ -10,6 +10,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.context.notification.NotifierCallback;
 
@@ -37,7 +38,7 @@ public class Policy {
   private Map<Class<? extends Notification>, Collection<Sender>> eventToSenders =
       new HashMap<>();
   private Map<Class<? extends Notification>, Collection<Sender>> concreteEventToSenders =
-      new HashMap<>();
+      new ConcurrentHashMap<>();
 
   // these are cumulative - set values should never change, they are just a cache of known info
   // they are co and contra-variant wrt to exact event type (see code below).
@@ -114,30 +115,26 @@ public class Policy {
 
   protected boolean doDispatch(Notification notification, Class<? extends Notification> notfnClass,
                                NotifierCallback notifier) {
-    boolean found = false;
-
     // Optimization to avoid iterating the eventToSenders map each time a notification is fired
     Collection<Sender> senders = concreteEventToSenders.get(notfnClass);
     if (senders != null) {
-      found = true;
       dispatchToSenders(notification, senders, notifier);
-    } else {
-      senders = concreteEventToSenders.get(notfnClass);
-      if (senders != null) {
-        dispatchToSenders(notification, senders, notifier);
-      } else {
-        senders = new ArrayList<>();
-        for (Entry<Class<? extends Notification>, Collection<Sender>> event : eventToSenders.entrySet()) {
-          if (event.getKey().isAssignableFrom(notfnClass)) {
-            found = true;
-            senders.addAll(event.getValue());
-            dispatchToSenders(notification, senders, notifier);
-          }
-        }
-        concreteEventToSenders.putIfAbsent(notfnClass, senders);
+      return true;
+    }
+
+    senders = new ArrayList<>();
+    for (Entry<Class<? extends Notification>, Collection<Sender>> event : eventToSenders.entrySet()) {
+      if (event.getKey().isAssignableFrom(notfnClass)) {
+        senders.addAll(event.getValue());
       }
     }
-    return found;
+
+    if (!senders.isEmpty()) {
+      dispatchToSenders(notification, senders, notifier);
+      concreteEventToSenders.putIfAbsent(notfnClass, senders);
+    }
+
+    return !senders.isEmpty();
   }
 
   private void dispatchToSenders(Notification notification, Collection<Sender> senders, NotifierCallback notifier) {
