@@ -185,7 +185,7 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase {
 
     ArrayList<Thread> threads = new ArrayList<>();
     Latch latch = new Latch();
-    CountDownLatch allstarted = new CountDownLatch(1000);
+    CountDownLatch allstarted = new CountDownLatch(CONCURRENCY);
     for (int i = 0; i < CONCURRENCY; i++) {
       Thread t = new Thread(() -> {
         try {
