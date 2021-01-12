@@ -30,10 +30,12 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.ON_NEXT_FAILURE_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -307,43 +309,62 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
-    FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
+    FluxSinkRecorder<Either<Throwable, CoreEvent>> pipelineOutlet = new FluxSinkRecorder<>();
+    return eventPublisher -> from(eventPublisher).compose(pipelineUpstream -> subscriberContext().flatMapMany(reactorContext -> {
+      if (reactorContext.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
+        return handlePipelineError(from(propagateCompletion(pipelineUpstream, pipelineOutlet.flux(),
+                                                            pipelineInlet -> splicePipeline(pipelineOutlet,
+                                                                                            pipelineInlet, true),
+                                                            pipelineOutlet::complete,
+                                                            pipelineOutlet::error)));
+      } else {
+        return handlePipelineError(from(propagateCompletion(pipelineUpstream, pipelineOutlet.flux(),
+                                                            pipelineInlet -> splicePipeline(pipelineOutlet,
+                                                                                            pipelineInlet, false),
+                                                            pipelineOutlet::complete,
+                                                            pipelineOutlet::error,
+                                                            muleContext.getConfiguration().getShutdownTimeout(),
+                                                            completionCallbackScheduler, getDslSource())));
+      }
+    }));
+  }
 
-    return pub -> from(propagateCompletion(pub,
-                                           sinkRecorder.flux(),
-                                           innerEventPub -> from(innerEventPub)
-                                               .doOnNext(event -> {
-                                                 // Retrieve response publisher before error is communicated
-                                                 // Subscribe the rest of reactor chain to response publisher,
-                                                 // through which errors and responses will be emitted
-                                                 ((BaseEventContext) event.getContext()).onResponse((e, t) -> {
-                                                   if (t != null) {
-                                                     sinkRecorder.next(left(t, CoreEvent.class));
-                                                   } else if (e != null) {
-                                                     sinkRecorder.next(right(Throwable.class, e));
-                                                   }
-                                                 });
-                                               })
+  private Flux<Either<Throwable, CoreEvent>> splicePipeline(FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder,
+                                                            Publisher<CoreEvent> innerEventPub, boolean isWithinProcessToApply) {
+    return from(innerEventPub)
+        // Retrieve response publisher before error is communicated Subscribe the rest of reactor chain to response publisher,
+        // through which errors and responses will be emitted.
+        .doOnNext(event -> ((BaseEventContext) event.getContext())
+            .onResponse((e, t) -> {
+              if (t != null) {
+                sinkRecorder.next(left(t, CoreEvent.class));
+              } else if (e != null) {
+                sinkRecorder.next(right(Throwable.class, e));
+              }
+              if (isWithinProcessToApply) {
+                // When the event that entered the pipeline has been emitted by a Mono, the pipeline downstream can be safely completed,
+                // in order to cover the case of both error and event being null (see BaseEventContext.success()).
+                sinkRecorder.complete();
+              }
+            }))
 
-                                               // This accept/emit choice is made because there's a
-                                               // backpressure check done in the #emit sink message, which can
-                                               // be done preemptively as the maxConcurrency one, before policies
-                                               // execution. As previous implementation, use WAIT strategy as
-                                               // default. This check may not be needed anymore for
-                                               // ProactorStreamProcessingStrategy. See MULE-16988.
-                                               .doOnNext(getSource() == null || getSource().getBackPressureStrategy() == WAIT
-                                                   ? event -> sink.accept(event)
-                                                   : event -> sinkEmit(event))
-                                               .map(e -> Either.empty()),
-                                           () -> sinkRecorder.complete(), t -> sinkRecorder.error(t),
-                                           muleContext.getConfiguration().getShutdownTimeout(),
-                                           completionCallbackScheduler, getDslSource()))
-                                               .map(result -> {
-                                                 result.applyLeft(t -> {
-                                                   throw propagate(t);
-                                                 });
-                                                 return result.getRight();
-                                               });
+        // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
+        // preemptively as the maxConcurrency one, before policies execution. As previous implementation, use WAIT strategy as
+        // default. This check may not be needed anymore for ProactorStreamProcessingStrategy. See MULE-16988.
+        .doOnNext(getSource() == null || getSource().getBackPressureStrategy() == WAIT
+            ? event -> sink.accept(event)
+            : event -> sinkEmit(event))
+        .map(e -> Either.empty());
+  }
+
+  private Flux<CoreEvent> handlePipelineError(Flux<Either<Throwable, CoreEvent>> flux) {
+    return flux
+        .map(result -> {
+          result.applyLeft(t -> {
+            throw propagate(t);
+          });
+          return result.getRight();
+        });
   }
 
   private void sinkEmit(CoreEvent event) {
