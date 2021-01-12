@@ -28,6 +28,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
@@ -364,6 +365,15 @@ public abstract class AbstractMuleTestCase {
 
   private static void logThreadsResult(String result) {
     LOGGER.warn(format("\n%s\n%s\n%s\n", THREAD_RESULT_LINE, result, THREAD_RESULT_LINE));
+  }
+
+  /**
+   * {@link FeatureFlaggingService} used for testing with all the features enabled
+   *
+   * @return
+   */
+  protected FeatureFlaggingService getFeatureFlaggingService() {
+    return feature -> true;
   }
 
 }

@@ -21,6 +21,7 @@ import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
@@ -83,6 +84,7 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 
@@ -296,10 +298,10 @@ public class ApplicationModel {
    * @throws Exception when the application configuration has semantic errors.
    */
   public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
-                          ResourceProvider externalResourceProvider)
+                          ResourceProvider externalResourceProvider, FeatureFlaggingService featureFlaggingService)
       throws Exception {
     this(artifactConfig, artifactDeclaration, emptySet(), emptyMap(), empty(), of(new ComponentBuildingDefinitionRegistry()),
-         true, externalResourceProvider);
+         true, externalResourceProvider, featureFlaggingService);
   }
 
   /**
@@ -325,12 +327,14 @@ public class ApplicationModel {
                           Map<String, String> deploymentProperties,
                           Optional<ConfigurationProperties> parentConfigurationProperties,
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
-                          boolean runtimeMode, ResourceProvider externalResourceProvider)
+                          boolean runtimeMode, ResourceProvider externalResourceProvider,
+                          FeatureFlaggingService featureFlaggingService)
       throws Exception {
 
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.externalResourceProvider = externalResourceProvider;
-    createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
+    createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties,
+                                         ofNullable(featureFlaggingService));
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
     resolveRegistrationNames();
@@ -348,6 +352,19 @@ public class ApplicationModel {
     resolveComponentTypes();
     resolveTypedComponentIdentifier(extensionModelHelper);
     executeOnEveryMuleComponentTree(componentModel -> new ComponentLocationVisitor(extensionModelHelper).accept(componentModel));
+  }
+
+  // TODO: MULE-9638 remove this optional
+  public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
+                          Set<ExtensionModel> extensionModels,
+                          Map<String, String> deploymentProperties,
+                          Optional<ConfigurationProperties> parentConfigurationProperties,
+                          Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
+                          boolean runtimeMode, ResourceProvider externalResourceProvider)
+      throws Exception {
+    this(artifactConfig, artifactDeclaration, extensionModels, deploymentProperties, parentConfigurationProperties,
+         componentBuildingDefinitionRegistry, runtimeMode, externalResourceProvider, null);
+
   }
 
   private void indexComponentModels() {
@@ -377,7 +394,8 @@ public class ApplicationModel {
 
   private void createConfigurationAttributeResolver(ArtifactConfig artifactConfig,
                                                     Optional<ConfigurationProperties> parentConfigurationProperties,
-                                                    Map<String, String> deploymentProperties) {
+                                                    Map<String, String> deploymentProperties,
+                                                    Optional<FeatureFlaggingService> featureFlaggingService) {
 
     ConfigurationPropertiesProvider deploymentPropertiesConfigurationProperties = null;
     if (!deploymentProperties.isEmpty()) {
@@ -406,7 +424,10 @@ public class ApplicationModel {
         new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(parentLocalResolver),
                                                                                                  globalPropertiesConfigurationAttributeProvider)),
                                                    environmentPropertiesConfigurationProvider);
-    localResolver.setRootResolver(parentLocalResolver);
+    // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
+    if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
+      localResolver.setRootResolver(parentLocalResolver);
+    }
 
     List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
         getConfigurationPropertiesProvidersFromComponents(artifactConfig, localResolver);

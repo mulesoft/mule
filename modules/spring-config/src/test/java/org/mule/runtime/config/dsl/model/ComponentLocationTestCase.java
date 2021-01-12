@@ -11,14 +11,11 @@ import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
@@ -69,7 +66,7 @@ public class ComponentLocationTestCase extends AbstractDslModelTestCase {
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(new ArtifactConfig.Builder().build(),
                                 declaration, extensions, emptyMap(), empty(), empty(), true,
-                                uri -> getClass().getResourceAsStream(uri));
+                                uri -> getClass().getResourceAsStream(uri), getFeatureFlaggingService());
   }
 
   private ArtifactDeclaration buildAppDeclaration() {

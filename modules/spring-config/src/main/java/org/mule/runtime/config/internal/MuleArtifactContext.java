@@ -24,6 +24,7 @@ import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.parserErrorType;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.configurePropertiesResolverFeatureFlag;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getExtensionModelsComponentBuildingDefinitions;
 import static org.mule.runtime.core.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
@@ -140,6 +141,9 @@ import org.xml.sax.EntityResolver;
 public class MuleArtifactContext extends AbstractRefreshableConfigApplicationContext implements ArtifactConfigResolverContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleArtifactContext.class);
+  static {
+    configurePropertiesResolverFeatureFlag();
+  }
 
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
@@ -246,7 +250,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
 
-    createApplicationModel();
+    createApplicationModel(featureFlaggingService);
     validateAllConfigElementHaveParsers();
 
     this.configurationDependencyResolver =
@@ -274,12 +278,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     });
   }
 
-  private void createApplicationModel() {
+  private void createApplicationModel(FeatureFlaggingService featureFlaggingService) {
     try {
       DefaultConfigurationPropertiesResolver propertyResolver =
           new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
 
-            ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
+            final ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
 
             @Override
             public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
@@ -362,7 +366,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       applicationModel = new ApplicationModel(artifactConfig, artifactDeclaration, extensions,
                                               artifactProperties, parentConfigurationProperties,
                                               of(componentBuildingDefinitionRegistry),
-                                              true, externalResourceProvider);
+                                              true, externalResourceProvider, featureFlaggingService);
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -502,7 +506,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       errorMappingComponents.stream().forEach(innerComponent -> {
         Map<String, String> parameters = innerComponent.getParameters();
         ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
-            ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE)) : ANY;
+            ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE))
+            : ANY;
 
         if (!muleContext.getErrorTypeRepository().lookupErrorType(source).isPresent()) {
           throw new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source));

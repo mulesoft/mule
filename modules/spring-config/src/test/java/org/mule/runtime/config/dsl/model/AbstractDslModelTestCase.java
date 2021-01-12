@@ -57,8 +57,9 @@ import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.mockito.Mock;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
-public abstract class AbstractDslModelTestCase {
+public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
 
   protected static final String NAMESPACE = "mockns";
   protected static final String NAMESPACE_URI = "http://www.mulesoft.org/schema/mule/mockns";
