@@ -98,15 +98,18 @@ public abstract class AbstractOSController {
 
     new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new Probe() {
 
+      private MuleProcessStatus status;
+
       @Override
       public boolean isSatisfied() {
-        return getProcessesStatus() != STARTED_STARTED;
+        status = getProcessesStatus();
+        return status == STARTED_STARTED;
       }
 
       @Override
       public String describeFailure() {
         runSync(DUMP_CMD);
-        return format("The mule instance didn't start on time: %s", getProcessesStatus());
+        return format("The mule instance didn't start on time: %s", status);
       }
     });
   }
