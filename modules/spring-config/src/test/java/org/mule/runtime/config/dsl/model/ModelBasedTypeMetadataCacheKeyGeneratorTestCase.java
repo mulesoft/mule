@@ -393,8 +393,8 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
     final String newConfigName = "myNewConfig";
     ArtifactDeclaration baseApp = getBaseApp();
     ArtifactDeclaration app = ElementDeclarer.newArtifact()
-        .withGlobalElement(baseApp.getGlobalElements().get(0)) //config
-        .withGlobalElement(baseApp.getGlobalElements().get(1)) //flow
+        .withGlobalElement(baseApp.getGlobalElements().get(0)) // config
+        .withGlobalElement(baseApp.getGlobalElements().get(1)) // flow
         .withGlobalElement(
                            newElementDeclarer.newConfiguration(CONFIGURATION_NAME)
                                .withRefName(newConfigName)
@@ -553,7 +553,7 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(new ArtifactConfig.Builder().build(),
                                 declaration, extensions, emptyMap(), empty(), empty(),
-                                uri -> getClass().getResourceAsStream(uri));
+                                uri -> getClass().getResourceAsStream(uri), getFeatureFlaggingService());
   }
 
   private MetadataCacheIdGenerator<ComponentAst> createGenerator(ApplicationModel app) {

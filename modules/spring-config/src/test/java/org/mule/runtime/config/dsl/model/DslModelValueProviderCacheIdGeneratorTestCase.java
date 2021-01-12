@@ -116,7 +116,7 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
 
   private static final String MY_FLOW = "myFlow";
   private static final String MY_CONFIG = "myConfig";
-  private static final String MY_CONNECTION = MY_CONFIG + "/connection"; //Not a valid location, hack to reuse helper function.
+  private static final String MY_CONNECTION = MY_CONFIG + "/connection"; // Not a valid location, hack to reuse helper function.
   private static final String SOURCE_LOCATION = MY_FLOW + "/source";
   private static final String OPERATION_LOCATION = MY_FLOW + "/processors/0";
   private static final String OTHER_OPERATION_LOCATION = MY_FLOW + "/processors/1";
@@ -464,7 +464,7 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(new ArtifactConfig.Builder().build(),
                                 declaration, extensions, emptyMap(), empty(), empty(),
-                                uri -> getClass().getResourceAsStream(uri));
+                                uri -> getClass().getResourceAsStream(uri), getFeatureFlaggingService());
   }
 
   private Optional<ValueProviderCacheId> computeIdFor(ArtifactDeclaration appDeclaration,
@@ -532,7 +532,7 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
                  .findAny()
                  .map(fp -> {
                    parameterConsumer.accept(fp);
-                   return EMPTY; //Needed to avoid exception
+                   return EMPTY; // Needed to avoid exception
                  })
                  .orElseThrow(() -> new RuntimeException("Could not find parameter to modify")))
         .orElseThrow(() -> new RuntimeException("Location not found"));

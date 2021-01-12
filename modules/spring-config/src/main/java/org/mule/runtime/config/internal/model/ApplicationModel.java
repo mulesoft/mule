@@ -23,6 +23,7 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER;
@@ -96,6 +97,7 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -283,15 +285,15 @@ public class ApplicationModel implements ArtifactAst {
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactConfig      the mule artifact configuration content.
+   * @param artifactConfig the mule artifact configuration content.
    * @param artifactDeclaration an {@link ArtifactDeclaration}
    * @throws Exception when the application configuration has semantic errors.
    */
   public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
-                          ResourceProvider externalResourceProvider)
+                          ResourceProvider externalResourceProvider, FeatureFlaggingService featureFlaggingService)
       throws Exception {
     this(artifactConfig, artifactDeclaration, emptySet(), emptyMap(), empty(), of(new ComponentBuildingDefinitionRegistry()),
-         externalResourceProvider, true);
+         externalResourceProvider, true, featureFlaggingService);
   }
 
   /**
@@ -299,14 +301,14 @@ public class ApplicationModel implements ArtifactAst {
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactConfig                      the mule artifact configuration content.
-   * @param artifactDeclaration                 an {@link ArtifactDeclaration}
-   * @param extensionModels                     Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
-   * @param parentConfigurationProperties       the {@link ConfigurationProperties} of the parent artifact. For instance, application
-   *                                            will receive the domain resolver.
+   * @param artifactConfig the mule artifact configuration content.
+   * @param artifactDeclaration an {@link ArtifactDeclaration}
+   * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
+   * @param parentConfigurationProperties the {@link ConfigurationProperties} of the parent artifact. For instance, application
+   *        will receive the domain resolver.
    * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
-   *                                            this model to their definitions expanded) false implies the mule is being created from a tooling perspective.
-   * @param externalResourceProvider            the provider for configuration properties files and ${file::name.txt} placeholders
+   *        this model to their definitions expanded) false implies the mule is being created from a tooling perspective.
+   * @param externalResourceProvider the provider for configuration properties files and ${file::name.txt} placeholders
    * @throws Exception when the application configuration has semantic errors.
    */
   // TODO: MULE-9638 remove this optional
@@ -318,8 +320,20 @@ public class ApplicationModel implements ArtifactAst {
                           ResourceProvider externalResourceProvider)
       throws Exception {
     this(artifactConfig, artifactDeclaration, extensionModels, deploymentProperties, parentConfigurationProperties,
+         componentBuildingDefinitionRegistry, externalResourceProvider, null);
+  }
+
+  // TODO: MULE-9638 remove this optional
+  public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
+                          Set<ExtensionModel> extensionModels,
+                          Map<String, String> deploymentProperties,
+                          Optional<ConfigurationProperties> parentConfigurationProperties,
+                          Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
+                          ResourceProvider externalResourceProvider, FeatureFlaggingService featureFlaggingService)
+      throws Exception {
+    this(artifactConfig, artifactDeclaration, extensionModels, deploymentProperties, parentConfigurationProperties,
          componentBuildingDefinitionRegistry,
-         externalResourceProvider, true);
+         externalResourceProvider, true, featureFlaggingService);
   }
 
   // TODO: MULE-9638 remove this optional
@@ -331,11 +345,25 @@ public class ApplicationModel implements ArtifactAst {
                           ResourceProvider externalResourceProvider,
                           boolean runtimeMode)
       throws Exception {
+    this(artifactConfig, artifactDeclaration, extensionModels, deploymentProperties, parentConfigurationProperties,
+         componentBuildingDefinitionRegistry, externalResourceProvider, runtimeMode, null);
+  }
+
+  // TODO: MULE-9638 remove this optional
+  public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
+                          Set<ExtensionModel> extensionModels,
+                          Map<String, String> deploymentProperties,
+                          Optional<ConfigurationProperties> parentConfigurationProperties,
+                          Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
+                          ResourceProvider externalResourceProvider,
+                          boolean runtimeMode, FeatureFlaggingService featureFlaggingService)
+      throws Exception {
 
     this.runtimeMode = runtimeMode;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.externalResourceProvider = externalResourceProvider;
-    createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
+    createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties,
+                                         ofNullable(featureFlaggingService));
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
     createEffectiveModel();
@@ -382,7 +410,8 @@ public class ApplicationModel implements ArtifactAst {
 
   private void createConfigurationAttributeResolver(ArtifactConfig artifactConfig,
                                                     Optional<ConfigurationProperties> parentConfigurationProperties,
-                                                    Map<String, String> deploymentProperties) {
+                                                    Map<String, String> deploymentProperties,
+                                                    Optional<FeatureFlaggingService> featureFlaggingService) {
 
     ConfigurationPropertiesProvider deploymentPropertiesConfigurationProperties = null;
     if (!deploymentProperties.isEmpty()) {
@@ -411,7 +440,10 @@ public class ApplicationModel implements ArtifactAst {
         new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(parentLocalResolver),
                                                                                                  globalPropertiesConfigurationAttributeProvider)),
                                                    environmentPropertiesConfigurationProvider);
-    localResolver.setRootResolver(parentLocalResolver);
+    // MULE-17659: it should behave without the fix for applications made for runtime prior 4.2.2
+    if (featureFlaggingService.orElse(f -> true).isEnabled(HONOUR_RESERVED_PROPERTIES)) {
+      localResolver.setRootResolver(parentLocalResolver);
+    }
 
     List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
         getConfigurationPropertiesProvidersFromComponents(artifactConfig, localResolver);
@@ -1190,8 +1222,8 @@ public class ApplicationModel implements ArtifactAst {
    * message processors
    *
    * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to check if the element has to be
-   *                        expanded.
-   * @param postProcess     a closure to be executed after the macroexpansion of an extension.
+   *        expanded.
+   * @param postProcess a closure to be executed after the macroexpansion of an extension.
    */
   private void expandModules(Set<ExtensionModel> extensionModels, Runnable postProcess) {
     new MacroExpansionModulesModel(this, extensionModels).expand(postProcess);

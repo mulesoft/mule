@@ -824,7 +824,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(new ArtifactConfig.Builder().build(),
                                 declaration, extensions, emptyMap(), empty(), empty(),
-                                uri -> getClass().getResourceAsStream(uri));
+                                uri -> getClass().getResourceAsStream(uri), getFeatureFlaggingService());
   }
 
   private void mockSimpleMetadataKeyId(OperationModel model) {

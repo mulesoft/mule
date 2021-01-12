@@ -116,6 +116,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
     dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
+        .withMinMuleVersion("4.3.0") // MULE-19038
         .definedBy("dummy-app-with-props-dependencies-config.xml");
 
     // Application plugin artifact builders
