@@ -16,9 +16,9 @@ import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_F
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.ParameterGroupUtils.getSourceCallbackAwareParameter;
+import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -366,7 +366,7 @@ class ComponentConfigurationBuilder<T> {
             .map(v -> (Object) v)
             .orElse(defaultValue);
       } else if ("frequency".equals(parameterName)
-          && ownerComponent.getIdentifier().getName().equals(FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER)
+          && ownerComponent.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_IDENTIFIER)
           && parameter.isDefaultValue()) {
         // Account for inconsistency in the extension model. Ref: MULE-18262
         parameterValue = getDefaultSchedulerFixedFrequency();

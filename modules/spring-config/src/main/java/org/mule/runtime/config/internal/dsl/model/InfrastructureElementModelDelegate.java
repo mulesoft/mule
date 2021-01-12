@@ -10,6 +10,9 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.internal.model.ApplicationModel.RECONNECTION_CONFIG_PARAMETER_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.SCHEDULING_STRATEGY_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.TLS_CONTEXT_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
@@ -29,8 +32,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_KEY_STORE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
@@ -142,10 +143,7 @@ class InfrastructureElementModelDelegate {
                                         DslSyntaxResolver dsl) {
 
     InternalComponentConfiguration.Builder schedulingWrapperConfig = InternalComponentConfiguration.builder()
-        .withIdentifier(builder()
-            .namespace(CORE_PREFIX)
-            .name(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER)
-            .build());
+        .withIdentifier(SCHEDULING_STRATEGY_IDENTIFIER);
 
     DslElementModel.Builder schedulingElement = DslElementModel.builder()
         .withDsl(paramDsl)
@@ -204,10 +202,7 @@ class InfrastructureElementModelDelegate {
       public void visitObjectValue(ParameterObjectValue objectValue) {
 
         InternalComponentConfiguration.Builder tlsConfig = InternalComponentConfiguration.builder()
-            .withIdentifier(builder()
-                .namespace(TLS_PREFIX)
-                .name(TLS_CONTEXT_ELEMENT_IDENTIFIER)
-                .build());
+            .withIdentifier(TLS_CONTEXT_IDENTIFIER);
 
         objectValue.getParameters()
             .forEach((name, value) -> value.accept(new ParameterValueVisitor() {
@@ -269,10 +264,7 @@ class InfrastructureElementModelDelegate {
                                         DslElementModel.Builder parentElement) {
 
     InternalComponentConfiguration.Builder config = InternalComponentConfiguration.builder()
-        .withIdentifier(builder()
-            .namespace(CORE_PREFIX)
-            .name(RECONNECTION_CONFIG_PARAMETER_NAME)
-            .build());
+        .withIdentifier(RECONNECTION_CONFIG_PARAMETER_IDENTIFIER);
 
     final DslElementModel.Builder<Object> elementBuilder = DslElementModel.builder()
         .withModel(parameterModel)
@@ -334,6 +326,7 @@ class InfrastructureElementModelDelegate {
                               namespace);
   }
 
+  // TODO review if this is needed
   private void cloneDeclarationToElement(Object parameterModel, DslElementSyntax paramDsl,
                                          InternalComponentConfiguration.Builder parentConfig,
                                          DslElementModel.Builder parentElement,
