@@ -7,48 +7,12 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeThat;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.deployment.meta.Product.MULE;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
-import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
-import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import io.qameta.allure.Issue;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -58,12 +22,15 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.internal.context.ArtifactStoppedListener;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
@@ -78,10 +45,38 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeThat;
+import static org.mockito.Mockito.*;
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
+import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.ARTIFACT_STOPPED_LISTENER;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.*;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.*;
+import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 /**
  * Contains test for application deployment on the default domain
@@ -91,14 +86,11 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   private static final String OVERWRITTEN_PROPERTY = "configFile";
   private static final String OVERWRITTEN_PROPERTY_SYSTEM_VALUE = "nonExistent.yaml";
   private static final String OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE = "someProps.yaml";
-
-  protected ApplicationFileBuilder dummyAppDescriptorWithPropsDependencyFileBuilder;
-
   @Rule
   public SystemProperty systemProperty = new SystemProperty(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_SYSTEM_VALUE);
-
   @Rule
   public SystemProperty otherSystemProperty = new SystemProperty("oneProperty", "someValue");
+  protected ApplicationFileBuilder dummyAppDescriptorWithPropsDependencyFileBuilder;
 
   public ApplicationDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -291,6 +283,38 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
                                       deploymentProperties,
                                       (registry) -> registry.lookupByName(OVERWRITTEN_PROPERTY).get()
                                           .equals(OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE));
+  }
+
+  @Test
+  public void whenAppIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception {
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    app.stop();
+
+    assertNotNull(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER));
+    Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), Optional.empty());
+    assertNotNull(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY));
+    assertEquals("false", deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY));
+  }
+
+  @Test
+  public void whenAppIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+
+    assertNotNull(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER));
+    deploymentService.undeploy(app);
+
+    Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), Optional.empty());
+    assertNull(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY));
   }
 
   /**
@@ -694,6 +718,43 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertStatus(app, STOPPED);
 
     deploymentService.undeploy(app);
+  }
+
+  @Test
+  public void undeploysStoppedAppAndDoesNotStartItOnDeploy() throws Exception {
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    app.stop();
+    assertStatus(app, STOPPED);
+
+    serviceManager.stop();
+    extensionModelLoaderManager.stop();
+    deploymentService.stop();
+
+    reset(applicationDeploymentListener);
+
+    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
+        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
+
+    serviceManager = muleArtifactResourcesRegistry.getServiceManager();
+    serviceManager.start();
+
+    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
+    extensionModelLoaderManager.start();
+
+    deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
+                                                      muleArtifactResourcesRegistry.getApplicationFactory(),
+                                                      () -> findSchedulerService(serviceManager));
+    configureDeploymentService();
+    deploymentService.start();
+
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
+    assertStatus(app_2, CREATED);
   }
 
   @Test

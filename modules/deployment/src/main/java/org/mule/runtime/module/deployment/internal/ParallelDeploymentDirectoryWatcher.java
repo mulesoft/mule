@@ -7,22 +7,24 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
-import static java.util.Optional.empty;
-
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
+
+import static java.util.Optional.empty;
+import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 
 /**
  * Provides parallel deployment of Mule applications.
@@ -53,7 +55,9 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
     for (final String zip : zips) {
       tasks.add(() -> {
         try {
-          applicationArchiveDeployer.deployPackagedArtifact(zip, empty());
+          Optional<DeployableArtifact> optDeployableArtifact =
+              Optional.ofNullable(applicationArchiveDeployer.deployPackagedArtifact(zip, empty()));
+          optDeployableArtifact.ifPresent(this::addArtifactStoppedDeploymentListenerToArtifact);
         } catch (Exception e) {
           // Ignore and continue
         }
@@ -73,7 +77,9 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
       if (applicationArchiveDeployer.isUpdatedZombieArtifact(addedApp)) {
         tasks.add(() -> {
           try {
-            applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty());
+            Optional<DeployableArtifact> optDeployableArtifact =
+                Optional.ofNullable(applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty()));
+            optDeployableArtifact.ifPresent(this::addArtifactStoppedDeploymentListenerToArtifact);
           } catch (Exception e) {
             // Ignore and continue
           }

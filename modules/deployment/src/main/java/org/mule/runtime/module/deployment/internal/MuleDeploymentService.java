@@ -27,9 +27,11 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.StartupListener;
@@ -343,7 +345,10 @@ public class MuleDeploymentService implements DeploymentService {
         File artifactLocation = toFile(artifactArchiveUri.toURL());
         String fileName = artifactLocation.getName();
         if (fileName.endsWith(".jar")) {
-          archiveDeployer.deployPackagedArtifact(artifactArchiveUri, deploymentProperties);
+          Optional<DeployableArtifact> optDeployableArtifact =
+              Optional.ofNullable((DeployableArtifact) archiveDeployer.deployPackagedArtifact(artifactArchiveUri,
+                                                                                              deploymentProperties));
+          optDeployableArtifact.ifPresent(deploymentDirectoryWatcher::addArtifactStoppedDeploymentListenerToArtifact);
         } else {
           if (!artifactLocation.getParent().equals(artifactDeploymentFolder.getPath())) {
             try {
@@ -352,7 +357,9 @@ public class MuleDeploymentService implements DeploymentService {
               throw new MuleRuntimeException(e);
             }
           }
-          archiveDeployer.deployExplodedArtifact(fileName, deploymentProperties);
+          Optional<DeployableArtifact> optDeployableArtifact =
+              Optional.ofNullable((DeployableArtifact) archiveDeployer.deployExplodedArtifact(fileName, deploymentProperties));
+          optDeployableArtifact.ifPresent(deploymentDirectoryWatcher::addArtifactStoppedDeploymentListenerToArtifact);
         }
       } catch (MalformedURLException e) {
         throw new MuleRuntimeException(e);

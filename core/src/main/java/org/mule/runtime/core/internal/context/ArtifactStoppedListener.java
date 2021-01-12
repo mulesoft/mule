@@ -19,7 +19,7 @@ public interface ArtifactStoppedListener {
   void onStop();
 
   /**
-   * Avoids persistance of the artifact's state
+   * Selects persistance of the artifact's state
    *
    * @param doPersist
    */

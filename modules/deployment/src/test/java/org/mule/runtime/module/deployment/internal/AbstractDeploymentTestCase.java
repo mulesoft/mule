@@ -1735,7 +1735,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private static class TestMuleDeploymentService extends MuleDeploymentService {
+  protected static class TestMuleDeploymentService extends MuleDeploymentService {
 
     public TestMuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
                                      Supplier<SchedulerService> schedulerServiceSupplier) {

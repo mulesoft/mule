@@ -85,10 +85,12 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
             optDeployableArtifact
                 .ifPresent(deployableArtifact -> ArtifactFactoryUtils.withArtifactMuleContext(deployableArtifact, muleContext -> {
                   MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
-                  ArtifactStoppedListener artifactStoppedListener =
-                      artifactStoppedMuleContextListeners.get(deployableArtifact.getArtifactName());
-                  artifactStoppedListener.mustPersist(true);
-                  muleRegistry.registerObject(ARTIFACT_STOPPED_LISTENER, artifactStoppedListener);
+                  if (artifactStoppedMuleContextListeners.containsKey(deployableArtifact.getArtifactName())) {
+                    ArtifactStoppedListener artifactStoppedListener =
+                        artifactStoppedMuleContextListeners.get(deployableArtifact.getArtifactName());
+                    artifactStoppedListener.mustPersist(true);
+                    muleRegistry.registerObject(ARTIFACT_STOPPED_LISTENER, artifactStoppedListener);
+                  }
                 }));
             applicationDeploymentListener.onRedeploymentSuccess(domainApplication.getArtifactName());
           } catch (RuntimeException e) {

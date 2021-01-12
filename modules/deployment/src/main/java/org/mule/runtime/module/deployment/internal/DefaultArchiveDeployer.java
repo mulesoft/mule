@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.internal.context.ArtifactStoppedListener;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
@@ -189,9 +190,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     logRequestToUndeployArtifact(artifact);
     try {
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
-      Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
-          artifact.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER);
-      optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
+      Optional<Registry> optionalRegistry = ofNullable(artifact.getRegistry());
+
+      optionalRegistry.ifPresent(artifactRegistry -> {
+        Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
+            artifactRegistry.lookupByName(ARTIFACT_STOPPED_LISTENER);
+        optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
+      });
       deployer.undeploy(artifact);
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
     } catch (DeploymentException e) {
@@ -301,9 +306,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
 
       artifacts.remove(artifact);
-      Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
-          artifact.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER);
-      optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
+      Optional<Registry> optionalRegistry = ofNullable(artifact.getRegistry());
+
+      optionalRegistry.ifPresent(artifactRegistry -> {
+        Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
+            artifactRegistry.lookupByName(ARTIFACT_STOPPED_LISTENER);
+        optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
+      });
       deployer.undeploy(artifact);
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
@@ -380,8 +389,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     deploymentListener.onRedeploymentStart(artifactName);
 
     deploymentTemplate.preRedeploy(artifact);
+
+    Optional<Registry> optionalRegistry = ofNullable(artifact.getRegistry());
     Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
-        artifact.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER);
+        optionalRegistry.isPresent() ? optionalRegistry.get().lookupByName(ARTIFACT_STOPPED_LISTENER) : Optional.empty();
 
     if (!artifactZombieMap.containsKey(artifactName)) {
       deploymentListener.onUndeploymentStart(artifactName);

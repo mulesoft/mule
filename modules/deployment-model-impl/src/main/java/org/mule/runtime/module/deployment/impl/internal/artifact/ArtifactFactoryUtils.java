@@ -96,7 +96,7 @@ public class ArtifactFactoryUtils {
    * @since 4.2
    */
   public static Optional<MuleContext> getMuleContext(DeployableArtifact artifact) {
-    return artifact != null ? artifact.getRegistry().lookupByType(MuleContext.class) : empty();
+    return artifact != null && artifact.getRegistry() != null ? artifact.getRegistry().lookupByType(MuleContext.class) : empty();
   }
 
   /**
