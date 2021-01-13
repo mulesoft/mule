@@ -24,7 +24,6 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.dsql.QueryTranslator;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.extension.api.metadata.NullQueryMetadataResolver;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
