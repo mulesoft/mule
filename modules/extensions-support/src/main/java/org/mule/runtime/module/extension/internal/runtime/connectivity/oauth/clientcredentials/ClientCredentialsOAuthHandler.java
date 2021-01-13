@@ -26,6 +26,7 @@ import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * {@link OAuthHandler} implementation for the client credentials grant type
@@ -38,7 +39,7 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
    * Becomes aware of the given {@code config} and makes sure that the access token callback
    * and authorization endpoints are provisioned.
    *
-   * @param config an {@link AuthorizationCodeConfig}
+   * @param config an {@link ClientCredentialsConfig}
    */
   public ClientCredentialsOAuthDancer register(ClientCredentialsConfig config) {
     return register(config, emptyList());
@@ -134,7 +135,7 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
         .responseExpiresInExpr(grantType.getExpirationRegex())
         .responseAccessTokenExpr(grantType.getAccessTokenExpr())
         .withClientCredentialsIn(toCredentialsLocation(grantType.getCredentialsPlacement()))
-        .resourceOwnerIdTransformer(ownerId -> ownerId + "-" + config.getOwnerConfigName());
+        .resourceOwnerIdTransformer(ownerId -> ownerId + "-" + config.getOwnerConfigName() + "-" + generateId(config));
 
     String scopes = config.getScope()
         .orElseGet(() -> grantType.getDefaultScopes().orElse(null));
@@ -157,5 +158,10 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
     }
 
     return dancer;
+  }
+
+  private Integer generateId(ClientCredentialsConfig config) {
+    return Objects.hash(config.getOwnerConfigName(), config.getClientId(), config.getClientSecret(), config.getTokenUrl(),
+                        config.getScope(), config.getCustomParameters(), config.getCustomHeaders());
   }
 }
