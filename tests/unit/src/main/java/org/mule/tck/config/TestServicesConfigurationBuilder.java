@@ -58,6 +58,8 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
 
   private Map<String, Object> additionalMockedServices = new HashMap<>();
 
+  private final Map<String, Object> overriddenDefaultServices = new HashMap<>();
+
   public TestServicesConfigurationBuilder() {
     this(true, true);
   }
@@ -108,11 +110,15 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
       registry.registerObject(cachedExprLanguageFactory.getName(), cachedExprLanguageFactory);
     }
 
+
     if (mockHttpService) {
       registry.registerObject(MOCK_HTTP_SERVICE, mock(HttpService.class));
     }
 
     registry.registerObjects(additionalMockedServices);
+    overriddenDefaultServices.forEach((serviceId, serviceImpl) -> {
+      ((MuleContextWithRegistries) muleContext).getCustomizationService().overrideDefaultServiceImpl(serviceId, serviceImpl);
+    });
   }
 
   public void stopServices() throws MuleException {
@@ -126,6 +132,10 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
 
   public void registerAdditionalService(String name, Object service) {
     this.additionalMockedServices.put(name, service);
+  }
+
+  public void registerOverriddenService(String name, Object service) {
+    this.overriddenDefaultServices.put(name, service);
   }
 
   @Override
