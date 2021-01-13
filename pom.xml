@@ -155,7 +155,7 @@
         <antVersion>1.9.14</antVersion>
         <assertJVersion>3.5.2</assertJVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
-        <apacheHttpClientVersion>4.5.3</apacheHttpClientVersion>
+        <apacheHttpClientVersion>4.5.13</apacheHttpClientVersion>
         <awaitilityVersion>1.7.0</awaitilityVersion>
         <bouncycastleVersion>1.67</bouncycastleVersion>
         <c3p0Version>0.9.5.4</c3p0Version>
