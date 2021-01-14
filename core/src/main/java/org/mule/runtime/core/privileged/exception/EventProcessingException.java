@@ -65,6 +65,8 @@ public class EventProcessingException extends MuleException {
   protected void storeErrorTypeInfo(Throwable cause) {
     if (cause instanceof TypedException) {
       getExceptionInfo().setErrorType(((TypedException) cause).getErrorType());
+    } else if (cause instanceof EventProcessingException) {
+      getExceptionInfo().setSuppressedCauses(((EventProcessingException) cause).getExceptionInfo().getSuppressedCauses());
     } else {
       event.getError().ifPresent(e -> getExceptionInfo().setErrorType(e.getErrorType()));
     }
