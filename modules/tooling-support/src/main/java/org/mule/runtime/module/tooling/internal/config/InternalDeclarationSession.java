@@ -46,8 +46,12 @@ import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InternalDeclarationSession implements DeclarationSession {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(InternalDeclarationSession.class);
 
   @Inject
   private ConfigurationComponentLocator componentLocator;
@@ -91,7 +95,7 @@ public class InternalDeclarationSession implements DeclarationSession {
                                                             artifactHelper()));
 
     this.sampleDataExecutorLazyValue =
-        new LazyValue<>(() -> new SampleDataExecutor(muleContext, connectionManager, expressionManager, sampleDataService,
+        new LazyValue<>(() -> new SampleDataExecutor(muleContext, expressionManager, sampleDataService,
                                                      reflectionCache, artifactHelper()));
   }
 
@@ -119,7 +123,18 @@ public class InternalDeclarationSession implements DeclarationSession {
   public ConnectionValidationResult testConnection(String configName) {
     return artifactHelper()
         .findConnectionProvider(configName)
-        .map(cp -> connectionManager.testConnectivity(cp))
+        .map(cp -> {
+          try {
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("Doing test connection for configName: {}", configName);
+            }
+            return connectionManager.testConnectivity(cp);
+          } finally {
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("Test connection for configName: {} completed", configName);
+            }
+          }
+        })
         .orElseGet(() -> failure(format("Could not perform test connection for configuration: '%s'. Connection provider is not defined",
                                         configName),
                                  new MuleRuntimeException(createStaticMessage("Could not find connection provider"))));

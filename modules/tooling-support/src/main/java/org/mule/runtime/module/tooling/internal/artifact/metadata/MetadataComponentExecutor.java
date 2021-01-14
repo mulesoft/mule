@@ -38,8 +38,12 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MetadataComponentExecutor extends MetadataExecutor {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetadataComponentExecutor.class);
 
   public MetadataComponentExecutor(ConnectionManager connectionManager, ReflectionCache reflectionCache,
                                    ExpressionManager expressionManager, ArtifactHelper artifactHelper) {
@@ -50,6 +54,9 @@ public class MetadataComponentExecutor extends MetadataExecutor {
   public MetadataResult<ComponentMetadataTypesDescriptor> resolveComponentMetadata(ComponentModel componentModel,
                                                                                    ComponentElementDeclaration componentElementDeclaration) {
     try {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Resolving metadata on component: {}", componentModel.getName());
+      }
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(componentModel, componentElementDeclaration);
 
@@ -63,6 +70,10 @@ public class MetadataComponentExecutor extends MetadataExecutor {
       }
 
       MetadataKey metadataKey = metadataKeyResult.getMetadataKey();
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Calling metadata connector's resolver on component: {} with key: {}", componentModel.getName(),
+                     metadataKey);
+      }
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
 
       return resolveMetadata(componentModel, optionalConfigurationInstance, metadataKey, extensionClassLoader);
@@ -72,6 +83,11 @@ public class MetadataComponentExecutor extends MetadataExecutor {
       return failure(newFailure(e).withFailureCode(e.getFailure()).onComponent());
     } catch (Exception e) {
       return failure(newFailure(e).onComponent());
+    } finally {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Resolved metadata on component: {}", componentModel.getName());
+      }
+
     }
   }
 

@@ -36,12 +36,18 @@ import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
+import org.mule.runtime.module.tooling.internal.artifact.sampledata.SampleDataExecutor;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SampleDataExecutor.class);
 
   private final ConnectionManager connectionManager;
 
@@ -55,6 +61,9 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
   public ValueResult resolveValues(ParameterizedModel parameterizedModel,
                                    ParameterizedElementDeclaration parameterizedElementDeclaration, String providerName) {
     try {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Resolving value provider on component: {}, providerName: {}", parameterizedModel.getName(), providerName);
+      }
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(parameterizedModel, parameterizedElementDeclaration, providerName);
 
@@ -65,6 +74,10 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
                                                                         connectionManager);
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(parameterizedElementDeclaration));
       try {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Calling value provider connector's resolver: {} on component: {}", providerName,
+                       parameterizedModel.getName());
+        }
         return resultFrom(withContextClassLoader(extensionClassLoader, () -> valueProviderMediator.getValues(providerName,
                                                                                                              parameterValueResolver,
                                                                                                              connectionSupplier(context),
@@ -96,6 +109,11 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
     } catch (Exception e) {
       propagateIfPossible(e, MuleRuntimeException.class);
       throw new MuleRuntimeException(e);
+    } finally {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Resolved value provider: {} on component: {}", providerName, parameterizedModel.getName());
+      }
+
     }
   }
 

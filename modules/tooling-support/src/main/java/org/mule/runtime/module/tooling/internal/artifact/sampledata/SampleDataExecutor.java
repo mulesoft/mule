@@ -32,6 +32,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
+import org.mule.runtime.module.tooling.internal.artifact.metadata.MetadataKeysExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import org.mule.sdk.api.data.sample.SampleDataException;
@@ -40,21 +41,26 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.google.common.base.Throwables;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
-  private final ConnectionManager connectionManager;
+  private static final Logger LOGGER = LoggerFactory.getLogger(SampleDataExecutor.class);
+
   private final SampleDataService sampleDataService;
 
-  public SampleDataExecutor(MuleContext muleContext, ConnectionManager connectionManager, ExpressionManager expressionManager,
+  public SampleDataExecutor(MuleContext muleContext, ExpressionManager expressionManager,
                             SampleDataService sampleDataService, ReflectionCache reflectionCache, ArtifactHelper artifactHelper) {
     super(muleContext, expressionManager, reflectionCache, artifactHelper);
-    this.connectionManager = connectionManager;
     this.sampleDataService = sampleDataService;
   }
 
   public SampleDataResult getSampleData(ComponentModel componentModel, ComponentElementDeclaration componentElementDeclaration) {
     try {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Resolving sample data on component: {}", componentModel.getName());
+      }
       String componentName = componentElementDeclaration.getName();
 
       if (!getSampleDataProviderModel(componentModel).isPresent()) {
@@ -67,6 +73,9 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
 
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Calling sample data connector's provider on component: {}", componentModel.getName());
+      }
       return resultFrom(withContextClassLoader(extensionClassLoader, () -> sampleDataService.getSampleData(extensionName,
                                                                                                            componentName,
                                                                                                            parametersMap(componentElementDeclaration,
@@ -92,6 +101,11 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
     } catch (Exception e) {
       propagateIfPossible(e, MuleRuntimeException.class);
       throw new MuleRuntimeException(e);
+    } finally {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Resolved sample data on component: {}", componentModel.getName());
+      }
+
     }
   }
 

@@ -33,7 +33,12 @@ import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class MetadataKeysExecutor extends MetadataExecutor {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetadataKeysExecutor.class);
 
   private static final FailureCode INVALID_PARAMETER_VALUE =
       new FailureCode(AbstractParameterResolverExecutor.INVALID_PARAMETER_VALUE);
@@ -46,6 +51,9 @@ public class MetadataKeysExecutor extends MetadataExecutor {
   public MetadataResult<MetadataKeysContainer> resolveMetadataKeys(ComponentModel componentModel,
                                                                    ComponentElementDeclaration componentElementDeclaration) {
     try {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Resolving metadata keys on component: {}", componentModel.getName());
+      }
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(componentModel, componentElementDeclaration);
 
@@ -58,7 +66,9 @@ public class MetadataKeysExecutor extends MetadataExecutor {
 
       MetadataContext metadataContext =
           createMetadataContext(optionalConfigurationInstance, extensionClassLoader);
-
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Calling metadata keys connector's resolver on component: {}", componentModel.getName());
+      }
       return withContextClassLoader(extensionClassLoader,
                                     () -> withMetadataContext(metadataContext, () -> metadataMediator
                                         .getMetadataKeys(metadataContext, metadataKey, reflectionCache)));
@@ -68,6 +78,10 @@ public class MetadataKeysExecutor extends MetadataExecutor {
       return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(e.getFailure()).onKeys());
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
+    } finally {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Resolved metadata keys on component: {}", componentModel.getName());
+      }
     }
   }
 
