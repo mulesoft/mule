@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.api.extension;
 
+import static java.lang.String.format;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -29,6 +31,9 @@ public final class MuleExtensionModelProvider {
   public static final String MULE_VERSION;
   public static final String MULESOFT_VENDOR = "MuleSoft, Inc.";
 
+  public static final String MULE_TLS_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "tls");
+  public static final String MULE_TLS_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
+
   static {
     try {
       final Properties buildProperties = new Properties();
@@ -44,10 +49,22 @@ public final class MuleExtensionModelProvider {
                                                  MuleExtensionModelProvider.class.getClassLoader(),
                                                  new NullDslResolvingContext())));
 
+  private static final LazyValue<ExtensionModel> TLS_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
+      .create(new DefaultExtensionLoadingContext(new TlsExtensionModelDeclarer().createExtensionModel(),
+                                                 MuleExtensionModelProvider.class.getClassLoader(),
+                                                 new NullDslResolvingContext())));
+
   /**
    * @return the {@link ExtensionModel} definition for Mule's Runtime
    */
   public static ExtensionModel getExtensionModel() {
     return EXTENSION_MODEL.get();
+  }
+
+  /**
+   * @return the {@link ExtensionModel} definition containing the namespace declaration for the tls module.
+   */
+  public static ExtensionModel getTlsExtensionModel() {
+    return TLS_EXTENSION_MODEL.get();
   }
 }

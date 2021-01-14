@@ -74,12 +74,14 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.property.QNameModelProperty;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 
@@ -414,7 +416,9 @@ class ComponentAstBasedElementModelFactory {
     final List<String> paramsAsChildrenNames = configuration.getModel(ParameterizedModel.class)
         .map(pmz -> pmz.getAllParameterModels()
             .stream()
-            .map(pm -> hyphenize(pm.getName()))
+            .flatMap(pm -> pm.getModelProperty(QNameModelProperty.class)
+                .map(qnmp -> Stream.of(hyphenize(pm.getName()), qnmp.getValue().getLocalPart()))
+                .orElseGet(() -> Stream.of(hyphenize(pm.getName()))))
             .collect(toList()))
         .orElse(emptyList());
 
