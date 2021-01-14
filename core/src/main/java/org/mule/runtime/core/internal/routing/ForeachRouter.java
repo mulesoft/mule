@@ -32,10 +32,10 @@ import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -72,7 +72,7 @@ class ForeachRouter {
     this.owner = owner;
     this.streamingManager = streamingManager;
     this.foreachContextResolver = new EventInternalContextResolver<>(MULE_FOREACH_CONTEXT_KEY,
-                                                                     HashMap::new);
+                                                                     ConcurrentHashMap::new);
 
     upstreamFlux = from(publisher)
         .doOnNext(event -> {
