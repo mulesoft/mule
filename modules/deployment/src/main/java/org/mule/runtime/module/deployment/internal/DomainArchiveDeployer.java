@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -13,14 +14,15 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URI;
-import java.util.*;
-
-import org.apache.commons.lang3.NotImplementedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Archive deployer for domains.
@@ -29,9 +31,8 @@ import org.slf4j.LoggerFactory;
  */
 public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
 
-  private transient final Logger logger = LoggerFactory.getLogger(getClass());
-
   public static final String DOMAIN_BUNDLE_APPS_FOLDER = "apps";
+  private transient final Logger logger = LoggerFactory.getLogger(getClass());
   private final ArchiveDeployer<Domain> domainDeployer;
   private final DeploymentService deploymentService;
   private final ArchiveDeployer<Application> applicationDeployer;
@@ -116,7 +117,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
       domainDeployer.redeploy(artifactName, deploymentProperties);
     } catch (DeploymentException e) {
       logger.warn(String.format("Failure during redeployment of domain %s, domain applications deployment will be skipped",
-                                artifactName));
+          artifactName));
       throw e;
     }
   }

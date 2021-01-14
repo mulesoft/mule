@@ -62,7 +62,6 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
-import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeMuleContextDeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
@@ -129,6 +128,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   @Override
   public void setMuleContextListener(MuleContextListener muleContextListener) {
     checkArgument(muleContextListener != null, "setMuleContextListener cannot be null");
+
     this.muleContextListener = muleContextListener;
   }
 

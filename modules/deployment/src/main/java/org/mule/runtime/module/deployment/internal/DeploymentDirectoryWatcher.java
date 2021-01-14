@@ -7,12 +7,14 @@
 package org.mule.runtime.module.deployment.internal;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
-import org.apache.commons.io.filefilter.*;
+import org.apache.commons.io.filefilter.AndFileFilter;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.context.ArtifactStoppedListener;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -20,7 +22,6 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ElementAddedEvent;
 import org.mule.runtime.module.deployment.internal.util.ElementRemovedEvent;
@@ -31,7 +32,15 @@ import org.slf4j.LoggerFactory;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -380,8 +389,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
 
     String[] artifactAnchors = findExpectedAnchorFiles(artifacts);
-    @SuppressWarnings("unchecked")
-    final Collection<String> deletedAnchors = subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
+    @SuppressWarnings("unchecked") final Collection<String> deletedAnchors = subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
     if (logger.isDebugEnabled()) {
       StringBuilder sb = new StringBuilder();
       sb.append(format("Deleted anchors:%n"));
@@ -546,7 +554,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
       }
       File descriptorFile =
           new File(((DeployableArtifactDescriptor) artifact.getDescriptor()).getArtifactLocation(),
-                   ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
+              ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
       if (descriptorFile.exists()) {
         timestampsPerResource.put(descriptorFile.getAbsolutePath(), descriptorFile.lastModified());
       }
