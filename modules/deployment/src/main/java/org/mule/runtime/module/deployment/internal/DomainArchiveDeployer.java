@@ -31,9 +31,8 @@ import java.util.Properties;
  */
 public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
 
-  private transient final Logger logger = LoggerFactory.getLogger(getClass());
-
   public static final String DOMAIN_BUNDLE_APPS_FOLDER = "apps";
+  private transient final Logger logger = LoggerFactory.getLogger(getClass());
   private final ArchiveDeployer<Domain> domainDeployer;
   private final DeploymentService deploymentService;
   private final ArchiveDeployer<Application> applicationDeployer;
@@ -118,7 +117,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
       domainDeployer.redeploy(artifactName, deploymentProperties);
     } catch (DeploymentException e) {
       logger.warn(String.format("Failure during redeployment of domain %s, domain applications deployment will be skipped",
-                                artifactName));
+          artifactName));
       throw e;
     }
   }
