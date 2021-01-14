@@ -52,7 +52,7 @@ public class MetadataKeysExecutor extends MetadataExecutor {
                                                                    ComponentElementDeclaration componentElementDeclaration) {
     try {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Resolving metadata keys on component: {}", componentModel.getName());
+        LOGGER.debug("Resolve metadata keys STARTED for component: {}", componentModel.getName());
       }
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(componentModel, componentElementDeclaration);
@@ -67,7 +67,7 @@ public class MetadataKeysExecutor extends MetadataExecutor {
       MetadataContext metadataContext =
           createMetadataContext(optionalConfigurationInstance, extensionClassLoader);
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling metadata keys connector's resolver on component: {}", componentModel.getName());
+        LOGGER.debug("Invoking connector's metadata key resolver for component: {}", componentModel.getName());
       }
       return withContextClassLoader(extensionClassLoader,
                                     () -> withMetadataContext(metadataContext, () -> metadataMediator
@@ -80,7 +80,7 @@ public class MetadataKeysExecutor extends MetadataExecutor {
       throw new MuleRuntimeException(e);
     } finally {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Resolved metadata keys on component: {}", componentModel.getName());
+        LOGGER.debug("Resolve metadata keys FINISHED for component: {}", componentModel.getName());
       }
     }
   }

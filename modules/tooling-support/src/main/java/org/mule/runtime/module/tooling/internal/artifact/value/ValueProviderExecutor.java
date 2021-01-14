@@ -62,7 +62,7 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
                                    ParameterizedElementDeclaration parameterizedElementDeclaration, String providerName) {
     try {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Resolving value provider on component: {}, providerName: {}", parameterizedModel.getName(), providerName);
+        LOGGER.debug("Resolve value provider: {} STARTED for component: {}", providerName, parameterizedModel.getName());
       }
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(parameterizedModel, parameterizedElementDeclaration, providerName);
@@ -75,7 +75,7 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(parameterizedElementDeclaration));
       try {
         if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Calling value provider connector's resolver: {} on component: {}", providerName,
+          LOGGER.debug("Invoking connector's value provider: {} for component: {}", providerName,
                        parameterizedModel.getName());
         }
         return resultFrom(withContextClassLoader(extensionClassLoader, () -> valueProviderMediator.getValues(providerName,
@@ -111,7 +111,7 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       throw new MuleRuntimeException(e);
     } finally {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Resolved value provider: {} on component: {}", providerName, parameterizedModel.getName());
+        LOGGER.debug("Resolve value provider: {} FINISHED for component: {}", providerName, parameterizedModel.getName());
       }
 
     }

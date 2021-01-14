@@ -55,7 +55,7 @@ public class MetadataComponentExecutor extends MetadataExecutor {
                                                                                    ComponentElementDeclaration componentElementDeclaration) {
     try {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Resolving metadata on component: {}", componentModel.getName());
+        LOGGER.debug("Resolve component metadata STARTED for component: {}", componentModel.getName());
       }
       Optional<ConfigurationInstance> optionalConfigurationInstance =
           getConfigurationInstance(componentModel, componentElementDeclaration);
@@ -71,7 +71,7 @@ public class MetadataComponentExecutor extends MetadataExecutor {
 
       MetadataKey metadataKey = metadataKeyResult.getMetadataKey();
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling metadata connector's resolver on component: {} with key: {}", componentModel.getName(),
+        LOGGER.debug("Invoking connector's component metadata resolver for component: {} with key: {}", componentModel.getName(),
                      metadataKey);
       }
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
@@ -85,7 +85,7 @@ public class MetadataComponentExecutor extends MetadataExecutor {
       return failure(newFailure(e).onComponent());
     } finally {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Resolved metadata on component: {}", componentModel.getName());
+        LOGGER.debug("Resolve component metadata FINISHED for component: {}", componentModel.getName());
       }
 
     }

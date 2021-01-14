@@ -59,7 +59,7 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
   public SampleDataResult getSampleData(ComponentModel componentModel, ComponentElementDeclaration componentElementDeclaration) {
     try {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Resolving sample data on component: {}", componentModel.getName());
+        LOGGER.debug("Get sample data STARTED for component: {}", componentModel.getName());
       }
       String componentName = componentElementDeclaration.getName();
 
@@ -74,7 +74,7 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling sample data connector's provider on component: {}", componentModel.getName());
+        LOGGER.debug("Invoking connector's sample data  provider for component: {}", componentModel.getName());
       }
       return resultFrom(withContextClassLoader(extensionClassLoader, () -> sampleDataService.getSampleData(extensionName,
                                                                                                            componentName,
@@ -103,7 +103,7 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
       throw new MuleRuntimeException(e);
     } finally {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Resolved sample data on component: {}", componentModel.getName());
+        LOGGER.debug("Get sample data FINISHED for component: {}", componentModel.getName());
       }
 
     }
