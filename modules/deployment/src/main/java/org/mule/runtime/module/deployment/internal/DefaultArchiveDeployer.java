@@ -427,7 +427,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       trackArtifact(artifact);
 
       deployer.deploy(artifact);
-      addArtifactStoppedDeploymentListenerToArtifact(artifact, optionalArtifactStoppedListener);
       artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
       deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
       deploymentTemplate.postRedeploy(artifact);
@@ -569,17 +568,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     return deployExplodedApp(artifactDir, deploymentProperties);
-  }
-
-  private void addArtifactStoppedDeploymentListenerToArtifact(T artifact,
-                                                              Optional<ArtifactStoppedListener> optionalArtifactStoppedDeploymentListener) {
-    optionalArtifactStoppedDeploymentListener.ifPresent(artifactStoppedDeploymentListener -> {
-      artifactStoppedDeploymentListener.mustPersist(true);
-      ArtifactFactoryUtils.withArtifactMuleContext(artifact, muleContext -> {
-        MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
-        muleRegistry.registerObject(ARTIFACT_STOPPED_LISTENER, artifactStoppedDeploymentListener);
-      });
-    });
   }
 
   private static class ZombieArtifact {

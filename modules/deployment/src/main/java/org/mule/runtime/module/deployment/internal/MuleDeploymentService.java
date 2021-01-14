@@ -6,6 +6,39 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.apache.commons.io.filefilter.AndFileFilter;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.service.Service;
+import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.api.DeploymentService;
+import org.mule.runtime.module.deployment.api.StartupListener;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
+import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
+import org.mule.runtime.module.deployment.internal.util.ObservableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
+
 import static java.lang.String.format;
 import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
@@ -21,46 +54,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.service.Service;
-import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.module.artifact.api.Artifact;
-import org.mule.runtime.module.deployment.api.DeploymentListener;
-import org.mule.runtime.module.deployment.api.DeploymentService;
-import org.mule.runtime.module.deployment.api.StartupListener;
-import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
-import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
-import org.mule.runtime.module.deployment.internal.util.ObservableList;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
-
-import org.apache.commons.io.filefilter.AndFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MuleDeploymentService implements DeploymentService {
 
@@ -125,6 +118,15 @@ public class MuleDeploymentService implements DeploymentService {
     }
   }
 
+  /**
+   * @param serviceManager the manager to do the lookup of the service in.
+   * @return the instance of the {@link SchedulerService} from within the given {@code serviceManager}.
+   */
+  public static SchedulerService findSchedulerService(ServiceRepository serviceManager) {
+    final List<Service> services = serviceManager.getServices();
+    return (SchedulerService) services.stream().filter(s -> s instanceof SchedulerService).findFirst().get();
+  }
+
   private boolean useParallelDeployment() {
     return getProperties().containsKey(PARALLEL_DEPLOYMENT_PROPERTY);
   }
@@ -180,7 +182,6 @@ public class MuleDeploymentService implements DeploymentService {
         .filter(application -> application.getDomain() != null && application.getDomain().getArtifactName().equals(domain))
         .collect(toList());
   }
-
 
   @Override
   public List<Application> getApplications() {
@@ -331,12 +332,6 @@ public class MuleDeploymentService implements DeploymentService {
     domainDeployer.undeployArtifact(domain.getArtifactName());
   }
 
-  private interface SynchronizedDeploymentAction {
-
-    void execute();
-
-  }
-
   private void deployTemplateMethod(final URI artifactArchiveUri, final Optional<Properties> deploymentProperties,
                                     File artifactDeploymentFolder, ArchiveDeployer archiveDeployer)
       throws IOException {
@@ -345,10 +340,8 @@ public class MuleDeploymentService implements DeploymentService {
         File artifactLocation = toFile(artifactArchiveUri.toURL());
         String fileName = artifactLocation.getName();
         if (fileName.endsWith(".jar")) {
-          Optional<DeployableArtifact> optDeployableArtifact =
-              Optional.ofNullable((DeployableArtifact) archiveDeployer.deployPackagedArtifact(artifactArchiveUri,
-                                                                                              deploymentProperties));
-          optDeployableArtifact.ifPresent(deploymentDirectoryWatcher::addArtifactStoppedDeploymentListenerToArtifact);
+          archiveDeployer.deployPackagedArtifact(artifactArchiveUri,
+                                                 deploymentProperties);
         } else {
           if (!artifactLocation.getParent().equals(artifactDeploymentFolder.getPath())) {
             try {
@@ -357,9 +350,7 @@ public class MuleDeploymentService implements DeploymentService {
               throw new MuleRuntimeException(e);
             }
           }
-          Optional<DeployableArtifact> optDeployableArtifact =
-              Optional.ofNullable((DeployableArtifact) archiveDeployer.deployExplodedArtifact(fileName, deploymentProperties));
-          optDeployableArtifact.ifPresent(deploymentDirectoryWatcher::addArtifactStoppedDeploymentListenerToArtifact);
+          archiveDeployer.deployExplodedArtifact(fileName, deploymentProperties);
         }
       } catch (MalformedURLException e) {
         throw new MuleRuntimeException(e);
@@ -387,15 +378,6 @@ public class MuleDeploymentService implements DeploymentService {
     }
   }
 
-  /**
-   * @param serviceManager the manager to do the lookup of the service in.
-   * @return the instance of the {@link SchedulerService} from within the given {@code serviceManager}.
-   */
-  public static SchedulerService findSchedulerService(ServiceRepository serviceManager) {
-    final List<Service> services = serviceManager.getServices();
-    return (SchedulerService) services.stream().filter(s -> s instanceof SchedulerService).findFirst().get();
-  }
-
   @Override
   public void deployDomain(URI domainArchiveUri, Properties appProperties) throws IOException {
     deployDomain(domainArchiveUri, ofNullable(appProperties));
@@ -421,13 +403,12 @@ public class MuleDeploymentService implements DeploymentService {
   /**
    * Creates a {@link DomainArchiveDeployer}. Override this method for testing purposes.
    *
-   * @param domainFactory the domainFactory to provide to the {@link DomainArchiveDeployer}.
-   * @param domainMuleDeployer the domainMuleDeployer to provide to the {@link DomainArchiveDeployer}.
-   * @param domains the domains that this DeploymentService manages.
-   * @param applicationDeployer the applicationDeployer to provide to the {@link DomainArchiveDeployer}.
+   * @param domainFactory                 the domainFactory to provide to the {@link DomainArchiveDeployer}.
+   * @param domainMuleDeployer            the domainMuleDeployer to provide to the {@link DomainArchiveDeployer}.
+   * @param domains                       the domains that this DeploymentService manages.
+   * @param applicationDeployer           the applicationDeployer to provide to the {@link DomainArchiveDeployer}.
    * @param applicationDeploymentListener the applicationDeployer listener to provide to the {@link DomainDeploymentTemplate}.
-   * @param domainDeploymentListener the domainDeploymentListener to provide to the {@link DeploymentMuleContextListenerFactory}
-   *
+   * @param domainDeploymentListener      the domainDeploymentListener to provide to the {@link DeploymentMuleContextListenerFactory}
    * @return the DomainArchiveDeployer.
    */
   protected DomainArchiveDeployer createDomainArchiveDeployer(DefaultDomainFactory domainFactory,
@@ -442,6 +423,12 @@ public class MuleDeploymentService implements DeploymentService {
                                                                   new DeploymentMuleContextListenerFactory(
                                                                                                            domainDeploymentListener)),
                                      applicationDeployer, this);
+
+  }
+
+  private interface SynchronizedDeploymentAction {
+
+    void execute();
 
   }
 

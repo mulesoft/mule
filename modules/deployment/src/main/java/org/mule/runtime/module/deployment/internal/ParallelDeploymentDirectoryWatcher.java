@@ -55,9 +55,7 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
     for (final String zip : zips) {
       tasks.add(() -> {
         try {
-          Optional<DeployableArtifact> optDeployableArtifact =
-              Optional.ofNullable(applicationArchiveDeployer.deployPackagedArtifact(zip, empty()));
-          optDeployableArtifact.ifPresent(this::addArtifactStoppedDeploymentListenerToArtifact);
+          applicationArchiveDeployer.deployPackagedArtifact(zip, empty());
         } catch (Exception e) {
           // Ignore and continue
         }
@@ -77,9 +75,7 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
       if (applicationArchiveDeployer.isUpdatedZombieArtifact(addedApp)) {
         tasks.add(() -> {
           try {
-            Optional<DeployableArtifact> optDeployableArtifact =
-                Optional.ofNullable(applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty()));
-            optDeployableArtifact.ifPresent(this::addArtifactStoppedDeploymentListenerToArtifact);
+            applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty());
           } catch (Exception e) {
             // Ignore and continue
           }

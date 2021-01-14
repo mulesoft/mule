@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils;
 import org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +24,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 
 public class DefaultArtifactDeployer<T extends DeployableArtifact> implements ArtifactDeployer<T> {
@@ -35,6 +39,13 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       if (startArtifact && shouldStartArtifact(artifact)) {
         artifact.start();
       }
+
+      ArtifactStoppedDeploymentListener artifactStoppedDeploymentListener =
+          new ArtifactStoppedDeploymentListener(artifact.getArtifactName());
+      ArtifactFactoryUtils.withArtifactMuleContext(artifact, muleContext -> {
+        MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
+        muleRegistry.registerObject(ARTIFACT_STOPPED_LISTENER, artifactStoppedDeploymentListener);
+      });
     } catch (Throwable t) {
       artifact.dispose();
 

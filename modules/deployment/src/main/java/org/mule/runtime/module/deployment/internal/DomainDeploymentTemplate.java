@@ -54,12 +54,6 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
       appStatusPreRedeployment = new HashMap<>();
       domainApplications = deploymentservice.findDomainApplications(domain.getArtifactName());
       for (Application domainApplication : domainApplications) {
-        ArtifactFactoryUtils.withArtifactMuleContext(domainApplication, muleContext -> {
-          Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
-              Optional.ofNullable(((DefaultMuleContext) muleContext).getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER));
-          optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedMuleContextListeners
-              .put(domainApplication.getArtifactName(), artifactStoppedListener));
-        });
         appStatusPreRedeployment.put(domainApplication, domainApplication.getStatus());
         applicationDeploymentListener.onRedeploymentStart(domainApplication.getArtifactName());
         applicationDeployer.undeployArtifactWithoutUninstall(domainApplication);
@@ -78,20 +72,9 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
         applicationDeployer.preTrackArtifact(domainApplication);
         if (applicationDeployer.isUpdatedZombieArtifact(domainApplication.getArtifactName())) {
           try {
-            Optional<DeployableArtifact> optDeployableArtifact =
-                Optional.ofNullable(applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(),
-                                                                               getProperties(appStatusPreRedeployment
-                                                                                   .get(domainApplication))));
-            optDeployableArtifact
-                .ifPresent(deployableArtifact -> ArtifactFactoryUtils.withArtifactMuleContext(deployableArtifact, muleContext -> {
-                  MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
-                  if (artifactStoppedMuleContextListeners.containsKey(deployableArtifact.getArtifactName())) {
-                    ArtifactStoppedListener artifactStoppedListener =
-                        artifactStoppedMuleContextListeners.get(deployableArtifact.getArtifactName());
-                    artifactStoppedListener.mustPersist(true);
-                    muleRegistry.registerObject(ARTIFACT_STOPPED_LISTENER, artifactStoppedListener);
-                  }
-                }));
+            applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(),
+                                                       getProperties(appStatusPreRedeployment
+                                                           .get(domainApplication)));
             applicationDeploymentListener.onRedeploymentSuccess(domainApplication.getArtifactName());
           } catch (RuntimeException e) {
             applicationDeploymentListener.onRedeploymentFailure(domainApplication.getArtifactName(), e);

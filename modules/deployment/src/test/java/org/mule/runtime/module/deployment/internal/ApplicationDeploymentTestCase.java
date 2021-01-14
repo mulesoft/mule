@@ -758,6 +758,42 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  public void undeploysNotStoppedAppAndStartsItOnDeploy() throws Exception {
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    assertStatus(app, STARTED);
+
+    serviceManager.stop();
+    extensionModelLoaderManager.stop();
+    deploymentService.stop();
+
+    reset(applicationDeploymentListener);
+
+    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
+        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
+
+    serviceManager = muleArtifactResourcesRegistry.getServiceManager();
+    serviceManager.start();
+
+    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
+    extensionModelLoaderManager.start();
+
+    deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
+                                                      muleArtifactResourcesRegistry.getApplicationFactory(),
+                                                      () -> findSchedulerService(serviceManager));
+    configureDeploymentService();
+    deploymentService.start();
+
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
+    assertStatus(app_2, STARTED);
+  }
+
+  @Test
   public void undeploysApplicationRemovingAnchorFile() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 

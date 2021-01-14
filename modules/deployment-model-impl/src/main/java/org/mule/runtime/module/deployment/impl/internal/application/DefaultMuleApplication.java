@@ -129,16 +129,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   @Override
   public void setMuleContextListener(MuleContextListener muleContextListener) {
     checkArgument(muleContextListener != null, "setMuleContextListener cannot be null");
-
-    if (this.muleContextListener != null) {
-      CompositeMuleContextDeploymentListener compositeMuleContextDeploymentListener =
-          new CompositeMuleContextDeploymentListener(this.muleContextListener);
-      compositeMuleContextDeploymentListener.addDeploymentListener(muleContextListener);
-      muleContextListener = compositeMuleContextDeploymentListener;
-      ((DefaultMuleContext) artifactContext.getMuleContext()).removeListener(this.muleContextListener);
-      ((DefaultMuleContext) artifactContext.getMuleContext()).addListener(muleContextListener);
-    }
-
     this.muleContextListener = muleContextListener;
   }
 

@@ -8,7 +8,9 @@ package org.mule.runtime.module.deployment.internal;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.io.filefilter.*;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.internal.context.ArtifactStoppedListener;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
@@ -37,6 +39,7 @@ import java.util.function.Supplier;
 import static java.lang.String.format;
 import static java.util.Arrays.sort;
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -170,14 +173,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
             File applicationFile = new File(appsDir, app + JAR_FILE_SUFFIX);
 
             if (applicationFile.exists() && applicationFile.isFile()) {
-              Optional<DeployableArtifact> optDeployableArtifact =
-                  Optional.ofNullable(applicationArchiveDeployer.deployPackagedArtifact(app + JAR_FILE_SUFFIX, empty()));
-              optDeployableArtifact.ifPresent(this::addArtifactStoppedDeploymentListenerToArtifact);
+              applicationArchiveDeployer.deployPackagedArtifact(app + JAR_FILE_SUFFIX, empty());
             } else {
               if (applicationArchiveDeployer.isUpdatedZombieArtifact(app)) {
-                Optional<DeployableArtifact> optDeployableArtifact =
-                    Optional.ofNullable(applicationArchiveDeployer.deployExplodedArtifact(app, empty()));
-                optDeployableArtifact.ifPresent(this::addArtifactStoppedDeploymentListenerToArtifact);
+                applicationArchiveDeployer.deployExplodedArtifact(app, empty());
               }
             }
           } catch (Exception e) {
@@ -223,8 +222,18 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   private void notifyStopListeners() {
-    artifactStoppedDeploymentListeners
-        .forEach(artifactStoppedDeploymentListener -> artifactStoppedDeploymentListener.mustPersist(false));
+    for (Application application : applications) {
+      Optional<Registry> optionalRegistry = ofNullable(application.getRegistry());
+      Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
+          optionalRegistry.isPresent() ? optionalRegistry.get().lookupByName(ARTIFACT_STOPPED_LISTENER) : Optional.empty();
+      optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
+    }
+    for (Domain domain : domains) {
+      Optional<Registry> optionalRegistry = ofNullable(domain.getRegistry());
+      Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
+          optionalRegistry.isPresent() ? optionalRegistry.get().lookupByName(ARTIFACT_STOPPED_LISTENER) : Optional.empty();
+      optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
+    }
   }
 
   private void scheduleChangeMonitor() {
@@ -240,9 +249,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   protected void deployPackedApps(String[] zips) {
     for (String zip : zips) {
       try {
-        Optional<DeployableArtifact> optDeployableArtifact =
-            Optional.ofNullable(applicationArchiveDeployer.deployPackagedArtifact(zip, empty()));
-        optDeployableArtifact.ifPresent(this::addArtifactStoppedDeploymentListenerToArtifact);
+        applicationArchiveDeployer.deployPackagedArtifact(zip, empty());
       } catch (Exception e) {
         // Ignore and continue
       }
@@ -252,9 +259,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   protected void deployExplodedApps(String[] apps) {
     for (String addedApp : apps) {
       try {
-        Optional<DeployableArtifact> optDeployableArtifact =
-            Optional.ofNullable(applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty()));
-        optDeployableArtifact.ifPresent(this::addArtifactStoppedDeploymentListenerToArtifact);
+        applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty());
       } catch (DeploymentException e) {
         // Ignore and continue
       }
@@ -418,9 +423,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     for (String addedDomain : domains) {
       try {
         if (domainArchiveDeployer.isUpdatedZombieArtifact(addedDomain)) {
-          Optional<DeployableArtifact> optDeployableArtifact =
-              Optional.ofNullable(domainArchiveDeployer.deployExplodedArtifact(addedDomain, empty()));
-          optDeployableArtifact.ifPresent(this::addArtifactStoppedDeploymentListenerToArtifact);
+          domainArchiveDeployer.deployExplodedArtifact(addedDomain, empty());
         }
       } catch (DeploymentException e) {
         logger.error("Error deploying domain '{}'", addedDomain, e);
@@ -431,9 +434,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   private void deployPackedDomains(String[] zips) {
     for (String zip : zips) {
       try {
-        Optional<DeployableArtifact> optDeployableArtifact =
-            Optional.ofNullable(domainArchiveDeployer.deployPackagedArtifact(zip, empty()));
-        optDeployableArtifact.ifPresent(this::addArtifactStoppedDeploymentListenerToArtifact);
+        domainArchiveDeployer.deployPackagedArtifact(zip, empty());
       } catch (Exception e) {
         // Ignore and continue
       }
@@ -496,17 +497,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
         }
       }
     }
-  }
-
-  public ArtifactStoppedDeploymentListener addArtifactStoppedDeploymentListenerToArtifact(DeployableArtifact deployableArtifact) {
-    ArtifactStoppedDeploymentListener artifactStoppedDeploymentListener =
-        new ArtifactStoppedDeploymentListener(deployableArtifact.getArtifactName());
-    ArtifactFactoryUtils.withArtifactMuleContext(deployableArtifact, muleContext -> {
-      MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
-      muleRegistry.registerObject(ARTIFACT_STOPPED_LISTENER, artifactStoppedDeploymentListener);
-    });
-    artifactStoppedDeploymentListeners.add(artifactStoppedDeploymentListener);
-    return artifactStoppedDeploymentListener;
   }
 
   private void stopAppDirMonitorTimer() {
