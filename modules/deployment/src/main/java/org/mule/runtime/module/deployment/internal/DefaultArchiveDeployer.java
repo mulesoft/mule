@@ -265,7 +265,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
           resourceFiles.add(artifact.getDescriptor().getDescriptorFile());
         }
         artifactZombieMap.put(artifact.getArtifactName(),
-                              new ZombieArtifact(resourceFiles.toArray(new File[resourceFiles.size()])));
+            new ZombieArtifact(resourceFiles.toArray(new File[resourceFiles.size()])));
       } catch (Exception e) {
         // ignore resource
       }
@@ -282,7 +282,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       return;
     }
     try {
-      artifactZombieMap.put(artifactName, new ZombieArtifact(new File[] {marker}));
+      artifactZombieMap.put(artifactName, new ZombieArtifact(new File[]{marker}));
     } catch (Exception e) {
       logger.debug(format("Failed to mark an exploded artifact [%s] as a zombie", marker.getName()), e);
     }
@@ -324,9 +324,9 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
           deleteDirectory(dataFolder);
         } catch (IOException e) {
           logger.warn(
-                      format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
-                             dataFolder, artifact.getArtifactName()),
-                      e);
+              format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
+                  dataFolder, artifact.getArtifactName()),
+              e);
         }
       }
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
@@ -413,8 +413,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     deploymentListener.onDeploymentStart(artifactName);
     try {
       artifact = createArtifact(artifactLocation,
-                                ofNullable(resolveDeploymentProperties(artifactDescriptor.getDataFolderName(),
-                                                                       deploymentProperties)));
+          ofNullable(resolveDeploymentProperties(artifactDescriptor.getDataFolderName(),
+              deploymentProperties)));
     } catch (IOException t) {
       try {
         logDeploymentFailure(t, artifactName);
@@ -468,7 +468,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       // error text has been created by the deployer already
       if (containsType(t, DeploymentStartException.class)) {
         log(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details",
-                              artifact.getArtifactName())));
+            artifact.getArtifactName())));
         logger.error(t.getMessage(), t);
       } else {
         log(miniSplash(format("Failed to deploy artifact '%s', %s", artifact.getArtifactName(), t.getCause().getMessage())));

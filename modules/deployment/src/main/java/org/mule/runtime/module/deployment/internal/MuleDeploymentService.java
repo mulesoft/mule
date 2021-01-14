@@ -93,32 +93,32 @@ public class MuleDeploymentService implements DeploymentService {
     ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>();
 
     this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications,
-                                                            NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
-                                                            new DeploymentMuleContextListenerFactory(applicationDeploymentListener));
+        NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
+        new DeploymentMuleContextListenerFactory(applicationDeploymentListener));
     this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
     this.domainDeployer = createDomainArchiveDeployer(domainFactory, domainMuleDeployer, domains, applicationDeployer,
-                                                      applicationDeploymentListener, domainDeploymentListener);
+        applicationDeploymentListener, domainDeploymentListener);
     this.domainDeployer.setDeploymentListener(domainDeploymentListener);
 
     this.domainBundleDeployer = new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
-                                                                applicationDeployer, applications, domainDeploymentListener,
-                                                                applicationDeploymentListener, this);
+        applicationDeployer, applications, domainDeploymentListener,
+        applicationDeploymentListener, this);
 
     if (useParallelDeployment()) {
       if (isDeployingSelectedAppsInOrder()) {
         throw new IllegalArgumentException(format("Deployment parameters '%s' and '%s' cannot be used together",
-                                                  DEPLOYMENT_APPLICATION_PROPERTY, PARALLEL_DEPLOYMENT_PROPERTY));
+            DEPLOYMENT_APPLICATION_PROPERTY, PARALLEL_DEPLOYMENT_PROPERTY));
       }
       logger.info("Using parallel deployment");
       this.deploymentDirectoryWatcher =
           new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
-                                                 applications,
-                                                 schedulerServiceSupplier, deploymentLock);
+              applications,
+              schedulerServiceSupplier, deploymentLock);
     } else {
       this.deploymentDirectoryWatcher =
           new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains, applications,
-                                         schedulerServiceSupplier,
-                                         deploymentLock);
+              schedulerServiceSupplier,
+              deploymentLock);
     }
   }
 
@@ -345,7 +345,7 @@ public class MuleDeploymentService implements DeploymentService {
         String fileName = artifactLocation.getName();
         if (fileName.endsWith(".jar")) {
           archiveDeployer.deployPackagedArtifact(artifactArchiveUri,
-                                                 deploymentProperties);
+              deploymentProperties);
         } else {
           if (!artifactLocation.getParent().equals(artifactDeploymentFolder.getPath())) {
             try {
@@ -421,12 +421,12 @@ public class MuleDeploymentService implements DeploymentService {
                                                               CompositeDeploymentListener applicationDeploymentListener,
                                                               DeploymentListener domainDeploymentListener) {
     return new DomainArchiveDeployer(new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
-                                                                  new DomainDeploymentTemplate(applicationDeployer,
-                                                                                               this,
-                                                                                               applicationDeploymentListener),
-                                                                  new DeploymentMuleContextListenerFactory(
-                                                                                                           domainDeploymentListener)),
-                                     applicationDeployer, this);
+        new DomainDeploymentTemplate(applicationDeployer,
+            this,
+            applicationDeploymentListener),
+        new DeploymentMuleContextListenerFactory(
+            domainDeploymentListener)),
+        applicationDeployer, this);
 
   }
 
