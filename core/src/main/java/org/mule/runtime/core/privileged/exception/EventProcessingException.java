@@ -33,6 +33,7 @@ public class EventProcessingException extends MuleException {
     super(message, getCause(cause));
     this.event = event;
     storeErrorTypeInfo(cause);
+    storeSuppressedCausesInfo(cause);
   }
 
   public EventProcessingException(CoreEvent event, Throwable cause) {
@@ -43,6 +44,7 @@ public class EventProcessingException extends MuleException {
     super(resolveType ? getCause(cause) : cause);
     this.event = event;
     storeErrorTypeInfo(cause);
+    storeSuppressedCausesInfo(cause);
   }
 
   public CoreEvent getEvent() {
@@ -65,6 +67,12 @@ public class EventProcessingException extends MuleException {
       getExceptionInfo().setErrorType(((TypedException) cause).getErrorType());
     } else {
       event.getError().ifPresent(e -> getExceptionInfo().setErrorType(e.getErrorType()));
+    }
+  }
+
+  private void storeSuppressedCausesInfo(Throwable cause) {
+    if (cause instanceof MuleException) {
+      this.getExceptionInfo().setSuppressedCauses(((MuleException) cause).getExceptionInfo().getSuppressedCauses());
     }
   }
 
