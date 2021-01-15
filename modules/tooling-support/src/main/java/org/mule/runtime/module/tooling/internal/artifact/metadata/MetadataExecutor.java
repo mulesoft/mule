@@ -7,9 +7,11 @@
 package org.mule.runtime.module.tooling.internal.artifact.metadata;
 
 import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -22,12 +24,18 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.module.tooling.internal.config.DefaultDeclarationSession;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class MetadataExecutor {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetadataExecutor.class);
 
   protected ConnectionManager connectionManager;
   protected ReflectionCache reflectionCache;
@@ -73,7 +81,23 @@ public abstract class MetadataExecutor {
     return new DefaultMetadataContext(() -> configurationInstance,
                                       connectionManager,
                                       new DefaultMetadataCache(),
-                                      new JavaTypeLoader(extensionClassLoader));
+                                      new JavaTypeLoader(extensionClassLoader)) {
+
+      @Override
+      public <C> Optional<C> getConnection() throws ConnectionException {
+        long startTime = currentTimeMillis();
+        try {
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Retrieving connection");
+          }
+          return super.getConnection();
+        } finally {
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Connection retrieved in {}ms", (currentTimeMillis() - startTime));
+          }
+        }
+      }
+    };
   }
 
   protected static <T> T withMetadataContext(MetadataContext metadataContext, Callable<T> callable) {
