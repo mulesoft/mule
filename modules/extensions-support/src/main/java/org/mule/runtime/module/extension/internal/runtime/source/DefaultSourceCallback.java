@@ -214,7 +214,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     encodingParam = ofNullable((String) initialisationParameters.get(ENCODING_PARAMETER_NAME))
         .map(MediaTypeUtils::parseCharset);
     mimeTypeInitParam = ofNullable((String) initialisationParameters.get(MIME_TYPE_PARAMETER_NAME))
-        .map(MediaType::parse);
+        .map(MediaType::parseDefinedInApp);
   });
 
   /**
