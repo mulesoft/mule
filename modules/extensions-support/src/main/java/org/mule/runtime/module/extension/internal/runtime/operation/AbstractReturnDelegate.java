@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.apache.commons.io.IOUtils.EOF;
+import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -57,7 +58,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.input.ClosedInputStream;
@@ -222,7 +222,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   private MediaType getContextMimeType(Map<String, Object> params) {
     String mimeType = (String) params.get(MIME_TYPE_PARAMETER_NAME);
-    return mimeType != null ? MediaType.parse(mimeType) : null;
+    return mimeType != null ? parseDefinedInApp(mimeType) : null;
   }
 
   private Charset getContextEncoding(Map<String, Object> params) {
@@ -288,7 +288,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
     private final ConnectionHandler<?> connectionHandler;
     private final Runnable onClose;
-    private AtomicBoolean alreadyClosed = new AtomicBoolean(false);
+    private final AtomicBoolean alreadyClosed = new AtomicBoolean(false);
 
     private ConnectedInputStreamWrapper(InputStream delegate, ConnectionHandler<?> connectionHandler, Runnable onClose) {
       super(delegate);
