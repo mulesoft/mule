@@ -169,7 +169,8 @@ public class HeisenbergExtension implements Lifecycle {
   private Map<String, KnockeableDoor> candidateDoors;
 
   @Parameter
-  @Optional(defaultValue = "CANCER")
+  @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "OTHER")
+  @org.mule.sdk.api.annotation.param.Optional(defaultValue = "CANCER")
   private HealthStatus initialHealth;
 
   @Parameter

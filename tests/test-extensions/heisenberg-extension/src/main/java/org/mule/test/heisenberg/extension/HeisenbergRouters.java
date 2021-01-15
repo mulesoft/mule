@@ -87,7 +87,7 @@ public class HeisenbergRouters implements Initialisable, Startable, Stoppable, D
 
   public void twoRoutesRouter(String processorName,
                               WhenRoute when,
-                              @Optional OtherwiseRoute other,
+                              @org.mule.sdk.api.annotation.param.Optional OtherwiseRoute other,
                               RouterCompletionCallback callback) {
     if (when.shouldExecute()) {
       when.getChain().process(Result.builder()

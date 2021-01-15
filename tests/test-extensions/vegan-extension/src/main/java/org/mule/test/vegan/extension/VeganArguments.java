@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 public class VeganArguments {
 
   @Parameter
-  @Optional
+  @org.mule.sdk.api.annotation.param.Optional
   private String argument1;
 
   @Parameter

@@ -568,4 +568,20 @@ public class MuleExtensionUtils {
     }
     return false;
   }
+
+  public static Optional<String> getDefaultValue(org.mule.sdk.api.annotation.param.Optional optionalAnnotation) {
+    final String defaultValue = optionalAnnotation.defaultValue();
+    if (!defaultValue.equals(org.mule.sdk.api.annotation.param.Optional.NULL)) {
+      return java.util.Optional.of(defaultValue);
+    }
+    return java.util.Optional.empty();
+  }
+
+  public static Optional<String> getDefaultValue(org.mule.runtime.extension.api.annotation.param.Optional optionalAnnotation) {
+    final String defaultValue = optionalAnnotation.defaultValue();
+    if (!defaultValue.equals(org.mule.runtime.extension.api.annotation.param.Optional.NULL)) {
+      return java.util.Optional.of(defaultValue);
+    }
+    return java.util.Optional.empty();
+  }
 }

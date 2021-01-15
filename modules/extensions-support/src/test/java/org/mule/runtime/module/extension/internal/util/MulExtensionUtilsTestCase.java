@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.extractExpression;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ARTIFACT_AST;
 import static org.mule.test.allure.AllureConstants.ArtifactAst.ParameterAst.PARAMETER_AST;
@@ -30,6 +34,7 @@ public class MulExtensionUtilsTestCase extends AbstractMuleTestCase {
 
   private static final String PAYLOAD_EXPRESSION = "#[payload]";
   private static final String MALFORMED_EXPRESSION = "#[payload";
+  private static final String DEFAULT_VALUE = "DEFAULT_VALUE";
 
   @Test
   @Description("Parse mule expression")
@@ -43,5 +48,25 @@ public class MulExtensionUtilsTestCase extends AbstractMuleTestCase {
   public void parseMalformedMuleExpression() {
     Optional<String> expressionValue = extractExpression(MALFORMED_EXPRESSION);
     assertThat(expressionValue, is(empty()));
+  }
+
+  @Test
+  public void deprecatedOptionalWithDefaultValue() {
+    org.mule.runtime.extension.api.annotation.param.Optional optional =
+        mock(org.mule.runtime.extension.api.annotation.param.Optional.class);
+    when(optional.defaultValue()).thenReturn(DEFAULT_VALUE);
+    assertOptional(getDefaultValue(optional));
+  }
+
+  @Test
+  public void optionalWithDefaultValue() {
+    org.mule.sdk.api.annotation.param.Optional optional = mock(org.mule.sdk.api.annotation.param.Optional.class);
+    when(optional.defaultValue()).thenReturn(DEFAULT_VALUE);
+    assertOptional(getDefaultValue(optional));
+  }
+
+  private void assertOptional(Optional<String> defaultValue) {
+    assertThat(defaultValue.isPresent(), is(true));
+    assertThat(defaultValue.get(), is(DEFAULT_VALUE));
   }
 }

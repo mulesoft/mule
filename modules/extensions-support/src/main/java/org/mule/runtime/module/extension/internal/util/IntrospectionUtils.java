@@ -824,7 +824,8 @@ public final class IntrospectionUtils {
   }
 
   public static boolean isRequired(AccessibleObject object) {
-    return object.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class) == null;
+    return object.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class) == null
+        && object.getAnnotation(org.mule.sdk.api.annotation.param.Optional.class) == null;
   }
 
   public static boolean isRequired(ParameterModel parameterModel, boolean forceOptional) {

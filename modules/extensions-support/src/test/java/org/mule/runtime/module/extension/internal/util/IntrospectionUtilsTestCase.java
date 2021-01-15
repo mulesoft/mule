@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static org.apache.commons.cli.OptionBuilder.isRequired;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -79,6 +80,7 @@ import org.mule.test.petstore.extension.TransactionalPetStoreClient;
 import org.mule.test.petstore.extension.TransactionalPetStoreConnectionProvider;
 
 import java.io.Serializable;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -482,6 +484,29 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     OperationElement operation = getMethod("byteArray");
     MetadataType metadataType = operation.getOperationReturnMetadataType();
     assertThat(metadataType, instanceOf(AnyType.class));
+  }
+
+  @Test
+  public void isRequired() {
+    AccessibleObject object = mock(AccessibleObject.class);
+    assertThat(IntrospectionUtils.isRequired(object), is(true));
+  }
+
+  @Test
+  public void isNotRequired() {
+    org.mule.sdk.api.annotation.param.Optional optional = mock(org.mule.sdk.api.annotation.param.Optional.class);
+    AccessibleObject object = mock(AccessibleObject.class);
+    when(object.getAnnotation(org.mule.sdk.api.annotation.param.Optional.class)).thenReturn(optional);
+    assertThat(IntrospectionUtils.isRequired(object), is(false));
+  }
+
+  @Test
+  public void isNotRequiredDeprecatedAnnotation() {
+    org.mule.runtime.extension.api.annotation.param.Optional optional =
+        mock(org.mule.runtime.extension.api.annotation.param.Optional.class);
+    AccessibleObject object = mock(AccessibleObject.class);
+    when(object.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class)).thenReturn(optional);
+    assertThat(IntrospectionUtils.isRequired(object), is(false));
   }
 
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {

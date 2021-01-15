@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -79,23 +80,23 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
    * @return A {@code boolean} indicating whether the parameter is a required or not
    */
   default boolean isRequired() {
-    return !(isAnnotatedWith(Optional.class));
+    return !(isAnnotatedWith(Optional.class) || isAnnotatedWith(org.mule.sdk.api.annotation.param.Optional.class));
   }
 
   /**
    * @return The {@link java.util.Optional} default value of the operation
    */
   default java.util.Optional<String> defaultValue() {
-    java.util.Optional<String> optionalDefaultValue = java.util.Optional.empty();
+    final java.util.Optional<org.mule.sdk.api.annotation.param.Optional> sdkAnnotation =
+        getAnnotation(org.mule.sdk.api.annotation.param.Optional.class);
+    if (sdkAnnotation.isPresent()) {
+      return getDefaultValue(sdkAnnotation.get());
+    }
     final java.util.Optional<Optional> annotation = getAnnotation(Optional.class);
     if (annotation.isPresent()) {
-      final Optional optionalAnnotation = annotation.get();
-      final String defaultValue = optionalAnnotation.defaultValue();
-      if (!defaultValue.equals(Optional.NULL)) {
-        optionalDefaultValue = java.util.Optional.of(defaultValue);
-      }
+      return getDefaultValue(annotation.get());
     }
-    return optionalDefaultValue;
+    return java.util.Optional.empty();
   }
 
   /**
