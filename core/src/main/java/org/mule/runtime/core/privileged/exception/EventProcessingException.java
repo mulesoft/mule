@@ -27,13 +27,13 @@ public class EventProcessingException extends MuleException {
   public EventProcessingException(I18nMessage message, CoreEvent event) {
     super(message);
     this.event = event;
-    copyErrorTypeInfo(event);
+    storeErrorTypeInfo(event);
   }
 
   public EventProcessingException(I18nMessage message, CoreEvent event, Throwable cause) {
     super(message, getCause(cause));
     this.event = event;
-    copyExceptionInfo(cause);
+    storeExceptionInfo(cause);
   }
 
   public EventProcessingException(CoreEvent event, Throwable cause) {
@@ -43,12 +43,12 @@ public class EventProcessingException extends MuleException {
   public EventProcessingException(CoreEvent event, Throwable cause, boolean resolveType) {
     super(resolveType ? getCause(cause) : cause);
     this.event = event;
-    copyExceptionInfo(cause);
+    storeExceptionInfo(cause);
   }
 
-  private void copyExceptionInfo(Throwable cause) {
-    copyErrorTypeInfo(cause);
-    copySuppressedCausesInfo(cause);
+  private void storeExceptionInfo(Throwable cause) {
+    storeErrorTypeInfo(cause);
+    storeSuppressedCausesInfo(cause);
   }
 
   public CoreEvent getEvent() {
@@ -66,21 +66,21 @@ public class EventProcessingException extends MuleException {
     return cause instanceof TypedException ? cause.getCause() : cause;
   }
 
-  protected void copyErrorTypeInfo(Throwable cause) {
+  protected void storeErrorTypeInfo(Throwable cause) {
     if (cause instanceof TypedException) {
       getExceptionInfo().setErrorType(((TypedException) cause).getErrorType());
     } else if (cause instanceof EventProcessingException) {
       getExceptionInfo().setErrorType(((EventProcessingException) cause).getExceptionInfo().getErrorType());
     } else {
-      copyErrorTypeInfo(event);
+      storeErrorTypeInfo(event);
     }
   }
 
-  protected void copyErrorTypeInfo(CoreEvent event) {
+  private void storeErrorTypeInfo(CoreEvent event) {
     event.getError().ifPresent(e -> getExceptionInfo().setErrorType(e.getErrorType()));
   }
 
-  private void copySuppressedCausesInfo(Throwable cause) {
+  private void storeSuppressedCausesInfo(Throwable cause) {
     if (cause instanceof MuleException) {
       this.getExceptionInfo().setSuppressedCauses(((MuleException) cause).getExceptionInfo().getSuppressedCauses());
     }
