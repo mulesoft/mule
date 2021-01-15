@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.processor.simple;
 
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -72,7 +73,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
   }
 
   public void setMimeType(String mimeType) {
-    setDataType(DataType.builder(dataType == null ? OBJECT : dataType).mediaType(mimeType).build());
+    setDataType(DataType.builder(dataType == null ? OBJECT : dataType).mediaType(parseDefinedInApp(mimeType)).build());
   }
 
   public void setEncoding(String encoding) {
