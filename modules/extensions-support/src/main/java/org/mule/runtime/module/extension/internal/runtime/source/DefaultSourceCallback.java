@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.api.metadata.MediaType.parse;
+import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -220,7 +220,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     String mimeType = (String) initialisationParameters.get(MIME_TYPE_PARAMETER_NAME);
     if (mimeType != null) {
-      mimeTypeInitParam = parse(mimeType);
+      mimeTypeInitParam = parseDefinedInApp(mimeType);
     }
   });
 
