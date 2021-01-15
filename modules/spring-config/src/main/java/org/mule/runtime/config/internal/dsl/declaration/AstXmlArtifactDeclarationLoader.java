@@ -496,6 +496,8 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
           });
 
       component.getParameters()
+          .stream()
+          .filter(p -> p.getResolvedRawValue() != null)
           .forEach(p -> transform.withCustomParameter(hyphenize(p.getModel().getName()), p.getResolvedRawValue()));
 
       declarationConsumer.accept((ComponentElementDeclaration) transform.getDeclaration());
@@ -672,6 +674,9 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
       }
 
       group.getParameterModels()
+          .stream()
+          // TODO MULE-17711 remove this filter
+          .filter(pm -> !groupAttributes.containsKey(pm.getName()))
           // TODO avoid using dsl
           .forEach(param -> elementDsl.getChild(param.getName())
               .ifPresent(paramDsl -> {
