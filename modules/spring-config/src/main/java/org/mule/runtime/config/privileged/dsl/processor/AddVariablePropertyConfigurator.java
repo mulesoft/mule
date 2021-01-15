@@ -7,9 +7,11 @@
 package org.mule.runtime.config.privileged.dsl.processor;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.config.api.dsl.ObjectFactoryCommonConfigurator;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 
@@ -40,7 +42,7 @@ public final class AddVariablePropertyConfigurator
     if (mimeType != null) {
       DataTypeParamsBuilder builder = DataType.builder();
       if (isNotEmpty(mimeType)) {
-        builder.mediaType(mimeType);
+        builder.mediaType(parseDefinedInApp(mimeType));
       }
       propVarSetterInstance.setReturnDataType(builder.charset(encoding).build());
     }
