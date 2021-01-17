@@ -8,6 +8,7 @@
 package org.mule.test.infrastructure.process;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.test.infrastructure.process.AbstractOSController.MuleProcessStatus.STARTED_STARTED;
@@ -31,8 +32,8 @@ import org.slf4j.Logger;
 
 public abstract class AbstractOSController {
 
-  private static final long TIMEOUT_MILLIS = 5000;
-  private static final long POLL_DELAY_MILLIS = 200;
+  private static final long TIMEOUT_MILLIS = SECONDS.toMillis(60);
+  private static final long POLL_DELAY_MILLIS = 500;
   protected static final String START_CMD = "start";
   protected static final String STOP_CMD = "stop";
   protected static final String DUMP_CMD = "dump";
