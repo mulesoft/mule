@@ -15,6 +15,7 @@ import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.FAILED_ADOPTION_COUNT;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -25,8 +26,10 @@ import org.mule.test.petstore.extension.PetAdoptionSource;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-19152")
 public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final List<CoreEvent> ADOPTION_EVENTS = new LinkedList<>();
