@@ -46,11 +46,6 @@ public class EventProcessingException extends MuleException {
     storeExceptionInfo(cause);
   }
 
-  private void storeExceptionInfo(Throwable cause) {
-    storeErrorTypeInfo(cause);
-    storeSuppressedCausesInfo(cause);
-  }
-
   public CoreEvent getEvent() {
     return event;
   }
@@ -64,6 +59,11 @@ public class EventProcessingException extends MuleException {
 
   private static Throwable getCause(Throwable cause) {
     return cause instanceof TypedException ? cause.getCause() : cause;
+  }
+
+  private void storeExceptionInfo(Throwable cause) {
+    storeErrorTypeInfo(cause);
+    storeSuppressedCausesInfo(cause);
   }
 
   protected void storeErrorTypeInfo(Throwable cause) {
