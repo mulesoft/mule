@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.internal.util.JdkVersionUtils.JdkVersion;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -20,9 +21,11 @@ import java.util.jar.Manifest;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+@Ignore("MULE-19045")
 public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   private String originalJavaVersion;
