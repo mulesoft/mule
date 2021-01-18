@@ -13,6 +13,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.connectionException;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.executor;
+
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -61,8 +62,9 @@ public class PetStoreSourceRetryPolicyFailsDeploymentTestCase extends AbstractEx
                              "petstore-source-retry-policy-error.xml", 2},
                          new Object[] {true, "petstore-connection-fail-deployment.xml",
                              "petstore-source-retry-policy-error.xml", 2},
-                         new Object[] {false, "petstore-connection-dont-fail-deployment.xml",
-                             "petstore-source-retry-policy-connection-exception.xml", 3},
+                         // TODO MULE-19151 reenable this
+                         // new Object[] {false, "petstore-connection-dont-fail-deployment.xml",
+                         // "petstore-source-retry-policy-connection-exception.xml", 3},
                          new Object[] {true, "petstore-connection-fail-deployment.xml",
                              "petstore-source-retry-policy-connection-exception.xml", 3});
   }
