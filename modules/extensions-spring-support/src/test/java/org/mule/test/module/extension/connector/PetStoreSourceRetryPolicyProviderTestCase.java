@@ -21,10 +21,12 @@ import org.mule.test.petstore.extension.PetStoreConnector;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@Ignore
 public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtensionFunctionalTestCase {
 
   public static final int TIMEOUT_MILLIS = 1000;
