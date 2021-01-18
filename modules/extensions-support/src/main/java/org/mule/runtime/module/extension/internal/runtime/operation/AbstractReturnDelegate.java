@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -201,7 +202,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   }
 
   private Optional<MediaType> getContextMimeType(Map<String, Object> params) {
-    return ofNullable((String) params.get(MIME_TYPE_PARAMETER_NAME)).map(mimeType -> MediaType.parse(mimeType));
+    return ofNullable((String) params.get(MIME_TYPE_PARAMETER_NAME)).map(mimeType -> MediaType.parseDefinedInApp(mimeType));
   }
 
   private Optional<Charset> getContextEncoding(Map<String, Object> params) {
