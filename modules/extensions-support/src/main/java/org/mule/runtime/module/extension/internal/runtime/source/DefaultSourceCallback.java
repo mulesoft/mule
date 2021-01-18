@@ -190,7 +190,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     encodingParam = ofNullable((String) initialisationParameters.get(ENCODING_PARAMETER_NAME))
         .map(encoding -> parseCharset(encoding));
     mimeTypeInitParam = ofNullable((String) initialisationParameters.get(MIME_TYPE_PARAMETER_NAME))
-        .map(mimeType -> MediaType.parse(mimeType));
+        .map(mimeType -> MediaType.parseDefinedInApp(mimeType));
   });
 
   /**
