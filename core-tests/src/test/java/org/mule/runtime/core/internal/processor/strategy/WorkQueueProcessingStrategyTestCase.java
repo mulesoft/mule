@@ -17,9 +17,7 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
@@ -42,11 +40,13 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(WORK_QUEUE)
@@ -56,6 +56,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     super(mode);
   }
 
+  @Override
   @Before
   public void before() throws RegistrationException {
     super.before();
@@ -195,6 +196,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
 
   @Override
   @Description("Concurrent stream with concurrency of 8 only uses four IO threads.")
+  @Ignore("MULE-19153")
   public void concurrentStream() throws Exception {
     super.concurrentStream();
     assertThat(threads, hasSize(4));

@@ -29,10 +29,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessingStrategyFactory.WorkQueueStreamProcessingStrategy;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(WORK_QUEUE)
@@ -90,19 +92,24 @@ public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessi
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
+  @Override
   @Test
   @Description("When back-pressure strategy is 'WAIT' the source thread blocks and all requests are processed.")
   public void sourceBackPressureWait() throws Exception {
     testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
   }
 
+  @Override
   @Test
+  @Ignore("MULE-19153")
   @Description("When back-pressure strategy is 'FAIL' some requests fail with an OVERLOAD error.")
   public void sourceBackPressureFail() throws Exception {
     testBackPressure(FAIL, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
   }
 
+  @Override
   @Test
+  @Ignore("MULE-19153")
   @Description("When back-pressure strategy is 'DROP' the flow rejects requests in the same way way with 'FAIL. It is the source that handles FAIL and DROP differently.")
   public void sourceBackPressureDrop() throws Exception {
     testBackPressure(DROP, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
