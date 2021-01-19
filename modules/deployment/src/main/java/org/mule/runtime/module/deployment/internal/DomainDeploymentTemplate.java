@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.lang.String.valueOf;
+import static java.util.Optional.of;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -18,12 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-
-import static java.lang.String.valueOf;
-import static java.util.Optional.of;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 
 /**
  * Utility to hook callbacks just before and after a domain zip is redeployed in Mule.
@@ -71,8 +71,8 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
         if (applicationDeployer.isUpdatedZombieArtifact(domainApplication.getArtifactName())) {
           try {
             applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(),
-                getProperties(appStatusPreRedeployment
-                    .get(domainApplication)));
+                                                       getProperties(appStatusPreRedeployment
+                                                           .get(domainApplication)));
             applicationDeploymentListener.onRedeploymentSuccess(domainApplication.getArtifactName());
           } catch (RuntimeException e) {
             applicationDeploymentListener.onRedeploymentFailure(domainApplication.getArtifactName(), e);

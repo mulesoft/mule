@@ -7,24 +7,22 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Optional.empty;
+import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
+
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
-
-import static java.util.Optional.empty;
-import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 
 /**
  * Provides parallel deployment of Mule applications.

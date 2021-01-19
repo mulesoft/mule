@@ -11,11 +11,36 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
-import static org.mule.runtime.core.api.config.MuleProperties.*;
+import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.invalidJdk;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
-import static org.mule.runtime.core.api.context.notification.MuleContextNotification.*;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.*;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_DISPOSED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_DISPOSING;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISING;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTING;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPING;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
@@ -347,7 +372,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     synchronized (lifecycleStateLock) {
       if (isStarted() || (lifecycleManager.getLastPhaseExecuted() != null
           && (lifecycleManager.getLastPhaseExecuted().equals(Startable.PHASE_NAME)
-              && lifecycleManager.isLastPhaseExecutionFailed()))) {
+          && lifecycleManager.isLastPhaseExecutionFailed()))) {
         try {
           stop();
         } catch (MuleException e) {
@@ -827,7 +852,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       defaultErrorHandler = getRegistry().lookupObject(config.getDefaultErrorHandlerName());
       if (defaultErrorHandler == null) {
         throw new MuleRuntimeException(createStaticMessage(format("No global error handler named %s",
-                                                                  config.getDefaultErrorHandlerName())));
+            config.getDefaultErrorHandlerName())));
       }
 
       if (rootContainerName.isPresent()) {
