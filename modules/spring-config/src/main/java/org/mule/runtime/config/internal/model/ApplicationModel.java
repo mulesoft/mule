@@ -50,7 +50,6 @@ import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.core.api.config.FeatureFlaggingService;
-import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.ArrayList;
@@ -72,8 +71,8 @@ import org.slf4j.Logger;
  * This model is represented by a set of {@link ComponentAst}a. Each {@code ComponentAst} holds a piece of configuration and may
  * have children {@code ComponentAst}s as defined in the artifact configuration.
  * <p/>
- * Once the set of {@code ComponentAst}s gets created from the application {@link ConfigFile}s the {@code ApplicationModel}
- * executes a set of common validations dictated by the configuration semantics.
+ * Once the set of {@code ComponentAst}s gets created from the application config, the {@code ApplicationModel} executes a set of
+ * common validations dictated by the configuration semantics.
  *
  * @since 4.0
  */
