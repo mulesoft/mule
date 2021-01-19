@@ -6,7 +6,14 @@
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
     <flow name="getBreederOperation">
-        <petstore:get-breeder mammals="#[vars.mammals]"/>
+        <petstore:get-breeder mammals="mammals"/>
+    </flow>
+
+    <flow name="getBreederOperationComplexPet">
+        <set-variable variableName="petType" value="Primate"/>
+        <petstore:get-breeder>
+            <petstore:complex-pet petType="#[vars.petType]" />
+        </petstore:get-breeder>
     </flow>
 
     <flow name="getAquariumOperation">

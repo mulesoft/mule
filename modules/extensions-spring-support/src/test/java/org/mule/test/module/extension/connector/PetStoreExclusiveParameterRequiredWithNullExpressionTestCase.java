@@ -56,6 +56,12 @@ public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extend
   }
 
   @Test
+  public void getBreederOperationFail2() throws Exception {
+    flowRunner("getBreederOperationComplexPet")
+        .runExpectingException(hasMessage(containsString("One of the following should be set: [complexPet, mammals, birds]")));
+  }
+
+  @Test
   public void getBreederOperationSuccess() throws Exception {
     ExclusivePetBreeder exclusivePetBreeder = (ExclusivePetBreeder) flowRunner("getBreederOperation")
         .withVariable("mammals", TEST_VALUE).run().getMessage().getPayload().getValue();
