@@ -411,7 +411,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
     model.getParameterGroupModels()
         .forEach(group -> declareParameterGroup(component, model, declarer, children, elementDsl, group,
-                                model.getParameterGroupModels().get(0) == group,
+                                                model.getParameterGroupModels().get(0) == group,
                                                 pm -> component.getParameter(pm.getName())));
 
     if (model instanceof SourceModel) {
