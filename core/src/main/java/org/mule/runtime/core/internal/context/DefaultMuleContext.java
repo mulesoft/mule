@@ -347,7 +347,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     synchronized (lifecycleStateLock) {
       if (isStarted() || (lifecycleManager.getLastPhaseExecuted() != null
           && (lifecycleManager.getLastPhaseExecuted().equals(Startable.PHASE_NAME)
-          && lifecycleManager.isLastPhaseExecutionFailed()))) {
+              && lifecycleManager.isLastPhaseExecutionFailed()))) {
         try {
           stop();
         } catch (MuleException e) {
@@ -827,7 +827,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       defaultErrorHandler = getRegistry().lookupObject(config.getDefaultErrorHandlerName());
       if (defaultErrorHandler == null) {
         throw new MuleRuntimeException(createStaticMessage(format("No global error handler named %s",
-            config.getDefaultErrorHandlerName())));
+                                                                  config.getDefaultErrorHandlerName())));
       }
 
       if (rootContainerName.isPresent()) {

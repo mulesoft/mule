@@ -76,7 +76,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       lazyInit = valueOf((String) deploymentProperties.getOrDefault(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "false"));
       enableXmlValidations =
           valueOf((String) deploymentProperties.getOrDefault(MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY,
-              "false"));
+                                                             "false"));
     }
 
     if (lazyInit) {
@@ -106,8 +106,8 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       artifact.dispose();
     } catch (Throwable t) {
       logger.error(format("Unable to cleanly dispose artifact '%s'. Restart Mule if you get errors redeploying this artifact",
-          artifact.getArtifactName()),
-          t);
+                          artifact.getArtifactName()),
+                   t);
     }
   }
 
@@ -117,8 +117,8 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       artifact.stop();
     } catch (Throwable t) {
       logger.error(format("Unable to cleanly stop artifact '%s'. Restart Mule if you get errors redeploying this artifact",
-          artifact.getArtifactName()),
-          t);
+                          artifact.getArtifactName()),
+                   t);
     }
   }
 
