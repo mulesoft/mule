@@ -6,34 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
-import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
-import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.core.internal.context.ArtifactStoppedListener;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
-import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.api.DeploymentStartException;
-import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.module.deployment.api.DeploymentListener;
-import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
-import org.mule.runtime.module.deployment.internal.util.ObservableList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -46,10 +18,39 @@ import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.ARTIFACT_STOPPED_LISTENER;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.DeploymentStartException;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
+import org.mule.runtime.module.deployment.internal.util.ObservableList;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
+import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Deployer of an artifact within mule container. - Keeps track of deployed artifacts - Avoid already deployed artifacts to be
@@ -193,13 +194,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     logRequestToUndeployArtifact(artifact);
     try {
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
-      Optional<Registry> optionalRegistry = ofNullable(artifact.getRegistry());
-
-      optionalRegistry.ifPresent(artifactRegistry -> {
-        Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
-            artifactRegistry.lookupByName(ARTIFACT_STOPPED_LISTENER);
-        optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
-      });
+      doNotPersistStop(artifact);
       deployer.undeploy(artifact);
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
     } catch (DeploymentException e) {
@@ -265,7 +260,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
           resourceFiles.add(artifact.getDescriptor().getDescriptorFile());
         }
         artifactZombieMap.put(artifact.getArtifactName(),
-                              new ZombieArtifact(resourceFiles.toArray(new File[resourceFiles.size()])));
+            new ZombieArtifact(resourceFiles.toArray(new File[resourceFiles.size()])));
       } catch (Exception e) {
         // ignore resource
       }
@@ -282,7 +277,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       return;
     }
     try {
-      artifactZombieMap.put(artifactName, new ZombieArtifact(new File[] {marker}));
+      artifactZombieMap.put(artifactName, new ZombieArtifact(new File[]{marker}));
     } catch (Exception e) {
       logger.debug(format("Failed to mark an exploded artifact [%s] as a zombie", marker.getName()), e);
     }
@@ -309,13 +304,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
 
       artifacts.remove(artifact);
-      Optional<Registry> optionalRegistry = ofNullable(artifact.getRegistry());
-
-      optionalRegistry.ifPresent(artifactRegistry -> {
-        Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
-            artifactRegistry.lookupByName(ARTIFACT_STOPPED_LISTENER);
-        optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
-      });
+      doNotPersistStop(artifact);
       deployer.undeploy(artifact);
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
@@ -324,9 +313,9 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
           deleteDirectory(dataFolder);
         } catch (IOException e) {
           logger.warn(
-                      format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
-                             dataFolder, artifact.getArtifactName()),
-                      e);
+              format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
+                  dataFolder, artifact.getArtifactName()),
+              e);
         }
       }
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
@@ -393,13 +382,9 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     deploymentTemplate.preRedeploy(artifact);
 
-    Optional<Registry> optionalRegistry = ofNullable(artifact.getRegistry());
-    Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
-        optionalRegistry.isPresent() ? optionalRegistry.get().lookupByName(ARTIFACT_STOPPED_LISTENER) : Optional.empty();
-
     if (!artifactZombieMap.containsKey(artifactName)) {
       deploymentListener.onUndeploymentStart(artifactName);
-      optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
+      doNotPersistStop(artifact);
       try {
         deployer.undeploy(artifact);
         artifact = null;
@@ -413,8 +398,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     deploymentListener.onDeploymentStart(artifactName);
     try {
       artifact = createArtifact(artifactLocation,
-                                ofNullable(resolveDeploymentProperties(artifactDescriptor.getDataFolderName(),
-                                                                       deploymentProperties)));
+          ofNullable(resolveDeploymentProperties(artifactDescriptor.getDataFolderName(),
+              deploymentProperties)));
     } catch (IOException t) {
       try {
         logDeploymentFailure(t, artifactName);
@@ -468,7 +453,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       // error text has been created by the deployer already
       if (containsType(t, DeploymentStartException.class)) {
         log(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details",
-                              artifact.getArtifactName())));
+            artifact.getArtifactName())));
         logger.error(t.getMessage(), t);
       } else {
         log(miniSplash(format("Failed to deploy artifact '%s', %s", artifact.getArtifactName(), t.getCause().getMessage())));
@@ -571,6 +556,16 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     return deployExplodedApp(artifactDir, deploymentProperties);
+  }
+
+  public void doNotPersistStop(T artifact) {
+    Registry artifactRegistry = artifact.getRegistry();
+
+    if (artifactRegistry != null) {
+      Optional<ArtifactStoppedPersistenceListener> optionalArtifactStoppedListener =
+          artifactRegistry.lookupByName(ARTIFACT_STOPPED_LISTENER);
+      optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::doNotPersist);
+    }
   }
 
   private static class ZombieArtifact {

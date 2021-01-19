@@ -31,7 +31,6 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;

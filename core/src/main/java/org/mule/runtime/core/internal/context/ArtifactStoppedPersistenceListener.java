@@ -6,22 +6,25 @@
  */
 package org.mule.runtime.core.internal.context;
 
-public interface ArtifactStoppedListener {
+/**
+ * Defines a listener to persist stop events of Mule artifacts.
+ */
+public interface ArtifactStoppedPersistenceListener {
+
+  String ARTIFACT_STOPPED_LISTENER = "artifactStoppedPersistenceListener";
 
   /**
-   * Notifies the starting of an artifact.
+   * Notifies an artifact has been started.
    */
   void onStart();
 
   /**
-   * Notifies the stopping of an artifact.
+   * Notifies an artifact has been stopped.
    */
   void onStop();
 
   /**
-   * Selects persistance of the artifact's state
-   *
-   * @param doPersist
+   * Turns off persistence
    */
-  void mustPersist(boolean doPersist);
+  void doNotPersist();
 }

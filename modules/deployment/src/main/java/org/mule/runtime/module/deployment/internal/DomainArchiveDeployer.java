@@ -31,8 +31,9 @@ import java.util.Properties;
  */
 public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
 
-  public static final String DOMAIN_BUNDLE_APPS_FOLDER = "apps";
   private transient final Logger logger = LoggerFactory.getLogger(getClass());
+
+  public static final String DOMAIN_BUNDLE_APPS_FOLDER = "apps";
   private final ArchiveDeployer<Domain> domainDeployer;
   private final DeploymentService deploymentService;
   private final ArchiveDeployer<Application> applicationDeployer;
@@ -130,5 +131,10 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   @Override
   public Domain deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties) {
     return domainDeployer.deployExplodedArtifact(artifactDir, deploymentProperties);
+  }
+
+  @Override
+  public void doNotPersistStop(Domain artifact) {
+    domainDeployer.doNotPersistStop(artifact);
   }
 }

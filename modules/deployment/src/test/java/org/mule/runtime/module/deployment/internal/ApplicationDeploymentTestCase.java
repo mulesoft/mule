@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
@@ -62,7 +63,7 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.ARTIFACT_STOPPED_LISTENER;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.*;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.*;

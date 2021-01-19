@@ -6,15 +6,23 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
-import org.apache.commons.io.filefilter.AndFileFilter;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.mule.runtime.api.artifact.Registry;
+import static java.lang.String.format;
+import static java.util.Arrays.sort;
+import static java.util.Optional.empty;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections.CollectionUtils.find;
+import static org.apache.commons.collections.CollectionUtils.subtract;
+import static org.apache.commons.io.IOCase.INSENSITIVE;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
+import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.*;
+
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.core.internal.context.ArtifactStoppedListener;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -26,13 +34,10 @@ import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ElementAddedEvent;
 import org.mule.runtime.module.deployment.internal.util.ElementRemovedEvent;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,28 +45,18 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import static java.lang.String.format;
-import static java.util.Arrays.sort;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.collections.CollectionUtils.find;
-import static org.apache.commons.collections.CollectionUtils.subtract;
-import static org.apache.commons.io.IOCase.INSENSITIVE;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.ARTIFACT_STOPPED_LISTENER;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
-import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.*;
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
+import org.apache.commons.io.filefilter.AndFileFilter;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * It's in charge of the whole deployment process.
@@ -101,7 +96,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
   private final DomainBundleArchiveDeployer domainBundleDeployer;
   private final File appsDir;
   private final File domainsDir;
-  private final List<ArtifactStoppedDeploymentListener> artifactStoppedDeploymentListeners;
   protected volatile boolean dirty;
   private ScheduledExecutorService artifactDirMonitorTimer;
 
@@ -137,7 +131,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
     this.schedulerServiceSupplier = schedulerServiceSupplier;
     this.applicationTimestampListener = new ArtifactTimestampListener(applications);
     this.domainTimestampListener = new ArtifactTimestampListener(domains);
-    this.artifactStoppedDeploymentListeners = new ArrayList<>();
   }
 
   private static int getChangesCheckIntervalMs() {
@@ -232,16 +225,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   private void notifyStopListeners() {
     for (Application application : applications) {
-      Optional<Registry> optionalRegistry = ofNullable(application.getRegistry());
-      Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
-          optionalRegistry.isPresent() ? optionalRegistry.get().lookupByName(ARTIFACT_STOPPED_LISTENER) : Optional.empty();
-      optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
+      applicationArchiveDeployer.doNotPersistStop(application);
     }
     for (Domain domain : domains) {
-      Optional<Registry> optionalRegistry = ofNullable(domain.getRegistry());
-      Optional<ArtifactStoppedListener> optionalArtifactStoppedListener =
-          optionalRegistry.isPresent() ? optionalRegistry.get().lookupByName(ARTIFACT_STOPPED_LISTENER) : Optional.empty();
-      optionalArtifactStoppedListener.ifPresent(artifactStoppedListener -> artifactStoppedListener.mustPersist(false));
+      domainArchiveDeployer.doNotPersistStop(domain);
     }
   }
 
@@ -389,8 +376,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
 
     String[] artifactAnchors = findExpectedAnchorFiles(artifacts);
-    @SuppressWarnings("unchecked")
-    final Collection<String> deletedAnchors = subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
+    @SuppressWarnings("unchecked") final Collection<String> deletedAnchors = subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
     if (logger.isDebugEnabled()) {
       StringBuilder sb = new StringBuilder();
       sb.append(format("Deleted anchors:%n"));
@@ -555,7 +541,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
       }
       File descriptorFile =
           new File(((DeployableArtifactDescriptor) artifact.getDescriptor()).getArtifactLocation(),
-                   ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
+              ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
       if (descriptorFile.exists()) {
         timestampsPerResource.put(descriptorFile.getAbsolutePath(), descriptorFile.lastModified());
       }

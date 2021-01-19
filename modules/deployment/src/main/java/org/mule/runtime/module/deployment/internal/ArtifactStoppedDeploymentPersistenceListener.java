@@ -6,25 +6,27 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.core.internal.context.ArtifactStoppedListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import static java.lang.String.valueOf;
+import static java.util.Optional.of;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 
-public class ArtifactStoppedDeploymentListener implements ArtifactStoppedListener {
+import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
+
+import java.io.IOException;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStoppedPersistenceListener {
 
   private transient final Logger logger = LoggerFactory.getLogger(getClass());
   private AtomicBoolean shouldPersist;
   private String artifactName;
 
-  public ArtifactStoppedDeploymentListener(String artifactName) {
+  public ArtifactStoppedDeploymentPersistenceListener(String artifactName) {
     this.artifactName = artifactName;
     shouldPersist = new AtomicBoolean(true);
   }
@@ -32,9 +34,9 @@ public class ArtifactStoppedDeploymentListener implements ArtifactStoppedListene
   @Override
   public void onStart() {
     Properties properties = new Properties();
-    properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, String.valueOf(true));
+    properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(true));
     try {
-      resolveDeploymentProperties(artifactName, Optional.of(properties));
+      resolveDeploymentProperties(artifactName, of(properties));
     } catch (IOException e) {
       logger.error("ApplicationStoppedDeploymentListener failed to process notification onArtifactStopped for artifact "
           + artifactName, e);
@@ -47,9 +49,9 @@ public class ArtifactStoppedDeploymentListener implements ArtifactStoppedListene
       return;
     }
     Properties properties = new Properties();
-    properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, String.valueOf(false));
+    properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(false));
     try {
-      resolveDeploymentProperties(artifactName, Optional.of(properties));
+      resolveDeploymentProperties(artifactName, of(properties));
     } catch (IOException e) {
       logger.error("ApplicationStoppedDeploymentListener failed to process notification onArtifactStopped for artifact "
           + artifactName, e);
@@ -57,7 +59,7 @@ public class ArtifactStoppedDeploymentListener implements ArtifactStoppedListene
   }
 
   @Override
-  public void mustPersist(boolean doPersist) {
-    shouldPersist.set(doPersist);
+  public void doNotPersist() {
+    shouldPersist.set(false);
   }
 }

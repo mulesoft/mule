@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.core.internal.context.ArtifactStoppedListener;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -34,7 +33,6 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
   private final DefaultArchiveDeployer<Application> applicationDeployer;
   private final DeploymentService deploymentservice;
   private final CompositeDeploymentListener applicationDeploymentListener;
-  private final Map<String, ArtifactStoppedListener> artifactStoppedMuleContextListeners = new HashMap<>();
   private Collection<Application> domainApplications = Collections.emptyList();
   private Map<Application, ApplicationStatus> appStatusPreRedeployment;
 

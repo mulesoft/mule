@@ -6,26 +6,29 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.registry.MuleRegistry;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils;
-import org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Properties;
-
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.ARTIFACT_STOPPED_LISTENER;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+
+import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultArtifactDeployer<T extends DeployableArtifact> implements ArtifactDeployer<T> {
 
@@ -40,9 +43,9 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
         artifact.start();
       }
 
-      ArtifactStoppedDeploymentListener artifactStoppedDeploymentListener =
-          new ArtifactStoppedDeploymentListener(artifact.getArtifactName());
-      ArtifactFactoryUtils.withArtifactMuleContext(artifact, muleContext -> {
+      ArtifactStoppedPersistenceListener artifactStoppedDeploymentListener =
+          new ArtifactStoppedDeploymentPersistenceListener(artifact.getArtifactName());
+      withArtifactMuleContext(artifact, muleContext -> {
         MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
         muleRegistry.registerObject(ARTIFACT_STOPPED_LISTENER, artifactStoppedDeploymentListener);
       });
@@ -73,7 +76,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       lazyInit = valueOf((String) deploymentProperties.getOrDefault(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "false"));
       enableXmlValidations =
           valueOf((String) deploymentProperties.getOrDefault(MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY,
-                                                             "false"));
+              "false"));
     }
 
     if (lazyInit) {
@@ -103,8 +106,8 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       artifact.dispose();
     } catch (Throwable t) {
       logger.error(format("Unable to cleanly dispose artifact '%s'. Restart Mule if you get errors redeploying this artifact",
-                          artifact.getArtifactName()),
-                   t);
+          artifact.getArtifactName()),
+          t);
     }
   }
 
@@ -114,20 +117,20 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       artifact.stop();
     } catch (Throwable t) {
       logger.error(format("Unable to cleanly stop artifact '%s'. Restart Mule if you get errors redeploying this artifact",
-                          artifact.getArtifactName()),
-                   t);
+          artifact.getArtifactName()),
+          t);
     }
   }
 
   private Boolean shouldStartArtifact(T artifact) {
     Properties deploymentProperties = null;
     try {
-      deploymentProperties = DeploymentPropertiesUtils.resolveDeploymentProperties(artifact.getArtifactName(), Optional.empty());
+      deploymentProperties = resolveDeploymentProperties(artifact.getArtifactName(), Optional.empty());
     } catch (IOException e) {
       logger.error("Failed to load deployment property for artifact "
           + artifact.getArtifactName(), e);
     }
     return deploymentProperties != null
-        && Boolean.parseBoolean(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
+        && parseBoolean(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
   }
 }
