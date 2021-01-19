@@ -122,7 +122,7 @@ public class InternalDeclarationSession implements DeclarationSession {
   @Override
   public ConnectionValidationResult testConnection(String configName) {
     return artifactHelper()
-        .findConnectionProvider(configName)
+        .getConfigurationInstance(configName)
         .map(cp -> {
           try {
             if (LOGGER.isDebugEnabled()) {
