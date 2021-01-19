@@ -7,8 +7,8 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;

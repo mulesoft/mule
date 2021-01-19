@@ -80,17 +80,18 @@ public class DeploymentDirectoryWatcher implements Runnable {
    * Property used to change the deployment mode to deploy only the indicated applications with no redeployment.
    * mule -M-Dmule.deploy.applications=app1:app2:app3
    * This can also be done passing an additional command line option (deprecated) like:
-   * mule -app app1:app2:app3 will restrict deployment only to those specified apps.
+   *  mule -app app1:app2:app3 will restrict deployment only to those specified apps.
    */
   public static final String DEPLOYMENT_APPLICATION_PROPERTY = "mule.deploy.applications";
 
   protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
-  protected final ArchiveDeployer<Application> applicationArchiveDeployer;
-  protected final Supplier<SchedulerService> schedulerServiceSupplier;
+
   private final ReentrantLock deploymentLock;
   private final ArchiveDeployer<Domain> domainArchiveDeployer;
+  protected final ArchiveDeployer<Application> applicationArchiveDeployer;
+  protected final Supplier<SchedulerService> schedulerServiceSupplier;
   private final ArtifactTimestampListener<Application> applicationTimestampListener;
   private final ArtifactTimestampListener<Domain> domainTimestampListener;
   private final ObservableList<Application> applications;
@@ -98,8 +99,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
   private final DomainBundleArchiveDeployer domainBundleDeployer;
   private final File appsDir;
   private final File domainsDir;
-  protected volatile boolean dirty;
   private ScheduledExecutorService artifactDirMonitorTimer;
+
+  protected volatile boolean dirty;
 
   public DeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
                                     final ArchiveDeployer<Domain> domainArchiveDeployer,
@@ -133,15 +135,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
     this.schedulerServiceSupplier = schedulerServiceSupplier;
     this.applicationTimestampListener = new ArtifactTimestampListener(applications);
     this.domainTimestampListener = new ArtifactTimestampListener(domains);
-  }
-
-  private static int getChangesCheckIntervalMs() {
-    try {
-      String value = System.getProperty(CHANGE_CHECK_INTERVAL_PROPERTY);
-      return Integer.parseInt(value);
-    } catch (NumberFormatException e) {
-      return DEFAULT_CHANGES_CHECK_INTERVAL_MS;
-    }
   }
 
   /**
@@ -225,12 +218,12 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
   }
 
-  private void notifyStopListeners() {
-    for (Application application : applications) {
-      applicationArchiveDeployer.doNotPersistStop(application);
-    }
-    for (Domain domain : domains) {
-      domainArchiveDeployer.doNotPersistStop(domain);
+  private static int getChangesCheckIntervalMs() {
+    try {
+      String value = System.getProperty(CHANGE_CHECK_INTERVAL_PROPERTY);
+      return Integer.parseInt(value);
+    } catch (NumberFormatException e) {
+      return DEFAULT_CHANGES_CHECK_INTERVAL_MS;
     }
   }
 
@@ -563,6 +556,14 @@ public class DeploymentDirectoryWatcher implements Runnable {
       });
     }
   }
-}
 
+  private void notifyStopListeners() {
+    for (Application application : applications) {
+      applicationArchiveDeployer.doNotPersistStop(application);
+    }
+    for (Domain domain : domains) {
+      domainArchiveDeployer.doNotPersistStop(domain);
+    }
+  }
+}
 

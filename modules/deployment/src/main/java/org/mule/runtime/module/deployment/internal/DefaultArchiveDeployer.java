@@ -61,17 +61,18 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String JAR_FILE_SUFFIX = ".jar";
   public static final String ZIP_FILE_SUFFIX = ".zip";
-  static final String START_ARTIFACT_ON_DEPLOYMENT_PROPERTY = "startArtifactOnDeployment";
   private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
+  static final String START_ARTIFACT_ON_DEPLOYMENT_PROPERTY = "startArtifactOnDeployment";
+
   private final ArtifactDeployer<T> deployer;
   private final ArtifactArchiveInstaller artifactArchiveInstaller;
   private final Map<String, ZombieArtifact> artifactZombieMap = new HashMap<>();
   private final File artifactDir;
   private final ObservableList<T> artifacts;
   private final ArtifactDeploymentTemplate deploymentTemplate;
-  private final MuleContextListenerFactory muleContextListenerFactory;
   private AbstractDeployableArtifactFactory<T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
+  private final MuleContextListenerFactory muleContextListenerFactory;
 
 
   public DefaultArchiveDeployer(final ArtifactDeployer deployer,
@@ -86,10 +87,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     this.artifactDir = artifactFactory.getArtifactDir();
     this.artifactArchiveInstaller = new ArtifactArchiveInstaller(artifactDir);
     this.muleContextListenerFactory = muleContextListenerFactory;
-  }
-
-  private static boolean allResourcesExist(File[] resourceFiles) {
-    return stream(resourceFiles).allMatch(File::exists);
   }
 
   @Override
@@ -347,6 +344,37 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     return artifact;
   }
 
+  private static boolean allResourcesExist(File[] resourceFiles) {
+    return stream(resourceFiles).allMatch(File::exists);
+  }
+
+  private static class ZombieArtifact {
+
+    Map<File, Long> initialResourceFiles = new HashMap<>();
+
+    private ZombieArtifact(File[] resourceFiles) {
+      // Is exploded artifact
+      for (File resourceFile : resourceFiles) {
+        initialResourceFiles.put(resourceFile, resourceFile.lastModified());
+      }
+    }
+
+    public boolean isFor(URI uri) {
+      return initialResourceFiles.entrySet().stream().anyMatch((entry) -> entry.getKey().toURI().equals(uri));
+    }
+
+    public boolean updatedZombieApp() {
+      return initialResourceFiles.entrySet().stream()
+          .anyMatch((entry) -> !entry.getValue().equals(entry.getKey().lastModified()));
+    }
+
+    // Returns true only if all the files exist
+    public boolean exists() {
+      return allResourcesExist(initialResourceFiles.keySet().toArray(new File[initialResourceFiles.size()]));
+    }
+
+  }
+
   @Override
   public T deployPackagedArtifact(String zip, Optional<Properties> deploymentProperties) throws DeploymentException {
     URI uri;
@@ -566,32 +594,5 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
           artifactRegistry.lookupByName(ARTIFACT_STOPPED_LISTENER);
       optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::doNotPersist);
     }
-  }
-
-  private static class ZombieArtifact {
-
-    Map<File, Long> initialResourceFiles = new HashMap<>();
-
-    private ZombieArtifact(File[] resourceFiles) {
-      // Is exploded artifact
-      for (File resourceFile : resourceFiles) {
-        initialResourceFiles.put(resourceFile, resourceFile.lastModified());
-      }
-    }
-
-    public boolean isFor(URI uri) {
-      return initialResourceFiles.entrySet().stream().anyMatch((entry) -> entry.getKey().toURI().equals(uri));
-    }
-
-    public boolean updatedZombieApp() {
-      return initialResourceFiles.entrySet().stream()
-          .anyMatch((entry) -> !entry.getValue().equals(entry.getKey().lastModified()));
-    }
-
-    // Returns true only if all the files exist
-    public boolean exists() {
-      return allResourcesExist(initialResourceFiles.keySet().toArray(new File[initialResourceFiles.size()]));
-    }
-
   }
 }

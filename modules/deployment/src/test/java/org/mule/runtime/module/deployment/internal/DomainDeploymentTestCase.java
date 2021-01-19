@@ -11,13 +11,29 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.apache.commons.io.FileUtils.*;
+import static org.apache.commons.io.FileUtils.copyFile;
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
+import static org.apache.commons.io.FileUtils.forceDelete;
+import static org.apache.commons.io.FileUtils.touch;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
@@ -134,18 +150,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     pluginForbiddenMuleThirdPartyEchoTestClassFile =
         new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
             .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
-  }
-
-  private static Throwable getOriginalCause(Throwable exception) {
-    if (exception.getCause() == null) {
-      return exception;
-    }
-
-    if (exception.getCause() == exception) {
-      return exception;
-    }
-
-    return getOriginalCause(exception.getCause());
   }
 
   @After
@@ -355,6 +359,18 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
       assertThat(originalCause, instanceOf(NoSuchMethodError.class));
       assertThat(originalCause.getMessage(), containsString("BarUtils.doStuff"));
     }
+  }
+
+  private static Throwable getOriginalCause(Throwable exception) {
+    if (exception.getCause() == null) {
+      return exception;
+    }
+
+    if (exception.getCause() == exception) {
+      return exception;
+    }
+
+    return getOriginalCause(exception.getCause());
   }
 
   @Test
