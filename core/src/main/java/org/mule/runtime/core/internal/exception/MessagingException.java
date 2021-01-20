@@ -56,7 +56,6 @@ public class MessagingException extends EventProcessingException {
   public MessagingException(I18nMessage message, CoreEvent event) {
     super(message, event);
     extractMuleMessage(event);
-    storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
@@ -64,14 +63,12 @@ public class MessagingException extends EventProcessingException {
     super(message, event);
     extractMuleMessage(event);
     this.failingComponent = failingComponent;
-    storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(I18nMessage message, CoreEvent event, Throwable cause) {
     super(message, event, cause);
     extractMuleMessage(event);
-    storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
@@ -79,14 +76,12 @@ public class MessagingException extends EventProcessingException {
     super(message, event, cause);
     extractMuleMessage(event);
     this.failingComponent = failingComponent;
-    storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(CoreEvent event, Throwable cause) {
     super(event, cause);
     extractMuleMessage(event);
-    storeErrorTypeInfo();
     setMessage(generateMessage(getI18nMessage(), null));
   }
 
@@ -96,7 +91,6 @@ public class MessagingException extends EventProcessingException {
     this.handled = original.handled();
     original.getInfo().forEach((key, value) -> addInfo(key, value));
     extractMuleMessage(event);
-    storeErrorTypeInfo();
     setMessage(original.getMessage());
   }
 
@@ -104,14 +98,7 @@ public class MessagingException extends EventProcessingException {
     super(event, cause);
     extractMuleMessage(event);
     this.failingComponent = failingComponent;
-    storeErrorTypeInfo();
     setMessage(generateMessage(getI18nMessage(), null));
-  }
-
-  private void storeErrorTypeInfo() {
-    if (event != null) {
-      addInfo(INFO_ERROR_TYPE_KEY, getEvent().getError().map(e -> e.getErrorType().toString()).orElse(MISSING_DEFAULT_VALUE));
-    }
   }
 
   protected String generateMessage(I18nMessage message, MuleContext muleContext) {

@@ -21,23 +21,26 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
  */
 public class EventProcessingException extends MuleException {
 
-  private static final long serialVersionUID = 8849038142532938068L;
+  private static final long serialVersionUID = 8849038142532938070L;
 
   protected final transient CoreEvent event;
 
   public EventProcessingException(I18nMessage message, CoreEvent event) {
     super(message);
     this.event = event;
+    storeErrorTypeInfo(event);
   }
 
   public EventProcessingException(I18nMessage message, CoreEvent event, Throwable cause) {
     super(message, getCause(cause));
     this.event = getEvent(event, cause);
+    storeErrorTypeInfo(cause);
   }
 
   public EventProcessingException(CoreEvent event, Throwable cause) {
     super(getCause(cause));
     this.event = getEvent(event, cause);
+    storeErrorTypeInfo(cause);
   }
 
   public CoreEvent getEvent() {
@@ -62,6 +65,20 @@ public class EventProcessingException extends MuleException {
   private static CoreEvent eventWithError(CoreEvent event, TypedException cause) {
     return CoreEvent.builder(event)
         .error(ErrorBuilder.builder(cause.getCause()).errorType(cause.getErrorType()).build()).build();
+  }
+
+  private void storeErrorTypeInfo(Throwable cause) {
+    if (cause instanceof TypedException) {
+      addInfo(INFO_ERROR_TYPE_KEY, ((TypedException)cause).getErrorType().toString());
+    } else if (cause instanceof EventProcessingException) {
+      addInfo(INFO_ERROR_TYPE_KEY, ((EventProcessingException)cause).getInfo().getOrDefault(INFO_ERROR_TYPE_KEY, MISSING_DEFAULT_VALUE));
+    } else {
+      storeErrorTypeInfo(event);
+    }
+  }
+
+  private void storeErrorTypeInfo(CoreEvent event) {
+    event.getError().ifPresent(e -> addInfo(INFO_ERROR_TYPE_KEY, e.getErrorType()));
   }
 
 }
