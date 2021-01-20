@@ -168,7 +168,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     }
 
     if (operationContext.hasParameter(MIME_TYPE_PARAMETER_NAME)) {
-      mediaType = MediaType.parse(operationContext.getParameter(MIME_TYPE_PARAMETER_NAME));
+      mediaType = MediaType.parseDefinedInApp(operationContext.getParameter(MIME_TYPE_PARAMETER_NAME));
     }
 
     if (operationContext.hasParameter(ENCODING_PARAMETER_NAME)) {
