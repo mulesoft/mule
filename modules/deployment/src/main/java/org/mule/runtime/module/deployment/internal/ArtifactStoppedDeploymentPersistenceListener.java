@@ -38,7 +38,7 @@ class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStoppedPer
     try {
       resolveDeploymentProperties(artifactName, of(properties));
     } catch (IOException e) {
-      logger.error("ApplicationStoppedDeploymentListener failed to process notification onArtifactStopped for artifact "
+      logger.error("ArtifactStoppedDeploymentPersistenceListener failed to process notification onStart for artifact "
           + artifactName, e);
     }
   }
@@ -53,7 +53,7 @@ class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStoppedPer
     try {
       resolveDeploymentProperties(artifactName, of(properties));
     } catch (IOException e) {
-      logger.error("ApplicationStoppedDeploymentListener failed to process notification onArtifactStopped for artifact "
+      logger.error("ArtifactStoppedDeploymentPersistenceListener failed to process notification onStop for artifact "
           + artifactName, e);
     }
   }
