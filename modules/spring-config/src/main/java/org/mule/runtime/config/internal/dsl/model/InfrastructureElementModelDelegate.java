@@ -326,7 +326,6 @@ class InfrastructureElementModelDelegate {
                               namespace);
   }
 
-  // TODO review if this is needed
   private void cloneDeclarationToElement(Object parameterModel, DslElementSyntax paramDsl,
                                          InternalComponentConfiguration.Builder parentConfig,
                                          DslElementModel.Builder parentElement,
