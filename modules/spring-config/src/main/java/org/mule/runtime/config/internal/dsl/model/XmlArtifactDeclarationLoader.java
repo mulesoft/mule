@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.lang.Class.forName;
+import static java.lang.System.getProperty;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -15,7 +19,6 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Loads a mule XML configuration file into an {@link ArtifactDeclaration} representation.
@@ -24,20 +27,21 @@ import org.slf4j.LoggerFactory;
  */
 public interface XmlArtifactDeclarationLoader {
 
+  // This mechanism is in place for reverting to the previous implementation just in case.
   public static final class Initializer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Initializer.class);
+    private static final Logger LOGGER = getLogger(Initializer.class);
 
     private static Class<?> LOADER_CLASS;
 
     static {
-      String loaderClassName = System.getProperty(XmlArtifactDeclarationLoader.class.getName() + ".loaderClassName");
+      String loaderClassName = getProperty(XmlArtifactDeclarationLoader.class.getName() + ".loaderClassName");
 
       if (loaderClassName == null) {
         LOADER_CLASS = null;
       } else {
         try {
-          LOADER_CLASS = Class.forName(loaderClassName);
+          LOADER_CLASS = forName(loaderClassName);
         } catch (ClassNotFoundException e) {
           LOGGER.warn(e.getClass().getName() + ": " + e.getMessage());
           LOADER_CLASS = null;
