@@ -160,25 +160,13 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
   // TODO MULE-19156 Remove this
   private final Map<String, ExtensionModel> extensionsByNamespace = new HashMap<>();
 
+  private final AstXmlParser parser;
+
   public AstXmlArtifactDeclarationLoader(DslResolvingContext context) {
     this.context = context;
     this.resolvers = context.getExtensions().stream()
         .collect(toMap(e -> e.getXmlDslModel().getNamespace(), e -> DslSyntaxResolver.getDefault(e, context)));
     this.context.getExtensions().forEach(e -> extensionsByNamespace.put(e.getXmlDslModel().getNamespace(), e));
-  }
-
-  @Override
-  public ArtifactDeclaration load(InputStream configResource) {
-    return load("app.xml", configResource);
-  }
-
-  @Override
-  public ArtifactDeclaration load(String name, InputStream configResource) {
-    return declareArtifact(loadArtifactAst(name, configResource));
-  }
-
-  private ArtifactAst loadArtifactAst(String name, InputStream resource) {
-    checkArgument(resource != null, "The given application was not found as resource");
 
     DefaultConfigurationPropertiesResolver propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
@@ -196,11 +184,25 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
           }
         });
 
-    return AstXmlParser.builder().withSchemaValidationsDisabled()
+    parser = AstXmlParser.builder().withSchemaValidationsDisabled()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
         .withExtensionModels(context.getExtensions())
-        .build()
-        .parse(name, resource);
+        .build();
+  }
+
+  @Override
+  public ArtifactDeclaration load(InputStream configResource) {
+    return load("app.xml", configResource);
+  }
+
+  @Override
+  public ArtifactDeclaration load(String name, InputStream configResource) {
+    return declareArtifact(loadArtifactAst(name, configResource));
+  }
+
+  private ArtifactAst loadArtifactAst(String name, InputStream resource) {
+    checkArgument(resource != null, "The given application was not found as resource");
+    return parser.parse(name, resource);
   }
 
   public static List<XmlNamespaceInfoProvider> createFromPluginClassloaders(Function<ClassLoader, List<XmlNamespaceInfoProvider>> xmlNamespaceInfoProvidersSupplier,
