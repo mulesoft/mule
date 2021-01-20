@@ -20,6 +20,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENC
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler.nullHandler;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -186,7 +187,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     }
 
     if (operationContext.hasParameter(MIME_TYPE_PARAMETER_NAME)) {
-      mediaType = MediaType.parse(operationContext.getParameter(MIME_TYPE_PARAMETER_NAME));
+      mediaType = MediaType.parseDefinedInApp(operationContext.getParameter(MIME_TYPE_PARAMETER_NAME));
     }
 
     if (operationContext.hasParameter(ENCODING_PARAMETER_NAME)) {

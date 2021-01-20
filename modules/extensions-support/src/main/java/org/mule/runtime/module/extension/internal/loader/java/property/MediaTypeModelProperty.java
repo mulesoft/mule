@@ -20,7 +20,7 @@ public class MediaTypeModelProperty implements ModelProperty {
   private final boolean strict;
 
   public MediaTypeModelProperty(String mimeType, boolean strict) {
-    mediaType = MediaType.parse(mimeType);
+    mediaType = MediaType.parseDefinedInApp(mimeType);
     this.strict = strict;
   }
 
