@@ -442,7 +442,7 @@
 /mule-standalone-${productVersion}/lib/opt/xmlbeans-2.6.3.jar
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
-/mule-standalone-${productVersion}/lib/opt/yagi-1.0.37.jar
+/mule-standalone-${productVersion}/lib/opt/yagi-1.0.28.jar
 /mule-standalone-${productVersion}/lib/opt/validation-api-1.1.0.Final.jar
 /mule-standalone-${productVersion}/lib/shared
 /mule-standalone-${productVersion}/lib/shared/README.txt
