@@ -6,12 +6,19 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.config.internal.dsl.declaration.DefaultXmlArtifactDeclarationLoader;
+import static java.lang.Class.forName;
+import static java.lang.System.getProperty;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.config.internal.dsl.declaration.AstXmlArtifactDeclarationLoader;
 
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+
+import org.slf4j.Logger;
 
 /**
  * Loads a mule XML configuration file into an {@link ArtifactDeclaration} representation.
@@ -19,6 +26,33 @@ import java.io.InputStream;
  * @since 4.0
  */
 public interface XmlArtifactDeclarationLoader {
+
+  // This mechanism is in place for reverting to the previous implementation just in case.
+  public static final class Initializer {
+
+    private static final Logger LOGGER = getLogger(Initializer.class);
+
+    private static Class<?> LOADER_CLASS;
+
+    static {
+      String loaderClassName = getProperty(XmlArtifactDeclarationLoader.class.getName() + ".loaderClassName");
+
+      if (loaderClassName == null) {
+        LOADER_CLASS = null;
+      } else {
+        try {
+          LOADER_CLASS = forName(loaderClassName);
+        } catch (ClassNotFoundException e) {
+          LOGGER.warn(e.getClass().getName() + ": " + e.getMessage());
+          LOADER_CLASS = null;
+        }
+      }
+    }
+
+    private Initializer() {
+      // Nothing to do
+    }
+  }
 
   /**
    * Provides an instance of the default implementation of the {@link XmlArtifactDeclarationLoader}.
@@ -28,7 +62,18 @@ public interface XmlArtifactDeclarationLoader {
    * @return an instance of the default implementation of the {@link XmlArtifactDeclarationLoader}
    */
   static XmlArtifactDeclarationLoader getDefault(DslResolvingContext context) {
-    return new DefaultXmlArtifactDeclarationLoader(context);
+    if (Initializer.LOADER_CLASS == null) {
+      return new AstXmlArtifactDeclarationLoader(context);
+    } else {
+      try {
+        return (XmlArtifactDeclarationLoader) Initializer.LOADER_CLASS.getConstructor(DslResolvingContext.class)
+            .newInstance(context);
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+          | NoSuchMethodException | SecurityException e) {
+        Initializer.LOGGER.warn(e.getClass().getName() + ": " + e.getMessage());
+        return new AstXmlArtifactDeclarationLoader(context);
+      }
+    }
   }
 
   /**

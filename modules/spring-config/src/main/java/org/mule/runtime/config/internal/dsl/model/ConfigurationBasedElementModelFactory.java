@@ -15,6 +15,19 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.config.internal.model.ApplicationModel.CRON_STRATEGY_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.EXPIRATION_POLICY_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.NON_REPEATABLE_ITERABLE_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.NON_REPEATABLE_STREAM_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.RECONNECTION_CONFIG_PARAMETER_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.RECONNECT_FOREVER_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.RECONNECT_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.REDELIVERY_POLICY_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.REPEATABLE_FILE_STORE_ITERABLE_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.REPEATABLE_FILE_STORE_STREAM_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.REPEATABLE_IN_MEMORY_ITERABLE_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.REPEATABLE_IN_MEMORY_STREAM_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.SCHEDULING_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
@@ -23,12 +36,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLIC
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_OBJECTS_STREAM_ALIAS;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
@@ -36,16 +43,9 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRequired;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -82,9 +82,6 @@ import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeA
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
@@ -93,6 +90,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Implementation of {@link DslElementModelFactory} that creates a {@link DslElementModel} based on its
@@ -104,7 +104,7 @@ import java.util.Set;
 class ConfigurationBasedElementModelFactory {
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  private Map<ExtensionModel, DslSyntaxResolver> resolvers;
+  private final Map<ExtensionModel, DslSyntaxResolver> resolvers;
   private ExtensionModel currentExtension;
   private DslSyntaxResolver dsl;
 
@@ -754,8 +754,7 @@ class ConfigurationBasedElementModelFactory {
     switch (paramModel.getName()) {
       case RECONNECTION_CONFIG_PARAMETER_NAME:
         ComponentConfiguration reconnection =
-            getSingleComponentConfiguration(nested, of(newIdentifier(RECONNECTION_CONFIG_PARAMETER_NAME,
-                                                                     paramDsl.getPrefix())));
+            getSingleComponentConfiguration(nested, of(RECONNECTION_CONFIG_PARAMETER_IDENTIFIER));
 
         if (reconnection != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, reconnection));
@@ -763,13 +762,10 @@ class ConfigurationBasedElementModelFactory {
         return;
 
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
-        ComponentIdentifier reconnectId = newIdentifier(RECONNECT_ELEMENT_IDENTIFIER,
-                                                        paramDsl.getPrefix());
-
-        ComponentConfiguration config = nested.containsKey(reconnectId)
-            ? getSingleComponentConfiguration(nested, of(reconnectId))
+        ComponentConfiguration config = nested.containsKey(RECONNECT_IDENTIFIER)
+            ? getSingleComponentConfiguration(nested, of(RECONNECT_IDENTIFIER))
             : getSingleComponentConfiguration(nested,
-                                              of(newIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER, paramDsl.getPrefix())));
+                                              of(RECONNECT_FOREVER_IDENTIFIER));
 
         if (config != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, config));
@@ -778,8 +774,7 @@ class ConfigurationBasedElementModelFactory {
 
       case REDELIVERY_POLICY_PARAMETER_NAME:
         ComponentConfiguration redelivery =
-            getSingleComponentConfiguration(nested, of(newIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER,
-                                                                     paramDsl.getPrefix())));
+            getSingleComponentConfiguration(nested, of(REDELIVERY_POLICY_IDENTIFIER));
         if (redelivery != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, redelivery));
         }
@@ -787,8 +782,7 @@ class ConfigurationBasedElementModelFactory {
 
       case EXPIRATION_POLICY_PARAMETER_NAME:
         ComponentConfiguration expiration =
-            getSingleComponentConfiguration(nested, of(newIdentifier(EXPIRATION_POLICY_ELEMENT_IDENTIFIER,
-                                                                     paramDsl.getPrefix())));
+            getSingleComponentConfiguration(nested, of(EXPIRATION_POLICY_IDENTIFIER));
         if (expiration != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, expiration));
         }
@@ -803,12 +797,12 @@ class ConfigurationBasedElementModelFactory {
 
       case STREAMING_STRATEGY_PARAMETER_NAME:
         Set<ComponentIdentifier> streaming =
-            newHashSet(newIdentifier(NON_REPEATABLE_BYTE_STREAM_ALIAS, CORE_PREFIX),
-                       newIdentifier(REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS, CORE_PREFIX),
-                       newIdentifier(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, EE_PREFIX),
-                       newIdentifier(REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS, CORE_PREFIX),
-                       newIdentifier(REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS, EE_PREFIX),
-                       newIdentifier(NON_REPEATABLE_OBJECTS_STREAM_ALIAS, CORE_PREFIX));
+            newHashSet(NON_REPEATABLE_STREAM_IDENTIFIER,
+                       REPEATABLE_IN_MEMORY_STREAM_IDENTIFIER,
+                       REPEATABLE_FILE_STORE_STREAM_IDENTIFIER,
+                       REPEATABLE_IN_MEMORY_ITERABLE_IDENTIFIER,
+                       REPEATABLE_FILE_STORE_ITERABLE_IDENTIFIER,
+                       NON_REPEATABLE_ITERABLE_IDENTIFIER);
 
         streaming.stream().filter(nested::containsKey).findFirst()
             .ifPresent(s -> groupElementBuilder
@@ -831,10 +825,7 @@ class ConfigurationBasedElementModelFactory {
 
       case SCHEDULING_STRATEGY_PARAMETER_NAME:
         ComponentConfiguration schedulingStrategyWrapper =
-            getSingleComponentConfiguration(nested, of(ComponentIdentifier.builder()
-                .name(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER)
-                .namespace(CORE_PREFIX)
-                .build()));
+            getSingleComponentConfiguration(nested, of(SCHEDULING_STRATEGY_IDENTIFIER));
         if (schedulingStrategyWrapper != null) {
           DslElementModel.Builder wrapper = DslElementModel.builder()
               .withModel(paramModel)
@@ -844,7 +835,7 @@ class ConfigurationBasedElementModelFactory {
           Iterator<ComponentConfiguration> nestedIt = schedulingStrategyWrapper.getNestedComponents().iterator();
           if (nestedIt.hasNext()) {
             final ComponentConfiguration strategy = nestedIt.next();
-            final MetadataType type = CRON_STRATEGY_ELEMENT_IDENTIFIER.equals(strategy.getIdentifier().getName())
+            final MetadataType type = CRON_STRATEGY_IDENTIFIER.equals(strategy.getIdentifier())
                 ? typeLoader.load(CronScheduler.class)
                 : typeLoader.load(FixedFrequencyScheduler.class);
 
@@ -862,10 +853,6 @@ class ConfigurationBasedElementModelFactory {
         return;
     }
 
-  }
-
-  private ComponentIdentifier newIdentifier(String name, String ns) {
-    return ComponentIdentifier.builder().name(name).namespace(ns).build();
   }
 
   private DslElementModel newElementModel(ParameterModel paramModel, DslElementSyntax paramDsl,

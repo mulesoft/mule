@@ -75,7 +75,6 @@ import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
-import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
@@ -88,7 +87,6 @@ import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalE
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
-import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -1178,8 +1176,7 @@ public final class XmlExtensionLoaderDelegate {
   /**
    * Utility class to read the XML module entirely so that if there's any usage of configurations properties, such as
    * "${someProperty}", the {@link ForbiddenConfigurationPropertiesValidator} can show the errors consistently, Without this dull
-   * implementation, the {@link ComponentModelReader#extractComponentDefinitionModel(ConfigLine, String)} method fails while
-   * reading ANY parametrization throwing a {@link PropertyNotFoundException} eagerly.
+   * implementation, the XML parser fails while reading ANY parametrization throwing a {@link PropertyNotFoundException} eagerly.
    */
   private class XmlExtensionConfigurationPropertiesResolver implements ConfigurationPropertiesResolver {
 

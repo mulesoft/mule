@@ -9,12 +9,12 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.SINGLE;
+import static org.mule.runtime.config.internal.dsl.SchemaConstants.buildRawParamKeyForDocAttribute;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.addAnnotation;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
@@ -49,14 +49,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.xml.namespace.QName;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
@@ -199,20 +195,6 @@ public class BeanDefinitionFactory {
                                                                                           .getMetadata()),
                         springComponentModel);
         });
-  }
-
-  private Optional<String> buildRawParamKeyForDocAttribute(Entry<String, String> docAttr) {
-    final QName qName = QName.valueOf(docAttr.getKey());
-
-    // The doc: prefix is hard-coded here to maintain compatibility of interception api use cases where the doc
-    // parameters are queried with this prefix
-    if (NS_MULE_DOCUMENTATION.equals(qName.getNamespaceURI())) {
-      return of("doc:" + qName.getLocalPart());
-    } else if (StringUtils.isEmpty(qName.getNamespaceURI())) {
-      return of("doc:" + docAttr.getKey());
-    } else {
-      return Optional.empty();
-    }
   }
 
   /**

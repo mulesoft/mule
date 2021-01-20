@@ -147,7 +147,10 @@ import com.google.common.collect.ImmutableList;
  * Default implementation of a {@link XmlArtifactDeclarationLoader}
  *
  * @since 4.0
+ *
+ * @deprecated From 4.4 onwards use {@link AstXmlArtifactDeclarationLoader}.
  */
+@Deprecated
 public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLoader {
 
   public static final String TRANSFORM_IDENTIFIER = "transform";

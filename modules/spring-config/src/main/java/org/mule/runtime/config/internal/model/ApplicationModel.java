@@ -15,8 +15,26 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.createConfigurationAttributeResolver;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_OBJECTS_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -32,7 +50,6 @@ import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.core.api.config.FeatureFlaggingService;
-import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.ArrayList;
@@ -54,8 +71,8 @@ import org.slf4j.Logger;
  * This model is represented by a set of {@link ComponentAst}a. Each {@code ComponentAst} holds a piece of configuration and may
  * have children {@code ComponentAst}s as defined in the artifact configuration.
  * <p/>
- * Once the set of {@code ComponentAst}s gets created from the application {@link ConfigFile}s the {@code ApplicationModel}
- * executes a set of common validations dictated by the configuration semantics.
+ * Once the set of {@code ComponentAst}s gets created from the application config, the {@code ApplicationModel} executes a set of
+ * common validations dictated by the configuration semantics.
  *
  * @since 4.0
  */
@@ -106,6 +123,41 @@ public class ApplicationModel implements ArtifactAst {
       builder().namespace(CORE_PREFIX).name(GLOBAL_PROPERTY).build();
   public static final ComponentIdentifier SECURITY_MANAGER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(SECURITY_MANAGER).build();
+
+  public static final ComponentIdentifier SCHEDULING_STRATEGY_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER).build();
+  public static final ComponentIdentifier FIXED_FREQUENCY_STRATEGY_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER).build();
+  public static final ComponentIdentifier CRON_STRATEGY_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(CRON_STRATEGY_ELEMENT_IDENTIFIER).build();
+  public static final ComponentIdentifier TLS_CONTEXT_IDENTIFIER =
+      builder().namespace(TLS_PREFIX).name(TLS_CONTEXT_ELEMENT_IDENTIFIER).build();
+  public static final ComponentIdentifier TLS_REVOCATION_CHECK_IDENTIFIER =
+      builder().namespace(TLS_PREFIX).name(TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER).build();
+  public static final ComponentIdentifier POOLING_PROFILE_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(POOLING_PROFILE_ELEMENT_IDENTIFIER).build();
+  public static final ComponentIdentifier EXPIRATION_POLICY_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(EXPIRATION_POLICY_ELEMENT_IDENTIFIER).build();
+  public static final ComponentIdentifier RECONNECT_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(RECONNECT_ELEMENT_IDENTIFIER).build();
+  public static final ComponentIdentifier RECONNECT_FOREVER_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(RECONNECT_FOREVER_ELEMENT_IDENTIFIER).build();
+  public static final ComponentIdentifier RECONNECTION_CONFIG_PARAMETER_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(RECONNECTION_CONFIG_PARAMETER_NAME).build();
+
+  public static final ComponentIdentifier REPEATABLE_IN_MEMORY_STREAM_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS).build();
+  public static final ComponentIdentifier REPEATABLE_FILE_STORE_STREAM_IDENTIFIER =
+      builder().namespace(EE_PREFIX).name(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS).build();
+  public static final ComponentIdentifier NON_REPEATABLE_STREAM_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(NON_REPEATABLE_BYTE_STREAM_ALIAS).build();
+
+  public static final ComponentIdentifier REPEATABLE_IN_MEMORY_ITERABLE_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS).build();
+  public static final ComponentIdentifier REPEATABLE_FILE_STORE_ITERABLE_IDENTIFIER =
+      builder().namespace(EE_PREFIX).name(REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS).build();
+  public static final ComponentIdentifier NON_REPEATABLE_ITERABLE_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(NON_REPEATABLE_OBJECTS_STREAM_ALIAS).build();
 
   private ArtifactAst ast;
   private final ArtifactAst originalAst;
