@@ -135,7 +135,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   }
 
   @Override
-  public void doNotPersistStop(Domain artifact) {
-    domainDeployer.doNotPersistStop(artifact);
+  public void doNotPersistArtifactStop(Domain artifact) {
+    domainDeployer.doNotPersistArtifactStop(artifact);
   }
 }

@@ -18,13 +18,10 @@ import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
-import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 
-import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -191,7 +188,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     logRequestToUndeployArtifact(artifact);
     try {
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
-      doNotPersistStop(artifact);
       deployer.undeploy(artifact);
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
     } catch (DeploymentException e) {
@@ -301,7 +297,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
 
       artifacts.remove(artifact);
-      doNotPersistStop(artifact);
       deployer.undeploy(artifact);
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
@@ -412,7 +407,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     if (!artifactZombieMap.containsKey(artifactName)) {
       deploymentListener.onUndeploymentStart(artifactName);
-      doNotPersistStop(artifact);
       try {
         deployer.undeploy(artifact);
         artifact = null;
@@ -586,13 +580,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     return deployExplodedApp(artifactDir, deploymentProperties);
   }
 
-  public void doNotPersistStop(T artifact) {
-    Registry artifactRegistry = artifact.getRegistry();
-
-    if (artifactRegistry != null) {
-      Optional<ArtifactStoppedPersistenceListener> optionalArtifactStoppedListener =
-          artifactRegistry.lookupByName(ARTIFACT_STOPPED_LISTENER);
-      optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::doNotPersist);
-    }
+  public void doNotPersistArtifactStop(T artifact) {
+    deployer.doNotPersistArtifactStop(artifact);
   }
 }

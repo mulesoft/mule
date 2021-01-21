@@ -17,6 +17,7 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
@@ -89,6 +90,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   @Override
   public void undeploy(T artifact) {
     try {
+      doNotPersistArtifactStop(artifact);
       tryToStopArtifact(artifact);
       tryToDisposeArtifact(artifact);
     } catch (Throwable t) {
@@ -132,5 +134,15 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     }
     return deploymentProperties != null
         && parseBoolean(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
+  }
+
+  public void doNotPersistArtifactStop(T artifact) {
+    Registry artifactRegistry = artifact.getRegistry();
+
+    if (artifactRegistry != null) {
+      Optional<ArtifactStoppedPersistenceListener> optionalArtifactStoppedListener =
+          artifactRegistry.lookupByName(ARTIFACT_STOPPED_LISTENER);
+      optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::doNotPersist);
+    }
   }
 }

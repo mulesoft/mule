@@ -559,10 +559,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   private void notifyStopListeners() {
     for (Application application : applications) {
-      applicationArchiveDeployer.doNotPersistStop(application);
+      applicationArchiveDeployer.doNotPersistArtifactStop(application);
     }
     for (Domain domain : domains) {
-      domainArchiveDeployer.doNotPersistStop(domain);
+      domainArchiveDeployer.doNotPersistArtifactStop(domain);
     }
   }
 }

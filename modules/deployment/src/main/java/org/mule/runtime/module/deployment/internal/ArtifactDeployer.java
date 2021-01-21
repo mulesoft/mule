@@ -46,4 +46,12 @@ public interface ArtifactDeployer<T extends DeployableArtifact> {
    */
   void undeploy(final T artifact);
 
+  /**
+   * Cancels the persistence of a stop of an artifact.
+   *
+   * A stop of a certain artifact must only be persisted when it was stopped by the Agent. In case of undeployment, it should not be persisted.
+   *
+   * @param artifact artifact to be undeployed
+   */
+  void doNotPersistArtifactStop(T artifact);
 }
