@@ -73,7 +73,6 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
-import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
@@ -274,20 +273,16 @@ public final class XmlExtensionLoaderDelegate {
     final Set<ExtensionModel> loaderExtensions = new HashSet<>(context.getDslResolvingContext().getExtensions());
     loaderExtensions.add(XmlSdk1ExtensionModelProvider.getExtensionModel());
 
-    final ExtensionModelHelper extensionModelHelper =
-        new ExtensionModelHelper(loaderExtensions, context.getDslResolvingContext());
-
-    final Set<ExtensionModel> extensions = new HashSet<>(extensionModelHelper.getExtensionsModels());
+    final Set<ExtensionModel> extensions = new HashSet<>(loaderExtensions);
     try {
-      createTnsExtensionModel(resource, extensionModelHelper).ifPresent(extensions::add);
+      createTnsExtensionModel(resource, loaderExtensions).ifPresent(extensions::add);
     } catch (IOException e) {
       throw new MuleRuntimeException(createStaticMessage(format("There was an issue reading the stream for the resource %s",
                                                                 resource.getFile())));
     }
 
     ArtifactAst moduleAst = getModuleDocument(extensions, resource);
-    loadModuleExtension(context.getExtensionDeclarer(), moduleAst,
-                        new ExtensionModelHelper(extensions), false);
+    loadModuleExtension(context.getExtensionDeclarer(), moduleAst, false);
   }
 
   private URL getResource(String resource) {
@@ -361,7 +356,7 @@ public final class XmlExtensionLoaderDelegate {
    * @return an {@link ExtensionModel} if there's a {@link #XMLNS_TNS} defined, {@link Optional#empty()} otherwise
    * @throws IOException if it fails reading the resource
    */
-  private Optional<ExtensionModel> createTnsExtensionModel(URL resource, ExtensionModelHelper extensionModelHelper)
+  private Optional<ExtensionModel> createTnsExtensionModel(URL resource, Set<ExtensionModel> extensionModels)
       throws IOException {
     final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
     try (InputStream in = getClass().getClassLoader().getResourceAsStream(TRANSFORMATION_FOR_TNS_RESOURCE)) {
@@ -379,7 +374,7 @@ public final class XmlExtensionLoaderDelegate {
 
     final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
     AstXmlParser xmlToAstParser = AstXmlParser.builder()
-        .withExtensionModels(extensionModelHelper.getExtensionsModels())
+        .withExtensionModels(extensionModels)
         .withSchemaValidationsDisabled()
         .build();
 
@@ -387,14 +382,14 @@ public final class XmlExtensionLoaderDelegate {
         xmlToAstParser.parse("transformed_" + resource.getFile(), new ByteArrayInputStream(resultStream.toByteArray()));
 
     if (transformedModuleAst.topLevelComponentsStream().findFirst().get().getRawParameterValue(XMLNS_TNS).isPresent()) {
-      loadModuleExtension(extensionDeclarer, transformedModuleAst, extensionModelHelper, true);
+      loadModuleExtension(extensionDeclarer, transformedModuleAst, true);
       return of(createExtensionModel(extensionDeclarer));
     } else {
       return empty();
     }
   }
 
-  private ComponentAst getModuleComponentModel(ArtifactAst moduleAst, Set<ExtensionModel> extensions) {
+  private ComponentAst getModuleComponentModel(ArtifactAst moduleAst) {
     moduleAst.updatePropertiesResolver(getConfigurationPropertiesResolver(moduleAst));
     return moduleAst.topLevelComponentsStream().findAny().get();
   }
@@ -439,9 +434,8 @@ public final class XmlExtensionLoaderDelegate {
     }));
   }
 
-  private void loadModuleExtension(ExtensionDeclarer declarer, ArtifactAst moduleAst,
-                                   ExtensionModelHelper extensionModelHelper, boolean comesFromTNS) {
-    ComponentAst moduleModel = getModuleComponentModel(moduleAst, extensionModelHelper.getExtensionsModels());
+  private void loadModuleExtension(ExtensionDeclarer declarer, ArtifactAst moduleAst, boolean comesFromTNS) {
+    ComponentAst moduleModel = getModuleComponentModel(moduleAst);
     if (!moduleModel.getIdentifier().equals(MODULE_IDENTIFIER)) {
       throw new MuleRuntimeException(createStaticMessage(format("The root element of a module must be '%s', but found '%s'",
                                                                 MODULE_IDENTIFIER.toString(),
@@ -473,7 +467,7 @@ public final class XmlExtensionLoaderDelegate {
     final List<ComponentAst> globalElementsComponentModel = extractGlobalElementsFrom(moduleModel);
     addGlobalElementModelProperty(declarer, globalElementsComponentModel);
     final Optional<ConfigurationDeclarer> configurationDeclarer =
-        loadPropertiesFrom(declarer, moduleModel, globalElementsComponentModel, extensionModelHelper);
+        loadPropertiesFrom(declarer, moduleModel, globalElementsComponentModel);
     final HasOperationDeclarer hasOperationDeclarer = configurationDeclarer.map(d -> (HasOperationDeclarer) d).orElse(declarer);
 
     ExtensionDeclarer temporalPublicOpsDeclarer = new ExtensionDeclarer();
@@ -713,8 +707,7 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private Optional<ConfigurationDeclarer> loadPropertiesFrom(ExtensionDeclarer declarer, ComponentAst moduleModel,
-                                                             List<ComponentAst> globalElementsComponentModel,
-                                                             ExtensionModelHelper extensionModelHelper) {
+                                                             List<ComponentAst> globalElementsComponentModel) {
     List<ComponentAst> configurationProperties = extractProperties(moduleModel);
     List<ComponentAst> connectionProperties = extractConnectionProperties(moduleModel);
     validateProperties(configurationProperties, connectionProperties);
@@ -723,7 +716,7 @@ public final class XmlExtensionLoaderDelegate {
       declarer.withModelProperty(new NoReconnectionStrategyModelProperty());
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
       configurationProperties.forEach(param -> extractProperty(configurationDeclarer, param));
-      addConnectionProvider(configurationDeclarer, connectionProperties, globalElementsComponentModel, extensionModelHelper);
+      addConnectionProvider(configurationDeclarer, connectionProperties, globalElementsComponentModel);
       return of(configurationDeclarer);
     }
     return empty();
@@ -789,17 +782,12 @@ public final class XmlExtensionLoaderDelegate {
    * @param globalElementsComponentModel collection of global elements where through
    *                                     {@link #getTestConnectionGlobalElement(ConfigurationDeclarer, List, Set)} will look for one that supports test
    *                                     connectivity.
-   * @param extensionModelHelper         used also in
-   *                                     {@link #getTestConnectionGlobalElement(ConfigurationDeclarer, List, ExtensionModelHelper)}, through the
-   *                                     {@link #findTestConnectionGlobalElementFrom}, as the XML of the extensions might change of the values that the
-   *                                     {@link ExtensionModel} has (heavily relies on the {@link ExtensionModelHelper}).
    */
   private void addConnectionProvider(ConfigurationDeclarer configurationDeclarer,
                                      List<ComponentAst> connectionProperties,
-                                     List<ComponentAst> globalElementsComponentModel,
-                                     ExtensionModelHelper extensionModelHelper) {
+                                     List<ComponentAst> globalElementsComponentModel) {
     final Optional<ComponentAst> testConnectionGlobalElementOptional =
-        getTestConnectionGlobalElement(configurationDeclarer, globalElementsComponentModel, extensionModelHelper);
+        getTestConnectionGlobalElement(configurationDeclarer, globalElementsComponentModel);
 
     if (testConnectionGlobalElementOptional.isPresent() || !connectionProperties.isEmpty()) {
       final ConnectionProviderDeclarer connectionProviderDeclarer =
@@ -819,8 +807,7 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private Optional<ComponentAst> getTestConnectionGlobalElement(ConfigurationDeclarer configurationDeclarer,
-                                                                List<ComponentAst> globalElementsComponentModel,
-                                                                ExtensionModelHelper extensionModelHelper) {
+                                                                List<ComponentAst> globalElementsComponentModel) {
     final List<ComponentAst> markedAsTestConnectionGlobalElements =
         globalElementsComponentModel.stream()
             .filter(globalElementComponentModel -> globalElementComponentModel
@@ -839,11 +826,11 @@ public final class XmlExtensionLoaderDelegate {
     }
     Optional<ComponentAst> testConnectionGlobalElement = markedAsTestConnectionGlobalElements.stream().findFirst();
     if (!testConnectionGlobalElement.isPresent()) {
-      testConnectionGlobalElement = findTestConnectionGlobalElementFrom(globalElementsComponentModel, extensionModelHelper);
+      testConnectionGlobalElement = findTestConnectionGlobalElementFrom(globalElementsComponentModel);
     } else {
       // validates that the MODULE_CONNECTION_MARKER_ATTRIBUTE is on a correct XML element that supports test connection
       Optional<ComponentAst> temporalTestConnectionGlobalElement =
-          findTestConnectionGlobalElementFrom(singletonList(testConnectionGlobalElement.get()), extensionModelHelper);
+          findTestConnectionGlobalElementFrom(singletonList(testConnectionGlobalElement.get()));
       if ((!temporalTestConnectionGlobalElement.isPresent())
           || (!temporalTestConnectionGlobalElement.get().equals(testConnectionGlobalElement.get()))) {
         configurationDeclarer.withModelProperty(new InvalidTestConnectionMarkerModelProperty(testConnectionGlobalElement
@@ -859,11 +846,9 @@ public final class XmlExtensionLoaderDelegate {
    * heavily relies on the {@link DslSyntaxResolver}, as many elements in the XML do not match to the names of the model.
    *
    * @param globalElementsComponentModel global elements of the smart connector
-   * @param extensionModelHelper with the set of extensions used to generate the current {@link ExtensionModel}
    * @return a {@link ComponentAst} of the global element to do test connection, empty otherwise.
    */
-  private Optional<ComponentAst> findTestConnectionGlobalElementFrom(List<ComponentAst> globalElementsComponentModel,
-                                                                     ExtensionModelHelper extensionModelHelper) {
+  private Optional<ComponentAst> findTestConnectionGlobalElementFrom(List<ComponentAst> globalElementsComponentModel) {
     final List<ComponentAst> testConnectionComponentModels = globalElementsComponentModel
         .stream()
         .filter(globalElementComponentModel -> globalElementComponentModel.getModel(ConfigurationModel.class)

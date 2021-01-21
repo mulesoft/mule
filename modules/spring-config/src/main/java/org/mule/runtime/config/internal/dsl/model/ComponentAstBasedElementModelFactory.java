@@ -62,8 +62,8 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.MetadataTypeAdapter;
 import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
-import org.mule.runtime.ast.internal.builder.MetadataTypeModelAdapter;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModel.Builder;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
@@ -124,8 +124,8 @@ class ComponentAstBasedElementModelFactory {
 
     return configuration.getModel(ParameterizedModel.class)
         .flatMap(model -> {
-          if (model instanceof MetadataTypeModelAdapter) {
-            return dsl.resolve(((MetadataTypeModelAdapter) model).getType())
+          if (model instanceof MetadataTypeAdapter) {
+            return dsl.resolve(((MetadataTypeAdapter) model).getType())
                 .map(dslSyntax -> (DslElementModel<T>) createElementModel(model, dslSyntax, configuration).build());
           } else {
             return of((DslElementModel<T>) createElementModel(model, dsl.resolve(model), configuration).build());
@@ -140,7 +140,7 @@ class ComponentAstBasedElementModelFactory {
           Optional<ComponentIdentifier> elementIdentifier = getIdentifier(typeDsl);
 
           if (elementIdentifier.isPresent()
-              && configuration.getModel(MetadataTypeModelAdapter.class).map(mtma -> mtma.isWrapperFor(type)).orElse(false)) {
+              && configuration.getModel(MetadataTypeAdapter.class).map(mtma -> mtma.isWrapperFor(type)).orElse(false)) {
             DslElementModel.Builder<ObjectType> typeBuilder = DslElementModel.<ObjectType>builder()
                 .withModel(type)
                 .withDsl(typeDsl)
@@ -545,14 +545,14 @@ class ComponentAstBasedElementModelFactory {
               MetadataType itemType = arrayType.getType();
               paramSyntax.getGeneric(itemType)
                   .ifPresent(itemdsl -> paramComponent.directChildrenStream()
-                      .filter(c -> c.getModel(MetadataTypeModelAdapter.class).map(mtma -> mtma.isWrapperFor(itemType))
+                      .filter(c -> c.getModel(MetadataTypeAdapter.class).map(mtma -> mtma.isWrapperFor(itemType))
                           .orElse(false))
                       .forEach(c -> {
                         final Builder<Object> arrayModelBuilder = DslElementModel.builder()
                             .withModel(itemType)
                             .withDsl(itemdsl)
                             .withConfig(c);
-                        enrichElementModel(c.getModel(MetadataTypeModelAdapter.class).get(), itemdsl, c,
+                        enrichElementModel(c.getModel(ParameterizedModel.class).get(), itemdsl, c,
                                            arrayModelBuilder);
                         paramElementBuilder.containing(arrayModelBuilder.build());
                       }));

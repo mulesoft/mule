@@ -16,7 +16,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.CONNECTION;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
@@ -42,7 +41,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.SCHEDULING
 import static org.mule.runtime.config.internal.model.ApplicationModel.TLS_CONTEXT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.TLS_REVOCATION_CHECK_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser.IS_CDATA;
+import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.IS_CDATA;
 import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
@@ -76,7 +75,6 @@ import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComposableModel;
@@ -116,8 +114,8 @@ import org.mule.runtime.app.declaration.api.fluent.TopLevelParameterDeclarer;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.MetadataTypeAdapter;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
-import org.mule.runtime.ast.internal.builder.MetadataTypeModelAdapter;
 import org.mule.runtime.config.internal.dsl.model.XmlArtifactDeclarationLoader;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
@@ -157,8 +155,6 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
   private final DslResolvingContext context;
   // TODO MULE-18660 remove this and migrate usages to get the dslSyntax form the component
   private final Map<String, DslSyntaxResolver> resolvers;
-  // TODO MULE-19156 Remove this
-  private final Map<String, ExtensionModel> extensionsByNamespace = new HashMap<>();
 
   private final AstXmlParser parser;
 
@@ -166,7 +162,6 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     this.context = context;
     this.resolvers = context.getExtensions().stream()
         .collect(toMap(e -> e.getXmlDslModel().getNamespace(), e -> DslSyntaxResolver.getDefault(e, context)));
-    this.context.getExtensions().forEach(e -> extensionsByNamespace.put(e.getXmlDslModel().getNamespace(), e));
 
     DefaultConfigurationPropertiesResolver propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
@@ -258,8 +253,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
   }
 
   private void declareElement(final ComponentAst component, final ArtifactDeclarer artifactDeclarer) {
-    final ExtensionModel ownerExtension = getExtensionModel(component);
-    final ElementDeclarer extensionElementsDeclarer = forExtension(ownerExtension.getName());
+    final ElementDeclarer extensionElementsDeclarer = forExtension(component.getExtension().getName());
     final DslSyntaxResolver dsl = resolvers.get(getNamespace(component));
 
     component.getModel(ConstructModel.class)
@@ -284,7 +278,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
           Map<String, String> attributes = resolveAttributes(component, param -> !param.getModel().isComponentId());
 
           List<ComponentAst> configComplexParameters = component.directChildrenStream()
-              .filter(config -> declareAsConnectionProvider(ownerExtension, model, configurationDeclarer,
+              .filter(config -> declareAsConnectionProvider(component.getExtension(), model, configurationDeclarer,
                                                             config, extensionElementsDeclarer))
               .collect(toList());
 
@@ -293,8 +287,8 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
           artifactDeclarer.withGlobalElement(configurationDeclarer.getDeclaration());
         });
 
-    component.getModel(MetadataTypeModelAdapter.class)
-        .map(MetadataTypeModelAdapter::getType)
+    component.getModel(MetadataTypeAdapter.class)
+        .map(MetadataTypeAdapter::getType)
         .ifPresent(type -> {
           TopLevelParameterDeclarer topLevelParameter = extensionElementsDeclarer
               .newGlobalParameter(component.getIdentifier().getName());
@@ -306,19 +300,6 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
           artifactDeclarer.withGlobalElement(topLevelParameter.getDeclaration());
         });
-  }
-
-  // TODO MULE-19156 Get the ext model from the component itself
-  private ExtensionModel getExtensionModel(ComponentAst component) {
-    String namespace = getNamespace(component);
-    ExtensionModel extensionModel = extensionsByNamespace.get(namespace);
-
-    if (extensionModel == null) {
-      throw new MuleRuntimeException(createStaticMessage("Missing Extension model in the context for namespace [" + namespace
-          + "]"));
-    }
-
-    return extensionModel;
   }
 
   private void declareComponent(final Consumer<ComponentElementDeclaration> declarationConsumer,
@@ -531,7 +512,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
   private void declareComposableModel(ComposableModel model, DslElementSyntax elementDsl,
                                       Stream<ComponentAst> children, HasNestedComponentDeclarer declarer) {
     children.forEach(child -> {
-      ElementDeclarer extensionElementsDeclarer = forExtension(getExtensionModel(child).getName());
+      ElementDeclarer extensionElementsDeclarer = forExtension(child.getExtension().getName());
 
       Reference<Boolean> componentFound = new Reference<>(false);
 
@@ -703,8 +684,8 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     Set<ObjectType> subTypes = context.getTypeCatalog().getSubTypes(objectType);
     if (!subTypes.isEmpty()) {
       subTypes.stream()
-          .filter(subType -> wrappedConfig.getModel(MetadataTypeModelAdapter.class)
-              .map(mtma -> mtma.getType().equals(subType))
+          .filter(subType -> wrappedConfig.getModel(MetadataTypeAdapter.class)
+              .map(mtma -> mtma.isWrapperFor(subType))
               .orElse(false))
           .findFirst()
           .ifPresent(subType -> createObjectValueFromType(subType, objectValue, wrappedConfig,

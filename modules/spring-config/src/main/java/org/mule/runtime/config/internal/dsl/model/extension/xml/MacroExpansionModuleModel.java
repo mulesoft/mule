@@ -187,6 +187,11 @@ public class MacroExpansionModuleModel {
 
           return new ComponentAst() {
 
+            private final ComponentIdentifier identifier = ComponentIdentifier.builder()
+                .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
+                .namespace(extensionModel.getXmlDslModel().getPrefix())
+                .name(DEFAULT_GLOBAL_ELEMENTS).build();
+
             @Override
             public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
               return Stream.concat(Stream.of(this),
@@ -230,6 +235,11 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
+            public ExtensionModel getExtension() {
+              return extensionModel;
+            }
+
+            @Override
             public <M> Optional<M> getModel(Class<M> modelClass) {
               return empty();
             }
@@ -246,10 +256,7 @@ public class MacroExpansionModuleModel {
 
             @Override
             public ComponentIdentifier getIdentifier() {
-              return ComponentIdentifier.builder()
-                  .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
-                  .namespace(extensionModel.getXmlDslModel().getPrefix())
-                  .name(DEFAULT_GLOBAL_ELEMENTS).build();
+              return identifier;
             }
 
             @Override
