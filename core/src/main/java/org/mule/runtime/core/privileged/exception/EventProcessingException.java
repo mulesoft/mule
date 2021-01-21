@@ -27,6 +27,7 @@ public class EventProcessingException extends MuleException {
   public EventProcessingException(I18nMessage message, CoreEvent event) {
     super(message);
     this.event = event;
+    storeErrorTypeInfo(event);
   }
 
   public EventProcessingException(I18nMessage message, CoreEvent event, Throwable cause) {
@@ -63,9 +64,15 @@ public class EventProcessingException extends MuleException {
   protected void storeErrorTypeInfo(Throwable cause) {
     if (cause instanceof TypedException) {
       getExceptionInfo().setErrorType(((TypedException) cause).getErrorType());
+    } else if (cause instanceof EventProcessingException) {
+      getExceptionInfo().setErrorType(((EventProcessingException) cause).getExceptionInfo().getErrorType());
     } else {
-      event.getError().ifPresent(e -> getExceptionInfo().setErrorType(e.getErrorType()));
+      storeErrorTypeInfo(event);
     }
+  }
+
+  private void storeErrorTypeInfo(CoreEvent event) {
+    event.getError().ifPresent(e -> getExceptionInfo().setErrorType(e.getErrorType()));
   }
 
 }
