@@ -630,7 +630,6 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
         } catch (Throwable e) {
           exceptions.add(e);
           LOGGER.error("An unexpected error processing events", e);
-          e.printStackTrace();
         }
       });
     }
