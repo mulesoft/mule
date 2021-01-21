@@ -33,7 +33,7 @@ public class EventProcessingException extends MuleException {
   public EventProcessingException(I18nMessage message, CoreEvent event, Throwable cause) {
     super(message, getCause(cause));
     this.event = event;
-    storeExceptionInfo(cause);
+    storeErrorTypeInfo(cause);
   }
 
   public EventProcessingException(CoreEvent event, Throwable cause) {
@@ -43,7 +43,7 @@ public class EventProcessingException extends MuleException {
   public EventProcessingException(CoreEvent event, Throwable cause, boolean resolveType) {
     super(resolveType ? getCause(cause) : cause);
     this.event = event;
-    storeExceptionInfo(cause);
+    storeErrorTypeInfo(cause);
   }
 
   public CoreEvent getEvent() {
@@ -59,10 +59,6 @@ public class EventProcessingException extends MuleException {
 
   private static Throwable getCause(Throwable cause) {
     return cause instanceof TypedException ? cause.getCause() : cause;
-  }
-
-  private void storeExceptionInfo(Throwable cause) {
-    storeErrorTypeInfo(cause);
   }
 
   protected void storeErrorTypeInfo(Throwable cause) {
