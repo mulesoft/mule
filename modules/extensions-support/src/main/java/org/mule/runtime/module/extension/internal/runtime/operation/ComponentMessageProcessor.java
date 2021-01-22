@@ -1004,7 +1004,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     } else {
       Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
       if (staticConfig.isPresent()) {
-        return getRetryPolicyTemplate(staticConfig).isEnabled();
+        return getRetryPolicyTemplate(staticConfig).isAsync();
       }
     }
 
