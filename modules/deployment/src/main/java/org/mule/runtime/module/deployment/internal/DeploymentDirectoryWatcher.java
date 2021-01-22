@@ -80,7 +80,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
    * Property used to change the deployment mode to deploy only the indicated applications with no redeployment.
    * mule -M-Dmule.deploy.applications=app1:app2:app3
    * This can also be done passing an additional command line option (deprecated) like:
-   *  mule -app app1:app2:app3 will restrict deployment only to those specified apps.
+   * mule -app app1:app2:app3 will restrict deployment only to those specified apps.
    */
   public static final String DEPLOYMENT_APPLICATION_PROPERTY = "mule.deploy.applications";
 
@@ -198,6 +198,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     deploymentLock.lock();
     try {
       notifyStopListeners();
+      notifyFlowStopListeners();
       stopArtifacts(applications);
       stopArtifacts(domains);
     } finally {
@@ -371,8 +372,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
 
     String[] artifactAnchors = findExpectedAnchorFiles(artifacts);
-    @SuppressWarnings("unchecked")
-    final Collection<String> deletedAnchors = subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
+    @SuppressWarnings("unchecked") final Collection<String> deletedAnchors = subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
     if (logger.isDebugEnabled()) {
       StringBuilder sb = new StringBuilder();
       sb.append(format("Deleted anchors:%n"));
@@ -537,7 +537,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
       }
       File descriptorFile =
           new File(((DeployableArtifactDescriptor) artifact.getDescriptor()).getArtifactLocation(),
-                   ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
+              ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
       if (descriptorFile.exists()) {
         timestampsPerResource.put(descriptorFile.getAbsolutePath(), descriptorFile.lastModified());
       }
@@ -554,6 +554,12 @@ public class DeploymentDirectoryWatcher implements Runnable {
         }
         return false;
       });
+    }
+  }
+
+  private void notifyFlowStopListeners() {
+    for (Application application : applications) {
+      applicationArchiveDeployer.doNotPersistFlowsStop(application.getArtifactName());
     }
   }
 

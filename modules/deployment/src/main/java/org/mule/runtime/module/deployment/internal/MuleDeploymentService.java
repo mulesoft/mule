@@ -269,6 +269,7 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   private void redeployDomain(String domainName, Optional<Properties> deploymentProperties) {
+    //Todo:cancelar persistencia
     executeSynchronized(() -> domainDeployer.redeploy(domainName, deploymentProperties));
   }
 
@@ -322,10 +323,12 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   void undeploy(Application app) {
+    //TODO: cancelar persistencia flows
     applicationDeployer.undeployArtifact(app.getArtifactName());
   }
 
   void undeploy(Domain domain) {
+    //TODO: cancelar persistencia flows
     domainDeployer.undeployArtifact(domain.getArtifactName());
   }
 
@@ -395,6 +398,7 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   private void redeploy(final String artifactName, final Optional<Properties> deploymentProperties) {
+    //TODO: Cancelar persistencia flows
     executeSynchronized(() -> {
       try {
         applicationDeployer.redeploy(artifactName, deploymentProperties);
@@ -414,13 +418,12 @@ public class MuleDeploymentService implements DeploymentService {
   /**
    * Creates a {@link DomainArchiveDeployer}. Override this method for testing purposes.
    *
-   * @param domainFactory the domainFactory to provide to the {@link DomainArchiveDeployer}.
-   * @param domainMuleDeployer the domainMuleDeployer to provide to the {@link DomainArchiveDeployer}.
-   * @param domains the domains that this DeploymentService manages.
-   * @param applicationDeployer the applicationDeployer to provide to the {@link DomainArchiveDeployer}.
+   * @param domainFactory                 the domainFactory to provide to the {@link DomainArchiveDeployer}.
+   * @param domainMuleDeployer            the domainMuleDeployer to provide to the {@link DomainArchiveDeployer}.
+   * @param domains                       the domains that this DeploymentService manages.
+   * @param applicationDeployer           the applicationDeployer to provide to the {@link DomainArchiveDeployer}.
    * @param applicationDeploymentListener the applicationDeployer listener to provide to the {@link DomainDeploymentTemplate}.
-   * @param domainDeploymentListener the domainDeploymentListener to provide to the {@link DeploymentMuleContextListenerFactory}
-   *
+   * @param domainDeploymentListener      the domainDeploymentListener to provide to the {@link DeploymentMuleContextListenerFactory}
    * @return the DomainArchiveDeployer.
    */
   protected DomainArchiveDeployer createDomainArchiveDeployer(DefaultDomainFactory domainFactory,
@@ -437,5 +440,4 @@ public class MuleDeploymentService implements DeploymentService {
                                      applicationDeployer, this);
 
   }
-
 }

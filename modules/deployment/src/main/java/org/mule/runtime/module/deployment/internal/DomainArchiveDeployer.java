@@ -119,7 +119,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
       domainDeployer.redeploy(artifactName, deploymentProperties);
     } catch (DeploymentException e) {
       logger.warn(String.format("Failure during redeployment of domain %s, domain applications deployment will be skipped",
-                                artifactName));
+          artifactName));
       throw e;
     }
   }
@@ -137,5 +137,10 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   @Override
   public void doNotPersistArtifactStop(Domain artifact) {
     domainDeployer.doNotPersistArtifactStop(artifact);
+  }
+
+  @Override
+  public void doNotPersistFlowsStop(String artifactName) {
+    domainDeployer.doNotPersistFlowsStop(artifactName);
   }
 }

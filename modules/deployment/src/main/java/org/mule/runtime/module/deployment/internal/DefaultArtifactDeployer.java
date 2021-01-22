@@ -27,6 +27,14 @@ import org.mule.runtime.deployment.model.api.DeploymentException;
 
 import java.io.IOException;
 import java.util.Optional;
+
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
+import org.mule.runtime.core.internal.context.FlowStoppedListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -35,12 +43,14 @@ import org.slf4j.LoggerFactory;
 public class DefaultArtifactDeployer<T extends DeployableArtifact> implements ArtifactDeployer<T> {
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  private HashMap<String, List<FlowStoppedListener>> appsFlowStoppedListeners = new HashMap<>();
 
   @Override
   public void deploy(T artifact, boolean startArtifact) {
     try {
       artifact.install();
       doInit(artifact);
+      addFlowStoppedListeners(artifact);
       if (startArtifact && shouldStartArtifact(artifact)) {
         artifact.start();
       }
@@ -60,6 +70,15 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
 
       final String msg = format("Failed to deploy artifact [%s]", artifact.getArtifactName());
       throw new DeploymentException(createStaticMessage(msg), t);
+    }
+  }
+
+  private void addFlowStoppedListeners(T artifact) {
+    appsFlowStoppedListeners.put(artifact.getArtifactName(), new ArrayList<>());
+    for (Flow flow : artifact.getRegistry().lookupAllByType(Flow.class)) {
+      FlowStoppedListener flowStoppedListener = new FlowStoppedDeploymentListener(flow.getName(), artifact.getArtifactName());
+      ((DefaultFlowBuilder.DefaultFlow) flow).addFlowStoppedListener(flowStoppedListener);
+      appsFlowStoppedListeners.get(artifact.getArtifactName()).add(flowStoppedListener);
     }
   }
 
@@ -91,6 +110,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   @Override
   public void undeploy(T artifact) {
     try {
+      doNotPersistFlowsStop(artifact.getArtifactName());
       doNotPersistArtifactStop(artifact);
       tryToStopArtifact(artifact);
       tryToDisposeArtifact(artifact);
@@ -146,4 +166,9 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::doNotPersist);
     }
   }
+  public void doNotPersistFlowsStop(String artifactName) {
+    appsFlowStoppedListeners.get(artifactName)
+        .forEach(FlowStoppedListener::doNotPersist);
+  }
+
 }

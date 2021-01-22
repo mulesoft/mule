@@ -537,6 +537,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         stopOnFailure(e);
       }
     }
+
   }
 
   private void stopOnFailure(Exception e) throws MuleException {

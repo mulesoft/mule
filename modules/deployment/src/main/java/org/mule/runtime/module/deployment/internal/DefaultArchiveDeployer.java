@@ -583,4 +583,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   public void doNotPersistArtifactStop(T artifact) {
     deployer.doNotPersistArtifactStop(artifact);
   }
+
+  public void doNotPersistFlowsStop(String artifactName) {
+    deployer.doNotPersistFlowsStop(artifactName);
+  }
 }

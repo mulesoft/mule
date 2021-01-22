@@ -28,32 +28,35 @@ public class DeploymentPropertiesUtils {
 
   private static final String DEPLOYMENT_PROPERTIES_FILE_NAME = "deployment.properties";
 
+  private static final String FLOWS_DEPLOYMENT_PROPERTIES_FILE_NAME = "flows.deployment.properties";
+
   private static final String DEPLOYMENT_PROPERTIES_DIRECTORY = "deployment-properties";
 
   /**
    * This method resolves the deploymentProperties for a new deploy/redeploy considering the new deployment properties passed by
    * the user as parameter and the deployment properties persisted in a previous deploy. In case no new deployment properties are
    * passed, the previous persisted properties are returned. Otherwise, the new deployment properties are used and persisted in
-   * .mule/app/deployment-properties/deployment.properties There is one deployment.properties file for each artifact (domain/app).
-   * 
-   * @param artifactName name of the artifact.
+   * .mule/app/deployment-properties/<fileName>.
+   *
+   * @param artifactName         name of the artifact.
    * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
-   * 
+   * @param fileName name of the file where the deployment properties are persisted.
    * @return deployment properties
    * @throws IOException
    */
-  public static Properties resolveDeploymentProperties(String artifactName, Optional<Properties> deploymentProperties)
+  public static Properties resolveDeploymentProperties(String artifactName, Optional<Properties> deploymentProperties,
+                                                       String fileName)
       throws IOException {
     File file = new File(getExecutionFolder(), artifactName);
     String workingDirectory = file.getAbsolutePath();
     String deploymentPropertiesPath = workingDirectory + separator + DEPLOYMENT_PROPERTIES_DIRECTORY;
 
     if (!deploymentProperties.isPresent()) {
-      return getDeploymentProperties(deploymentPropertiesPath);
+      return getDeploymentProperties(deploymentPropertiesPath, fileName);
     }
 
     initDeploymentPropertiesDirectory(deploymentPropertiesPath);
-    persistDeploymentPropertiesFile(deploymentPropertiesPath, deploymentProperties.get());
+    persistDeploymentPropertiesFile(deploymentPropertiesPath, deploymentProperties.get(), fileName);
 
     return deploymentProperties.get();
   }
@@ -61,14 +64,13 @@ public class DeploymentPropertiesUtils {
   /**
    * Gets the deployment properties from the deploymentPropertiesPath. The file that contains the properties is
    * deployment.properties.
-   * 
+   *
    * @param deploymentPropertiesPath the path where the deployment properties are located
    * @return deployment properties
-   * 
    * @throws IOException
    */
-  private static Properties getDeploymentProperties(String deploymentPropertiesPath) throws IOException {
-    File configFile = new File(deploymentPropertiesPath + separator + DEPLOYMENT_PROPERTIES_FILE_NAME);
+  private static Properties getDeploymentProperties(String deploymentPropertiesPath, String fileName) throws IOException {
+    File configFile = new File(deploymentPropertiesPath + separator + fileName);
     Properties props = new Properties();
 
     if (!configFile.exists()) {
@@ -84,7 +86,7 @@ public class DeploymentPropertiesUtils {
 
   /**
    * Initialises the directory for the deployment properties in case it does not exist.
-   * 
+   *
    * @param deploymentPropertiesPath the path to persist the deployment properties.
    */
   private static void initDeploymentPropertiesDirectory(String deploymentPropertiesPath) {
@@ -97,7 +99,7 @@ public class DeploymentPropertiesUtils {
 
   /**
    * Creates the deployment properties directory.
-   * 
+   *
    * @param deploymentPropertiesDirectory path to create
    */
   private static synchronized void createDeploymentPropertiesDirectory(File deploymentPropertiesDirectory) {
@@ -108,11 +110,38 @@ public class DeploymentPropertiesUtils {
     }
   }
 
-  private static void persistDeploymentPropertiesFile(String deploymentPropertiesPath, Properties deploymentProperties)
+  private static void persistDeploymentPropertiesFile(String deploymentPropertiesPath, Properties deploymentProperties,
+                                                      String fileName)
       throws IOException {
-    File deploymentPropertiesFile = new File(deploymentPropertiesPath, DEPLOYMENT_PROPERTIES_FILE_NAME);
+    File deploymentPropertiesFile = new File(deploymentPropertiesPath, fileName);
     FileWriter fileWriter = new FileWriter(deploymentPropertiesFile.getAbsolutePath(), false);
     deploymentProperties.store(fileWriter, "deployment properties");
     fileWriter.close();
+  }
+
+  /**
+   * This method resolves the deploymentProperties for a certain artifact. There is one deployment.properties file for each artifact (domain/app).
+   *
+   * @param artifactName         name of the artifact.
+   * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
+   * @return deployment properties
+   * @throws IOException
+   */
+  public static Properties resolveDeploymentProperties(String artifactName, Optional<Properties> deploymentProperties)
+      throws IOException {
+    return resolveDeploymentProperties(artifactName, deploymentProperties, DEPLOYMENT_PROPERTIES_FILE_NAME);
+  }
+
+  /**
+   * This method resolves the deploymentProperties for a flow of a certain app. There is one flow.deployment.properties file for all flows of an app.
+   *
+   * @param appName         name of the application that contains the flows.
+   * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
+   * @return deployment properties
+   * @throws IOException
+   */
+  public static Properties resolveFlowDeploymentProperties(String appName, Optional<Properties> deploymentProperties)
+      throws IOException {
+    return resolveDeploymentProperties(appName, deploymentProperties, FLOWS_DEPLOYMENT_PROPERTIES_FILE_NAME);
   }
 }
