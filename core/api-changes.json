@@ -13,7 +13,7 @@
           "methodName": "storeErrorTypeInfo",
           "elementKind": "method",
           "justification": "MULE-19139: Method should be private"
-        }
+        },
         {
           "code": "java.class.nonFinalClassInheritsFromNewClass",
           "old": "class org.mule.runtime.core.api.exception.Errors",
