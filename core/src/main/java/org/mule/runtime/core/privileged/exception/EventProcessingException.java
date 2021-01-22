@@ -69,9 +69,10 @@ public class EventProcessingException extends MuleException {
 
   private void storeErrorTypeInfo(Throwable cause) {
     if (cause instanceof TypedException) {
-      addInfo(INFO_ERROR_TYPE_KEY, ((TypedException)cause).getErrorType().toString());
+      addInfo(INFO_ERROR_TYPE_KEY, ((TypedException) cause).getErrorType().toString());
     } else if (cause instanceof EventProcessingException) {
-      addInfo(INFO_ERROR_TYPE_KEY, ((EventProcessingException)cause).getInfo().getOrDefault(INFO_ERROR_TYPE_KEY, MISSING_DEFAULT_VALUE));
+      addInfo(INFO_ERROR_TYPE_KEY,
+              ((EventProcessingException) cause).getInfo().getOrDefault(INFO_ERROR_TYPE_KEY, MISSING_DEFAULT_VALUE));
     } else {
       storeErrorTypeInfo(event);
     }
