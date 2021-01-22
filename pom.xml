@@ -239,7 +239,7 @@
         <muleMavenClientTest>1.4.2-20210118</muleMavenClientTest>
         <mulePolicyApiVersion>1.2.1-20210118</mulePolicyApiVersion>
         <muleApiVersion>1.2.2-20210122</muleApiVersion>
-        <muleMetadataModelVersion>1.2.2-20210118</muleMetadataModelVersion>
+        <muleMetadataModelVersion>1.2.2-20210122</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!-- Test Extensions -->
