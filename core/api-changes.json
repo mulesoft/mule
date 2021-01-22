@@ -3,6 +3,18 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.visibilityReduced",
+          "old": "method void org.mule.runtime.core.privileged.exception.EventProcessingException::storeErrorTypeInfo(java.lang.Throwable)",
+          "new": "method void org.mule.runtime.core.privileged.exception.EventProcessingException::storeErrorTypeInfo(java.lang.Throwable)",
+          "oldVisibility": "protected",
+          "newVisibility": "private",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "EventProcessingException",
+          "methodName": "storeErrorTypeInfo",
+          "elementKind": "method",
+          "justification": "MULE-19139: Method should be private"
+        },
+        {
           "code": "java.class.nonFinalClassInheritsFromNewClass",
           "old": "class org.mule.runtime.core.api.exception.Errors",
           "new": "class org.mule.runtime.core.api.exception.Errors",
