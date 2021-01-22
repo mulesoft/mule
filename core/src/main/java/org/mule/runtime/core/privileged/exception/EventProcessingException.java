@@ -7,10 +7,13 @@
 package org.mule.runtime.core.privileged.exception;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 
 /**
@@ -59,12 +62,24 @@ public class EventProcessingException extends MuleException {
   }
 
   private static CoreEvent getEvent(CoreEvent event, Throwable cause) {
-    return cause instanceof TypedException ? eventWithError(event, (TypedException) cause) : event;
+    CoreEvent result = event;
+    if (cause instanceof TypedException) {
+      result = eventWithError(event, (TypedException) cause);
+    } else if (cause instanceof EventProcessingException) {
+      result = eventWithError(event, (EventProcessingException) cause);
+    }
+    return result;
   }
 
   private static CoreEvent eventWithError(CoreEvent event, TypedException cause) {
     return CoreEvent.builder(event)
         .error(ErrorBuilder.builder(cause.getCause()).errorType(cause.getErrorType()).build()).build();
+  }
+
+  private static CoreEvent eventWithError(CoreEvent event, EventProcessingException cause) {
+    Builder coreEventBuilder = CoreEvent.builder(event);
+    cause.getEvent().getError().ifPresent(error -> coreEventBuilder.error(ErrorBuilder.builder(error).build()));
+    return coreEventBuilder.build();
   }
 
   private void storeErrorTypeInfo(Throwable cause) {
