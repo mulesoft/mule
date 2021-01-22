@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
+import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+
+import java.io.InputStream;
+import java.lang.reflect.Method;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclarer;
 import org.mule.runtime.extension.api.annotation.Streaming;
+import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.route.Route;
@@ -18,9 +23,6 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
-
-import java.io.InputStream;
-import java.lang.reflect.Method;
 
 /**
  * Utility class for {@link ModelLoaderDelegate model loaders}
@@ -45,6 +47,14 @@ public final class ModelLoaderUtils {
   }
 
   public static boolean isNonBlocking(MethodElement method) {
+    return isCompletionCallbackIn(method) && !isBlockingExecutionType(method);
+  }
+
+  private static boolean isBlockingExecutionType(MethodElement method) {
+    return method.getAnnotation(Execution.class).map(an -> an.value().equals(BLOCKING)).orElse(false);
+  }
+
+  private static boolean isCompletionCallbackIn(MethodElement method) {
     return method.getParameters().stream()
         .anyMatch(p -> p.getType().isAssignableTo(CompletionCallback.class));
   }
