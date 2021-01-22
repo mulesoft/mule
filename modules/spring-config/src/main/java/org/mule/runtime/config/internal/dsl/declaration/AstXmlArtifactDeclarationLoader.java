@@ -126,7 +126,6 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
@@ -153,15 +152,11 @@ import com.google.common.collect.ImmutableList;
 public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLoader {
 
   private final DslResolvingContext context;
-  // TODO MULE-18660 remove this and migrate usages to get the dslSyntax form the component
-  private final Map<String, DslSyntaxResolver> resolvers;
 
   private final AstXmlParser parser;
 
   public AstXmlArtifactDeclarationLoader(DslResolvingContext context) {
     this.context = context;
-    this.resolvers = context.getExtensions().stream()
-        .collect(toMap(e -> e.getXmlDslModel().getNamespace(), e -> DslSyntaxResolver.getDefault(e, context)));
 
     DefaultConfigurationPropertiesResolver propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
@@ -254,7 +249,6 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
   private void declareElement(final ComponentAst component, final ArtifactDeclarer artifactDeclarer) {
     final ElementDeclarer extensionElementsDeclarer = forExtension(component.getExtension().getName());
-    final DslSyntaxResolver dsl = resolvers.get(getNamespace(component));
 
     component.getModel(ConstructModel.class)
         .map(model -> {
@@ -282,7 +276,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
                                                             config, extensionElementsDeclarer))
               .collect(toList());
 
-          declareParameterizedComponent(model, dsl.resolve(component.getModel(ConfigurationModel.class).get()),
+          declareParameterizedComponent(model, component.getGenerationInformation().getSyntax().get(),
                                         configurationDeclarer, attributes, component, configComplexParameters);
           artifactDeclarer.withGlobalElement(configurationDeclarer.getDeclaration());
         });
@@ -295,7 +289,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
           component.getComponentId().ifPresent(topLevelParameter::withRefName);
 
-          type.accept(getParameterDeclarerVisitor(component, dsl.resolve(type).get(),
+          type.accept(getParameterDeclarerVisitor(component, component.getGenerationInformation().getSyntax().get(),
                                                   value -> topLevelParameter.withValue((ParameterObjectValue) value)));
 
           artifactDeclarer.withGlobalElement(topLevelParameter.getDeclaration());
@@ -368,11 +362,9 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
       return true;
     }
 
-    final DslSyntaxResolver dsl = resolvers.get(getNamespace(component));
-
     ConnectionProviderModel providerModel = connectionProvider.get();
     ConnectionElementDeclarer connectionDeclarer = extensionElementsDeclarer.newConnection(providerModel.getName());
-    declareParameterizedComponent(providerModel, dsl.resolve(providerModel), connectionDeclarer,
+    declareParameterizedComponent(providerModel, component.getGenerationInformation().getSyntax().get(), connectionDeclarer,
                                   resolveAttributes(component, alwaysTrue()),
                                   component, component.directChildrenStream().collect(toList()));
 
@@ -389,8 +381,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     }
 
     final List<ComponentAst> children = component.directChildrenStream().collect(toList());
-
-    final DslElementSyntax elementDsl = resolvers.get(getNamespace(component)).resolve(model);
+    final DslElementSyntax elementDsl = component.getGenerationInformation().getSyntax().get();
 
     model.getParameterGroupModels()
         .forEach(group -> declareParameterGroup(component, model, declarer, children, elementDsl, group,
@@ -578,7 +569,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
                 .stream()
                 .anyMatch(p -> p.getValue().getValue().isPresent())) {
               declareInlineGroup(component,
-                                 resolvers.get(getNamespace(component)).resolve(model),
+                                 component.getGenerationInformation().getSyntax().get(),
                                  group, true, groupParams, groupDeclarer,
                                  resolveParams(component, param -> groupParams.contains(param)));
             }
@@ -680,7 +671,6 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
 
   private void createWrappedObject(ObjectType objectType, ParameterObjectValue.Builder objectValue, ComponentAst component) {
     ComponentAst wrappedConfig = component.directChildrenStream().findFirst().get();
-    DslSyntaxResolver wrappedElementResolver = resolvers.get(getNamespace(wrappedConfig));
     Set<ObjectType> subTypes = context.getTypeCatalog().getSubTypes(objectType);
     if (!subTypes.isEmpty()) {
       subTypes.stream()
@@ -689,10 +679,11 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
               .orElse(false))
           .findFirst()
           .ifPresent(subType -> createObjectValueFromType(subType, objectValue, wrappedConfig,
-                                                          wrappedElementResolver.resolve(subType).get()));
+                                                          wrappedConfig.getGenerationInformation().getSyntax().get()));
 
     } else if (objectType.getAnnotation(ExtensibleTypeAnnotation.class).isPresent()) {
-      createObjectValueFromType(objectType, objectValue, wrappedConfig, wrappedElementResolver.resolve(objectType).get());
+      createObjectValueFromType(objectType, objectValue, wrappedConfig,
+                                wrappedConfig.getGenerationInformation().getSyntax().get());
     }
   }
 

@@ -7,13 +7,13 @@
 package org.mule.runtime.config.api.dsl;
 
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
+import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.builder.ArtifactAstBuilder;
 import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
@@ -76,7 +76,7 @@ public final class ArtifactDeclarationUtils {
                                                     ComponentAstBuilder componentAstBuilder) {
     componentAstBuilder
         .withIdentifier(componentConfiguration.getIdentifier())
-        .withMetadata(ComponentMetadataAst.builder().build());
+        .withMetadata(EMPTY_METADATA);
     for (Map.Entry<String, String> parameter : componentConfiguration.getParameters().entrySet()) {
       componentAstBuilder.withRawParameter(parameter.getKey(), parameter.getValue());
     }
