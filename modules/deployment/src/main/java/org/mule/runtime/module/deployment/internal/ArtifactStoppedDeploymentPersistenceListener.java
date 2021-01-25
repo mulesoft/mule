@@ -23,6 +23,10 @@ import org.slf4j.LoggerFactory;
 final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStoppedPersistenceListener {
 
   private static transient final Logger logger = LoggerFactory.getLogger(ArtifactStoppedDeploymentPersistenceListener.class);
+  /**
+   * A possible race condition could happen if a stop request and a shutdown request
+   * are concurrently sent to mule, in order to prevent it this property is defined as an AtomicBoolean.
+   */
   private AtomicBoolean shouldPersist;
   private String artifactName;
 
