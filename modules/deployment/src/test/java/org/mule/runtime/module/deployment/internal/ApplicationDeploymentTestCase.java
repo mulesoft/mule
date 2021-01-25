@@ -12,6 +12,7 @@ import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -22,7 +23,6 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
@@ -104,6 +104,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Rule
   public SystemProperty systemProperty = new SystemProperty(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_SYSTEM_VALUE);
+
   @Rule
   public SystemProperty otherSystemProperty = new SystemProperty("oneProperty", "someValue");
 
@@ -300,6 +301,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
                                           .equals(OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE));
   }
 
+  @Issue("MULE-19040")
   @Test
   public void whenAppIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
@@ -310,12 +312,13 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final Application app = findApp(emptyAppFileBuilder.getId(), 1);
     app.stop();
 
-    assertNotNull(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER));
-    Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), Optional.empty());
-    assertNotNull(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY));
-    assertEquals("false", deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY));
+    assertThat(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
   }
 
+  @Issue("MULE-19040")
   @Test
   public void whenAppIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
@@ -325,11 +328,11 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
     final Application app = findApp(emptyAppFileBuilder.getId(), 1);
 
-    assertNotNull(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER));
+    assertThat(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     deploymentService.undeploy(app);
 
-    Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), Optional.empty());
-    assertNull(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY));
+    Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   /**
@@ -735,6 +738,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService.undeploy(app);
   }
 
+  @Issue("MULE-19040")
   @Test
   public void undeploysStoppedAppAndDoesNotStartItOnDeploy() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
@@ -772,6 +776,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertStatus(app_2, CREATED);
   }
 
+  @Issue("MULE-19040")
   @Test
   public void undeploysNotStoppedAppAndStartsItOnDeploy() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);

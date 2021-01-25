@@ -23,10 +23,10 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -631,6 +631,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  @Issue("MULE-19040")
+  @Description("When a domain was stopped and the server is restarted, the domain should not start")
   public void redeploysDomainZipRefreshesAppsButIfTheyWereStoppedTheyDoNotStart() throws Exception {
     addPackedDomainFromBuilder(dummyDomainFileBuilder);
     File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
@@ -1132,6 +1134,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  @Issue("MULE-19040")
+  @Description("When a domain was stopped, this state should be persisted as a deployment property")
   public void whenDomainIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
@@ -1141,15 +1145,17 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
     domain.stop();
 
-    assertNotNull(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER));
+    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
 
     Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), Optional.empty());
-    assertNotNull(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY));
-    assertEquals("false", deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
   }
 
   @Test
-  public void whenDomainIsStoppedByUndeploymentStateIsNotfedAsDeploymentProperty() throws Exception {
+  @Issue("MULE-19040")
+  @Description("When a domain was stopped by undeployment, this state should not be persisted as a deployment property")
+  public void whenDomainIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
     startDeployment();
@@ -1157,11 +1163,11 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
 
-    assertNotNull(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER));
+    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     deploymentService.undeploy(domain);
 
     Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), Optional.empty());
-    assertNull(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Test
@@ -1372,10 +1378,11 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  @Issue("MULE-19040")
+  @Description("When a domain is restarted, if its apps were stopped before restart, they should not get started")
   public void redeployDomainWithStoppedAppsShouldPersistStoppedStateAndDoNotStartApps() throws Exception {
     addPackedDomainFromBuilder(dummyDomainFileBuilder);
     File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
-    long firstFileTimestamp = dummyDomainFile.lastModified();
 
     addPackedAppFromBuilder(dummyDomainApp1FileBuilder);
 
@@ -1383,7 +1390,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     final Domain domain = findADomain(dummyDomainFileBuilder.getId());
-    assertNotNull(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER));
+    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
 
@@ -1394,8 +1401,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     Properties deploymentProperties = resolveDeploymentProperties(dummyDomainApp1FileBuilder.getId(), Optional.empty());
     assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
-    assertNotNull(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY));
-    assertEquals("false", deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
   }
 
   @Ignore("MULE-6926: flaky test")

@@ -20,9 +20,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStoppedPersistenceListener {
+final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStoppedPersistenceListener {
 
-  private transient final Logger logger = LoggerFactory.getLogger(getClass());
+  private static transient final Logger logger = LoggerFactory.getLogger(ArtifactStoppedDeploymentPersistenceListener.class);
   private AtomicBoolean shouldPersist;
   private String artifactName;
 

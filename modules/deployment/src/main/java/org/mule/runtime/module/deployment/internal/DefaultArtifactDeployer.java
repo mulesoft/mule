@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
@@ -127,7 +128,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   private Boolean shouldStartArtifact(T artifact) {
     Properties deploymentProperties = null;
     try {
-      deploymentProperties = resolveDeploymentProperties(artifact.getArtifactName(), Optional.empty());
+      deploymentProperties = resolveDeploymentProperties(artifact.getArtifactName(), empty());
     } catch (IOException e) {
       logger.error("Failed to load deployment property for artifact "
           + artifact.getArtifactName(), e);

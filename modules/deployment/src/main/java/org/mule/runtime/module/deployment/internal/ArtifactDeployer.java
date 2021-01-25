@@ -17,7 +17,7 @@ public interface ArtifactDeployer<T extends DeployableArtifact> {
 
   /**
    * Deploys an artifact.
-   *
+   *<p>
    * The deployer executes the artifact installation phases until the artifact is deployed After this method call the Artifact
    * will be installed in the container and started.
    *  @param artifact artifact to be deployed
@@ -27,7 +27,7 @@ public interface ArtifactDeployer<T extends DeployableArtifact> {
 
   /**
    * Deploys an artifact.
-   *
+   *<p>
    * The deployer executes the artifact installation phases until the artifact is deployed After this method call the Artifact
    * will be installed in the container and started.
    *  @param artifact artifact to be deployed
@@ -38,7 +38,7 @@ public interface ArtifactDeployer<T extends DeployableArtifact> {
 
   /**
    * Undeploys an artifact.
-   *
+   *<p>
    * The deployer executes the artifact desinstallation phases until de artifact is undeployed. After this method call the
    * Artifact will not longer be running inside the container.
    *
@@ -48,7 +48,7 @@ public interface ArtifactDeployer<T extends DeployableArtifact> {
 
   /**
    * Cancels the persistence of a stop of an artifact.
-   *
+   *<p>
    * A stop of a certain artifact must only be persisted when it was stopped by the Agent. In case of undeployment, it should not be persisted.
    *
    * @param artifact artifact to be undeployed
