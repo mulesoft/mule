@@ -240,7 +240,7 @@
         <muleHttpPolicyApiVersion>1.4.0-20210125</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.6.0-20210125</muleMavenClientApi>
         <muleMavenClientImpl>1.6.0-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.6.0-SNAPSHOT</muleMavenClientTest>
+        <muleMavenClientTest>1.6.0-20210125</muleMavenClientTest>
         <mulePolicyApiVersion>1.4.0-20210125</mulePolicyApiVersion>
         <muleApiVersion>1.4.0-20210125</muleApiVersion>
         <muleMetadataModelVersion>1.4.0-20210125</muleMetadataModelVersion>
