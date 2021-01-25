@@ -26,8 +26,8 @@ public class MultiLevelValueProvider implements ValueProvider {
   @Override
   public Set<Value> resolve() {
     return Collections.singleton(ValueBuilder.newValue(AMERICA).withDisplayName(AMERICA)
-        .withChild(ValueBuilder.newValue(ARGENTINA).withChild(ValueBuilder.newValue(BUENOS_AIRES))
-            .withChild(ValueBuilder.newValue(LA_PLATA)))
+        .withChild(ValueBuilder.newValue(ARGENTINA).withChild(ValueBuilder.newValue(LA_PLATA))
+                .withChild(ValueBuilder.newValue(BUENOS_AIRES)))
         .withChild(ValueBuilder.newValue(USA).withDisplayName(USA_DISPLAY_NAME).withChild(ValueBuilder.newValue(SAN_FRANCISCO)))
         .build());
   }

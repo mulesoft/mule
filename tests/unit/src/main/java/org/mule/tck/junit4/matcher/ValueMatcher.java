@@ -10,11 +10,13 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import org.mule.runtime.api.value.Value;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.collection.IsIterableContainingInOrder;
 
 /**
  * {@link Matcher} to easily test the structure of a {@link Value}
@@ -29,9 +31,16 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
   private StringBuilder descriptionBuilder = new StringBuilder();
   private ValueMatcher[] childValues = new ValueMatcher[] {};
 
+  private boolean strict = false;
+
   private ValueMatcher(Matcher<String> id) {
     this.id = id;
     descriptionBuilder.append(String.format("a Value whose ID %s", id));
+  }
+
+  private ValueMatcher(Matcher<String> id, boolean strict) {
+    this(id);
+    this.strict = strict;
   }
 
   /**
@@ -48,10 +57,32 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
    * Creates a new instance of the {@link ValueMatcher}
    *
    * @param id of the {@link Value}
+   * @param strict defines if the {@link Value} should be completed and childs validated in order
+   * @return the new instance of {@link ValueMatcher}
+   */
+  public static ValueMatcher valueWithId(Matcher<String> id, boolean strict) {
+    return new ValueMatcher(id, strict);
+  }
+
+  /**
+   * Creates a new instance of the {@link ValueMatcher}
+   *
+   * @param id of the {@link Value}
    * @return the new instance of {@link ValueMatcher}
    */
   public static ValueMatcher valueWithId(String id) {
     return valueWithId(is(id));
+  }
+
+  /**
+   * Creates a new instance of the {@link ValueMatcher}
+   *
+   * @param id of the {@link Value}
+   * @param strict defines if the {@link Value} should be completed and childs validated in order
+   * @return the new instance of {@link ValueMatcher}
+   */
+  public static ValueMatcher valueWithId(String id, boolean strict) {
+    return valueWithId(is(id), strict);
   }
 
   @Override
@@ -60,7 +91,11 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
       assertThat(value.getId(), id);
       assertThat(value.getDisplayName(), displayName);
       assertThat(value.getPartName(), partName);
-      assertThat(value.getChilds(), hasItems(childValues));
+      if (strict) {
+        assertThat(value.getChilds(), contains(childValues));
+      } else {
+        assertThat(value.getChilds(), hasItems(childValues));
+      }
       return true;
     } catch (RuntimeException e) {
       return false;

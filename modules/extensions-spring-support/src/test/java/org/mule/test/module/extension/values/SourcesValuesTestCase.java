@@ -76,6 +76,32 @@ public class SourcesValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
+  public void childsOrder() throws Exception {
+    Set<Value> values = getValuesFromSource("source-with-multi-level-value", "values");
+    ValueMatcher americaValue = valueWithId("America", true)
+            .withDisplayName("America")
+            .withPartName("continent")
+            .withChilds(valueWithId("Argentina")
+                    .withDisplayName("Argentina")
+                    .withPartName("country")
+                    .withChilds(valueWithId("La Plata")
+                                    .withDisplayName("La Plata")
+                                    .withPartName("city"),
+                            valueWithId("Buenos Aires")
+                                    .withDisplayName("Buenos Aires")
+                                    .withPartName("city"))
+                    , valueWithId("USA")
+                    .withDisplayName("United States Of America")
+                    .withPartName("country")
+                    .withChilds(valueWithId("San Francisco")
+                    .withDisplayName("San Francisco")
+                    .withPartName("city"))
+            );
+
+    assertThat(values, hasValues(americaValue));
+  }
+
+  @Test
   public void singleValuesWithRequiredParameterWithAlias() throws Exception {
     Set<Value> channels = getValuesFromSource("source-with-required-parameter-with-alias", "channels");
     assertThat(channels, hasSize(1));
