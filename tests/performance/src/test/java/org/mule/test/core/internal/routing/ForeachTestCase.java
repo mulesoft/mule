@@ -8,7 +8,6 @@ package org.mule.test.core.internal.routing;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.AbstractBenchmarkAssertionTestCase;
 import org.mule.runtime.core.internal.routing.ForeachBenchmark;
@@ -16,20 +15,17 @@ import org.mule.runtime.core.internal.routing.ForeachBenchmark;
 public class ForeachTestCase extends AbstractBenchmarkAssertionTestCase {
 
   @Test
-  @Ignore
   public void singleForeach() {
-    runAndAssertBenchmark(ForeachBenchmark.class, "singleForeach", 500, MILLISECONDS);
+    runAndAssertBenchmark(ForeachBenchmark.class, "singleForeach", 1000, MILLISECONDS);
   }
 
   @Test
-
   public void nestedForeach() {
-    runAndAssertBenchmark(ForeachBenchmark.class, "nestedForeach", 4200, MILLISECONDS);
+    runAndAssertBenchmark(ForeachBenchmark.class, "nestedForeach", 6000, MILLISECONDS);
   }
 
   @Test
-  @Ignore
   public void multiplesThreadsUsingSameForeach() {
-    runAndAssertBenchmark(ForeachBenchmark.class, "multiplesThreadsUsingSameForeach", 1400, MILLISECONDS);
+    runAndAssertBenchmark(ForeachBenchmark.class, "multiplesThreadsUsingSameForeach", 3000, MILLISECONDS);
   }
 }

@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class ForeachInternalContextManager {
+class ForeachInternalContextManager {
 
   private static Optional<ForeachInternalContext> from(CoreEvent event) {
     return ofNullable((ForeachInternalContext) ((InternalEvent) event).<ForeachInternalContext>getForeachInternalContext());
@@ -39,7 +39,7 @@ public class ForeachInternalContextManager {
     from(event).map(ctx -> ctx.remove(event));
   }
 
-  public static class ForeachInternalContext implements EventInternalContext<ForeachInternalContext> {
+  static class ForeachInternalContext implements EventInternalContext<ForeachInternalContext> {
 
     private Map<String, ForeachContext> contexts = new HashMap<>();
 

@@ -16,10 +16,12 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.openjdk.jmh.profile.GCProfiler;
+import org.openjdk.jmh.results.Result;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -33,7 +35,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTestCase {
 
   private static final String ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY = "enablePerformanceTests";
-  private static final String NORM_ALLOCATION_RESULT_KEY = "�gc.alloc.rate.norm";
+  private static final String NORM_ALLOCATION_RESULT_KEY = "gc.alloc.rate.norm";
 
   @Override
   public int getTestTimeoutSecs() {
@@ -98,8 +100,10 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
     runAndAssertBenchmark(clazz, testName, threads, params, timeUnit, true,
                           runResult -> {
                             assertThat(runResult.getPrimaryResult().getScore(), lessThanOrEqualTo(expectedResult));
-                            assertThat(runResult.getSecondaryResults().get(NORM_ALLOCATION_RESULT_KEY).getScore(),
-                                       lessThanOrEqualTo(expectedAllocation));
+                            runResult.getSecondaryResults().entrySet().stream()
+                                .filter(e -> e.getKey().contains(NORM_ALLOCATION_RESULT_KEY)).findFirst()
+                                .ifPresent(stringResultEntry -> assertThat(stringResultEntry.getValue().getScore(),
+                                                                           lessThanOrEqualTo(expectedAllocation)));
                           });
   }
 
@@ -130,7 +134,8 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
             .forks(0)
             .warmupIterations(0)
             .measurementIterations(1);
-        new Runner(optionsBuilder.build()).runSingle();
+        // new Runner(optionsBuilder.build()).runSingle();
+        assertions.accept(new Runner(optionsBuilder.build()).runSingle());
       }
     } catch (RunnerException e) {
       fail(e.getMessage());

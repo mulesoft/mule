@@ -99,9 +99,9 @@ import io.qameta.allure.Story;
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   private static final Logger LOGGER = getLogger(ForeachTestCase.class);
-  private static String ERR_NUMBER_MESSAGES = "Not a correct number of messages processed";
-  private static String ERR_PAYLOAD_TYPE = "Type error on processed payloads";
-  private static String ERR_OUTPUT = "Messages processed incorrectly";
+  private static final String ERR_NUMBER_MESSAGES = "Not a correct number of messages processed";
+  private static final String ERR_PAYLOAD_TYPE = "Type error on processed payloads";
+  private static final String ERR_OUTPUT = "Messages processed incorrectly";
   private static final String ERR_INVALID_ITEM_SEQUENCE = "Null ItemSequence received";
   private static final String ERR_SEQUENCE_OVERRIDDEN = "Sequence should't be overridden after foreach";
   private static final int CONCURRENCY = 1000;

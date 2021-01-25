@@ -14,7 +14,7 @@ import java.util.List;
 public class StringHashCodeCollisionGenerator {
 
   public static List<String> stringsWithSameHashCode(int desiredRecords) {
-    List<String> strings = new ArrayList<>(asList("Aa", "BB"));
+    List<String> strings = asList("Aa", "BB");
     List<String> temp = new ArrayList<>();
 
     boolean finished = false;

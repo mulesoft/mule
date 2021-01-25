@@ -76,14 +76,14 @@ public interface InternalEvent extends PrivilegedEvent {
 
   /**
    * @return a {@link EventInternalContext} with state from the foreach processor
-   * @since 4.3.1
+   * @since 4.4, 4.3.1
    */
   <T extends EventInternalContext> EventInternalContext<T> getForeachInternalContext();
 
   /**
    * Sets context related to the foreach processor
    * @param context an {@link EventInternalContext}
-   * @since 4.3.1
+   * @since 4.4, 4.3.1
    */
   <T extends EventInternalContext> void setForeachInternalContext(EventInternalContext<T> context);
 
