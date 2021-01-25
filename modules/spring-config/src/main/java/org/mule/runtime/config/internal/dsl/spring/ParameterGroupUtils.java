@@ -7,9 +7,6 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.regex.Pattern.compile;
-import static org.apache.commons.lang3.text.WordUtils.capitalize;
-import static org.mule.runtime.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.api.util.NameUtils.sanitizeName;
 
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -19,6 +16,7 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public final class ParameterGroupUtils {
@@ -35,7 +33,7 @@ public final class ParameterGroupUtils {
    * <p>
    * For sources, we need to account for the case where parameters in the callbacks may have colliding names. This logic ensures
    * that the parameter fetching logic is consistent with the logic that handles this scenario in previous implementations.
-   * 
+   *
    * @param ownerComponent
    * @param parameterName
    * @param possibleGroup
@@ -55,7 +53,9 @@ public final class ParameterGroupUtils {
     for (ParameterGroupModel parameterGroupModel : sourceParamGroups) {
       if (parameterGroupModel.getParameter(parameterName).isPresent()
           && parameterGroupModel.isShowInDsl()
-          && possibleGroup.getIdentifier().getName().equals(getSanitizedElementName(parameterGroupModel))) {
+          && getChildElementName(ownerComponent, parameterGroupModel)
+              .map(en -> possibleGroup.getIdentifier().getName().equals(en))
+              .orElse(false)) {
         ComponentParameterAst parameter = ownerComponent.getParameter(parameterGroupModel.getName(), parameterName);
 
         if (parameter == null) {
@@ -69,15 +69,10 @@ public final class ParameterGroupUtils {
     return null;
   }
 
-  /**
-   * Provides a sanitized, hyphenized, space-free name that can be used as an XML element-name for a given {@link NamedObject}
-   *
-   * @param component the {@link NamedObject} who's name we want to convert
-   * @return a sanitized, hyphenized, space-free name that can be used as an XML element-name
-   */
-  // TODO MULE-18660: remove and use a resolved DSLElementSyntax available in the ast
-  private static String getSanitizedElementName(NamedObject component) {
-    return SANITIZE_PATTERN.matcher(hyphenize(sanitizeName(capitalize(component.getName())))).replaceAll("");
+  private static Optional<String> getChildElementName(ComponentAst ownerComponent, NamedObject component) {
+    return ownerComponent.getGenerationInformation().getSyntax()
+        .flatMap(stx -> stx.getChild(component.getName()))
+        .map(child -> child.getElementName());
   }
 
 }
