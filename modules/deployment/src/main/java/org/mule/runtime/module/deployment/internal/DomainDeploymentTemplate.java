@@ -30,6 +30,7 @@ import java.util.Properties;
 public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplate {
 
   private Collection<Application> domainApplications = Collections.emptyList();
+  //TODO MULE-19166: Remove this property since it's no longer necessary
   private Map<Application, ApplicationStatus> appStatusPreRedeployment;
   private final DefaultArchiveDeployer<Application> applicationDeployer;
   private final DeploymentService deploymentservice;
