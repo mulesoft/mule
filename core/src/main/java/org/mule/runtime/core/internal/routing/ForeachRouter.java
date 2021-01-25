@@ -174,14 +174,12 @@ class ForeachRouter {
 
   private CoreEvent eventWithCurrentContextDeleted(CoreEvent event) {
     removeContext(event);
-    return quickCopy(event, new HashMap<>(0));
+    return copyEvent(event);
   }
 
   private CoreEvent prepareEvent(CoreEvent event, String expression) {
-    CoreEvent responseEvent = InternalEvent.builder(event)
-        .addVariable(owner.getRootMessageVariableName(), event.getMessage(), MULE_MESSAGE)
-        .internalParameters(new HashMap<>())
-        .build();
+    CoreEvent responseEvent =
+        builder(event).addVariable(owner.getRootMessageVariableName(), event.getMessage(), MULE_MESSAGE).build();
 
     try {
       Iterator<TypedValue<?>> typedValueIterator = owner.splitRequest(responseEvent, expression);
@@ -195,6 +193,8 @@ class ForeachRouter {
       ForeachContext foreachContext = this.createForeachContext(event, typedValueIterator);
 
       addContext(responseEvent, foreachContext);
+
+      responseEvent = copyEvent(responseEvent);
 
     } catch (Exception e) {
       // Delete foreach context
@@ -297,6 +297,10 @@ class ForeachRouter {
     } else {
       responseBuilder.removeVariable(owner.getRootMessageVariableName());
     }
+  }
+
+  private CoreEvent copyEvent(CoreEvent event) {
+    return quickCopy(event, new HashMap<>(0));
   }
 
 }
