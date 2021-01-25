@@ -506,7 +506,7 @@ class ComponentAstBasedElementModelFactory {
 
     ComponentAst paramComponent = getSingleComponentConfiguration(innerComponents, getIdentifier(paramSyntax));
 
-    // TODO MULE-XXXXX remove this
+    // TODO MULE-19168 remove this
     if (isInfrastructure(paramModel)) {
       handleInfrastructure(paramModel, paramSyntax, innerComponents, parameters,
                            groupElementBuilder);

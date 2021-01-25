@@ -446,7 +446,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         .filter(pm -> !groupAttributes.containsKey(pm.getName()))
         .forEach(param -> elementDsl.getChild(param.getName())
             .ifPresent(paramDsl -> {
-              // TODO MULE-XXXXX remove this
+              // TODO MULE-19168 remove this
               if (isInfrastructure(param)) {
                 handleInfrastructure(param, children, declarer);
               } else {
