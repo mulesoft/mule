@@ -197,6 +197,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
     deploymentLock.lock();
     try {
+      notifyStopListeners();
       stopArtifacts(applications);
       stopArtifacts(domains);
     } finally {
@@ -555,6 +556,14 @@ public class DeploymentDirectoryWatcher implements Runnable {
       });
     }
   }
-}
 
+  private void notifyStopListeners() {
+    for (Application application : applications) {
+      applicationArchiveDeployer.doNotPersistArtifactStop(application);
+    }
+    for (Domain domain : domains) {
+      domainArchiveDeployer.doNotPersistArtifactStop(domain);
+    }
+  }
+}
 
