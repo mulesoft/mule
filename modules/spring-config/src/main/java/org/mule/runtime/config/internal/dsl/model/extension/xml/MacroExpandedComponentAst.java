@@ -17,6 +17,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
@@ -159,6 +160,11 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
       @Override
       public Optional<ComponentMetadataAst> getMetadata() {
         return originalParameter.getMetadata();
+      }
+
+      @Override
+      public ComponentGenerationInformation getGenerationInformation() {
+        return originalParameter.getGenerationInformation();
       }
 
       @Override

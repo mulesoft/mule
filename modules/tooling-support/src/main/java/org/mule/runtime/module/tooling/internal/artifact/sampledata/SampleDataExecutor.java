@@ -25,14 +25,12 @@ import org.mule.runtime.api.sampledata.SampleDataFailure;
 import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
-import org.mule.runtime.module.tooling.internal.artifact.metadata.MetadataKeysExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import org.mule.sdk.api.data.sample.SampleDataException;
@@ -40,7 +38,6 @@ import org.mule.sdk.api.data.sample.SampleDataException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import com.google.common.base.Throwables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +67,7 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
       ExtensionModel extensionModel = artifactHelper.getExtensionModel(componentElementDeclaration);
       String extensionName = extensionModel.getName();
-
-
-      ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
+      ClassLoader extensionClassLoader = getClassLoader(extensionModel);
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Invoking connector's sample data  provider for component: {}", componentModel.getName());
       }

@@ -18,7 +18,6 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
-import static org.mule.runtime.config.internal.model.ApplicationModel.CRON_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.EXPIRATION_POLICY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.NON_REPEATABLE_ITERABLE_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.NON_REPEATABLE_STREAM_IDENTIFIER;
@@ -53,33 +52,34 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.UnionType;
+import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.MetadataTypeAdapter;
 import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
-import org.mule.runtime.ast.internal.builder.MetadataTypeModelAdapter;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModel.Builder;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.core.api.source.scheduler.CronScheduler;
-import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -93,57 +93,30 @@ import com.google.common.collect.Multimap;
  *
  * @since 4.4
  */
-// TODO MULE-11496 Delete this factory once everything has an ExtensionModel and can be represented with an ElementDeclaration
 class ComponentAstBasedElementModelFactory {
 
   private static final Logger LOGGER = getLogger(ComponentAstBasedElementModelFactory.class);
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  // TODO MULE-18660 remove resolvers and dsl, and obtain the information provided by those from the AST being processed
-  private final Map<ExtensionModel, DslSyntaxResolver> resolvers;
-  private DslSyntaxResolver dsl;
-
-  ComponentAstBasedElementModelFactory(Map<ExtensionModel, DslSyntaxResolver> resolvers) {
-    this.resolvers = resolvers;
-  }
-
   public <T> Optional<DslElementModel<T>> create(ComponentAst configuration) {
-    final ComponentIdentifier identifier = configuration.getIdentifier();
-
-    Optional<Map.Entry<ExtensionModel, DslSyntaxResolver>> entry =
-        resolvers.entrySet().stream()
-            .filter(e -> e.getKey().getXmlDslModel().getPrefix().equals(identifier.getNamespace()))
-            .findFirst();
-
-    if (!entry.isPresent()) {
-      return empty();
-    }
-
-    dsl = entry.get().getValue();
-
     return configuration.getModel(ParameterizedModel.class)
-        .flatMap(model -> {
-          if (model instanceof MetadataTypeModelAdapter) {
-            return dsl.resolve(((MetadataTypeModelAdapter) model).getType())
-                .map(dslSyntax -> (DslElementModel<T>) createElementModel(model, dslSyntax, configuration).build());
-          } else {
-            return of((DslElementModel<T>) createElementModel(model, dsl.resolve(model), configuration).build());
-          }
-        });
+        .flatMap(model -> of((DslElementModel<T>) createElementModel(model,
+                                                                     configuration.getGenerationInformation().getSyntax().get(),
+                                                                     configuration).build()));
   }
 
   private Optional<DslElementModel.Builder<ObjectType>> resolveBasedOnType(ObjectType type,
                                                                            ComponentAst configuration) {
-    return dsl.resolve(type)
+    return configuration.getGenerationInformation().getSyntax()
         .flatMap(typeDsl -> {
           Optional<ComponentIdentifier> elementIdentifier = getIdentifier(typeDsl);
 
           if (elementIdentifier.isPresent()
-              && configuration.getModel(MetadataTypeModelAdapter.class).map(mtma -> mtma.isWrapperFor(type)).orElse(false)) {
+              && configuration.getModel(MetadataTypeAdapter.class).map(mtma -> mtma.isWrapperFor(type)).orElse(false)) {
             DslElementModel.Builder<ObjectType> typeBuilder = DslElementModel.<ObjectType>builder()
                 .withModel(type)
-                .withDsl(typeDsl)
+                .withDsl(configuration.getGenerationInformation().getSyntax().get())
                 .withConfig(configuration);
 
             enrichElementModel(configuration.getModel(ParameterizedModel.class).get(), typeDsl, configuration, typeBuilder);
@@ -204,25 +177,14 @@ class ComponentAstBasedElementModelFactory {
             .withDsl(modelDsl);
 
         Optional<ComponentIdentifier> identifier = getIdentifier(modelDsl);
-        String value = configuration.getRawParameterValue(name).orElse(null);
-        LOGGER.trace("getComponentChildVisitor#defaultVisit: '{}': '{}'", identifier, value);
 
-        if (isBlank(value)) {
-          if (identifier.isPresent()) {
-            ComponentAst nested = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
-            if (nested != null) {
-              value = nested.getRawParameterValue(BODY_RAW_PARAM_NAME)
-                  .flatMap(body -> !isBlank(body) ? of(body.trim()) : empty())
-                  .orElse(null);
-            }
-          } else if (defaultValue.isPresent()) {
-            value = defaultValue.get();
-            elementBuilder.isExplicitInDsl(false);
+        final ComponentParameterAst param = configuration.getParameter(name);
+        if (param != null) {
+          String value = param.getRawValue();
+          LOGGER.trace("getComponentChildVisitor#defaultVisit: '{}': '{}'", identifier, value);
+          if (!isBlank(value)) {
+            typeBuilder.containing(elementBuilder.withValue(value).build());
           }
-        }
-
-        if (!isBlank(value)) {
-          typeBuilder.containing(elementBuilder.withValue(value).build());
         }
       }
 
@@ -240,7 +202,7 @@ class ComponentAstBasedElementModelFactory {
         if (fieldComponent != null) {
           DslElementModel.Builder<Object> list = DslElementModel.builder()
               .withModel(model)
-              .withDsl(modelDsl)
+              .withDsl(fieldComponent.getGenerationInformation().getSyntax().get())
               .withConfig(fieldComponent);
 
           modelDsl.getGeneric(arrayType.getType())
@@ -276,9 +238,8 @@ class ComponentAstBasedElementModelFactory {
           return;
         }
 
-        fieldComponent = fieldComponent == null ? configuration : fieldComponent;
-
-        String value = fieldComponent.getRawParameterValue(modelDsl.getAttributeName()).orElse(null);
+        final ComponentParameterAst param = configuration.getParameter(name);
+        String value = param != null ? param.getRawValue() : null;
         if (!isBlank(value)) {
           typeBuilder.containing(DslElementModel.builder()
               .withModel(model)
@@ -309,7 +270,7 @@ class ComponentAstBasedElementModelFactory {
                                            ComponentAst configuration) {
     DslElementModel.Builder<Object> mapBuilder = DslElementModel.builder()
         .withModel(objectType)
-        .withDsl(modelDsl)
+        .withDsl(configuration.getGenerationInformation().getSyntax().get())
         .withConfig(configuration);
 
     if (configuration != null && configuration.directChildrenStream().count() > 0) {
@@ -327,15 +288,15 @@ class ComponentAstBasedElementModelFactory {
         DslElementModel.Builder<Object> entry = DslElementModel.builder()
             .withModel(entryType)
             .withConfig(entryConfig)
-            .withDsl(entryDsl);
+            .withDsl(entryConfig.getGenerationInformation().getSyntax().get());
 
         entry.containing(DslElementModel.builder()
             .withModel(typeLoader.load(String.class))
-            .withValue(entryConfig.getRawParameterValue(KEY_ATTRIBUTE_NAME).orElse(null))
+            .withValue(entryConfig.getParameter(KEY_ATTRIBUTE_NAME).getRawValue())
             .withDsl(entryDsl.getAttribute(KEY_ATTRIBUTE_NAME).get())
             .build());
 
-        String value = entryConfig.getRawParameterValue(VALUE_ATTRIBUTE_NAME).orElse(null);
+        String value = entryConfig.getParameter(VALUE_ATTRIBUTE_NAME).getRawValue();
         if (isBlank(value)) {
           entryType.accept(getComponentChildVisitor(entry, entryConfig, entryType,
                                                     VALUE_ATTRIBUTE_NAME, entryDsl.getAttribute(VALUE_ATTRIBUTE_NAME).get(),
@@ -357,7 +318,7 @@ class ComponentAstBasedElementModelFactory {
                                                                                        ComponentAst configuration) {
     DslElementModel.Builder<T> builder = DslElementModel.builder();
     builder.withModel(model)
-        .withDsl(elementDsl)
+        .withDsl(configuration.getGenerationInformation().getSyntax().get())
         .withConfig(configuration);
 
     enrichElementModel(model, elementDsl, configuration, builder);
@@ -370,20 +331,26 @@ class ComponentAstBasedElementModelFactory {
                                                                  DslElementModel.Builder builder) {
     // Have to keep the order of the elements consistent so the generated metadata keys are backwards compatible
     populateConnectionProviderElements(builder, configuration);
-    populateParameterizedElements(model, elementDsl, builder, configuration);
+    populateParameterizedElements(model, elementDsl, builder, configuration,
+                                  paramGroupModel -> paramModel -> configuration.getParameter(paramModel.getName()));
     populateComposableElements(builder, configuration);
 
     if (model instanceof SourceModel) {
       ((SourceModel) model).getSuccessCallback()
-          .ifPresent(cb -> populateParameterizedElements(cb, elementDsl, builder, configuration));
+          .ifPresent(cb -> populateParameterizedElements(cb, elementDsl, builder, configuration,
+                                                         paramGroupModel -> paramModel -> configuration
+                                                             .getParameter(paramGroupModel.getName(), paramModel.getName())));
 
       ((SourceModel) model).getErrorCallback()
-          .ifPresent(cb -> populateParameterizedElements(cb, elementDsl, builder, configuration));
+          .ifPresent(cb -> populateParameterizedElements(cb, elementDsl, builder, configuration,
+                                                         paramGroupModel -> paramModel -> configuration
+                                                             .getParameter(paramGroupModel.getName(), paramModel.getName())));
     }
   }
 
   private void populateParameterizedElements(ParameterizedModel model, DslElementSyntax elementDsl,
-                                             DslElementModel.Builder builder, ComponentAst configuration) {
+                                             DslElementModel.Builder builder, ComponentAst configuration,
+                                             Function<ParameterGroupModel, Function<ParameterModel, ComponentParameterAst>> paramFetcher) {
 
     Multimap<ComponentIdentifier, ComponentAst> innerComponents = getNestedComponents(configuration);
     Map<String, String> parameters = configuration.getParameters()
@@ -393,7 +360,8 @@ class ComponentAstBasedElementModelFactory {
 
     model.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)
-        .forEach(group -> addInlineGroup(innerComponents, parameters, builder, group));
+        .forEach(group -> addInlineGroup(configuration, innerComponents, parameters, builder, group,
+                                         paramFetcher.apply(group)));
 
     List<ParameterModel> inlineGroupedParameters = model.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)
@@ -402,7 +370,8 @@ class ComponentAstBasedElementModelFactory {
 
     model.getAllParameterModels().stream()
         .filter(p -> !inlineGroupedParameters.contains(p))
-        .forEach(p -> addElementParameter(innerComponents, parameters, elementDsl, builder, p));
+        .forEach(p -> addElementParameter(configuration, innerComponents, parameters, elementDsl, builder, p,
+                                          paramModel -> configuration.getParameter(paramModel.getName())));
   }
 
   private void populateConnectionProviderElements(DslElementModel.Builder builder, ComponentAst configuration) {
@@ -415,9 +384,26 @@ class ComponentAstBasedElementModelFactory {
     final List<String> paramsAsChildrenNames = configuration.getModel(ParameterizedModel.class)
         .map(pmz -> pmz.getAllParameterModels()
             .stream()
-            .flatMap(pm -> pm.getModelProperty(QNameModelProperty.class)
-                .map(qnmp -> Stream.of(hyphenize(pm.getName()), qnmp.getValue().getLocalPart()))
-                .orElseGet(() -> Stream.of(hyphenize(pm.getName()))))
+            .flatMap(pm -> {
+              Set<String> unions = new HashSet<>();
+              // Workaround for reconnection-strategy
+              pm.getType().accept(new MetadataTypeVisitor() {
+
+                @Override
+                public void visitUnion(UnionType union) {
+                  union.getTypes()
+                      .stream()
+                      .map(t -> MetadataTypeUtils.getTypeId(t))
+                      .filter(Optional::isPresent)
+                      .map(Optional::get)
+                      .forEach(unions::add);
+                }
+              });
+
+              return Stream.concat(unions.stream(), pm.getModelProperty(QNameModelProperty.class)
+                  .map(qnmp -> Stream.of(hyphenize(pm.getName()), qnmp.getValue().getLocalPart()))
+                  .orElseGet(() -> Stream.of(hyphenize(pm.getName()))));
+            })
             .collect(toList()))
         .orElse(emptyList());
 
@@ -428,10 +414,12 @@ class ComponentAstBasedElementModelFactory {
         .forEach(nestedComponentConfig -> create(nestedComponentConfig).ifPresent(builder::containing));
   }
 
-  private void addInlineGroup(Multimap<ComponentIdentifier, ComponentAst> innerComponents,
+  private void addInlineGroup(ComponentAst configuration, Multimap<ComponentIdentifier, ComponentAst> innerComponents,
                               Map<String, String> parameters,
-                              DslElementModel.Builder parent, ParameterGroupModel group) {
-    final DslElementSyntax groupSyntax = dsl.resolveInline(group);
+                              DslElementModel.Builder parent, ParameterGroupModel group,
+                              Function<ParameterModel, ComponentParameterAst> paramFetcher) {
+    final DslElementSyntax groupSyntax =
+        configuration.getGenerationInformation().getSyntax().flatMap(gs -> gs.getChild(group.getName())).get();
     Optional<ComponentIdentifier> identifier = getIdentifier(groupSyntax);
     if (!identifier.isPresent()) {
       return;
@@ -446,7 +434,8 @@ class ComponentAstBasedElementModelFactory {
 
       Multimap<ComponentIdentifier, ComponentAst> groupInnerComponents = getNestedComponents(groupComponent);
       group.getParameterModels()
-          .forEach(p -> addElementParameter(groupInnerComponents, parameters, groupSyntax, groupElementBuilder, p));
+          .forEach(p -> addElementParameter(configuration, groupInnerComponents, parameters, groupSyntax, groupElementBuilder,
+                                            p, paramFetcher));
 
       parent.containing(groupElementBuilder.build());
 
@@ -504,20 +493,28 @@ class ComponentAstBasedElementModelFactory {
     return !isRequired(group) && group.getParameterModels().stream().anyMatch(p -> getDefaultValue(p).isPresent());
   }
 
-  private void addElementParameter(Multimap<ComponentIdentifier, ComponentAst> innerComponents,
+  private void addElementParameter(ComponentAst configuration, Multimap<ComponentIdentifier, ComponentAst> innerComponents,
                                    Map<String, String> parameters,
                                    DslElementSyntax groupDsl, DslElementModel.Builder<ParameterGroupModel> groupElementBuilder,
-                                   ParameterModel paramModel) {
-    final DslElementSyntax paramSyntax = dsl.resolve(paramModel);
+                                   ParameterModel paramModel, Function<ParameterModel, ComponentParameterAst> paramFetcher) {
+    final DslElementSyntax paramSyntax = groupDsl.getContainedElement(paramModel.getName())
+        .orElseGet(() -> configuration.getGenerationInformation().getSyntax().get().getContainedElement(paramModel.getName())
+            .orElse(null));
+    if (paramSyntax == null) {
+      return;
+    }
+
     ComponentAst paramComponent = getSingleComponentConfiguration(innerComponents, getIdentifier(paramSyntax));
 
+    // TODO MULE-19168 remove this
     if (isInfrastructure(paramModel)) {
-      handleInfrastructure(paramModel, paramSyntax, innerComponents, parameters, groupElementBuilder);
+      handleInfrastructure(paramModel, paramSyntax, innerComponents, parameters,
+                           groupElementBuilder);
       return;
     }
 
     if (paramSyntax.isWrapped()) {
-      resolveWrappedElement(groupElementBuilder, paramModel, paramSyntax, paramComponent);
+      resolveWrappedElement(groupElementBuilder, paramModel, paramComponent);
       return;
     }
 
@@ -527,11 +524,11 @@ class ComponentAstBasedElementModelFactory {
 
     Optional<String> defaultValue = getDefaultValue(paramModel);
     if (paramComponent != null || !isBlank(value) || defaultValue.isPresent()) {
-      if (paramComponent != null && !isContent(paramModel)) {
+      if (paramComponent != null && !isContent(paramModel) && !isText(paramModel)) {
 
         DslElementModel.Builder<ParameterModel> paramElementBuilder = DslElementModel.<ParameterModel>builder()
             .withModel(paramModel)
-            .withDsl(paramSyntax);
+            .withDsl(paramComponent.getGenerationInformation().getSyntax().get());
         paramElementBuilder.withConfig(paramComponent);
 
         final Optional<ParameterizedModel> parameterized = paramComponent.getModel(ParameterizedModel.class);
@@ -545,14 +542,14 @@ class ComponentAstBasedElementModelFactory {
               MetadataType itemType = arrayType.getType();
               paramSyntax.getGeneric(itemType)
                   .ifPresent(itemdsl -> paramComponent.directChildrenStream()
-                      .filter(c -> c.getModel(MetadataTypeModelAdapter.class).map(mtma -> mtma.isWrapperFor(itemType))
+                      .filter(c -> c.getModel(MetadataTypeAdapter.class).map(mtma -> mtma.isWrapperFor(itemType))
                           .orElse(false))
                       .forEach(c -> {
                         final Builder<Object> arrayModelBuilder = DslElementModel.builder()
                             .withModel(itemType)
-                            .withDsl(itemdsl)
+                            .withDsl(c.getGenerationInformation().getSyntax().get())
                             .withConfig(c);
-                        enrichElementModel(c.getModel(MetadataTypeModelAdapter.class).get(), itemdsl, c,
+                        enrichElementModel(c.getModel(ParameterizedModel.class).get(), itemdsl, c,
                                            arrayModelBuilder);
                         paramElementBuilder.containing(arrayModelBuilder.build());
                       }));
@@ -577,7 +574,7 @@ class ComponentAstBasedElementModelFactory {
             .withDsl(paramSyntax);
 
         final Optional<String> body = paramComponent != null
-            ? paramComponent.getRawParameterValue(BODY_RAW_PARAM_NAME)
+            ? of(paramFetcher.apply(paramModel).getRawValue())
             : empty();
 
         paramElementBuilder.withValue(body
@@ -599,23 +596,17 @@ class ComponentAstBasedElementModelFactory {
   }
 
   private void resolveWrappedElement(DslElementModel.Builder<ParameterGroupModel> groupElementBuilder, ParameterModel p,
-                                     DslElementSyntax pDsl, ComponentAst paramComponent) {
+                                     ComponentAst paramComponent) {
     if (paramComponent != null) {
       DslElementModel.Builder<ParameterModel> paramElement = DslElementModel.<ParameterModel>builder()
           .withModel(p)
-          .withDsl(pDsl)
+          .withDsl(paramComponent.getGenerationInformation().getSyntax().get())
           .withConfig(paramComponent);
 
       paramComponent.directChildrenStream()
           .findFirst()
-          .ifPresent(wrapper -> {
-            DslSyntaxResolver wrapperDsl = this.dsl;
-
-            this.create(wrapper)
-                .ifPresent(paramElement::containing);
-
-            this.dsl = wrapperDsl;
-          });
+          .flatMap(wrapper -> this.create(wrapper))
+          .ifPresent(paramElement::containing);
 
       groupElementBuilder.containing(paramElement.build());
     }
@@ -643,19 +634,19 @@ class ComponentAstBasedElementModelFactory {
             getSingleComponentConfiguration(nested, of(RECONNECTION_CONFIG_PARAMETER_IDENTIFIER));
 
         if (reconnection != null) {
-          groupElementBuilder.containing(newElementModel(paramModel, paramDsl, reconnection));
+          groupElementBuilder.containing(newElementModel(paramModel, reconnection));
         }
         break;
 
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
-        handleReconnectionStrategy(paramModel, paramDsl, nested, groupElementBuilder);
+        handleReconnectionStrategy(paramModel, nested, groupElementBuilder);
         break;
 
       case REDELIVERY_POLICY_PARAMETER_NAME:
         ComponentAst redelivery =
             getSingleComponentConfiguration(nested, of(REDELIVERY_POLICY_IDENTIFIER));
         if (redelivery != null) {
-          groupElementBuilder.containing(newElementModel(paramModel, paramDsl, redelivery));
+          groupElementBuilder.containing(newElementModel(paramModel, redelivery));
         }
         break;
 
@@ -663,14 +654,14 @@ class ComponentAstBasedElementModelFactory {
         ComponentAst expiration =
             getSingleComponentConfiguration(nested, of(EXPIRATION_POLICY_IDENTIFIER));
         if (expiration != null) {
-          groupElementBuilder.containing(newElementModel(paramModel, paramDsl, expiration));
+          groupElementBuilder.containing(newElementModel(paramModel, expiration));
         }
         break;
 
       case POOLING_PROFILE_PARAMETER_NAME:
         ComponentAst pooling = getSingleComponentConfiguration(nested, getIdentifier(paramDsl));
         if (pooling != null) {
-          groupElementBuilder.containing(newElementModel(paramModel, paramDsl, pooling));
+          groupElementBuilder.containing(newElementModel(paramModel, pooling));
         }
         break;
 
@@ -685,7 +676,7 @@ class ComponentAstBasedElementModelFactory {
 
         streaming.stream().filter(nested::containsKey).findFirst()
             .ifPresent(s -> groupElementBuilder
-                .containing(newElementModel(paramModel, paramDsl, getSingleComponentConfiguration(nested, of(s)))));
+                .containing(newElementModel(paramModel, getSingleComponentConfiguration(nested, of(s)))));
         break;
 
       case TLS_PARAMETER_NAME:
@@ -693,7 +684,7 @@ class ComponentAstBasedElementModelFactory {
         break;
 
       case SCHEDULING_STRATEGY_PARAMETER_NAME:
-        handleSchedulingStrategy(paramModel, paramDsl, nested, groupElementBuilder);
+        handleSchedulingStrategy(paramModel, nested, groupElementBuilder);
         break;
 
       default:
@@ -701,7 +692,7 @@ class ComponentAstBasedElementModelFactory {
     }
   }
 
-  private void handleReconnectionStrategy(final ParameterModel paramModel, final DslElementSyntax paramDsl,
+  private void handleReconnectionStrategy(final ParameterModel paramModel,
                                           final Multimap<ComponentIdentifier, ComponentAst> nested,
                                           final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
     ComponentAst config = nested.containsKey(RECONNECT_IDENTIFIER)
@@ -710,7 +701,7 @@ class ComponentAstBasedElementModelFactory {
                                           of(RECONNECT_FOREVER_IDENTIFIER));
 
     if (config != null) {
-      groupElementBuilder.containing(newElementModel(paramModel, paramDsl, config));
+      groupElementBuilder.containing(newElementModel(paramModel, config));
     }
   }
 
@@ -719,7 +710,7 @@ class ComponentAstBasedElementModelFactory {
                                   final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
     ComponentAst tls = getSingleComponentConfiguration(nested, getIdentifier(paramDsl));
     if (tls != null) {
-      groupElementBuilder.containing(newElementModel(paramModel, paramDsl, tls));
+      groupElementBuilder.containing(newElementModel(paramModel, tls));
     } else if (!isBlank(parameters.get(TLS_PARAMETER_NAME))) {
       groupElementBuilder.containing(DslElementModel.builder()
           .withModel(paramModel)
@@ -729,7 +720,7 @@ class ComponentAstBasedElementModelFactory {
     }
   }
 
-  private void handleSchedulingStrategy(final ParameterModel paramModel, final DslElementSyntax paramDsl,
+  private void handleSchedulingStrategy(final ParameterModel paramModel,
                                         final Multimap<ComponentIdentifier, ComponentAst> nested,
                                         final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
     ComponentAst schedulingStrategyWrapper =
@@ -737,19 +728,15 @@ class ComponentAstBasedElementModelFactory {
     if (schedulingStrategyWrapper != null) {
       DslElementModel.Builder wrapper = DslElementModel.builder()
           .withModel(paramModel)
-          .withDsl(paramDsl)
+          .withDsl(schedulingStrategyWrapper.getGenerationInformation().getSyntax().get())
           .withConfig(schedulingStrategyWrapper);
 
       Iterator<ComponentAst> nestedIt = schedulingStrategyWrapper.directChildrenStream().iterator();
       if (nestedIt.hasNext()) {
         final ComponentAst strategy = nestedIt.next();
-        final MetadataType type = CRON_STRATEGY_IDENTIFIER.equals(strategy.getIdentifier())
-            ? typeLoader.load(CronScheduler.class)
-            : typeLoader.load(FixedFrequencyScheduler.class);
-
-        dsl.resolve(type)
+        strategy.getGenerationInformation().getSyntax()
             .ifPresent(typeDsl -> wrapper.containing(DslElementModel.builder()
-                .withModel(type)
+                .withModel(strategy.getModel(MetadataTypeAdapter.class).get().getType())
                 .withDsl(typeDsl)
                 .withConfig(strategy)
                 .build()));
@@ -759,11 +746,10 @@ class ComponentAstBasedElementModelFactory {
     }
   }
 
-  private DslElementModel newElementModel(ParameterModel paramModel, DslElementSyntax paramDsl,
-                                          ComponentAst configuration) {
+  private DslElementModel newElementModel(ParameterModel paramModel, ComponentAst configuration) {
     return DslElementModel.builder()
         .withModel(paramModel)
-        .withDsl(paramDsl)
+        .withDsl(configuration.getGenerationInformation().getSyntax().get())
         .withConfig(configuration)
         .build();
   }

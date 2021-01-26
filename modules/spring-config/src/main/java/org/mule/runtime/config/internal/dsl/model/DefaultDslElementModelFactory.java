@@ -37,7 +37,7 @@ public class DefaultDslElementModelFactory implements DslElementModelFactory {
 
     this.declarationBasedDelegate = new DeclarationBasedElementModelFactory(context, resolvers);
     this.configurationBasedDelegate = new ConfigurationBasedElementModelFactory(resolvers);
-    this.componentAstBasedDelegate = new ComponentAstBasedElementModelFactory(resolvers);
+    this.componentAstBasedDelegate = new ComponentAstBasedElementModelFactory();
   }
 
   /**

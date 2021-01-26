@@ -16,6 +16,8 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
+import static org.mule.runtime.ast.api.ComponentGenerationInformation.EMPTY_GENERATION_INFO;
+import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsNamespace;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
@@ -31,6 +33,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
@@ -187,6 +190,11 @@ public class MacroExpansionModuleModel {
 
           return new ComponentAst() {
 
+            private final ComponentIdentifier identifier = ComponentIdentifier.builder()
+                .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
+                .namespace(extensionModel.getXmlDslModel().getPrefix())
+                .name(DEFAULT_GLOBAL_ELEMENTS).build();
+
             @Override
             public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
               return Stream.concat(Stream.of(this),
@@ -230,13 +238,23 @@ public class MacroExpansionModuleModel {
             }
 
             @Override
+            public ExtensionModel getExtension() {
+              return extensionModel;
+            }
+
+            @Override
             public <M> Optional<M> getModel(Class<M> modelClass) {
               return empty();
             }
 
             @Override
             public ComponentMetadataAst getMetadata() {
-              return ComponentMetadataAst.builder().build();
+              return EMPTY_METADATA;
+            }
+
+            @Override
+            public ComponentGenerationInformation getGenerationInformation() {
+              return EMPTY_GENERATION_INFO;
             }
 
             @Override
@@ -246,10 +264,7 @@ public class MacroExpansionModuleModel {
 
             @Override
             public ComponentIdentifier getIdentifier() {
-              return ComponentIdentifier.builder()
-                  .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
-                  .namespace(extensionModel.getXmlDslModel().getPrefix())
-                  .name(DEFAULT_GLOBAL_ELEMENTS).build();
+              return identifier;
             }
 
             @Override
