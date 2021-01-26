@@ -128,17 +128,18 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
 
     // preserve order
     assertThat(continents, hasItems(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT),
-            metadataKeyWithId(EUROPE).withDisplayName(EUROPE).withPartName(CONTINENT)));
+                                    metadataKeyWithId(EUROPE).withDisplayName(EUROPE).withPartName(CONTINENT)));
 
     // preserve order
     MetadataKey americaKey = continents.iterator().next();
     assertThat(americaKey.getChilds(), hasItems(metadataKeyWithId(ARGENTINA).withDisplayName(ARGENTINA).withPartName(COUNTRY),
-            metadataKeyWithId(USA).withDisplayName(USA_DISPLAY_NAME).withPartName(COUNTRY)));
+                                                metadataKeyWithId(USA).withDisplayName(USA_DISPLAY_NAME).withPartName(COUNTRY)));
 
     // preserve order
     MetadataKey argentinaKey = americaKey.getChilds().iterator().next();
-    assertThat(argentinaKey.getChilds(), hasItems(metadataKeyWithId(BUENOS_AIRES).withDisplayName(BUENOS_AIRES).withPartName(CITY),
-            metadataKeyWithId(LA_PLATA).withDisplayName(LA_PLATA).withPartName(CITY)));
+    assertThat(argentinaKey.getChilds(),
+               hasItems(metadataKeyWithId(BUENOS_AIRES).withDisplayName(BUENOS_AIRES).withPartName(CITY),
+                        metadataKeyWithId(LA_PLATA).withDisplayName(LA_PLATA).withPartName(CITY)));
   }
 
   @Test

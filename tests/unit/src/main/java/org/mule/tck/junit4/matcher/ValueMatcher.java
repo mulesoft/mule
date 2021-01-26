@@ -38,11 +38,6 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
     descriptionBuilder.append(String.format("a Value whose ID %s", id));
   }
 
-  private ValueMatcher(Matcher<String> id, boolean strict) {
-    this(id);
-    this.strict = strict;
-  }
-
   /**
    * Creates a new instance of the {@link ValueMatcher}
    *
@@ -57,32 +52,10 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
    * Creates a new instance of the {@link ValueMatcher}
    *
    * @param id of the {@link Value}
-   * @param strict defines if the {@link Value} should be completed and childs validated in order
-   * @return the new instance of {@link ValueMatcher}
-   */
-  public static ValueMatcher valueWithId(Matcher<String> id, boolean strict) {
-    return new ValueMatcher(id, strict);
-  }
-
-  /**
-   * Creates a new instance of the {@link ValueMatcher}
-   *
-   * @param id of the {@link Value}
    * @return the new instance of {@link ValueMatcher}
    */
   public static ValueMatcher valueWithId(String id) {
     return valueWithId(is(id));
-  }
-
-  /**
-   * Creates a new instance of the {@link ValueMatcher}
-   *
-   * @param id of the {@link Value}
-   * @param strict defines if the {@link Value} should be completed and childs validated in order
-   * @return the new instance of {@link ValueMatcher}
-   */
-  public static ValueMatcher valueWithId(String id, boolean strict) {
-    return valueWithId(is(id), strict);
   }
 
   @Override
@@ -162,6 +135,16 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
     descriptionBuilder.append(format(", with child values that %s", stream(childValues)
         .map(Matcher::toString)
         .collect(joining(", "))));
+    return this;
+  }
+
+  /**
+   * Defines if the {@link Value} should be completed and childs validated in order.
+   *
+   * @return the contribute {@link ValueMatcher}
+   */
+  public ValueMatcher strict() {
+    this.strict = true;
     return this;
   }
 
