@@ -42,6 +42,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
@@ -357,6 +358,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       fireNotification(new MuleContextNotification(this, CONTEXT_STARTED));
       final org.mule.runtime.api.artifact.Registry apiRegistry = getApiRegistry();
       listeners.forEach(l -> l.onStart(this, apiRegistry));
+      ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
+          getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
+      if (artifactStoppedPersistenceListener != null) {
+        artifactStoppedPersistenceListener.onStart();
+      }
 
       startLatch.release();
 
@@ -414,6 +420,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       final org.mule.runtime.api.artifact.Registry apiRegistry = getApiRegistry();
       listeners.forEach(l -> l.onStop(this, apiRegistry));
+      ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
+          getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
+      if (artifactStoppedPersistenceListener != null) {
+        artifactStoppedPersistenceListener.onStop();
+      }
     }
   }
 

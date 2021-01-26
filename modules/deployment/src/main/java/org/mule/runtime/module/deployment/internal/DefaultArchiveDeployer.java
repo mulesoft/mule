@@ -579,4 +579,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     return deployExplodedApp(artifactDir, deploymentProperties);
   }
+
+  public void doNotPersistArtifactStop(T artifact) {
+    deployer.doNotPersistArtifactStop(artifact);
+  }
 }

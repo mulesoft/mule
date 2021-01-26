@@ -283,5 +283,4 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   protected File getArtifactInstallationDirectory() {
     return descriptor.getArtifactLocation();
   }
-
 }
