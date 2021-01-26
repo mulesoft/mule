@@ -16,21 +16,18 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.IntStream.range;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsNot.not;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
-import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
@@ -44,16 +41,20 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
@@ -76,18 +77,24 @@ import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.error.ErrorMapping;
+import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
+import org.mule.runtime.extension.api.model.config.ImmutableConfigurationModel;
+import org.mule.runtime.extension.api.model.connection.ImmutableConnectionProviderModel;
+import org.mule.runtime.extension.api.model.operation.ImmutableOperationModel;
+import org.mule.runtime.extension.api.model.parameter.ImmutableParameterGroupModel;
+import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
+import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -143,61 +150,42 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   @Mock(lenient = true)
   protected ExtensionModel mockExtension;
 
-  @Mock(lenient = true)
   protected ConfigurationModel configuration;
 
-  @Mock(lenient = true)
   protected ConfigurationModel otherConfiguration;
 
-  @Mock(lenient = true)
   protected OperationModel operation;
 
-  @Mock(lenient = true)
   protected OperationModel otherOperation;
 
-  @Mock(lenient = true)
   protected ConnectionProviderModel connectionProvider;
 
-  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected SourceModel source;
 
-  @Mock(lenient = true)
   protected ParameterModel parameterInGroup;
 
-  @Mock(lenient = true)
   protected ParameterGroupModel actingParametersGroup;
 
-  @Mock(lenient = true)
   protected ParameterModel nameParameter;
 
-  @Mock(lenient = true)
   protected ParameterModel configRefParameter;
 
-  @Mock(lenient = true)
   protected ParameterModel actingParameter;
 
-  @Mock(lenient = true)
   protected ParameterModel providedParameter;
 
-  @Mock(lenient = true)
   protected ParameterModel otherProvidedParameter;
 
-  @Mock(lenient = true)
   protected ParameterModel providedParameterFromComplex;
 
-  @Mock(lenient = true)
   protected ParameterModel complexActingParameter;
 
-  @Mock(lenient = true)
   protected ParameterGroupModel parameterGroup;
 
-  @Mock(lenient = true)
   protected ParameterModel errorMappingsParameter;
 
-  @Mock(lenient = true)
   protected ParameterGroupModel errorMappingsParameterGroup;
 
-  @Mock(lenient = true)
   protected ParameterModel parameterRequiredForMetadata;
 
   @Mock(lenient = true)
@@ -210,36 +198,21 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected ValueProviderModel complexValueProviderModel;
 
   protected ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  protected List<ParameterModel> customParameterGroupModels;
-  protected List<ParameterModel> defaultGroupParameterModels;
 
   private Set<ExtensionModel> extensions;
   private ElementDeclarer declarer;
 
   @Before
   public void before() {
-    initializeExtensionMock(mockExtension);
+    final MetadataType stringType = TYPE_LOADER.load(String.class);
 
-    when(nameParameter.getName()).thenReturn("name");
-    when(nameParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(nameParameter.getModelProperty(any())).thenReturn(empty());
-    when(nameParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(nameParameter.getLayoutModel()).thenReturn(empty());
-    when(nameParameter.getRole()).thenReturn(BEHAVIOUR);
-    when(nameParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
-    when(nameParameter.isComponentId()).thenReturn(true);
+    nameParameter =
+        createParameterModel("name", true, stringType, null, NOT_SUPPORTED, BEHAVIOUR, null, emptyList());
 
-    when(configRefParameter.getName()).thenReturn("config-ref");
-    when(configRefParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(configRefParameter.getModelProperty(any())).thenReturn(empty());
-    when(configRefParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(configRefParameter.getLayoutModel()).thenReturn(empty());
-    when(configRefParameter.getRole()).thenReturn(BEHAVIOUR);
-    when(configRefParameter.getType()).thenReturn(TYPE_LOADER.load(ConfigurationProvider.class));
-    final List<StereotypeModel> configStereotypes = singletonList(
-                                                                  newStereotype(CONFIGURATION_NAME, EXTENSION_NAME)
-                                                                      .withParent(MuleStereotypes.CONFIG).build());
-    when(configRefParameter.getAllowedStereotypes()).thenReturn(configStereotypes);
+    configRefParameter = createParameterModel("config-ref", false, TYPE_LOADER.load(ConfigurationProvider.class), null,
+                                              NOT_SUPPORTED, BEHAVIOUR, null,
+                                              singletonList(newStereotype(CONFIGURATION_NAME, EXTENSION_NAME)
+                                                  .withParent(MuleStereotypes.CONFIG).build()));
 
     when(valueProviderModel.getPartOrder()).thenReturn(0);
     when(valueProviderModel.getProviderName()).thenReturn(VALUE_PROVIDER_NAME);
@@ -255,174 +228,78 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(complexValueProviderModel.requiresConfiguration()).thenReturn(false);
     when(complexValueProviderModel.requiresConnection()).thenReturn(false);
 
-    when(parameterInGroup.getName()).thenReturn(PARAMETER_IN_GROUP_NAME);
-    when(parameterInGroup.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(parameterInGroup.getModelProperty(any())).thenReturn(empty());
-    when(parameterInGroup.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(parameterInGroup.getLayoutModel()).thenReturn(empty());
-    when(parameterInGroup.getRole()).thenReturn(BEHAVIOUR);
-    when(parameterInGroup.getType()).thenReturn(TYPE_LOADER.load(String.class));
+    parameterInGroup = createParameterModel(PARAMETER_IN_GROUP_NAME, false, stringType, null,
+                                            NOT_SUPPORTED, BEHAVIOUR, null, emptyList());
+    actingParameter = createParameterModel(ACTING_PARAMETER_NAME, false, stringType,
+                                           ACTING_PARAMETER_DEFAULT_VALUE, NOT_SUPPORTED, BEHAVIOUR, null, emptyList());
+    providedParameter = createParameterModel(PROVIDED_PARAMETER_NAME, false, stringType, null, NOT_SUPPORTED,
+                                             BEHAVIOUR, valueProviderModel, emptyList());
 
-    when(actingParameter.getName()).thenReturn(ACTING_PARAMETER_NAME);
-    when(actingParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(actingParameter.getDefaultValue()).thenReturn(ACTING_PARAMETER_DEFAULT_VALUE);
-    when(actingParameter.getModelProperty(any())).thenReturn(empty());
-    when(actingParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(actingParameter.getLayoutModel()).thenReturn(empty());
-    when(actingParameter.getRole()).thenReturn(BEHAVIOUR);
-    when(actingParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
+    otherProvidedParameter =
+        createParameterModel(OTHER_PROVIDED_PARAMETER_NAME, false, stringType, null,
+                             NOT_SUPPORTED, BEHAVIOUR, valueProviderModel, emptyList());
 
-    when(providedParameter.getName()).thenReturn(PROVIDED_PARAMETER_NAME);
-    when(providedParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(providedParameter.getModelProperty(any())).thenReturn(empty());
-    when(providedParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(providedParameter.getLayoutModel()).thenReturn(empty());
-    when(providedParameter.getRole()).thenReturn(BEHAVIOUR);
-    when(providedParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
-    when(providedParameter.getValueProviderModel()).thenReturn(of(valueProviderModel));
+    providedParameterFromComplex =
+        createParameterModel(PROVIDED_FROM_COMPLEX_PARAMETER_NAME, false, stringType, null,
+                             NOT_SUPPORTED, BEHAVIOUR, complexValueProviderModel, emptyList());
 
-    when(otherProvidedParameter.getName()).thenReturn(OTHER_PROVIDED_PARAMETER_NAME);
-    when(otherProvidedParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(otherProvidedParameter.getModelProperty(any())).thenReturn(empty());
-    when(otherProvidedParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(otherProvidedParameter.getLayoutModel()).thenReturn(empty());
-    when(otherProvidedParameter.getRole()).thenReturn(BEHAVIOUR);
-    when(otherProvidedParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
-    when(otherProvidedParameter.getValueProviderModel()).thenReturn(of(valueProviderModel));
+    complexActingParameter =
+        createParameterModel(COMPLEX_ACTING_PARAMETER_NAME, false, TYPE_LOADER.load(ComplexActingParameter.class), null,
+                             NOT_SUPPORTED,
+                             BEHAVIOUR, null, emptyList());
 
-    when(providedParameterFromComplex.getName()).thenReturn(PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
-    when(providedParameterFromComplex.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(providedParameterFromComplex.getModelProperty(any())).thenReturn(empty());
-    when(providedParameterFromComplex.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(providedParameterFromComplex.getLayoutModel()).thenReturn(empty());
-    when(providedParameterFromComplex.getRole()).thenReturn(BEHAVIOUR);
-    when(providedParameterFromComplex.getType()).thenReturn(TYPE_LOADER.load(String.class));
-    when(providedParameterFromComplex.getValueProviderModel()).thenReturn(of(complexValueProviderModel));
+    parameterRequiredForMetadata =
+        createParameterModel(PARAMETER_REQUIRED_FOR_METADATA_NAME, false, stringType, null, NOT_SUPPORTED,
+                             BEHAVIOUR, null, emptyList());
 
-    when(complexActingParameter.getName()).thenReturn(COMPLEX_ACTING_PARAMETER_NAME);
-    when(complexActingParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(complexActingParameter.getModelProperty(any())).thenReturn(empty());
-    when(complexActingParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(complexActingParameter.getLayoutModel()).thenReturn(empty());
-    when(complexActingParameter.getRole()).thenReturn(BEHAVIOUR);
-    when(complexActingParameter.getType()).thenReturn(TYPE_LOADER.load(ComplexActingParameter.class));
+    actingParametersGroup = new ImmutableParameterGroupModel(CUSTOM_PARAMETER_GROUP_NAME, "", asList(parameterInGroup),
+                                                             emptyList(), false, null, null, emptySet());
 
-    when(parameterRequiredForMetadata.getName()).thenReturn(PARAMETER_REQUIRED_FOR_METADATA_NAME);
-    when(parameterRequiredForMetadata.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(parameterRequiredForMetadata.getModelProperty(any())).thenReturn(empty());
-    when(parameterRequiredForMetadata.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(parameterRequiredForMetadata.getLayoutModel()).thenReturn(empty());
-    when(parameterRequiredForMetadata.getRole()).thenReturn(BEHAVIOUR);
-    when(parameterRequiredForMetadata.getType()).thenReturn(TYPE_LOADER.load(String.class));
+    errorMappingsParameter = createParameterModel(ERROR_MAPPINGS_PARAMETER_NAME, false, BaseTypeBuilder.create(JAVA).arrayType()
+        .of(TYPE_LOADER.load(ErrorMapping.class)).build(), null, NOT_SUPPORTED,
+                                                  BEHAVIOUR, null, emptyList());
 
-    this.customParameterGroupModels = asList(parameterInGroup);
-    when(actingParametersGroup.getName()).thenReturn(CUSTOM_PARAMETER_GROUP_NAME);
-    when(actingParametersGroup.isShowInDsl()).thenReturn(false);
-    when(actingParametersGroup.getParameterModels()).thenReturn(customParameterGroupModels);
-    when(actingParametersGroup.getParameter(anyString())).then(invocation -> {
-      String paramName = invocation.getArgument(0);
-      if (PARAMETER_IN_GROUP_NAME.equals(paramName)) {
-        return of(parameterInGroup);
-      }
-      return empty();
-    });
+    errorMappingsParameterGroup = new ImmutableParameterGroupModel(ERROR_MAPPINGS, "", asList(errorMappingsParameter),
+                                                                   emptyList(), false, null, null, emptySet());
 
-    when(errorMappingsParameter.getName()).thenReturn(ERROR_MAPPINGS_PARAMETER_NAME);
-    when(errorMappingsParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
-    when(errorMappingsParameter.getModelProperty(any())).thenReturn(empty());
-    when(errorMappingsParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
-    when(errorMappingsParameter.getLayoutModel()).thenReturn(empty());
-    when(errorMappingsParameter.getRole()).thenReturn(BEHAVIOUR);
-    when(errorMappingsParameter.getType()).thenReturn(BaseTypeBuilder.create(JAVA).arrayType()
-        .of(TYPE_LOADER.load(ErrorMapping.class)).build());
-
-    when(errorMappingsParameterGroup.getName()).thenReturn(ERROR_MAPPINGS);
-    when(errorMappingsParameterGroup.isShowInDsl()).thenReturn(false);
-    when(errorMappingsParameterGroup.getParameterModels()).thenReturn(asList(errorMappingsParameter));
-    when(errorMappingsParameterGroup.getParameter(ERROR_MAPPINGS_PARAMETER_NAME)).thenReturn(of(errorMappingsParameter));
-
-    this.defaultGroupParameterModels = asList(nameParameter,
-                                              configRefParameter,
-                                              actingParameter,
-                                              providedParameter,
-                                              parameterRequiredForMetadata,
-                                              complexActingParameter,
-                                              providedParameterFromComplex);
-    when(parameterGroup.getName()).thenReturn(DEFAULT_GROUP_NAME);
-    when(parameterGroup.isShowInDsl()).thenReturn(false);
-    when(parameterGroup.getParameterModels()).thenReturn(defaultGroupParameterModels);
-    when(parameterGroup.getParameter(anyString())).then(invocation -> {
-      String paramName = invocation.getArgument(0);
-      switch (paramName) {
-        case ACTING_PARAMETER_NAME:
-          return of(actingParameter);
-        case PROVIDED_PARAMETER_NAME:
-          return of(providedParameter);
-        case PARAMETER_REQUIRED_FOR_METADATA_NAME:
-          return of(parameterRequiredForMetadata);
-        case OTHER_PROVIDED_PARAMETER_NAME:
-          return of(otherProvidedParameter);
-        case PROVIDED_FROM_COMPLEX_PARAMETER_NAME:
-          return of(providedParameterFromComplex);
-        case COMPLEX_ACTING_PARAMETER_NAME:
-          return of(complexActingParameter);
-      }
-      return empty();
-    });
+    parameterGroup = new ImmutableParameterGroupModel(DEFAULT_GROUP_NAME, "", asList(nameParameter,
+                                                                                     configRefParameter,
+                                                                                     actingParameter,
+                                                                                     providedParameter,
+                                                                                     parameterRequiredForMetadata,
+                                                                                     complexActingParameter,
+                                                                                     providedParameterFromComplex),
+                                                      emptyList(), false,
+                                                      null, null, emptySet());
 
     RequiredForMetadataModelProperty requiredForMetadataModelProperty =
         new RequiredForMetadataModelProperty(asList(PARAMETER_REQUIRED_FOR_METADATA_NAME));
 
-    when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
-    when(connectionProvider.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
-    when(connectionProvider.getModelProperty(RequiredForMetadataModelProperty.class))
-        .thenReturn(of(requiredForMetadataModelProperty));
-    when(connectionProvider.getStereotype()).thenReturn(CONNECTION);
+    connectionProvider =
+        new ImmutableConnectionProviderModel(CONNECTION_PROVIDER_NAME, "", asList(parameterGroup, actingParametersGroup), NONE,
+                                             false, emptySet(), null,
+                                             CONNECTION, Collections.singleton(requiredForMetadataModelProperty));
 
-    when(configuration.getName()).thenReturn(CONFIGURATION_NAME);
-    when(configuration.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
-    when(configuration.getOperationModels()).thenReturn(asList(operation, otherOperation));
-    when(configuration.getSourceModels()).thenReturn(asList(source));
-    when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
-    when(configuration.getConnectionProviderModel(CONNECTION_PROVIDER_NAME)).thenReturn(of(connectionProvider));
-    when(configuration.getModelProperty(RequiredForMetadataModelProperty.class)).thenReturn(of(requiredForMetadataModelProperty));
-    when(configuration.getStereotype()).thenReturn(CONFIG);
+    operation = createOperationModel(OPERATION_NAME, asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
+    otherOperation =
+        createOperationModel(OTHER_OPERATION_NAME, asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
 
-    when(otherConfiguration.getName()).thenReturn(OTHER_CONFIGURATION_NAME);
-    when(otherConfiguration.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
-    when(otherConfiguration.getOperationModels()).thenReturn(emptyList());
-    when(otherConfiguration.getSourceModels()).thenReturn(emptyList());
-    when(otherConfiguration.getConnectionProviders()).thenReturn(asList(connectionProvider));
-    when(otherConfiguration.getModelProperty(RequiredForMetadataModelProperty.class))
-        .thenReturn(of(requiredForMetadataModelProperty));
-    when(otherConfiguration.getStereotype()).thenReturn(CONFIG);
+    source = new ImmutableSourceModel(SOURCE_NAME, "", false, false, asList(parameterGroup, actingParametersGroup), emptyList(),
+                                      null, null, empty(), empty(), empty(), false, false, false, null, null, emptySet(),
+                                      emptySet(), emptySet(), null);
 
-    when(source.getName()).thenReturn(SOURCE_NAME);
-    when(source.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
-    when(source.getSuccessCallback()).thenReturn(empty());
-    when(source.getErrorCallback()).thenReturn(empty());
+    configuration = new ImmutableConfigurationModel(CONFIGURATION_NAME, "", asList(parameterGroup, actingParametersGroup),
+                                                    asList(operation, otherOperation), asList(connectionProvider), asList(source),
+                                                    emptySet(), null, CONFIG, singleton(requiredForMetadataModelProperty));
+    otherConfiguration =
+        new ImmutableConfigurationModel(OTHER_CONFIGURATION_NAME, "", asList(parameterGroup, actingParametersGroup),
+                                        emptyList(), asList(connectionProvider), emptyList(),
+                                        emptySet(), null, CONFIG, singleton(requiredForMetadataModelProperty));
 
-    when(operation.getName()).thenReturn(OPERATION_NAME);
-    when(operation.getStereotype()).thenReturn(PROCESSOR);
-    when(operation.getParameterGroupModels())
-        .thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
-
-    when(otherOperation.getName()).thenReturn(OTHER_OPERATION_NAME);
-    when(otherOperation.getStereotype()).thenReturn(PROCESSOR);
-    when(otherOperation.getParameterGroupModels())
-        .thenReturn(asList(parameterGroup, actingParametersGroup, errorMappingsParameterGroup));
-
-    visitableMock(operation, otherOperation, source);
+    mockExtension = createExtensionMock();
 
     when(dslContext.getExtension(any())).thenReturn(of(mockExtension));
     when(dslContext.getExtensions()).thenReturn(singleton(mockExtension));
-
-    List<ParameterModel> allParameterModels = new ArrayList<>();
-    allParameterModels.addAll(defaultGroupParameterModels);
-    allParameterModels.addAll(customParameterGroupModels);
-
-    Stream.of(configuration, otherConfiguration, operation, otherOperation, connectionProvider, source)
-        .forEach(model -> when(model.getAllParameterModels()).thenReturn(allParameterModels));
 
     extensions = ImmutableSet.<ExtensionModel>builder()
         .add(MuleExtensionModelProvider.getExtensionModel())
@@ -436,42 +313,54 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     declarer = ElementDeclarer.forExtension(EXTENSION_NAME);
   }
 
-  protected void initializeExtensionMock(ExtensionModel extension) {
-    when(extension.getName()).thenReturn(EXTENSION_NAME);
-    when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
-        .setXsdFileName("mule-mockns.xsd")
-        .setPrefix(NAMESPACE)
-        .setNamespace(NAMESPACE_URI)
-        .setSchemaLocation(SCHEMA_LOCATION)
-        .setSchemaVersion("4.0")
-        .build());
-    when(extension.getSubTypes()).thenReturn(emptySet());
-    when(extension.getImportedTypes()).thenReturn(emptySet());
-    when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
-        .setXsdFileName(EMPTY)
-        .setPrefix(NAMESPACE)
-        .setNamespace(NAMESPACE_URI)
-        .setSchemaLocation(SCHEMA_LOCATION)
-        .setSchemaVersion(EMPTY)
-        .build());
+  private ImmutableParameterModel createParameterModel(String paramName, boolean isComponentId, MetadataType type,
+                                                       Object defaultValue, ExpressionSupport expressionSupport,
+                                                       ParameterRole parameterRole, ValueProviderModel valueProviderModel,
+                                                       List<StereotypeModel> allowedStereotypes) {
+    return new ImmutableParameterModel(paramName, "", type, false, false,
+                                       false, isComponentId, expressionSupport, defaultValue,
+                                       parameterRole, ParameterDslConfiguration.getDefaultInstance(), null, null,
+                                       valueProviderModel,
+                                       allowedStereotypes, emptySet());
+  }
 
-    when(extension.getConfigurationModels()).thenReturn(asList(configuration, otherConfiguration));
-    when(extension.getConfigurationModel(anyString())).then(invocation -> {
-      if (configuration.getName().equals(invocation.getArgument(0))) {
-        return of(configuration);
-      } else if (otherConfiguration.getName().equals(invocation.getArgument(0))) {
-        return of(otherConfiguration);
-      }
-      return empty();
-    });
-    when(extension.getOperationModels()).thenReturn(asList(operation, otherOperation));
-    when(extension.getOperationModel(eq(OPERATION_NAME))).thenReturn(of(operation));
-    when(extension.getOperationModel(eq(OTHER_OPERATION_NAME))).thenReturn(of(otherOperation));
+  private ImmutableOperationModel createOperationModel(String operationName, List<ParameterGroupModel> paramGroups) {
+    return new ImmutableOperationModel(operationName, "",
+                                       paramGroups,
+                                       emptyList(), null, null, true, ExecutionType.BLOCKING, false, false, false, null,
+                                       emptySet(), PROCESSOR, emptySet(), emptySet());
+  }
 
-    when(extension.getSourceModels()).thenReturn(asList(source));
-    when(extension.getSourceModel(anyString())).thenReturn(of(source));
-    when(extension.getConnectionProviders()).thenReturn(asList(connectionProvider));
-    when(extension.getConnectionProviderModel(anyString())).thenReturn(of(connectionProvider));
+  protected ExtensionModel createExtensionMock() {
+    return new ImmutableExtensionModel(EXTENSION_NAME,
+                                       "",
+                                       "1.0",
+                                       "Mulesoft",
+                                       COMMUNITY,
+                                       asList(configuration, otherConfiguration),
+                                       asList(operation, otherOperation),
+                                       asList(connectionProvider),
+                                       asList(source),
+                                       emptyList(),
+                                       emptyList(),
+                                       null,
+                                       XmlDslModel.builder()
+                                           .setXsdFileName("mule-mockns.xsd")
+                                           .setPrefix(NAMESPACE)
+                                           .setNamespace(NAMESPACE_URI)
+                                           .setSchemaLocation(SCHEMA_LOCATION)
+                                           .setSchemaVersion("4.0")
+                                           .build(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet());
   }
 
   protected ConfigurationElementDeclaration declareConfig(ConnectionElementDeclaration connectionDeclaration, String name,

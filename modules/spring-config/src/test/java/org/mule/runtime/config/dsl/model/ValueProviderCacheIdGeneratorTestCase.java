@@ -12,7 +12,6 @@ import static junit.framework.TestCase.fail;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
 
@@ -90,8 +89,6 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
       fail(format("missing declaration or model for: %s", location));
     }
 
-    Optional<ValueProviderCacheId> astId =
-        componentAstBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
     Optional<ValueProviderCacheId> dslElementId =
         dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName);
     Optional<ValueProviderCacheId> componentBasedId =
@@ -343,7 +340,6 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   public void idForConnectionAwareOperationChangesInConnectionRequiredForMetadata() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConnection()).thenReturn(true);
-    when(configuration.getConnectionProviderModel(anyString())).thenReturn(Optional.of(connectionProvider));
     Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(opId.isPresent(), is(true));
     modifyParameter(app, MY_CONNECTION, PARAMETER_REQUIRED_FOR_METADATA_NAME,
@@ -385,7 +381,6 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   public void idForConnectionAwareSourceChangesInConnectionRequiredForMetadata() throws Exception {
     ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConnection()).thenReturn(true);
-    when(configuration.getConnectionProviderModel(anyString())).thenReturn(Optional.of(connectionProvider));
     Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(sourceId.isPresent(), is(true));
     modifyParameter(app, MY_CONNECTION, PARAMETER_REQUIRED_FOR_METADATA_NAME,

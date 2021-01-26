@@ -6,21 +6,19 @@
  */
 package org.mule.runtime.config.dsl.model;
 
-import static java.util.Collections.emptySet;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -32,14 +30,14 @@ import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMetadataCacheIdGeneratorTestCase {
 
@@ -372,27 +370,13 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     final String newSchemaLocation = "http://www.mulesoft.org/schema/mule/new-mockns/current/mule-new-mockns.xsd";
 
 
-    ExtensionModel newExtensionModel = mock(ExtensionModel.class);
-
-    initializeExtensionMock(newExtensionModel);
-
-    when(newExtensionModel.getName()).thenReturn(newExtensionModelName);
-    when(newExtensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder()
+    ExtensionModel newExtensionModel = createExtension(newExtensionModelName, XmlDslModel.builder()
         .setXsdFileName("new-mule-mockns.xsd")
         .setPrefix(newNamespace)
         .setNamespace(newNamespaceUri)
         .setSchemaLocation(newSchemaLocation)
         .setSchemaVersion("4.0")
-        .build());
-    when(newExtensionModel.getSubTypes()).thenReturn(emptySet());
-    when(newExtensionModel.getImportedTypes()).thenReturn(emptySet());
-    when(newExtensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder()
-        .setXsdFileName(EMPTY)
-        .setPrefix(newNamespace)
-        .setNamespace(newNamespaceUri)
-        .setSchemaLocation(newSchemaLocation)
-        .setSchemaVersion(EMPTY)
-        .build());
+        .build(), asList(configuration), asList(connectionProvider));
 
     extensions = ImmutableSet.<ExtensionModel>builder()
         .add(MuleExtensionModelProvider.getExtensionModel())
