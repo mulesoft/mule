@@ -433,5 +433,4 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
     return domainRepository.getCompatibleDomain(domainBundleDescriptor.get());
   }
-
 }

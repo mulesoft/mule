@@ -12,6 +12,7 @@ import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -36,15 +37,21 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
@@ -64,6 +71,7 @@ import org.mule.runtime.deployment.model.internal.application.MuleApplicationCla
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
@@ -291,6 +299,40 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
                                       deploymentProperties,
                                       (registry) -> registry.lookupByName(OVERWRITTEN_PROPERTY).get()
                                           .equals(OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE));
+  }
+
+  @Issue("MULE-19040")
+  @Test
+  public void whenAppIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception {
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    app.stop();
+
+    assertThat(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+  }
+
+  @Issue("MULE-19040")
+  @Test
+  public void whenAppIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+
+    assertThat(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    deploymentService.undeploy(app);
+
+    Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   /**
@@ -694,6 +736,81 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertStatus(app, STOPPED);
 
     deploymentService.undeploy(app);
+  }
+
+  @Issue("MULE-19040")
+  @Test
+  public void undeploysStoppedAppAndDoesNotStartItOnDeploy() throws Exception {
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    app.stop();
+    assertStatus(app, STOPPED);
+
+    serviceManager.stop();
+    extensionModelLoaderManager.stop();
+    deploymentService.stop();
+
+    reset(applicationDeploymentListener);
+
+    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
+        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
+
+    serviceManager = muleArtifactResourcesRegistry.getServiceManager();
+    serviceManager.start();
+
+    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
+    extensionModelLoaderManager.start();
+
+    deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
+                                                      muleArtifactResourcesRegistry.getApplicationFactory(),
+                                                      () -> findSchedulerService(serviceManager));
+    configureDeploymentService();
+    deploymentService.start();
+
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
+    assertStatus(app_2, CREATED);
+  }
+
+  @Issue("MULE-19040")
+  @Test
+  public void undeploysNotStoppedAppAndStartsItOnDeploy() throws Exception {
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    assertStatus(app, STARTED);
+
+    serviceManager.stop();
+    extensionModelLoaderManager.stop();
+    deploymentService.stop();
+
+    reset(applicationDeploymentListener);
+
+    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
+        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
+
+    serviceManager = muleArtifactResourcesRegistry.getServiceManager();
+    serviceManager.start();
+
+    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
+    extensionModelLoaderManager.start();
+
+    deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
+                                                      muleArtifactResourcesRegistry.getApplicationFactory(),
+                                                      () -> findSchedulerService(serviceManager));
+    configureDeploymentService();
+    deploymentService.start();
+
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
+    assertStatus(app_2, STARTED);
   }
 
   @Test
