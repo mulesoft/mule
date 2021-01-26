@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -53,8 +51,6 @@ import reactor.util.context.Context;
 class ForeachRouter {
 
   private static final Logger LOGGER = getLogger(ForeachRouter.class);
-  private static final String QUICK_COPY_PROP = "quickCopy";
-  private static final boolean QUICK_COPY = parseBoolean(getProperty(QUICK_COPY_PROP));
 
   static final String MAP_NOT_SUPPORTED_MESSAGE =
       "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
@@ -303,11 +299,6 @@ class ForeachRouter {
   }
 
   private CoreEvent copyEvent(CoreEvent event) {
-    if (QUICK_COPY) {
-      return quickCopy(event, new HashMap<>(0));
-    } else {
-      return event;
-    }
+    return quickCopy(event, new HashMap<>(0));
   }
-
 }

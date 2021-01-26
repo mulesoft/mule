@@ -16,12 +16,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.openjdk.jmh.profile.GCProfiler;
-import org.openjdk.jmh.results.Result;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -134,8 +132,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
             .forks(0)
             .warmupIterations(0)
             .measurementIterations(1);
-        // new Runner(optionsBuilder.build()).runSingle();
-        assertions.accept(new Runner(optionsBuilder.build()).runSingle());
+        new Runner(optionsBuilder.build()).runSingle();
       }
     } catch (RunnerException e) {
       fail(e.getMessage());
