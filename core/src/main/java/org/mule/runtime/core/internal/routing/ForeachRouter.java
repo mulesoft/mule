@@ -173,7 +173,7 @@ class ForeachRouter {
 
   private CoreEvent eventWithCurrentContextDeleted(CoreEvent event) {
     removeContext(event);
-    return copyEvent(event);
+    return quickCopy(event, new HashMap<>(0));
   }
 
   private CoreEvent prepareEvent(CoreEvent event, String expression) {
@@ -193,7 +193,13 @@ class ForeachRouter {
 
       addContext(responseEvent, foreachContext);
 
-      responseEvent = copyEvent(responseEvent);
+      // TODO: MULE-19180
+      // quickCopy(responseEvent, new HashMap<>(0)) is needed because actual InternalEventImplementation might returns a ava.util.Collections.unmodifiableMap instance while getting event internal parameter. 
+      // Under multiples event copy might result in a multiple nested map of java.util.Collections.unmodifiableMap instances.
+      // e.g: Collections.unmodifiableMap(Collections.unmodifiableMap(Collections.unmodifiableMap(....)))
+      // When this structure is to heavy might throw a StackOverflow error when try to access it
+      // Using a SmallMap prevent current issue because SmallMap.unmodifiable implementation validate actual map it's already an UnmodifiableSmallMap instance.
+      responseEvent = quickCopy(responseEvent, new HashMap<>(0));
 
     } catch (Exception e) {
       // Delete foreach context
@@ -296,9 +302,5 @@ class ForeachRouter {
     } else {
       responseBuilder.removeVariable(owner.getRootMessageVariableName());
     }
-  }
-
-  private CoreEvent copyEvent(CoreEvent event) {
-    return quickCopy(event, new HashMap<>(0));
   }
 }
