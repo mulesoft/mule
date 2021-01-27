@@ -19,6 +19,17 @@ import org.junit.Test;
 
 public class SourcesValuesTestCase extends AbstractValuesTestCase {
 
+  private static final String AMERICA = "America";
+  private static final String CONTINENT = "continent";
+  private static final String ARGENTINA = "Argentina";
+  private static final String COUNTRY = "country";
+  private static final String BUENOS_AIRES = "Buenos Aires";
+  private static final String CITY = "city";
+  private static final String LA_PLATA = "La Plata";
+  private static final String USA = "USA";
+  private static final String UNITED_STATES_OF_AMERICA = "United States Of America";
+  private static final String SAN_FRANCISCO = "San Francisco";
+
   @Override
   protected String getConfigFile() {
     return "values/sources-values.xml";
@@ -62,15 +73,15 @@ public class SourcesValuesTestCase extends AbstractValuesTestCase {
   @Test
   public void multiLevelValue() throws Exception {
     Set<Value> values = getValuesFromSource("source-with-multi-level-value", "values");
-    ValueMatcher americaValue = valueWithId("America")
-        .withDisplayName("America")
-        .withPartName("continent")
-        .withChilds(valueWithId("Argentina")
-            .withDisplayName("Argentina")
-            .withPartName("country")
-            .withChilds(valueWithId("Buenos Aires")
-                .withDisplayName("Buenos Aires")
-                .withPartName("city")));
+    ValueMatcher americaValue = valueWithId(AMERICA)
+        .withDisplayName(AMERICA)
+        .withPartName(CONTINENT)
+        .withChilds(valueWithId(ARGENTINA)
+            .withDisplayName(ARGENTINA)
+            .withPartName(COUNTRY)
+            .withChilds(valueWithId(BUENOS_AIRES)
+                .withDisplayName(BUENOS_AIRES)
+                .withPartName(CITY)));
 
     assertThat(values, hasValues(americaValue));
   }
@@ -79,23 +90,23 @@ public class SourcesValuesTestCase extends AbstractValuesTestCase {
   public void childsOrder() throws Exception {
     Set<Value> values = getValuesFromSource("source-with-multi-level-value", "values");
     ValueMatcher americaValue = valueWithId("America").strict()
-        .withDisplayName("America")
-        .withPartName("continent")
-        .withChilds(valueWithId("Argentina")
-            .withDisplayName("Argentina")
-            .withPartName("country")
-            .withChilds(valueWithId("La Plata")
-                .withDisplayName("La Plata")
-                .withPartName("city"),
-                        valueWithId("Buenos Aires")
-                            .withDisplayName("Buenos Aires")
-                            .withPartName("city")),
-                    valueWithId("USA")
-                        .withDisplayName("United States Of America")
-                        .withPartName("country")
-                        .withChilds(valueWithId("San Francisco")
-                            .withDisplayName("San Francisco")
-                            .withPartName("city")));
+        .withDisplayName(AMERICA)
+        .withPartName(CONTINENT)
+        .withChilds(valueWithId(ARGENTINA)
+            .withDisplayName(ARGENTINA)
+            .withPartName(COUNTRY)
+            .withChilds(valueWithId(LA_PLATA)
+                .withDisplayName(LA_PLATA)
+                .withPartName(CITY),
+                        valueWithId(BUENOS_AIRES)
+                            .withDisplayName(BUENOS_AIRES)
+                            .withPartName(CITY)),
+                    valueWithId(USA)
+                        .withDisplayName(UNITED_STATES_OF_AMERICA)
+                        .withPartName(COUNTRY)
+                        .withChilds(valueWithId(SAN_FRANCISCO)
+                            .withDisplayName(SAN_FRANCISCO)
+                            .withPartName(CITY)));
 
     assertThat(values, hasValues(americaValue));
   }
