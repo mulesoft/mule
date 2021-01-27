@@ -15,6 +15,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_P
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentGenerationInformation;
@@ -150,6 +151,11 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
         } else {
           return null;
         }
+      }
+
+      @Override
+      public ParameterGroupModel getGroupModel() {
+        return originalParameter.getGroupModel();
       }
 
       @Override
