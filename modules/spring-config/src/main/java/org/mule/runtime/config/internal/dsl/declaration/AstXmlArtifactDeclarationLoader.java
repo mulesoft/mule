@@ -429,7 +429,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
         copyExplicitAttributes(model, resolveDocAttributes(component), declarer);
       }
 
-      declareNonInlineParameterGroup(declarer, children, elementDsl, group, groupDeclarer, groupAttributes);
+      declareNonInlineParameterGroup(declarer, children, elementDsl, component, group, groupDeclarer, groupAttributes);
     }
     if (!groupDeclarer.getDeclaration().getParameters().isEmpty()) {
       declarer.withParameterGroup(groupDeclarer.getDeclaration());
@@ -437,8 +437,8 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
   }
 
   private void declareNonInlineParameterGroup(ParameterizedElementDeclarer declarer, final List<ComponentAst> children,
-                                              final DslElementSyntax elementDsl, ParameterGroupModel group,
-                                              ParameterGroupElementDeclarer groupDeclarer,
+                                              final DslElementSyntax elementDsl, ComponentAst component,
+                                              ParameterGroupModel group, ParameterGroupElementDeclarer groupDeclarer,
                                               final Map<String, ComponentParameterAst> groupAttributes) {
     group.getParameterModels()
         .stream()
@@ -450,6 +450,19 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
               if (isInfrastructure(param)) {
                 handleInfrastructure(param, children, declarer);
               } else {
+                //                final ComponentParameterAst parameter = component.getParameter(param.getName());
+                //
+                //                if (parameter != null) {
+                //
+                //                  parameter.getValue().applyRight(r -> {
+                //                    if (r instanceof ComponentAst) {
+                //                      param.getType()
+                //                          .accept(getParameterDeclarerVisitor((ComponentAst) r, paramDsl,
+                //                                                              value -> groupDeclarer.withParameter(param.getName(),
+                //                                                                                                   value)));
+                //                    }
+                //                  });
+                //                }
                 children.stream()
                     .filter(c -> c.getIdentifier().getName().equals(paramDsl.getElementName()))
                     .findFirst()
@@ -575,7 +588,7 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
                                  resolveParams(component, param -> groupParams.contains(param)));
             }
           } else {
-            declareNonInlineParameterGroup(declarer, children, modelDsl, group, groupDeclarer, emptyMap());
+            declareNonInlineParameterGroup(declarer, children, modelDsl, component, group, groupDeclarer, emptyMap());
           }
 
           if (!groupDeclarer.getDeclaration().getParameters().isEmpty()) {
@@ -614,6 +627,46 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
                                                       groupDsl.getChild(param.getName()).get(),
                                                       value -> groupBuilder.withParameter(param.getName(), value))));
         });
+  }
+
+  private MetadataTypeVisitor getParameterDeclarerVisitor2(final List<ComponentAst> componentValue,
+                                                           final DslElementSyntax paramDsl,
+                                                           final Consumer<ParameterValue> valueConsumer) {
+    return new MetadataTypeVisitor() {
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        ParameterListValue.Builder listBuilder = ElementDeclarer.newListValue();
+        componentValue
+            .forEach(item -> arrayType.getType().accept(getParameterDeclarerVisitor(item,
+                                                                                    paramDsl.getGeneric(arrayType.getType())
+                                                                                        .get(),
+                                                                                    listBuilder::withValue)));
+        valueConsumer.accept(listBuilder.build());
+      }
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        if (componentValue.isEmpty()) {
+          defaultVisit(objectType);
+          return;
+        }
+
+        ParameterObjectValue.Builder objectValue = ElementDeclarer.newObjectValue();
+        if (isMap(objectType)) {
+          createMapValue2(objectValue, componentValue, objectType.getOpenRestriction().orElse(null));
+        } else {
+          if (paramDsl.isWrapped()) {
+            if (componentValue.size() == 1) {
+              createWrappedObject2(objectType, objectValue, componentValue.get(0));
+            }
+            // } else {
+            // createObjectValueFromType(objectType, objectValue, component, paramDsl);
+          }
+        }
+        valueConsumer.accept(objectValue.build());
+      }
+    };
   }
 
   private MetadataTypeVisitor getParameterDeclarerVisitor(final ComponentAst component,
@@ -656,6 +709,20 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     };
   }
 
+  private void createMapValue2(ParameterObjectValue.Builder objectValue, List<ComponentAst> componentValue,
+                               MetadataType elementMetadataType) {
+    componentValue
+        .forEach(comp -> {
+          final ComponentParameterAst keyParam = comp.getParameter(KEY_ATTRIBUTE_NAME);
+          final ComponentParameterAst valueParam = comp.getParameter(VALUE_ATTRIBUTE_NAME);
+
+          if (keyParam != null && keyParam.getRawValue() != null && valueParam != null && valueParam.getRawValue() != null) {
+            objectValue.withParameter(keyParam.getRawValue(),
+                                      createParameterSimpleValue(valueParam.getRawValue(), elementMetadataType));
+          }
+        });
+  }
+
   private void createMapValue(ParameterObjectValue.Builder objectValue, ComponentAst component,
                               MetadataType elementMetadataType) {
     component.directChildrenStream()
@@ -668,6 +735,24 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
                                       createParameterSimpleValue(valueParam.getRawValue(), elementMetadataType));
           }
         });
+  }
+
+  private void createWrappedObject2(ObjectType objectType, ParameterObjectValue.Builder objectValue,
+                                    final ComponentAst wrappedConfig) {
+    Set<ObjectType> subTypes = context.getTypeCatalog().getSubTypes(objectType);
+    if (!subTypes.isEmpty()) {
+      subTypes.stream()
+          .filter(subType -> wrappedConfig.getModel(MetadataTypeAdapter.class)
+              .map(mtma -> mtma.isWrapperFor(subType))
+              .orElse(false))
+          .findFirst()
+          .ifPresent(subType -> createObjectValueFromType(subType, objectValue, wrappedConfig,
+                                                          wrappedConfig.getGenerationInformation().getSyntax().get()));
+
+    } else if (objectType.getAnnotation(ExtensibleTypeAnnotation.class).isPresent()) {
+      createObjectValueFromType(objectType, objectValue, wrappedConfig,
+                                wrappedConfig.getGenerationInformation().getSyntax().get());
+    }
   }
 
   private void createWrappedObject(ObjectType objectType, ParameterObjectValue.Builder objectValue, ComponentAst component) {
@@ -703,7 +788,6 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     }
 
     copyExplicitAttributes(resolveAttributes(component, param -> !param.getModel().isComponentId()), objectValue, objectType);
-
 
     objectType.getFields()
         .forEach(fieldType -> {
