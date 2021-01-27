@@ -17,8 +17,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Configuration(name = "auth-code")
+<<<<<<< Updated upstream
 @ConnectionProviders({TestOAuthConnectionProvider.class, ScopelessOAuthConnectionProvider.class,
     TestOAuthRefreshValidationConnectionProvider.class})
+=======
+<<<<<<< Updated upstream
+@ConnectionProviders({TestOAuthConnectionProvider.class, ScopelessOAuthConnectionProvider.class})
+=======
+@ConnectionProviders({TestOAuthConnectionProvider.class, ScopelessOAuthConnectionProvider.class,
+    TestOAuthRefreshValidationConnectionProvider.class, TestWithOAuthParamsConnectionProvider.class})
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 @Operations({TestOAuthOperations.class, CallbackOperations.class})
 @Sources({TestOAuthRefreshPollingSource.class, TestOAuthRefreshSource.class})
 public class AuthCodeConfig {
