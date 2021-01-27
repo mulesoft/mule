@@ -8,12 +8,14 @@ package org.mule.runtime.config.dsl.model;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
@@ -22,6 +24,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -36,7 +39,9 @@ import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
+import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -176,9 +181,13 @@ public class DeclarationElementModelFactoryTestCase extends AbstractDslModelTest
     when(emptyConfig.getSourceModels()).thenReturn(emptyList());
     when(emptyConfig.getConnectionProviders()).thenReturn(emptyList());
 
-    ExtensionModel extensionModel = mock(ExtensionModel.class, withSettings().lenient());
-    initializeExtensionMock(extensionModel);
-    when(extensionModel.getConfigurationModels()).thenReturn(asList(emptyConfig));
+    mockExtension = createExtension(EXTENSION_NAME, XmlDslModel.builder()
+        .setXsdFileName("mule-mockns.xsd")
+        .setPrefix(NAMESPACE)
+        .setNamespace(NAMESPACE_URI)
+        .setSchemaLocation(SCHEMA_LOCATION)
+        .setSchemaVersion("4.0")
+        .build(), asList(emptyConfig), asList(connectionProvider));
 
     ConfigurationElementDeclaration declaration =
         ElementDeclarer.forExtension(EXTENSION_NAME).newConfiguration(CONFIGURATION_NAME)
@@ -196,9 +205,13 @@ public class DeclarationElementModelFactoryTestCase extends AbstractDslModelTest
     when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
     when(connectionProvider.getParameterGroupModels()).thenReturn(emptyList());
 
-    ExtensionModel extensionModel = mock(ExtensionModel.class, withSettings().lenient());
-    initializeExtensionMock(extensionModel);
-    when(extensionModel.getConnectionProviders()).thenReturn(asList(emptyConnection));
+    mockExtension = createExtension(EXTENSION_NAME, XmlDslModel.builder()
+        .setXsdFileName("mule-mockns.xsd")
+        .setPrefix(NAMESPACE)
+        .setNamespace(NAMESPACE_URI)
+        .setSchemaLocation(SCHEMA_LOCATION)
+        .setSchemaVersion("4.0")
+        .build(), asList(configuration), asList(emptyConnection));
 
     ConnectionElementDeclaration declaration =
         ElementDeclarer.forExtension(EXTENSION_NAME).newConnection(CONNECTION_PROVIDER_NAME)
@@ -207,6 +220,34 @@ public class DeclarationElementModelFactoryTestCase extends AbstractDslModelTest
     DslElementModel<ConnectionProviderModel> element = create(declaration);
     assertThat(element.getModel(), is(connectionProvider));
     assertThat(element.getContainedElements().isEmpty(), is(true));
+  }
+
+  @Override
+  protected ExtensionModel createExtension(String name, XmlDslModel xmlDslModel, List<ConfigurationModel> configs,
+                                           List<ConnectionProviderModel> connectionProviders) {
+    return new ImmutableExtensionModel(name,
+                                       "",
+                                       "1.0",
+                                       "Mulesoft",
+                                       COMMUNITY,
+                                       configs,
+                                       asList(operation, anotherOperation),
+                                       connectionProviders,
+                                       asList(source),
+                                       emptyList(),
+                                       emptyList(),
+                                       null,
+                                       xmlDslModel,
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet());
   }
 
   @Test

@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
+import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArtifact;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
@@ -38,6 +40,9 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.api.LazyComponentInitializer.ComponentLocationFilter;
 import org.mule.runtime.config.dsl.model.AbstractDslModelTestCase;
@@ -50,8 +55,10 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.ConfigResource;
+import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -172,8 +179,31 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
   }
 
   @Override
-  protected void initializeExtensionMock(ExtensionModel extension) {
-    when(extension.getName()).thenReturn(EXTENSION_NAME);
+  protected ExtensionModel createExtension(String name, XmlDslModel xmlDslModel, List<ConfigurationModel> configs,
+                                           List<ConnectionProviderModel> connectionProviders) {
+    return new ImmutableExtensionModel(EXTENSION_NAME,
+                                       "",
+                                       "1.0",
+                                       "Mulesoft",
+                                       COMMUNITY,
+                                       emptyList(),
+                                       emptyList(),
+                                       emptyList(),
+                                       emptyList(),
+                                       emptyList(),
+                                       emptyList(),
+                                       null,
+                                       xmlDslModel,
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet(),
+                                       emptySet());
   }
 
   private ArtifactDeclaration getSimpleApp() {

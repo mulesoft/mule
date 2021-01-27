@@ -73,8 +73,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.hamcrest.Matchers;
-import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.creation.MockSettingsImpl;
@@ -85,6 +83,8 @@ import com.google.common.collect.ImmutableList;
 
 import io.qameta.allure.Issue;
 
+//@RunWith(FlakinessDetectorTestRunner.class)
+//@FlakyTest
 public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadataCacheIdGeneratorTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelBasedMetadataCacheKeyGeneratorTestCase.class);
