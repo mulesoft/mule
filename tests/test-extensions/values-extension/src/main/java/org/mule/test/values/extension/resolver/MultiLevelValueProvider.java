@@ -15,19 +15,19 @@ import java.util.Set;
 
 public class MultiLevelValueProvider implements ValueProvider {
 
-  private static final String AMERICA = "America";
-  private static final String ARGENTINA = "Argentina";
-  private static final String BUENOS_AIRES = "Buenos Aires";
-  private static final String LA_PLATA = "La Plata";
-  private static final String USA = "USA";
-  private static final String USA_DISPLAY_NAME = "United States Of America";
-  private static final String SAN_FRANCISCO = "San Francisco";
+  public static final String AMERICA = "America";
+  public static final String ARGENTINA = "Argentina";
+  public static final String BUENOS_AIRES = "Buenos Aires";
+  public static final String LA_PLATA = "La Plata";
+  public static final String USA = "USA";
+  public static final String USA_DISPLAY_NAME = "United States Of America";
+  public static final String SAN_FRANCISCO = "San Francisco";
 
   @Override
   public Set<Value> resolve() {
     return Collections.singleton(ValueBuilder.newValue(AMERICA).withDisplayName(AMERICA)
-        .withChild(ValueBuilder.newValue(ARGENTINA).withChild(ValueBuilder.newValue(BUENOS_AIRES))
-            .withChild(ValueBuilder.newValue(LA_PLATA)))
+        .withChild(ValueBuilder.newValue(ARGENTINA).withChild(ValueBuilder.newValue(LA_PLATA))
+            .withChild(ValueBuilder.newValue(BUENOS_AIRES)))
         .withChild(ValueBuilder.newValue(USA).withDisplayName(USA_DISPLAY_NAME).withChild(ValueBuilder.newValue(SAN_FRANCISCO)))
         .build());
   }

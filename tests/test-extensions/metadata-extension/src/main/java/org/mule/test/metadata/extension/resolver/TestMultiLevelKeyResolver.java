@@ -7,6 +7,7 @@
 package org.mule.test.metadata.extension.resolver;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Sets.newLinkedHashSet;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.APPLICATION_JAVA_MIME_TYPE;
 
@@ -23,6 +24,7 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.test.metadata.extension.LocationKey;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class TestMultiLevelKeyResolver implements TypeKeysResolver, InputTypeResolver<LocationKey> {
@@ -71,7 +73,10 @@ public class TestMultiLevelKeyResolver implements TypeKeysResolver, InputTypeRes
 
   @Override
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
-    return newHashSet(buildAmericaKey(), buildEuropeKey());
+    LinkedHashSet<MetadataKey> keys = newLinkedHashSet();
+    keys.add(buildAmericaKey());
+    keys.add(buildEuropeKey());
+    return keys;
   }
 
   public static MetadataKey buildEuropeKey() {

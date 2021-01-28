@@ -10,11 +10,13 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import org.mule.runtime.api.value.Value;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.collection.IsIterableContainingInOrder;
 
 /**
  * {@link Matcher} to easily test the structure of a {@link Value}
@@ -28,6 +30,8 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
   private Matcher<String> partName;
   private StringBuilder descriptionBuilder = new StringBuilder();
   private ValueMatcher[] childValues = new ValueMatcher[] {};
+
+  private boolean strict = false;
 
   private ValueMatcher(Matcher<String> id) {
     this.id = id;
@@ -60,7 +64,11 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
       assertThat(value.getId(), id);
       assertThat(value.getDisplayName(), displayName);
       assertThat(value.getPartName(), partName);
-      assertThat(value.getChilds(), hasItems(childValues));
+      if (strict) {
+        assertThat(value.getChilds(), contains(childValues));
+      } else {
+        assertThat(value.getChilds(), hasItems(childValues));
+      }
       return true;
     } catch (RuntimeException e) {
       return false;
@@ -127,6 +135,16 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
     descriptionBuilder.append(format(", with child values that %s", stream(childValues)
         .map(Matcher::toString)
         .collect(joining(", "))));
+    return this;
+  }
+
+  /**
+   * Defines if the {@link Value} should be completed and childs validated in order.
+   *
+   * @return the contribute {@link ValueMatcher}
+   */
+  public ValueMatcher strict() {
+    this.strict = true;
     return this;
   }
 

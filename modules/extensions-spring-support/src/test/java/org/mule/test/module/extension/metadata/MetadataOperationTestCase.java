@@ -33,6 +33,8 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.BUENOS_AIRES;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.EUROPE;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.LA_PLATA;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA_DISPLAY_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
 import org.mule.functional.listener.Callback;
@@ -124,8 +126,20 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final Set<MetadataKey> continents = getKeysFromContainer(metadataKeysResult.get());
     assertThat(continents, hasSize(2));
 
-    assertThat(continents, hasItem(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT)));
-    assertThat(continents, hasItem(metadataKeyWithId(EUROPE).withDisplayName(EUROPE).withPartName(CONTINENT)));
+    // preserve order
+    assertThat(continents, hasItems(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT),
+                                    metadataKeyWithId(EUROPE).withDisplayName(EUROPE).withPartName(CONTINENT)));
+
+    // preserve order
+    MetadataKey americaKey = continents.iterator().next();
+    assertThat(americaKey.getChilds(), hasItems(metadataKeyWithId(ARGENTINA).withDisplayName(ARGENTINA).withPartName(COUNTRY),
+                                                metadataKeyWithId(USA).withDisplayName(USA_DISPLAY_NAME).withPartName(COUNTRY)));
+
+    // preserve order
+    MetadataKey argentinaKey = americaKey.getChilds().iterator().next();
+    assertThat(argentinaKey.getChilds(),
+               hasItems(metadataKeyWithId(BUENOS_AIRES).withDisplayName(BUENOS_AIRES).withPartName(CITY),
+                        metadataKeyWithId(LA_PLATA).withDisplayName(LA_PLATA).withPartName(CITY)));
   }
 
   @Test

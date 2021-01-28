@@ -9,6 +9,13 @@ package org.mule.test.module.extension.values;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mule.tck.junit4.matcher.ValueMatcher.valueWithId;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.AMERICA;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.ARGENTINA;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.BUENOS_AIRES;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.LA_PLATA;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.SAN_FRANCISCO;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.USA;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.USA_DISPLAY_NAME;
 
 import org.mule.runtime.api.value.Value;
 import org.mule.tck.junit4.matcher.ValueMatcher;
@@ -18,6 +25,10 @@ import java.util.Set;
 import org.junit.Test;
 
 public class SourcesValuesTestCase extends AbstractValuesTestCase {
+
+  private static final String CONTINENT = "continent";
+  private static final String COUNTRY = "country";
+  private static final String CITY = "city";
 
   @Override
   protected String getConfigFile() {
@@ -62,15 +73,40 @@ public class SourcesValuesTestCase extends AbstractValuesTestCase {
   @Test
   public void multiLevelValue() throws Exception {
     Set<Value> values = getValuesFromSource("source-with-multi-level-value", "values");
-    ValueMatcher americaValue = valueWithId("America")
-        .withDisplayName("America")
-        .withPartName("continent")
-        .withChilds(valueWithId("Argentina")
-            .withDisplayName("Argentina")
-            .withPartName("country")
-            .withChilds(valueWithId("Buenos Aires")
-                .withDisplayName("Buenos Aires")
-                .withPartName("city")));
+    ValueMatcher americaValue = valueWithId(AMERICA)
+        .withDisplayName(AMERICA)
+        .withPartName(CONTINENT)
+        .withChilds(valueWithId(ARGENTINA)
+            .withDisplayName(ARGENTINA)
+            .withPartName(COUNTRY)
+            .withChilds(valueWithId(BUENOS_AIRES)
+                .withDisplayName(BUENOS_AIRES)
+                .withPartName(CITY)));
+
+    assertThat(values, hasValues(americaValue));
+  }
+
+  @Test
+  public void childsOrder() throws Exception {
+    Set<Value> values = getValuesFromSource("source-with-multi-level-value", "values");
+    ValueMatcher americaValue = valueWithId("America").strict()
+        .withDisplayName(AMERICA)
+        .withPartName(CONTINENT)
+        .withChilds(valueWithId(ARGENTINA)
+            .withDisplayName(ARGENTINA)
+            .withPartName(COUNTRY)
+            .withChilds(valueWithId(LA_PLATA)
+                .withDisplayName(LA_PLATA)
+                .withPartName(CITY),
+                        valueWithId(BUENOS_AIRES)
+                            .withDisplayName(BUENOS_AIRES)
+                            .withPartName(CITY)),
+                    valueWithId(USA)
+                        .withDisplayName(USA_DISPLAY_NAME)
+                        .withPartName(COUNTRY)
+                        .withChilds(valueWithId(SAN_FRANCISCO)
+                            .withDisplayName(SAN_FRANCISCO)
+                            .withPartName(CITY)));
 
     assertThat(values, hasValues(americaValue));
   }
