@@ -14,7 +14,6 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 
 import io.qameta.allure.Issue;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -29,7 +28,6 @@ public class DefaultEventBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("MULE-19180")
-  @Ignore("MULE-19180")
   public void stackOverflowOverInternalParameter() throws MuleException {
     InternalEvent quickCopy = quickCopy(newEvent(), singletonMap(INTERNAL_PARAMETER_KEY, INTERNAL_PARAMETER_VALUE));
 
