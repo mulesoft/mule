@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -35,13 +36,18 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -74,6 +80,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
@@ -625,6 +632,36 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  @Issue("MULE-19040")
+  @Description("When a domain was stopped and the server is restarted, the domain should not start")
+  public void redeploysDomainZipRefreshesAppsButIfTheyWereStoppedTheyDoNotStart() throws Exception {
+    addPackedDomainFromBuilder(dummyDomainFileBuilder);
+    File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
+    long firstFileTimestamp = dummyDomainFile.lastModified();
+
+    addPackedAppFromBuilder(dummyDomainApp1FileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+
+    final Application app = findApp(dummyDomainApp1FileBuilder.getId(), 1);
+    app.stop();
+
+    reset(domainDeploymentListener);
+    reset(applicationDeploymentListener);
+
+    addPackedDomainFromBuilder(dummyDomainFileBuilder);
+    alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
+
+    assertUndeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+    assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+    assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
+  }
+
+  @Test
   public void redeploysDomainZipDeployedAfterStartup() throws Exception {
     addPackedDomainFromBuilder(dummyDomainFileBuilder);
     File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
@@ -1059,6 +1096,43 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  @Issue("MULE-19040")
+  @Description("When a domain was stopped, this state should be persisted as a deployment property")
+  public void whenDomainIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception {
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+    final Domain domain = findADomain(emptyDomainFileBuilder.getId());
+    domain.stop();
+
+    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+
+    Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), Optional.empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+  }
+
+  @Test
+  @Issue("MULE-19040")
+  @Description("When a domain was stopped by undeployment, this state should not be persisted as a deployment property")
+  public void whenDomainIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+    final Domain domain = findADomain(emptyDomainFileBuilder.getId());
+
+    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    deploymentService.undeploy(domain);
+
+    Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), Optional.empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+  }
+
+  @Test
   public void undeploysDomainRemovingAnchorFile() throws Exception {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
@@ -1263,6 +1337,34 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     redeployAndVerifyPropertyInRegistry(domainWithPropsFileBuilder.getId(), deploymentProperties,
                                         (registry) -> registry.lookupByName(COMPONENT_NAME_IN_APP)
                                             .get() instanceof TestComponentOnRedeploy);
+  }
+
+  @Test
+  @Issue("MULE-19040")
+  @Description("When a domain is restarted, if its apps were stopped before restart, they should not get started")
+  public void redeployDomainWithStoppedAppsShouldPersistStoppedStateAndDoNotStartApps() throws Exception {
+    addPackedDomainFromBuilder(dummyDomainFileBuilder);
+    File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
+
+    addPackedAppFromBuilder(dummyDomainApp1FileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+    final Domain domain = findADomain(dummyDomainFileBuilder.getId());
+    assertThat(domain.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+
+    final Application app = findApp(dummyDomainApp1FileBuilder.getId(), 1);
+    app.stop();
+
+    redeployId(dummyDomainFileBuilder.getId(), null);
+
+    Properties deploymentProperties = resolveDeploymentProperties(dummyDomainApp1FileBuilder.getId(), Optional.empty());
+    assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
   }
 
   @Ignore("MULE-6926: flaky test")
