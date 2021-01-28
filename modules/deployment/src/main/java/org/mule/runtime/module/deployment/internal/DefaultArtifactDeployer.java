@@ -30,7 +30,7 @@ import java.util.Optional;
 
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
-import org.mule.runtime.core.internal.context.FlowStoppedListener;
+import org.mule.runtime.core.internal.context.FlowStoppedPersistenceListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultArtifactDeployer<T extends DeployableArtifact> implements ArtifactDeployer<T> {
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
-  private HashMap<String, List<FlowStoppedListener>> appsFlowStoppedListeners = new HashMap<>();
+  private HashMap<String, List<FlowStoppedPersistenceListener>> appsFlowStoppedListeners = new HashMap<>();
 
   @Override
   public void deploy(T artifact, boolean startArtifact) {
@@ -76,9 +76,10 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   private void addFlowStoppedListeners(T artifact) {
     appsFlowStoppedListeners.put(artifact.getArtifactName(), new ArrayList<>());
     for (Flow flow : artifact.getRegistry().lookupAllByType(Flow.class)) {
-      FlowStoppedListener flowStoppedListener = new FlowStoppedDeploymentListener(flow.getName(), artifact.getArtifactName());
-      ((DefaultFlowBuilder.DefaultFlow) flow).addFlowStoppedListener(flowStoppedListener);
-      appsFlowStoppedListeners.get(artifact.getArtifactName()).add(flowStoppedListener);
+      FlowStoppedPersistenceListener flowStoppedPersistenceListener =
+          new FlowStoppedDeploymentPersistenceListener(flow.getName(), artifact.getArtifactName());
+      ((DefaultFlowBuilder.DefaultFlow) flow).addFlowStoppedListener(flowStoppedPersistenceListener);
+      appsFlowStoppedListeners.get(artifact.getArtifactName()).add(flowStoppedPersistenceListener);
     }
   }
 
@@ -168,9 +169,9 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   }
 
   public void doNotPersistFlowsStop(String artifactName) {
-    if (appsFlowStoppedListeners.containsKey(artifactName)){
+    if (appsFlowStoppedListeners.containsKey(artifactName)) {
       appsFlowStoppedListeners.get(artifactName)
-          .forEach(FlowStoppedListener::doNotPersist);
+          .forEach(FlowStoppedPersistenceListener::doNotPersist);
     }
   }
 

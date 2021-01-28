@@ -881,8 +881,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     extensionModelLoaderManager.start();
 
     deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
-        muleArtifactResourcesRegistry.getApplicationFactory(),
-        () -> findSchedulerService(serviceManager));
+                                                      muleArtifactResourcesRegistry.getApplicationFactory(),
+                                                      () -> findSchedulerService(serviceManager));
     configureDeploymentService();
     deploymentService.start();
 

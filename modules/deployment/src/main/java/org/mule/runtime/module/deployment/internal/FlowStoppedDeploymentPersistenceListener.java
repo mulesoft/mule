@@ -13,7 +13,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
 
-import org.mule.runtime.core.internal.context.FlowStoppedListener;
+import org.mule.runtime.core.internal.context.FlowStoppedPersistenceListener;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FlowStoppedDeploymentListener implements FlowStoppedListener {
+public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPersistenceListener {
 
   private transient final Logger logger = LoggerFactory.getLogger(getClass());
   private AtomicBoolean shouldPersist;
@@ -32,7 +32,7 @@ public class FlowStoppedDeploymentListener implements FlowStoppedListener {
   private String propertyName;
   private AtomicBoolean shouldStart;
 
-  public FlowStoppedDeploymentListener(String flowName, String appName) {
+  public FlowStoppedDeploymentPersistenceListener(String flowName, String appName) {
     this.flowName = flowName;
     this.appName = appName;
     this.propertyName = flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY;

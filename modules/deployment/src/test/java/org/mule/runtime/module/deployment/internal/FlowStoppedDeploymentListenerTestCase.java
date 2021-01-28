@@ -17,7 +17,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
-import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
 
 import java.io.File;
 import java.util.Properties;
@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class FlowStoppedDeploymentListenerTestCase {
+
   private String appName;
   private String flowName;
 
@@ -47,7 +48,8 @@ public class FlowStoppedDeploymentListenerTestCase {
   public void onStopShouldSaveDeploymentProperty() throws Exception {
     String propertyName = flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY;
 
-    FlowStoppedDeploymentListener flowStoppedDeploymentListener = new FlowStoppedDeploymentListener(flowName, appName);
+    FlowStoppedDeploymentPersistenceListener flowStoppedDeploymentListener =
+        new FlowStoppedDeploymentPersistenceListener(flowName, appName);
     flowStoppedDeploymentListener.onStop();
 
     Properties deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
@@ -59,7 +61,8 @@ public class FlowStoppedDeploymentListenerTestCase {
   public void onStopWhenShouldNotPersistIsFalseShouldNotSaveDeploymentProperty() throws Exception {
     String propertyName = flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY;
 
-    FlowStoppedDeploymentListener flowStoppedDeploymentListener = new FlowStoppedDeploymentListener(flowName, appName);
+    FlowStoppedDeploymentPersistenceListener flowStoppedDeploymentListener =
+        new FlowStoppedDeploymentPersistenceListener(flowName, appName);
     flowStoppedDeploymentListener.doNotPersist();
     flowStoppedDeploymentListener.onStop();
 
@@ -71,7 +74,8 @@ public class FlowStoppedDeploymentListenerTestCase {
   public void onStartShouldSaveDeploymentPropertyAsTrue() throws Exception {
     String propertyName = flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY;
 
-    FlowStoppedDeploymentListener flowStoppedDeploymentListener = new FlowStoppedDeploymentListener(flowName, appName);
+    FlowStoppedDeploymentPersistenceListener flowStoppedDeploymentListener =
+        new FlowStoppedDeploymentPersistenceListener(flowName, appName);
     flowStoppedDeploymentListener.onStart();
 
     Properties deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
@@ -87,7 +91,8 @@ public class FlowStoppedDeploymentListenerTestCase {
     properties.setProperty(propertyName, valueOf(false));
     resolveFlowDeploymentProperties(appName, of(properties));
 
-    FlowStoppedDeploymentListener flowStoppedDeploymentListener = new FlowStoppedDeploymentListener(flowName, appName);
+    FlowStoppedDeploymentPersistenceListener flowStoppedDeploymentListener =
+        new FlowStoppedDeploymentPersistenceListener(flowName, appName);
     flowStoppedDeploymentListener.checkIfFlowShouldStart();
 
     assertThat(flowStoppedDeploymentListener.shouldStart(), is(false));

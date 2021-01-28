@@ -38,9 +38,10 @@ public class DeploymentPropertiesUtils {
    * passed, the previous persisted properties are returned. Otherwise, the new deployment properties are used and persisted in
    * .mule/app/deployment-properties/<fileName>.
    *
-   * @param artifactName         name of the artifact.
+   * @param artifactName name of the artifact.
    * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
    * @param fileName name of the file where the deployment properties are persisted.
+   *
    * @return deployment properties
    * @throws IOException
    */
@@ -67,6 +68,7 @@ public class DeploymentPropertiesUtils {
    *
    * @param deploymentPropertiesPath the path where the deployment properties are located
    * @return deployment properties
+   *
    * @throws IOException
    */
   private static Properties getDeploymentProperties(String deploymentPropertiesPath, String fileName) throws IOException {
