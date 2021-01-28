@@ -26,7 +26,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FlowStoppedDeploymentListenerTestCase {
+public class FlowStoppedDeploymentPersistenceListenerTestCase {
 
   private String appName;
   private String flowName;
@@ -39,7 +39,7 @@ public class FlowStoppedDeploymentListenerTestCase {
 
   @After
   public void tearDown() throws Exception {
-    // Cleaning deployment properties
+    // Cleaning up deployment properties
     File file = new File(getExecutionFolder(), appName);
     deleteDirectory(file);
   }
