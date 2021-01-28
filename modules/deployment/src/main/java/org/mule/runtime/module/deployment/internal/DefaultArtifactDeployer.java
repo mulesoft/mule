@@ -166,9 +166,12 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::doNotPersist);
     }
   }
+
   public void doNotPersistFlowsStop(String artifactName) {
-    appsFlowStoppedListeners.get(artifactName)
-        .forEach(FlowStoppedListener::doNotPersist);
+    if (appsFlowStoppedListeners.containsKey(artifactName)){
+      appsFlowStoppedListeners.get(artifactName)
+          .forEach(FlowStoppedListener::doNotPersist);
+    }
   }
 
 }

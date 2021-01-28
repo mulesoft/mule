@@ -80,7 +80,7 @@ public class FlowStoppedDeploymentListener implements FlowStoppedListener {
     try {
       deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
     } catch (IOException e) {
-      logger.error("FlowStoppedDeploymentListener failed to process mustStart for flow "
+      logger.error("FlowStoppedDeploymentListener failed to process checkIfFlowShouldStart for flow "
           + flowName, e);
     }
     shouldStart.set(deploymentProperties != null

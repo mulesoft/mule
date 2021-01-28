@@ -63,6 +63,7 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -811,6 +812,158 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
     final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
     assertStatus(app_2, STARTED);
+  }
+
+  @Issue("MULE-19127")
+  @Test
+  public void undeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+      flow.stop();
+    }
+
+    serviceManager.stop();
+    extensionModelLoaderManager.stop();
+    deploymentService.stop();
+
+    reset(applicationDeploymentListener);
+
+    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
+        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
+
+    serviceManager = muleArtifactResourcesRegistry.getServiceManager();
+    serviceManager.start();
+
+    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
+    extensionModelLoaderManager.start();
+
+    deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
+                                                      muleArtifactResourcesRegistry.getApplicationFactory(),
+                                                      () -> findSchedulerService(serviceManager));
+    configureDeploymentService();
+    deploymentService.start();
+
+    assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    final Application app_2 = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    assertStatus(app_2, STARTED);
+    for (Flow flow : app_2.getRegistry().lookupAllByType(Flow.class)) {
+      assertThat(flow.getLifecycleState().isStarted(), is(false));
+    }
+  }
+
+  @Issue("MULE-19127")
+  @Test
+  public void undeploysAppWithNotStoppedFlowAndStartsItOnDeploy() throws Exception {
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+
+    serviceManager.stop();
+    extensionModelLoaderManager.stop();
+    deploymentService.stop();
+
+    reset(applicationDeploymentListener);
+
+    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
+        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
+
+    serviceManager = muleArtifactResourcesRegistry.getServiceManager();
+    serviceManager.start();
+
+    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
+    extensionModelLoaderManager.start();
+
+    deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
+        muleArtifactResourcesRegistry.getApplicationFactory(),
+        () -> findSchedulerService(serviceManager));
+    configureDeploymentService();
+    deploymentService.start();
+
+    assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    final Application app_2 = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    assertStatus(app_2, STARTED);
+    for (Flow flow : app_2.getRegistry().lookupAllByType(Flow.class)) {
+      assertThat(flow.getLifecycleState().isStarted(), is(true));
+    }
+  }
+
+  @Issue("MULE-19127")
+  @Test
+  public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+      flow.stop();
+    }
+
+    reset(applicationDeploymentListener);
+    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+
+    assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    final Application app_2 = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    assertStatus(app_2, STARTED);
+    for (Flow flow : app_2.getRegistry().lookupAllByType(Flow.class)) {
+      assertThat(flow.getLifecycleState().isStarted(), is(false));
+    }
+  }
+
+  @Issue("MULE-19127")
+  @Test
+  public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeployButCanBeStartedManually() throws Exception {
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+      flow.stop();
+    }
+
+    reset(applicationDeploymentListener);
+    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+
+    assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    final Application app_2 = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    assertStatus(app_2, STARTED);
+    for (Flow flow : app_2.getRegistry().lookupAllByType(Flow.class)) {
+      assertThat(flow.getLifecycleState().isStarted(), is(false));
+      flow.start();
+      assertThat(flow.getLifecycleState().isStarted(), is(true));
+    }
+  }
+
+  @Issue("MULE-19127")
+  @Test
+  public void stopsAndStartsAppWithStoppedFlowAndDoesNotStartIt() throws Exception {
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+      flow.stop();
+    }
+    app.stop();
+    assertStatus(app, STOPPED);
+    app.start();
+    assertStatus(app, STARTED);
+
+    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+      assertThat(flow.getLifecycleState().isStarted(), is(false));
+    }
   }
 
   @Test

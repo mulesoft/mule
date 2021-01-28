@@ -372,7 +372,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
 
     String[] artifactAnchors = findExpectedAnchorFiles(artifacts);
-    @SuppressWarnings("unchecked") final Collection<String> deletedAnchors = subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
+    @SuppressWarnings("unchecked")
+    final Collection<String> deletedAnchors = subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
     if (logger.isDebugEnabled()) {
       StringBuilder sb = new StringBuilder();
       sb.append(format("Deleted anchors:%n"));
@@ -537,7 +538,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
       }
       File descriptorFile =
           new File(((DeployableArtifactDescriptor) artifact.getDescriptor()).getArtifactLocation(),
-              ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
+                   ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
       if (descriptorFile.exists()) {
         timestampsPerResource.put(descriptorFile.getAbsolutePath(), descriptorFile.lastModified());
       }
