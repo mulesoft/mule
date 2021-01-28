@@ -9,6 +9,13 @@ package org.mule.test.module.extension.values;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mule.tck.junit4.matcher.ValueMatcher.valueWithId;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.AMERICA;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.ARGENTINA;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.BUENOS_AIRES;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.LA_PLATA;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.SAN_FRANCISCO;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.USA;
+import static org.mule.test.values.extension.resolver.MultiLevelValueProvider.USA_DISPLAY_NAME;
 
 import org.mule.runtime.api.value.Value;
 import org.mule.tck.junit4.matcher.ValueMatcher;
@@ -19,16 +26,9 @@ import org.junit.Test;
 
 public class SourcesValuesTestCase extends AbstractValuesTestCase {
 
-  private static final String AMERICA = "America";
   private static final String CONTINENT = "continent";
-  private static final String ARGENTINA = "Argentina";
   private static final String COUNTRY = "country";
-  private static final String BUENOS_AIRES = "Buenos Aires";
   private static final String CITY = "city";
-  private static final String LA_PLATA = "La Plata";
-  private static final String USA = "USA";
-  private static final String UNITED_STATES_OF_AMERICA = "United States Of America";
-  private static final String SAN_FRANCISCO = "San Francisco";
 
   @Override
   protected String getConfigFile() {
@@ -102,7 +102,7 @@ public class SourcesValuesTestCase extends AbstractValuesTestCase {
                             .withDisplayName(BUENOS_AIRES)
                             .withPartName(CITY)),
                     valueWithId(USA)
-                        .withDisplayName(UNITED_STATES_OF_AMERICA)
+                        .withDisplayName(USA_DISPLAY_NAME)
                         .withPartName(COUNTRY)
                         .withChilds(valueWithId(SAN_FRANCISCO)
                             .withDisplayName(SAN_FRANCISCO)
