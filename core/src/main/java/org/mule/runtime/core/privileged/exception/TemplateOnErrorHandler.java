@@ -51,7 +51,6 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
@@ -338,9 +337,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
               // When lazy init deployment is used an error-mapping may not be initialized due to the component that declares it
               // could not be part of the minimal application model. So, whenever we found that scenario we have to create the
               // errorType if not present in the repository already.
-              /* if (configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false)) {
-                 return errorTypeRepository.addErrorType(errorTypeComponentIdentifier, errorTypeRepository.getAnyErrorType());
-               } else */if (getBoolean(MULE_LAX_ERROR_TYPES)) {
+              if (getBoolean(MULE_LAX_ERROR_TYPES)) {
                 LOGGER.warn("Could not find ErrorType for the given identifier: {}", parsedIdentifier);
                 return errorTypeRepository.addErrorType(errorTypeComponentIdentifier, errorTypeRepository.getAnyErrorType());
               } else {
@@ -363,11 +360,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       return true;
     }
 
-    if (Objects.equals(WILDCARD_TOKEN, errorTypeIdentifier.getNamespace())) {
-      return true;
-    }
-
-    return false;
+    return Objects.equals(WILDCARD_TOKEN, errorTypeIdentifier.getNamespace());
   }
 
   /**

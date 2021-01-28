@@ -83,7 +83,6 @@ import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -181,13 +180,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     customizationService.overrideDefaultServiceImpl(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, this);
 
-    String sharedPartitionatedPersistentObjectStorePath = artifactProperties.get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
-    if (sharedPartitionatedPersistentObjectStorePath != null) {
+    String sharedPartitionedPersistentObjectStorePath = artifactProperties.get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
+    if (sharedPartitionedPersistentObjectStorePath != null) {
       // We need to first define this service so it would be later initialized
       muleContext.getCustomizationService().registerCustomServiceClass(SHARED_PERSISTENT_OBJECT_STORE_KEY,
                                                                        SharedPartitionedPersistentObjectStore.class);
       muleContext.getCustomizationService().overrideDefaultServiceImpl(SHARED_PERSISTENT_OBJECT_STORE_KEY,
-                                                                       new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionatedPersistentObjectStorePath),
+                                                                       new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionedPersistentObjectStorePath),
                                                                                                                     runtimeLockFactory));
       MuleObjectStoreManager osm = new MuleObjectStoreManager();
       osm.setBasePersistentStoreKey(SHARED_PERSISTENT_OBJECT_STORE_KEY);
@@ -350,7 +349,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
               comp.getLocation().getLocation().equals(locationOptional.get().toString()));
 
       final ArtifactAst minimalApplicationModel = buildMinimalApplicationModel(basePredicate);
-      validateAst(minimalApplicationModel);
+      //validateAst(minimalApplicationModel);
 
       if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
           .noneMatch(comp -> comp.getLocation() != null
@@ -634,7 +633,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * Just register the locations, do not do any initialization!
    */
   @Override
-  protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
+  protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) {
     getApplicationModel()
         .filteredComponents(cm -> !isIgnored(cm))
         .forEach(cm -> componentLocator.addComponentLocation(cm.getLocation()));

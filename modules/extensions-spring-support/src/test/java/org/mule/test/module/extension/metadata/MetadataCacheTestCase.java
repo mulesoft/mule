@@ -78,7 +78,7 @@ public class MetadataCacheTestCase extends AbstractMetadataOperationTestCase {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     try {
       getMetadataObjectStore().clear();
     } catch (Exception ignored) {
