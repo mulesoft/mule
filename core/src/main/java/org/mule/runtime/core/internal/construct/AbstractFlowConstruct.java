@@ -110,7 +110,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
 
   @Override
   public final void start() throws MuleException {
-    if (!flowStoppedPersistenceListener.shouldStart()) {
+    if (flowStoppedPersistenceListener != null && !flowStoppedPersistenceListener.shouldStart()) {
       return;
     }
     // Check if Initial State is Stopped
@@ -127,7 +127,9 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
       startIfStartable(exceptionListener);
       doStart();
     });
-    flowStoppedPersistenceListener.onStart();
+    if (flowStoppedPersistenceListener != null) {
+      flowStoppedPersistenceListener.onStart();
+    }
   }
 
   @Override
@@ -137,7 +139,9 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
       stopIfStoppable(exceptionListener);
       doStopProcessingStrategy();
     });
-    flowStoppedPersistenceListener.onStop();
+    if (flowStoppedPersistenceListener != null) {
+      flowStoppedPersistenceListener.onStop();
+    }
   }
 
   @Override
@@ -241,7 +245,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
       if (!((MessagingExceptionHandlerAcceptor) exceptionListener).acceptsAll()) {
         throw new FlowConstructInvalidException(createStaticMessage("Flow exception listener contains an exception strategy that doesn't handle all request,"
             + " Perhaps there's an exception strategy with a when attribute set but it's not part of a catch exception strategy"),
-                                                this);
+            this);
       }
     }
   }
