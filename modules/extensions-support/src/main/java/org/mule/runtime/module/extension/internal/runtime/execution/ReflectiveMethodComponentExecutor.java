@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.stream;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -26,11 +25,8 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
-
-import org.slf4j.Logger;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -38,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
 
 /**
  * Executes a task associated to a {@link ExecutionContext} by invoking a given {@link Method}
@@ -78,9 +76,11 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   }
 
   public Object execute(ExecutionContext<M> executionContext) {
-    final ClassLoader currentClassLoader = currentThread().getContextClassLoader();
-    final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
-    return withContextClassLoader(compositeClassLoader,
+    // TODO MULE-19185 revert this
+    // final ClassLoader currentClassLoader = currentThread().getContextClassLoader();
+    // final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
+    // return withContextClassLoader(compositeClassLoader,
+    return withContextClassLoader(extensionClassLoader,
                                   () -> invokeMethod(method, componentInstance,
                                                      stream(getParameterValues(executionContext, method.getParameterTypes()))
                                                          .map(Supplier::get).toArray(Object[]::new)));
@@ -133,9 +133,11 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   @Override
   public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
-    ClassLoader currentClassLoader = currentThread().getContextClassLoader();
-    final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
-    return ec -> withContextClassLoader(compositeClassLoader,
+    // TODO MULE-19185 revert this
+    // ClassLoader currentClassLoader = currentThread().getContextClassLoader();
+    // final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
+    // return ec -> withContextClassLoader(compositeClassLoader,
+    return ec -> withContextClassLoader(extensionClassLoader,
                                         () -> {
                                           final Object[] resolved =
                                               getParameterValues(ec, method.getParameterTypes());

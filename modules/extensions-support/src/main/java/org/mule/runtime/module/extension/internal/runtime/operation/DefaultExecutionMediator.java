@@ -30,7 +30,6 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
@@ -52,6 +51,7 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -146,11 +146,13 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
 
       InterceptorsExecutionResult beforeExecutionResult = before(context, interceptors);
       if (beforeExecutionResult.isOk()) {
-        final Thread currentThread = Thread.currentThread();
-        final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-        final ClassLoader extensionClassLoader = getClassLoader(context.getExtensionModel());
-        final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
-        result = from(withContextClassLoader(compositeClassLoader, () -> executor.execute(context)));
+        // TODO MULE-19185 revert this
+        // final Thread currentThread = Thread.currentThread();
+        // final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+        // final ClassLoader extensionClassLoader = getClassLoader(context.getExtensionModel());
+        // final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
+        // result = from(withContextClassLoader(compositeClassLoader, () -> executor.execute(context)));
+        result = from(withContextClassLoader(getClassLoader(context.getExtensionModel()), () -> executor.execute(context)));
         executedInterceptors.addAll(interceptors);
       } else {
         result = error(beforeExecutionResult.getThrowable());
