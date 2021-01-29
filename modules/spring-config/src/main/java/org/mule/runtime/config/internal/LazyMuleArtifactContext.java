@@ -349,7 +349,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
               comp.getLocation().getLocation().equals(locationOptional.get().toString()));
 
       final ArtifactAst minimalApplicationModel = buildMinimalApplicationModel(basePredicate);
-      //validateAst(minimalApplicationModel);
+      validateAst(minimalApplicationModel);
 
       if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
           .noneMatch(comp -> comp.getLocation() != null
