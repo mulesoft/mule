@@ -71,9 +71,11 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import io.qameta.allure.Issue;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -365,6 +367,21 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
         .afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeSourceErrorResponseSend()))));
     verify(notifier, never()).phaseSuccessfully();
     verify(notifier).phaseFailure(argThat(instanceOf(mockException.getClass())));
+  }
+
+  @Test
+  @Issue("MULE-19187")
+  public void eventIsCleanedUpWhenSourceErrorResponseSend() {
+    configureFailingFlow(mockException);
+    when(template.sendFailureResponseToClient(any(), any())).thenReturn(error(mockException));
+
+    CompletableFuture<Void> externalCompletion = new CompletableFuture<>();
+    moduleFlowProcessingPhase.runPhase(template, context, notifier, externalCompletion);
+
+    verify(template)
+        .afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeSourceErrorResponseSend()))));
+
+    assertThat(externalCompletion.isDone(), is(true));
   }
 
   @Test
