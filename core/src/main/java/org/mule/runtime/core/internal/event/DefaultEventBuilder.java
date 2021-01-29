@@ -77,6 +77,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private SecurityContext securityContext;
   private FlowProcessMediatorContext flowProcessMediatorContext;
   private EventInternalContext sdkInternalContext;
+  private EventInternalContext foreachInternalContext;
   private EventInternalContext sourcePolicyContext;
   private EventInternalContext operationPolicyContext;
   private InternalEvent originalEvent;
@@ -106,6 +107,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
     this.internalParameters = (Map<String, Object>) event.getInternalParameters();
     flowProcessMediatorContext = copyOf(event.getFlowProcessMediatorContext());
+    foreachInternalContext = copyOf(event.getForeachInternalContext());
     sdkInternalContext = copyOf(event.getSdkInternalContext());
     sourcePolicyContext = copyOf(event.getSourcePolicyContext());
     operationPolicyContext = copyOf(event.getOperationPolicyContext());
@@ -314,6 +316,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                              itemSequenceInfo,
                                              flowProcessMediatorContext,
                                              sdkInternalContext,
+                                             foreachInternalContext,
                                              sourcePolicyContext,
                                              operationPolicyContext,
                                              error,
@@ -382,6 +385,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private transient Map<String, ?> internalParameters;
     private transient FlowProcessMediatorContext flowProcessMediatorContext;
     private transient EventInternalContext sdkInternalContext;
+    private transient EventInternalContext foreachInternalContext;
     private transient EventInternalContext sourcePolicyContext;
     private transient EventInternalContext operationPolicyContext;
     private transient LazyValue<BindingContext> bindingContextBuilder =
@@ -399,6 +403,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.itemSequenceInfo = null;
       this.flowProcessMediatorContext = null;
       this.sdkInternalContext = null;
+      this.foreachInternalContext = null;
       this.sourcePolicyContext = null;
       this.operationPolicyContext = null;
       this.internalParameters = new SmallMap<>();
@@ -414,6 +419,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                         Optional<ItemSequenceInfo> itemSequenceInfo,
                                         FlowProcessMediatorContext flowProcessMediatorContext,
                                         EventInternalContext sdkInternalContext,
+                                        EventInternalContext foreachInternalContext,
                                         EventInternalContext sourcePolicyContext,
                                         EventInternalContext operationPolicyContext,
                                         Error error,
@@ -429,6 +435,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.itemSequenceInfo = itemSequenceInfo.orElse(null);
       this.flowProcessMediatorContext = flowProcessMediatorContext;
       this.sdkInternalContext = sdkInternalContext;
+      this.foreachInternalContext = foreachInternalContext;
       this.sourcePolicyContext = sourcePolicyContext;
       this.operationPolicyContext = operationPolicyContext;
       this.error = error;
@@ -628,6 +635,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public void setSdkInternalContext(EventInternalContext sdkInternalContext) {
       this.sdkInternalContext = sdkInternalContext;
+    }
+
+    @Override
+    public EventInternalContext getForeachInternalContext() {
+      return foreachInternalContext;
+    }
+
+    @Override
+    public void setForeachInternalContext(EventInternalContext foreachInternalContext) {
+      this.foreachInternalContext = foreachInternalContext;
     }
 
     @Override

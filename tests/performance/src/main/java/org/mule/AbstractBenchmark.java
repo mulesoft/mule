@@ -21,6 +21,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextFactory;
@@ -29,7 +30,9 @@ import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuild
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -67,6 +70,7 @@ public class AbstractBenchmark {
   protected MuleContext createMuleContextWithServices() throws MuleException {
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builderList = new ArrayList<>();
+    builderList.add(new SimpleConfigurationBuilder(getStartUpRegistryObjects()));
     builderList.add(new BasicRuntimeServicesConfigurationBuilder());
     builderList.add(new DefaultsConfigurationBuilder());
     return muleContextFactory.createMuleContext(builderList.toArray(new ConfigurationBuilder[] {}));
@@ -76,6 +80,10 @@ public class AbstractBenchmark {
     final Flow flow = builder(FLOW_NAME, muleContext).build();
     flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     return flow;
+  }
+
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return new HashMap<>();
   }
 
   public CoreEvent createEvent(Flow flow) {

@@ -67,13 +67,25 @@ public interface InternalEvent extends PrivilegedEvent {
    */
   <T extends EventInternalContext> EventInternalContext<T> getSdkInternalContext();
 
-
   /**
    * Sets context related to the SDK
    * @param context an {@link EventInternalContext}
    * @since 4.3.0
    */
   <T extends EventInternalContext> void setSdkInternalContext(EventInternalContext<T> context);
+
+  /**
+   * @return a {@link EventInternalContext} with state from the foreach processor
+   * @since 4.4, 4.3.1
+   */
+  <T extends EventInternalContext> EventInternalContext<T> getForeachInternalContext();
+
+  /**
+   * Sets context related to the foreach processor
+   * @param context an {@link EventInternalContext}
+   * @since 4.4, 4.3.1
+   */
+  <T extends EventInternalContext> void setForeachInternalContext(EventInternalContext<T> context);
 
   /**
    * @return a {@link EventInternalContext} with state from the policy infrastructure relative to sources
