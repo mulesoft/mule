@@ -183,6 +183,16 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
   }
 
   @Override
+  public <T extends EventInternalContext> EventInternalContext<T> getForeachInternalContext() {
+    return event.getForeachInternalContext();
+  }
+
+  @Override
+  public <T extends EventInternalContext> void setForeachInternalContext(EventInternalContext<T> context) {
+    event.setForeachInternalContext(context);
+  }
+
+  @Override
   public <T extends EventInternalContext> EventInternalContext<T> getSourcePolicyContext() {
     return event.getSourcePolicyContext();
   }

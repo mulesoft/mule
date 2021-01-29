@@ -6,12 +6,12 @@
  */
 package org.mule;
 
-import static java.lang.System.getProperty;
 import static java.lang.Boolean.getBoolean;
 import static java.util.Collections.EMPTY_MAP;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.openjdk.jmh.results.Defaults.PREFIX;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -34,7 +34,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTestCase {
 
   private static final String ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY = "enablePerformanceTests";
-  private static final String NORM_ALLOCATION_RESULT_KEY = "·gc.alloc.rate.norm";
+  private static final String NORM_ALLOCATION_RESULT_KEY = PREFIX + "gc.alloc.rate.norm";
 
   @Override
   public int getTestTimeoutSecs() {
@@ -117,7 +117,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   protected void runAndAssertBenchmark(Class clazz, String testName, int threads, Map<String, String[]> params, TimeUnit timeUnit,
                                        boolean profileGC, Consumer<RunResult> assertions) {
     try {
-      if (getBoolean(getProperty(ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY))) {
+      if (getBoolean(ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY)) {
         ChainedOptionsBuilder optionsBuilder = createCommonOptionsBuilder(clazz, testName, params, timeUnit, profileGC);
         optionsBuilder = optionsBuilder
             .forks(1)
