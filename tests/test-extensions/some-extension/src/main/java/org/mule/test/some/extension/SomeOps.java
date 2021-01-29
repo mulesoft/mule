@@ -44,11 +44,19 @@ public class SomeOps {
    * <it>isOneRequired</it> property.
    *
    * @param oneParameterGroup some test operation config with a isOneRequired exclusive-optional configuration
-   * @return one of the configs arguments
+   * @return the config
    */
-  public String oneRequiredParameterResolverOperation(@ParameterGroup(
+  public SomeParameterGroupOneRequiredConfig oneRequiredParameterResolverOperationDslTrue(@ParameterGroup(
       name = "Awesome Parameter Group", showInDsl = true) SomeParameterGroupOneRequiredConfig oneParameterGroup) {
-    return oneParameterGroup.getSomeParameter() != null ? oneParameterGroup.getSomeParameter()
-        : oneParameterGroup.getSomeOtherParameter();
+    return oneParameterGroup;
+  }
+
+  /**
+   * An operation to test an use-case of a ParameterGroup with a <it>isOneRequired</it> exclusive-optionals configuration
+   * where show in Dsl is off.
+   */
+  public SomeParameterGroupOneRequiredConfig oneRequiredParameterResolverOperation(@ParameterGroup(
+      name = "Awesome Parameter Group") SomeParameterGroupOneRequiredConfig oneParameterGroup) {
+    return oneParameterGroup;
   }
 }

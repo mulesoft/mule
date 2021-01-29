@@ -23,10 +23,6 @@ public class ExclusivePetBreeder {
   @Parameter
   private String birds;
 
-  @Optional
-  @Parameter
-  private ComplexPet complexPet;
-
   public String getBirds() {
     return birds;
   }

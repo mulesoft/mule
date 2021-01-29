@@ -5,9 +5,51 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
 
-    <flow name="salute" initialState="stopped">
-        <some:one-required-parameter-resolver-operation >
+    <flow name="dslTrueSomeParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true >
             <some:awesome-parameter-group someParameter="hello dog!"/>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueComplexParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true >
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!"/>
+            </some:awesome-parameter-group>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueSomeParameterDynamic">
+        <some:one-required-parameter-resolver-operation-dsl-true >
+            <some:awesome-parameter-group someParameter="#[vars.someParameter]"/>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueComplexParameterDynamic">
+        <some:one-required-parameter-resolver-operation-dsl-true >
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="#[vars.anotherParameter]"/>
+            </some:awesome-parameter-group>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="someParameter">
+        <some:one-required-parameter-resolver-operation someParameter="hello dog!" />
+    </flow>
+
+    <flow name="complexParameter">
+        <some:one-required-parameter-resolver-operation>
+            <some:complex-parameter anotherParameter="hello bird!"/>
+        </some:one-required-parameter-resolver-operation>
+    </flow>
+
+    <flow name="someParameterDynamic">
+        <some:one-required-parameter-resolver-operation someParameter="#[vars.someParameter]" />
+    </flow>
+
+    <flow name="complexParameterDynamic">
+        <some:one-required-parameter-resolver-operation>
+            <some:complex-parameter anotherParameter="#[vars.someField]"/>
         </some:one-required-parameter-resolver-operation>
     </flow>
 
