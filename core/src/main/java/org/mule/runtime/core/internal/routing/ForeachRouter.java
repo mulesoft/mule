@@ -12,7 +12,6 @@ import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.addContext;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.getContext;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.removeContext;
@@ -35,7 +34,6 @@ import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -173,7 +171,7 @@ class ForeachRouter {
 
   private CoreEvent eventWithCurrentContextDeleted(CoreEvent event) {
     removeContext(event);
-    return quickCopy(event, new HashMap<>(0));
+    return event;
   }
 
   private CoreEvent prepareEvent(CoreEvent event, String expression) {
@@ -192,14 +190,6 @@ class ForeachRouter {
       ForeachContext foreachContext = this.createForeachContext(event, typedValueIterator);
 
       addContext(responseEvent, foreachContext);
-
-      // TODO: MULE-19180
-      // quickCopy(responseEvent, new HashMap<>(0)) is needed because actual InternalEventImplementation might returns a ava.util.Collections.unmodifiableMap instance while getting event internal parameter. 
-      // Under multiples event copy might result in a multiple nested map of java.util.Collections.unmodifiableMap instances.
-      // e.g: Collections.unmodifiableMap(Collections.unmodifiableMap(Collections.unmodifiableMap(....)))
-      // When this structure is to heavy might throw a StackOverflow error when try to access it
-      // Using a SmallMap prevent current issue because SmallMap.unmodifiable implementation validate actual map it's already an UnmodifiableSmallMap instance.
-      responseEvent = quickCopy(responseEvent, new HashMap<>(0));
 
     } catch (Exception e) {
       // Delete foreach context

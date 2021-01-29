@@ -14,7 +14,6 @@ import static java.util.Collections.synchronizedList;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -33,7 +32,6 @@ import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.getContext;
@@ -672,25 +670,6 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     // All elements should be processed without exceptions
     assertTrue(exceptions.isEmpty());
     assertThat(secondForeachCounter.get(), is(CONCURRENCY * payload.size()));
-  }
-
-  @Test
-  @Issue("MULE-19180")
-  public void preventStackOverflowWhileHeavyIterations() throws Exception {
-    InternalEvent quickCopy = quickCopy(newEvent(), singletonMap("key", "value"));
-
-    List<String> payloads = new ArrayList<>();
-    for (int i = 0; i < 10000; i++) {
-      payloads.add("" + i);
-    }
-
-    CoreEvent event = CoreEvent.builder(quickCopy).message(of(payloads)).build();
-    CoreEvent processedEvent = process(simpleForeach, event);
-    assertThat(processedEvent, is(instanceOf(InternalEvent.class)));
-    InternalEvent internalEvent = (InternalEvent) processedEvent;
-    assertThat(internalEvent.getInternalParameters().size(), is(1));
-    assertThat(internalEvent.getInternalParameters().keySet(), hasItem("key"));
-
   }
 
   private CoreEvent processInChain(Processor processor, CoreEvent event) throws Exception {
