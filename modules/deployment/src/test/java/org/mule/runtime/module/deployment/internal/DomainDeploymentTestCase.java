@@ -42,6 +42,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -77,13 +78,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 /**
  * Contains test for domain deployment
@@ -1714,6 +1714,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   @Issue("MULE-18159")
+  @Ignore("MULE-19185")
   public void pluginDeclaredInDomainIsAbleToLoadClassesExportedByTheAppWhereItIsUsed() throws Exception {
     // Given a plugin which loads classes.
     final ArtifactPluginFileBuilder pluginWhichLoadsClasses = loadClassExtensionPlugin;
