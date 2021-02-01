@@ -236,7 +236,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                            if (entry.getValue() instanceof ParameterValueResolver) {
                                              try {
                                                return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
-                                                   .stream().map(k -> aliasedParameterNames.getOrDefault(k, entry.getKey()));
+                                                   .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
                                              } catch (ValueResolvingException e) {
                                                throw new MuleRuntimeException(e);
                                              }

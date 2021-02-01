@@ -49,7 +49,7 @@
 
     <flow name="complexParameterDynamic">
         <some:one-required-parameter-resolver-operation>
-            <some:complex-parameter anotherParameter="#[vars.someField]"/>
+            <some:complex-parameter anotherParameter="#[vars.anotherParameter]"/>
         </some:one-required-parameter-resolver-operation>
     </flow>
 

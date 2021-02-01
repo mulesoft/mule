@@ -25,54 +25,54 @@ public class ParameterGroupExclusiveOptionalsOneRequiredTestCase extends Abstrac
     SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueSomeParameter");
     assertThat(config.getSomeParameter(), is("hello dog!"));
   }
-
-  /*  @Test
+  
+  @Test
   public void testShowInDslTrueWithComplexParameter() throws Exception {
     SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueComplexParameter");
-    assertThat(config.getSomeParameter(), is("hello bird!"));
+    assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
   }
-  
+
   @Test
   public void testShowInDslTrueWithDynamicSimpleParameter() throws Exception {
     SomeParameterGroupOneRequiredConfig config =
         runFlowAndGetConfig("dslTrueSomeParameterDynamic", "someParameter", "hello dog!");
     assertThat(config.getSomeParameter(), is("hello dog!"));
   }
-  
+
   @Test
   public void testShowInDslTrueWithDynamicComplexParameter() throws Exception {
     SomeParameterGroupOneRequiredConfig config =
         runFlowAndGetConfig("dslTrueComplexParameterDynamic", "anotherParameter", "hello bird!");
-    assertThat(config.getSomeParameter(), is("hello bird!"));
+    assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
   }
-  
+
   @Test
   public void testWithSimpleParameter() throws Exception {
     SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("someParameter");
     assertThat(config.getSomeParameter(), is("hello dog!"));
   }
-  
+
   @Test
   public void testWithComplexParameter() throws Exception {
     SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("complexParameter");
-    assertThat(config.getSomeParameter(), is("hello bird!"));
+    assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
   }
-  
+
   @Test
   public void testWithDynamicSimpleParameter() throws Exception {
     SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("someParameterDynamic", "someParameter", "hello dog!");
     assertThat(config.getSomeParameter(), is("hello dog!"));
   }
-  
+
   @Test
   public void testWithDynamicComplexParameter() throws Exception {
     SomeParameterGroupOneRequiredConfig config =
         runFlowAndGetConfig("complexParameterDynamic", "anotherParameter", "hello bird!");
-    assertThat(config.getSomeParameter(), is("hello bird!"));
-  }*/
+    assertThat(config.getComplexParameter().getAnotherParameter(), is("hello bird!"));
+  }
 
   private SomeParameterGroupOneRequiredConfig runFlowAndGetConfig(String flowName) throws Exception {
-    return runFlowAndGetConfig(flowName, null, null);
+    return runFlowAndGetConfig(flowName, "", "");
   }
 
   private SomeParameterGroupOneRequiredConfig runFlowAndGetConfig(String flowName, String variableName, String variableValue)
