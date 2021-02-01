@@ -31,8 +31,8 @@ public class MetadataKeyResultSuccessMatcher<T> extends TypeSafeMatcher<Metadata
       description.appendText("MetadataFailure (" + metadataFailure.getFailureCode() + " @ "
           + metadataFailure.getFailingComponent() + ") on " + metadataFailure.getFailingElement()
           + ":" + lineSeparator());
-      description.appendText("\tMessaage: " + metadataFailure.getMessage() + lineSeparator());
-      description.appendText("\t  Reason: " + metadataFailure.getReason() + lineSeparator());
+      description.appendText("\tMessage: " + metadataFailure.getMessage() + lineSeparator());
+      description.appendText("\t Reason: " + metadataFailure.getReason() + lineSeparator());
     }
   }
 
