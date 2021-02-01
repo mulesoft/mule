@@ -148,11 +148,15 @@ public class ModuleFlowProcessingPhase
   @Override
   public void runPhase(final ModuleFlowProcessingPhaseTemplate template, final MessageProcessContext messageProcessContext,
                        final PhaseResultNotifier phaseResultNotifier) {
+    runPhase(template, messageProcessContext, phaseResultNotifier, new CompletableFuture<>());
+  }
+
+  public void runPhase(final ModuleFlowProcessingPhaseTemplate template, final MessageProcessContext messageProcessContext,
+                       final PhaseResultNotifier phaseResultNotifier, final CompletableFuture<Void> responseCompletion) {
     try {
       final MessageSource messageSource = messageProcessContext.getMessageSource();
       final FlowConstruct flowConstruct = (FlowConstruct) componentLocator.find(messageSource.getRootContainerLocation()).get();
       final Consumer<Either<MessagingException, CoreEvent>> terminateConsumer = getTerminateConsumer(messageSource, template);
-      final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
       final CoreEvent templateEvent = createEvent(template, messageSource, responseCompletion, flowConstruct);
 
       try {
@@ -180,7 +184,7 @@ public class ModuleFlowProcessingPhase
             .doOnSuccess(aVoid -> phaseResultNotifier.phaseSuccessfully())
             .doOnError(onFailure(flowConstruct, messageSource, phaseResultNotifier, terminateConsumer))
             // Complete EventContext via responseCompletion Mono once everything is done.
-            .doAfterTerminate(() -> responseCompletion.complete(null))
+            .doFinally(signalType -> responseCompletion.complete(null))
             .subscribe();
       } catch (Exception e) {
         from(template.sendFailureResponseToClient(new MessagingExceptionResolver(messageProcessContext.getMessageSource())

@@ -11,6 +11,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -43,9 +45,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.SourceRemoteConnectionException;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -71,9 +71,11 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import io.qameta.allure.Issue;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -365,6 +367,21 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
         .afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeSourceErrorResponseSend()))));
     verify(notifier, never()).phaseSuccessfully();
     verify(notifier).phaseFailure(argThat(instanceOf(mockException.getClass())));
+  }
+
+  @Test
+  @Issue("MULE-19187")
+  public void eventIsCleanedUpWhenSourceErrorResponseSend() {
+    configureFailingFlow(mockException);
+    when(template.sendFailureResponseToClient(any(), any())).thenReturn(error(mockException));
+
+    CompletableFuture<Void> externalCompletion = new CompletableFuture<>();
+    moduleFlowProcessingPhase.runPhase(template, context, notifier, externalCompletion);
+
+    verify(template)
+        .afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeSourceErrorResponseSend()))));
+
+    assertThat(externalCompletion.isDone(), is(true));
   }
 
   @Test
