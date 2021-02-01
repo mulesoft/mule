@@ -68,6 +68,12 @@
             <reconnect count="30" frequency="50" blocking="false"/>
         </reconnection:get-retry-policy-template>
     </flow>
+    
+     <flow name="getInlineReconnectionBlocking">
+        <reconnection:get-retry-policy-template config-ref="reconnection_Config">
+            <reconnect count="30" frequency="50" blocking="true"/>
+        </reconnection:get-retry-policy-template>
+    </flow>
 
     <flow name="synchronizableSource" initialState="stopped">
         <reconnection:sync-source config-ref="sync_Config">

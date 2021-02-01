@@ -789,13 +789,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private RetryPolicyTemplate fetchRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
-    RetryPolicyTemplate delegate = null;
-    if (retryPolicyTemplate != null) {
-      delegate = configuration
-          .map(config -> config.getConnectionProvider().orElse(null))
-          .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(retryPolicyTemplate))
-          .orElse(retryPolicyTemplate);
-    }
+    RetryPolicyTemplate delegate = retryPolicyTemplate;
 
     // In case of no template available in the context, use the one defined by the ConnectionProvider
     if (delegate == null) {
@@ -1004,7 +998,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     } else {
       Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
       if (staticConfig.isPresent()) {
-        return getRetryPolicyTemplate(staticConfig).isEnabled();
+        return getRetryPolicyTemplate(staticConfig).isEnabled() && getRetryPolicyTemplate(staticConfig).isAsync();
       }
     }
 
