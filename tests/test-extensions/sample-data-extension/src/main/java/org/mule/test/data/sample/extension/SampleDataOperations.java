@@ -20,13 +20,18 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.test.data.sample.extension.provider.ComplexActingParameterSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.ComplexTypeSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ConfigAwareTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ConnectedTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.GroupTestSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.MoreComplexTypeSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.MuleContextAwareSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.OptionalTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ParameterizedTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.SimplestTestSampleDataProvider;
+
+import java.util.List;
+import java.util.Map;
 
 public class SampleDataOperations {
 
@@ -110,6 +115,17 @@ public class SampleDataOperations {
   @MediaType(TEXT_PLAIN)
   public Result<String, String> complexActingParameter(ComplexActingParameter complex) {
     return connectionLess(complex.getPayload(), complex.getAttributes());
+  }
+
+
+  @SampleData(ComplexTypeSampleDataProvider.class)
+  public Result<Map<String, Object>, String> complexGenerics(ComplexActingParameter complex) {
+    return Result.<Map<String, Object>, String>builder().build();
+  }
+
+  @SampleData(MoreComplexTypeSampleDataProvider.class)
+  public Result<Map<String, List<String>>, String> moreComplexGenerics(ComplexActingParameter complex) {
+    return Result.<Map<String, List<String>>, String>builder().build();
   }
 
   @SampleData(OptionalTestSampleDataProvider.class)
