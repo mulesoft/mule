@@ -222,7 +222,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
           throw new DeploymentStartException(createStaticMessage(getRootCauseMessage(e)), e);
         }
       }
-      persistArtifactState(TRUE);
+      persistArtifactState(START);
       // null CCL ensures we log at 'system' level
       // TODO create a more usable wrapper for any logger to be logged at sys level
       withContextClassLoader(null, () -> {

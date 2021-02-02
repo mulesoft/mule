@@ -42,6 +42,9 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
   protected ArtifactContext artifactContext;
   protected ArtifactClassLoader deploymentClassLoader;
 
+  protected static final String START = "start";
+  protected static final String STOP = "stop";
+
   public AbstractDeployableArtifact(String shortArtifactType, String artifactType, ArtifactClassLoader deploymentClassLoader) {
     this.artifactType = artifactType;
     this.shortArtifactType = shortArtifactType;
@@ -69,11 +72,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
     withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> {
       this.artifactContext.getMuleContext().stop();
-      ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
-          ((DefaultMuleContext) this.artifactContext.getMuleContext()).getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
-      if (artifactStoppedPersistenceListener != null) {
-        artifactStoppedPersistenceListener.onStop();
-      }
+      persistArtifactState(STOP);
       return null;
     });
   }
@@ -134,13 +133,13 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
     artifactContext = null;
   }
 
-  protected void persistArtifactState(Boolean persistStop) {
+  protected void persistArtifactState(String state) {
     ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
         ((DefaultMuleContext) this.artifactContext.getMuleContext()).getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
-    if (artifactStoppedPersistenceListener != null && persistStop.equals(TRUE)) {
-      artifactStoppedPersistenceListener.onStop();
-    } else if (artifactStoppedPersistenceListener != null) {
+    if (artifactStoppedPersistenceListener != null && state.equals(START)) {
       artifactStoppedPersistenceListener.onStart();
+    } else if (artifactStoppedPersistenceListener != null && state.equals(STOP)) {
+      artifactStoppedPersistenceListener.onStop();
     }
   }
 

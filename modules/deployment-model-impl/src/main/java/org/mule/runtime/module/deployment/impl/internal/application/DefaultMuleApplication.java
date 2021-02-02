@@ -178,7 +178,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     try {
       checkIfFlowsShouldStart();
       this.artifactContext.getMuleContext().start();
-      persistArtifactState(FALSE);
+      persistArtifactState(START);
 
       // null CCL ensures we log at 'system' level
       // TODO getDomainClassLoader a more usable wrapper for any logger to be logged at sys level
