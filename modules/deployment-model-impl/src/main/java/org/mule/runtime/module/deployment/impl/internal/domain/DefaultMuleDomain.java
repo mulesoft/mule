@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
+import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
@@ -221,6 +222,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
           throw new DeploymentStartException(createStaticMessage(getRootCauseMessage(e)), e);
         }
       }
+      persistArtifactState(TRUE);
       // null CCL ensures we log at 'system' level
       // TODO create a more usable wrapper for any logger to be logged at sys level
       withContextClassLoader(null, () -> {
