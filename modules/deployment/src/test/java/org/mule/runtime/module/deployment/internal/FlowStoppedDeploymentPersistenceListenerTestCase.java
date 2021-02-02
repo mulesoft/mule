@@ -22,6 +22,8 @@ import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentP
 import java.io.File;
 import java.util.Properties;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,12 +31,16 @@ import org.junit.Test;
 public class FlowStoppedDeploymentPersistenceListenerTestCase {
 
   private String appName;
-  private String flowName;
+  private String propertyName;
+  private FlowStoppedDeploymentPersistenceListener flowStoppedDeploymentListener;
 
-  @Before
-  public void setUp() {
-    flowName = "testFlow";
+  public void createListener() {
+    String flowName = "testFlow";
     appName = "testApp";
+    propertyName = flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY;
+
+    flowStoppedDeploymentListener =
+        new FlowStoppedDeploymentPersistenceListener(flowName, appName);
   }
 
   @After
@@ -45,11 +51,10 @@ public class FlowStoppedDeploymentPersistenceListenerTestCase {
   }
 
   @Test
+  @Issue("MULE-19127")
+  @Description("When a flow is stopped, this status should be persisted as a deployment property")
   public void onStopShouldSaveDeploymentProperty() throws Exception {
-    String propertyName = flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY;
-
-    FlowStoppedDeploymentPersistenceListener flowStoppedDeploymentListener =
-        new FlowStoppedDeploymentPersistenceListener(flowName, appName);
+    createListener();
     flowStoppedDeploymentListener.onStop();
 
     Properties deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
@@ -58,11 +63,11 @@ public class FlowStoppedDeploymentPersistenceListenerTestCase {
   }
 
   @Test
-  public void onStopWhenShouldNotPersistIsFalseShouldNotSaveDeploymentProperty() throws Exception {
-    String propertyName = flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY;
+  @Issue("MULE-19127")
+  @Description("When doNotPersist method is called, if the flow is stopped afterwards, this should not be persisted")
+  public void whenDoNotPersistIsCalledOnStopMethodShouldNotSaveDeploymentProperty() throws Exception {
+    createListener();
 
-    FlowStoppedDeploymentPersistenceListener flowStoppedDeploymentListener =
-        new FlowStoppedDeploymentPersistenceListener(flowName, appName);
     flowStoppedDeploymentListener.doNotPersist();
     flowStoppedDeploymentListener.onStop();
 
@@ -71,11 +76,11 @@ public class FlowStoppedDeploymentPersistenceListenerTestCase {
   }
 
   @Test
+  @Issue("MULE-19127")
+  @Description("When a flow is started, this status should be persisted as a deployment property")
   public void onStartShouldSaveDeploymentPropertyAsTrue() throws Exception {
-    String propertyName = flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY;
+    createListener();
 
-    FlowStoppedDeploymentPersistenceListener flowStoppedDeploymentListener =
-        new FlowStoppedDeploymentPersistenceListener(flowName, appName);
     flowStoppedDeploymentListener.onStart();
 
     Properties deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
@@ -84,15 +89,15 @@ public class FlowStoppedDeploymentPersistenceListenerTestCase {
   }
 
   @Test
+  @Issue("MULE-19127")
+  @Description("checkIfFlowShouldStart method should check deployment properties")
   public void checkIfFlowShouldStartMethodMustSetShouldStartPropertyAsFalseWhenDeploymentPropertyIsFalse() throws Exception {
-    String propertyName = flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY;
+    createListener();
 
     Properties properties = new Properties();
     properties.setProperty(propertyName, valueOf(false));
     resolveFlowDeploymentProperties(appName, of(properties));
 
-    FlowStoppedDeploymentPersistenceListener flowStoppedDeploymentListener =
-        new FlowStoppedDeploymentPersistenceListener(flowName, appName);
     flowStoppedDeploymentListener.checkIfFlowShouldStart();
 
     assertThat(flowStoppedDeploymentListener.shouldStart(), is(false));

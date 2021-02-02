@@ -22,6 +22,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Defines a listener to persist stop events of Mule flows using deployment properties.
+ */
 public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPersistenceListener {
 
   private transient final Logger logger = LoggerFactory.getLogger(getClass());
@@ -89,9 +92,8 @@ public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPers
 
   @Override
   public Boolean shouldStart() {
-    Boolean start = shouldStart.get();
-    //Resetting variable
-    shouldStart.set(true);
+    //Getting and resetting variable
+    Boolean start = shouldStart.getAndSet(true);
     return start;
   }
 }
