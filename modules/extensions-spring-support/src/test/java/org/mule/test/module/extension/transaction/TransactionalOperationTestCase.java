@@ -134,7 +134,7 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
-  @Ignore("MULE-19197")
+  @Ignore("MULE-19198")
   public void doNotReconnectPagedOperationInTxWhenConnectionExceptionOnSecondPage() throws Exception {
     resetCounters();
     expectedException.expectCause(instanceOf(ConnectionException.class));
@@ -143,6 +143,7 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
+  @Ignore("MULE-19198")
   public void doNotReconnectStickyPagedOperationInTxWhenConnectionExceptionOnSecondPage() throws Exception {
     resetCounters();
     expectedException.expectCause(instanceOf(ConnectionException.class));
@@ -178,7 +179,7 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
-  @Ignore("MULE-19197")
+  @Ignore("MULE-19198")
   public void doNotReconnectStickyPagedOperationWithoutTxWhenConnectionExceptionOnSecondPage() throws Exception {
     resetCounters();
     expectedException.expectCause(instanceOf(ConnectionException.class));
