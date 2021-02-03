@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Defines a listener to persist stop events of Mule flows using deployment properties.
  *
- * @since 4.2
+ * @since 4.2.3 4.3.1 4.4.0
  */
 public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPersistenceListener {
 

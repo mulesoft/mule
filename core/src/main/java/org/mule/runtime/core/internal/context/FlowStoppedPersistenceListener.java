@@ -10,7 +10,7 @@ package org.mule.runtime.core.internal.context;
 /**
  * Defines a listener to persist stop events of Mule flows.
  *
- * @since 4.2
+ * @since 4.2.3 4.3.1 4.4.0
  */
 public interface FlowStoppedPersistenceListener {
 
