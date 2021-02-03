@@ -1512,13 +1512,13 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService.start();
   }
 
-  private Application deployApplication(ApplicationFileBuilder dummyAppDescriptorFileBuilder) throws Exception {
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+  private Application deployApplication(ApplicationFileBuilder applicationFileBuilder) throws Exception {
+    addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    return findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    return findApp(applicationFileBuilder.getId(), 1);
   }
 
   private Application assertAppDeploymentAndStatus(ApplicationFileBuilder applicationFileBuilder, ApplicationStatus status) {
