@@ -54,7 +54,10 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FlowStatePersistenceStory.FLOW_STATE_PERSISTENCE;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -87,6 +90,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import io.qameta.allure.Story;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -741,8 +745,10 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
   }
 
-  @Issue("MULE-19127")
   @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
   public void undeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
     for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
@@ -755,8 +761,10 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertIfFlowsHaveStarted(app_2, false);
   }
 
-  @Issue("MULE-19127")
   @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
   public void undeploysAppWithNotStoppedFlowAndStartsItOnDeploy() throws Exception {
     addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
@@ -770,8 +778,10 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertIfFlowsHaveStarted(app_2, true);
   }
 
-  @Issue("MULE-19127")
   @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
   public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
     for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
@@ -785,8 +795,10 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertIfFlowsHaveStarted(app_2, false);
   }
 
-  @Issue("MULE-19127")
   @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
   public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeployButCanBeStartedManually() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
     for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
@@ -804,8 +816,10 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     }
   }
 
-  @Issue("MULE-19127")
   @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
   public void stopsAndStartsAppWithStoppedFlowAndDoesNotStartIt() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
     for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
