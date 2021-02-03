@@ -19,6 +19,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.test.transactional.TransactionalOperations.getPageCalls;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -133,6 +134,7 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
+  @Ignore("MULE-19197")
   public void doNotReconnectPagedOperationInTxWhenConnectionExceptionOnSecondPage() throws Exception {
     resetCounters();
     expectedException.expectCause(instanceOf(ConnectionException.class));
@@ -176,6 +178,7 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
+  @Ignore("MULE-19197")
   public void doNotReconnectStickyPagedOperationWithoutTxWhenConnectionExceptionOnSecondPage() throws Exception {
     resetCounters();
     expectedException.expectCause(instanceOf(ConnectionException.class));
