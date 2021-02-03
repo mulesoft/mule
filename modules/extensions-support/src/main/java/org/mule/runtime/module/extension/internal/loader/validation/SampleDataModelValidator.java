@@ -179,7 +179,8 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
     Pair<Type, Type> outputGenericTypes = getOutputTypes(model, providerClass.getClassLoader());
     if (!validateIfPaged(model, providerClass, outputGenericTypes, providerGenericTypes, problemsReporter)) {
       String providerGenerics = asGenericSignature(getInterfaceGenerics(providerClass, SampleDataProvider.class));
-      String outputGenerics = asGenericSignature(outputGenericTypes);
+      Pair<String, String> outputTypeWithGenerics = getOutputTypesWithGenerics(model, outputGenericTypes);
+      String outputGenerics = asGenericSignature(outputTypeWithGenerics.getFirst(), outputTypeWithGenerics.getSecond());
 
       if (!Objects.equals(providerGenerics, outputGenerics)) {
         problemsReporter.addError(new Problem(model, format(
@@ -189,6 +190,15 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
       }
     }
 
+  }
+
+  private Pair<String, String> getOutputTypesWithGenerics(ConnectableComponentModel model, Pair<Type, Type> outputGenericTypes) {
+    return new Pair<>(model.getOutput().getType().getAnnotation(ClassInformationAnnotation.class)
+        .map(classInformationAnnotation -> classInformationAnnotation.toString())
+        .orElse(asString(outputGenericTypes.getFirst())),
+                      model.getOutputAttributes().getType().getAnnotation(ClassInformationAnnotation.class)
+                          .map(classInformationAnnotation -> classInformationAnnotation.toString())
+                          .orElse(asString(outputGenericTypes.getSecond())));
   }
 
   private Pair<Type, Type> getProviderGenerics(Class<? extends SampleDataProvider> providerClass) {
@@ -202,13 +212,17 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
   }
 
   private String asGenericSignature(List<Type> types) {
+    return asGenericSignature(types, true);
+  }
+
+  private String asGenericSignature(List<Type> types, boolean getGenerics) {
     return "<" + types.stream()
-        .map(this::asString)
+        .map(type -> asString(type, getGenerics))
         .collect(joining(", ")) + ">";
   }
 
-  private String asGenericSignature(Pair<Type, Type> types) {
-    return "<" + asString(types.getFirst()) + ", " + asString(types.getSecond()) + ">";
+  private String asGenericSignature(String firstType, String secondType) {
+    return "<" + firstType + ", " + secondType + ">";
   }
 
   private boolean validateIfPaged(ConnectableComponentModel component,
@@ -290,10 +304,18 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
   }
 
   private String asString(Type type) {
+    return asString(type, true);
+  }
+
+  private String asString(Type type, boolean getGenerics) {
     if (type instanceof ParameterizedTypeImpl) {
       ParameterizedTypeImpl parameterizedType = (ParameterizedTypeImpl) type;
+      if (getGenerics) {
         return parameterizedType.getRawType().getName()
-            + asGenericSignature(asList(parameterizedType.getActualTypeArguments()));
+            + asGenericSignature(asList(parameterizedType.getActualTypeArguments()), false);
+      } else {
+        return parameterizedType.getRawType().getName();
+      }
     } else if (type == null) {
       return Object.class.getName();
     } else if (isVoid(type)) {
