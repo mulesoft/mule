@@ -40,9 +40,11 @@ import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.logging.LogUtil;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
@@ -177,6 +179,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
       log(miniSplash(format("Starting %s '%s'", shortArtifactType, descriptor.getName())));
     });
     try {
+      checkIfFlowsShouldStart();
       this.artifactContext.getMuleContext().start();
 
       // null CCL ensures we log at 'system' level
@@ -433,4 +436,11 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
     return domainRepository.getCompatibleDomain(domainBundleDescriptor.get());
   }
+
+  private void checkIfFlowsShouldStart() {
+    for (Flow flow : getRegistry().lookupAllByType(Flow.class)) {
+      ((DefaultFlowBuilder.DefaultFlow) flow).checkIfFlowShouldStart();
+    }
+  }
+
 }

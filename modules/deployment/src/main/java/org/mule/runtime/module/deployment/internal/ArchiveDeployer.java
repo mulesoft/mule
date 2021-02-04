@@ -55,4 +55,6 @@ public interface ArchiveDeployer<T extends Artifact> {
   T deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties);
 
   void doNotPersistArtifactStop(T artifact);
+
+  void doNotPersistFlowsStop(String artifactName);
 }
