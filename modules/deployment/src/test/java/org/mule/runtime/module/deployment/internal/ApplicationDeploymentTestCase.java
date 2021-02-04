@@ -54,7 +54,10 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FlowStatePersistenceStory.FLOW_STATE_PERSISTENCE;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -63,6 +66,7 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -86,6 +90,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import io.qameta.allure.Story;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -154,13 +159,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Test
   public void extensionManagerPresent() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-
-    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    final Application app = deployApplication(emptyAppFileBuilder);
     assertThat(app.getRegistry().<ExtensionManager>lookupByName(MuleProperties.OBJECT_EXTENSION_MANAGER).get(),
                is(notNullValue()));
   }
@@ -304,12 +303,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Issue("MULE-19040")
   @Test
   public void whenAppIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
 
     assertThat(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
@@ -321,12 +315,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Issue("MULE-19040")
   @Test
   public void whenAppIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    final Application app = deployApplication(emptyAppFileBuilder);
 
     assertThat(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     deploymentService.undeploy(app);
@@ -726,12 +715,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Test
   public void undeploysStoppedApp() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
     assertStatus(app, STOPPED);
 
@@ -741,86 +725,117 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Issue("MULE-19040")
   @Test
   public void undeploysStoppedAppAndDoesNotStartItOnDeploy() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
     assertStatus(app, STOPPED);
 
-    serviceManager.stop();
-    extensionModelLoaderManager.stop();
-    deploymentService.stop();
+    restartServer();
 
-    reset(applicationDeploymentListener);
-
-    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
-        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
-
-    serviceManager = muleArtifactResourcesRegistry.getServiceManager();
-    serviceManager.start();
-
-    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
-    extensionModelLoaderManager.start();
-
-    deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
-                                                      muleArtifactResourcesRegistry.getApplicationFactory(),
-                                                      () -> findSchedulerService(serviceManager));
-    configureDeploymentService();
-    deploymentService.start();
-
-    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
-    assertStatus(app_2, CREATED);
+    assertAppDeploymentAndStatus(emptyAppFileBuilder, CREATED);
   }
 
   @Issue("MULE-19040")
   @Test
   public void undeploysNotStoppedAppAndStartsItOnDeploy() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+    final Application app = deployApplication(emptyAppFileBuilder);
+    assertStatus(app, STARTED);
+
+    restartServer();
+
+    assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
+  }
+
+  @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
+  public void undeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
+    final Application app = deployApplication(dummyAppDescriptorFileBuilder);
+    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+      flow.stop();
+    }
+
+    restartServer();
+
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
+    assertIfFlowsHaveStarted(app_2, false);
+  }
+
+  @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
+  public void undeploysAppWithNotStoppedFlowAndStartsItOnDeploy() throws Exception {
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
-    assertStatus(app, STARTED);
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
 
-    serviceManager.stop();
-    extensionModelLoaderManager.stop();
-    deploymentService.stop();
+    restartServer();
+
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
+    assertIfFlowsHaveStarted(app_2, true);
+  }
+
+  @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
+  public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
+    final Application app = deployApplication(dummyAppDescriptorFileBuilder);
+    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+      flow.stop();
+    }
 
     reset(applicationDeploymentListener);
+    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
 
-    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
-        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
+    assertIfFlowsHaveStarted(app_2, false);
+  }
 
-    serviceManager = muleArtifactResourcesRegistry.getServiceManager();
-    serviceManager.start();
+  @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
+  public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeployButCanBeStartedManually() throws Exception {
+    final Application app = deployApplication(dummyAppDescriptorFileBuilder);
+    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+      flow.stop();
+    }
 
-    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
-    extensionModelLoaderManager.start();
+    reset(applicationDeploymentListener);
+    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
 
-    deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
-                                                      muleArtifactResourcesRegistry.getApplicationFactory(),
-                                                      () -> findSchedulerService(serviceManager));
-    configureDeploymentService();
-    deploymentService.start();
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
+    for (Flow flow : app_2.getRegistry().lookupAllByType(Flow.class)) {
+      assertThat(flow.getLifecycleState().isStarted(), is(false));
+      flow.start();
+      assertThat(flow.getLifecycleState().isStarted(), is(true));
+    }
+  }
 
-    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
-    assertStatus(app_2, STARTED);
+  @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
+  public void stopsAndStartsAppWithStoppedFlowAndDoesNotStartIt() throws Exception {
+    final Application app = deployApplication(dummyAppDescriptorFileBuilder);
+    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+      flow.stop();
+    }
+    app.stop();
+    assertStatus(app, STOPPED);
+    app.start();
+    assertStatus(app, STARTED);
+
+    assertIfFlowsHaveStarted(app, false);
   }
 
   @Test
   public void undeploysApplicationRemovingAnchorFile() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    Application app = deployApplication(emptyAppFileBuilder);
 
     assertTrue("Unable to remove anchor file", removeAppAnchorFile(emptyAppFileBuilder.getId()));
 
@@ -1172,13 +1187,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("app-with-plugin-bootstrap")
         .definedBy("app-with-plugin-bootstrap.xml").dependingOn(pluginFileBuilder);
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-
-    final Application application = findApp(applicationFileBuilder.getId(), 1);
+    final Application application = deployApplication(applicationFileBuilder);
     final Optional<Object> lookupObject = application.getRegistry().lookupByName("plugin.echotest");
     assertThat(lookupObject.isPresent(), is(true));
     assertThat(lookupObject.get().getClass().getName(), equalTo("org.foo.EchoTest"));
@@ -1477,6 +1486,51 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
       assertDeploymentFailure(applicationDeploymentListener, "broken-app.jar");
       fail("Install was invoked again for the broken application file");
     } catch (AssertionError expected) {
+    }
+  }
+
+  private void restartServer() throws MuleException {
+    serviceManager.stop();
+    extensionModelLoaderManager.stop();
+    deploymentService.stop();
+
+    reset(applicationDeploymentListener);
+
+    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
+        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
+
+    serviceManager = muleArtifactResourcesRegistry.getServiceManager();
+    serviceManager.start();
+
+    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
+    extensionModelLoaderManager.start();
+
+    deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
+                                                      muleArtifactResourcesRegistry.getApplicationFactory(),
+                                                      () -> findSchedulerService(serviceManager));
+    configureDeploymentService();
+    deploymentService.start();
+  }
+
+  private Application deployApplication(ApplicationFileBuilder applicationFileBuilder) throws Exception {
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    return findApp(applicationFileBuilder.getId(), 1);
+  }
+
+  private Application assertAppDeploymentAndStatus(ApplicationFileBuilder applicationFileBuilder, ApplicationStatus status) {
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    final Application app = findApp(applicationFileBuilder.getId(), 1);
+    assertStatus(app, status);
+    return app;
+  }
+
+  private void assertIfFlowsHaveStarted(Application app, boolean started) {
+    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+      assertThat(flow.getLifecycleState().isStarted(), is(started));
     }
   }
 }
