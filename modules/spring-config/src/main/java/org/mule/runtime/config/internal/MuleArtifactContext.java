@@ -305,12 +305,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         artifactAst = toArtifactast(artifactDeclaration, getExtensions());
       }
 
-      // TODO validate the AST instead of the model
-      return (ApplicationModel) validateModel(new ApplicationModel(artifactAst,
-                                                                   artifactProperties, parentConfigurationProperties,
-                                                                   new ClassLoaderResourceProvider(muleContext
-                                                                       .getExecutionClassLoader()),
-                                                                   featureFlaggingService));
+      validateArtifact(artifactAst);
+      return new ApplicationModel(artifactAst,
+                                  artifactProperties, parentConfigurationProperties,
+                                  new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader()),
+                                  featureFlaggingService);
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -318,12 +317,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
+  protected void validateArtifact(final ArtifactAst artifactAst) {
+    doValidateModel(artifactAst);
+  }
+
   private String compToLoc(ComponentAst component) {
     return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
         + component.getMetadata().getStartLine().orElse(-1) + "]";
   }
 
-  private ArtifactAst validateModel(ArtifactAst appModel) {
+  protected final void doValidateModel(ArtifactAst appModel) {
     final ValidationResult validation = validate(appModel);
 
     final Collection<ValidationResultItem> items = validation.getItems();
@@ -337,8 +340,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
       throw new MuleRuntimeException(createStaticMessage(allMessages));
     }
-
-    return appModel;
   }
 
   public void initialize() {

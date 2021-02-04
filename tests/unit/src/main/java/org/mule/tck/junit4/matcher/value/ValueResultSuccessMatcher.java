@@ -26,8 +26,8 @@ public class ValueResultSuccessMatcher extends TypeSafeMatcher<ValueResult> {
   public void describeTo(Description description) {
     item.getFailure().ifPresent(failure -> {
       description.appendText("ValueResultFailure (" + failure.getFailureCode() + ":" + lineSeparator());
-      description.appendText("\tMessaage: " + failure.getMessage() + lineSeparator());
-      description.appendText("\t  Reason: " + failure.getReason() + lineSeparator());
+      description.appendText("\tMessage: " + failure.getMessage() + lineSeparator());
+      description.appendText("\t Reason: " + failure.getReason() + lineSeparator());
     });
   }
 

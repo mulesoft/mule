@@ -51,7 +51,6 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
@@ -363,11 +362,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       return true;
     }
 
-    if (Objects.equals(WILDCARD_TOKEN, errorTypeIdentifier.getNamespace())) {
-      return true;
-    }
-
-    return false;
+    return Objects.equals(WILDCARD_TOKEN, errorTypeIdentifier.getNamespace());
   }
 
   /**
