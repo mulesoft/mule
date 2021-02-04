@@ -167,7 +167,7 @@ public final class SampleDataModelValidator implements ExtensionModelValidator {
   private void validateGenerics(ConnectableComponentModel model,
                                 Class<? extends SampleDataProvider> providerClass,
                                 ProblemsReporter problemsReporter) {
-
+    // TODO MULE-19201
     Pair<Type, Type> providerGenericTypes = getProviderGenerics(providerClass);
     if (providerGenericTypes.getFirst() == null) {
       problemsReporter
