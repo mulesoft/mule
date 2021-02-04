@@ -104,6 +104,11 @@ public interface AllureConstants {
       String FEATURE_FLAGGING = "Feature Flagging";
     }
 
+    interface FlowStatePersistenceStory {
+
+      String FLOW_STATE_PERSISTENCE = "Flow State Persistence";
+    }
+
   }
 
   interface EmailFeature {

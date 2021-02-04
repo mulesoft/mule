@@ -20,6 +20,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Defines a listener to persist stop events of Mule artifacts using deployment properties.
+ */
 final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStoppedPersistenceListener {
 
   private static transient final Logger logger = LoggerFactory.getLogger(ArtifactStoppedDeploymentPersistenceListener.class);

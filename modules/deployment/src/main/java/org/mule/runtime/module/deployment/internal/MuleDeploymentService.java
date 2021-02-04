@@ -419,7 +419,6 @@ public class MuleDeploymentService implements DeploymentService {
    * @param applicationDeployer the applicationDeployer to provide to the {@link DomainArchiveDeployer}.
    * @param applicationDeploymentListener the applicationDeployer listener to provide to the {@link DomainDeploymentTemplate}.
    * @param domainDeploymentListener the domainDeploymentListener to provide to the {@link DeploymentMuleContextListenerFactory}
-   *
    * @return the DomainArchiveDeployer.
    */
   protected DomainArchiveDeployer createDomainArchiveDeployer(DefaultDomainFactory domainFactory,

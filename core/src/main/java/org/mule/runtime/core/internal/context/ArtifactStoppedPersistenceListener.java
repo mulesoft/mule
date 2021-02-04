@@ -26,8 +26,8 @@ public interface ArtifactStoppedPersistenceListener {
   /**
    * Turns off persistence.
    * <p>
-   * The artifact stopped state should only be persisted if it was stopped by external users.
-   * Since external users usually call the artifact stop() method directly from their own methods, a workaround is
+   * The artifact's stopped state should only be persisted if it was stopped by external users.
+   * Since external users usually call the artifact's stop() method directly from their own methods, a workaround is
    * to prevent persistence when the artifact is stopped for other reasons.
    */
   void doNotPersist();
