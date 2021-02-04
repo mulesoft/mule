@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.context.FlowStoppedPersistenceListener;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
@@ -68,6 +69,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   private final String name;
   private final FlowExceptionHandler exceptionListener;
   private volatile FlowConstructStatistics statistics;
+  protected FlowStoppedPersistenceListener flowStoppedPersistenceListener;
 
   /**
    * Determines the initial state of this flow when the mule starts. Can be 'stopped' or 'started' (default)
@@ -108,6 +110,9 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
 
   @Override
   public final void start() throws MuleException {
+    if (flowStoppedPersistenceListener != null && !flowStoppedPersistenceListener.shouldStart()) {
+      return;
+    }
     // Check if Initial State is Stopped
     if (muleContext.isStarting() && initialState.equals(INITIAL_STATE_STOPPED)) {
       lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<>());
@@ -122,6 +127,9 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
       startIfStartable(exceptionListener);
       doStart();
     });
+    if (flowStoppedPersistenceListener != null) {
+      flowStoppedPersistenceListener.onStart();
+    }
   }
 
   @Override
@@ -131,6 +139,9 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
       stopIfStoppable(exceptionListener);
       doStopProcessingStrategy();
     });
+    if (flowStoppedPersistenceListener != null) {
+      flowStoppedPersistenceListener.onStop();
+    }
   }
 
   @Override
@@ -264,5 +275,13 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
 
   protected void disposeIfDisposable(Object candidate) {
     disposeIfNeeded(candidate, LOGGER);
+  }
+
+  public void addFlowStoppedListener(FlowStoppedPersistenceListener flowStoppedPersistenceListener) {
+    this.flowStoppedPersistenceListener = flowStoppedPersistenceListener;
+  }
+
+  public void checkIfFlowShouldStart() {
+    flowStoppedPersistenceListener.checkIfFlowShouldStart();
   }
 }
