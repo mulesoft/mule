@@ -11,6 +11,7 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.data.sample.extension.SampleDataExtension.NULL_VALUE;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -18,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.test.data.sample.extension.provider.ComplexActingParameterSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ComplexTypeSampleDataProvider;
@@ -119,8 +121,8 @@ public class SampleDataOperations {
 
 
   @SampleData(ComplexTypeSampleDataProvider.class)
-  public Result<Map<String, Object>, String> complexGenerics(ComplexActingParameter complex) {
-    return Result.<Map<String, Object>, String>builder().build();
+  public Result<Map<String, String>, String> complexGenerics(ComplexActingParameter complex) {
+    return Result.<Map<String, String>, String>builder().build();
   }
 
   @SampleData(MoreComplexTypeSampleDataProvider.class)

@@ -6,18 +6,15 @@
  */
 package org.mule.test.data.sample.extension.provider;
 
-import static org.mule.test.data.sample.extension.SampleDataExtension.adaptLegacy;
-
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.sdk.api.data.sample.SampleDataProvider;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.test.data.sample.extension.ComplexActingParameter;
-import org.mule.test.data.sample.extension.SampleDataOperations;
 
 import java.util.Map;
 
-public class ComplexTypeSampleDataProvider implements SampleDataProvider<Map<String, Object>, String> {
+public class ComplexTypeSampleDataProvider implements SampleDataProvider<Map<String, String>, String> {
 
   @Override
   public String getId() {
@@ -28,7 +25,7 @@ public class ComplexTypeSampleDataProvider implements SampleDataProvider<Map<Str
   private ComplexActingParameter complex;
 
   @Override
-  public Result<Map<String, Object>, String> getSample() throws SampleDataException {
-    return Result.<Map<String, Object>, String>builder().build();
+  public Result<Map<String, String>, String> getSample() throws SampleDataException {
+    return Result.<Map<String, String>, String>builder().build();
   }
 }
