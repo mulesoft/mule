@@ -78,13 +78,11 @@ public class FallibleReconnectableSource extends Source<Void, Void> {
 
   @Override
   public void onStop() {
-    if (!fail) {
-      if (this.scheduleWithFixedDelay != null) {
-        this.scheduleWithFixedDelay.cancel(true);
-      }
-      if (this.scheduler != null) {
-        this.scheduler.stop();
-      }
+    if (this.scheduleWithFixedDelay != null) {
+      this.scheduleWithFixedDelay.cancel(true);
+    }
+    if (this.scheduler != null) {
+      this.scheduler.stop();
     }
   }
 
