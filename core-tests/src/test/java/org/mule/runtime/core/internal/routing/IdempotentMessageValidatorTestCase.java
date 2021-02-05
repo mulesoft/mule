@@ -9,8 +9,6 @@ package org.mule.runtime.core.internal.routing;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
@@ -100,8 +98,8 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     idempotent.initialise();
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
-    assertNotNull(processedEvent);
-    assertEquals("1", idempotent.getObjectStore().retrieve("OK"));
+    assertThat(processedEvent, is(notNullValue()));
+    assertThat(idempotent.getObjectStore().retrieve("OK"), is("1"));
 
     // This will not process, because the message is a duplicate
     okMessage = of("OK");
@@ -128,8 +126,8 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     idempotent.initialise();
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
-    assertNotNull(processedEvent);
-    assertEquals("1", idempotent.getObjectStore().retrieve("Hello World"));
+    assertThat(processedEvent, is(notNullValue()));
+    assertThat(idempotent.getObjectStore().retrieve("Hello World"), is("1"));
 
     // This will not process, because the message is a duplicate
     okMessage = of("Hello");
@@ -165,9 +163,9 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     idempotent.initialise();
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
-    assertNotNull(processedEvent);
-    assertEquals("1", idempotent.getObjectStore()
-        .retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())));
+    assertThat(processedEvent, is(notNullValue()));
+    assertThat(idempotent.getObjectStore()
+        .retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())), is("1"));
 
     // This will not process, because the message is a duplicate
     message = of(payload);
@@ -204,16 +202,16 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     idempotent.initialise();
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
-    assertNotNull(processedEvent);
-    assertEquals("1", idempotent.getObjectStore()
-        .retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())));
+    assertThat(processedEvent, is(notNullValue()));
+    assertThat(idempotent.getObjectStore()
+        .retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())), is("1"));
 
     // This will process, because the message is a new one
     Message otherMessage = of(otherPayload);
     event = CoreEvent.builder(context).message(otherMessage).build();
 
     processedEvent = idempotent.process(event);
-    assertNotNull(processedEvent);
+    assertThat(processedEvent, is(notNullValue()));
   }
 
   @Test
