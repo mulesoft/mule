@@ -35,7 +35,7 @@ import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigura
 import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
-import org.mule.runtime.core.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;

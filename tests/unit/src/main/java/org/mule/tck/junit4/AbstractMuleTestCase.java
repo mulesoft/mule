@@ -6,6 +6,7 @@
  */
 package org.mule.tck.junit4;
 
+import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.getAllStackTraces;
@@ -13,6 +14,7 @@ import static java.util.Collections.singletonMap;
 import static java.util.Collections.sort;
 import static java.util.Optional.empty;
 import static org.junit.Assume.assumeThat;
+import static org.junit.rules.Timeout.millis;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,7 +33,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
@@ -82,7 +84,7 @@ public abstract class AbstractMuleTestCase {
     if (!isBlank(muleOpts)) {
       Map<String, String> parsedOpts = parsePropertyDefinitions(muleOpts);
       String optVerbose = parsedOpts.get("mule.verbose");
-      verbose = Boolean.valueOf(optVerbose);
+      verbose = valueOf(optVerbose);
     } else {
       verbose = true;
     }
@@ -117,7 +119,7 @@ public abstract class AbstractMuleTestCase {
     int millisecondsTimeout = getTestTimeoutSecs() * 1000;
 
     if (isFailOnTimeout()) {
-      return new DisableOnDebug(new Timeout(millisecondsTimeout));
+      return new DisableOnDebug(millis(millisecondsTimeout));
     } else {
       return new WarningTimeout(millisecondsTimeout);
     }

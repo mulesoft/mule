@@ -32,7 +32,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;

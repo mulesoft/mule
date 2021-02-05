@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.slf4j.Logger;
 
 /**

@@ -44,7 +44,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
   private static IdempotentMessageValidator idempotent;
 
   @Before
-  public void reset() throws Exception {
+  public void reset() {
     // Needs to create a new validator for every test because the idExpression needs to be reset and there is not way of knowing
     // the default from the test
     idempotent = new IdempotentMessageValidator();
@@ -101,7 +101,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
-    assertEquals(idempotent.getObjectStore().retrieve("OK"), "1");
+    assertEquals("1", idempotent.getObjectStore().retrieve("OK"));
 
     // This will not process, because the message is a duplicate
     okMessage = of("OK");
@@ -129,7 +129,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
-    assertEquals(idempotent.getObjectStore().retrieve("Hello World"), "1");
+    assertEquals("1", idempotent.getObjectStore().retrieve("Hello World"));
 
     // This will not process, because the message is a duplicate
     okMessage = of("Hello");
@@ -158,15 +158,16 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // Evaluate DW expression outside MessageValidator
     ExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(muleContext, mock(Registry.class),
-                                               new WeaveDefaultExpressionLanguageFactoryService(null));
-    TypedValue hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
+                                               new WeaveDefaultExpressionLanguageFactoryService(null),
+                                               getFeatureFlaggingService());
+    TypedValue<?> hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
     idempotent.initialise();
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
-    assertEquals(idempotent.getObjectStore()
-        .retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())), "1");
+    assertEquals("1", idempotent.getObjectStore()
+        .retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())));
 
     // This will not process, because the message is a duplicate
     message = of(payload);
@@ -196,15 +197,16 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // Evaluate DW expression outside MessageValidator
     ExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(muleContext, mock(Registry.class),
-                                               new WeaveDefaultExpressionLanguageFactoryService(null));
-    TypedValue hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
+                                               new WeaveDefaultExpressionLanguageFactoryService(null),
+                                               getFeatureFlaggingService());
+    TypedValue<Object> hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
     idempotent.initialise();
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
-    assertEquals(idempotent.getObjectStore()
-        .retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())), "1");
+    assertEquals("1", idempotent.getObjectStore()
+        .retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())));
 
     // This will process, because the message is a new one
     Message otherMessage = of(otherPayload);

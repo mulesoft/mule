@@ -8,6 +8,7 @@
 package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.api.config.Feature;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.Map;
