@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
@@ -38,13 +39,15 @@ import reactor.core.publisher.FluxSink;
 public class StreamPerThreadSink implements Sink, Disposable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StreamPerThreadSink.class);
+  private static final String LIMIT_CACHE_SIZE = "mule.tx.stream.cache.limitsize";
+  private static final boolean isLimitedCacheSize = getBoolean(LIMIT_CACHE_SIZE);
 
   private final ReactiveProcessor processor;
   private final Consumer<CoreEvent> eventConsumer;
   private final FlowConstruct flowConstruct;
 
   private volatile boolean disposing = false;
-  private final Cache<Thread, FluxSink<CoreEvent>> sinks = Caffeine.newBuilder().weakKeys().build();
+  private final Cache<Thread, FluxSink<CoreEvent>> sinks;
 
   /**
    * Creates a {@link StreamPerThreadSink}.
@@ -57,6 +60,11 @@ public class StreamPerThreadSink implements Sink, Disposable {
     this.processor = processor;
     this.eventConsumer = eventConsumer;
     this.flowConstruct = flowConstruct;
+    if (isLimitedCacheSize) {
+      this.sinks = Caffeine.newBuilder().weakKeys().maximumSize(1000).build();
+    } else {
+      this.sinks = Caffeine.newBuilder().weakKeys().build();
+    }
   }
 
   @Override
@@ -65,17 +73,14 @@ public class StreamPerThreadSink implements Sink, Disposable {
       throw new IllegalStateException("Already disposed");
     }
 
-
-    final Thread currentThread = currentThread();
-    sinks.get(currentThread, t -> {
+    sinks.get(currentThread(), t -> {
       final FluxSinkRecorder<CoreEvent> recorder = new FluxSinkRecorder<>();
       recorder.flux()
           .doOnNext(request -> eventConsumer.accept(request))
           .transform(processor)
           .subscribe(null, e -> {
             LOGGER.error("Exception reached PS subscriber for flow '" + flowConstruct.getName() + "'", e);
-            sinks.invalidate(currentThread);
-          }, () -> sinks.invalidate(currentThread));
+          });
 
       return recorder.getFluxSink();
     })
