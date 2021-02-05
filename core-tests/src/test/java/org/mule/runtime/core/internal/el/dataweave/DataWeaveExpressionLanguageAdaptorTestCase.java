@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.el.dataweave;
 
+import static java.io.File.separator;
 import static java.lang.String.format;
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
@@ -14,7 +15,6 @@ import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.apache.commons.lang3.SystemUtils.FILE_SEPARATOR;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
@@ -59,7 +59,7 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -144,26 +144,26 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void stringExpression() throws Exception {
-    TypedValue result = expressionLanguage.evaluate("\"hey\"", testEvent(), BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate("\"hey\"", testEvent(), BindingContext.builder().build());
     assertThat(result.getValue(), is("hey"));
     assertThat(result.getDataType(), is(assignableTo(STRING)));
   }
 
   @Test
   public void withPrefixExpression() throws Exception {
-    TypedValue result = expressionLanguage.evaluate("#[dw:\"hey\"]", testEvent(), BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate("#[dw:\"hey\"]", testEvent(), BindingContext.builder().build());
     assertThat(result.getValue(), is("hey"));
     assertThat(result.getDataType(), is(assignableTo(STRING)));
   }
 
   @Test
-  public void attributesBinding() throws Exception {
+  public void attributesBinding() {
     CoreEvent event = getEventWithError(empty());
     SomeAttributes attributes = new SomeAttributes();
     InternalMessage message = (InternalMessage) Message.builder().nullValue().attributesValue(attributes).build();
     when(event.getMessage()).thenReturn(message);
 
-    TypedValue result = expressionLanguage.evaluate(ATTRIBUTES, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(ATTRIBUTES, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(equalTo(attributes)));
     assertThat(result.getDataType().getType(), is((equalTo(SomeAttributes.class))));
   }
@@ -187,18 +187,18 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     CoreEvent jsonMessage =
         eventBuilder(muleContext).message(Message.builder().value("{\"student\": false}").mediaType(APPLICATION_JSON).build())
             .build();
-    TypedValue result = expressionLanguage.evaluate("payload.student", BOOLEAN, jsonMessage, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate("payload.student", BOOLEAN, jsonMessage, BindingContext.builder().build());
     assertThat(result.getValue(), is(false));
   }
 
   @Test
   public void errorBinding() throws Exception {
     Error error = mock(Error.class);
-    Optional opt = of(error);
+    Optional<Error> opt = of(error);
     CoreEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
-    TypedValue result = expressionLanguage.evaluate(ERROR, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(ERROR, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(sameInstance(error)));
   }
 
@@ -218,13 +218,13 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
         .exception(new IllegalArgumentException(exceptionMessage))
         .errorType(errorType)
         .build();
-    Optional opt = of(error);
+    Optional<Error> opt = of(error);
     CoreEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
     String expression =
         "'$(error.description) $(error.detailedDescription) $(error.cause.message) $(error.errorType.identifier)'";
-    TypedValue result = expressionLanguage.evaluate(expression, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(expression, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(format("%s %s %s %s", description, detailedDescription, exceptionMessage, errorId)));
   }
 
@@ -242,12 +242,12 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
                                                    ErrorBuilder.builder(new DefaultMuleException(otherChildErrorMessage))
                                                        .errorType(errorType).build()));
 
-    Optional opt = of(error);
+    Optional<Error> opt = of(error);
     CoreEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
     String expression = "error.childErrors reduce ((child, acc = '') -> acc ++ child.cause.message)";
-    TypedValue result = expressionLanguage.evaluate(expression, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(expression, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(format("%s%s", childErrorMessage, otherChildErrorMessage)));
   }
 
@@ -256,19 +256,19 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     Error error = mock(Error.class);
     when(error.getErrorMessage()).thenReturn(Message.of(new Integer[] {1, 3, 6}));
 
-    Optional opt = of(error);
+    Optional<Error> opt = of(error);
     CoreEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
     String expression = "error.errorMessage.payload reduce ($$ + $)";
-    TypedValue result = expressionLanguage.evaluate(expression, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(expression, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(10));
   }
 
   @Test
   public void errorMessageContainsDataweaveExceptionCauseMessage() throws Exception {
     Error error = mock(Error.class);
-    Optional opt = of(error);
+    Optional<Error> opt = of(error);
     CoreEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
     String expressionThatThrowsException = "payload + 'foo'";
@@ -285,7 +285,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     final String invalidExpression = "#[INVALID_EXPRESSION()]";
 
     Error error = mock(Error.class);
-    Optional opt = of(error);
+    Optional<Error> opt = of(error);
     CoreEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
@@ -295,49 +295,49 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   }
 
   @Test
-  public void payloadBinding() throws Exception {
+  public void payloadBinding() {
     CoreEvent event = getEventWithError(empty());
     InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(event.getMessage()).thenReturn(message);
-    TypedValue payload = new TypedValue<>("hey", STRING);
-    TypedValue attributes = new TypedValue<>(null, OBJECT);
+    TypedValue<Object> payload = new TypedValue<>("hey", STRING);
+    TypedValue<Object> attributes = new TypedValue<>(null, OBJECT);
     when(message.getPayload()).thenReturn(payload);
     when(message.getAttributes()).thenReturn(attributes);
 
-    TypedValue result = expressionLanguage.evaluate(PAYLOAD, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(PAYLOAD, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(equalTo(payload.getValue())));
     assertThat(result.getDataType(), is(equalTo(payload.getDataType())));
   }
 
   @Test
-  public void dataTypeBinding() throws Exception {
+  public void dataTypeBinding() {
     CoreEvent event = getEventWithError(empty());
     InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(event.getMessage()).thenReturn(message);
-    TypedValue payload = new TypedValue<>("hey", STRING);
-    TypedValue attributes = new TypedValue<>(null, OBJECT);
+    TypedValue<Object> payload = new TypedValue<>("hey", STRING);
+    TypedValue<Object> attributes = new TypedValue<>(null, OBJECT);
     when(message.getPayload()).thenReturn(payload);
     when(message.getAttributes()).thenReturn(attributes);
 
-    TypedValue result = expressionLanguage.evaluate(DATA_TYPE, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(DATA_TYPE, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(equalTo(STRING)));
     assertThat(result.getDataType(), is(assignableTo(fromType(DataType.class))));
   }
 
   @Test
-  public void variablesBindings() throws Exception {
+  public void variablesBindings() {
     CoreEvent event = getEventWithError(empty());
     String var1 = "var1";
     String var2 = "var2";
     when(event.getVariables().keySet()).thenReturn(Sets.newHashSet(var1, var2));
-    TypedValue varValue = new TypedValue<>(null, OBJECT);
+    TypedValue<?> varValue = new TypedValue<>(null, OBJECT);
     when(event.getVariables()).thenReturn(ImmutableMap.<String, TypedValue<?>>builder()
         .put(var1, varValue).put(var2, varValue).build());
 
-    TypedValue result = expressionLanguage.evaluate(VARS, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(VARS, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Map.class)));
-    assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var1, varValue));
-    assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var2, varValue));
+    assertThat((Map<String, TypedValue<?>>) result.getValue(), hasEntry(var1, varValue));
+    assertThat((Map<String, TypedValue<?>>) result.getValue(), hasEntry(var2, varValue));
   }
 
   @Test
@@ -355,7 +355,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     assertThat(expressionLanguage.evaluate(ERROR, event, BindingContext.builder().build()).getValue(), is(nullValue()));
     assertThat(expressionLanguage.evaluate(VARS, event, BindingContext.builder().build()).getValue(),
                is(instanceOf(Map.class)));
-    assertThat(expressionLanguage.evaluate("flow.name", event, fromSingleComponent(flowName), BindingContext.builder().build())
+    assertThat(expressionLanguage.evaluate("flow.name", event, from(flowName), BindingContext.builder().build())
         .getValue(),
                is(flowName));
   }
@@ -363,7 +363,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void messageBinding() throws Exception {
     CoreEvent event = testEvent();
-    TypedValue result = expressionLanguage.evaluate(MESSAGE, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(MESSAGE, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Message.class)));
     assertEquals(((Message) result.getValue()).getPayload(), event.getMessage().getPayload());
   }
@@ -371,7 +371,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void nullItemSequenceInfoBinding() throws Exception {
     CoreEvent event = testEvent();
-    TypedValue result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(nullValue()));
   }
 
@@ -379,7 +379,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void noSequenceSizeItemSequenceInfoBinding() throws Exception {
     CoreEvent event = spy(testEvent());
     when(event.getItemSequenceInfo()).thenReturn(of(ItemSequenceInfo.of(43)));
-    TypedValue result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".position", event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".position", event, BindingContext.builder().build());
     assertThat(result.getValue(), is(43));
     result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".sequenceSize", event, BindingContext.builder().build());
     assertThat(result.getValue(), is(nullValue()));
@@ -389,7 +389,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void itemSequenceInfoBinding() throws Exception {
     CoreEvent event = spy(testEvent());
     when(event.getItemSequenceInfo()).thenReturn(of(ItemSequenceInfo.of(43, 100)));
-    TypedValue result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".position", event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".position", event, BindingContext.builder().build());
     assertThat(result.getValue(), is(43));
     result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".sequenceSize", event, BindingContext.builder().build());
     assertThat(result.getValue(), is(100));
@@ -401,7 +401,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     Authentication authentication =
         new DefaultMuleAuthentication(new DefaultMuleCredentials("username", "password".toCharArray()));
     when(event.getAuthentication()).thenReturn(of(authentication));
-    TypedValue result = expressionLanguage.evaluate(AUTHENTICATION, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(AUTHENTICATION, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Authentication.class)));
     assertThat(result.getValue(), is(authentication));
     assertThat(result.getDataType().getType(), is(equalTo(Authentication.class)));
@@ -410,7 +410,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void authenticationBindingWhenNullSecurityContext() throws Exception {
     CoreEvent event = spy(testEvent());
-    TypedValue result = expressionLanguage.evaluate(AUTHENTICATION, event, BindingContext.builder().build());
+    TypedValue<?> result = expressionLanguage.evaluate(AUTHENTICATION, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(nullValue()));
   }
 
@@ -418,7 +418,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void accessRegistryBean() throws MuleException {
     CoreEvent event = testEvent();
     when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
-    TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean.name", event, BindingContext.builder().build());
+    TypedValue<?> evaluate = expressionLanguage.evaluate("app.registry.myBean.name", event, BindingContext.builder().build());
     assertThat(evaluate.getValue(), is("DataWeave"));
   }
 
@@ -426,8 +426,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void accessRegistryAnnotatedBean() throws MuleException {
     CoreEvent event = testEvent();
     when(registry.lookupByName("myBean")).thenReturn(of(new MyAnnotatedBean("DataWeave")));
-    TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean", fromType(MyBean.class), event,
-                                                      fromSingleComponent("flow"), BindingContext.builder().build(), false);
+    TypedValue<?> evaluate = expressionLanguage.evaluate("app.registry.myBean", fromType(MyBean.class), event,
+                                                         from("flow"), BindingContext.builder().build(), false);
     assertThat(evaluate.getValue(), is(instanceOf(MyAnnotatedBean.class)));
   }
 
@@ -438,8 +438,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     MyBean annotatedMyBean = (MyBean) addAnnotationsToClass(MyBean.class).newInstance();
     annotatedMyBean.setName("DataWeave");
     when(registry.lookupByName("myBean")).thenReturn(of(annotatedMyBean));
-    TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean", fromType(MyBean.class), event,
-                                                      fromSingleComponent("flow"), BindingContext.builder().build(), false);
+    TypedValue<?> evaluate = expressionLanguage.evaluate("app.registry.myBean", fromType(MyBean.class), event,
+                                                         from("flow"), BindingContext.builder().build(), false);
     assertThat(evaluate.getValue(), is(instanceOf(MyBean.class)));
   }
 
@@ -447,15 +447,15 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void accessServerFileSeparator() throws MuleException {
     CoreEvent event = testEvent();
     when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
-    TypedValue evaluate = expressionLanguage.evaluate("server.fileSeparator", event, BindingContext.builder().build());
-    assertThat(evaluate.getValue(), is(FILE_SEPARATOR));
+    TypedValue<?> evaluate = expressionLanguage.evaluate("server.fileSeparator", event, BindingContext.builder().build());
+    assertThat(evaluate.getValue(), is(separator));
   }
 
   @Test
   public void accessMuleVersion() throws MuleException {
     CoreEvent event = testEvent();
     when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
-    TypedValue evaluate = expressionLanguage.evaluate("mule.version", event, BindingContext.builder().build());
+    TypedValue<?> evaluate = expressionLanguage.evaluate("mule.version", event, BindingContext.builder().build());
     assertThat(evaluate.getValue(), is(MuleManifest.getProductVersion()));
   }
 
@@ -464,8 +464,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     CoreEvent event = getEventWithError(empty());
     String flowName = "myFlowName";
 
-    TypedValue result =
-        expressionLanguage.evaluate("flow.name", event, fromSingleComponent(flowName), BindingContext.builder().build());
+    TypedValue<?> result =
+        expressionLanguage.evaluate("flow.name", event, from(flowName), BindingContext.builder().build());
     assertThat(result.getDataType(), is(assignableTo(STRING)));
     assertThat(result.getValue(), is(flowName));
   }
@@ -473,52 +473,52 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void payloadExpressionShouldNotBeEvaluate() throws MuleException {
     new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService)
+                                           genericExpressionLanguageService, getFeatureFlaggingService())
                                                .evaluate("#[payload]", testEvent(), bindingContext);
     verify(genericExpressionLanguage, never()).evaluate(eq("payload"), any(BindingContext.class));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateNoEventDoesntInstantiateExtraBindingContexts() throws MuleException {
+  public void evaluateNoEventDoesntInstantiateExtraBindingContexts() {
     new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService)
+                                           genericExpressionLanguageService, getFeatureFlaggingService())
                                                .evaluate("#['Hello World']", null, bindingContext);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event or DataType), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateWithDataTypeNoEventDoesntInstantiateExtraBindingContexts() throws MuleException {
+  public void evaluateWithDataTypeNoEventDoesntInstantiateExtraBindingContexts() {
     new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService)
+                                           genericExpressionLanguageService, getFeatureFlaggingService())
                                                .evaluate("#['Hello World']", OBJECT, null, bindingContext);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(OBJECT), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event, with DataType), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateNoLocationNoEventWithDataTypeDoesntInstantiateExtraBindingContexts() throws MuleException {
+  public void evaluateNoLocationNoEventWithDataTypeDoesntInstantiateExtraBindingContexts() {
     new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService)
+                                           genericExpressionLanguageService, getFeatureFlaggingService())
                                                .evaluate("#['Hello World']", OBJECT, null, null, bindingContext, false);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(OBJECT), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event, no Location, no DataType), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateNoLocationNoEventDoesntInstantiateExtraBindingContexts() throws MuleException {
+  public void evaluateNoLocationNoEventDoesntInstantiateExtraBindingContexts() {
     new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService)
+                                           genericExpressionLanguageService, getFeatureFlaggingService())
                                                .evaluate("#['Hello World']", null, null, null, bindingContext);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event, no Location), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateLogExpressionNoLocationNoEventDoesntInstantiateExtraBindingContexts() throws MuleException {
+  public void evaluateLogExpressionNoLocationNoEventDoesntInstantiateExtraBindingContexts() {
     new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService)
+                                           genericExpressionLanguageService, getFeatureFlaggingService())
                                                .evaluateLogExpression("#['Hello World']", null, null, bindingContext);
     verify(genericExpressionLanguage).evaluateLogExpression(anyString(), eq(bindingContext));
   }
@@ -528,11 +528,11 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     final String key = "foo";
     final String value = "bar";
     CoreEvent event = eventBuilder(muleContext).message(Message.builder().value(singletonMap(key, value)).build()).build();
-    TypedValue result =
+    TypedValue<?> result =
         expressionLanguage.evaluate("dw::core::Objects::entrySet(payload)", event, BindingContext.builder().build());
     assertThat(result.getValue(), instanceOf(List.class));
-    assertThat(((List) result.getValue()).get(0), instanceOf(Map.class));
-    Map entry = (Map) ((List) result.getValue()).get(0);
+    assertThat(((List<?>) result.getValue()).get(0), instanceOf(Map.class));
+    Map<?, ?> entry = (Map<?, ?>) ((List<?>) result.getValue()).get(0);
     assertThat(entry.get("key"), equalTo(key));
     assertThat(entry.get("value"), equalTo(value));
   }
@@ -547,7 +547,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   }
 
   @Test
-  public void bindingValueNotReferencedByDWParserCache() throws MuleException {
+  public void bindingValueNotReferencedByDWParserCache() {
     Object bindingValue = new Object();
     PhantomReference<CoreEvent> bindingValueRef = new PhantomReference(bindingValue, new ReferenceQueue<>());
 
@@ -566,16 +566,16 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void handlesOptional() throws Exception {
-    TypedValue result =
+    TypedValue<?> result =
         expressionLanguage.evaluate("'hello' as String {class: 'java.util.Optional'}", testEvent(),
                                     BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Optional.class)));
-    assertThat(((Optional) result.getValue()).get(), is("hello"));
+    assertThat(((Optional<?>) result.getValue()).get(), is("hello"));
   }
 
   @Test
   public void handlesEmptyOptional() throws Exception {
-    TypedValue result =
+    TypedValue<?> result =
         expressionLanguage.evaluate("null as Null {class: 'java.util.Optional'}", testEvent(), BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Optional.class)));
     assertThat(result.getValue(), is(empty()));
@@ -583,16 +583,16 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void handlesExpectedOptional() throws Exception {
-    TypedValue result =
+    TypedValue<?> result =
         expressionLanguage.evaluate("java!java::util::Optional::of('hello')", DataType.fromType(Optional.class), testEvent(),
                                     BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Optional.class)));
-    assertThat(((Optional) result.getValue()).get(), is("hello"));
+    assertThat(((Optional<?>) result.getValue()).get(), is("hello"));
   }
 
   @Test
   public void handlesEmptyExpectedOptional() throws Exception {
-    TypedValue result =
+    TypedValue<?> result =
         expressionLanguage.evaluate("java!java::util::Optional::empty()", DataType.fromType(Optional.class), testEvent(),
                                     BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Optional.class)));
@@ -628,7 +628,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   @Issue("MULE-18490")
-  public void compiledWithBindingContextAndLocation() throws MuleException {
+  public void compiledWithBindingContextAndLocation() {
     final ExpressionLanguage el = mock(ExpressionLanguage.class);
 
     compile("flow.name", el);
@@ -696,7 +696,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     return event;
   }
 
-  private class SomeAttributes extends BaseAttributes {
+  private static class SomeAttributes extends BaseAttributes {
 
   }
 

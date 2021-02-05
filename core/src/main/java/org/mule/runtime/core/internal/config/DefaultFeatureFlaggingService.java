@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;

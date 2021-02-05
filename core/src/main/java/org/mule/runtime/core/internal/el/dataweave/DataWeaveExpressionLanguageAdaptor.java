@@ -19,6 +19,7 @@ import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.BindingContext.Builder;
 import org.mule.runtime.api.el.CompiledExpression;
@@ -57,9 +58,11 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
-                                            DefaultExpressionLanguageFactoryService service) {
+                                            DefaultExpressionLanguageFactoryService service,
+                                            FeatureFlaggingService featureFlaggingService) {
     this.expressionExecutor = service.create(ExpressionLanguageConfiguration.builder()
         .defaultEncoding(getDefaultEncoding(muleContext))
+        .featureFlaggingService(featureFlaggingService)
         .build());
     this.muleContext = muleContext;
     registerGlobalBindings(registry);

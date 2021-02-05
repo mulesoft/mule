@@ -49,7 +49,7 @@ import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
-import org.mule.runtime.core.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.ArrayList;

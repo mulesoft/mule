@@ -24,6 +24,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
@@ -69,6 +70,9 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Inject
   private ConfigurationProperties properties;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
                                                                  "Expression parsing is deprecated, regular expressions should be used instead.");
@@ -137,7 +141,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   private DataWeaveExpressionLanguageAdaptor createWeaveExpressionLanguageAdaptor(
                                                                                   DefaultExpressionLanguageFactoryService service) {
-    return new DataWeaveExpressionLanguageAdaptor(muleContext, registry, service);
+    return new DataWeaveExpressionLanguageAdaptor(muleContext, registry, service, featureFlaggingService);
   }
 
   @Override
@@ -146,56 +150,56 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public TypedValue evaluate(String expression) {
+  public TypedValue<?> evaluate(String expression) {
     return evaluate(expression, NULL_BINDING_CONTEXT);
   }
 
   @Override
-  public TypedValue evaluate(String expression, CoreEvent event) {
+  public TypedValue<?> evaluate(String expression, CoreEvent event) {
     return evaluate(expression, event, NULL_BINDING_CONTEXT);
   }
 
   @Override
-  public TypedValue evaluate(String expression, BindingContext context) {
+  public TypedValue<?> evaluate(String expression, BindingContext context) {
     return evaluate(expression, null, null, null, context);
   }
 
   @Override
-  public TypedValue evaluate(String expression, CoreEvent event, BindingContext context) {
+  public TypedValue<?> evaluate(String expression, CoreEvent event, BindingContext context) {
     return evaluate(expression, event, CoreEvent.builder(event), null, context);
   }
 
   @Override
-  public TypedValue evaluate(String expression, CoreEvent event, ComponentLocation componentLocation) {
+  public TypedValue<?> evaluate(String expression, CoreEvent event, ComponentLocation componentLocation) {
     return evaluate(expression, event, CoreEvent.builder(event), componentLocation, NULL_BINDING_CONTEXT);
   }
 
   @Override
-  public TypedValue evaluate(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
-                             ComponentLocation componentLocation) {
+  public TypedValue<?> evaluate(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
+                                ComponentLocation componentLocation) {
     return evaluate(expression, event, eventBuilder, componentLocation, NULL_BINDING_CONTEXT);
   }
 
   @Override
-  public TypedValue evaluate(String expression, CoreEvent event, ComponentLocation componentLocation,
-                             BindingContext context) {
+  public TypedValue<?> evaluate(String expression, CoreEvent event, ComponentLocation componentLocation,
+                                BindingContext context) {
     return evaluate(expression, event, CoreEvent.builder(event), componentLocation, context);
   }
 
-  private TypedValue evaluate(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
-                              ComponentLocation componentLocation,
-                              BindingContext context) {
+  private TypedValue<?> evaluate(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
+                                 ComponentLocation componentLocation,
+                                 BindingContext context) {
     return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, event, eventBuilder, componentLocation, context),
                                         event, streamingManager);
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType outputType) {
+  public TypedValue<?> evaluate(String expression, DataType outputType) {
     return evaluate(expression, outputType, NULL_BINDING_CONTEXT);
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType outputType, BindingContext context) {
+  public TypedValue<?> evaluate(String expression, DataType outputType, BindingContext context) {
     return evaluate(expression, outputType, context, null);
   }
 
@@ -205,20 +209,20 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType outputType, BindingContext context, CoreEvent event) {
+  public TypedValue<?> evaluate(String expression, DataType outputType, BindingContext context, CoreEvent event) {
     return evaluate(expression, outputType, context, event, null, false);
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType outputType, BindingContext context, CoreEvent event,
-                             ComponentLocation componentLocation, boolean failOnNull)
+  public TypedValue<?> evaluate(String expression, DataType outputType, BindingContext context, CoreEvent event,
+                                ComponentLocation componentLocation, boolean failOnNull)
       throws ExpressionRuntimeException {
     return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, outputType, event, componentLocation, context,
                                                                     failOnNull),
                                         event, streamingManager);
   }
 
-  private TypedValue transform(TypedValue target, DataType sourceType, DataType outputType) throws TransformerException {
+  private TypedValue<?> transform(TypedValue<?> target, DataType sourceType, DataType outputType) throws TransformerException {
     if (target.getValue() != null && !isInstance(outputType.getType(), target.getValue())) {
       Object result = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(sourceType, outputType)
           .transform(target);
