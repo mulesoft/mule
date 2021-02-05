@@ -830,7 +830,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     ffRegistry.registerFeature(HANDLE_SPLITTER_EXCEPTION,
                                ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
-                                   && ctx.getConfiguration().getMinMuleVersion().get().newerThan("4.4.0"));
+                                   && ctx.getConfiguration().getMinMuleVersion().get().atLeast("4.4.0"));
   }
 
 }
