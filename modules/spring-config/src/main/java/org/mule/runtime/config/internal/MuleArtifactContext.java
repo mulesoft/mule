@@ -21,6 +21,7 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
@@ -144,6 +145,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   static {
     configurePropertiesResolverFeatureFlag();
+    configureSplitterExceptionHandlingFeature();
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactContext.class);
@@ -250,7 +252,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           DefaultConfigurationPropertiesResolver propertyResolver =
               new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
 
-                ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
+                final ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
 
                 @Override
                 public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
@@ -591,7 +593,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     final Set<ComponentAst> rootComponents = resolveRootComponents(applicationModel);
 
     recursiveStreamWithHierarchy(applicationModel, BOTTOM_UP)
-        // Create component if must not be root is mandatory or component is a root component or component is child of a root component
+        // Create component if must not be root is mandatory or component is a root component or component is child of a root
+        // component
         .filter(cm -> !mustBeRoot || rootComponents.contains(cm.getFirst())
             || cm.getSecond().stream().anyMatch(rootComponents::contains))
         .filter(cm -> !isIgnored(cm.getFirst()))
@@ -820,6 +823,14 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   public ApplicationModel getApplicationModel() {
     return applicationModel;
+  }
+
+  private static void configureSplitterExceptionHandlingFeature() {
+    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
+
+    ffRegistry.registerFeature(HANDLE_SPLITTER_EXCEPTION,
+                               ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
+                                   && ctx.getConfiguration().getMinMuleVersion().get().newerThan("4.4.0"));
   }
 
 }
