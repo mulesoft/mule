@@ -7,6 +7,7 @@
 package org.mule.test.petstore.extension;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
@@ -15,6 +16,7 @@ import static org.mule.test.petstore.extension.PetStoreFeatures.LEGACY_FEATURE;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -101,6 +103,11 @@ public class PetStoreOperations {
       return format("%s [old way]", message);
     }
     return message;
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public Boolean isSplitterExceptionHandled() {
+    return ffService.isEnabled(HANDLE_SPLITTER_EXCEPTION);
   }
 
   public List<String> getPets(@Connection PetStoreClient client,
