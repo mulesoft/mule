@@ -358,11 +358,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       fireNotification(new MuleContextNotification(this, CONTEXT_STARTED));
       final org.mule.runtime.api.artifact.Registry apiRegistry = getApiRegistry();
       listeners.forEach(l -> l.onStart(this, apiRegistry));
-      ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
-          getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
-      if (artifactStoppedPersistenceListener != null) {
-        artifactStoppedPersistenceListener.onStart();
-      }
 
       startLatch.release();
 
@@ -420,11 +415,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       final org.mule.runtime.api.artifact.Registry apiRegistry = getApiRegistry();
       listeners.forEach(l -> l.onStop(this, apiRegistry));
-      ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
-          getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
-      if (artifactStoppedPersistenceListener != null) {
-        artifactStoppedPersistenceListener.onStop();
-      }
     }
   }
 
