@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.el.function;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_MAP;
 import static java.util.Optional.of;
@@ -29,6 +30,7 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -43,6 +45,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -77,19 +80,21 @@ public class LookupFunction implements ExpressionFunction {
         .orElseThrow(() -> new IllegalArgumentException(format("There is no component named '%s'.", flowName)));
 
     if (component instanceof Flow) {
+      Message incomingMessage = lookupValue(context, MESSAGE, Message.builder().nullValue().build());
+      Map<String, ?> incomingVariables = lookupValue(context, VARS, EMPTY_MAP);
+      Error incomingError = lookupValue(context, ERROR, null);
+
+      Message message = Message.builder(incomingMessage).value(payload).mediaType(APPLICATION_JAVA).build();
+      CoreEvent event = CoreEvent.builder(PrivilegedEvent.getCurrentEvent().getContext())
+          .variables(incomingVariables)
+          .error(incomingError)
+          .message(message)
+          .build();
+
+      CompletableFuture<Event> lookupResultFuture = null;
       try {
-        Message incomingMessage = lookupValue(context, MESSAGE, Message.builder().nullValue().build());
-        Map<String, ?> incomingVariables = lookupValue(context, VARS, EMPTY_MAP);
-        Error incomingError = lookupValue(context, ERROR, null);
-
-        Message message = Message.builder(incomingMessage).value(payload).mediaType(APPLICATION_JAVA).build();
-        CoreEvent event = CoreEvent.builder(PrivilegedEvent.getCurrentEvent().getContext())
-            .variables(incomingVariables)
-            .error(incomingError)
-            .message(message)
-            .build();
-
-        return ((ExecutableComponent) component).execute(event)
+        lookupResultFuture = ((ExecutableComponent) component).execute(event);
+        return lookupResultFuture
             // If this timeout is hit, the thread that is executing the flow is interrupted
             .get(timeout, MILLISECONDS)
             .getMessage().getPayload();
@@ -102,11 +107,19 @@ public class LookupFunction implements ExpressionFunction {
                                                                   error.getDescription())),
                                        error.getCause());
       } catch (InterruptedException e) {
+        currentThread().interrupt();
+        if (lookupResultFuture != null) {
+          lookupResultFuture.cancel(true);
+        }
         throw new MuleRuntimeException(e);
       } catch (TimeoutException e) {
+        if (lookupResultFuture != null) {
+          lookupResultFuture.cancel(true);
+        }
         throw new MuleRuntimeException(createStaticMessage(format("Flow '%s' has timed out after %d millis",
                                                                   flowName,
-                                                                  timeout)));
+                                                                  timeout)),
+                                       e);
       }
     } else {
       throw new IllegalArgumentException(format("Component '%s' is not a flow.", flowName));

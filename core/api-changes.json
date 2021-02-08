@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.finalMethodAddedToNonFinalClass",
+          "new": "method java.util.concurrent.CompletableFuture<org.mule.runtime.api.event.Event> org.mule.runtime.core.privileged.component.AbstractExecutableComponent::execute(org.mule.runtime.api.event.Event, java.util.function.Consumer<org.mule.runtime.core.api.event.CoreEvent.Builder>)",
+          "package": "org.mule.runtime.core.privileged.component",
+          "classSimpleName": "AbstractExecutableComponent",
+          "methodName": "execute",
+          "elementKind": "method",
+          "justification": "MULE-17747: Added for testability"
+        },
+        {
           "code": "java.class.added",
           "new": "class org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils",
           "package": "org.mule.runtime.core.privileged.processor.chain",
