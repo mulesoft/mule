@@ -737,35 +737,11 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Issue("MULE-19040")
   @Test
   public void undeploysStoppedAppDoesNotStartItOnDeployButCanBeStartedManually() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+    final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
     assertStatus(app, STOPPED);
 
-    serviceManager.stop();
-    extensionModelLoaderManager.stop();
-    deploymentService.stop();
-
-    reset(applicationDeploymentListener);
-
-    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
-        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
-
-    serviceManager = muleArtifactResourcesRegistry.getServiceManager();
-    serviceManager.start();
-
-    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
-    extensionModelLoaderManager.start();
-
-    deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
-                                                      muleArtifactResourcesRegistry.getApplicationFactory(),
-                                                      () -> findSchedulerService(serviceManager));
-    configureDeploymentService();
-    deploymentService.start();
+    restartServer();
 
     assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
     final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
