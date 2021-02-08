@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.yield;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -39,15 +39,15 @@ import reactor.core.publisher.FluxSink;
 public class StreamPerThreadSink implements Sink, Disposable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StreamPerThreadSink.class);
-  private static final String LIMIT_CACHE_SIZE = "mule.tx.stream.cache.limitsize";
-  private static final boolean isLimitedCacheSize = getBoolean(LIMIT_CACHE_SIZE);
+  private static final int CACHE_TIME_LIMIT_IN_MINUTES = 60;
 
   private final ReactiveProcessor processor;
   private final Consumer<CoreEvent> eventConsumer;
   private final FlowConstruct flowConstruct;
 
   private volatile boolean disposing = false;
-  private final Cache<Thread, FluxSink<CoreEvent>> sinks;
+  private final Cache<Thread, FluxSink<CoreEvent>> sinks =
+      Caffeine.newBuilder().weakKeys().expireAfterAccess(CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();;
 
   /**
    * Creates a {@link StreamPerThreadSink}.
@@ -60,11 +60,6 @@ public class StreamPerThreadSink implements Sink, Disposable {
     this.processor = processor;
     this.eventConsumer = eventConsumer;
     this.flowConstruct = flowConstruct;
-    if (isLimitedCacheSize) {
-      this.sinks = Caffeine.newBuilder().weakKeys().maximumSize(1000).build();
-    } else {
-      this.sinks = Caffeine.newBuilder().weakKeys().build();
-    }
   }
 
   @Override
