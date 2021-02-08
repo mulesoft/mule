@@ -10,6 +10,7 @@ import static com.google.common.collect.ImmutableSet.copyOf;
 import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mockito.Mockito.mock;
@@ -90,10 +91,10 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
 
   static final Map<String, ExtensionModel> extensionModels = new HashMap<>();
 
-  private static ExtensionModelLoader javaLoader = new DefaultJavaExtensionModelLoader();
-  private static ExtensionModelLoader soapLoader = new SoapExtensionModelLoader();
+  private static final ExtensionModelLoader javaLoader = new DefaultJavaExtensionModelLoader();
+  private static final ExtensionModelLoader soapLoader = new SoapExtensionModelLoader();
 
-  @Parameterized.Parameter(0)
+  @Parameterized.Parameter
   public ExtensionModel extensionUnderTest;
 
   @Parameterized.Parameter(1)
@@ -108,7 +109,7 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
     final ClassLoader classLoader = DefaultExtensionSchemaGeneratorTestCase.class.getClassLoader();
     final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
     when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
-        .thenReturn(asList(new JavaXmlDeclarationEnricher()));
+        .thenReturn(singletonList(new JavaXmlDeclarationEnricher()));
 
     final List<SchemaGeneratorTestUnit> extensions;
     extensions = asList(newTestUnit(javaLoader, MapConnector.class, "map.xsd"),
@@ -152,10 +153,9 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
   }
 
   /**
-   * Utility to batch fix input files when severe model changes are introduced.
-   * Use carefully, not a mechanism to get away with anything.
-   * First check why the generated json is different and make sure you're not introducing any bugs.
-   * This should NEVER be committed as true
+   * Utility to batch fix input files when severe model changes are introduced. Use carefully, not a mechanism to get away with
+   * anything. First check why the generated json is different and make sure you're not introducing any bugs. This should NEVER be
+   * committed as true
    *
    * @return whether or not the "expected" test files should be updated when comparison fails
    */
@@ -213,10 +213,13 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
   public static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader) {
     Map<String, Object> params = of(TYPE_PROPERTY_NAME, clazz.getName(),
                                     VERSION, getProductVersion(),
-                                    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+                                    // TODO MULE-14517: This workaround should be replaced for a better and more complete
+                                    // mechanism
                                     COMPILATION_MODE, true);
 
-    //TODO MULE-11797: as this utils is consumed from org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel), this util should get dropped once the ticket gets implemented.
+    // TODO MULE-11797: as this utils is consumed from
+    // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
+    // this util should get dropped once the ticket gets implemented.
     final DslResolvingContext dslResolvingContext = getDefault(new LinkedHashSet<>(extensionModels.values()));
 
     final String basePackage = clazz.getPackage().toString();

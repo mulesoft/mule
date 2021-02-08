@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.resources;
 import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -80,10 +81,10 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
 
   static Map<String, ExtensionModel> extensionModels = new HashMap<>();
 
-  private static ExtensionModelLoader javaLoader = new DefaultJavaExtensionModelLoader();
-  private static ExtensionModelLoader soapLoader = new SoapExtensionModelLoader();
+  private static final ExtensionModelLoader javaLoader = new DefaultJavaExtensionModelLoader();
+  private static final ExtensionModelLoader soapLoader = new SoapExtensionModelLoader();
 
-  @Parameterized.Parameter(0)
+  @Parameterized.Parameter
   public ExtensionModel extensionUnderTest;
 
   @Parameterized.Parameter(1)
@@ -120,7 +121,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     final ClassLoader classLoader = ExtensionModelJsonGeneratorTestCase.class.getClassLoader();
     final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
     when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
-        .thenReturn(asList(new JavaXmlDeclarationEnricher()));
+        .thenReturn(singletonList(new JavaXmlDeclarationEnricher()));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);
@@ -139,10 +140,9 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
   }
 
   /**
-   * Utility to batch fix input files when severe model changes are introduced.
-   * Use carefully, not a mechanism to get away with anything.
-   * First check why the generated json is different and make sure you're not introducing any bugs.
-   * This should NEVER be committed as true
+   * Utility to batch fix input files when severe model changes are introduced. Use carefully, not a mechanism to get away with
+   * anything. First check why the generated json is different and make sure you're not introducing any bugs. This should NEVER be
+   * committed as true
    *
    * @return whether or not the "expected" test files should be updated when comparison fails
    */
