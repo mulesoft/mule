@@ -4,6 +4,15 @@
       "ignore": [
         {
           "code": "java.method.finalMethodAddedToNonFinalClass",
+          "new": "method java.util.concurrent.CompletableFuture<org.mule.runtime.api.event.Event> org.mule.runtime.core.privileged.component.AbstractExecutableComponent::execute(org.mule.runtime.api.event.Event, java.util.function.Consumer<org.mule.runtime.core.api.event.CoreEvent.Builder>)",
+          "package": "org.mule.runtime.core.privileged.component",
+          "classSimpleName": "AbstractExecutableComponent",
+          "methodName": "execute",
+          "elementKind": "method",
+          "justification": "MULE-17747: Added for testability"
+        },
+        {
+          "code": "java.method.finalMethodAddedToNonFinalClass",
           "new": "method java.lang.Object org.mule.runtime.core.api.streaming.bytes.factory.AbstractCursorStreamProviderFactory::of(org.mule.runtime.api.event.EventContext, java.io.InputStream, org.mule.runtime.api.component.location.ComponentLocation)",
           "package": "org.mule.runtime.core.api.streaming.bytes.factory",
           "classSimpleName": "AbstractCursorStreamProviderFactory",
