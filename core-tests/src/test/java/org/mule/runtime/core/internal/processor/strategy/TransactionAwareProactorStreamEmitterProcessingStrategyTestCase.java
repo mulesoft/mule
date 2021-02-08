@@ -56,9 +56,6 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     extends ProactorStreamEmitterProcessingStrategyTestCase
     implements TransactionAwareProcessingStrategyTestCase {
 
-  private static final int PROBER_POLIING_TIMEOUT = 5000;
-  private static final int PROBER_POLLING_INTERVAL = 100;
-
   public TransactionAwareProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
     super(mode);
   }
@@ -137,18 +134,18 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     // we cannot do a thread.join because we must not set a strong reference
     Latch latch = new Latch();
 
-    new Thread(() -> {
+    asyncExecutor.submit(() -> {
       try {
-        getInstance()
-            .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
+        getInstance().bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
         processFlow(testEvent());
         threads.clear();
         latch.release();
       } catch (Exception e) {
       }
-    }).start();
+    });
 
     latch.await();
+    asyncExecutor.stop();
 
     assertThat(captor.reference, is(eventually(collectedByGc())));
   }
