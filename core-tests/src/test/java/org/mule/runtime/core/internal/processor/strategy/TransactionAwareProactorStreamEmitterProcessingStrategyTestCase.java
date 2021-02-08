@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
-import static java.lang.System.gc;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -20,12 +19,14 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.FLOW;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
+import static org.mule.tck.junit4.matcher.Eventually.eventually;
+import static org.mule.tck.util.CollectableReference.collectedByGc;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
-import org.junit.Assert;
+import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -35,12 +36,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStrategyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
-import org.mule.tck.probe.JUnitProbe;
-import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.mule.TestTransaction;
+import org.mule.tck.util.CollectableReference;
 
-import java.lang.ref.PhantomReference;
-import java.lang.ref.ReferenceQueue;
 import java.util.Collection;
 
 import org.junit.After;
@@ -130,6 +128,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
   }
 
   @Test
+  @Issue("MULE-19209")
   public void txDoesNotLeakThread() throws Exception {
     ThreadReferenceCaptor captor = new ThreadReferenceCaptor();
     flow = flowBuilder.get().processors(captor).build();
@@ -151,28 +150,18 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
 
     latch.await();
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitProbe() {
-
-      @Override
-      protected boolean test() throws Exception {
-        gc();
-        Assert.assertThat(captor.reference.isEnqueued(), is(true));
-        return true;
-      }
-    });
+    assertThat(captor.reference, is(eventually(collectedByGc())));
   }
 
   public static class ThreadReferenceCaptor implements Processor {
 
-    public PhantomReference<Thread> reference;
+    public CollectableReference<Thread> reference;
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
-      reference = new PhantomReference<>(currentThread(), new ReferenceQueue<>());
+      reference = new CollectableReference<>(currentThread());
       return event;
     }
   }
-
-
 
 }
