@@ -24,13 +24,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-
-import javax.inject.Inject;
-
 import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -41,11 +34,13 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -86,6 +81,14 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValu
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
 import reactor.core.publisher.Mono;
@@ -130,14 +133,14 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private SourceConnectionManager sourceConnectionManager;
   private Processor messageProcessor;
-  private LazyValue<TransactionConfig> transactionConfig = new LazyValue<>(this::buildTransactionConfig);
+  private final LazyValue<TransactionConfig> transactionConfig = new LazyValue<>(this::buildTransactionConfig);
 
   private SourceAdapter sourceAdapter;
   private RetryPolicyTemplate retryPolicyTemplate;
   private Scheduler retryScheduler;
   private Scheduler flowTriggerScheduler;
 
-  private AtomicBoolean started = new AtomicBoolean(false);
+  private final AtomicBoolean started = new AtomicBoolean(false);
 
   public ExtensionMessageSource(ExtensionModel extensionModel,
                                 SourceModel sourceModel,
@@ -210,8 +213,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private void stopSource() throws MuleException {
     if (sourceAdapter != null) {
+      CoreEvent initialiserEvent = null;
       try {
-        CoreEvent initialiserEvent = getInitialiserEvent(muleContext);
+        initialiserEvent = getInitialiserEvent(muleContext);
         stopUsingConfiguration(initialiserEvent);
         sourceAdapter.stop();
         if (usesDynamicConfiguration()) {
@@ -222,6 +226,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                               sourceAdapter.getName(),
                                               getLocation().getRootContainerName()),
                                        e);
+      } finally {
+        if (initialiserEvent != null) {
+          ((BaseEventContext) initialiserEvent.getContext()).success();
+        }
       }
     }
   }

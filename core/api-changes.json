@@ -3,6 +3,24 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.api.event.CoreEvent org.mule.runtime.core.api.transformer.AbstractMessageTransformer::createTransformationEvent(org.mule.runtime.api.message.Message, org.mule.runtime.api.event.EventContext)",
+          "package": "org.mule.runtime.core.api.transformer",
+          "classSimpleName": "AbstractMessageTransformer",
+          "methodName": "createTransformationEvent",
+          "elementKind": "method",
+          "justification": "MULE-17747: Added for testability"
+        },
+        {
+          "code": "java.method.finalMethodAddedToNonFinalClass",
+          "new": "method java.util.concurrent.CompletableFuture<org.mule.runtime.api.event.Event> org.mule.runtime.core.privileged.component.AbstractExecutableComponent::execute(org.mule.runtime.api.event.Event, java.util.function.Consumer<org.mule.runtime.core.api.event.CoreEvent.Builder>)",
+          "package": "org.mule.runtime.core.privileged.component",
+          "classSimpleName": "AbstractExecutableComponent",
+          "methodName": "execute",
+          "elementKind": "method",
+          "justification": "MULE-17747: Added for testability"
+        },
+        {
           "code": "java.method.finalMethodAddedToNonFinalClass",
           "new": "method java.lang.Object org.mule.runtime.core.api.streaming.bytes.factory.AbstractCursorStreamProviderFactory::of(org.mule.runtime.api.event.EventContext, java.io.InputStream, org.mule.runtime.api.component.location.ComponentLocation)",
           "package": "org.mule.runtime.core.api.streaming.bytes.factory",
@@ -107,16 +125,6 @@
           "package": "org.mule.runtime.core.api.retry.policy",
           "classSimpleName": "NoRetryPolicyTemplate",
           "methodName": "isEnabled",
-          "elementKind": "method",
-          "justification": "Cherrypick MULE-17281"
-        },
-        {
-          "code": "java.method.defaultMethodAddedToInterface",
-          "new": "method <T> java.util.concurrent.CompletableFuture<T> org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate::applyPolicy(java.util.function.Supplier<java.util.concurrent.CompletableFuture<T>>, java.util.function.Predicate<java.lang.Throwable>, java.uti
-       ion.Consumer<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
-          "package": "org.mule.runtime.core.api.retry.policy",
-          "classSimpleName": "RetryPolicyTemplate",
-          "methodName": "applyPolicy",
           "elementKind": "method",
           "justification": "Cherrypick MULE-17281"
         },
