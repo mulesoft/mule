@@ -6,14 +6,18 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
@@ -37,6 +41,9 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
   protected ArtifactContext artifactContext;
   protected ArtifactClassLoader deploymentClassLoader;
+
+  protected static final String START = "start";
+  protected static final String STOP = "stop";
 
   public AbstractDeployableArtifact(String shortArtifactType, String artifactType, ArtifactClassLoader deploymentClassLoader) {
     this.artifactType = artifactType;
@@ -65,6 +72,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
     withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> {
       this.artifactContext.getMuleContext().stop();
+      persistArtifactState(STOP);
       return null;
     });
   }
@@ -123,6 +131,16 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
     artifactContext.getMuleContext().dispose();
     artifactContext = null;
+  }
+
+  protected void persistArtifactState(String state) {
+    ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
+        ((DefaultMuleContext) this.artifactContext.getMuleContext()).getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
+    if (artifactStoppedPersistenceListener != null && state.equals(START)) {
+      artifactStoppedPersistenceListener.onStart();
+    } else if (artifactStoppedPersistenceListener != null && state.equals(STOP)) {
+      artifactStoppedPersistenceListener.onStop();
+    }
   }
 
 }

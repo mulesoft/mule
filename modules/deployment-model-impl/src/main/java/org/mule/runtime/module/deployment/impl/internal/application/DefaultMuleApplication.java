@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
@@ -177,6 +178,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     try {
       checkIfFlowsShouldStart();
       this.artifactContext.getMuleContext().start();
+      persistArtifactState(START);
 
       // null CCL ensures we log at 'system' level
       // TODO getDomainClassLoader a more usable wrapper for any logger to be logged at sys level
