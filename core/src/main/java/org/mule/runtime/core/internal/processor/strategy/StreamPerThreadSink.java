@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.yield;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.construct.BackPressureReason;
@@ -18,6 +19,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -35,13 +37,18 @@ import reactor.core.publisher.FluxSink;
 public class StreamPerThreadSink implements Sink, Disposable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StreamPerThreadSink.class);
+  private static final int CACHE_TIME_LIMIT_IN_MINUTES = 60;
 
   private final ReactiveProcessor processor;
   private final Consumer<CoreEvent> eventConsumer;
   private final FlowConstruct flowConstruct;
 
   private volatile boolean disposing = false;
-  private final Cache<Thread, FluxSink<CoreEvent>> sinks = Caffeine.newBuilder().weakKeys().build();
+  private final Cache<Thread, FluxSink<CoreEvent>> sinks =
+      Caffeine.newBuilder().weakKeys().expireAfterAccess(CACHE_TIME_LIMIT_IN_MINUTES, MINUTES).build();;
+  // We add this counter so we can count the amount of finished sinks when disposing
+  // The previous way involved having a strong reference to the thread, which caused MULE-19209
+  private AtomicLong disponsableSinks = new AtomicLong();
 
   /**
    * Creates a {@link StreamPerThreadSink}.
@@ -62,13 +69,12 @@ public class StreamPerThreadSink implements Sink, Disposable {
       throw new IllegalStateException("Already disposed");
     }
 
-    final Thread currentThread = currentThread();
-    sinks.get(currentThread, t -> {
+    sinks.get(currentThread(), t -> {
       final FluxSinkRecorder<CoreEvent> recorder = new FluxSinkRecorder<>();
       recorder.flux()
           .doOnNext(request -> eventConsumer.accept(request))
           .transform(processor)
-          .subscribe(null, e -> sinks.invalidate(currentThread), () -> sinks.invalidate(currentThread));
+          .subscribe(null, e -> disponsableSinks.decrementAndGet(), () -> disponsableSinks.decrementAndGet());
 
       return recorder.getFluxSink();
     })
@@ -89,7 +95,7 @@ public class StreamPerThreadSink implements Sink, Disposable {
     final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
     long startMillis = currentTimeMillis();
 
-    while (!sinks.asMap().isEmpty()
+    while (disponsableSinks.get() != 0
         && currentTimeMillis() <= shutdownTimeout + startMillis
         && !currentThread().isInterrupted()) {
       yield();
@@ -99,7 +105,7 @@ public class StreamPerThreadSink implements Sink, Disposable {
       LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed before thread interruption",
                   flowConstruct.getName());
       sinks.invalidateAll();
-    } else if (!sinks.asMap().isEmpty()) {
+    } else if (disponsableSinks.get() != 0) {
       LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
                   shutdownTimeout);
       sinks.invalidateAll();
