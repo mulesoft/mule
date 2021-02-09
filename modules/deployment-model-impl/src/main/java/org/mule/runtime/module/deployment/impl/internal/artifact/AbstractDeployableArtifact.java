@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
@@ -141,7 +142,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
   protected void persistArtifactState(String state) {
     ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
-        ((DefaultMuleContext) this.artifactContext.getMuleContext()).getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
+        ((MuleContextWithRegistry) this.artifactContext.getMuleContext()).getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
     if (artifactStoppedPersistenceListener != null && state.equals(START)) {
       artifactStoppedPersistenceListener.onStart();
     } else if (artifactStoppedPersistenceListener != null && state.equals(STOP)) {

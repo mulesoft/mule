@@ -20,7 +20,7 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -58,7 +58,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       ArtifactStoppedPersistenceListener artifactStoppedDeploymentListener =
           new ArtifactStoppedDeploymentPersistenceListener(artifact.getArtifactName());
       withArtifactMuleContext(artifact, muleContext -> {
-        MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
+        MuleRegistry muleRegistry = ((MuleContextWithRegistry) muleContext).getRegistry();
         muleRegistry.registerObject(ARTIFACT_STOPPED_LISTENER, artifactStoppedDeploymentListener);
       });
     } catch (Throwable t) {
