@@ -284,4 +284,8 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   public void checkIfFlowShouldStart() {
     flowStoppedPersistenceListener.checkIfFlowShouldStart();
   }
+
+  public void doNotPersist() {
+    flowStoppedPersistenceListener.doNotPersist();
+  }
 }

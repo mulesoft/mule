@@ -16,6 +16,8 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
@@ -60,6 +62,10 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
         LOGGER.info(format("Stopping %s '%s' with no mule context", shortArtifactType, getArtifactName()));
       }
       return;
+    }
+
+    for (Flow flow : getRegistry().lookupAllByType(Flow.class)) {
+      ((DefaultFlowBuilder.DefaultFlow) flow).doNotPersist();
     }
 
     artifactContext.getMuleContext().getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
