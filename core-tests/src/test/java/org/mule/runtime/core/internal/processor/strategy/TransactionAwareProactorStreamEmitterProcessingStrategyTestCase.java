@@ -131,7 +131,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
 
     asyncExecutor.submit(() -> {
       try {
-        getInstance().bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
+        TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
         processFlow(testEvent());
         threads.clear();
         latch.release();
