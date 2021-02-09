@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.tck.mockito.answer.BuilderAnswer.BUILDER_ANSWER;
 
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -25,6 +26,9 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -62,7 +66,10 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
   private final ClassLoader originalThreadClassloader = mock(ClassLoader.class);
   private final ClassLoader domainClassloader = mock(ClassLoader.class);
   private final ArtifactContext artifactContext = mock(ArtifactContext.class);
-  private final MuleContext muleContext = mock(MuleContext.class);
+  private final MuleContext muleContext = mock(MuleContextWithRegistry.class);
+  private final MuleRegistry muleRegistry = mock(MuleRegistry.class);
+  private final ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
+      mock(ArtifactStoppedPersistenceListener.class);
   private final LifecycleManager lifecycleManager = mock(LifecycleManager.class);
   private ClassLoader classloaderUsedInDispose;
   private Domain domain;
@@ -93,6 +100,10 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
       return null;
     }).when(muleContext).dispose();
 
+    doAnswer(invocation -> artifactStoppedPersistenceListener).when(muleRegistry).lookupObject(ARTIFACT_STOPPED_LISTENER);
+
+    doAnswer(invocation -> muleRegistry).when((MuleContextWithRegistry) muleContext).getRegistry();
+
     domain.dispose();
 
     assertThat(classloaderUsedInDispose, sameInstance(domainClassloader));
@@ -105,6 +116,10 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
       classloaderUsedInDispose = currentThread().getContextClassLoader();
       return null;
     }).when(muleContext).stop();
+
+    doAnswer(invocation -> artifactStoppedPersistenceListener).when(muleRegistry).lookupObject(ARTIFACT_STOPPED_LISTENER);
+
+    doAnswer(invocation -> muleRegistry).when((MuleContextWithRegistry) muleContext).getRegistry();
 
     domain.stop();
 
