@@ -66,7 +66,8 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
   private final ArtifactContext artifactContext = mock(ArtifactContext.class);
   private final MuleContext muleContext = mock(MuleContextWithRegistry.class);
   private final MuleRegistry muleRegistry = mock(MuleRegistry.class);
-  private final ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener = mock(ArtifactStoppedPersistenceListener.class);
+  private final ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
+      mock(ArtifactStoppedPersistenceListener.class);
   private final LifecycleManager lifecycleManager = mock(LifecycleManager.class);
   private ClassLoader classloaderUsedInDispose;
   private Domain domain;
