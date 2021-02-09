@@ -8,7 +8,7 @@
       http://www.mulesoft.org/schema/mule/reconnection http://www.mulesoft.org/schema/mule/reconnection/current/mule-reconnection.xsd
       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <object name="capture" class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
+    <object name="capture" class="org.mule.test.module.extension.reconnection.AbstractReconnectionTestCase$CaptureProcessor" />
 
     <reconnection:config name="reconnection_Config" configId="dsa" >
         <reconnection:connection>
@@ -71,7 +71,7 @@
     
      <flow name="getInlineReconnectionBlocking">
         <reconnection:get-retry-policy-template config-ref="reconnection_Config">
-            <reconnect count="30" frequency="50" blocking="true"/>
+            <reconnect count="30" frequency="50" />
         </reconnection:get-retry-policy-template>
     </flow>
 

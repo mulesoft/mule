@@ -38,6 +38,18 @@
     <flow name="fail-connection-validation">
         <petstore:fail-connection config-ref="petstore-invalid"/>
     </flow>
+    
+    <flow name="fail-connection-validation-with-reconnect-override-blocking">
+        <petstore:fail-connection config-ref="petstore-invalid">
+            <reconnect count="3" frequency="5" blocking="true"/>
+        </petstore:fail-connection>
+    </flow>
+    
+     <flow name="fail-connection-validation-with-reconnect-override-non-blocking">
+        <petstore:fail-connection config-ref="petstore-invalid">
+            <reconnect count="3" frequency="5" blocking="false"/>
+        </petstore:fail-connection>
+    </flow>
 
     <flow name="fail-operation-with-connection-exception-tx">
         <try transactionalAction="ALWAYS_BEGIN">

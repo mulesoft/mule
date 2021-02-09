@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.disconnectCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
+import static org.mule.runtime.api.util.MuleSystemProperties.HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
 import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
@@ -53,7 +54,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
+public abstract class AbstractReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Rule
   public SystemProperty muleDisableAsyncRetryPolicyOnSourcesProperty =
@@ -159,7 +160,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getReconnectionFromConfig").run()
         .getMessage().getPayload().getValue();
 
-    assertRetryTemplate(template, true, 3, 1000);
+    assertRetryTemplate(template, false, 3, 1000);
   }
 
   @Test
@@ -175,7 +176,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getInlineReconnectionBlocking").run()
         .getMessage().getPayload().getValue();
 
-    assertRetryTemplate(template, false, 30, 50);
+    assertRetryTemplate(template, expectedAsyncWhenOperationBlockingRetryPolicyIsOverridden(), 30, 50);
   }
 
   @Test
@@ -305,6 +306,8 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
     return provider.openCursor();
   }
+
+  protected abstract boolean expectedAsyncWhenOperationBlockingRetryPolicyIsOverridden();
 
   public static void resetCounters() {
     closePagingProviderCalls = 0;
