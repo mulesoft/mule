@@ -444,7 +444,7 @@
 /mule-standalone-${productVersion}/lib/opt/xstream-1.4.15.jar
 /mule-standalone-${productVersion}/lib/opt/opensaml-2.6.6.jar
 /mule-standalone-${productVersion}/lib/opt/openws-1.5.6.jar
-/mule-standalone-${productVersion}/lib/opt/xmlbeans-2.6.3.jar
+/mule-standalone-${productVersion}/lib/opt/xmlbeans-3.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/xpp3_min-1.1.4c.jar
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.4.6.jar
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
