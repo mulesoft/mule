@@ -849,6 +849,20 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
+  public void stopsAndStartsAppWithStartedFlowAndDoesNotStopIt() throws Exception {
+    final Application app = deployApplication(dummyAppDescriptorFileBuilder);
+    app.stop();
+    assertStatus(app, STOPPED);
+    app.start();
+    assertStatus(app, STARTED);
+
+    assertIfFlowsHaveStarted(app, true);
+  }
+
+  @Test
   public void undeploysApplicationRemovingAnchorFile() throws Exception {
     Application app = deployApplication(emptyAppFileBuilder);
 
