@@ -11,6 +11,7 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.data.sample.extension.SampleDataExtension.NULL_VALUE;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -18,15 +19,21 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.test.data.sample.extension.provider.ComplexActingParameterSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.ComplexTypeSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ConfigAwareTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ConnectedTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.GroupTestSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.MoreComplexTypeSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.MuleContextAwareSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.OptionalTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ParameterizedTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.SimplestTestSampleDataProvider;
+
+import java.util.List;
+import java.util.Map;
 
 public class SampleDataOperations {
 
@@ -110,6 +117,17 @@ public class SampleDataOperations {
   @MediaType(TEXT_PLAIN)
   public Result<String, String> complexActingParameter(ComplexActingParameter complex) {
     return connectionLess(complex.getPayload(), complex.getAttributes());
+  }
+
+
+  @SampleData(ComplexTypeSampleDataProvider.class)
+  public Result<Map<String, String>, String> complexGenerics(ComplexActingParameter complex) {
+    return Result.<Map<String, String>, String>builder().build();
+  }
+
+  @SampleData(MoreComplexTypeSampleDataProvider.class)
+  public Result<Map<String, List<String>>, String> moreComplexGenerics(ComplexActingParameter complex) {
+    return Result.<Map<String, List<String>>, String>builder().build();
   }
 
   @SampleData(OptionalTestSampleDataProvider.class)
