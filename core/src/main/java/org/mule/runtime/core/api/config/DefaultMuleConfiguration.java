@@ -197,11 +197,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   private boolean inheritIterableRepeatability = false;
 
   /**
-   * Expression to override default correlation id generation
+   * Generator to override default correlation id
    *
    * @since 4.4.0
    */
-  private Optional<String> correlationIdGenerationExpression = empty();
+  private Optional<CorrelationIdGenerator> correlationIdGenerationExpression = empty();
 
   /**
    * Mule Registry to initialize this configuration
@@ -710,12 +710,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   }
 
   @Override
-  public Optional<String> getDefaultCorrelationIdGeneratorExpression() {
+  public Optional<CorrelationIdGenerator> getDefaultCorrelationIdGenerator() {
     return correlationIdGenerationExpression;
   }
 
-  public void setDefaultCorrelationIdGeneratorExpression(String expression) {
-    this.correlationIdGenerationExpression = of(expression);
+  public void setDefaultCorrelationIdGeneratorExpression(CorrelationIdGenerator generator) {
+    this.correlationIdGenerationExpression = of(generator);
   }
 
   @Override
