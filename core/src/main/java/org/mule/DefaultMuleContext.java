@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static org.mule.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
@@ -208,6 +209,9 @@ public class DefaultMuleContext implements MuleContext
     private ArtifactType artifactType;
     
     private Properties deploymentProperties;
+
+    public static final String START = "start";
+    public static final String STOP = "stop";
 
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -1269,5 +1273,15 @@ public class DefaultMuleContext implements MuleContext
     {
         this.deploymentProperties = deploymentProperties;
         
+    }
+
+    public void persistArtifactState(String state) {
+        ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
+            getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
+        if (artifactStoppedPersistenceListener != null && state.equals(START)) {
+            artifactStoppedPersistenceListener.onStart();
+        } else if (artifactStoppedPersistenceListener != null && state.equals(STOP)) {
+            artifactStoppedPersistenceListener.onStop();
+        }
     }
 }

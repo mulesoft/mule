@@ -618,4 +618,8 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         Optional<Properties> properties = absent();
         return deployPackagedArtifact(zip, properties);
     }
+
+    public void doNotPersistArtifactStop(T artifact) {
+        deployer.doNotPersistArtifactStop(artifact);
+    }
 }

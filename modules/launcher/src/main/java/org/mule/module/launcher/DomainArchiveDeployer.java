@@ -286,4 +286,9 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
         Optional<Properties> properties = absent();
         return deployPackagedArtifact(zip, properties);
     }
+
+    @Override
+    public void doNotPersistArtifactStop(Domain artifact) {
+        domainDeployer.doNotPersistArtifactStop(artifact);
+    }
 }

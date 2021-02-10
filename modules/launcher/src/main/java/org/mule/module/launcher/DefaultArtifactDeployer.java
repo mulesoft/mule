@@ -6,9 +6,26 @@
  */
 package org.mule.module.launcher;
 
+import static com.google.common.base.Optional.absent;
+import static java.lang.Boolean.parseBoolean;
+import static org.mule.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
+import static org.mule.module.launcher.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
+import org.mule.ArtifactStoppedPersistenceListener;
+import org.mule.DefaultMuleContext;
+import org.mule.api.registry.MuleRegistry;
+import org.mule.api.registry.RegistrationException;
+import org.mule.api.registry.Registry;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.artifact.Artifact;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Properties;
+
+import com.google.common.base.Optional;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,6 +38,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
     {
         try
         {
+            doNotPersistArtifactStop(artifact);
             tryToStopArtifact(artifact);
             tryToDisposeArtifact(artifact);
         }
@@ -69,9 +87,16 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         {
             artifact.install();
             artifact.init();
-            if (startArtifact)
+            if (startArtifact && shouldStartArtifact(artifact))
             {
                 artifact.start();
+            }
+            if (artifact.getMuleContext() != null && artifact.getMuleContext().getRegistry() != null){
+                ArtifactStoppedPersistenceListener artifactStoppedDeploymentListener =
+                    new ArtifactStoppedDeploymentPersistenceListener(artifact.getArtifactName());
+                DefaultMuleContext defaultMuleContext = (DefaultMuleContext) artifact.getMuleContext();
+                MuleRegistry muleRegistry = defaultMuleContext.getRegistry();
+                muleRegistry.registerObject(ARTIFACT_STOPPED_LISTENER, artifactStoppedDeploymentListener);
             }
         }
         catch (Throwable t)
@@ -92,6 +117,31 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
     public void deploy(Artifact artifact)
     {
         deploy(artifact, true);
+    }
+
+    private Boolean shouldStartArtifact(Artifact artifact) {
+        Properties deploymentProperties = null;
+        try {
+            Optional<Properties> properties = absent();
+            deploymentProperties = resolveDeploymentProperties(artifact.getArtifactName(), properties);
+        } catch (IOException e) {
+            logger.error("Failed to load deployment property for artifact "
+                + artifact.getArtifactName(), e);
+        }
+        return deploymentProperties != null
+            && parseBoolean(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
+    }
+
+    public void doNotPersistArtifactStop(Artifact artifact) {
+        if (artifact.getMuleContext() == null || artifact.getMuleContext().getRegistry() == null){
+            return;
+        }
+        Registry artifactRegistry = artifact.getMuleContext().getRegistry();
+        Collection<ArtifactStoppedPersistenceListener> listeners =
+            artifactRegistry.lookupObjects(ArtifactStoppedPersistenceListener.class);
+        for (ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener : listeners){
+            artifactStoppedPersistenceListener.doNotPersist();
+        }
     }
 
 }
