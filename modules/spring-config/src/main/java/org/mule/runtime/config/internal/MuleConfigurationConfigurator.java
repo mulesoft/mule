@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.internal.config.ExpressionCorrelationIdGenerator;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.springframework.beans.factory.SmartFactoryBean;
@@ -117,6 +118,10 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
 
   public void setInheritIterableRepeatability(String inheritIterableRepeatability) {
     config.setInheritIterableRepeatability(inheritIterableRepeatability);
+  }
+
+  public void setCorrelationIdGeneratorExpression(String correlationIdGeneratorExpression) {
+    config.setDefaultCorrelationIdGeneratorExpression(new ExpressionCorrelationIdGenerator(correlationIdGeneratorExpression));
   }
 
   public void setExtensions(List<ConfigurationExtension> extensions) {
