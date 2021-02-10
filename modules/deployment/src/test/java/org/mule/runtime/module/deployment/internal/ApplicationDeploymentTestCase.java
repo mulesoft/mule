@@ -736,6 +736,22 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Issue("MULE-19040")
   @Test
+  public void undeploysStoppedAppDoesNotStartItOnDeployButCanBeStartedManually() throws Exception {
+    final Application app = deployApplication(emptyAppFileBuilder);
+    app.stop();
+    assertStatus(app, STOPPED);
+
+    restartServer();
+
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
+    assertStatus(app_2, CREATED);
+    app_2.start();
+    assertStatus(app_2, STARTED);
+  }
+
+  @Issue("MULE-19040")
+  @Test
   public void undeploysNotStoppedAppAndStartsItOnDeploy() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     assertStatus(app, STARTED);
