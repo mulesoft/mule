@@ -759,6 +759,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="correlationIdGeneratorExpression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The default correlation id generation expression for every source. This must be DataWeave expression.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
