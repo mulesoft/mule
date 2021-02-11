@@ -144,6 +144,8 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
       defaultConfig.setDynamicConfigExpiration(resolveDynamicConfigExpiration());
       defaultConfig.setInheritIterableRepeatability(config.isInheritIterableRepeatability());
+      config.getDefaultCorrelationIdGenerator()
+          .ifPresent(generator -> defaultConfig.setDefaultCorrelationIdGeneratorExpression(generator));
       applyDefaultIfNoObjectSerializerSet(defaultConfig);
 
       return configuration;
