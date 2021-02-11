@@ -4158,18 +4158,15 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    private class RetryPolicyApplicationCancelStartAndStopRunnable implements Runnable
-    {
+    private class RetryPolicyApplicationCancelStartAndStopRunnable implements Runnable {
         private final CountDownLatch latch;
 
-        public RetryPolicyApplicationCancelStartAndStopRunnable(CountDownLatch latch)
-        {
+        public RetryPolicyApplicationCancelStartAndStopRunnable(CountDownLatch latch) {
             this.latch = latch;
         }
 
         @Override
-        public void run()
-        {
+        public void run() {
             PollingProber pollingProber = new PollingProber(7000, 300);
 
             pollingProber.check(new ApplicationReconnectingProbe());
