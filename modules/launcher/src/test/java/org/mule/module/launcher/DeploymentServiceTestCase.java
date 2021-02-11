@@ -147,7 +147,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                 {
                         {false},
                         {true},
-                        {true},
                 });
     }
 
