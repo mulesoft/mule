@@ -54,7 +54,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
     appClassLoader.addClass(CLASS_NAME, APP_LOADED_CLASS);
     pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
 
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
 
     Class<?> aClass = compositeApplicationClassLoader.loadClass(CLASS_NAME);
     assertThat(aClass, equalTo(APP_LOADED_CLASS));
@@ -64,7 +64,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
   public void loadsClassFromPluginWhenIsNotDefinedInApp() throws Exception {
     pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
 
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
 
     Class<?> aClass = compositeApplicationClassLoader.loadClass(CLASS_NAME);
     assertThat(aClass, equalTo(PLUGIN_LOADED_CLASS));
@@ -74,7 +74,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
   public void loadsClassFromPluginNotDefineInAppButLoadedFromExtendedClassLoader() throws Exception {
     pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
 
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(pluginClassLoader, appClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(pluginClassLoader, appClassLoader);
     ClassLoader extendedClassLoader = new URLClassLoader(new URL[0], compositeApplicationClassLoader);
 
     Class<?> aClass = extendedClassLoader.loadClass(CLASS_NAME);
@@ -83,7 +83,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
 
   @Test(expected = ClassNotFoundException.class)
   public void failsToLoadClassWhenIsNotDefinedInAnyClassLoader() throws Exception {
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
 
     compositeApplicationClassLoader.loadClass(CLASS_NAME);
   }
@@ -93,7 +93,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
     appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
     pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
 
     URL resource = compositeApplicationClassLoader.getResource(RESOURCE_NAME);
     assertThat(resource, equalTo(APP_LOADED_RESOURCE));
@@ -103,7 +103,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
   public void loadsResourceFromPluginWhenIsNotDefinedInApp() throws Exception {
     pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
 
     URL resource = compositeApplicationClassLoader.getResource(RESOURCE_NAME);
     assertThat(resource, equalTo(PLUGIN_LOADED_RESOURCE));
@@ -111,7 +111,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void returnsNullResourceWhenIsNotDefinedInAnyClassLoader() throws Exception {
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
 
     URL resource = compositeApplicationClassLoader.getResource(RESOURCE_NAME);
     assertThat(resource, equalTo(null));
@@ -122,7 +122,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
     appClassLoader.addStreamResource(RESOURCE_NAME, APP_LOADED_STREAM_RESOURCE);
     pluginClassLoader.addStreamResource(RESOURCE_NAME, PLUGIN_LOADED_STREAM_RESOURCE);
 
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
 
     InputStream resourceAsStream = compositeApplicationClassLoader.getResourceAsStream(RESOURCE_NAME);
     assertThat(resourceAsStream, equalTo(APP_LOADED_STREAM_RESOURCE));
@@ -132,7 +132,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
   public void loadsStreamResourceFromPluginWhenIsNotDefinedInApp() throws Exception {
     pluginClassLoader.addStreamResource(RESOURCE_NAME, PLUGIN_LOADED_STREAM_RESOURCE);
 
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
 
     InputStream resourceAsStream = compositeApplicationClassLoader.getResourceAsStream(RESOURCE_NAME);
     assertThat(resourceAsStream, equalTo(PLUGIN_LOADED_STREAM_RESOURCE));
@@ -140,7 +140,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void returnsNullStreamResourceWhenIsNotDefinedInAnyClassLoader() throws Exception {
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
 
     InputStream resourceAsStream = compositeApplicationClassLoader.getResourceAsStream(RESOURCE_NAME);
     assertThat(resourceAsStream, equalTo(null));
@@ -151,7 +151,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
     appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
     pluginClassLoader.addResource(PLUGIN_RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
 
     Enumeration<URL> resources = compositeApplicationClassLoader.getResources(RESOURCE_NAME);
 
@@ -167,7 +167,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
     appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
     pluginClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
 
-    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
+    CompositeClassLoader compositeApplicationClassLoader = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
 
     Enumeration<URL> resources = compositeApplicationClassLoader.getResources(RESOURCE_NAME);
 

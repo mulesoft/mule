@@ -150,7 +150,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
         final Thread currentThread = Thread.currentThread();
         final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
         final ClassLoader extensionClassLoader = getClassLoader(context.getExtensionModel());
-        final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
+        final CompositeClassLoader compositeClassLoader = CompositeClassLoader.from(extensionClassLoader, currentClassLoader);
         result = from(withContextClassLoader(compositeClassLoader, () -> executor.execute(context)));
         executedInterceptors.addAll(interceptors);
       } else {

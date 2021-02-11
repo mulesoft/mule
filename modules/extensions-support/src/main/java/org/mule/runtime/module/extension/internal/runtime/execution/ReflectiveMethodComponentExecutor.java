@@ -79,7 +79,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   public Object execute(ExecutionContext<M> executionContext) {
     final ClassLoader currentClassLoader = currentThread().getContextClassLoader();
-    final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
+    final CompositeClassLoader compositeClassLoader = CompositeClassLoader.from(extensionClassLoader, currentClassLoader);
     return withContextClassLoader(compositeClassLoader,
                                   () -> invokeMethod(method, componentInstance,
                                                      stream(getParameterValues(executionContext, method.getParameterTypes()))
@@ -134,7 +134,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   @Override
   public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
     ClassLoader currentClassLoader = currentThread().getContextClassLoader();
-    final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
+    final CompositeClassLoader compositeClassLoader = CompositeClassLoader.from(extensionClassLoader, currentClassLoader);
     return ec -> withContextClassLoader(compositeClassLoader,
                                         () -> {
                                           final Object[] resolved =

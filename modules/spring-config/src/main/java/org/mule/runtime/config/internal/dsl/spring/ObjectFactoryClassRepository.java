@@ -46,7 +46,7 @@ public class ObjectFactoryClassRepository {
   private final static LoadingCache<ClassLoader, ClassLoader> COMPOSITE_CL_CACHE = newBuilder()
       .weakKeys()
       .weakValues()
-      .build(cl -> new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(), cl));
+      .build(cl -> CompositeClassLoader.from(ObjectFactoryClassRepository.class.getClassLoader(), cl));
 
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the

@@ -7,10 +7,15 @@
 package org.mule.runtime.core.internal.util;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
 
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Classloader implementation that, given a set of classloaders, will first search for a resource/class in the first one. If it is
@@ -35,13 +41,55 @@ public class CompositeClassLoader extends ClassLoader {
 
   private List<ClassLoader> delegates;
 
-  public CompositeClassLoader(ClassLoader first, ClassLoader... others) {
-    delegates = new ArrayList<>();
+  private static final Cache<Pair<ClassLoader, ClassLoader>, CompositeClassLoader> cache = Caffeine.newBuilder()
+      .maximumSize(1024).expireAfterAccess(1, TimeUnit.MINUTES).build();
+
+  private CompositeClassLoader(ClassLoader first, ClassLoader second, ClassLoader... others) {
+    delegates = new ArrayList<>(others.length + 1);
     if (first != null) {
       delegates.add(first);
     }
-    delegates.addAll(asList(others).stream().filter(o -> o != null).collect(toList()));
+    if (second != null) {
+      delegates.add(second);
+    }
+    for (ClassLoader cl : others) {
+      if (cl != null) {
+        delegates.add(cl);
+      }
+    }
     delegates = unmodifiableList(delegates);
+  }
+
+  private CompositeClassLoader(ClassLoader first, ClassLoader second) {
+    if (first != null && second != null) {
+      delegates = unmodifiableList(asList(first, second));
+    } else if (first != null) {
+      delegates = unmodifiableList(singletonList(first));
+    } else if (second != null) {
+      delegates = unmodifiableList(singletonList(second));
+    } else {
+      delegates = unmodifiableList(emptyList());
+    }
+  }
+
+  private CompositeClassLoader(ClassLoader delegate) {
+    if (delegate != null) {
+      delegates = unmodifiableList(singletonList(delegate));
+    } else {
+      delegates = unmodifiableList(emptyList());
+    }
+  }
+
+  public static CompositeClassLoader from(ClassLoader first, ClassLoader second, ClassLoader... others) {
+    return new CompositeClassLoader(first, second, others);
+  }
+
+  public static CompositeClassLoader from(ClassLoader first, ClassLoader second) {
+    return cache.get(new Pair<>(first, second), pair -> new CompositeClassLoader(pair.getFirst(), pair.getSecond()));
+  }
+
+  public static CompositeClassLoader from(ClassLoader first) {
+    return cache.get(new Pair<>(first, null), pair -> new CompositeClassLoader(pair.getFirst()));
   }
 
   /**

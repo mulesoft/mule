@@ -32,7 +32,7 @@ public class CompositeClassLoaderArtifactFinderTestCase {
   public void appClassLoader() {
     ClassLoader appClassLoader = mockArtifactClassLoader(appDescriptor);
     CompositeClassLoader compositeClassLoader =
-        new CompositeClassLoader(mockArtifactClassLoader(pluginDescriptor), appClassLoader);
+        CompositeClassLoader.from(mockArtifactClassLoader(pluginDescriptor), appClassLoader);
 
     assertThat(findClassLoader(compositeClassLoader), equalTo(appClassLoader));
   }
@@ -41,7 +41,7 @@ public class CompositeClassLoaderArtifactFinderTestCase {
   public void domainClassLoader() {
     ClassLoader domainClassLoader = mockArtifactClassLoader(domainDescriptor);
     CompositeClassLoader compositeClassLoader =
-        new CompositeClassLoader(mockArtifactClassLoader(pluginDescriptor), domainClassLoader);
+        CompositeClassLoader.from(mockArtifactClassLoader(pluginDescriptor), domainClassLoader);
 
     assertThat(findClassLoader(compositeClassLoader), equalTo(domainClassLoader));
   }
@@ -49,7 +49,7 @@ public class CompositeClassLoaderArtifactFinderTestCase {
   @Test
   public void firstDelegateIfNoArtifactClassLoaderFound() {
     ClassLoader pluginClassLoader = mockArtifactClassLoader(pluginDescriptor);
-    CompositeClassLoader compositeClassLoader = new CompositeClassLoader(pluginClassLoader);
+    CompositeClassLoader compositeClassLoader = CompositeClassLoader.from(pluginClassLoader);
 
     assertThat(findClassLoader(compositeClassLoader), equalTo(pluginClassLoader));
   }
