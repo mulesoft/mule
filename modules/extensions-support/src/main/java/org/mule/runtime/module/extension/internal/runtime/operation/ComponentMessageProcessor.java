@@ -798,15 +798,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return resolveDelegateForComponentUsing(configuration);
   }
 
-  private RetryPolicyTemplate resolveRetryTemplateFromConnectionConfig(Optional<ConfigurationInstance> configuration) {
-    RetryPolicyTemplate delegate;
-    delegate = configuration
-        .map(config -> config.getConnectionProvider().orElse(null))
-        .map(provider -> connectionManager.getRetryTemplateFor((ConnectionProvider<? extends Object>) provider))
-        .orElse(fallbackRetryPolicyTemplate);
-    return delegate;
-  }
-
   private RetryPolicyTemplate resolveDelegateForComponentUsing(Optional<ConfigurationInstance> configuration) {
     RetryPolicyTemplate delegate = retryPolicyTemplate;
 
@@ -848,6 +839,15 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       }
     }
 
+    return delegate;
+  }
+
+  private RetryPolicyTemplate resolveRetryTemplateFromConnectionConfig(Optional<ConfigurationInstance> configuration) {
+    RetryPolicyTemplate delegate;
+    delegate = configuration
+        .map(config -> config.getConnectionProvider().orElse(null))
+        .map(provider -> connectionManager.getRetryTemplateFor((ConnectionProvider<? extends Object>) provider))
+        .orElse(fallbackRetryPolicyTemplate);
     return delegate;
   }
 
