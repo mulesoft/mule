@@ -56,6 +56,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.Registry;
 import org.mule.api.transport.Connector;
+import org.mule.common.query.expression.NullValue;
 import org.mule.config.StartupContext;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.module.launcher.application.Application;
@@ -1280,6 +1281,19 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         restartServer();
 
         assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
+    }
+
+    @Test
+    public void stoppingMuleContextDoesNotPersistAppStoppedState() throws Exception {
+        final Application app = deployApplication();
+        assertStatus(app, STARTED);
+        app.getMuleContext().stop();
+
+        assertThat(app.getMuleContext().getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
     }
 
     @Test
