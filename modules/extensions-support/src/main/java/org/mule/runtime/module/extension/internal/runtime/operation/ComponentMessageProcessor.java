@@ -815,7 +815,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     } else {
 
       // Previous behavior was to resolve the retry policy taking into account the connection level config
-      // which resolves the retry policy according to failDeployment and system properties for the source.s
+      // which resolves the retry policy according to failDeployment and system properties for the source.
       // This should not be taken into account for operations/components but is left for preserving
       // previous behavior
       return resolveWithoutHonouringRetryPolicyTemplateOverride(configuration, delegate);
