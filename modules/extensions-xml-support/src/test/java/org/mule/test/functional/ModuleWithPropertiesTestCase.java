@@ -10,6 +10,7 @@ import static java.lang.Thread.currentThread;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -89,5 +90,12 @@ public class ModuleWithPropertiesTestCase extends AbstractXmlExtensionMuleArtifa
             .trim();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(
                                                                   expectedContent));
+  }
+
+  @Test
+  @Issue("MULE-19035")
+  public void testSetPayloadAddParamAndPropertyValueThruInternalOperationFlow() throws Exception {
+    CoreEvent muleEvent = flowRunner("testSetPayloadAddParamAndPropertyValueThruInternalOperationFlow").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("a parameter value some config-value-parameter"));
   }
 }
