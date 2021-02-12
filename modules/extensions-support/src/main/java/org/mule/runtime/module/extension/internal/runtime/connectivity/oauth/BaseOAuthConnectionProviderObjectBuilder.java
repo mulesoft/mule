@@ -158,7 +158,7 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
         alias = parameter.getName();
       }
 
-      final Object value = valueFunction.apply(alias);
+      final Object value = valueFunction.apply(parameter.getName());
 
       if (value == null) {
         return;
