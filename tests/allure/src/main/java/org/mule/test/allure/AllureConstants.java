@@ -291,6 +291,16 @@ public interface AllureConstants {
 
   }
 
+  interface ReconnectionPolicyFeature {
+
+    String RECONNECTION_POLICIES = "Reconnection Policies";
+
+    interface RetryTemplateStory {
+
+      String RETRY_TEMPLATE = "Blocking";
+    }
+  }
+
   interface ProcessingStrategiesFeature {
 
     String PROCESSING_STRATEGIES = "Processing Strategies";
