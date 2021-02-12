@@ -55,12 +55,27 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.CollectionDataType;
@@ -72,39 +87,33 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
+import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
+import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.google.common.reflect.TypeToken;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
+
 
 @SmallTest
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
@@ -125,10 +134,10 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(operationModel.isBlocking()).thenReturn(false);
 
     OperationMessageProcessor operationMessageProcessor =
-        new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
-                                      cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
-                                      mockPolicyManager, reflectionCache, null,
-                                      muleContext.getConfiguration().getShutdownTimeout());
+        new TestOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
+                                          cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
+                                          mockPolicyManager, reflectionCache, null,
+                                          muleContext.getConfiguration().getShutdownTimeout());
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
     operationMessageProcessor.setComponentLocator(componentLocator);
 
@@ -529,5 +538,24 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Override
   protected boolean isGracefulShutdown() {
     return true;
+  }
+
+  private static class TestOperationMessageProcessor extends OperationMessageProcessor {
+
+
+    public TestOperationMessageProcessor(ExtensionModel extensionModel, OperationModel operationModel,
+                                         ConfigurationProvider configurationProvider, String target, String targetValue,
+                                         ResolverSet resolverSet, CursorProviderFactory cursorProviderFactory,
+                                         RetryPolicyTemplate retryPolicyTemplate, ExtensionManager extensionManager,
+                                         PolicyManager policyManager, ReflectionCache reflectionCache,
+                                         ResultTransformer resultTransformer, long terminationTimeout) {
+      super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
+            retryPolicyTemplate, extensionManager, policyManager, reflectionCache, resultTransformer, terminationTimeout);
+    }
+
+    @Override
+    protected boolean honourOperationRetryPolicyOverride() {
+      return true;
+    }
   }
 }
