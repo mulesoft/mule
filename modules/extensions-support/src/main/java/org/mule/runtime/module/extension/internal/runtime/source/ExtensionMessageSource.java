@@ -306,7 +306,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       return;
     }
 
-    muleContext.getExceptionListener().handleException(exception);
+    muleContext.getExceptionListener().handleException(exception, getLocation());
 
     refreshTokenIfNecessary(getConfigurationInstance()
         .flatMap(configurationInstance -> configurationInstance.getConnectionProvider()).orElse(null), exception);
