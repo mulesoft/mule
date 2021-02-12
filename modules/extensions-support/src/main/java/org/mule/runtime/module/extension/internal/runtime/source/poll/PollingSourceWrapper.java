@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.notification.PollingSourceNotification.ITEM_DISPATCHED;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedPersistent;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedTransient;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -31,12 +32,16 @@ import static org.mule.sdk.api.runtime.source.PollingSource.WATERMARK_ITEM_OS_KE
 import static org.mule.sdk.api.runtime.source.PollingSource.WATERMARK_OS_NAME_SUFFIX;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.PollingSourceNotification;
+import org.mule.runtime.api.notification.PollingSourceNotificationInfo;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
@@ -57,6 +62,7 @@ import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +108,9 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
   @Inject
   private SchedulerService schedulerService;
+
+  @Inject
+  private NotificationDispatcher notificationDispatcher;
 
   private ObjectStore<Serializable> watermarkObjectStore;
   private ObjectStore<Serializable> inflightIdsObjectStore;
@@ -260,6 +269,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     private Serializable updatedWatermark;
     private Serializable minimumRejectedByLimitPassingWatermark;
     private Comparator<Serializable> watermarkComparator = null;
+    private String pollId;
 
     private int currentPollItems;
 
@@ -270,6 +280,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       this.updatedWatermark = updatedWatermark;
       this.currentPollItems = 0;
       this.minimumRejectedByLimitPassingWatermark = null;
+      this.pollId = componentLocation.getLocation() + " | " + LocalDateTime.now().toString();
     }
 
     @Override
@@ -293,6 +304,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
           status = FILTERED_BY_WATERMARK;
         } else if (currentPollItems < maxItemsPerPoll) {
           currentPollItems++;
+          PollingSourceNotificationInfo info = new PollingSourceNotificationInfo(this.pollId);
+          notificationDispatcher.dispatch(new PollingSourceNotification(info, ITEM_DISPATCHED, componentLocation.getLocation()));
           sourceCallback.handle(pollItem.getResult(), callbackContext);
           saveWatermarkValue(watermarkStatus, pollItem);
         } else {
