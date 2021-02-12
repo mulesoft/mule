@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.disconnectCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
-import static org.mule.runtime.api.util.MuleSystemProperties.HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
 import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
@@ -156,14 +155,6 @@ public abstract class AbstractReconnectionTestCase extends AbstractExtensionFunc
   }
 
   @Test
-  public void getRetryPolicyTemplateFromConfig() throws Exception {
-    RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getReconnectionFromConfig").run()
-        .getMessage().getPayload().getValue();
-
-    assertRetryTemplate(template, false, 3, 1000);
-  }
-
-  @Test
   public void getInlineRetryPolicyTemplate() throws Exception {
     RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getInlineReconnection").run()
         .getMessage().getPayload().getValue();
@@ -284,7 +275,7 @@ public abstract class AbstractReconnectionTestCase extends AbstractExtensionFunc
     check(TIMEOUT, POLL_DELAY, () -> SynchronizableConnection.disconnectionWaitedFullTimeout);
   }
 
-  private void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
+  protected void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
     assertThat(template.isAsync(), is(async));
 
     RetryPolicy policy = template.createRetryInstance();

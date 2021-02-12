@@ -255,8 +255,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    * rest of the policy we need to transform the {@link Result} returned by the operation into a {@link CoreEvent}, we use {@link
    * #valueReturnDelegate} as a helper class to do this transformation. It's used only when there is an operation that defines a
    * target, and at the same time, there are operation policies applied to it. Finally, when the policy finishes, the proper
-   * {@link #returnDelegate} is executed. It'd be ideal to improve this by extracting from {@link ReturnDelegate} the logic
-   * that transforms an {@link Object} into a {@link CoreEvent}.
+   * {@link #returnDelegate} is executed. It'd be ideal to improve this by extracting from {@link ReturnDelegate} the logic that
+   * transforms an {@link Object} into a {@link CoreEvent}.
    */
   private ReturnDelegate valueReturnDelegate;
   protected PolicyManager policyManager;
@@ -801,7 +801,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private RetryPolicyTemplate resolveDelegateForComponentUsing(Optional<ConfigurationInstance> configuration) {
     RetryPolicyTemplate delegate = retryPolicyTemplate;
 
-    if (featureFlaggingService.isEnabled(HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE)) {
+    if (honourOperationRetryPolicyOverride()) {
       return resolveHonouringRetryPolicyTemplateOverride(configuration, delegate);
     } else {
 
@@ -1296,5 +1296,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
                                    && ctx.getConfiguration().getMinMuleVersion().get().atLeast("4.4.0"));
 
+  }
+
+  protected boolean honourOperationRetryPolicyOverride() {
+    return featureFlaggingService.isEnabled(HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE);
   }
 }

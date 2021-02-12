@@ -11,6 +11,8 @@ import static org.mule.test.allure.AllureConstants.ReconnectionPolicyFeature.REC
 import static org.mule.test.allure.AllureConstants.ReconnectionPolicyFeature.RetryTemplateStory.RETRY_TEMPLATE;
 
 import org.junit.Rule;
+import org.junit.Test;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.tck.junit4.rule.SystemProperty;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -28,6 +30,15 @@ public class OperationRetryPolicyOverrideTestCase extends AbstractReconnectionTe
   @Override
   protected boolean expectedAsyncWhenOperationBlockingRetryPolicyIsOverridden() {
     return false;
+  }
+
+
+  @Test
+  public void getRetryPolicyTemplateFromConfig() throws Exception {
+    RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getReconnectionFromConfig").run()
+        .getMessage().getPayload().getValue();
+
+    assertRetryTemplate(template, false, 3, 1000);
   }
 
 }

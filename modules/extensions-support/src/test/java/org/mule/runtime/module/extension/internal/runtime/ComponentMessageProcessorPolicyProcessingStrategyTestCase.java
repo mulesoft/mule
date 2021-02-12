@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -30,18 +31,32 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.tck.probe.PollingProber.probe;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.config.DefaultFeatureFlaggingService;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -56,17 +71,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +112,19 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     this.processingType = processingType;
   }
 
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new AbstractConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) throws Exception {
+        muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY,
+                                                                         new DefaultFeatureFlaggingService());
+      }
+    });
+  }
+
   @Before
   public void before() throws MuleException {
     CoreEvent response = testEvent();
@@ -126,12 +143,12 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     extensionManager = mock(ExtensionManager.class);
     policyManager = mock(PolicyManager.class);
 
-    processor = new ComponentMessageProcessor<ComponentModel>(extensionModel,
-                                                              componentModel, null, null, null,
-                                                              resolverSet, null, null, null,
-                                                              extensionManager,
-                                                              policyManager, null, null,
-                                                              muleContext.getConfiguration().getShutdownTimeout()) {
+    processor = new TestComponentMessageProcessor(extensionModel,
+                                                  componentModel, null, null, null,
+                                                  resolverSet, null, null, null,
+                                                  extensionManager,
+                                                  policyManager, null, null,
+                                                  muleContext.getConfiguration().getShutdownTimeout()) {
 
       @Override
       protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {}
@@ -387,4 +404,5 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
       return true;
     });
   }
+
 }
