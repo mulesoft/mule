@@ -11,11 +11,10 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.success
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.sdk.api.annotation.Alias;
-import org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode;
-import org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter;
-import org.mule.sdk.api.annotation.param.Optional;
-import org.mule.sdk.api.runtime.parameter.HttpParameterPlacement;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
+import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
+import org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement;
 
 @AuthorizationCode(accessTokenUrl = TestOAuthConnectionProvider.ACCESS_TOKEN_URL,
     authorizationUrl = TestOAuthConnectionProvider.AUTH_URL,
