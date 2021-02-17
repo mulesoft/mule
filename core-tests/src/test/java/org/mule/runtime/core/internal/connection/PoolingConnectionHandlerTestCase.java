@@ -15,7 +15,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -29,8 +28,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.IOException;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -58,7 +55,6 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     managedConnection = new PoolingConnectionHandler<>(connection, pool, poolingListener, connectionProvider);
-    when(connectionProvider.validate(connection)).thenReturn(success());
   }
 
   @Test
@@ -72,15 +68,6 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
     verify(pool).returnObject(connection);
     verify(poolingListener).onReturn(connection);
     assertDisconnected();
-  }
-
-  @Test
-  public void releaseInvalidConnection() throws Exception {
-    when(connectionProvider.validate(connection)).thenReturn(failure("Connection is invalid", new IOException()));
-    managedConnection.release();
-    verify(pool).invalidateObject(connection);
-    verify(pool, never()).returnObject(connection);
-    verify(poolingListener, never()).onReturn(connection);
   }
 
   @Test
