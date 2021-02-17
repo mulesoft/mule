@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.8.2-20210121</version>
+        <version>3.8.2-20210217</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
