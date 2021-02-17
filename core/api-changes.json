@@ -75,15 +75,6 @@
           "classSimpleName": "ReactiveInterceptor",
           "elementKind": "interface",
           "justification": "MULE-18177: This should have neven been made privileged"
-        },
-        {
-        "code": "java.method.addedToInterface",
-        "new": "method void org.mule.runtime.core.api.exception.SystemExceptionHandler::handleException(java.lang.Exception, org.mule.runtime.api.component.location.ComponentLocation)",
-        "package": "org.mule.runtime.core.api.exception",
-        "classSimpleName": "SystemExceptionHandler",
-        "methodName": "handleException",
-        "elementKind": "method",
-        "justification": "MULE-19124: Exception notifications emitted by polling sources must inform the component location."
         }
       ]
     }
