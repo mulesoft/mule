@@ -518,8 +518,7 @@ public class FlowProcessMediator implements Initialisable {
   }
 
   private Optional<String> evaluateCorrelationIdExpressionGenerator() {
-    return muleContext.getConfiguration().getDefaultCorrelationIdGenerator()
-        .map(generator -> generator.generateCorrelationId(muleContext));
+    return muleContext.getConfiguration().getDefaultCorrelationIdGenerator().map(generator -> generator.generateCorrelationId());
   }
 
   private String resolveSourceCorrelationId(SourceResultAdapter adapter) {
