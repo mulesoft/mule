@@ -33,6 +33,8 @@ public interface SystemExceptionHandler {
    *
    * @param exception which occurred
    * @param componentLocation the {@link ComponentLocation} which produced the exception
+   *
+   * @since 4.4.0
    */
   default void handleException(Exception exception, ComponentLocation componentLocation) {
     handleException(exception);
