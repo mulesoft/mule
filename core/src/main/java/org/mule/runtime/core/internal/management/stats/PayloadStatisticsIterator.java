@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
-import org.mule.runtime.api.streaming.HasSize;
-
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.function.LongConsumer;
 
 import org.apache.commons.collections.iterators.AbstractIteratorDecorator;
+import org.mule.runtime.api.streaming.HasSize;
 
-final class PayloadStatisticsIterator<T> extends AbstractIteratorDecorator implements HasSize {
+final class PayloadStatisticsIterator<T> extends AbstractIteratorDecorator implements HasSize, Closeable {
 
   private final LongConsumer populator;
 
@@ -32,5 +33,12 @@ final class PayloadStatisticsIterator<T> extends AbstractIteratorDecorator imple
   @Override
   public int getSize() {
     return getIterator() instanceof HasSize ? ((HasSize) getIterator()).getSize() : -1;
+  }
+
+  @Override
+  public void close() throws IOException {
+    if (this.iterator instanceof Closeable) {
+      ((Closeable) this.iterator).close();
+    }
   }
 }
