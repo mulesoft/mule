@@ -14,6 +14,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
@@ -147,6 +148,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   static {
     configurePropertiesResolverFeatureFlag();
     configureHonourRetryPolicyTemplateOverrideFeature();
+    configureBatchFixedAggregatorTransactionRecordBuffer();
   }
 
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
@@ -818,6 +820,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   public ClassLoader getExecutionClassLoader() {
     return muleContext.getExecutionClassLoader();
+  }
+
+  private static void configureBatchFixedAggregatorTransactionRecordBuffer() {
+    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
+
+    ffRegistry.registerFeature(BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER, ctx -> false);
   }
 
 }
