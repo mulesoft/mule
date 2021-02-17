@@ -25,7 +25,7 @@ public class ParameterGroupExclusiveOptionalsOneRequiredTestCase extends Abstrac
     SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueSomeParameter");
     assertThat(config.getSomeParameter(), is("hello dog!"));
   }
-  
+
   @Test
   public void testShowInDslTrueWithComplexParameter() throws Exception {
     SomeParameterGroupOneRequiredConfig config = runFlowAndGetConfig("dslTrueComplexParameter");
