@@ -113,16 +113,6 @@ public class SystemExceptionListener {
     }
 
     @Override
-    public void handleException(Exception exception, ComponentLocation componentLocation) {
-      try {
-        numberOfInvocations.incrementAndGet();
-        exceptionListener.handleException(exception, componentLocation);
-      } finally {
-        exceptionThrownLatch.countDown();
-      }
-    }
-
-    @Override
     public void dispose() {
       disposeIfNeeded(exceptionListener, logger);
     }

@@ -85,11 +85,6 @@ public class TestExceptionStrategy implements FlowExceptionHandler, SystemExcept
   }
 
   @Override
-  public void handleException(Exception exception, ComponentLocation componentLocation) {
-    handleException(exception, null, null, componentLocation);
-  }
-
-  @Override
   public void handleException(Exception exception) {
     handleException(exception, null, null, null);
   }
