@@ -121,7 +121,8 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   }
 
   public void setCorrelationIdGeneratorExpression(String correlationIdGeneratorExpression) {
-    config.setDefaultCorrelationIdGeneratorExpression(new ExpressionCorrelationIdGenerator(correlationIdGeneratorExpression));
+    config.setDefaultCorrelationIdGeneratorExpression(new ExpressionCorrelationIdGenerator(muleContext,
+                                                                                           correlationIdGeneratorExpression));
   }
 
   public void setExtensions(List<ConfigurationExtension> extensions) {
