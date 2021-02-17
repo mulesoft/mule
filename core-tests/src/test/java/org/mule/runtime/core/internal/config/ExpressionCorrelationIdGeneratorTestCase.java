@@ -29,16 +29,16 @@ public class ExpressionCorrelationIdGeneratorTestCase extends AbstractMuleContex
 
   @Test
   public void staticEvaluation() {
-    CorrelationIdGenerator generator = new ExpressionCorrelationIdGenerator("'test'");
-    assertThat(generator.generateCorrelationId(muleContext), is("test"));
+    CorrelationIdGenerator generator = new ExpressionCorrelationIdGenerator(muleContext, "'test'");
+    assertThat(generator.generateCorrelationId(), is("test"));
   }
 
   @Test
   public void fullExpressionEvaluation() {
     CorrelationIdGenerator generator =
-        new ExpressionCorrelationIdGenerator("#[(random() * 42 as String splitBy('.'))[0]]");
+        new ExpressionCorrelationIdGenerator(muleContext, "#[(random() * 42 as String splitBy('.'))[0]]");
 
-    assertThat(parseInt(generator.generateCorrelationId(muleContext)), is(both(greaterThan(0)).and(lessThan(42))));
+    assertThat(parseInt(generator.generateCorrelationId()), is(both(greaterThan(0)).and(lessThan(42))));
   }
 
 }

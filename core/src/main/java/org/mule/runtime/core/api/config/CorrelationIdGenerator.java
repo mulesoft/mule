@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.core.api.config;
 
-import org.mule.runtime.core.api.MuleContext;
-
 public interface CorrelationIdGenerator {
 
-  String generateCorrelationId(MuleContext context);
+  String generateCorrelationId();
 
 }

@@ -14,12 +14,15 @@ public class ExpressionCorrelationIdGenerator implements CorrelationIdGenerator 
 
   private String expression;
 
-  public ExpressionCorrelationIdGenerator(String expression) {
+  private MuleContext context;
+
+  public ExpressionCorrelationIdGenerator(MuleContext context, String expression) {
     this.expression = expression;
+    this.context = context;
   }
 
   @Override
-  public String generateCorrelationId(MuleContext context) {
+  public String generateCorrelationId() {
     ExpressionManager expressionManager = context.getExpressionManager();
     return expressionManager.evaluate(expression).getValue().toString();
   }
