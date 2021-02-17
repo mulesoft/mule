@@ -305,6 +305,7 @@ public abstract class AbstractReconnectionTestCase extends AbstractExtensionFunc
     getPageCalls = 0;
     disconnectCalls = 0;
     SynchronizableSource.first = true;
+    SynchronizableConnection.disconnectionWaitedFullTimeout = false;
   }
 
   private void clear(List<CoreEvent> list) {
