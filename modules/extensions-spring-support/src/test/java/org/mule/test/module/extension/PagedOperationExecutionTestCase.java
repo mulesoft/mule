@@ -84,26 +84,10 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
 
   @Test
   public void emptyPagedOperation() throws Exception {
-    CursorIteratorProvider provider =
-        (CursorIteratorProvider) flowRunner("emptyPagedOperation").keepStreamsOpen().withPayload(1).run().getMessage()
-            .getPayload()
-            .getValue();
-
-    CursorIterator iterator = provider.openCursor();
+    CursorIterator iterator = getCursor("emptyPagedOperation");
     assertThat(iterator.hasNext(), is(false));
     assertThat(iterator.getSize(), is(0));
     assertThat(closeEmptyOperationCalls, is(1));
-  }
-
-  @Test
-  public void closeOperation() throws Exception {
-    CursorIteratorProvider provider =
-        (CursorIteratorProvider) flowRunner("emptyPagedOperation").keepStreamsOpen().withPayload(1).run().getMessage()
-            .getPayload()
-            .getValue();
-
-    CursorIterator iterator = provider.openCursor();
-    iterator.close();
   }
 
   @Test
