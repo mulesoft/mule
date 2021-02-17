@@ -110,15 +110,13 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
 
   @Override
   public final void start() throws MuleException {
-    if (flowStoppedPersistenceListener != null && !flowStoppedPersistenceListener.shouldStart()) {
-      return;
-    }
     // Check if Initial State is Stopped
-    if (muleContext.isStarting() && initialState.equals(INITIAL_STATE_STOPPED)) {
+    if (muleContext.isStarting() && initialState.equals(INITIAL_STATE_STOPPED)
+        || flowStoppedPersistenceListener != null && !flowStoppedPersistenceListener.shouldStart()) {
       lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<>());
       lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<>());
 
-      LOGGER.info("Flow " + name + " has not been started (initial state = 'stopped')");
+      LOGGER.info("Flow " + name + " has not been started");
       return;
     }
 
@@ -283,5 +281,9 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
 
   public void checkIfFlowShouldStart() {
     flowStoppedPersistenceListener.checkIfFlowShouldStart();
+  }
+
+  public void doNotPersist() {
+    flowStoppedPersistenceListener.doNotPersist();
   }
 }
