@@ -12,12 +12,25 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.typed.value.extension.extension.TypedValueParameterOperations.THIS_IS_A_DEFAULT_STRING;
 import static org.mule.test.typed.value.extension.extension.TypedValueSource.onSuccessValue;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.Flow;
@@ -30,20 +43,6 @@ import org.mule.test.typed.value.extension.extension.SimplePojo;
 import org.mule.test.typed.value.extension.extension.TypedValueSource;
 import org.mule.test.vegan.extension.VeganProductInformation;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-
 @RunnerDelegateTo(Parameterized.class)
 public class TypedValueParameterOperationExecutionTestCase extends AbstractTypedValueTestCase {
 
@@ -53,16 +52,23 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
       "}";
   private static final String THIS_IS_A_STRING = "This is a string";
 
-  @Parameters(name = "enableStatistics: {0}")
-  public static Collection<String> data() {
-    return asList("false", "true");
+  @Parameters
+  public static List<Object[]> parameters() {
+    return asList(new Object[][] {{"true", "false"},
+        {"true", "true"},
+        {"false", "false"},
+        {"false", "true"}});
   }
 
   @Rule
   public SystemProperty withStatistics;
 
-  public TypedValueParameterOperationExecutionTestCase(String enableStatistics) {
+  @Rule
+  public SystemProperty withPayloadStatistics;
+
+  public TypedValueParameterOperationExecutionTestCase(String enableStatistics, String disablePayloadStatistics) {
     this.withStatistics = new SystemProperty(MULE_ENABLE_STATISTICS, enableStatistics);
+    this.withPayloadStatistics = new SystemProperty(MULE_DISABLE_PAYLOAD_STATISTICS, disablePayloadStatistics);
   }
 
   @Override
