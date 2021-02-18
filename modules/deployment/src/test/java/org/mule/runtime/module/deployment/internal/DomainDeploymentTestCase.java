@@ -68,8 +68,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
-import org.mule.tck.junit4.FlakinessDetectorTestRunnerWithParameters;
-import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.util.CompilerUtils;
 
@@ -93,12 +91,10 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 /**
  * Contains test for domain deployment
  */
-@Parameterized.UseParametersRunnerFactory(FlakinessDetectorTestRunnerWithParameters.FlakinessDetectorTestRunnerWithParametersFactory.class)
 public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   private static File pluginForbiddenJavaEchoTestClassFile;
@@ -1386,7 +1382,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   @Issue("MULE-19040")
   @Description("When a domain is restarted, if its apps were stopped before restart, they should not get started")
-  @FlakyTest(times = 200)
   public void redeployDomainWithStoppedAppsShouldPersistStoppedStateAndDoNotStartApps() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
