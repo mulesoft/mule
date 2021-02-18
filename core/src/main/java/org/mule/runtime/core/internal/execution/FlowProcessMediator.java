@@ -65,6 +65,7 @@ import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactor
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.config.ExpressionCorrelationIdGenerator;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -518,7 +519,9 @@ public class FlowProcessMediator implements Initialisable {
   }
 
   private Optional<String> evaluateCorrelationIdExpressionGenerator() {
-    return muleContext.getConfiguration().getDefaultCorrelationIdGenerator().map(generator -> generator.generateCorrelationId());
+    return Optional
+        .of(new ExpressionCorrelationIdGenerator(muleContext, "#[(uuid() splitBy('-'))[2] ++ '*doge' ]").generateCorrelationId());
+    //return muleContext.getConfiguration().getDefaultCorrelationIdGenerator().map(generator -> generator.generateCorrelationId());
   }
 
   private String resolveSourceCorrelationId(SourceResultAdapter adapter) {
