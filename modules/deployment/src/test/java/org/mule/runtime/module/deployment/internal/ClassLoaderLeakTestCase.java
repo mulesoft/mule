@@ -1,4 +1,3 @@
-package org.mule.runtime.module.deployment.internal;
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
@@ -6,19 +5,22 @@ package org.mule.runtime.module.deployment.internal;
  * LICENSE.txt file.
  */
 
+package org.mule.runtime.module.deployment.internal;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.lang.ref.PhantomReference;
-import java.lang.ref.ReferenceQueue;
-
-import org.junit.Test;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+
+import org.junit.Test;
 
 public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase {
 
