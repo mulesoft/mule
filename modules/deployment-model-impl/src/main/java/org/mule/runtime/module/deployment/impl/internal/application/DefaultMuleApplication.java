@@ -440,8 +440,10 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   }
 
   private void checkIfFlowsShouldStart() {
-    for (Flow flow : getRegistry().lookupAllByType(Flow.class)) {
-      ((DefaultFlowBuilder.DefaultFlow) flow).checkIfFlowShouldStart();
+    if (getRegistry() != null) {
+      for (Flow flow : getRegistry().lookupAllByType(Flow.class)) {
+        ((DefaultFlowBuilder.DefaultFlow) flow).checkIfFlowShouldStart();
+      }
     }
   }
 
