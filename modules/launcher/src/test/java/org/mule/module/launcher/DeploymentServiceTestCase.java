@@ -3999,14 +3999,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.findApplication(dummyDomainApp1FileBuilder.getId()).stop();
         assertStatus(dummyDomainApp1FileBuilder.getId(), STOPPED);
 
+        reset(mockDeploymentListener);
         // Redeploy domain
         deploymentService.redeployDomain(dummyDomainFileBuilder.getId());
+        assertDeploymentSuccess(mockDeploymentListener, dummyDomainApp1FileBuilder.getId());
 
         // Application was redeployed but it is not started
         assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
 
+        reset(mockDeploymentListener);
         // Redeploy domain again
         deploymentService.redeployDomain(dummyDomainFileBuilder.getId());
+        assertDeploymentSuccess(mockDeploymentListener, dummyDomainApp1FileBuilder.getId());
 
         // Application was redeployed twice but it is not started
         assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
