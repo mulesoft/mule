@@ -80,9 +80,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
-import org.mule.tck.junit4.FlakinessDetectorTestRunnerWithParameters;
-import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -98,13 +95,10 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 /**
  * Contains test for application deployment on the default domain
  */
-@Parameterized.UseParametersRunnerFactory(FlakinessDetectorTestRunnerWithParameters.FlakinessDetectorTestRunnerWithParametersFactory.class)
 public class ApplicationDeploymentTestCase extends AbstractApplicationDeploymentTestCase {
 
   private static final String OVERWRITTEN_PROPERTY = "configFile";
@@ -804,7 +798,6 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Issue("MULE-19127")
   @Feature(DEPLOYMENT_CONFIGURATION)
   @Story(FLOW_STATE_PERSISTENCE)
-  @FlakyTest(times = 100)
   public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
     for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
