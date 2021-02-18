@@ -90,6 +90,11 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
                                                  throw new ExecutorExceptionWrapper(e);
                                                }));
     } catch (SampleDataException e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn(format("Get sample data has FAILED with code: %s for component: %s", e.getFailureCode(),
+                           componentModel.getName()),
+                    e);
+      }
       return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
     } catch (ExpressionNotSupportedException e) {
       return resultFrom(newFailure(new SampleDataException(e.getMessage(), INVALID_PARAMETER_VALUE))
@@ -97,8 +102,14 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
     } catch (ExecutorExceptionWrapper e) {
       Throwable cause = e.getCause();
       if (cause instanceof SampleDataException) {
+        SampleDataException sampleDataException = (SampleDataException) cause;
+        if (LOGGER.isWarnEnabled()) {
+          LOGGER.warn(format("Get sample data has FAILED with code: %s for component: %s", sampleDataException.getFailureCode(),
+                             componentModel.getName()),
+                      e);
+        }
         SampleDataFailure.Builder failureBuilder = newFailure(cause);
-        failureBuilder.withFailureCode(((SampleDataException) cause).getFailureCode());
+        failureBuilder.withFailureCode(sampleDataException.getFailureCode());
         return resultFrom(failureBuilder.build());
       }
       propagateIfPossible(cause, MuleRuntimeException.class);
@@ -110,7 +121,6 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Get sample data FINISHED for component: {}", componentModel.getName());
       }
-
     }
   }
 

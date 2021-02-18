@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact.metadata;
 
+import static com.google.common.base.Throwables.propagateIfPossible;
+import static java.lang.String.format;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import static org.mule.runtime.api.sampledata.SampleDataFailure.Builder.newFailure;
+import static org.mule.runtime.api.sampledata.SampleDataResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -20,6 +24,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.sampledata.SampleDataFailure;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -28,8 +33,10 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
+import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
+import org.mule.sdk.api.data.sample.SampleDataException;
 
 import java.util.Optional;
 
@@ -71,12 +78,35 @@ public class MetadataKeysExecutor extends MetadataExecutor {
       }
       return withContextClassLoader(extensionClassLoader,
                                     () -> withMetadataContext(metadataContext, () -> metadataMediator
-                                        .getMetadataKeys(metadataContext, metadataKey, reflectionCache)));
+                                        .getMetadataKeys(metadataContext, metadataKey, reflectionCache)),
+                                    MetadataResolvingException.class, e -> {
+                                      throw new ExecutorExceptionWrapper(e);
+                                    });
+    } catch (MetadataResolvingException e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn(format("Resolve metadata keys has FAILED with code: %s for component: %s", e.getFailure(),
+                           componentModel.getName()),
+                    e);
+      }
+      return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(e.getFailure()).onKeys());
     } catch (ExpressionNotSupportedException e) {
       return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(INVALID_PARAMETER_VALUE).onKeys());
-    } catch (MetadataResolvingException e) {
-      return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(e.getFailure()).onKeys());
+    } catch (ExecutorExceptionWrapper e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof MetadataResolvingException) {
+        MetadataResolvingException metadataResolvingException = (MetadataResolvingException) cause;
+        if (LOGGER.isWarnEnabled()) {
+          LOGGER.warn(format("Resolve metadata keys has FAILED with code: %s for component: %s",
+                             metadataResolvingException.getFailure(), componentModel.getName()),
+                      cause);
+        }
+        return failure(MetadataFailure.Builder.newFailure(e).withFailureCode(metadataResolvingException.getFailure())
+            .onKeys());
+      }
+      propagateIfPossible(cause, MuleRuntimeException.class);
+      throw new MuleRuntimeException(cause);
     } catch (Exception e) {
+      propagateIfPossible(e, MuleRuntimeException.class);
       throw new MuleRuntimeException(e);
     } finally {
       if (LOGGER.isDebugEnabled()) {
