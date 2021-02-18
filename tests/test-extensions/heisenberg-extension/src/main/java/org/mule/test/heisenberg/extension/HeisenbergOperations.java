@@ -547,7 +547,7 @@ public class HeisenbergOperations implements Disposable {
 
   @Override
   public void dispose() {
-    executor.ifComputed(ExecutorService::shutdownNow);
+    executor.ifComputed(ExecutorService::shutdown);
     disposed = true;
   }
 
