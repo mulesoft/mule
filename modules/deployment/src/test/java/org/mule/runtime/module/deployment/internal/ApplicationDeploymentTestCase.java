@@ -805,6 +805,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     reset(applicationDeploymentListener);
     deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
     assertIfFlowsHaveStarted(app_2, false);
