@@ -52,8 +52,7 @@ public class SomeOps {
   }
 
   /**
-   * An operation to test an use-case of a ParameterGroup with a <it>isOneRequired</it> exclusive-optionals configuration
-   * where show in Dsl is off.
+   * An operation to test an use-case of a exclusive-optionals <it>isOneRequired</it> ParameterGroup where show in Dsl is off.
    */
   public SomeParameterGroupOneRequiredConfig oneRequiredParameterResolverOperation(@ParameterGroup(
       name = "Awesome Parameter Group") SomeParameterGroupOneRequiredConfig oneParameterGroup) {

@@ -236,7 +236,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         .flatMap(entry -> {
           if (entry.getValue() instanceof ParameterValueResolver) {
             try {
-              parameterValueResolvers.add(entry.getKey());
+              parameterValueResolvers.add(aliasedParameterNames.getOrDefault(entry.getKey(), entry.getKey()));
               return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
                   .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
             } catch (ValueResolvingException e) {

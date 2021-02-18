@@ -18,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.annotation.param.ParameterGroup;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -44,14 +45,19 @@ public class SomeEmittingSource extends Source<byte[], Object> implements Initia
   Integer times;
   private Scheduler emitterScheduler;
 
+  @ParameterGroup(name = "Awesome Parameter Group")
+  SomeParameterGroupOneRequiredConfig someParameterGroup;
+
   @Override
   public void onStart(SourceCallback<byte[], Object> sourceCallback) {
+    Object parameterValue = someParameterGroup.getSomeParameter() != null ? someParameterGroup.getSomeParameter()
+        : someParameterGroup.getComplexParameter();
     emissions.set(times);
     launchedEmitterFuture = emitterScheduler
         .submit(() -> {
           while (!Thread.currentThread().isInterrupted() && emissions.getAndDecrement() > 0) {
             LOGGER.info("Emitting an event through flow");
-            sourceCallback.handle(Result.<byte[], Object>builder().output(message.getBytes()).build());
+            sourceCallback.handle(Result.<byte[], Object>builder().output(message.getBytes()).attributes(parameterValue).build());
             try {
               Thread.sleep(1000);
             } catch (InterruptedException e) {

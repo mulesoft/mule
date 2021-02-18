@@ -10,7 +10,9 @@
     <object name="event-recorder" class="org.mule.test.functional.ByteArrayToInputStreamSdkTestCase$EventRecorder"/>
 
     <flow name="main">
-        <some:some-emitting-source message="hello dog!" times="1"/>
+        <some:some-emitting-source message="hello dog!" times="1">
+            <some:some-parameter-group someParameter="hello dog!"/>
+        </some:some-emitting-source>
         <logger level="ERROR" message="#[payload]"/>
         <some:input-stream-consuming-operation />
         <flow-ref name="event-recorder"/>
