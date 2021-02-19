@@ -59,7 +59,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private final ServiceRepository serviceRepository;
   private final ClassLoaderRepository classLoaderRepository;
   private final List<ArtifactPlugin> artifactPlugins;
-  private final List<ArtifactPlugin> ownArtifactPlugins;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final MuleContextListener muleContextListener;
   private ArtifactContext policyContext;
@@ -73,20 +72,16 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    * @param parametrization parameters used to configure the created instance. Non null
    * @param serviceRepository repository of available services. Non null.
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
-   * @param artifactPlugins artifact plugins deployed only inside the policy. Non null.
-   * @param ownArtifactPlugins artifact plugins the policy depends on. Non null.
+   * @param artifactPlugins artifact plugins the policy depends on. Non null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
    * @param muleContextListener the listener to execute for specific events that occur on the {@link MuleContext} of the policy.
    *        May be {@code null}.
-   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    */
   public DefaultApplicationPolicyInstance(Application application, PolicyTemplate template,
                                           PolicyParametrization parametrization,
                                           ServiceRepository serviceRepository,
                                           ClassLoaderRepository classLoaderRepository,
                                           List<ArtifactPlugin> artifactPlugins,
-                                          List<ArtifactPlugin> ownArtifactPlugins,
                                           ExtensionModelLoaderRepository extensionModelLoaderRepository,
                                           MuleContextListener muleContextListener) {
     this.application = application;
@@ -95,7 +90,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     this.serviceRepository = serviceRepository;
     this.classLoaderRepository = classLoaderRepository;
     this.artifactPlugins = artifactPlugins;
-    this.ownArtifactPlugins = ownArtifactPlugins;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.muleContextListener = muleContextListener;
   }
@@ -113,7 +107,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setParentArtifact(application)
             // TODO MULE-19203 This is where the extensions from the app are being added to the plugin as well.
             .setExtensionManagerFactory(new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,
-                                                                                     ownArtifactPlugins,
+                                                                                     artifactPlugins,
                                                                                      new DefaultExtensionManagerFactory()))
             .setMuleContextListener(muleContextListener);
 
