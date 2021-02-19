@@ -63,7 +63,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
         new DefaultApplicationPolicyInstance(application, policyTemplate,
                                              parameterization, mock(ServiceRepository.class),
                                              mock(ClassLoaderRepository.class),
-                                             emptyList(), emptyList(),
+                                             emptyList(),
                                              mock(ExtensionModelLoaderRepository.class),
                                              muleContextListener);
 
