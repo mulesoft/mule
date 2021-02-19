@@ -58,8 +58,8 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
     this.childExtensionManager = childExtensionManager;
 
     extensionModels = new HashSet<>();
-    extensionModels.addAll(parentExtensionManager.getExtensions());
     extensionModels.addAll(childExtensionManager.getExtensions());
+    extensionModels.addAll(parentExtensionManager.getExtensions());
   }
 
   @Override
