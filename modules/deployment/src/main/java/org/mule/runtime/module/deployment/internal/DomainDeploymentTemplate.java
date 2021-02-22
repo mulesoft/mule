@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.valueOf;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
@@ -30,8 +31,6 @@ import java.util.Properties;
 public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplate {
 
   private Collection<Application> domainApplications = Collections.emptyList();
-  //TODO MULE-19166: Remove this property since it's no longer necessary
-  private Map<Application, ApplicationStatus> appStatusPreRedeployment;
   private final DefaultArchiveDeployer<Application> applicationDeployer;
   private final DeploymentService deploymentservice;
   private final CompositeDeploymentListener applicationDeploymentListener;
@@ -49,10 +48,8 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
   @Override
   public void preRedeploy(Artifact domain) {
     if (domain instanceof Domain) {
-      appStatusPreRedeployment = new HashMap<>();
       domainApplications = deploymentservice.findDomainApplications(domain.getArtifactName());
       for (Application domainApplication : domainApplications) {
-        appStatusPreRedeployment.put(domainApplication, domainApplication.getStatus());
         applicationDeploymentListener.onRedeploymentStart(domainApplication.getArtifactName());
         applicationDeployer.undeployArtifactWithoutUninstall(domainApplication);
       }
@@ -71,7 +68,7 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
         if (applicationDeployer.isUpdatedZombieArtifact(domainApplication.getArtifactName())) {
           try {
             applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(),
-                                                       getProperties(appStatusPreRedeployment.get(domainApplication)));
+                                                       empty());
             applicationDeploymentListener.onRedeploymentSuccess(domainApplication.getArtifactName());
           } catch (RuntimeException e) {
             applicationDeploymentListener.onRedeploymentFailure(domainApplication.getArtifactName(), e);
@@ -86,12 +83,5 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
       }
     }
     domainApplications = Collections.emptyList();
-  }
-
-  private Optional<Properties> getProperties(ApplicationStatus applicationStatus) {
-    Properties properties = new Properties();
-    boolean startArtifact = applicationStatus.equals(STARTED) || applicationStatus.equals(DEPLOYMENT_FAILED);
-    properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(startArtifact));
-    return of(properties);
   }
 }
