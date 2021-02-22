@@ -11,6 +11,7 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.PollingSourceNotification.ITEM_DISPATCHED;
+import static org.mule.runtime.api.notification.PollingSourceNotification.ITEM_REJECTED_WATERMARK;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedPersistent;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedTransient;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -304,8 +305,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
           status = FILTERED_BY_WATERMARK;
         } else if (currentPollItems < maxItemsPerPoll) {
           currentPollItems++;
-          PollingSourceNotificationInfo info = new PollingSourceNotificationInfo(this.pollId);
-          notificationDispatcher.dispatch(new PollingSourceNotification(info, ITEM_DISPATCHED, componentLocation.getLocation()));
+          notificationDispatcher.dispatch(new PollingSourceNotification(new PollingSourceNotificationInfo(this.pollId), ITEM_DISPATCHED, componentLocation.getLocation()));
           sourceCallback.handle(pollItem.getResult(), callbackContext);
           saveWatermarkValue(watermarkStatus, pollItem);
         } else {
@@ -315,6 +315,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       }
 
       if (status != ACCEPTED || currentPollItemLimitApplied) {
+        // TODO: match notification action to status.
+        notificationDispatcher.dispatch(new PollingSourceNotification(new PollingSourceNotificationInfo(this.pollId), ITEM_REJECTED_WATERMARK, componentLocation.getLocation()));
         rejectItem(pollItem.getResult(), callbackContext);
       }
 
