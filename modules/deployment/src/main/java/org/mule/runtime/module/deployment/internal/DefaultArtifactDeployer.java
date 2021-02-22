@@ -52,7 +52,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       artifact.install();
       doInit(artifact);
       addFlowStoppedListeners(artifact);
-      if (startArtifact && shouldStartArtifact(artifact)) {
+      if (shouldStartArtifact(artifact)) {
         artifact.start();
       }
 
