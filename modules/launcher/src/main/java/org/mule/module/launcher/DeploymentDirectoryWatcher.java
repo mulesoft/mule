@@ -675,11 +675,14 @@ public class DeploymentDirectoryWatcher implements Runnable
         }
     }
 
-    private void notifyStopListeners() {
-        for (Application application : applications) {
+    private void notifyStopListeners()
+    {
+        for (Application application : applications)
+        {
             applicationArchiveDeployer.doNotPersistArtifactStop(application);
         }
-        for (Domain domain : domains) {
+        for (Domain domain : domains)
+        {
             domainArchiveDeployer.doNotPersistArtifactStop(domain);
         }
     }

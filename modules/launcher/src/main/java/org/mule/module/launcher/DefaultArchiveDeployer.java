@@ -619,7 +619,8 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         return deployPackagedArtifact(zip, properties);
     }
 
-    public void doNotPersistArtifactStop(T artifact) {
+    public void doNotPersistArtifactStop(T artifact)
+    {
         deployer.doNotPersistArtifactStop(artifact);
     }
 }

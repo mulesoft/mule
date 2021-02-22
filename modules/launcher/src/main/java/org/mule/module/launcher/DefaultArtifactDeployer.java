@@ -91,7 +91,8 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
             {
                 artifact.start();
             }
-            if (artifact.getMuleContext() != null && artifact.getMuleContext().getRegistry() != null){
+            if (artifact.getMuleContext() != null && artifact.getMuleContext().getRegistry() != null)
+            {
                 ArtifactStoppedPersistenceListener artifactStoppedDeploymentListener =
                     new ArtifactStoppedDeploymentPersistenceListener(artifact.getArtifactName());
                 DefaultMuleContext defaultMuleContext = (DefaultMuleContext) artifact.getMuleContext();
@@ -119,12 +120,16 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         deploy(artifact, true);
     }
 
-    private Boolean shouldStartArtifact(Artifact artifact) {
+    private Boolean shouldStartArtifact(Artifact artifact)
+    {
         Properties deploymentProperties = null;
-        try {
+        try
+        {
             Optional<Properties> properties = absent();
             deploymentProperties = resolveDeploymentProperties(artifact.getArtifactName(), properties);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             logger.error("Failed to load deployment property for artifact "
                 + artifact.getArtifactName(), e);
         }
@@ -132,14 +137,17 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
             && parseBoolean(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
     }
 
-    public void doNotPersistArtifactStop(Artifact artifact) {
-        if (artifact.getMuleContext() == null || artifact.getMuleContext().getRegistry() == null){
+    public void doNotPersistArtifactStop(Artifact artifact)
+    {
+        if (artifact.getMuleContext() == null || artifact.getMuleContext().getRegistry() == null)
+        {
             return;
         }
         Registry artifactRegistry = artifact.getMuleContext().getRegistry();
         Collection<ArtifactStoppedPersistenceListener> listeners =
             artifactRegistry.lookupObjects(ArtifactStoppedPersistenceListener.class);
-        for (ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener : listeners){
+        for (ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener : listeners)
+        {
             artifactStoppedPersistenceListener.doNotPersist();
         }
     }

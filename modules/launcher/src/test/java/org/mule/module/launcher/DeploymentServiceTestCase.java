@@ -1167,7 +1167,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void whenAppIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception {
+    public void whenAppIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception
+    {
         Application app = deployApplication();
         app.stop();
 
@@ -1181,7 +1182,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void whenAppIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
+    public void whenAppIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception
+    {
         final Application app = deployApplication();
 
         DefaultMuleContext defaultMuleContext = (DefaultMuleContext) app.getMuleContext();
@@ -1247,7 +1249,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void undeploysStoppedAppAndDoesNotStartItOnDeploy() throws Exception {
+    public void undeploysStoppedAppAndDoesNotStartItOnDeploy() throws Exception
+    {
         final Application app = deployApplication();
         app.stop();
         assertStatus(app, STOPPED);
@@ -1258,7 +1261,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void undeploysStoppedAppDoesNotStartItOnDeployButCanBeStartedManually() throws Exception {
+    public void undeploysStoppedAppDoesNotStartItOnDeployButCanBeStartedManually() throws Exception
+    {
         final Application app = deployApplication();
         app.stop();
         assertStatus(app, STOPPED);
@@ -1273,7 +1277,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void undeploysNotStoppedAppAndStartsItOnDeploy() throws Exception {
+    public void undeploysNotStoppedAppAndStartsItOnDeploy() throws Exception
+    {
         final Application app = deployApplication();
         assertStatus(app, STARTED);
 
@@ -1283,7 +1288,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void stoppingMuleContextDoesNotPersistAppStoppedState() throws Exception {
+    public void stoppingMuleContextDoesNotPersistAppStoppedState() throws Exception
+    {
         final Application app = deployApplication();
         assertStatus(app, STARTED);
         app.getMuleContext().stop();
@@ -2125,7 +2131,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void redeploysDomainZipRefreshesAppsButIfTheyWereStoppedTheyDoNotStart() throws Exception {
+    public void redeploysDomainZipRefreshesAppsButIfTheyWereStoppedTheyDoNotStart() throws Exception
+    {
         addPackedDomainFromBuilder(dummyDomainFileBuilder);
         File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
         long firstFileTimestamp = dummyDomainFile.lastModified();
@@ -2372,7 +2379,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void whenDomainIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception {
+    public void whenDomainIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception
+    {
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
         deploymentService.start();
@@ -2390,7 +2398,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void whenDomainIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
+    public void whenDomainIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception
+    {
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
         deploymentService.start();
@@ -2899,7 +2908,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void redeployDomainWithStoppedAppsShouldPersistStoppedStateAndDoNotStartApps() throws Exception {
+    public void redeployDomainWithStoppedAppsShouldPersistStoppedStateAndDoNotStartApps() throws Exception
+    {
         addPackedDomainFromBuilder(dummyDomainFileBuilder);
 
         addPackedAppFromBuilder(dummyDomainApp1FileBuilder);
@@ -4149,15 +4159,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    private class RetryPolicyApplicationCancelStartAndStopRunnable implements Runnable {
+    private class RetryPolicyApplicationCancelStartAndStopRunnable implements Runnable
+    {
         private final CountDownLatch latch;
 
-        public RetryPolicyApplicationCancelStartAndStopRunnable(CountDownLatch latch) {
+        public RetryPolicyApplicationCancelStartAndStopRunnable(CountDownLatch latch)
+        {
             this.latch = latch;
         }
 
         @Override
-        public void run() {
+        public void run()
+        {
             PollingProber pollingProber = new PollingProber(7000, 300);
 
             pollingProber.check(new ApplicationReconnectingProbe());
@@ -4170,7 +4183,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    private Application deployApplication() throws Exception {
+    private Application deployApplication() throws Exception
+    {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
         deploymentService.start();
@@ -4179,7 +4193,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         return findApp(emptyAppFileBuilder.getId(), 1);
     }
 
-    private void restartServer() throws MuleException {
+    private void restartServer() throws MuleException
+    {
         deploymentService.stop();
 
         reset(applicationDeploymentListener);
@@ -4192,7 +4207,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
     }
 
-    private Application assertAppDeploymentAndStatus(ApplicationFileBuilder applicationFileBuilder, ApplicationStatus status) {
+    private Application assertAppDeploymentAndStatus(ApplicationFileBuilder applicationFileBuilder, ApplicationStatus status)
+    {
         assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
         final Application app = findApp(applicationFileBuilder.getId(), 1);
         assertStatus(app, status);

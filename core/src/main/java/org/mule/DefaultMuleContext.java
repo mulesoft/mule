@@ -1275,12 +1275,15 @@ public class DefaultMuleContext implements MuleContext
         
     }
 
-    public void persistArtifactState(String state) {
+    public void persistArtifactState(String state)
+    {
         ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
             getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
-        if (artifactStoppedPersistenceListener != null && state.equals(START)) {
+        if (artifactStoppedPersistenceListener != null && state.equals(START))
+        {
             artifactStoppedPersistenceListener.onStart();
-        } else if (artifactStoppedPersistenceListener != null && state.equals(STOP)) {
+        } else if (artifactStoppedPersistenceListener != null && state.equals(STOP))
+        {
             artifactStoppedPersistenceListener.onStop();
         }
     }

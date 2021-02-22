@@ -23,7 +23,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Defines a listener to persist stop events of Mule artifacts using deployment properties.
  */
-final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStoppedPersistenceListener {
+final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStoppedPersistenceListener
+{
 
   private static transient final Logger logger = LoggerFactory.getLogger(ArtifactStoppedDeploymentPersistenceListener.class);
   /**
@@ -33,7 +34,8 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
   private AtomicBoolean shouldPersist;
   private String artifactName;
 
-  public ArtifactStoppedDeploymentPersistenceListener(String artifactName) {
+  public ArtifactStoppedDeploymentPersistenceListener(String artifactName)
+  {
     this.artifactName = artifactName;
     shouldPersist = new AtomicBoolean(true);
   }
@@ -42,31 +44,40 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
   public void onStart() {
     Properties properties = new Properties();
     properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(true));
-    try {
+    try
+    {
       resolveDeploymentProperties(artifactName, of(properties));
-    } catch (IOException e) {
+    }
+    catch (IOException e)
+    {
       logger.error("ArtifactStoppedDeploymentPersistenceListener failed to process notification onStart for artifact "
           + artifactName, e);
     }
   }
 
   @Override
-  public void onStop() {
-    if (!shouldPersist.get()) {
+  public void onStop()
+  {
+    if (!shouldPersist.get())
+    {
       return;
     }
     Properties properties = new Properties();
     properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(false));
-    try {
+    try
+    {
       resolveDeploymentProperties(artifactName, of(properties));
-    } catch (IOException e) {
+    }
+    catch (IOException e)
+    {
       logger.error("ArtifactStoppedDeploymentPersistenceListener failed to process notification onStop for artifact "
           + artifactName, e);
     }
   }
 
   @Override
-  public void doNotPersist() {
+  public void doNotPersist()
+  {
     shouldPersist.set(false);
   }
 }

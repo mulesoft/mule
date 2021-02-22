@@ -9,7 +9,8 @@ package org.mule;
 /**
  * Defines a listener to persist stop events of Mule artifacts.
  */
-public interface ArtifactStoppedPersistenceListener {
+public interface ArtifactStoppedPersistenceListener
+{
 
   String ARTIFACT_STOPPED_LISTENER = "artifactStoppedPersistenceListener";
 
