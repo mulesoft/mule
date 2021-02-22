@@ -6,15 +6,23 @@
  */
 package org.mule.runtime.core.internal.config;
 
+import org.mule.runtime.api.el.*;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.CorrelationIdGenerator;
 import org.mule.runtime.core.api.el.ExpressionManager;
+
+import static java.lang.String.format;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 public class ExpressionCorrelationIdGenerator implements CorrelationIdGenerator {
 
   private String expression;
 
   private MuleContext context;
+
+  private ExpressionManager manager;
+  private CompiledExpression compiledExpression;
 
   public ExpressionCorrelationIdGenerator(MuleContext context, String expression) {
     this.expression = expression;
@@ -23,7 +31,30 @@ public class ExpressionCorrelationIdGenerator implements CorrelationIdGenerator 
 
   @Override
   public String generateCorrelationId() {
-    ExpressionManager expressionManager = context.getExpressionManager();
-    return expressionManager.evaluate(expression).getValue().toString();
+    try (ExpressionLanguageSession session = getManager().openSession(NULL_BINDING_CONTEXT)) {
+      return session.evaluate(getCompiledExpression()).getValue().toString();
+    }
+  }
+
+  private ExpressionManager getManager() {
+    if (manager == null) {
+      manager = context.getExpressionManager();
+    }
+    return manager;
+  }
+
+  private CompiledExpression getCompiledExpression() {
+    if (compiledExpression == null) {
+      compiledExpression = getManager().compile(expression, NULL_BINDING_CONTEXT);
+    }
+    return compiledExpression;
+  }
+
+  @Override
+  public void validateGenerator() {
+    if (!getManager().isExpression(expression) || !getManager().isValid(expression)) {
+      throw new ExpressionCompilationException(createStaticMessage(format("Invalid Correlation ID Generation expression: %s",
+                                                                          expression)));
+    }
   }
 }

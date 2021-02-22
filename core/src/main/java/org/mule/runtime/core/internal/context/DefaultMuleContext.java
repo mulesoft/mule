@@ -307,9 +307,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
         lifecycleStrategy.initialise(this);
 
-        // if there is a correlation id generator, try generating one. If there is an error in the generation
+        // if there is a correlation id generator, check validity. If there is an error in the generation
         // we want to catch it in deploy time, and avoid waiting for the first event to appear in runtime
-        getConfiguration().getDefaultCorrelationIdGenerator().ifPresent(generator -> generator.generateCorrelationId());
+        getConfiguration().getDefaultCorrelationIdGenerator().ifPresent(generator -> generator.validateGenerator());
 
       } catch (InitialisationException e) {
         dispose();

@@ -9,7 +9,10 @@ package org.mule.runtime.core.internal.config;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.core.api.config.CorrelationIdGenerator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -19,6 +22,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CORRELATION_ID;
 import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CorrelationIdOnSourcesStory.CORRELATION_ID_ON_SOURCES;
 
@@ -27,10 +31,14 @@ import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.Correlat
 @Story(CORRELATION_ID_ON_SOURCES)
 public class ExpressionCorrelationIdGeneratorTestCase extends AbstractMuleContextTestCase {
 
+  @Rule
+  public ExpectedException exception = none();
+
   @Test
   public void staticEvaluation() {
     CorrelationIdGenerator generator = new ExpressionCorrelationIdGenerator(muleContext, "'test'");
-    assertThat(generator.generateCorrelationId(), is("test"));
+    exception.expect(ExpressionCompilationException.class);
+    generator.validateGenerator();
   }
 
   @Test

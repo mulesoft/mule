@@ -1002,7 +1002,7 @@ class MuleExtensionModelDeclarer {
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("correlationIdGeneratorExpression")
         .ofType(typeLoader.load(String.class))
-        .withExpressionSupport(SUPPORTED)
+        .withExpressionSupport(REQUIRED)
         .describedAs("The default correlation id generation expression for every source. This must be DataWeave expression.");
   }
 
