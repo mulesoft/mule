@@ -277,7 +277,7 @@
         <gpg.plugin.version>1.6</gpg.plugin.version>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
         <javadocPluginVersion>3.2.0</javadocPluginVersion>
-        <mavenCompilerVersion>3.7.0</mavenCompilerVersion>
+        <mavenCompilerVersion>3.8.1</mavenCompilerVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
@@ -308,7 +308,7 @@
         <formatterGoal>validate</formatterGoal>
         <oldMuleArtifactVersion>4.3.0</oldMuleArtifactVersion>
         
-        <surefire.args.base>-Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
+        <surefire.args.base>-XX:+TieredCompilation -Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
     </properties>
 
@@ -1400,17 +1400,10 @@
                     <version>${mavenCompilerVersion}</version>
                     <configuration>
                         <encoding>ISO-8859-1</encoding>
-                        <fork>true</fork>
-                        <maxmem>512m</maxmem>
                         <source>${javaVersion}</source>
                         <target>${javaVersion}</target>
                         <proc>none</proc>
-                        <!-- Slightly faster builds, see https://jira.codehaus.org/browse/MCOMPILER-209 -->
-                        <useIncrementalCompilation>false</useIncrementalCompilation>
-                        <compilerArgs>
-                            <arg>-parameters</arg>
-                        </compilerArgs>
-                        <testCompilerArgument>-parameters</testCompilerArgument>
+                        <parameters>true</parameters>
                     </configuration>
                 </plugin>
                 <plugin>
