@@ -93,6 +93,11 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
         context.dispose();
       }
     } catch (ValueResolvingException e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn(format("Resolve value provider has FAILED with code: %s for component: %s", e.getFailureCode(),
+                           parameterizedModel.getName()),
+                    e);
+      }
       return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
     } catch (ExpressionNotSupportedException e) {
       return resultFrom(newFailure(new ValueResolvingException(e.getMessage(), INVALID_PARAMETER_VALUE))
@@ -100,8 +105,14 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
     } catch (ExecutorExceptionWrapper e) {
       Throwable cause = e.getCause();
       if (cause instanceof ValueResolvingException) {
+        ValueResolvingException valueResolvingException = (ValueResolvingException) cause;
+        if (LOGGER.isWarnEnabled()) {
+          LOGGER.warn(format("Resolve value provider has FAILED with code: %s for component: %s",
+                             valueResolvingException.getFailureCode(), parameterizedModel.getName()),
+                      cause);
+        }
         ResolvingFailure.Builder failureBuilder = newFailure(cause);
-        failureBuilder.withFailureCode(((ValueResolvingException) cause).getFailureCode());
+        failureBuilder.withFailureCode(valueResolvingException.getFailureCode());
         return resultFrom(failureBuilder.build());
       }
       propagateIfPossible(cause, MuleRuntimeException.class);

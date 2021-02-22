@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact.metadata;
 
+import static com.google.common.base.Throwables.propagateIfPossible;
+import static java.lang.String.format;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -13,6 +15,8 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -30,11 +34,13 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -77,17 +83,34 @@ public class MetadataComponentExecutor extends MetadataExecutor {
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
 
       return resolveMetadata(componentModel, optionalConfigurationInstance, metadataKey, extensionClassLoader);
+    } catch (MetadataResolvingException e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn(format("Resolve component metadata has FAILED with code: %s for component: %s", e.getFailure(),
+                           componentModel.getName()),
+                    e);
+      }
+      return failure(newFailure(e).withFailureCode(e.getFailure()).onComponent());
     } catch (ExpressionNotSupportedException e) {
       return failure(newFailure(e).withFailureCode(INVALID_METADATA_KEY).onKeys());
-    } catch (MetadataResolvingException e) {
-      return failure(newFailure(e).withFailureCode(e.getFailure()).onComponent());
+    } catch (ExecutorExceptionWrapper e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof MetadataResolvingException) {
+        MetadataResolvingException metadataResolvingException = (MetadataResolvingException) cause;
+        LOGGER.warn(format("Resolve component metadata has FAILED with code: %s for component: %s",
+                           metadataResolvingException.getFailure(), componentModel.getName()),
+                    cause);
+        return failure(newFailure(e).withFailureCode(metadataResolvingException.getFailure())
+            .onKeys());
+      }
+      propagateIfPossible(cause, MuleRuntimeException.class);
+      throw new MuleRuntimeException(cause);
     } catch (Exception e) {
-      return failure(newFailure(e).onComponent());
+      propagateIfPossible(e, MuleRuntimeException.class);
+      throw new MuleRuntimeException(e);
     } finally {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Resolve component metadata FINISHED for component: {}", componentModel.getName());
       }
-
     }
   }
 
@@ -113,7 +136,8 @@ public class MetadataComponentExecutor extends MetadataExecutor {
   private MetadataResult<ComponentMetadataTypesDescriptor> resolveMetadata(ComponentModel componentModel,
                                                                            Optional<ConfigurationInstance> configurationInstance,
                                                                            MetadataKey metadataKey,
-                                                                           ClassLoader extensionClassLoader) {
+                                                                           ClassLoader extensionClassLoader)
+      throws MetadataResolvingException {
     MetadataMediator<? extends ComponentModel> metadataMediator = new MetadataMediator<>(componentModel);
 
     MetadataContext metadataContext = createMetadataContext(configurationInstance, extensionClassLoader);
@@ -126,7 +150,9 @@ public class MetadataComponentExecutor extends MetadataExecutor {
         outputMetadata = metadataMediator.getOutputMetadata(metadataContext, metadataKey);
       }
       return collectMetadata(inputMetadata, outputMetadata);
-    }));
+    }), MetadataResolvingException.class, e -> {
+      throw new ExecutorExceptionWrapper(e);
+    });
   }
 
   private MetadataResult<ComponentMetadataTypesDescriptor> collectMetadata(@Nonnull MetadataResult<InputMetadataDescriptor> inputMetadataResult,
