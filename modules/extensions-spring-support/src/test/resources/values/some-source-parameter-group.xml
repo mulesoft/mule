@@ -8,18 +8,18 @@
     <object name="capture" class="org.mule.test.module.extension.source.SourceWithParameterGroupExclusiveOptionalsOneRequiredTestCase$CaptureProcessor"/>
 
     <flow name="someParameter" initialState="stopped">
-        <some:some-emitting-source message="salute" times="1">
+        <some:another-emitting-source>
             <some:some-parameter-group someParameter="hello dog!"/>
-        </some:some-emitting-source>
+        </some:another-emitting-source>
         <flow-ref name="capture"/>
     </flow>
 
     <flow name="complexParameter" initialState="stopped">
-        <some:some-emitting-source message="salute" times="1">
+        <some:another-emitting-source>
             <some:some-parameter-group>
                 <some:complex-parameter anotherParameter="hello bird!"/>
             </some:some-parameter-group>
-        </some:some-emitting-source>
+        </some:another-emitting-source>
         <flow-ref name="capture"/>
     </flow>
 

@@ -53,14 +53,14 @@ public class SourceWithParameterGroupExclusiveOptionalsOneRequiredTestCase exten
   public void testWithSimpleParameter() throws Exception {
     startFlow("someParameter");
     assertEventsFired();
-    assertThat(EVENTS.get(0).getMessage().getAttributes().getValue(), is("hello dog!"));
+    assertThat(EVENTS.get(0).getMessage().getPayload().getValue(), is("hello dog!"));
   }
 
   @Test
   public void testWithComplexParameter() throws Exception {
     startFlow("complexParameter");
     assertEventsFired();
-    assertThat(((ComplexParameter) EVENTS.get(0).getMessage().getAttributes().getValue()).getAnotherParameter(),
+    assertThat(((ComplexParameter) EVENTS.get(0).getMessage().getPayload().getValue()).getAnotherParameter(),
                is("hello bird!"));
   }
 
