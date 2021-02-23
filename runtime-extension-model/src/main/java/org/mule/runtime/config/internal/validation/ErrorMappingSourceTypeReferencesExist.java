@@ -11,13 +11,11 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.List;
@@ -46,21 +44,12 @@ public class ErrorMappingSourceTypeReferencesExist extends AbstractErrorTypesVal
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(comp -> {
-      final ComponentParameterAst errorMappingsAst = comp.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
-      if (errorMappingsAst == null) {
-        return false;
-      }
-      return errorMappingsAst != null && !((List<ErrorMapping>) errorMappingsAst.getValue().getRight()).isEmpty();
-    });
+    return currentElemement(AbstractErrorTypesValidation::errorMappingPresent);
   }
 
   @Override
   public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
-    List<ErrorMapping> errorMappings =
-        (List<ErrorMapping>) component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME).getValue().getRight();
-
-    for (ErrorMapping errorMapping : errorMappings) {
+    for (ErrorMapping errorMapping : getErrorMappings(component)) {
       final ComponentIdentifier errorTypeId = parserErrorType(errorMapping.getSource());
 
       final Optional<ErrorType> errorType = artifact.getErrorTypeRepository().lookupErrorType(errorTypeId);

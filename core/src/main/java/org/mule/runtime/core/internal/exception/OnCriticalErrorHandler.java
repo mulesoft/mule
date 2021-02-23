@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.message.Error;

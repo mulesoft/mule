@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -14,8 +15,11 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.extension.api.error.ErrorMapping;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -38,6 +42,18 @@ public abstract class AbstractErrorTypesValidation implements Validation {
       builder().namespace(CORE_PREFIX).name(ON_ERROR_PROPAGATE).build();
   protected static final ComponentIdentifier ON_ERROR_CONTINUE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
+
+  protected static boolean errorMappingPresent(ComponentAst operationComponent) {
+    final ComponentParameterAst errorMappingsAst = operationComponent.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
+    if (errorMappingsAst == null) {
+      return false;
+    }
+    return errorMappingsAst != null && !((List<ErrorMapping>) errorMappingsAst.getValue().getRight()).isEmpty();
+  }
+
+  protected static List<ErrorMapping> getErrorMappings(ComponentAst component) {
+    return (List<ErrorMapping>) component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME).getValue().getRight();
+  }
 
   protected static Optional<ErrorType> lookup(ComponentAst component, String errorTypeParamName, ArtifactAst artifact) {
     return artifact.getErrorTypeRepository()

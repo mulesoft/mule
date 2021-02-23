@@ -17,7 +17,8 @@ import org.mule.runtime.api.message.ErrorType;
 import java.util.Objects;
 
 /**
- * @deprecated Keeping this because the package it belongs to is exported.
+ * @deprecated Keeping this because the package it belongs to is exported. Use
+ *             {@link org.mule.runtime.ast.internal.error.ErrorTypeBuilder} instead.
  */
 @Deprecated
 public class ErrorTypeBuilder {

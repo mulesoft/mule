@@ -22,7 +22,7 @@ import org.junit.Test;
 public class MuleCoreErrorTypeRepositoryTestCase {
 
   @Test
-  public void lookupsAvailableErrorType() {
+  public void lookupAvailableErrorType() {
     Optional<ErrorType> errorType = MULE_CORE_ERROR_TYPE_REPOSITORY.lookupErrorType(CONNECTIVITY);
     assertThat(errorType.isPresent(), is(true));
     assertThat(errorType.get().getIdentifier(), is(CONNECTIVITY.getName()));

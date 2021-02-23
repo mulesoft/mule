@@ -25,8 +25,6 @@ import static org.mule.runtime.internal.exception.SuppressedMuleException.suppre
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
@@ -35,9 +33,8 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.config.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.internal.exception.SuppressedMuleException;
@@ -49,6 +46,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 
 @SmallTest
 @Feature(ERROR_HANDLING)
