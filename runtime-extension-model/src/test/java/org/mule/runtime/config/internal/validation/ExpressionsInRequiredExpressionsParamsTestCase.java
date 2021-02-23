@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
-
 import org.junit.Test;
 import org.mule.runtime.ast.api.validation.Validation;
 
 import java.util.Optional;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
 
 public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCoreValidationTestCase {
 
@@ -29,12 +29,15 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xsi:schemaLocation=\"\n" +
         "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n" +
+        "    <flow name=\"flow\">\n" +
+        "        <foreach collection=\"1, 2, 3\">\n" +
+        "            <logger message=\"hello\"/>\n" +
+        "        </foreach>\n" +
+        "    </flow>\n" +
         "\n" +
-        "<configuration correlationIdGeneratorExpression=\"(uuid() splitBy('-'))[2] ++ '*doge'\"/>\n" +
         "</mule>");
 
     assertThat(msg.isPresent(), is(true));
-    assertThat(msg.get(),
-               containsString("A static value was given for parameter 'correlationIdGeneratorExpression' but it requires a expression"));
+    assertThat(msg.get(), containsString("A static value was given for parameter 'collection' but it requires a expression"));
   }
 }
