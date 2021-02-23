@@ -33,27 +33,13 @@ public class ExpressionCorrelationIdGenerator implements CorrelationIdGenerator 
 
   @Override
   public String generateCorrelationId() {
-    try (ExpressionLanguageSession session = getManager().openSession(NULL_BINDING_CONTEXT)) {
-      return session.evaluate(getCompiledExpression()).getValue().toString();
+    try (ExpressionLanguageSession session = manager.openSession(NULL_BINDING_CONTEXT)) {
+      return session.evaluate(compiledExpression).getValue().toString();
     }
-  }
-
-  private ExpressionManager getManager() {
-    if (manager == null) {
-      manager = context.getExpressionManager();
-    }
-    return manager;
-  }
-
-  private CompiledExpression getCompiledExpression() {
-    if (compiledExpression == null) {
-      compiledExpression = getManager().compile(expression, NULL_BINDING_CONTEXT);
-    }
-    return compiledExpression;
   }
 
   private void validateExpression() {
-    if (!getManager().isExpression(expression) || !getManager().isValid(expression)) {
+    if (!manager.isExpression(expression) || !manager.isValid(expression)) {
       throw new ExpressionCompilationException(createStaticMessage(format("Invalid Correlation ID Generation expression: %s",
                                                                           expression)));
     }
@@ -62,7 +48,7 @@ public class ExpressionCorrelationIdGenerator implements CorrelationIdGenerator 
   // TODO (MULE-19231): remove this from here (won't be more necessary)
   public void initializeGenerator() {
     manager = context.getExpressionManager();
-    compiledExpression = getManager().compile(expression, NULL_BINDING_CONTEXT);
+    compiledExpression = manager.compile(expression, NULL_BINDING_CONTEXT);
     validateExpression();
   }
 
