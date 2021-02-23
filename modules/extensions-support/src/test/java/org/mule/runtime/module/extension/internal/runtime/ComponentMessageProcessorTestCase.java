@@ -26,13 +26,6 @@ import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolic
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -52,6 +45,14 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,12 +89,12 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     mockPolicyManager = mock(PolicyManager.class);
     when(mockPolicyManager.createOperationPolicy(any(), any(), any())).thenReturn(noPolicyOperation());
 
-    processor = new TestComponentMessageProcessor(extensionModel,
-                                                  componentModel, null, null, null,
-                                                  resolverSet, null, null, null,
-                                                  extensionManager,
-                                                  mockPolicyManager, null, null,
-                                                  muleContext.getConfiguration().getShutdownTimeout()) {
+    processor = new ComponentMessageProcessor<ComponentModel>(extensionModel,
+                                                              componentModel, null, null, null,
+                                                              resolverSet, null, null, null,
+                                                              extensionManager,
+                                                              mockPolicyManager, null, null,
+                                                              muleContext.getConfiguration().getShutdownTimeout()) {
 
       @Override
       protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {}
@@ -174,5 +175,4 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
       }
     });
   }
-
 }

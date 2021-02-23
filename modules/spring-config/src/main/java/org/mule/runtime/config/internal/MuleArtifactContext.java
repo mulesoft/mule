@@ -46,7 +46,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
-import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.configureHonourRetryPolicyTemplateOverrideFeature;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -105,7 +104,6 @@ import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
@@ -148,7 +146,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   static {
     configurePropertiesResolverFeatureFlag();
     configureSplitterExceptionHandlingFeature();
-    configureHonourRetryPolicyTemplateOverrideFeature();
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactContext.class);

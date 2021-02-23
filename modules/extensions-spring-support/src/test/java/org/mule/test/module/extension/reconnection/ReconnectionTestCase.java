@@ -16,20 +16,11 @@ import static org.mule.extension.test.extension.reconnection.ReconnectableConnec
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
-import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.junit.Rule;
-import org.junit.Test;
 import org.mule.extension.test.extension.reconnection.FallibleReconnectableSource;
 import org.mule.extension.test.extension.reconnection.NonReconnectableSource;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
@@ -50,14 +41,17 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-public abstract class AbstractReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-  @Rule
-  public SystemProperty muleDisableAsyncRetryPolicyOnSourcesProperty =
-      new SystemProperty(DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES, "false");
+import org.junit.Test;
+
+public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private final static long TIMEOUT = 5000;
   private final static long POLL_DELAY = 500;
@@ -155,19 +149,19 @@ public abstract class AbstractReconnectionTestCase extends AbstractExtensionFunc
   }
 
   @Test
+  public void getRetryPolicyTemplateFromConfig() throws Exception {
+    RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getReconnectionFromConfig").run()
+        .getMessage().getPayload().getValue();
+
+    assertRetryTemplate(template, false, 3, 1000);
+  }
+
+  @Test
   public void getInlineRetryPolicyTemplate() throws Exception {
     RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getInlineReconnection").run()
         .getMessage().getPayload().getValue();
 
-    assertRetryTemplate(template, true, 30, 50);
-  }
-
-  @Test
-  public void getInlineRetryPolicyBlockingTemplate() throws Exception {
-    RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getInlineReconnectionBlocking").run()
-        .getMessage().getPayload().getValue();
-
-    assertRetryTemplate(template, expectedAsyncWhenOperationBlockingRetryPolicyIsOverridden(), 30, 50);
+    assertRetryTemplate(template, false, 30, 50);
   }
 
   @Test
@@ -275,7 +269,7 @@ public abstract class AbstractReconnectionTestCase extends AbstractExtensionFunc
     check(TIMEOUT, POLL_DELAY, () -> SynchronizableConnection.disconnectionWaitedFullTimeout);
   }
 
-  protected void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
+  private void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
     assertThat(template.isAsync(), is(async));
 
     RetryPolicy policy = template.createRetryInstance();
@@ -297,8 +291,6 @@ public abstract class AbstractReconnectionTestCase extends AbstractExtensionFunc
 
     return provider.openCursor();
   }
-
-  protected abstract boolean expectedAsyncWhenOperationBlockingRetryPolicyIsOverridden();
 
   public static void resetCounters() {
     closePagingProviderCalls = 0;
