@@ -466,7 +466,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       trackArtifact(artifact);
 
       deploymentListener.onDeploymentStart(artifact.getArtifactName());
-      deployer.deploy(artifact, true);
+      deployer.deploy(artifact, shouldStartArtifact(artifact, deploymentProperties.orElse(null)));
 
       artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
       deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
@@ -491,6 +491,14 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         throw new DeploymentException(createStaticMessage("Failed to deploy artifact: " + artifact.getArtifactName()), t);
       }
     }
+  }
+
+  private boolean shouldStartArtifact(T artifact, Properties deploymentProperties) {
+    if (!(artifact instanceof Application) || deploymentProperties == null) {
+      return true;
+    }
+
+    return valueOf(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
   }
 
   private T deployOrRedeployPackagedArtifact(final URI artifactUri, String artifactName,
