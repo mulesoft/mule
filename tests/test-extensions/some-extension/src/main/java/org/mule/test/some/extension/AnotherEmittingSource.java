@@ -6,10 +6,10 @@
  */
 package org.mule.test.some.extension;
 
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.sdk.api.annotation.param.ParameterGroup;
 
 public class AnotherEmittingSource extends Source<Object, Void> {
 
