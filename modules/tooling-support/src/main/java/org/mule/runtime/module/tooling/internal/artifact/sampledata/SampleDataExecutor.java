@@ -10,13 +10,9 @@ import static com.google.common.base.Throwables.propagateIfPossible;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.sampledata.SampleDataFailure.Builder.newFailure;
 import static org.mule.runtime.api.sampledata.SampleDataResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
 
@@ -25,16 +21,13 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.data.sample.SampleDataProviderModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.sampledata.SampleDataFailure;
 import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
-import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
@@ -42,11 +35,8 @@ import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSup
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 import org.mule.sdk.api.data.sample.SampleDataException;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,8 +73,8 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
       }
       return resultFrom(withContextClassLoader(extensionClassLoader, () -> sampleDataService.getSampleData(extensionName,
                                                                                                            componentName,
-                                                                                                           parameterMapWithDefaults(componentElementDeclaration,
-                                                                                                                                    componentModel),
+                                                                                                           parametersMap(componentElementDeclaration,
+                                                                                                                         componentModel),
                                                                                                            getConfigurationInstance(componentElementDeclaration)),
                                                SampleDataException.class, e -> {
                                                  throw new ExecutorExceptionWrapper(e);
@@ -112,28 +102,6 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
       }
 
     }
-  }
-
-  private Map<String, Object> parameterMapWithDefaults(ParameterizedElementDeclaration componentElementDeclaration,
-                                                       ComponentModel componentModel) {
-    Map<String, Object> explicitParameterMaps = parametersMap(componentElementDeclaration, componentModel);
-    if (componentModel instanceof HasOutputModel) {
-      ((HasOutputModel) componentModel).getSampleDataProviderModel().ifPresent(model -> {
-        // No need to identify the acting parameter is required or not, maybe be required but DSL on component
-        // is optional with default so we need to include its default value.
-        List<String> actingParameters = model.getParameters().stream()
-            .map(actingParameterModel -> actingParameterModel.getName())
-            .collect(toList());
-        // Now we get the default values for those optional parameters from model that are marked as acting
-        // parameters
-        componentModel.getAllParameterModels().stream()
-            .filter(p -> actingParameters.contains(p.getName()))
-            .filter(p -> !explicitParameterMaps.containsKey(p.getName()))
-            .filter(p -> !p.isRequired() && p.getDefaultValue() != null)
-            .forEach(p -> explicitParameterMaps.put(p.getName(), p.getDefaultValue()));
-      });
-    }
-    return explicitParameterMaps;
   }
 
   private Supplier<Optional<ConfigurationInstance>> getConfigurationInstance(ComponentElementDeclaration componentElementDeclaration) {
