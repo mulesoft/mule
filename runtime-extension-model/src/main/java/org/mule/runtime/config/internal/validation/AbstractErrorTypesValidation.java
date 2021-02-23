@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.config.internal.validation;
 
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -55,6 +58,21 @@ public abstract class AbstractErrorTypesValidation implements Validation {
     return (List<ErrorMapping>) component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME).getValue().getRight();
   }
 
+  protected static Optional<String> validateErrorTypeId(ComponentAst component, ArtifactAst artifact, String errorTypeString,
+                                                        final ComponentIdentifier errorTypeId) {
+    final Optional<ErrorType> errorType = artifact.getErrorTypeRepository().lookupErrorType(errorTypeId);
+
+    if (!errorType.isPresent()) {
+      if (CORE_PREFIX.toUpperCase().equals(errorTypeId.getNamespace())) {
+        return of(format("There's no MULE error named '%s' in %s.", errorTypeId.getName(), compToLoc(component)));
+      } else {
+        return of(format("Could not find error '%s' used in %s", errorTypeString, compToLoc(component)));
+      }
+    }
+
+    return empty();
+  }
+
   protected static Optional<ErrorType> lookup(ComponentAst component, String errorTypeParamName, ArtifactAst artifact) {
     return artifact.getErrorTypeRepository()
         .lookupErrorType(parserErrorType(component.getParameter("type").getResolvedRawValue()));
@@ -73,6 +91,11 @@ public abstract class AbstractErrorTypesValidation implements Validation {
     }
 
     return builder().name(identifier).namespace(namespace).build();
+  }
+
+  protected static String compToLoc(ComponentAst component) {
+    return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
+        + component.getMetadata().getStartLine().orElse(-1) + "]";
   }
 
 
