@@ -72,6 +72,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -229,23 +230,27 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
           }
         });
 
-    checkParameterGroupExclusiveness(model, groups,
-                                     parameters.entrySet().stream()
-                                         .flatMap(entry -> {
-                                           if (entry.getValue() instanceof ParameterValueResolver) {
-                                             try {
-                                               return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
-                                                   .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
-                                             } catch (ValueResolvingException e) {
-                                               throw new MuleRuntimeException(e);
-                                             }
-                                           } else {
-                                             String key = entry.getKey();
-                                             aliasedParameterNames.getOrDefault(key, key);
-                                             return Stream.of(key);
-                                           }
-                                         })
-                                         .collect(toSet()));
+    Set<String> parameterValueResolvers = new HashSet<>();
+    Set<String> parameterNames = parameters.entrySet().stream()
+        .flatMap(entry -> {
+          if (entry.getValue() instanceof ParameterValueResolver) {
+            try {
+              parameterValueResolvers.add(aliasedParameterNames.getOrDefault(entry.getKey(), entry.getKey()));
+              return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
+                  .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
+            } catch (ValueResolvingException e) {
+              throw new MuleRuntimeException(e);
+            }
+          } else {
+            String key = entry.getKey();
+            aliasedParameterNames.getOrDefault(key, key);
+            return Stream.of(key);
+          }
+        })
+        .collect(toSet());
+    parameterNames.addAll(parameterValueResolvers);
+
+    checkParameterGroupExclusiveness(model, groups, parameterNames);
     return resolverSet;
   }
 
