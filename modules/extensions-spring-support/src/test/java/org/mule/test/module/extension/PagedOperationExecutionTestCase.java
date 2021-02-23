@@ -13,22 +13,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.core.Is.is;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.INVOLVED_PEOPLE;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closeEmptyOperationCalls;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closePagingProviderCalls;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.getPageCalls;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import org.mockito.Mock;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
@@ -37,17 +27,24 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.runner.RunnerDelegateTo;
 
+import java.util.Collection;
+import java.util.Iterator;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Mock;
+
 @RunnerDelegateTo(Parameterized.class)
 public class PagedOperationExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final String SAUL_NEW_NUMBER = "123-12-3";
 
-  @Parameters
-  public static List<Object[]> data() {
-    return asList(new Object[][] {{"true", "false"},
-        {"true", "true"},
-        {"false", "false"},
-        {"false", "true"}});
+  @Parameters(name = "enableStatistics: {0}")
+  public static Collection<String> data() {
+    return asList("false", "true");
   }
 
   @Rule
@@ -56,16 +53,11 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
   @Rule
   public SystemProperty withStatistics;
 
-  @Rule
-  public SystemProperty withPayloadStatistics;
-
   @Mock
   private ConnectionManager connectionManager;
 
-  public PagedOperationExecutionTestCase(String enableStatistics, String disablePayloadStatistics) {
+  public PagedOperationExecutionTestCase(String enableStatistics) {
     this.withStatistics = new SystemProperty(MULE_ENABLE_STATISTICS, enableStatistics);
-    this.withPayloadStatistics =
-        new SystemProperty(MULE_DISABLE_PAYLOAD_STATISTICS, disablePayloadStatistics);
   }
 
   @Override

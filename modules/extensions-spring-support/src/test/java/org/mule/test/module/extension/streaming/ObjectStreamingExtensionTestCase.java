@@ -18,7 +18,6 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingSto
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -54,9 +53,6 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   // This test asserts internals that are modified when statistics are enabled
   @Rule
   public SystemProperty withStatistics = new SystemProperty(MULE_DISABLE_PAYLOAD_STATISTICS, "true");
-
-  @Rule
-  public SystemProperty withPayloadStatistics = new SystemProperty(MULE_DISABLE_PAYLOAD_STATISTICS, "false");
 
   @Override
   protected void doSetUp() throws Exception {
