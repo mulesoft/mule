@@ -19,7 +19,6 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERR
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -119,7 +118,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     // nothing to do
   }
 
-  protected void fireNotification(Exception ex, CoreEvent event, ComponentLocation componentLocation) {
+  protected void fireNotification(Exception ex, CoreEvent event) {
     if (enableNotifications) {
       if (ex.getCause() != null && getCause(ex) instanceof SecurityException) {
         fireNotification(new SecurityNotification((SecurityException) getCause(ex), SECURITY_AUTHENTICATION_FAILED));
@@ -128,14 +127,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         if (ex instanceof MessagingException) {
           component = ((MessagingException) ex).getFailingComponent();
         }
-        fireNotification(new ExceptionNotification(createInfo(event, ex, component),
-                                                   componentLocation != null ? componentLocation : getLocation()));
+        fireNotification(new ExceptionNotification(createInfo(event, ex, component), getLocation()));
       }
     }
-  }
-
-  protected void fireNotification(Exception ex, CoreEvent event) {
-    fireNotification(ex, event, null);
   }
 
   private Throwable getCause(Exception ex) {

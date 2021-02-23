@@ -35,7 +35,6 @@ import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
@@ -109,7 +108,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
     disposeIfNeeded(context.getExceptionListener(), LOGGER);
     context.setExceptionListener(mockSystemExceptionHandler);
     context.handleException(mockMessagingException);
-    verify(mockSystemExceptionHandler, times(1)).handleException(mockMessagingException, (RollbackSourceCallback) null);
+    verify(mockSystemExceptionHandler, times(1)).handleException(mockMessagingException, null);
   }
 
   @Test

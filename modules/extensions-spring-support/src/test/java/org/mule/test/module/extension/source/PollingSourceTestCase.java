@@ -185,7 +185,6 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(notifications.get(0).getInfo().getException(), instanceOf(RuntimeException.class));
       assertThat(notifications.get(0).getInfo().getException().getCause(), instanceOf(ConnectionException.class));
       assertThat(notifications.get(0).getInfo().getException().getCause().getMessage(), is("A tiger cannot be petted."));
-      assertThat(notifications.get(0).getResourceIdentifier(), is("pet-tiger"));
     } finally {
       notificationListenerRegistry.unregisterListener(listener);
     }
@@ -208,7 +207,6 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(notifications.get(0).getInfo().getException(), notNullValue());
       assertThat(notifications.get(0).getInfo().getException(), instanceOf(RuntimeException.class));
       assertThat(notifications.get(0).getInfo().getException().getMessage(), is("Why do you want to pet a whale?"));
-      assertThat(notifications.get(0).getResourceIdentifier(), is("pet-whale"));
     } finally {
       notificationListenerRegistry.unregisterListener(listener);
     }
@@ -231,7 +229,6 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(notifications.get(0).getInfo().getException(), notNullValue());
       assertThat(notifications.get(0).getInfo().getException(), instanceOf(ConnectionException.class));
       assertThat(notifications.get(0).getInfo().getException().getMessage(), is("Dinosaurs no longer exist."));
-      assertThat(notifications.get(0).getResourceIdentifier(), is("pet-dinosaur"));
     } finally {
       notificationListenerRegistry.unregisterListener(listener);
     }
