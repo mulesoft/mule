@@ -8,6 +8,7 @@ package org.mule.module.launcher;
 
 import static com.google.common.base.Optional.absent;
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static org.mule.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.module.launcher.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
@@ -49,7 +50,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
                 throw ((DeploymentException) t);
             }
 
-            final String msg = String.format("Failed to undeployArtifact artifact [%s]", artifact.getArtifactName());
+            final String msg = format("Failed to undeployArtifact artifact [%s]", artifact.getArtifactName());
             throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
         }
     }
@@ -62,7 +63,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         }
         catch (Throwable t)
         {
-            logger.error(String.format("Unable to cleanly dispose artifact '%s'. Restart Mule if you get errors redeploying this artifact", artifact.getArtifactName()), t);
+            logger.error(format("Unable to cleanly dispose artifact '%s'. Restart Mule if you get errors redeploying this artifact", artifact.getArtifactName()), t);
         }
     }
 
@@ -76,7 +77,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         }
         catch (Throwable t)
         {
-            logger.error(String.format("Unable to cleanly stop artifact '%s'. Restart Mule if you get errors redeploying this artifact", artifact.getArtifactName()), t);
+            logger.error(format("Unable to cleanly stop artifact '%s'. Restart Mule if you get errors redeploying this artifact", artifact.getArtifactName()), t);
         }
     }
 
@@ -109,7 +110,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
                 throw ((DeploymentException) t);
             }
 
-            final String msg = String.format("Failed to deploy artifact [%s]", artifact.getArtifactName());
+            final String msg = format("Failed to deploy artifact [%s]", artifact.getArtifactName());
             throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
         }
     }
@@ -130,8 +131,8 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         }
         catch (IOException e)
         {
-            logger.error("Failed to load deployment property for artifact "
-                + artifact.getArtifactName(), e);
+            logger.error(format("Failed to load deployment property for artifact %s",
+                artifact.getArtifactName()), e);
         }
         return deploymentProperties != null
             && parseBoolean(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
