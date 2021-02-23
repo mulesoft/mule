@@ -21,7 +21,6 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -150,7 +149,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     configurePropertiesResolverFeatureFlag();
     configureSplitterExceptionHandlingFeature();
     configureHonourRetryPolicyTemplateOverrideFeature();
-    configureBatchFixedAggregatorTransactionRecordBuffer();
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactContext.class);
@@ -836,12 +834,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     ffRegistry.registerFeature(HANDLE_SPLITTER_EXCEPTION,
                                ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
                                    && ctx.getConfiguration().getMinMuleVersion().get().atLeast("4.4.0"));
-  }
-
-  private static void configureBatchFixedAggregatorTransactionRecordBuffer() {
-    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
-
-    ffRegistry.registerFeature(BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER, ctx -> false);
   }
 
 }
