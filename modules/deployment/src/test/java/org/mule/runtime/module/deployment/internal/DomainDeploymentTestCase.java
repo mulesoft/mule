@@ -32,7 +32,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
@@ -41,7 +40,6 @@ import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceL
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
@@ -1383,9 +1381,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   @Issue("MULE-19040")
   @Description("When a domain is restarted, if its apps were stopped before restart, they should not get started")
   public void redeployDomainWithStoppedAppsShouldPersistStoppedStateAndDoNotStartApps() throws Exception {
-    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
-    deploymentService.addDeploymentListener(mockDeploymentListener);
     addPackedDomainFromBuilder(dummyDomainFileBuilder);
+    File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
 
     addPackedAppFromBuilder(dummyDomainApp1FileBuilder);
 
@@ -1400,18 +1397,12 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final Application app = findApp(dummyDomainApp1FileBuilder.getId(), 1);
     app.stop();
 
-    assertStatus(dummyDomainApp1FileBuilder.getId(), STOPPED);
-
     redeployId(dummyDomainFileBuilder.getId(), null);
 
-    assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
-    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyDomainApp1FileBuilder.getId());
-    assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
-
     Properties deploymentProperties = resolveDeploymentProperties(dummyDomainApp1FileBuilder.getId(), Optional.empty());
+    assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
-
   }
 
   @Ignore("MULE-6926: flaky test")
