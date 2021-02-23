@@ -10,16 +10,17 @@ import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.ApplicationConfiguration.APPLICATION_CONFIGURATION;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
@@ -35,7 +36,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
 @SmallTest
+@Feature(DEPLOYMENT_CONFIGURATION)
+@Story(APPLICATION_CONFIGURATION)
 public class MuleConfigurationTestCase extends AbstractMuleTestCase {
 
   @Rule
@@ -58,8 +65,8 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
     muleContext = null;
   }
 
-  /** Test for MULE-3092 */
   @Test
+  @Issue("MULE-3092")
   public void testConfigureProgramatically() throws Exception {
     DefaultMuleConfiguration config = new DefaultMuleConfiguration();
     config.setDefaultEncoding("UTF-16");
@@ -85,8 +92,8 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
     verifyConfiguration();
   }
 
-  /** Test for MULE-3092 */
   @Test
+  @Issue("MULE-3092")
   public void testConfigureWithSystemProperties() throws Exception {
     setProperty(SYSTEM_PROPERTY_PREFIX + "encoding", "UTF-16");
     setProperty(SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous", "true");
@@ -129,8 +136,8 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
     clearProperty(SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
   }
 
-  /** Test for MULE-3110 */
   @Test
+  @Issue("MULE-3110")
   public void testConfigureAfterInitFails() throws Exception {
     muleContext = new DefaultMuleContextFactory()
         .createMuleContext(testServicesConfigurationBuilder, new DefaultsConfigurationBuilder());
@@ -151,18 +158,18 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
     MuleConfiguration config = muleContext.getConfiguration();
 
     // These are OK to change after init but before start
-    assertEquals("direct", config.getSystemModelType());
-    assertTrue(config.isClientMode());
+    assertThat(config.getSystemModelType(), is("direct"));
+    assertThat(config.isClientMode(), is(true));
 
     // These are not OK to change after init
-    assertFalse("UTF-16".equals(config.getDefaultEncoding()));
-    assertFalse(workingDirectory.equals(config.getWorkingDirectory()));
-    assertFalse("MY_SERVER".equals(config.getId()));
-    assertFalse("MY_DOMAIN".equals(config.getDomainId()));
+    assertThat(config.getDefaultEncoding(), not(equals("UTF-16")));
+    assertThat(config.getWorkingDirectory(), not(equals(workingDirectory)));
+    assertThat(config.getId(), not(equals("MY_SERVER")));
+    assertThat(config.getDomainId(), not(equals("MY_DOMAIN")));
   }
 
-  /** Test for MULE-3110 */
   @Test
+  @Issue("MULE-3110")
   public void testConfigureAfterStartFails() throws Exception {
     muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
                                                                     new DefaultsConfigurationBuilder());
@@ -174,22 +181,22 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
     mutableConfig.setClientMode(true);
 
     MuleConfiguration config = muleContext.getConfiguration();
-    assertFalse("direct".equals(config.getSystemModelType()));
-    assertFalse(config.isClientMode());
+    assertThat(config.getSystemModelType(), not(equals("direct")));
+    assertThat(config.isClientMode(), is(false));
   }
 
   protected void verifyConfiguration() {
     MuleConfiguration config = muleContext.getConfiguration();
-    assertEquals("UTF-16", config.getDefaultEncoding());
-    assertEquals("direct", config.getSystemModelType());
+    assertThat(config.getDefaultEncoding(), is("UTF-16"));
+    assertThat(config.getSystemModelType(), is("direct"));
     // on windows this ends up with a c:/ in it
-    assertTrue(config.getWorkingDirectory().indexOf(workingDirectory) != -1);
-    assertTrue(config.isClientMode());
-    assertEquals("MY_SERVER", config.getId());
-    assertEquals("MY_DOMAIN", config.getDomainId());
-    assertFalse(config.isCacheMessageAsBytes());
-    assertFalse(config.isEnableStreaming());
-    assertFalse(config.isAutoWrapMessageAwareTransform());
+    assertThat(config.getWorkingDirectory(), containsString(workingDirectory));
+    assertThat(config.isClientMode(), is(true));
+    assertThat(config.getId(), is("MY_SERVER"));
+    assertThat(config.getDomainId(), is("MY_DOMAIN"));
+    assertThat(config.isCacheMessageAsBytes(), is(false));
+    assertThat(config.isEnableStreaming(), is(false));
+    assertThat(config.isAutoWrapMessageAwareTransform(), is(false));
     assertThat(config.getMaxQueueTransactionFilesSizeInMegabytes(), is(500));
   }
 }
