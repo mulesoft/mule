@@ -41,7 +41,8 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
   }
 
   @Override
-  public void onStart() {
+  public void onStart()
+  {
     Properties properties = new Properties();
     properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(true));
     try
@@ -50,8 +51,8 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
     }
     catch (IOException e)
     {
-      logger.error("ArtifactStoppedDeploymentPersistenceListener failed to process notification onStart for artifact "
-          + artifactName, e);
+      logger.error("ArtifactStoppedDeploymentPersistenceListener failed to process notification onStart for artifact {}",
+          artifactName, e);
     }
   }
 
@@ -70,8 +71,8 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
     }
     catch (IOException e)
     {
-      logger.error("ArtifactStoppedDeploymentPersistenceListener failed to process notification onStop for artifact "
-          + artifactName, e);
+      logger.error("ArtifactStoppedDeploymentPersistenceListener failed to process notification onStop for artifact {}",
+          artifactName, e);
     }
   }
 

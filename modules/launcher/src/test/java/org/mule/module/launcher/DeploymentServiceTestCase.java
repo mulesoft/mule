@@ -56,7 +56,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.Registry;
 import org.mule.api.transport.Connector;
-import org.mule.common.query.expression.NullValue;
 import org.mule.config.StartupContext;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.module.launcher.application.Application;
@@ -2930,8 +2929,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         Optional<Properties> properties = absent();
         Properties deploymentProperties = resolveDeploymentProperties(dummyDomainApp1FileBuilder.getId(), properties);
         assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
-        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
         assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
     }
 
     @Test

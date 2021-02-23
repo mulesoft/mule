@@ -1282,7 +1282,8 @@ public class DefaultMuleContext implements MuleContext
         if (artifactStoppedPersistenceListener != null && state.equals(START))
         {
             artifactStoppedPersistenceListener.onStart();
-        } else if (artifactStoppedPersistenceListener != null && state.equals(STOP))
+        }
+        else if (artifactStoppedPersistenceListener != null && state.equals(STOP))
         {
             artifactStoppedPersistenceListener.onStop();
         }
