@@ -284,6 +284,8 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   }
 
   public void doNotPersist() {
-    flowStoppedPersistenceListener.doNotPersist();
+    if (flowStoppedPersistenceListener != null) {
+      flowStoppedPersistenceListener.doNotPersist();
+    }
   }
 }
