@@ -6,6 +6,7 @@
  */
 package org.mule.tck.junit4;
 
+import static org.apache.logging.log4j.LogManager.shutdown;
 import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.File;
@@ -53,6 +54,7 @@ public class TestsLogConfigurationHelper {
   public static void clearLoggingConfig() {
     LOGGING_CONFIG_CACHE.remove();
     System.clearProperty(LOG4J_CONFIGURATION_FILE);
+    shutdown();
   }
 
   private static String findLogConfigurationPath(Class<?> testClass) {
