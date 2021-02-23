@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
@@ -34,13 +33,8 @@ import java.util.function.Predicate;
  */
 public class ExpressionsInRequiredExpressionsParams implements Validation {
 
-  private static final String FLOW_REF_ELEMENT = "flow-ref";
-
   private static final String DEFAULT_EXPRESSION_PREFIX = "#[";
   private static final String DEFAULT_EXPRESSION_SUFFIX = "]";
-
-  private static final ComponentIdentifier FLOW_REF_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(FLOW_REF_ELEMENT).build();
 
   @Override
   public String getName() {
@@ -59,25 +53,19 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(component -> component.getModel(ParameterizedModel.class).isPresent())
-        // According to the extension model, flow-ref cannot be dynamic,
-        // But this check is needed to avoid breaking on legacy cases that use dynamic flow-refs.
-        .and(currentElemement(equalsIdentifier(FLOW_REF_IDENTIFIER).negate()));
+    return currentElemement(component -> component.getModel(ParameterizedModel.class).isPresent());
   }
 
   @Override
   public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
     for (ComponentParameterAst param : component.getParameters()) {
-      if (!param.getModel().isComponentId()
-          && param.getValue().isRight()
-          && param.getValue().getRight() instanceof String) {
+      if (param.getValue().isRight() && param.getValue().getRight() instanceof String) {
         final String stringValue = (String) param.getValue().getRight();
 
         if (REQUIRED.equals(param.getModel().getExpressionSupport())
-            && !param.getModel().getType().getAnnotation(LiteralTypeAnnotation.class).isPresent()
             && (!stringValue.startsWith(DEFAULT_EXPRESSION_PREFIX)
                 || !stringValue.endsWith(DEFAULT_EXPRESSION_SUFFIX))) {
-          return of(format("An expression value was not given for parameter '%s' but it requires a expression",
+          return of(format("A static value was given for parameter '%s' but it requires a expression",
                            param.getModel().getName()));
         }
       }
