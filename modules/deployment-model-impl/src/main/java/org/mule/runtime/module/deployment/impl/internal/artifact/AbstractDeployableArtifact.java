@@ -65,10 +65,8 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       return;
     }
 
-    if (getRegistry() != null) {
-      for (Flow flow : getRegistry().lookupAllByType(Flow.class)) {
-        ((DefaultFlowBuilder.DefaultFlow) flow).doNotPersist();
-      }
+    for (Flow flow : getRegistry().lookupAllByType(Flow.class)) {
+      ((DefaultFlowBuilder.DefaultFlow) flow).doNotPersist();
     }
 
     artifactContext.getMuleContext().getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);

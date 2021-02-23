@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.internal;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
-import static java.rmi.registry.LocateRegistry.getRegistry;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
@@ -76,13 +75,11 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
 
   private void addFlowStoppedListeners(T artifact) {
     appsFlowStoppedListeners.put(artifact.getArtifactName(), new ArrayList<>());
-    if (artifact.getRegistry() != null) {
-      for (Flow flow : artifact.getRegistry().lookupAllByType(Flow.class)) {
-        FlowStoppedPersistenceListener flowStoppedPersistenceListener =
-            new FlowStoppedDeploymentPersistenceListener(flow.getName(), artifact.getArtifactName());
-        ((DefaultFlowBuilder.DefaultFlow) flow).addFlowStoppedListener(flowStoppedPersistenceListener);
-        appsFlowStoppedListeners.get(artifact.getArtifactName()).add(flowStoppedPersistenceListener);
-      }
+    for (Flow flow : artifact.getRegistry().lookupAllByType(Flow.class)) {
+      FlowStoppedPersistenceListener flowStoppedPersistenceListener =
+          new FlowStoppedDeploymentPersistenceListener(flow.getName(), artifact.getArtifactName());
+      ((DefaultFlowBuilder.DefaultFlow) flow).addFlowStoppedListener(flowStoppedPersistenceListener);
+      appsFlowStoppedListeners.get(artifact.getArtifactName()).add(flowStoppedPersistenceListener);
     }
   }
 
