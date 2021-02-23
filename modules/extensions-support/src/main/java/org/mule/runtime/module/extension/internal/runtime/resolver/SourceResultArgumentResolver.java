@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.of;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.invocationError;
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.responseError;
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.success;
@@ -29,8 +29,8 @@ import java.util.Set;
  */
 public class SourceResultArgumentResolver implements ArgumentResolver<SourceResult> {
 
-  private ArgumentResolver<Error> errorArgumentResolver;
-  private ArgumentResolver<SourceCallbackContext> callbackContextArgumentResolver;
+  private final ArgumentResolver<Error> errorArgumentResolver;
+  private final ArgumentResolver<SourceCallbackContext> callbackContextArgumentResolver;
 
   private static final Set<String> GENERATE_ERRORS = of(SOURCE_RESPONSE_GENERATE,
                                                         SOURCE_ERROR_RESPONSE_GENERATE)

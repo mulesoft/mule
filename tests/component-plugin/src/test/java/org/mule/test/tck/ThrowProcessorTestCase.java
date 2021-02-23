@@ -8,15 +8,15 @@ package org.mule.test.tck;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SECURITY;
 
 import org.mule.functional.api.component.ThrowProcessor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.api.exception.TypedException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class ThrowProcessorTestCase extends AbstractMuleContextTestCase {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private ThrowProcessor throwProcessor = new ThrowProcessor();
+  private final ThrowProcessor throwProcessor = new ThrowProcessor();
 
   @Before
   public void setUp() throws MuleException {
@@ -71,7 +71,7 @@ public class ThrowProcessorTestCase extends AbstractMuleContextTestCase {
 
   private class TypedExceptionErrorMatcher extends TypeSafeMatcher<TypedException> {
 
-    private ComponentIdentifier errorIdentifier;
+    private final ComponentIdentifier errorIdentifier;
 
     public TypedExceptionErrorMatcher(ComponentIdentifier errorIdentifier) {
       this.errorIdentifier = errorIdentifier;

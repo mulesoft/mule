@@ -21,7 +21,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -38,7 +37,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
-import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
@@ -78,24 +76,16 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   @Inject
   private ExpressionManager expressionManager;
 
-  @Inject
-  private ErrorTypeRepository errorTypeRepository;
-
-  @Inject
-  private ErrorTypeLocator errorTypeLocator;
-
   private MuleContext muleContext;
   private ExtensionRegistry extensionRegistry;
   private ConfigurationExpirationMonitor configurationExpirationMonitor;
-  private ExtensionErrorsRegistrant extensionErrorsRegistrant;
 
   private ExtensionActivator extensionActivator;
 
   @Override
   public void initialise() throws InitialisationException {
     extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
-    extensionErrorsRegistrant = new ExtensionErrorsRegistrant(errorTypeRepository, errorTypeLocator);
-    extensionActivator = new ExtensionActivator(extensionErrorsRegistrant, muleContext);
+    extensionActivator = new ExtensionActivator(muleContext);
   }
 
   /**

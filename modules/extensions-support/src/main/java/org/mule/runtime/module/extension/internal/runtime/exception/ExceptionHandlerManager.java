@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 
 import org.mule.runtime.api.component.ComponentIdentifier;

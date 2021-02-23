@@ -48,6 +48,8 @@ public final class RaiseErrorProcessor extends AbstractComponent implements Proc
 
   @Override
   public void initialise() throws InitialisationException {
+    // These validations are already covered by RaiseErrorTypeReferencesPresent and RaiseErrorTypeReferencesExist
+    // So it should never reach this point since these situations must be caught eagerly by those validations
     if (isEmpty(typeId)) {
       throw new InitialisationException(createStaticMessage("type cannot be an empty string or null"), this);
     }
@@ -55,6 +57,7 @@ public final class RaiseErrorProcessor extends AbstractComponent implements Proc
     ComponentIdentifier errorTypeComponentIdentifier = buildFromStringRepresentation(typeId);
     errorType = errorTypeRepository.lookupErrorType(errorTypeComponentIdentifier)
         .orElseThrow(() -> new InitialisationException(createStaticMessage(format("Could not find error '%s'.", typeId)), this));
+
     descriptionEvaluator.initialize(expressionManager);
   }
 

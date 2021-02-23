@@ -10,11 +10,10 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.internal.dsl.DefaultDslResolvingContext;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
@@ -45,8 +44,7 @@ public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
                                                                  new DefaultDslResolvingContext(Collections.emptySet()),
                                                                  attributes);
 
-    ExtensionActivator extensionActivator = new ExtensionActivator(mock(ExtensionErrorsRegistrant.class, RETURNS_DEEP_STUBS),
-                                                                   mockMuleContext());
+    ExtensionActivator extensionActivator = new ExtensionActivator(mockMuleContext());
     extensionActivator.activateExtension(extensionModel);
     assertThat(extensionActivator.getEnumTypes().size(), is(greaterThan(0)));
 

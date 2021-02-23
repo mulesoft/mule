@@ -14,8 +14,8 @@ import static org.mule.runtime.api.exception.ExceptionHelper.sanitize;
 import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
-import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;

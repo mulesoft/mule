@@ -12,6 +12,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 
@@ -80,7 +81,8 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
                                        fromSimpleParameter(TARGET_VALUE_PARAMETER_NAME).build())
         .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
                                        fromChildConfiguration(CursorProviderFactory.class).build())
-        .withSetterParameterDefinition("errorMappings", fromChildCollectionConfiguration(EnrichedErrorMapping.class).build())
+        .withSetterParameterDefinition(ERROR_MAPPINGS_PARAMETER_NAME,
+                                       fromChildCollectionConfiguration(EnrichedErrorMapping.class).build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());
 
     Optional<? extends NestableElementModel> nestedChain = componentModel.getNestedComponents().stream()

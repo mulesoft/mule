@@ -19,7 +19,6 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
@@ -31,9 +30,7 @@ import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHier
 import static org.mule.runtime.ast.api.util.MuleAstUtils.validate;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
-import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.configurePropertiesResolverFeatureFlag;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
@@ -44,9 +41,9 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
-import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
+import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.configureHonourRetryPolicyTemplateOverrideFeature;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
@@ -61,16 +58,14 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.util.BaseArtifactAst;
 import org.mule.runtime.ast.api.validation.ValidationResult;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
@@ -79,7 +74,6 @@ import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -99,11 +93,15 @@ import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
@@ -120,6 +118,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -229,6 +228,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
 
     this.applicationModel = createApplicationModel(artifactDeclaration, artifactConfigResources, featureFlaggingService);
+    registerErrors(applicationModel);
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -290,9 +290,44 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                   return "Deployment properties";
                 }
               });
+
+          final ErrorTypeRepository parentErrorTypeRepository =
+              ((ContributedErrorTypeRepository) muleContext.getErrorTypeRepository()).getDelegate();
+
           Builder builder = AstXmlParser.builder()
               .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
-              .withExtensionModels(getExtensions());
+              // TODO MULE-19203 for policies this includes all extensions from the app as well. It should be just the ones
+              // declared in the policy, with a feature flag for getting the ones from the app as well (ref:
+              // MuleSystemProperties#SHARE_ERROR_TYPE_REPOSITORY_PROPERTY).
+              .withExtensionModels(getExtensions())
+              // TODO MULE-19204 get and pass the actual parent artifact
+              .withParentArtifact(new BaseArtifactAst() {
+
+                @Override
+                public void updatePropertiesResolver(UnaryOperator<String> newPropertiesResolver) {
+                  // nothing to do
+                }
+
+                @Override
+                public Stream<ComponentAst> topLevelComponentsStream() {
+                  return Stream.empty();
+                }
+
+                @Override
+                public ErrorTypeRepository getErrorTypeRepository() {
+                  return parentErrorTypeRepository;
+                }
+
+                @Override
+                public Set<ExtensionModel> dependencies() {
+                  return emptySet();
+                }
+
+                @Override
+                public Optional<ArtifactAst> getParent() {
+                  return empty();
+                }
+              });
           if (disableXmlValidations) {
             builder = builder.withSchemaValidationsDisabled();
           }
@@ -349,16 +384,27 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
+  protected void registerErrors(final ArtifactAst artifactAst) {
+    doRegisterErrors(artifactAst);
+  }
+
+  protected void doRegisterErrors(final ArtifactAst artifactAst) {
+    final ErrorTypeRepository errorTypeRepository = artifactAst.getErrorTypeRepository();
+    final ErrorTypeLocator errorTypeLocator = createDefaultErrorTypeLocator(errorTypeRepository);
+
+    final Set<ExtensionModel> dependencies = artifactAst.dependencies();
+    registerErrorMappings(errorTypeRepository, errorTypeLocator, dependencies);
+
+    // Because instances of the repository and locator may be already created and injected into another objects, those instances
+    // cannot just be set into the registry, and this contributing layer is needed to ensure the correct functioning of the DI
+    // mechanism.
+    ((ContributedErrorTypeRepository) muleContext.getErrorTypeRepository()).setDelegate(errorTypeRepository);
+    ((ContributedErrorTypeLocator) ((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).setDelegate(errorTypeLocator);
+  }
+
   public void initialize() {
     applicationModel.prepareAstForRuntime(getExtensions());
     validateAllConfigElementHaveParsers();
-  }
-
-  @Override
-  protected void prepareRefresh() {
-    super.prepareRefresh();
-    // As this is the only way we get this context initialized we will register the error types at this point
-    registerErrorTypes();
   }
 
   @Override
@@ -456,99 +502,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
     createApplicationComponents(beanFactory, applicationModel, true);
-  }
-
-  private void registerErrorTypes() {
-    Set<String> syntheticErrorNamespaces = new HashSet<>();
-
-    applicationModel.topLevelComponentsStream()
-        .forEach(componentModel -> resolveErrorTypes(componentModel, syntheticErrorNamespaces));
-  }
-
-  private void resolveErrorTypes(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {
-    if (componentModel.getModel(OperationModel.class)
-        .map(om -> !om.getModelProperty(OperationComponentModelModelProperty.class).isPresent())
-        .orElse(true)) {
-      componentModel.directChildrenStream()
-          .forEach(innerComponent -> {
-            processRaiseError(innerComponent, syntheticErrorNamespaces);
-            resolveErrorTypes(innerComponent, syntheticErrorNamespaces);
-          });
-    }
-
-    registerErrorMappings(componentModel, syntheticErrorNamespaces);
-  }
-
-  private void registerErrorMappings(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {
-    forEachErrorMappingDo(componentModel, mappings -> mappings
-        .forEach(mapping -> {
-          ComponentIdentifier source = buildFromStringRepresentation(mapping.getSource());
-
-          if (!muleContext.getErrorTypeRepository().lookupErrorType(source).isPresent()) {
-            throw new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source));
-          }
-
-          resolveErrorType(mapping.getTarget(), syntheticErrorNamespaces, !disableXmlValidations);
-        }));
-  }
-
-  private void processRaiseError(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {
-    if (componentModel.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
-      final ComponentParameterAst parameter = componentModel.getParameter("type");
-
-      if (parameter != null) {
-        parameter.getValue().getValue()
-            .map(r -> (String) r)
-            // We can just ignore this as we should allow an empty value here
-            .filter(representation -> !isEmpty(representation) || !disableXmlValidations)
-            .ifPresent(representation -> resolveErrorType(representation, syntheticErrorNamespaces, !disableXmlValidations));
-      }
-    }
-  }
-
-  private ErrorType resolveErrorType(String representation, Set<String> syntheticErrorNamespaces, boolean checkErrorTypes) {
-    ComponentIdentifier errorIdentifier = parserErrorType(representation);
-    String namespace = errorIdentifier.getNamespace();
-    String identifier = errorIdentifier.getName();
-    ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
-    Optional<ErrorType> optionalErrorType = errorTypeRepository.lookupErrorType(errorIdentifier);
-    if (CORE_ERROR_NS.equals(namespace)) {
-      if (checkErrorTypes) {
-        return optionalErrorType
-            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
-                                                                                   identifier))));
-      }
-      return optionalErrorType.orElse(null);
-
-    } else if (errorTypeRepository.getErrorNamespaces().contains(namespace) && !syntheticErrorNamespaces.contains(namespace)) {
-      throw new MuleRuntimeException(createStaticMessage(format("Cannot use error type '%s:%s': namespace already exists.",
-                                                                namespace, identifier)));
-    } else if (syntheticErrorNamespaces.contains(namespace)) {
-      if (optionalErrorType.isPresent()) {
-        return optionalErrorType.get();
-      }
-    } else {
-      syntheticErrorNamespaces.add(namespace);
-    }
-    if (logger.isDebugEnabled()) {
-      logger.debug(format("Registering errorType '%s'", errorIdentifier));
-    }
-    return errorTypeRepository.addErrorType(errorIdentifier, errorTypeRepository.getAnyErrorType());
-  }
-
-  private ComponentIdentifier parserErrorType(String representation) {
-    int separator = representation.indexOf(':');
-    String namespace;
-    String identifier;
-    if (separator > 0) {
-      namespace = representation.substring(0, separator).toUpperCase();
-      identifier = representation.substring(separator + 1).toUpperCase();
-    } else {
-      namespace = CORE_ERROR_NS;
-      identifier = representation.toUpperCase();
-    }
-
-    return ComponentIdentifier.builder().namespace(namespace).name(identifier).build();
   }
 
   @Override

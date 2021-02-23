@@ -111,6 +111,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setClassLoaderRepository(classLoaderRepository)
             .setArtifactPlugins(artifactPlugins)
             .setParentArtifact(application)
+            // TODO MULE-19203 This is where the extensions from the app are being added to the plugin as well.
             .setExtensionManagerFactory(new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,
                                                                                      ownArtifactPlugins,
                                                                                      new DefaultExtensionManagerFactory()))
