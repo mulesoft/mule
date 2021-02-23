@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.config;
 
-import org.mule.runtime.api.el.*;
+import org.mule.runtime.api.el.CompiledExpression;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
+import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.CorrelationIdGenerator;
 import org.mule.runtime.core.api.el.ExpressionManager;
