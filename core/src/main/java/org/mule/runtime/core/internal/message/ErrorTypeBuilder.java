@@ -8,20 +8,20 @@ package org.mule.runtime.core.internal.message;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.CRITICAL_IDENTIFIER;
 
 import org.mule.runtime.api.message.ErrorType;
 
 import java.util.Objects;
 
 /**
- * Builder for {@link ErrorType}. This must be the only mechanism to create an instance of {@code ErrorType}.
- *
- * @since 4.0
+ * @deprecated Keeping this because the package it belongs to is exported. Use
+ *             {@link org.mule.runtime.ast.internal.error.ErrorTypeBuilder} instead.
  */
-public final class ErrorTypeBuilder {
+@Deprecated
+public class ErrorTypeBuilder {
 
   private String identifier;
   private String namespace;

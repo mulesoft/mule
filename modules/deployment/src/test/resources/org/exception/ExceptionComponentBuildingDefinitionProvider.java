@@ -12,7 +12,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import org.mule.functional.api.component.ThrowProcessor;
 import org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository;
-import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
+import org.mule.runtime.config.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 

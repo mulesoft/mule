@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
@@ -34,7 +35,6 @@ import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
@@ -45,12 +45,15 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -202,15 +205,19 @@ public class MuleContextUtils {
   public static MuleContextWithRegistry mockContextWithServices() {
     final MuleContextWithRegistry muleContext = mockMuleContext();
 
+    final ExtensionManager extensionManager = mock(ExtensionManager.class, withSettings().lenient());
+    when(extensionManager.getExtensions()).thenReturn(emptySet());
+    when(muleContext.getExtensionManager()).thenReturn(extensionManager);
+
     SchedulerService schedulerService = spy(new SimpleUnitTestSupportSchedulerService());
 
     when(muleContext.getSchedulerService()).thenReturn(schedulerService);
 
-    ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class, withSettings().lenient());
+    ContributedErrorTypeRepository errorTypeRepository = new ContributedErrorTypeRepository();
+    errorTypeRepository.setDelegate(MULE_CORE_ERROR_TYPE_REPOSITORY);
     when(muleContext.getErrorTypeRepository()).thenReturn(errorTypeRepository);
-    when(errorTypeRepository.getErrorType(any(ComponentIdentifier.class))).thenReturn(of(mock(ErrorType.class)));
 
-    ErrorTypeLocator typeLocator = mock(ErrorTypeLocator.class);
+    ErrorTypeLocator typeLocator = new ContributedErrorTypeLocator();
     when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(typeLocator);
 
     final MuleRegistry registry = muleContext.getRegistry();

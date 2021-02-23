@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;

@@ -14,13 +14,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.EXTENSION;
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.OPERATION;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;

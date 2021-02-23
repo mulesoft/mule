@@ -17,18 +17,17 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import io.qameta.allure.Issue;
-import org.junit.Test;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
@@ -42,9 +41,12 @@ import java.util.Optional;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import io.qameta.allure.Issue;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTestCase {
@@ -127,13 +129,19 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
     when(errorWithSuppression.getErrorType()).thenReturn(unsuppressedErrorType);
     when(suppressedError.getErrorType()).thenReturn(suppressedErrorType);
     when(event.getError()).thenReturn(Optional.of(errorWithSuppression));
-    when(muleContext.getErrorTypeRepository()
+
+    final ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
+    ((ContributedErrorTypeRepository) muleContext.getErrorTypeRepository()).setDelegate(errorTypeRepository);
+
+    when(errorTypeRepository
         .lookupErrorType(ComponentIdentifier.buildFromStringRepresentation("MULE:SUPPRESSED")))
             .thenReturn(Optional.of(suppressedErrorType));
-    when(muleContext.getErrorTypeRepository()
+    when(errorTypeRepository
         .lookupErrorType(ComponentIdentifier.buildFromStringRepresentation("MULE:UNSUPPRESSED")))
             .thenReturn(Optional.of(unsuppressedErrorType));
-    when(muleContext.getErrorTypeRepository().getSourceResponseErrorType()).thenReturn(sourceResponseErrorType);
+    when(errorTypeRepository
+        .getSourceResponseErrorType()).thenReturn(sourceResponseErrorType);
+
     return event;
   }
 }

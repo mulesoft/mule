@@ -226,6 +226,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   @Override
+  protected void registerErrors(ArtifactAst artifactAst) {
+    // Nothing to do, errorType repository is done after calculating the minimal artifact in #createComponents
+  }
+
+  @Override
   protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     super.prepareBeanFactory(beanFactory);
     trackingPostProcessor = new TrackingPostProcessor();
@@ -349,8 +354,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     return withContextClassLoader(getMuleContext().getExecutionClassLoader(), () -> {
       // User input components to be initialized...
       final Predicate<ComponentAst> basePredicate =
-          predicateOptional.orElseGet(() -> comp -> comp.getLocation() != null &&
-              comp.getLocation().getLocation().equals(locationOptional.get().toString()));
+          predicateOptional.orElseGet(() -> comp -> comp.getLocation() != null
+              && comp.getLocation().getLocation().equals(locationOptional.get().toString()));
 
       final ArtifactAst minimalApplicationModel = buildMinimalApplicationModel(basePredicate);
       doValidateModel(minimalApplicationModel);
@@ -399,6 +404,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       trackingPostProcessor.reset();
       objectProviders.clear();
       resetMuleSecurityManager();
+
+      // This has to be called after all previous state has been cleared because the unregister/cleanup process requires the
+      // errorTypeRespository as it was during its initialization.
+      doRegisterErrors(minimalApplicationModel);
 
       List<Pair<String, ComponentAst>> applicationComponents =
           createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);

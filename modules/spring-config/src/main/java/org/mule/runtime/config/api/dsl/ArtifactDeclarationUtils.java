@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 
@@ -45,7 +46,7 @@ public final class ArtifactDeclarationUtils {
    */
   public static ArtifactAst toArtifactast(ArtifactDeclaration artifactDeclaration, Set<ExtensionModel> extensionModels) {
     final ArtifactAstBuilder astBuilder =
-        ArtifactAstBuilder.builder(extensionModels);
+        ArtifactAstBuilder.builder(extensionModels, empty());
 
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration, astBuilder);
     return astBuilder.build();

@@ -16,15 +16,14 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.getCoreErrorTypeRepo;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.runtime.exception.TestError.CHILD;
 import static org.mule.runtime.module.extension.internal.runtime.exception.TestError.PARENT;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
-import org.junit.Ignore;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -34,6 +33,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.ast.internal.error.DefaultErrorTypeRepository;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.exception.ModuleException;
@@ -44,14 +44,15 @@ import org.mule.tck.size.SmallTest;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -68,7 +69,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   @Mock
   CoreEvent event;
 
-  private ErrorTypeRepository typeRepository = createDefaultErrorTypeRepository();
+  private final ErrorTypeRepository typeRepository = new DefaultErrorTypeRepository();
 
   @Before
   public void setUp() {
@@ -80,7 +81,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void handleThrowingOfNotDeclaredErrorType() {
     typeRepository.addErrorType(buildFromStringRepresentation(ERROR_NAMESPACE + ":" + CONNECTIVITY_ERROR_IDENTIFIER),
-                                typeRepository.getAnyErrorType());
+                                getCoreErrorTypeRepo().getAnyErrorType());
     when(operationModel.getErrorModels())
         .thenReturn(singleton(newError(TRANSFORMATION_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
@@ -101,7 +102,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
     ErrorModel child = newError(CHILD.getType(), ERROR_NAMESPACE).withParent(parent).build();
     errors.add(parent);
 
-    ErrorType parentErrorType = typeRepository.addErrorType(getIdentifier(parent), typeRepository.getAnyErrorType());
+    ErrorType parentErrorType = typeRepository.addErrorType(getIdentifier(parent), getCoreErrorTypeRepo().getAnyErrorType());
     typeRepository.addErrorType(getIdentifier(child), parentErrorType);
 
     when(operationModel.getErrorModels()).thenReturn(errors);
@@ -137,7 +138,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
         .name(CONNECTIVITY_ERROR_IDENTIFIER)
         .namespace(ERROR_NAMESPACE)
         .build(),
-                                typeRepository.getAnyErrorType());
+                                getCoreErrorTypeRepo().getAnyErrorType());
 
     ModuleException moduleException =
         new ModuleException(CONNECTIVITY, new RuntimeException());
@@ -160,7 +161,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
         .name(CONNECTIVITY_ERROR_IDENTIFIER)
         .namespace(ERROR_NAMESPACE)
         .build(),
-                                typeRepository.getAnyErrorType());
+                                getCoreErrorTypeRepo().getAnyErrorType());
 
     ModuleException moduleException =
         new ModuleException(CONNECTIVITY, new RuntimeException(new MessagingException(

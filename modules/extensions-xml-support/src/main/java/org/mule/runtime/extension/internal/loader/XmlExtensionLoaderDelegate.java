@@ -32,7 +32,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENT
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;

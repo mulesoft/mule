@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.factories;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
@@ -151,6 +150,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     // Mule context mocking
     mockMuleContext = mockContextWithServices();
     mockMuleContext.getInjector().inject(this);
+
     when(locator.find(any(Location.class))).thenReturn(of(mock(Flow.class)));
     when(locator.find(Location.builder().globalName("flow").build())).thenReturn(of(callerFlow));
     // Main flow mocking
