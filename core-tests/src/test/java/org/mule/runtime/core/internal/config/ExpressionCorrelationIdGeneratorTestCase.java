@@ -36,9 +36,9 @@ public class ExpressionCorrelationIdGeneratorTestCase extends AbstractMuleContex
 
   @Test
   public void staticEvaluation() {
-    CorrelationIdGenerator generator = new ExpressionCorrelationIdGenerator(muleContext, "'test'");
+    ExpressionCorrelationIdGenerator generator = new ExpressionCorrelationIdGenerator(muleContext, "'test'");
     exception.expect(ExpressionCompilationException.class);
-    generator.validateGenerator();
+    generator.initializeGenerator();
   }
 
   @Test

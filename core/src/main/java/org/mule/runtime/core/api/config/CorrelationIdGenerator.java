@@ -18,9 +18,4 @@ public interface CorrelationIdGenerator {
    */
   String generateCorrelationId();
 
-  /**
-   * Fails if generator is has invalid arguments
-   */
-  void validateGenerator();
-
 }

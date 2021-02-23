@@ -50,11 +50,18 @@ public class ExpressionCorrelationIdGenerator implements CorrelationIdGenerator 
     return compiledExpression;
   }
 
-  @Override
-  public void validateGenerator() {
+  private void validateExpression() {
     if (!getManager().isExpression(expression) || !getManager().isValid(expression)) {
       throw new ExpressionCompilationException(createStaticMessage(format("Invalid Correlation ID Generation expression: %s",
                                                                           expression)));
     }
   }
+
+  // TODO (MULE-19231): remove this from here (won't be more necessary)
+  public void initializeGenerator() {
+    manager = context.getExpressionManager();
+    compiledExpression = getManager().compile(expression, NULL_BINDING_CONTEXT);
+    validateExpression();
+  }
+
 }

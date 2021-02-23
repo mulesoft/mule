@@ -121,8 +121,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   }
 
   public void setCorrelationIdGeneratorExpression(String correlationIdGeneratorExpression) {
-    config.setDefaultCorrelationIdGeneratorExpression(new ExpressionCorrelationIdGenerator(muleContext,
-                                                                                           correlationIdGeneratorExpression));
+    config.setDefaultCorrelationIdGenerator(new ExpressionCorrelationIdGenerator(muleContext, correlationIdGeneratorExpression));
   }
 
   public void setExtensions(List<ConfigurationExtension> extensions) {
@@ -145,8 +144,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
       defaultConfig.setDynamicConfigExpiration(resolveDynamicConfigExpiration());
       defaultConfig.setInheritIterableRepeatability(config.isInheritIterableRepeatability());
-      config.getDefaultCorrelationIdGenerator()
-          .ifPresent(generator -> defaultConfig.setDefaultCorrelationIdGeneratorExpression(generator));
+      config.getDefaultCorrelationIdGenerator().ifPresent(generator -> defaultConfig.setDefaultCorrelationIdGenerator(generator));
       applyDefaultIfNoObjectSerializerSet(defaultConfig);
 
       return configuration;

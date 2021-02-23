@@ -714,7 +714,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     return correlationIdGenerationExpression;
   }
 
-  public void setDefaultCorrelationIdGeneratorExpression(CorrelationIdGenerator generator) {
+  public void setDefaultCorrelationIdGenerator(CorrelationIdGenerator generator) {
     this.correlationIdGenerationExpression = of(generator);
   }
 
