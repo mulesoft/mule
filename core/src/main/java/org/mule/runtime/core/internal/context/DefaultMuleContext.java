@@ -42,6 +42,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
@@ -590,6 +591,10 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
    */
   @Override
   public SecurityManager getSecurityManager() {
+    if (config.isLazyInit()) {
+      return fetchSecurityManager();
+    }
+
     if (securityManager == null) {
       this.securityManager = fetchSecurityManager();
     }
