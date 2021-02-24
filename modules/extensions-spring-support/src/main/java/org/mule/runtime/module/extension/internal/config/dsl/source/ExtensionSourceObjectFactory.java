@@ -12,7 +12,6 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.api.util.ClassUtils.memoize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.PRIMARY_NODE_ONLY_PARAMETER_NAME;
@@ -23,12 +22,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -89,26 +87,9 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   @Override
   public ExtensionMessageSource doGetObject() {
     return withContextClassLoader(getClassLoader(extensionModel), () -> {
-      Set<String> parameterValueResolvers = new HashSet<>();
-      Set<String> parameterNames = parameters.entrySet().stream()
-          .flatMap(entry -> {
-            if (entry.getValue() instanceof ParameterValueResolver) {
-              try {
-                parameterValueResolvers.add(entry.getKey());
-                return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
-                    .stream();
-              } catch (ValueResolvingException e) {
-                throw new MuleRuntimeException(e);
-              }
-            } else {
-              return Stream.of(entry.getKey());
-            }
-          })
-          .collect(toSet());
-      parameterNames.addAll(parameterValueResolvers);
       getParametersResolver().checkParameterGroupExclusiveness(Optional.of(sourceModel),
                                                                sourceModel.getParameterGroupModels(),
-                                                               parameterNames);
+                                                               parameters, new SmallMap<>());
       ResolverSet nonCallbackParameters = getNonCallbackParameters();
 
       if (hasDynamicNonCallbackParameters(nonCallbackParameters)) {
