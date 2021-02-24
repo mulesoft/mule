@@ -4,6 +4,14 @@
       "ignore": [
          {
           "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate::computeStats()",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "AbstractPolicyTemplate",
+          "methodName": "computeStats",
+          "elementKind": "method",
+          "justification": "Feature to compute connection errors"
+         },         {
+          "code": "java.method.added",
           "new": "method void org.mule.runtime.core.api.management.stats.AllStatistics::configureComputeConnectionErrorsInStats()",
           "package": "org.mule.runtime.core.api.management.stats",
           "classSimpleName": "AllStatistics",

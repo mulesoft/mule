@@ -67,11 +67,7 @@ public abstract class AbstractPolicyTemplate extends AbstractComponent implement
         } catch (Exception e) {
           cause = e;
 
-          AllStatistics statistics = muleContext.getStatistics();
-
-          if (statistics != null && statistics.isEnabled() && computeConnectionErrorsInStats()) {
-            statistics.getApplicationStatistics().incConnectionErrors();
-          }
+          computeStats();
 
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Error executing policy", cause);
@@ -100,6 +96,14 @@ public abstract class AbstractPolicyTemplate extends AbstractComponent implement
           LOGGER.debug("Error executing policy", status.getThrowable());
         }
       }
+    }
+  }
+
+  protected void computeStats() {
+    AllStatistics statistics = muleContext.getStatistics();
+
+    if (statistics != null && statistics.isEnabled() && computeConnectionErrorsInStats()) {
+      statistics.getApplicationStatistics().incConnectionErrors();
     }
   }
 
