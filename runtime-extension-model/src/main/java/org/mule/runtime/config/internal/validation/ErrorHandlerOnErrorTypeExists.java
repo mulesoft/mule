@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -51,17 +52,21 @@ public class ErrorHandlerOnErrorTypeExists extends AbstractErrorTypesValidation 
 
   @Override
   public Optional<String> validate(ComponentAst onErrorModel, ArtifactAst artifact) {
-    final Optional<ErrorType> errorType = lookup(onErrorModel, "type", artifact);
-    if (!errorType.isPresent()) {
-      return of(format("Could not find error '%s' used in %s", errorType, compToLoc(onErrorModel)));
+    for (String type : onErrorModel.getParameter("type").getResolvedRawValue().split(",")) {
+      final ComponentIdentifier parsedErrorType = parserErrorType(type.trim());
+
+      if ("*".equals(parsedErrorType.getNamespace()) || "*".equals(parsedErrorType.getName())) {
+        // skip validation for matchers with wildcards
+        return empty();
+      }
+
+      final Optional<ErrorType> errorType = artifact.getErrorTypeRepository().lookupErrorType(parsedErrorType);
+      if (!errorType.isPresent()) {
+        return of(format("Could not find error '%s' used in %s", type.trim(), compToLoc(onErrorModel)));
+      }
     }
 
     return empty();
-  }
-
-  private String compToLoc(ComponentAst component) {
-    return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
-        + component.getMetadata().getStartLine().orElse(-1) + "]";
   }
 
 }

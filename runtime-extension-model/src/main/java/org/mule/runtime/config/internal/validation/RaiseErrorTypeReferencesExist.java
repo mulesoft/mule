@@ -13,10 +13,8 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 
@@ -24,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Referenced error types do exist in the context of the artifact
@@ -49,7 +49,7 @@ public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation 
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(equalsIdentifier(RAISE_ERROR_IDENTIFIER)
         // there is already another validation for the presence of this param
-        .and(component -> component.getParameter("type").getResolvedRawValue() != null));
+        .and(component -> !StringUtils.isEmpty(component.getParameter("type").getResolvedRawValue())));
   }
 
   @Override
@@ -63,17 +63,7 @@ public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation 
     final ComponentIdentifier errorTypeId = parserErrorType(errorTypeString);
 
     if (errorNamespaces.contains(errorTypeId.getNamespace())) {
-      final Optional<ErrorType> errorType = artifact.getErrorTypeRepository().lookupErrorType(errorTypeId);
-
-      if (errorType.isPresent()) {
-        return empty();
-      }
-
-      if (CORE_PREFIX.toUpperCase().equals(errorTypeId.getNamespace())) {
-        return of(format("There's no MULE error named '%s' in %s.", errorTypeId.getName(), compToLoc(component)));
-      } else {
-        return of(format("Could not find error '%s' used in %s", errorTypeString, compToLoc(component)));
-      }
+      return validateErrorTypeId(component, artifact, errorTypeString, errorTypeId);
     } else if (artifact.getParent()
         .map(p -> p.getErrorTypeRepository().getErrorNamespaces().contains(errorTypeId.getNamespace()))
         .orElse(false)) {
@@ -82,11 +72,6 @@ public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation 
     }
 
     return empty();
-  }
-
-  private String compToLoc(ComponentAst component) {
-    return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
-        + component.getMetadata().getStartLine().orElse(-1) + "]";
   }
 
 }
