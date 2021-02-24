@@ -7,8 +7,11 @@
 package org.mule.module.launcher.domain;
 
 import static java.lang.Thread.currentThread;
+import static org.mule.DefaultMuleContext.START;
+import static org.mule.DefaultMuleContext.STOP;
 import static org.mule.util.SplashScreen.miniSplash;
 
+import org.mule.DefaultMuleContext;
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -265,6 +268,7 @@ public class DefaultMuleDomain implements Domain
                 try
                 {
                     this.muleContext.start();
+                    ((DefaultMuleContext) this.muleContext).persistArtifactState(START);
                 }
                 catch (MuleException e)
                 {
@@ -305,6 +309,7 @@ public class DefaultMuleDomain implements Domain
             if (this.muleContext != null)
             {
                 this.muleContext.stop();
+                ((DefaultMuleContext) this.muleContext).persistArtifactState(STOP);
             }
         }
         catch (Exception e)

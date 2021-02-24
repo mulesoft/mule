@@ -6,9 +6,14 @@
  */
 package org.mule.module.launcher.application;
 
+import static org.mule.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
+import static org.mule.DefaultMuleContext.START;
+import static org.mule.DefaultMuleContext.STOP;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.util.SplashScreen.miniSplash;
 
+import org.mule.ArtifactStoppedPersistenceListener;
+import org.mule.DefaultMuleContext;
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -144,6 +149,7 @@ public class DefaultMuleApplication implements Application
         try
         {
             this.muleContext.start();
+            ((DefaultMuleContext) this.muleContext).persistArtifactState(START);
 
             // null CCL ensures we log at 'system' level
             // TODO getDomainClassLoader a more usable wrapper for any logger to be logged at sys level
@@ -388,6 +394,7 @@ public class DefaultMuleApplication implements Application
             }
 
             this.muleContext.stop();
+            ((DefaultMuleContext) this.muleContext).persistArtifactState(STOP);
         }
         catch (MuleException e)
         {

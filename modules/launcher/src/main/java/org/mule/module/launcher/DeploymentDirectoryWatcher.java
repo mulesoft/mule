@@ -219,6 +219,7 @@ public class DeploymentDirectoryWatcher implements Runnable
         deploymentLock.lock();
         try
         {
+            notifyStopListeners();
             stopArtifacts(applications);
             stopArtifacts(domains);
         }
@@ -654,6 +655,18 @@ public class DeploymentDirectoryWatcher implements Runnable
                 }
             }
             return resourcesHaveSameTimestamp;
+        }
+    }
+
+    private void notifyStopListeners()
+    {
+        for (Application application : applications)
+        {
+            applicationArchiveDeployer.doNotPersistArtifactStop(application);
+        }
+        for (Domain domain : domains)
+        {
+            domainArchiveDeployer.doNotPersistArtifactStop(domain);
         }
     }
 }
