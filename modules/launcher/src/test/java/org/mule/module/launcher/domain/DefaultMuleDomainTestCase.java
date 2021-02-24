@@ -8,6 +8,8 @@ package org.mule.module.launcher.domain;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
@@ -53,7 +55,7 @@ public class DefaultMuleDomainTestCase
         when(domainClassLoaderRepository.getDomainClassLoader(domainDescriptor)).thenReturn(artifactClassLoader);
         when(artifactClassLoader.findLocalResource(DOMAIN_CONFIG_FILE_LOCATION)).thenReturn(resource);
 
-        muleContext = mock(MuleContext.class);
+        muleContext = mock(DefaultMuleContext.class);
         when(muleContextFactory.createMuleContext(any(List.class), any(MuleContextBuilder.class))).thenReturn(muleContext);
 
         muleRegistry = mock(MuleRegistry.class);

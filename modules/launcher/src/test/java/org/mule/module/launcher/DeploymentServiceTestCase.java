@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher;
 
+import static com.google.common.base.Optional.absent;
 import static org.apache.commons.io.filefilter.FileFileFilter.FILE;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
@@ -34,6 +35,9 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
+import static org.mule.module.launcher.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.module.launcher.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.module.launcher.application.ApplicationStatus.CREATED;
 import static org.mule.module.launcher.application.ApplicationStatus.DESTROYED;
@@ -42,7 +46,10 @@ import static org.mule.module.launcher.application.ApplicationStatus.STOPPED;
 import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.util.FileUtils.deleteFile;
+
+import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -102,7 +109,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.google.common.base.Optional;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -269,13 +278,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void extensionManagerPresent() throws Exception
     {
-        addPackedAppFromBuilder(emptyAppFileBuilder);
-
-        deploymentService.start();
-
-        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-
-        final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+        final Application app = deployApplication();
         assertThat(app.getMuleContext().getExtensionManager(), is(notNullValue()));
     }
 
@@ -1155,12 +1158,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void undeploysStoppedApp() throws Exception
     {
-        addPackedAppFromBuilder(emptyAppFileBuilder);
-
-        deploymentService.start();
-
-        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-        final Application app = findApp(emptyAppFileBuilder.getId(), 1);
+        final Application app = deployApplication();
         app.stop();
         assertStatus(app, STOPPED);
 
@@ -1168,14 +1166,38 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void whenAppIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception
+    {
+        Application app = deployApplication();
+        app.stop();
+
+        DefaultMuleContext defaultMuleContext = (DefaultMuleContext) app.getMuleContext();
+        assertThat(defaultMuleContext.getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
+    }
+
+    @Test
+    public void whenAppIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception
+    {
+        final Application app = deployApplication();
+
+        DefaultMuleContext defaultMuleContext = (DefaultMuleContext) app.getMuleContext();
+        assertThat(defaultMuleContext.getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+        deploymentService.undeploy(app);
+
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    }
+
+    @Test
     public void undeploysApplicationRemovingAnchorFile() throws Exception
     {
-        addPackedAppFromBuilder(emptyAppFileBuilder);
-
-        deploymentService.start();
-
-        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-        Application app = findApp(emptyAppFileBuilder.getId(), 1);
+        Application app = deployApplication();
 
         assertTrue("Unable to remove anchor file", removeAppAnchorFile(emptyAppFileBuilder.getId()));
 
@@ -1223,6 +1245,59 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
         assertStatus(app, STOPPED);
         assertAppFolderIsDeleted(emptyAppFileBuilder.getId());
+    }
+
+    @Test
+    public void undeploysStoppedAppAndDoesNotStartItOnDeploy() throws Exception
+    {
+        final Application app = deployApplication();
+        app.stop();
+        assertStatus(app, STOPPED);
+
+        restartServer();
+
+        assertAppDeploymentAndStatus(emptyAppFileBuilder, CREATED);
+    }
+
+    @Test
+    public void undeploysStoppedAppDoesNotStartItOnDeployButCanBeStartedManually() throws Exception
+    {
+        final Application app = deployApplication();
+        app.stop();
+        assertStatus(app, STOPPED);
+
+        restartServer();
+
+        assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+        final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
+        assertStatus(app_2, CREATED);
+        app_2.start();
+        assertStatus(app_2, STARTED);
+    }
+
+    @Test
+    public void undeploysNotStoppedAppAndStartsItOnDeploy() throws Exception
+    {
+        final Application app = deployApplication();
+        assertStatus(app, STARTED);
+
+        restartServer();
+
+        assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
+    }
+
+    @Test
+    public void stoppingMuleContextDoesNotPersistAppStoppedState() throws Exception
+    {
+        final Application app = deployApplication();
+        assertStatus(app, STARTED);
+        app.getMuleContext().stop();
+
+        assertThat(app.getMuleContext().getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
     }
 
     @Test
@@ -2055,6 +2130,35 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void redeploysDomainZipRefreshesAppsButIfTheyWereStoppedTheyDoNotStart() throws Exception
+    {
+        addPackedDomainFromBuilder(dummyDomainFileBuilder);
+        File dummyDomainFile = new File(domainsDir, dummyDomainFileBuilder.getZipPath());
+        long firstFileTimestamp = dummyDomainFile.lastModified();
+
+        addPackedAppFromBuilder(dummyDomainApp1FileBuilder);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+
+        final Application app = findApp(dummyDomainApp1FileBuilder.getId(), 1);
+        app.stop();
+
+        reset(domainDeploymentListener);
+        reset(applicationDeploymentListener);
+
+        addPackedDomainFromBuilder(dummyDomainFileBuilder);
+        alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
+
+        assertUndeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+        assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+        assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
+    }
+
+    @Test
     public void redeploysDomainZipDeployedAfterStartup() throws Exception
     {
         addPackedDomainFromBuilder(dummyDomainFileBuilder);
@@ -2271,6 +2375,43 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         domain.stop();
 
         deploymentService.undeploy(domain);
+    }
+
+    @Test
+    public void whenDomainIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception
+    {
+        addPackedDomainFromBuilder(emptyDomainFileBuilder);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+        final Domain domain = findADomain(emptyDomainFileBuilder.getId(), 1);
+        domain.stop();
+
+        assertThat(domain.getMuleContext().getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
+    }
+
+    @Test
+    public void whenDomainIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception
+    {
+        addPackedDomainFromBuilder(emptyDomainFileBuilder);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+        final Domain domain = findADomain(emptyDomainFileBuilder.getId(), 1);
+
+        assertThat(domain.getMuleContext().getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+        deploymentService.undeploy(domain);
+
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveDeploymentProperties(emptyDomainFileBuilder.getId(), properties);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
     }
 
     @Test
@@ -2763,6 +2904,33 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentFailure(domainDeploymentListener, dummyDomainFileBuilder.getId());
 
         assertNoDeploymentInvoked(applicationDeploymentListener);
+    }
+
+    @Test
+    public void redeployDomainWithStoppedAppsShouldPersistStoppedStateAndDoNotStartApps() throws Exception
+    {
+        addPackedDomainFromBuilder(dummyDomainFileBuilder);
+
+        addPackedAppFromBuilder(dummyDomainApp1FileBuilder);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+        final Domain domain = findADomain(dummyDomainFileBuilder.getId(), 1);
+        assertThat(domain.getMuleContext().getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
+
+        final Application app = findApp(dummyDomainApp1FileBuilder.getId(), 1);
+        app.stop();
+
+        deploymentService.redeployDomain(dummyDomainFileBuilder.getId());
+
+        Optional<Properties> properties = absent();
+        Properties deploymentProperties = resolveDeploymentProperties(dummyDomainApp1FileBuilder.getId(), properties);
+        assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+        assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), Is.<Object>is("false"));
     }
 
     @Test
@@ -3769,7 +3937,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         undeployLatch = new Latch();
     }
 
-    private static class TestMuleDeploymentService extends MuleDeploymentService
+    protected static class TestMuleDeploymentService extends MuleDeploymentService
     {
         TestMuleDeploymentService(PluginClassLoaderManager pluginClassLoaderManager)
         {
@@ -3840,14 +4008,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.findApplication(dummyDomainApp1FileBuilder.getId()).stop();
         assertStatus(dummyDomainApp1FileBuilder.getId(), STOPPED);
 
+        reset(mockDeploymentListener);
         // Redeploy domain
         deploymentService.redeployDomain(dummyDomainFileBuilder.getId());
+        assertDeploymentSuccess(mockDeploymentListener, dummyDomainApp1FileBuilder.getId());
 
         // Application was redeployed but it is not started
         assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
 
+        reset(mockDeploymentListener);
         // Redeploy domain again
         deploymentService.redeployDomain(dummyDomainFileBuilder.getId());
+        assertDeploymentSuccess(mockDeploymentListener, dummyDomainApp1FileBuilder.getId());
 
         // Application was redeployed twice but it is not started
         assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
@@ -4008,5 +4180,37 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             pollingProber.check(new ApplicationStoppedProbe());
             latch.countDown();
         }
+    }
+
+    private Application deployApplication() throws Exception
+    {
+        addPackedAppFromBuilder(emptyAppFileBuilder);
+
+        deploymentService.start();
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+        return findApp(emptyAppFileBuilder.getId(), 1);
+    }
+
+    private void restartServer() throws MuleException
+    {
+        deploymentService.stop();
+
+        reset(applicationDeploymentListener);
+
+        deploymentService = new TestMuleDeploymentService(new MulePluginClassLoaderManager());
+        deploymentService.addDeploymentListener(applicationDeploymentListener);
+        deploymentService.addDomainDeploymentListener(domainDeploymentListener);
+        deploymentService.addDeploymentListener(testDeploymentListener);
+        deploymentService.addDomainDeploymentListener(testDomainDeploymentListener);
+        deploymentService.start();
+    }
+
+    private Application assertAppDeploymentAndStatus(ApplicationFileBuilder applicationFileBuilder, ApplicationStatus status)
+    {
+        assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+        final Application app = findApp(applicationFileBuilder.getId(), 1);
+        assertStatus(app, status);
+        return app;
     }
 }
