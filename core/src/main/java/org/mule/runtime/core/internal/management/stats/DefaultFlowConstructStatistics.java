@@ -8,10 +8,10 @@ package org.mule.runtime.core.internal.management.stats;
 
 import static java.lang.System.currentTimeMillis;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
@@ -26,6 +26,7 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   private final AtomicLong executionError = new AtomicLong(0);
   private final AtomicLong fatalError = new AtomicLong(0);
   protected final ComponentStatistics flowStatistics = new ComponentStatistics();
+  private final AtomicLong connectionErrors = new AtomicLong(0);
 
   public DefaultFlowConstructStatistics(String flowConstructType, String name) {
     this.name = name;
@@ -130,8 +131,18 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   }
 
   @Override
+  public long getConnectionErrors() {
+    return connectionErrors.get();
+  }
+
+  @Override
   public void incReceivedEvents() {
     receivedEvents.addAndGet(1);
+  }
+
+  @Override
+  public void incConnectionErrors() {
+    connectionErrors.addAndGet(1);
   }
 
   @Override
