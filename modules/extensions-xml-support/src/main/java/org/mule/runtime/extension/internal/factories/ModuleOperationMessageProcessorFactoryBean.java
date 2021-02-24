@@ -8,7 +8,6 @@ package org.mule.runtime.extension.internal.factories;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_OPERATION_CONFIG_REF;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -18,7 +17,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
-import org.mule.runtime.extension.internal.config.dsl.XmlSdkConfigurationProvider;
 import org.mule.runtime.extension.internal.processor.ModuleOperationMessageProcessor;
 
 import java.util.List;
@@ -57,24 +55,11 @@ public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponen
   @Override
   public ModuleOperationMessageProcessor getObject() throws Exception {
     final ModuleOperationMessageProcessor messageProcessorChain =
-        new ModuleOperationMessageProcessor(getProperties(), parameters, errorMappings, extensionModel,
-                                            operationModel);
+        new ModuleOperationMessageProcessor(parameters, errorMappings, extensionManager, extensionModel, operationModel);
 
     messageProcessorChain.setAnnotations(getAnnotations());
     messageProcessorChain.setMessageProcessors(processors == null ? emptyList() : processors);
     return messageProcessorChain;
-  }
-
-  public Map<String, String> getProperties() {
-    // `properties` in the scope of a Xml-Sdk operation means the parameters of the config.
-    if (parameters.containsKey(MODULE_OPERATION_CONFIG_REF)) {
-      return extensionManager.getConfigurationProvider((String) parameters.get(MODULE_OPERATION_CONFIG_REF))
-          .filter(cp -> cp instanceof XmlSdkConfigurationProvider)
-          .map(cp -> ((XmlSdkConfigurationProvider) cp).getParameters())
-          .orElse(emptyMap());
-    } else {
-      return emptyMap();
-    }
   }
 
   public void setParameters(Map<String, Object> parameters) {
