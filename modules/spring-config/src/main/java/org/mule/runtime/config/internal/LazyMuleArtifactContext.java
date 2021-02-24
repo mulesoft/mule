@@ -16,6 +16,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.exception.ExceptionUtils.hasCause;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
@@ -65,12 +66,12 @@ import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.core.internal.metadata.cache.DelegateMetadataCacheManager;
+import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
@@ -96,6 +97,7 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -553,11 +555,28 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   private void resetMuleSecurityManager() {
-    SecurityManager securityManager = getMuleRegistry().get(OBJECT_SECURITY_MANAGER);
-
-    if (securityManager != null) {
-      securityManager.getProviders().forEach(p -> securityManager.removeProvider(p.getName()));
-      securityManager.getEncryptionStrategies().forEach(s -> securityManager.removeEncryptionStrategy(s.getName()));
+    boolean registerMuleSecurityManager = false;
+    // Always unregister first the default security manager from Mule.
+    try {
+      getMuleRegistry().unregisterObject(OBJECT_SECURITY_MANAGER);
+      registerMuleSecurityManager = true;
+    } catch (Exception e) {
+      // NoSuchBeanDefinitionException can be ignored
+      if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
+        throw new MuleRuntimeException(createStaticMessage("Error while unregistering Mule security manager"),
+                                       e);
+      }
+    }
+    if (registerMuleSecurityManager) {
+      try {
+        // Has to be created before as the factory for SecurityManager (MuleSecurityManagerConfigurator) is expecting to
+        // retrieve it (through MuleContext and registry) while creating it. See
+        // org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator.doGetObject
+        getMuleRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
+      } catch (RegistrationException e) {
+        throw new MuleRuntimeException(createStaticMessage("Couldn't register a new instance of Mule security manager in the registry"),
+                                       e);
+      }
     }
   }
 
