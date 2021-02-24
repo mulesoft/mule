@@ -6,7 +6,6 @@
  */
 package org.mule.module.launcher;
 
-import com.google.common.base.Optional;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.artifact.Artifact;
@@ -15,14 +14,6 @@ import org.mule.module.launcher.domain.Domain;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Properties;
-
-import static com.google.common.base.Optional.of;
-import static java.lang.String.valueOf;
-import static java.util.Collections.emptyMap;
-import static org.mule.module.launcher.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
-import static org.mule.module.launcher.application.ApplicationStatus.DEPLOYMENT_FAILED;
-import static org.mule.module.launcher.application.ApplicationStatus.STARTED;
 
 /**
  * Utility to hook callbacks just before and after a domain zip is redeployed in Mule.
@@ -77,19 +68,10 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
                 applicationDeployer.preTrackArtifact(domainApplication);
                 if (applicationDeployer.isUpdatedZombieArtifact(domainApplication.getArtifactName()))
                 {
-                    Optional<Properties> property = addShouldStartProperty(appStatusPreRedeployment.getOrDefault(domainApplication,STARTED));
-                    applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(), property);
+                    applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName());
                 }
             }
         }
         domainApplications = Collections.emptyList();
-    }
-
-    private Optional<Properties> addShouldStartProperty(ApplicationStatus applicationStatus)
-    {
-        Properties newProperties = new Properties();
-        boolean startArtifact = applicationStatus.equals(STARTED) || applicationStatus.equals(DEPLOYMENT_FAILED);
-        newProperties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(startArtifact));
-        return of(newProperties);
     }
 }
