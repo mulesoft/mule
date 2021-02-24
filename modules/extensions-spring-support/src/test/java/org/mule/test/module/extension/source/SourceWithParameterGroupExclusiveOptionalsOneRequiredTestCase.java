@@ -64,6 +64,21 @@ public class SourceWithParameterGroupExclusiveOptionalsOneRequiredTestCase exten
                is("hello bird!"));
   }
 
+  @Test
+  public void testWithSimpleParameterDslTrue() throws Exception {
+    startFlow("someParameterDslTrue");
+    assertEventsFired();
+    assertThat(EVENTS.get(0).getMessage().getPayload().getValue(), is("hello dog!"));
+  }
+
+  @Test
+  public void testWithComplexParameterDslTrue() throws Exception {
+    startFlow("complexParameterDslTrue");
+    assertEventsFired();
+    assertThat(((ComplexParameter) EVENTS.get(0).getMessage().getPayload().getValue()).getAnotherParameter(),
+               is("hello bird!"));
+  }
+
   private void startFlow(String flowName) throws Exception {
     ((Startable) getFlowConstruct(flowName)).start();
   }
