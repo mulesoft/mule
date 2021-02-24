@@ -104,12 +104,6 @@ public interface AllureConstants {
 
     String DEPLOYMENT_CONFIGURATION = "Deployment Configuration";
 
-    interface ApplicationConfiguration {
-
-      String APPLICATION_CONFIGURATION = "Application Configuration";
-
-    }
-
     interface LazyConnectionsStory {
 
       String LAZY_CONNECTIONS = "Lazy Connections";
