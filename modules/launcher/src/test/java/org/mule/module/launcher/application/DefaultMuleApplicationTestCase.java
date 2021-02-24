@@ -8,6 +8,8 @@ package org.mule.module.launcher.application;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.Stoppable;
@@ -43,7 +45,7 @@ public class DefaultMuleApplicationTestCase
         domain = mock(Domain.class);
 
         defaultMuleApplication = new DefaultMuleApplication(applicationDescriptor, applicationClassLoaderFactory, domain);
-        muleContext = mock(MuleContext.class);
+        muleContext = mock(DefaultMuleContext.class);
         defaultMuleApplication.setMuleContext(muleContext);
         muleRegistry = mock(MuleRegistry.class);
         when(muleContext.getRegistry()).thenReturn(muleRegistry);

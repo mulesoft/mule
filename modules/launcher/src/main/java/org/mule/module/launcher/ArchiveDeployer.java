@@ -70,4 +70,6 @@ public interface ArchiveDeployer<T extends Artifact>
 
     T deployPackagedArtifact(URL domainArchiveUrl, Optional<Properties> appProperties) throws DeploymentException;
 
+    void doNotPersistArtifactStop(T artifact);
+
 }
