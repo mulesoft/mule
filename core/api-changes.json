@@ -2,6 +2,51 @@
   "4.3.1": {
     "revapi": {
       "ignore": [
+         {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.management.stats.AllStatistics::configureComputeConnectionErrorsInStats()",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "configureComputeConnectionErrorsInStats",
+          "elementKind": "method",
+          "justification": "Feature to compute connection errors"
+         },
+         {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method long org.mule.runtime.core.api.management.stats.FlowConstructStatistics::getConnectionErrors()",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "FlowConstructStatistics",
+          "methodName": "getConnectionErrors",
+          "elementKind": "method",
+          "justification": "Feature to compute connection errors"
+         },
+         {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method void org.mule.runtime.core.api.management.stats.FlowConstructStatistics::incConnectionErrors()",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "FlowConstructStatistics",
+          "methodName": "incConnectionErrors",
+          "elementKind": "method",
+          "justification": "Feature to compute connection errors"
+         },
+         {
+          "code": "java.field.added",
+          "new": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "AbstractPolicyTemplate",
+          "fieldName": "muleContext",
+          "elementKind": "field",
+          "justification": "Feature to compute connection errors"
+         },
+         {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate::computeConnectionErrorsInStats()",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "AbstractPolicyTemplate",
+          "methodName": "computeConnectionErrorsInStats",
+          "elementKind": "method",
+          "justification": "Feature to compute connection errors"
+         },
         {
           "code": "java.method.added",
           "new": "method java.util.Optional<org.mule.runtime.api.meta.MuleVersion> org.mule.runtime.core.api.config.DefaultMuleConfiguration::getMinMuleVersion()",

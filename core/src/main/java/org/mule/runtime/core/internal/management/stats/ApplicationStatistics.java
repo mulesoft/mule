@@ -18,8 +18,6 @@ public class ApplicationStatistics extends DefaultFlowConstructStatistics {
   private AllStatistics parent;
 
   public ApplicationStatistics(AllStatistics parent) {
-
-
     super("Application", "application totals");
     this.parent = parent;
   }

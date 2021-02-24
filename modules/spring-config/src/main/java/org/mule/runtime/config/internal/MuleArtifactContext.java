@@ -149,6 +149,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   static {
     configurePropertiesResolverFeatureFlag();
     configureHonourRetryPolicyTemplateOverrideFeature();
+    configureBatchFixedAggregatorTransactionRecordBuffer();
     configureComputeConnectionErrorsInStats();
   }
 

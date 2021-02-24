@@ -17,7 +17,7 @@ import javax.inject.Inject;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
