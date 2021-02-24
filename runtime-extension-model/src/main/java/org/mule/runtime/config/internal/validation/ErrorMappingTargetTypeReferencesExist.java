@@ -12,10 +12,8 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.error.ErrorMapping;
@@ -57,27 +55,20 @@ public class ErrorMappingTargetTypeReferencesExist extends AbstractErrorTypesVal
         .collect(toSet());
 
     for (ErrorMapping errorMapping : getErrorMappings(component)) {
-      final ComponentIdentifier errorTypeId = parserErrorType(errorMapping.getTarget());
+      final String errorTypeString = errorMapping.getTarget();
+      final ComponentIdentifier errorTypeId = parserErrorType(errorTypeString);
 
       if (errorNamespaces.contains(errorTypeId.getNamespace())) {
-        final Optional<ErrorType> errorType = artifact.getErrorTypeRepository().lookupErrorType(errorTypeId);
-
-        if (!errorType.isPresent()) {
-          if (CORE_PREFIX.toUpperCase().equals(errorTypeId.getNamespace())) {
-            return of(format("There's no MULE error named '%s' in %s.", errorTypeId.getName(), compToLoc(component)));
-          } else {
-            return of(format("Could not find error '%s' used in %s", errorMapping.getTarget(), compToLoc(component)));
-          }
-        }
+        return validateErrorTypeId(component, artifact, errorMapping.getTarget(), errorTypeId);
+      } else if (artifact.getParent()
+          .map(p -> p.getErrorTypeRepository().getErrorNamespaces().contains(errorTypeId.getNamespace()))
+          .orElse(false)) {
+        return of(format("Cannot use error type '%s': namespace already exists. Used in %s", errorMapping.getTarget(),
+                         compToLoc(component)));
       }
     }
 
     return empty();
-  }
-
-  private String compToLoc(ComponentAst component) {
-    return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
-        + component.getMetadata().getStartLine().orElse(-1) + "]";
   }
 
 }

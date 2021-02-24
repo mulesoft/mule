@@ -61,9 +61,4 @@ public class ErrorMappingSourceTypeReferencesExist extends AbstractErrorTypesVal
     return empty();
   }
 
-  private String compToLoc(ComponentAst component) {
-    return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
-        + component.getMetadata().getStartLine().orElse(-1) + "]";
-  }
-
 }
