@@ -135,7 +135,7 @@ public abstract class AbstractCompletableInterceptorSourceCallbackAdapter<T exte
         }
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));
+        throw propagate(resolveMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));
       }
     };
   }
