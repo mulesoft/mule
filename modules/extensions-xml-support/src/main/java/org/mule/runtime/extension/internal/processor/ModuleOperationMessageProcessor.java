@@ -8,6 +8,7 @@ package org.mule.runtime.extension.internal.processor;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -20,6 +21,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CO
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_OPERATION_CONFIG_REF;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
@@ -57,6 +59,7 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
@@ -67,6 +70,7 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.extension.internal.config.dsl.XmlSdkConfigurationProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -112,9 +116,12 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   @Inject
   private Collection<ExceptionContextProvider> exceptionContextProviders;
 
+  private final ExtensionManager extensionManager;
+
   private MessageProcessorChain nestedChain;
   private List<Processor> processors;
 
+  private final List<ParameterModel> allProperties;
   private final Map<String, Pair<String, MetadataType>> properties;
   private final Map<String, Pair<String, MetadataType>> parameters;
   private final boolean returnsVoid;
@@ -123,14 +130,33 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private CompiledExpression targetValueExpression;
   private List<ErrorMapping> errorMappings = emptyList();
 
-  public ModuleOperationMessageProcessor(Map<String, String> properties,
-                                         Map<String, String> parameters,
-                                         ExtensionModel extensionModel, OperationModel operationModel) {
-    this.properties = parseParameters(properties, getAllProperties(extensionModel));
+  public ModuleOperationMessageProcessor(Map<String, String> parameters,
+                                         ExtensionManager extensionManager, ExtensionModel extensionModel,
+                                         OperationModel operationModel) {
+    this.extensionManager = extensionManager;
+
+    allProperties = getAllProperties(extensionModel);
+    this.properties = parseParameters(getProperties(parameters), allProperties);
     this.parameters = parseParameters(parameters, operationModel.getAllParameterModels());
     this.returnsVoid = MetadataTypeUtils.isVoid(operationModel.getOutput().getType());
     this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of(parameters.remove(TARGET_PARAMETER_NAME)) : empty();
     this.targetValue = parameters.remove(TARGET_VALUE_PARAMETER_NAME);
+  }
+
+  public Map<String, String> getProperties(Map<String, String> parameters) {
+    // `properties` in the scope of a Xml-Sdk operation means the parameters of the config.
+    if (parameters.containsKey(MODULE_OPERATION_CONFIG_REF)) {
+      return createPropertiesFromConfigName(parameters.get(MODULE_OPERATION_CONFIG_REF));
+    } else {
+      return emptyMap();
+    }
+  }
+
+  private Map<String, String> createPropertiesFromConfigName(final String configName) {
+    return extensionManager.getConfigurationProvider(configName)
+        .filter(cp -> cp instanceof XmlSdkConfigurationProvider)
+        .map(cp -> ((XmlSdkConfigurationProvider) cp).getParameters())
+        .orElse(emptyMap());
   }
 
   /**
@@ -323,7 +349,18 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private CoreEvent createEventWithParameters(CoreEvent event) {
     InternalEvent.Builder builder = InternalEvent.builder(event.getContext());
     builder.message(builder().nullValue().build());
-    addVariables(event, builder, properties);
+
+    Map<String, Pair<String, MetadataType>> resolvedProperties;
+    // If this operation is called from an outer operation, we need to obtain the config from the previous caller in order to
+    // populate the event variables as expected.
+    if (properties.isEmpty() && event.getVariables().containsKey(MODULE_OPERATION_CONFIG_REF)) {
+      resolvedProperties = parseParameters(createPropertiesFromConfigName((String) event.getVariables()
+          .get(MODULE_OPERATION_CONFIG_REF).getValue()), allProperties);
+    } else {
+      resolvedProperties = properties;
+    }
+    addVariables(event, builder, resolvedProperties);
+
     addVariables(event, builder, parameters);
     builder.internalParameters(((InternalEvent) event).getInternalParameters());
     builder.addInternalParameter(getParameterId(ORIGINAL_EVENT_KEY, event), event);
