@@ -43,8 +43,9 @@ public class ExpressionCorrelationIdGeneratorTestCase extends AbstractMuleContex
 
   @Test
   public void fullExpressionEvaluation() {
-    CorrelationIdGenerator generator =
+    ExpressionCorrelationIdGenerator generator =
         new ExpressionCorrelationIdGenerator(muleContext, "#[(random() * 42 as String splitBy('.'))[0]]");
+    generator.initializeGenerator();
 
     assertThat(parseInt(generator.generateCorrelationId()), is(both(greaterThan(0)).and(lessThan(42))));
   }
