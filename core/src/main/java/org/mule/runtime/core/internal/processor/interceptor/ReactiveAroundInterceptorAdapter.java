@@ -112,16 +112,16 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
         if (t instanceof MessagingException) {
           throw new CompletionException(t);
         } else {
-          throw new CompletionException(createMessagingException(eventWithResolvedParams,
-                                                                 t instanceof CompletionException ? t.getCause()
-                                                                     : t,
-                                                                 (Component) component, empty()));
+          throw new CompletionException(resolveMessagingException(eventWithResolvedParams,
+                                                                  t instanceof CompletionException ? t.getCause()
+                                                                      : t,
+                                                                  (Component) component, empty()));
         }
       }).thenApply(interceptedEvent -> interceptedEvent != null
           ? ((DefaultInterceptionEvent) interceptedEvent).resolve()
           : null);
     } catch (Exception e) {
-      throw propagate(createMessagingException(interceptionEvent.resolve(), e, (Component) component, empty()));
+      throw propagate(resolveMessagingException(interceptionEvent.resolve(), e, (Component) component, empty()));
     }
   }
 }

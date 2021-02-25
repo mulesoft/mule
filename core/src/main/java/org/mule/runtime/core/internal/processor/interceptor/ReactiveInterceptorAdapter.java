@@ -178,7 +178,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
 
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(createMessagingException(interceptionEvent.resolve(), e, component, empty()));
+        throw propagate(resolveMessagingException(interceptionEvent.resolve(), e, component, empty()));
       }
     };
   }
