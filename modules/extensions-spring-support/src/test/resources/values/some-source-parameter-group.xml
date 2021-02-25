@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:some="http://www.mulesoft.org/schema/mule/some"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
+
+    <object name="capture" class="org.mule.test.module.extension.source.SourceWithParameterGroupExclusiveOptionalsOneRequiredTestCase$CaptureProcessor"/>
+
+    <flow name="someParameter" initialState="stopped">
+        <some:another-emitting-source someParameter="hello dog!"/>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="complexParameter" initialState="stopped">
+        <some:another-emitting-source>
+            <some:complex-parameter anotherParameter="hello bird!"/>
+        </some:another-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="someParameterDslTrue" initialState="stopped">
+        <some:yet-another-emitting-source>
+            <some:awesome-parameter-group someParameter="hello dog!"/>
+        </some:yet-another-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="complexParameterDslTrue" initialState="stopped">
+        <some:yet-another-emitting-source>
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!"/>
+            </some:awesome-parameter-group>
+        </some:yet-another-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+</mule>

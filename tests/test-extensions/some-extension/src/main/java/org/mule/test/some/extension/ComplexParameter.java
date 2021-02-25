@@ -6,26 +6,23 @@
  */
 package org.mule.test.some.extension;
 
-import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-@ExclusiveOptionals(isOneRequired = true)
-public class SomeParameterGroupOneRequiredConfig {
+public class ComplexParameter {
+
+  @Parameter
+  private String anotherParameter;
 
   @Parameter
   @Optional
-  private String someParameter;
+  private String yetAnotherParameter;
 
-  @Parameter
-  @Optional
-  private ComplexParameter complexParameter;
-
-  public String getSomeParameter() {
-    return someParameter;
+  public String getAnotherParameter() {
+    return anotherParameter;
   }
 
-  public ComplexParameter getComplexParameter() {
-    return complexParameter;
+  public String getYetAnotherParameter() {
+    return yetAnotherParameter;
   }
 }

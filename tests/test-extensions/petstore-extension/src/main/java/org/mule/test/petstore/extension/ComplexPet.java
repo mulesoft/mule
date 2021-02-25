@@ -4,28 +4,33 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.some.extension;
+package org.mule.test.petstore.extension;
 
-import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-@ExclusiveOptionals(isOneRequired = true)
-public class SomeParameterGroupOneRequiredConfig {
+public class ComplexPet {
+
+  @Parameter
+  private String petType;
 
   @Parameter
   @Optional
-  private String someParameter;
+  private String category;
 
-  @Parameter
-  @Optional
-  private ComplexParameter complexParameter;
-
-  public String getSomeParameter() {
-    return someParameter;
+  public String getPetType() {
+    return petType;
   }
 
-  public ComplexParameter getComplexParameter() {
-    return complexParameter;
+  public void setPetType(String petType) {
+    this.petType = petType;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
   }
 }
