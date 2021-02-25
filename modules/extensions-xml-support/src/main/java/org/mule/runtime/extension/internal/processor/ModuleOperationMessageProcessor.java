@@ -7,8 +7,8 @@
 package org.mule.runtime.extension.internal.processor;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -143,10 +143,10 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     this.targetValue = parameters.remove(TARGET_VALUE_PARAMETER_NAME);
   }
 
-  public Map<String, String> getProperties(Map<String, Object> parameters) {
+  public Map<String, String> getProperties(Map<String, String> parameters) {
     // `properties` in the scope of a Xml-Sdk operation means the parameters of the config.
     if (parameters.containsKey(MODULE_OPERATION_CONFIG_REF)) {
-      return createPropertiesFromConfigName((String) parameters.get(MODULE_OPERATION_CONFIG_REF));
+      return createPropertiesFromConfigName(parameters.get(MODULE_OPERATION_CONFIG_REF));
     } else {
       return emptyMap();
     }

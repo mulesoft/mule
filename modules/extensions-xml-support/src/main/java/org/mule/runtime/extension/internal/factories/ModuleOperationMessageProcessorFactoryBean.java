@@ -52,7 +52,7 @@ public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponen
   @Override
   public ModuleOperationMessageProcessor getObject() throws Exception {
     final ModuleOperationMessageProcessor messageProcessorChain =
-        new ModuleOperationMessageProcessor(parameters, errorMappings, extensionManager, extensionModel, operationModel);
+        new ModuleOperationMessageProcessor(parameters, extensionManager, extensionModel, operationModel);
 
     messageProcessorChain.setAnnotations(getAnnotations());
     messageProcessorChain.setMessageProcessors(processors == null ? emptyList() : processors);
