@@ -94,7 +94,10 @@ public class ApplicationStatistics extends DefaultFlowConstructStatistics {
         total += stats.getExecutionErrors();
       }
     }
-    return total;
+
+    // MULE-19020: this is enabled by a flag so that connection errors
+    // are able to trigger alerts.
+    return total + getConnectionErrors();
   }
 
   @Override

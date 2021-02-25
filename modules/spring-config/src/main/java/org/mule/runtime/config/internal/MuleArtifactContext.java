@@ -38,6 +38,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.management.stats.AllStatistics.configureComputeConnectionErrorsInStats;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
@@ -149,6 +150,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     configurePropertiesResolverFeatureFlag();
     configureHonourRetryPolicyTemplateOverrideFeature();
     configureBatchFixedAggregatorTransactionRecordBuffer();
+    configureComputeConnectionErrorsInStats();
   }
 
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
