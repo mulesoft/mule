@@ -35,6 +35,8 @@ import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
@@ -134,13 +136,23 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
         List<String> actingParameters = model.getParameters().stream()
             .map(actingParameterModel -> actingParameterModel.getName())
             .collect(toList());
+
         // Now we get the default values for those optional parameters from model that are marked as acting
         // parameters
+        ParameterValueResolver parameterValueResolver = parameterValueResolver(componentElementDeclaration, componentModel);
+
         componentModel.getAllParameterModels().stream()
             .filter(p -> actingParameters.contains(p.getName()))
             .filter(p -> !explicitParameterMaps.containsKey(p.getName()))
             .filter(p -> !p.isRequired() && p.getDefaultValue() != null)
-            .forEach(p -> explicitParameterMaps.put(p.getName(), p.getDefaultValue()));
+            .forEach(p -> {
+              try {
+                // Force to use parameterValueResolver with default values in order to convert from String to model field type
+                explicitParameterMaps.put(p.getName(), parameterValueResolver.getParameterValue(p.getName()));
+              } catch (ValueResolvingException e) {
+                throw new MuleRuntimeException(e);
+              }
+            });
       });
     }
     return explicitParameterMaps;
