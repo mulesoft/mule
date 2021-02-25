@@ -13,6 +13,7 @@ import static java.lang.Thread.getAllStackTraces;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.sort;
 import static java.util.Optional.empty;
+import static org.apache.logging.log4j.LogManager.shutdown;
 import static org.junit.Assume.assumeThat;
 import static org.junit.rules.Timeout.millis;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -56,7 +57,6 @@ import org.junit.rules.DisableOnDebug;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
-import org.junit.rules.Timeout;
 import org.slf4j.Logger;
 
 /**
@@ -242,6 +242,11 @@ public abstract class AbstractMuleTestCase {
   @After
   public void clearRequestContext() {
     setCurrentEvent(null);
+  }
+
+  @After
+  public void shutdownLogging() throws MuleException {
+    shutdown();
   }
 
   protected static List<String> collectThreadNames() {
