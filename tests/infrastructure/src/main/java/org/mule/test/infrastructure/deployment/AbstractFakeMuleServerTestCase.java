@@ -6,6 +6,7 @@
  */
 package org.mule.test.infrastructure.deployment;
 
+import static org.apache.logging.log4j.LogManager.shutdown;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildHttpServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
@@ -49,5 +50,6 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
       muleServer.stop();
       muleServer = null;
     }
+    shutdown();
   }
 }
