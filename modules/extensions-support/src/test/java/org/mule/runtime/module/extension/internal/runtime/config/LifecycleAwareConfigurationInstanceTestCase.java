@@ -36,6 +36,19 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 
+import java.util.Collection;
+import java.util.Optional;
+
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.verification.VerificationMode;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -60,20 +73,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
-
-import java.util.Collection;
-import java.util.Optional;
-
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.verification.VerificationMode;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -143,7 +142,7 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractMuleCon
   }
 
   protected RetryPolicyTemplate createRetryTemplate() {
-    return new SimpleRetryPolicyTemplate(RECONNECTION_FREQ, RECONNECTION_MAX_ATTEMPTS);
+    return new TestSimpleRetryPolicyTemplate(RECONNECTION_FREQ, RECONNECTION_MAX_ATTEMPTS);
   }
 
   @After
@@ -325,5 +324,17 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractMuleCon
   @Test
   public void getState() {
     assertThat(configurationInstance.getState(), is(sameInstance(configurationState)));
+  }
+
+  private class TestSimpleRetryPolicyTemplate extends SimpleRetryPolicyTemplate {
+
+    public TestSimpleRetryPolicyTemplate(long frequency, int retryCount) {
+      super(frequency, retryCount);
+    }
+
+    @Override
+    protected void computeStats() {
+      // Do not compute stats as there are no mule context associated in the test.
+    }
   }
 }
