@@ -7,7 +7,7 @@
         xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-           http://www.mulesoft.org/schema/mule/module-properties http://www.mulesoft.org/schema/mule/module-properties/current/module-properties.xsd">
+           http://www.mulesoft.org/schema/mule/module-properties http://www.mulesoft.org/schema/mule/module-properties/current/mule-module-properties.xsd">
 
     <mule:global-property name="mule-global-property" value="a-constant-global-value" />
 
