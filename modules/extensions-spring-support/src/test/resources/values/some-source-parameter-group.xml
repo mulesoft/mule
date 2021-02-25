@@ -8,18 +8,30 @@
     <object name="capture" class="org.mule.test.module.extension.source.SourceWithParameterGroupExclusiveOptionalsOneRequiredTestCase$CaptureProcessor"/>
 
     <flow name="someParameter" initialState="stopped">
-        <some:another-emitting-source>
-            <some:some-parameter-group someParameter="hello dog!"/>
-        </some:another-emitting-source>
+        <some:another-emitting-source someParameter="hello dog!"/>
         <flow-ref name="capture"/>
     </flow>
 
     <flow name="complexParameter" initialState="stopped">
         <some:another-emitting-source>
-            <some:some-parameter-group>
-                <some:complex-parameter anotherParameter="hello bird!"/>
-            </some:some-parameter-group>
+            <some:complex-parameter anotherParameter="hello bird!"/>
         </some:another-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="someParameterDslTrue" initialState="stopped">
+        <some:yet-another-emitting-source>
+            <some:awesome-parameter-group someParameter="hello dog!"/>
+        </some:yet-another-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="complexParameterDslTrue" initialState="stopped">
+        <some:yet-another-emitting-source>
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!"/>
+            </some:awesome-parameter-group>
+        </some:yet-another-emitting-source>
         <flow-ref name="capture"/>
     </flow>
 

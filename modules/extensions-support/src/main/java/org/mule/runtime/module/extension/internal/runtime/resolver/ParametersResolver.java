@@ -231,27 +231,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
           }
         });
 
-    Set<String> parameterValueResolvers = new HashSet<>();
-    Set<String> parameterNames = parameters.entrySet().stream()
-        .flatMap(entry -> {
-          if (entry.getValue() instanceof ParameterValueResolver) {
-            try {
-              parameterValueResolvers.add(aliasedParameterNames.getOrDefault(entry.getKey(), entry.getKey()));
-              return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
-                  .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
-            } catch (ValueResolvingException e) {
-              throw new MuleRuntimeException(e);
-            }
-          } else {
-            String key = entry.getKey();
-            aliasedParameterNames.getOrDefault(key, key);
-            return Stream.of(key);
-          }
-        })
-        .collect(toSet());
-    parameterNames.addAll(parameterValueResolvers);
-
-    checkParameterGroupExclusiveness(model, groups, parameterNames);
+    checkParameterGroupExclusiveness(model, groups, parameters, aliasedParameterNames);
     return resolverSet;
   }
 
@@ -414,15 +394,35 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
 
   public void checkParameterGroupExclusiveness(Optional<ParameterizedModel> model,
                                                List<ParameterGroupModel> groups,
-                                               Set<String> resolverKeys)
+                                               Map<String, ?> parameters, Map<String, String> aliasedParameterNames)
       throws ConfigurationException {
     if (disableValidations) {
       return;
     }
 
+    Set<String> parameterValueResolvers = new HashSet<>();
+    Set<String> parameterNames = parameters.entrySet().stream()
+        .flatMap(entry -> {
+          if (entry.getValue() instanceof ParameterValueResolver) {
+            try {
+              parameterValueResolvers.add(aliasedParameterNames.getOrDefault(entry.getKey(), entry.getKey()));
+              return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
+                  .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
+            } catch (ValueResolvingException e) {
+              throw new MuleRuntimeException(e);
+            }
+          } else {
+            String key = entry.getKey();
+            aliasedParameterNames.getOrDefault(key, key);
+            return Stream.of(key);
+          }
+        })
+        .collect(toSet());
+    parameterNames.addAll(parameterValueResolvers);
+
     for (ParameterGroupModel group : groups) {
       for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
-        Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), resolverKeys);
+        Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), parameterNames);
         if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
           throw new ConfigurationException((createStaticMessage(format(
                                                                        "Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing. "

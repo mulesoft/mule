@@ -11,9 +11,9 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
-public class AnotherEmittingSource extends Source<Object, Void> {
+public class YetAnotherEmittingSource extends Source<Object, Void> {
 
-  @ParameterGroup(name = "Awesome Parameter Group")
+  @ParameterGroup(name = "Awesome Parameter Group", showInDsl = true)
   SomeParameterGroupOneRequiredConfig someParameterGroup;
 
   @Override
