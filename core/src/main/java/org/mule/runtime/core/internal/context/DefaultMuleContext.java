@@ -104,6 +104,7 @@ import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.config.ClusterConfiguration;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
+import org.mule.runtime.core.internal.config.ExpressionCorrelationIdGenerator;
 import org.mule.runtime.core.internal.config.NullClusterConfiguration;
 import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
 import org.mule.runtime.core.internal.connector.SchedulerController;
@@ -306,6 +307,14 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
         });
 
         lifecycleStrategy.initialise(this);
+
+        // TODO (MULE-19231): remove this from here after ExpressionManager is available in the validations
+        // (this won't be more necessary here anymore). If there is an error in the expression, it will be detected here
+        getConfiguration().getDefaultCorrelationIdGenerator().ifPresent(generator -> {
+          if (generator instanceof ExpressionCorrelationIdGenerator) {
+            ((ExpressionCorrelationIdGenerator) generator).initializeGenerator();
+          }
+        });
 
       } catch (InitialisationException e) {
         dispose();

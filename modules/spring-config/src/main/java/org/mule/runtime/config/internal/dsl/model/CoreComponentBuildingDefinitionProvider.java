@@ -454,6 +454,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(Object.class).build())
         .withSetterParameterDefinition(INHERIT_ITERABLE_REPEATABILITY,
                                        fromSimpleParameter(INHERIT_ITERABLE_REPEATABILITY).build())
+        .withSetterParameterDefinition("correlationIdGeneratorExpression",
+                                       fromSimpleParameter("correlationIdGeneratorExpression").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("dynamic-config-expiration")

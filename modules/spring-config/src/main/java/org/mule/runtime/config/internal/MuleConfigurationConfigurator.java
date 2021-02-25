@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.internal.config.ExpressionCorrelationIdGenerator;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.springframework.beans.factory.SmartFactoryBean;
@@ -119,6 +120,10 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
     config.setInheritIterableRepeatability(inheritIterableRepeatability);
   }
 
+  public void setCorrelationIdGeneratorExpression(String correlationIdGeneratorExpression) {
+    config.setDefaultCorrelationIdGenerator(new ExpressionCorrelationIdGenerator(muleContext, correlationIdGeneratorExpression));
+  }
+
   public void setExtensions(List<ConfigurationExtension> extensions) {
     config.addExtensions(extensions);
   }
@@ -139,6 +144,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
       defaultConfig.setDynamicConfigExpiration(resolveDynamicConfigExpiration());
       defaultConfig.setInheritIterableRepeatability(config.isInheritIterableRepeatability());
+      config.getDefaultCorrelationIdGenerator().ifPresent(generator -> defaultConfig.setDefaultCorrelationIdGenerator(generator));
       applyDefaultIfNoObjectSerializerSet(defaultConfig);
 
       return configuration;

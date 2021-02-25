@@ -153,4 +153,12 @@ public interface MuleConfiguration {
    */
   Optional<MuleVersion> getMinMuleVersion();
 
+  /**
+   * @return the default Correlation ID generator for every source. Empty value will be returned if internal
+   * mule correlation id must be kept
+   *
+   * @since 4.4.0
+   */
+  Optional<CorrelationIdGenerator> getDefaultCorrelationIdGenerator();
+
 }

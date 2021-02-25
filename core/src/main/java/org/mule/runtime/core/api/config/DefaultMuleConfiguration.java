@@ -9,6 +9,8 @@ package org.mule.runtime.core.api.config;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_TRACE;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
@@ -193,6 +195,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    * @since 4.3.0
    */
   private boolean inheritIterableRepeatability = false;
+
+  /**
+   * Generator to override default correlation id
+   *
+   * @since 4.4.0
+   */
+  private Optional<CorrelationIdGenerator> correlationIdGenerationExpression = empty();
 
   /**
    * Mule Registry to initialize this configuration
@@ -698,6 +707,15 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   public void setMinMuleVersion(MuleVersion minMuleversion) {
     this.minMuleVersion = minMuleversion;
+  }
+
+  @Override
+  public Optional<CorrelationIdGenerator> getDefaultCorrelationIdGenerator() {
+    return correlationIdGenerationExpression;
+  }
+
+  public void setDefaultCorrelationIdGenerator(CorrelationIdGenerator generator) {
+    this.correlationIdGenerationExpression = of(generator);
   }
 
   @Override

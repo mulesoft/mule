@@ -998,6 +998,12 @@ class MuleExtensionModelDeclarer {
             .allowsInlineDefinition(true)
             .allowTopLevelDefinition(false)
             .build());
+
+    configuration.onDefaultParameterGroup()
+        .withOptionalParameter("correlationIdGeneratorExpression")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(REQUIRED)
+        .describedAs("The default correlation id generation expression for every source. This must be DataWeave expression.");
   }
 
   private void declareConfigurationProperties(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {

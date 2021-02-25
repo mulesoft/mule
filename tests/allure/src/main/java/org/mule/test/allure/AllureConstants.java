@@ -733,4 +733,15 @@ public interface AllureConstants {
     }
   }
 
+  interface CorrelationIdFeature {
+
+    String CORRELATION_ID = "Correlation ID";
+
+    interface CorrelationIdOnSourcesStory {
+
+      String CORRELATION_ID_ON_SOURCES = "Sources' correlation id generation";
+
+    }
+  }
+
 }
