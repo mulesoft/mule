@@ -16,14 +16,12 @@ import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeployme
 import org.mule.ArtifactStoppedPersistenceListener;
 import org.mule.DefaultMuleContext;
 import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.artifact.Artifact;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Properties;
 
 import com.google.common.base.Optional;
@@ -88,7 +86,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         {
             artifact.install();
             artifact.init();
-            if (startArtifact && shouldStartArtifact(artifact))
+            if (shouldStartArtifact(artifact))
             {
                 artifact.start();
             }
