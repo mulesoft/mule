@@ -106,6 +106,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   private static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
   private static final String POLICY_PROPERTY_KEY = "policyPropertyKey";
   private static final String FOO_POLICY_NAME = "fooPolicy";
+  private static final String POLICY_WITH_INTERNAL_DEPENDENCY_NAME = "policyWithInternalDependency";
 
   private static File simpleExtensionJarFile;
   private static File withErrorDeclarationExtensionJarFile;
@@ -131,6 +132,17 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
           .setName(FOO_POLICY_NAME)
           .setRequiredProduct(MULE)
           .withBundleDescriptorLoader(createBundleDescriptorLoader(FOO_POLICY_NAME,
+                                                                   MULE_POLICY_CLASSIFIER,
+                                                                   PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+          .withClassLoaderModelDescriptorLoader(
+                                                new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+          .build());
+  private final PolicyFileBuilder withInternalDependencyPolicyFileBuilder =
+      new PolicyFileBuilder(POLICY_WITH_INTERNAL_DEPENDENCY_NAME).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
+          .setMinMuleVersion(MIN_MULE_VERSION)
+          .setName(POLICY_WITH_INTERNAL_DEPENDENCY_NAME)
+          .setRequiredProduct(MULE)
+          .withBundleDescriptorLoader(createBundleDescriptorLoader(POLICY_WITH_INTERNAL_DEPENDENCY_NAME,
                                                                    MULE_POLICY_CLASSIFIER,
                                                                    PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
           .withClassLoaderModelDescriptorLoader(
@@ -707,6 +719,30 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  public void appliesPolicyAndAppWithSameExtensionDeclaringAnInternalDependency() throws Exception {
+    ArtifactPluginFileBuilder extensionWithInternalDependencyPlugin = createExtensionWithInternalDependencyPlugin();
+    ArtifactPluginFileBuilder withErrorDeclarationExtensionPlugin = createWithErrorDeclarationExtensionPlugin();
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder
+        .dependingOn(withErrorDeclarationExtensionPlugin)
+        .dependingOn(extensionWithInternalDependencyPlugin)
+        .getArtifactFile());
+    ApplicationFileBuilder applicationFileBuilder =
+        createExtensionApplicationWithServices("app-with-internal-dependency-extension.xml",
+                                               extensionWithInternalDependencyPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder
+        .dependingOn(extensionWithInternalDependencyPlugin)
+        .dependingOn(withErrorDeclarationExtensionPlugin).getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/policy-with-internal-dependency-extension.xml"),
+                                                      emptyList()));
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
   @Feature(CLASSLOADING_ISOLATION)
   public void policyWithExtensionUsingObjectStore() throws Exception {
     policyManager.registerPolicyTemplate(policyWithPluginUsingObjectStore().getArtifactFile());
@@ -895,6 +931,22 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
         .addProperty("version", "1.0.0");
     return new ArtifactPluginFileBuilder("withErrorDeclarationExtensionPlugin")
         .dependingOn(new JarFileBuilder("withErrorDeclarationExtension", withErrorDeclarationExtensionJarFile))
+        .describedBy(mulePluginModelBuilder.build());
+  }
+
+  private ArtifactPluginFileBuilder createExtensionWithInternalDependencyPlugin() {
+    MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("withInternalDependencyExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("withInternalDependencyExtensionPlugin",
+                                                                 MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.withInternalDependency.WithInternalDependencyExtension")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("withInternalDependencyExtensionPlugin")
+        .dependingOn(new JarFileBuilder("withInternalDependencyExtension", extensionWithInternalDependencyJarFile))
         .describedBy(mulePluginModelBuilder.build());
   }
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test-policy="http://www.mulesoft.org/schema/mule/test-policy"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:with-internal-dependency="http://www.mulesoft.org/schema/mule/with-internal-dependency"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/test-policy http://www.mulesoft.org/schema/mule/test-policy/current/mule-test-policy.xsd
+      http://www.mulesoft.org/schema/mule/with-internal-dependency http://www.mulesoft.org/schema/mule/with-internal-dependency/current/mule-with-internal-dependency.xsd">
+
+    <test-policy:proxy name="with-internal-dependency-extension">
+        <test-policy:operation>
+                <test-policy:execute-next/>
+                <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+                <with-internal-dependency:check-dependency/>
+        </test-policy:operation>
+    </test-policy:proxy>
+</mule>
