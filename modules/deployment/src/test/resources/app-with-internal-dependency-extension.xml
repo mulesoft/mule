@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:with-internal-dependency="http://www.mulesoft.org/schema/mule/with-internal-dependency"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/with-internal-dependency http://www.mulesoft.org/schema/mule/with-internal-dependency/current/mule-with-internal-dependency.xsd">
+    <flow name="main">
+        <scheduler>
+            <scheduling-strategy>
+                <fixed-frequency frequency="10000"/>
+            </scheduling-strategy>
+        </scheduler>
+        <set-payload value=""/>
+        <with-internal-dependency:check-dependency/>
+    </flow>
+</mule>

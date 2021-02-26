@@ -267,6 +267,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File goodbyeExtensionV1JarFile;
 
   private static File helloExtensionV2JarFile;
+  protected static File extensionWithInternalDependencyJarFile;
 
   protected static File loadsAppResourceCallbackClassFile;
   protected static File loadsAppResourceCallbackJarFile;
@@ -366,6 +367,13 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                                 getResourceFile("/org/foo/hello/HelloOperation.java"))
         .compile("mule-module-hello-2.0.0.jar", "2.0.0");
 
+    extensionWithInternalDependencyJarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/withInternalDependency/WithInternalDependencyExtension.java"),
+                   getResourceFile("/org/foo/withInternalDependency/WithInternalDependencyOperation.java"))
+        .including(getResourceFile("/org/foo/withInternalDependency/registry-bootstrap.properties"),
+                   "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
+        .compile("mule-module-with-internal-dependency-4.0-SNAPSHOT.jar", "1.0.0");
+
     loadsAppResourceCallbackClassFile =
         new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceCallback.java"));
     loadsAppResourceCallbackJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/LoadsAppResourceCallback.java"))
@@ -397,9 +405,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected final ArtifactPluginFileBuilder goodbyeExtensionV1Plugin = createGoodbyeExtensionV1PluginFileBuilder();
   protected final ArtifactPluginFileBuilder oracleExtensionPlugin = createOracleExtensionPluginFileBuilder();
   protected final ArtifactPluginFileBuilder loadClassExtensionPlugin = createLoadClassExtensionPluginFileBuilder();
-
   protected final ArtifactPluginFileBuilder exceptionThrowingPlugin = createExceptionThrowingPluginFileBuilder();
-
   protected final ArtifactPluginFileBuilder byeXmlExtensionPlugin = createByeXmlPluginFileBuilder();
   protected final ArtifactPluginFileBuilder moduleUsingByeXmlExtensionPlugin = createModuleUsingByeXmlPluginFileBuilder();
   protected final ArtifactPluginFileBuilder usingObjectStorePlugin = createUsingObjectStorePluginFileBuilder();
@@ -421,6 +427,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   // Domain file builders
   protected DomainFileBuilder dummyDomainFileBuilder =
       new DomainFileBuilder("dummy-domain").definedBy("empty-domain-config.xml");
+  protected final DomainFileBuilder exceptionThrowingPluginImportingDomain =
+      new DomainFileBuilder("exception-throwing-plugin-importing-domain").definedBy("empty-domain-config.xml")
+          .dependingOn(exceptionThrowingPlugin);
 
   // Policy file builders
   protected final PolicyFileBuilder barPolicyFileBuilder =
@@ -435,7 +444,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
           .withClassLoaderModelDescriptorLoader(
                                                 new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
-
   protected final PolicyFileBuilder policyUsingAppPluginFileBuilder =
       new PolicyFileBuilder(BAR_POLICY_NAME).describedBy(new MulePolicyModelBuilder()
           .setMinMuleVersion(MIN_MULE_VERSION)
@@ -448,7 +456,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
           .withClassLoaderModelDescriptorLoader(
                                                 new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
-
   protected final PolicyFileBuilder policyIncludingPluginFileBuilder =
       createPolicyIncludingPluginFileBuilder();
   protected final PolicyFileBuilder policyIncludingHelloPluginV2FileBuilder =
@@ -457,10 +464,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       createExceptionThrowingPluginImportingPolicyFileBuilder();
   protected final PolicyFileBuilder policyIncludingDependantPluginFileBuilder =
       createPolicyIncludingDependantPluginFileBuilder();
-
-  protected final DomainFileBuilder exceptionThrowingPluginImportingDomain =
-      new DomainFileBuilder("exception-throwing-plugin-importing-domain").definedBy("empty-domain-config.xml")
-          .dependingOn(exceptionThrowingPlugin);
 
   private File muleHome;
   protected File appsDir;
