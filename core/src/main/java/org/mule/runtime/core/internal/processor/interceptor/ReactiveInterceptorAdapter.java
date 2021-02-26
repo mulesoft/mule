@@ -46,7 +46,6 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.util.LinkedList;
@@ -116,10 +115,12 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
                   .cast(CoreEvent.class)
                   .transform(next)
                   .onErrorMap(MessagingException.class,
-                              error -> createMessagingException(doAfter(interceptor, (Component) component, of(error.getCause()))
-                                  .apply((InternalEvent) error.getEvent()),
+                              error -> createMessagingException(doAfter(interceptor, (Component) component,
+                                                                        of(error.getCause()))
+                                                                            .apply((InternalEvent) error.getEvent()),
                                                                 error.getCause(),
-                                                                error.getFailingComponent() != null ? error.getFailingComponent()
+                                                                error.getFailingComponent() != null
+                                                                    ? error.getFailingComponent()
                                                                     : (Component) component,
                                                                 of(error)))
                   .cast(InternalEvent.class)
@@ -188,7 +189,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
 
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(createMessagingException(interceptionEvent.resolve(), e, component, empty()));
+        throw propagate(resolveMessagingException(interceptionEvent.resolve(), e, component, empty()));
       }
     };
   }

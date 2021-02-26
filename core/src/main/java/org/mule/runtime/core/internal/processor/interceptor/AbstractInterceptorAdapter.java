@@ -111,11 +111,17 @@ class AbstractInterceptorAdapter {
 
   protected MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor,
                                                         Optional<MessagingException> original) {
-    MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
     MessagingException me = new MessagingException(event, cause, processor);
     original.ifPresent(error -> error.getInfo().forEach(me::addInfo));
 
-    return exceptionResolver.resolve(me, errorTypeLocator, exceptionContextProviders);
+    return me;
+  }
+
+  protected MessagingException resolveMessagingException(CoreEvent event, Throwable cause, Component processor,
+                                                         Optional<MessagingException> original) {
+    return new MessagingExceptionResolver(processor)
+        .resolve(createMessagingException(event, cause, processor, original),
+                 errorTypeLocator, exceptionContextProviders);
   }
 
   protected MuleContext getMuleContext() {
