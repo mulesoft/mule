@@ -155,6 +155,8 @@ public class WSConsumer extends AbstractAnnotatedObject implements MessageProces
 
     private MessageProcessor createCopyAttachmentsMessageProcessor()
     {
+        final MessageProcessor callerMessageProcessor = this;
+
         return new AbstractRequestResponseMessageProcessor()
         {
             @Override
@@ -194,7 +196,7 @@ public class WSConsumer extends AbstractAnnotatedObject implements MessageProces
 
                         event.getMessage().setPayload(soapFault.getDetail());
 
-                        throw new SoapFaultException(event, soapFault, this);
+                        throw new SoapFaultException(event, soapFault, callerMessageProcessor);
                     }
                     else
                     {
