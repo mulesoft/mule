@@ -194,7 +194,7 @@ public class WSConsumer extends AbstractAnnotatedObject implements MessageProces
 
                         event.getMessage().setPayload(soapFault.getDetail());
 
-                        throw new SoapFaultException(event, soapFault, this);
+                        throw new SoapFaultException(event, soapFault, WSConsumer.this);
                     }
                     else
                     {

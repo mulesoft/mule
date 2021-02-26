@@ -9,9 +9,18 @@ package org.mule.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.text.IsEmptyString.isEmptyString;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.ws.consumer.SoapFaultException;
+import org.mule.module.ws.consumer.WSConsumer;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
@@ -91,5 +100,10 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
         assertEquals(NullPayload.getInstance(), response.getPayload());
         SoapFaultException exception = (SoapFaultException) response.getExceptionPayload().getException();
         assertEquals(expectedFaultCode, exception.getFaultCode().getLocalPart());
+
+        String element = exception.getInfo().get(INFO_LOCATION_KEY).toString();
+        assertThat(element, not(nullValue()));
+        assertThat(element, not(isEmptyString()));
+        assertThat(exception.getFailingMessageProcessor(), is(instanceOf(WSConsumer.class)));
     }
 }
