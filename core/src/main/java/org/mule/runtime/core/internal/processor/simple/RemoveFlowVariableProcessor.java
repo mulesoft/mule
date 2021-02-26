@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.simple;
 
+import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -29,8 +30,8 @@ public class RemoveFlowVariableProcessor extends AbstractRemoveVariablePropertyP
     if (event.getVariables().containsKey(propertyName)) {
       return PrivilegedEvent.builder(event).removeVariable(propertyName).build();
     } else {
-      LOGGER.warn("There is no variable named '%s'. Check the 'variableName' parameter in the 'remove-variable' component at %s",
-                  propertyName, this.getLocation().getLocation());
+      LOGGER.warn(format("There is no variable named '{}'. Check the 'variableName' parameter in the 'remove-variable' component at {}",
+                  propertyName, this.getLocation().getLocation()));
       return event;
     }
   }
