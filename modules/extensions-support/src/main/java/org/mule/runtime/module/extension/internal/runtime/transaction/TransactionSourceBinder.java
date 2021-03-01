@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -78,6 +79,6 @@ public class TransactionSourceBinder {
                                                             extensionModel.getName())));
 
     final ExtensionTransactionKey txKey = new ExtensionTransactionKey(configuration);
-    return Optional.of(transactionBindingDelegate.getBoundResource(transactionConfig, txKey, () -> connectionHandler));
+    return Optional.of(transactionBindingDelegate.getBoundResource(false, txKey, () -> connectionHandler));
   }
 }

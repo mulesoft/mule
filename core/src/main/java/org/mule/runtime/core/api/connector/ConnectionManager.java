@@ -77,7 +77,7 @@ public interface ConnectionManager {
    * @param config a config for which a binding has been established through {@link #bind(Object, ConnectionProvider)}
    * @param <C>    the generic type of the returned connection
    * @return a {@link ConnectionHandler} wrapping the produced connection
-   * @throws ConnectionException if the conection could not be established or if no such binding exists for the {@code config}
+   * @throws ConnectionException if the connection could not be established or if no such binding exists for the {@code config}
    */
   <C> ConnectionHandler<C> getConnection(Object config) throws ConnectionException;
 
