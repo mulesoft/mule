@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.util;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -176,6 +177,27 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
     expectedResources.add(APP_LOADED_RESOURCE);
 
     assertThat(resources, EnumerationMatcher.equalTo(expectedResources));
+  }
+
+  @Test
+  public void twoClassLoadersFromTheSameOneAreTheSameInstanceOneArg() {
+    CompositeClassLoader cl1 = CompositeClassLoader.from(appClassLoader);
+    CompositeClassLoader cl2 = CompositeClassLoader.from(appClassLoader);
+    assertThat(cl2, is(cl1));
+  }
+
+  @Test
+  public void twoClassLoadersFromTheSameOneAreTheSameInstanceTwoArgs() {
+    CompositeClassLoader cl1 = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
+    CompositeClassLoader cl2 = CompositeClassLoader.from(appClassLoader, pluginClassLoader);
+    assertThat(cl2, is(cl1));
+  }
+
+  @Test
+  public void twoClassLoadersFromTheSameOneAreTheSameInstanceMoreArgs() {
+    CompositeClassLoader cl1 = CompositeClassLoader.from(appClassLoader, pluginClassLoader, pluginClassLoader);
+    CompositeClassLoader cl2 = CompositeClassLoader.from(appClassLoader, pluginClassLoader, pluginClassLoader);
+    assertThat(cl2, is(cl1));
   }
 
 }

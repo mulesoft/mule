@@ -6,16 +6,13 @@
  */
 package org.mule.runtime.core.internal.util;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.util.Collections.unmodifiableList;
-
-import org.mule.runtime.api.util.Pair;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.stream.Stream.of;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +20,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Classloader implementation that, given a set of classloaders, will first search for a resource/class in the first one. If it is
@@ -41,18 +39,12 @@ public class CompositeClassLoader extends ClassLoader {
 
   private List<ClassLoader> delegates;
 
-  private static final Cache<Pair<ClassLoader, ClassLoader>, CompositeClassLoader> cache = Caffeine.newBuilder()
-      .maximumSize(1024).expireAfterAccess(1, TimeUnit.MINUTES).build();
+  private static final Cache<String, CompositeClassLoader> cache = newBuilder()
+      .maximumSize(1024).expireAfterAccess(1, MINUTES).weakValues().build();
 
-  private CompositeClassLoader(ClassLoader first, ClassLoader second, ClassLoader... others) {
-    delegates = new ArrayList<>(others.length + 1);
-    if (first != null) {
-      delegates.add(first);
-    }
-    if (second != null) {
-      delegates.add(second);
-    }
-    for (ClassLoader cl : others) {
+  private CompositeClassLoader(ClassLoader... classLoaders) {
+    delegates = new ArrayList<>(classLoaders.length);
+    for (ClassLoader cl : classLoaders) {
       if (cl != null) {
         delegates.add(cl);
       }
@@ -60,36 +52,10 @@ public class CompositeClassLoader extends ClassLoader {
     delegates = unmodifiableList(delegates);
   }
 
-  private CompositeClassLoader(ClassLoader first, ClassLoader second) {
-    if (first != null && second != null) {
-      delegates = unmodifiableList(asList(first, second));
-    } else if (first != null) {
-      delegates = unmodifiableList(singletonList(first));
-    } else if (second != null) {
-      delegates = unmodifiableList(singletonList(second));
-    } else {
-      delegates = unmodifiableList(emptyList());
-    }
-  }
-
-  private CompositeClassLoader(ClassLoader delegate) {
-    if (delegate != null) {
-      delegates = unmodifiableList(singletonList(delegate));
-    } else {
-      delegates = unmodifiableList(emptyList());
-    }
-  }
-
-  public static CompositeClassLoader from(ClassLoader first, ClassLoader second, ClassLoader... others) {
-    return new CompositeClassLoader(first, second, others);
-  }
-
-  public static CompositeClassLoader from(ClassLoader first, ClassLoader second) {
-    return cache.get(new Pair<>(first, second), pair -> new CompositeClassLoader(pair.getFirst(), pair.getSecond()));
-  }
-
-  public static CompositeClassLoader from(ClassLoader first) {
-    return cache.get(new Pair<>(first, null), pair -> new CompositeClassLoader(pair.getFirst()));
+  public static CompositeClassLoader from(ClassLoader... classLoaders) {
+    String compositeId = of(classLoaders).filter(Objects::nonNull).map(System::identityHashCode).map(Object::toString)
+        .collect(Collectors.joining("#"));
+    return cache.get(compositeId, id -> new CompositeClassLoader(classLoaders));
   }
 
   /**
