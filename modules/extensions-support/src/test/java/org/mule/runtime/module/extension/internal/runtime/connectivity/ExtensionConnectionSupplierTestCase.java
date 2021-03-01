@@ -6,16 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
+import static java.util.Arrays.asList;
 import static java.util.Optional.of;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assume.assumeThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
+
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
@@ -30,13 +37,28 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionCon
 import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensionTransactionalResource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Properties;
+
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+import io.qameta.allure.Issue;
+
+@RunWith(Parameterized.class)
 public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTestCase {
+
+  @Parameters(name = "lazyConnections: {0}")
+  public static Collection<Boolean> params() {
+    return asList(true, false);
+  }
 
   @Inject
   private ExtensionConnectionSupplier adapter;
@@ -54,9 +76,24 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
 
   private ConfigurationInstance configurationInstance;
 
+  private final boolean lazyConnections;
+
+
+  public ExtensionConnectionSupplierTestCase(boolean lazyConnections) {
+    this.lazyConnections = lazyConnections;
+  }
+
   @Override
   protected boolean doTestClassInjection() {
     return true;
+  }
+
+  @Override
+  protected Optional<Properties> getDeploymentProperties() {
+    final Properties deploymentProps = new Properties();
+    deploymentProps.put(MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY, Boolean.toString(lazyConnections));
+
+    return of(deploymentProps);
   }
 
   @Before
@@ -107,12 +144,29 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
     bindAndVerify();
   }
 
+  @Test
+  @Issue("MULE-17900")
+  public void transactionResourceBindWithLazyConnections() throws Exception {
+    assumeThat(lazyConnections, is(true));
+    when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
+    when(connectionProvider.connect()).thenThrow(new AssertionError("Should not have tried to establish a connection"));
+
+    connectionManager.bind(config, connectionProvider);
+    TransactionCoordination.getInstance().bindTransaction(transaction);
+
+    adapter.getConnection(operationContext);
+    verify(transaction, never()).bindResource(any(), any(XAExtensionTransactionalResource.class));
+  }
+
   private void bindAndVerify() throws TransactionException, ConnectionException {
     connectionManager.bind(config, connectionProvider);
 
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
-    adapter.getConnection(operationContext);
+    final ConnectionHandler connection = adapter.getConnection(operationContext);
+    if (lazyConnections) {
+      connection.getConnection();
+    }
     verify(transaction).bindResource(any(), any(XAExtensionTransactionalResource.class));
   }
 }
