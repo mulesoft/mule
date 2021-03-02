@@ -184,11 +184,11 @@ class FirstSuccessfulRouter {
           }
           // Scope execution was successful
           inflightEvents.decrementAndGet();
-          completeRouterIfNecessary();
           Stack<CoreEvent> nextEventContainer = nextExecutionContextResolver.getCurrentContextFromEvent(successfulEvent);
           nextEventContainer.pop();
           downstreamRecorder
               .next(right(Throwable.class, nextExecutionContextResolver.eventWithContext(successfulEvent, nextEventContainer)));
+          completeRouterIfNecessary();
         }).onErrorContinue((error, object) -> {
           if (object instanceof CoreEvent) {
             executeNext(next, (CoreEvent) object, error);
