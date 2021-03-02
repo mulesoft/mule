@@ -7,9 +7,12 @@
 package org.mule.runtime.core.internal.util;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
+import static java.lang.System.identityHashCode;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.stream.Stream.of;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -20,8 +23,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Classloader implementation that, given a set of classloaders, will first search for a resource/class in the first one. If it is
@@ -39,10 +40,22 @@ public class CompositeClassLoader extends ClassLoader {
 
   private List<ClassLoader> delegates;
 
-  private static final Cache<String, CompositeClassLoader> cache = newBuilder()
-      .maximumSize(1024).expireAfterAccess(1, MINUTES).weakValues().build();
+  private static final Cache<List<Integer>, CompositeClassLoader> cache = newBuilder()
+      .maximumSize(1024).expireAfterAccess(1, MINUTES).build();
 
-  private CompositeClassLoader(ClassLoader... classLoaders) {
+  CompositeClassLoader(ClassLoader first, ClassLoader second) {
+    if (first != null && second != null) {
+      delegates = unmodifiableList(asList(first, second));
+    } else if (first != null) {
+      delegates = unmodifiableList(singletonList(first));
+    } else if (second != null) {
+      delegates = unmodifiableList(singletonList(second));
+    } else {
+      delegates = unmodifiableList(emptyList());
+    }
+  }
+
+  CompositeClassLoader(ClassLoader... classLoaders) {
     delegates = new ArrayList<>(classLoaders.length);
     for (ClassLoader cl : classLoaders) {
       if (cl != null) {
@@ -53,20 +66,46 @@ public class CompositeClassLoader extends ClassLoader {
   }
 
   public static CompositeClassLoader from(ClassLoader... classLoaders) {
-    String compositeId = of(classLoaders).filter(Objects::nonNull).map(System::identityHashCode).map(Object::toString)
-        .collect(Collectors.joining("#"));
-    return cache.get(compositeId, id -> new CompositeClassLoader(classLoaders));
+    List<Integer> key = getKey(classLoaders);
+    return cache.get(key, id -> new CompositeClassLoader(classLoaders));
+  }
+
+  public static CompositeClassLoader from(ClassLoader first, ClassLoader second) {
+    List<Integer> key = getKey(first, second);
+    return cache.get(key, id -> new CompositeClassLoader(first, second));
+  }
+
+  private static List<Integer> getKey(ClassLoader... classLoaders) {
+    List<Integer> key = new ArrayList<>(classLoaders.length);
+    for (ClassLoader cl : classLoaders) {
+      if (cl != null) {
+        key.add(identityHashCode(cl));
+      }
+    }
+    return key;
+  }
+
+  private static List<Integer> getKey(ClassLoader first, ClassLoader second) {
+    if (first != null && second != null) {
+      return asList(identityHashCode(first), identityHashCode(second));
+    } else if (first != null) {
+      return singletonList(identityHashCode(first));
+    } else if (second != null) {
+      return singletonList(identityHashCode(second));
+    } else {
+      return emptyList();
+    }
   }
 
   /**
-   * Overrides the loadClass in order to support scenarios where a custom class loader is created in a plugin
-   * and these calls to this method explicitly.
-   *
-   * @param name    The <a href="#name">binary name</a> of the class
-   * @param resolve If <tt>true</tt> then resolve the class
-   * @return The resulting <tt>Class</tt> object
-   * @throws ClassNotFoundException If the class could not be found
-   */
+  * Overrides the loadClass in order to support scenarios where a custom class loader is created in a plugin
+  * and these calls to this method explicitly.
+  *
+  * @param name    The <a href="#name">binary name</a> of the class
+  * @param resolve If <tt>true</tt> then resolve the class
+  * @return The resulting <tt>Class</tt> object
+  * @throws ClassNotFoundException If the class could not be found
+  */
   @Override
   public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
     ClassNotFoundException firstException = null;
