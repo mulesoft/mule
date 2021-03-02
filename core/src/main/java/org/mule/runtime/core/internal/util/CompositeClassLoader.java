@@ -94,72 +94,72 @@ public class CompositeClassLoader extends ClassLoader {
 
   private static class ShortList<T> extends AbstractList<T> {
 
-      final T first;
-      final T second;
-      final T third;
+    final T first;
+    final T second;
+    final T third;
 
-      ShortList(T first) {
-          this.first = first;
-          this.second = null;
-          this.third = null;
+    ShortList(T first) {
+      this.first = first;
+      this.second = null;
+      this.third = null;
+    }
+
+    ShortList(T first, T second) {
+      this.first = first;
+      this.second = second;
+      this.third = null;
+    }
+
+    ShortList(T first, T second, T third) {
+      this.first = first;
+      this.second = second;
+      this.third = third;
+    }
+
+    @Override
+    public T get(int index) {
+      if (index >= size()) {
+        throw new IndexOutOfBoundsException();
+      }
+      if (index == 0) {
+        return first;
+      }
+      if (index == 1) {
+        return second;
+      }
+      if (index == 2) {
+        return third;
+      }
+      throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public int size() {
+      if (third != null) {
+        return 3;
+      }
+      if (second != null) {
+        return 2;
+      }
+      return 1;
+    }
+
+    @Override
+    public int hashCode() {
+      return hash(first, second, third);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (!(o instanceof ShortList)) {
+        return false;
       }
 
-      ShortList(T first, T second) {
-          this.first = first;
-          this.second = second;
-          this.third = null;
-      }
-
-      ShortList(T first, T second, T third) {
-          this.first = first;
-          this.second = second;
-          this.third = third;
-      }
-
-      @Override
-      public T get(int index) {
-          if (index >= size()) {
-              throw new IndexOutOfBoundsException();
-          }
-          if (index == 0) {
-              return first;
-          }
-          if (index == 1) {
-              return second;
-          }
-          if (index == 2) {
-              return third;
-          }
-          throw new IndexOutOfBoundsException();
-      }
-
-      @Override
-      public int size() {
-          if (third != null) {
-              return 3;
-          }
-          if (second != null) {
-              return 2;
-          }
-          return 1;
-      }
-
-      @Override
-      public int hashCode() {
-          return hash(first, second, third);
-      }
-
-      @Override
-      public boolean equals(Object o) {
-          if (!(o instanceof ShortList)) {
-              return false;
-          }
-
-          ShortList<T> other = (ShortList) o;
-          return Objects.equals(first, other.first) &&
-                 Objects.equals(second, other.second) &&
-                 Objects.equals(third, other.third);
-      }
+      ShortList<T> other = (ShortList) o;
+      return Objects.equals(first, other.first) &&
+          Objects.equals(second, other.second) &&
+          Objects.equals(third, other.third);
+    }
   }
 
   /**
