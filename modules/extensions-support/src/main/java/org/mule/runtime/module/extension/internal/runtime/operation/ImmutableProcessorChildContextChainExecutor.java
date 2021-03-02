@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 
 import static java.util.Optional.of;
 
@@ -18,8 +17,6 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -27,8 +24,6 @@ import java.util.function.Consumer;
 
 
 public class ImmutableProcessorChildContextChainExecutor implements ChildContextChain {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ImmutableProcessorChainExecutor.class);
 
   /**
    * Processor that will be executed upon calling process
