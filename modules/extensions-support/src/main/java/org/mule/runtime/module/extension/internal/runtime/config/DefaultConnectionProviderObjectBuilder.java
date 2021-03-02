@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -100,7 +101,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     final ClassLoader appRegionClassLoader = muleContext.getExecutionClassLoader().getParent();
 
     return ClassLoaderConnectionProviderWrapper
-        .newInstance(provider, CompositeClassLoader.from(extensionClassLoader, appRegionClassLoader));
+        .newInstance(provider, from(extensionClassLoader, appRegionClassLoader));
   }
 
 }

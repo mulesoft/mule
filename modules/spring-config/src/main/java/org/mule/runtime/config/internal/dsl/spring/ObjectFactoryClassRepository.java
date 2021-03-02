@@ -8,7 +8,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
@@ -46,7 +46,7 @@ public class ObjectFactoryClassRepository {
   private final static LoadingCache<ClassLoader, ClassLoader> COMPOSITE_CL_CACHE = newBuilder()
       .weakKeys()
       .weakValues()
-      .build(cl -> CompositeClassLoader.from(ObjectFactoryClassRepository.class.getClassLoader(), cl));
+      .build(cl -> from(ObjectFactoryClassRepository.class.getClassLoader(), cl));
 
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the

@@ -13,6 +13,7 @@ import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isConnectedStreamingOperation;
@@ -150,7 +151,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
         final Thread currentThread = Thread.currentThread();
         final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
         final ClassLoader extensionClassLoader = getClassLoader(context.getExtensionModel());
-        final CompositeClassLoader compositeClassLoader = CompositeClassLoader.from(extensionClassLoader, currentClassLoader);
+        final CompositeClassLoader compositeClassLoader = from(extensionClassLoader, currentClassLoader);
         result = from(withContextClassLoader(compositeClassLoader, () -> executor.execute(context)));
         executedInterceptors.addAll(interceptors);
       } else {

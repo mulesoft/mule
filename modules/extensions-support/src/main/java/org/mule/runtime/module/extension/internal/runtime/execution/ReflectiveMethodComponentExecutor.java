@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
 
@@ -79,7 +80,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   public Object execute(ExecutionContext<M> executionContext) {
     final ClassLoader currentClassLoader = currentThread().getContextClassLoader();
-    final CompositeClassLoader compositeClassLoader = CompositeClassLoader.from(extensionClassLoader, currentClassLoader);
+    final CompositeClassLoader compositeClassLoader = from(extensionClassLoader, currentClassLoader);
     return withContextClassLoader(compositeClassLoader,
                                   () -> invokeMethod(method, componentInstance,
                                                      stream(getParameterValues(executionContext, method.getParameterTypes()))
@@ -134,7 +135,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   @Override
   public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
     ClassLoader currentClassLoader = currentThread().getContextClassLoader();
-    final CompositeClassLoader compositeClassLoader = CompositeClassLoader.from(extensionClassLoader, currentClassLoader);
+    final CompositeClassLoader compositeClassLoader = from(extensionClassLoader, currentClassLoader);
     return ec -> withContextClassLoader(compositeClassLoader,
                                         () -> {
                                           final Object[] resolved =
