@@ -67,6 +67,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     return child(parent, componentLocation, NullExceptionHandler.getInstance());
   }
 
+  public static BaseEventContext child(BaseEventContext parent, Optional<ComponentLocation> componentLocation,
+                                       String correlationId) {
+    return child(parent, componentLocation, NullExceptionHandler.getInstance(), correlationId);
+  }
+
   /**
    * Builds a new child execution context from a parent context. A child context delegates all getters to the parent context but
    * has it's own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is
@@ -80,8 +85,13 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    */
   public static BaseEventContext child(BaseEventContext parent, Optional<ComponentLocation> componentLocation,
                                        FlowExceptionHandler exceptionHandler) {
-    BaseEventContext child =
-        new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler, parent.getDepthLevel() + 1);
+    return child(parent, componentLocation, exceptionHandler, null);
+  }
+
+  public static BaseEventContext child(BaseEventContext parent, Optional<ComponentLocation> componentLocation,
+                                       FlowExceptionHandler exceptionHandler, String correlationId) {
+    BaseEventContext child = new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler,
+                                                   parent.getDepthLevel() + 1, correlationId);
     if (parent instanceof AbstractEventContext) {
       ((AbstractEventContext) parent).addChildContext(child);
     }
@@ -311,9 +321,10 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private final BaseEventContext parent;
     private final ComponentLocation componentLocation;
     private final String id;
+    private final Optional<String> correlationId;
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
-                              FlowExceptionHandler messagingExceptionHandler, int depthLevel) {
+                              FlowExceptionHandler messagingExceptionHandler, int depthLevel, String correlationId) {
       super(messagingExceptionHandler, depthLevel, empty());
       this.flowCallStack = parent.getFlowCallStack().clone();
       this.root = parent.getRootContext();
@@ -322,6 +333,12 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       this.id = parent.getId() != null
           ? parent.getId().concat("_").concat(Integer.toString(identityHashCode(this)))
           : Integer.toString(identityHashCode(this));
+      this.correlationId = ofNullable(correlationId);
+    }
+
+    private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
+                              FlowExceptionHandler messagingExceptionHandler, int depthLevel) {
+      this(parent, componentLocation, messagingExceptionHandler, depthLevel, null);
     }
 
     @Override
@@ -331,7 +348,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     @Override
     public String getCorrelationId() {
-      return parent.getCorrelationId();
+      return correlationId.orElse(parent.getCorrelationId());
     }
 
     @Override
