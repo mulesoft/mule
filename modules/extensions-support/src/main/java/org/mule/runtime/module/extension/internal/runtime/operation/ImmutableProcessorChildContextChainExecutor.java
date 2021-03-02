@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 
-public class DefaultChildContextChain implements ChildContextChain {
+public class ImmutableProcessorChildContextChainExecutor implements ChildContextChain {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ImmutableProcessorChainExecutor.class);
 
@@ -52,7 +52,7 @@ public class DefaultChildContextChain implements ChildContextChain {
    * @param event the original {@link CoreEvent} for the execution of the given chain
    * @param chain a {@link Processor} chain to be executed
    */
-  public DefaultChildContextChain(CoreEvent event, MessageProcessorChain chain) {
+  public ImmutableProcessorChildContextChainExecutor(CoreEvent event, MessageProcessorChain chain) {
     this.originalEvent = event;
     this.chain = chain;
     this.oldContext = (BaseEventContext) this.originalEvent.getContext();
