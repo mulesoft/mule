@@ -10,6 +10,7 @@ import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isConnectedStreamingOperation;
@@ -205,7 +206,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       }
       final Thread currentThread = Thread.currentThread();
       final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-      final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
+      final CompositeClassLoader compositeClassLoader = from(extensionClassLoader, currentClassLoader);
       setContextClassLoader(currentThread, currentClassLoader, compositeClassLoader);
       try {
         executor.execute(context, callback);
