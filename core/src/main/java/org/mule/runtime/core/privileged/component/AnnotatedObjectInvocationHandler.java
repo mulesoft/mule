@@ -12,6 +12,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedMap;
 import static java.util.Collections.unmodifiableSet;
 import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -19,7 +20,6 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.component.DynamicallyComponent;
 import org.mule.runtime.core.internal.component.DynamicallySerializableComponent;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -119,8 +119,8 @@ public final class AnnotatedObjectInvocationHandler {
     enhancer.setCallbackFilter(callbackHelper);
 
     if (Enhancer.class.getClassLoader() != clazz.getClassLoader()) {
-      enhancer.setClassLoader(new CompositeClassLoader(AnnotatedObjectInvocationHandler.class.getClassLoader(),
-                                                       clazz.getClassLoader()));
+      enhancer.setClassLoader(from(AnnotatedObjectInvocationHandler.class.getClassLoader(),
+                                   clazz.getClassLoader()));
       enhancer.setUseCache(false);
     }
 
