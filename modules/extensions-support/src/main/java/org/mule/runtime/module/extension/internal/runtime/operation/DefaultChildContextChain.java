@@ -16,8 +16,8 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain;
-import org.mule.sdk.api.runtime.operation.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +45,8 @@ public class DefaultChildContextChain implements ChildContextChain {
    */
   private final BaseEventContext oldContext;
 
+  private ImmutableProcessorChainExecutor delegate;
+
   /**
    *
    * @param event the original {@link CoreEvent} for the execution of the given chain
@@ -54,28 +56,30 @@ public class DefaultChildContextChain implements ChildContextChain {
     this.originalEvent = event;
     this.chain = chain;
     this.oldContext = (BaseEventContext) this.originalEvent.getContext();
+    this.delegate = new ImmutableProcessorChainExecutor(this.originalEvent, this.chain);
   }
+
 
   @Override
   public void process(String correlationId, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
     Optional<ComponentLocation> location = of(chain.getLocation());
     BaseEventContext newContext = child(oldContext, location, correlationId);
     CoreEvent eventWithCorrelationId = quickCopy(newContext, originalEvent);
-    processWithChildContext(eventWithCorrelationId, chain, location);
+    new ChainExecutor(chain, originalEvent, eventWithCorrelationId, onSuccess, onError).execute();
   }
 
   @Override
   public void process(Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
-
+    this.delegate.process(onSuccess, onError);
   }
 
   @Override
   public void process(Object payload, Object attributes, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
-
+    this.delegate.process(payload, attributes, onSuccess, onError);
   }
 
   @Override
   public void process(Result input, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
-
+    this.delegate.process(input, onSuccess, onError);
   }
 }

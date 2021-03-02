@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.extension.api.runtime.privileged;
 
-import org.mule.sdk.api.runtime.operation.Result;
-import org.mule.sdk.api.runtime.route.Chain;
-
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -18,6 +17,12 @@ import java.util.function.Consumer;
  */
 public interface ChildContextChain extends Chain {
 
+  /**
+   *
+   * @param correlationId
+   * @param onSuccess
+   * @param onError
+   */
   void process(String correlationId, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError);
 
 }

@@ -97,8 +97,7 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
                   "A success completion handler is required in order to execute the components chain, but it was null");
     checkArgument(onError != null,
                   "An error completion handler is required in order to execute the components chain, but it was null");
-    new Executor(chain, originalEvent, event, onSuccess, onError)
-        .execute();
+    new ChainExecutor(chain, originalEvent, event, onSuccess, onError).execute();
   }
 
   @Override
@@ -110,62 +109,4 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
     return originalEvent;
   }
 
-  private static final class Executor {
-
-    private final CoreEvent event;
-    private final CoreEvent originalEvent;
-    private final MessageProcessorChain chain;
-    private final Consumer<Result> successHandler;
-    private final BiConsumer<Throwable, Result> errorHandler;
-
-    Executor(MessageProcessorChain chain,
-             CoreEvent originalEvent, CoreEvent event,
-             Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
-      this.chain = chain;
-      this.event = event;
-      this.originalEvent = originalEvent;
-      this.successHandler = onSuccess;
-      this.errorHandler = onError;
-    }
-
-    public void execute() {
-      final SdkInternalContext sdkInternalCtx = from(event);
-      Function<Context, Context> innerChainCtxMapping = identity();
-      if (sdkInternalCtx != null) {
-        innerChainCtxMapping = sdkInternalCtx.getInnerChainSubscriberContextMapping();
-      }
-
-      from(processWithChildContextDontComplete(event, chain, ofNullable(chain.getLocation())))
-          .doOnSuccess(this::handleSuccess)
-          .doOnError(error -> {
-            if (error instanceof MessagingException) {
-              this.handleError(error, ((MessagingException) error).getEvent());
-            } else {
-              LOGGER.error("Exception in nested chain", error);
-              this.handleError(error, event);
-            }
-          })
-          .subscriberContext(innerChainCtxMapping)
-          .subscribe();
-    }
-
-    private void handleSuccess(CoreEvent childEvent) {
-      Result result = childEvent != null ? EventedResult.from(childEvent) : Result.builder().build();
-      try {
-        successHandler.accept(result);
-      } catch (Throwable error) {
-        errorHandler.accept(error, result);
-      }
-    }
-
-    private CoreEvent handleError(Throwable error, CoreEvent childEvent) {
-      try {
-        errorHandler.accept(error, EventedResult.from(childEvent));
-      } catch (Throwable e) {
-        ((BaseEventContext) originalEvent.getContext()).error(e);
-      }
-      return null;
-    }
-
-  }
 }
