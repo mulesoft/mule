@@ -41,7 +41,7 @@ public class CompositeClassLoader extends ClassLoader {
   private List<ClassLoader> delegates;
 
   private static final Cache<List<Integer>, CompositeClassLoader> cache = newBuilder()
-      .maximumSize(1024).expireAfterAccess(1, MINUTES).build();
+      .maximumSize(1024).weakValues().expireAfterAccess(1, MINUTES).build();
 
   CompositeClassLoader(ClassLoader first, ClassLoader second) {
     if (first != null && second != null) {
