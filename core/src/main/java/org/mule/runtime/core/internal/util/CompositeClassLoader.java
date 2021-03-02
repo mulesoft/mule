@@ -12,6 +12,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Objects.hash;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
 
@@ -20,9 +21,11 @@ import com.github.benmanes.caffeine.cache.Cache;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Classloader implementation that, given a set of classloaders, will first search for a resource/class in the first one. If it is
@@ -86,15 +89,77 @@ public class CompositeClassLoader extends ClassLoader {
   }
 
   private static List<Integer> getKey(ClassLoader first, ClassLoader second) {
-    if (first != null && second != null) {
-      return asList(identityHashCode(first), identityHashCode(second));
-    } else if (first != null) {
-      return singletonList(identityHashCode(first));
-    } else if (second != null) {
-      return singletonList(identityHashCode(second));
-    } else {
-      return emptyList();
-    }
+    return new ShortList<>(identityHashCode(first), identityHashCode(second));
+  }
+
+  private static class ShortList<T> extends AbstractList<T> {
+
+      final T first;
+      final T second;
+      final T third;
+
+      ShortList(T first) {
+          this.first = first;
+          this.second = null;
+          this.third = null;
+      }
+
+      ShortList(T first, T second) {
+          this.first = first;
+          this.second = second;
+          this.third = null;
+      }
+
+      ShortList(T first, T second, T third) {
+          this.first = first;
+          this.second = second;
+          this.third = third;
+      }
+
+      @Override
+      public T get(int index) {
+          if (index >= size()) {
+              throw new IndexOutOfBoundsException();
+          }
+          if (index == 0) {
+              return first;
+          }
+          if (index == 1) {
+              return second;
+          }
+          if (index == 2) {
+              return third;
+          }
+          throw new IndexOutOfBoundsException();
+      }
+
+      @Override
+      public int size() {
+          if (third != null) {
+              return 3;
+          }
+          if (second != null) {
+              return 2;
+          }
+          return 1;
+      }
+
+      @Override
+      public int hashCode() {
+          return hash(first, second, third);
+      }
+
+      @Override
+      public boolean equals(Object o) {
+          if (!(o instanceof ShortList)) {
+              return false;
+          }
+
+          ShortList<T> other = (ShortList) o;
+          return Objects.equals(first, other.first) &&
+                 Objects.equals(second, other.second) &&
+                 Objects.equals(third, other.third);
+      }
   }
 
   /**
