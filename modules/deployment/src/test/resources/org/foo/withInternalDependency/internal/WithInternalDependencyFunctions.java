@@ -7,9 +7,15 @@
 
 package org.foo.withInternalDependency.internal;
 
-public class InternalRegistryBean {
+import javax.inject.Inject;
 
-    public InternalRegistryBean() {
+public class WithInternalDependencyFunctions {
+
+    @Inject
+    private InternalRegistryBean registryBean;
+
+    public boolean isInternalDependencyInjectedIntoFunctions() {
+        return registryBean != null;
     }
 
 }

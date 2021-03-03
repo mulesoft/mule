@@ -49,7 +49,7 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
                                           PolicyParametrization parametrization) {
     return new DefaultApplicationPolicyInstance(application, policyTemplate, parametrization, serviceRepository,
                                                 classLoaderRepository,
-                                                policyTemplate.getOwnArtifactPlugins(),
+                                                policyTemplate.getArtifactPlugins(),
                                                 extensionModelLoaderRepository, null);
   }
 

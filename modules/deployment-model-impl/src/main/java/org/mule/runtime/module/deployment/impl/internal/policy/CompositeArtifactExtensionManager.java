@@ -133,9 +133,10 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
     Optional<ConfigurationProvider> configurationModel =
         childExtensionManager.getConfigurationProvider(extensionModel, componentModel);
 
-    if (!configurationModel.isPresent()) {
+    // TODO: Reformulate this (horrible logic): Start with !childExtensionManager.getExtension condition
+    if (!configurationModel.isPresent() && !childExtensionManager.getExtension(extensionModel.getName()).isPresent()) {
       configurationModel =
-          parentExtensionManager.getConfigurationProvider(extensionModel, componentModel);;
+          parentExtensionManager.getConfigurationProvider(extensionModel, componentModel);
     }
 
     return configurationModel;
