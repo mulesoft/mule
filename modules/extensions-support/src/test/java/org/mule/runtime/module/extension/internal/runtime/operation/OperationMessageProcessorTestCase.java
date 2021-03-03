@@ -27,6 +27,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
@@ -55,20 +56,6 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.event.EventContext;
@@ -111,6 +98,21 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
+
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 
 import com.google.common.reflect.TypeToken;
 
@@ -462,6 +464,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     verify(operationExecutor).execute(same(context.get()), any());
     verify(context.get(), atLeastOnce()).getConfiguration();
     messageProcessor.disposeResolvedParameters(context.get());
+
+    verify(resolverSet, times(1)).resolve(any());
   }
 
   @Test
