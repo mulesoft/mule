@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -23,11 +24,9 @@ import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProvi
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-
 
 /**
  * Implementation of {@link ResolverSetBasedObjectBuilder} which produces instances of {@link ConnectionProviderModel}
@@ -113,7 +112,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     final ClassLoader appRegionClassLoader = muleContext.getExecutionClassLoader().getParent();
 
     return ClassLoaderConnectionProviderWrapper
-        .newInstance(provider, new CompositeClassLoader(extensionClassLoader, appRegionClassLoader));
+        .newInstance(provider, from(extensionClassLoader, appRegionClassLoader));
   }
 
 }
