@@ -190,7 +190,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     if (!config.isPresent() && requiresConfig(extensionModel, componentModel)) {
       throw new NoConfigRefFoundException(extensionModel, componentModel);
     }
-    return config.flatMap(c -> getConfigurationProvider(getImplicitConfigurationProviderName(extensionModel, c)));
+    return config.flatMap(c -> getConfigurationProvider(getImplicitConfigurationProviderName(muleContext, extensionModel, c)));
   }
 
   /**
@@ -205,7 +205,8 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   private ConfigurationProvider createImplicitConfiguration(ExtensionModel extensionModel,
                                                             ConfigurationModel implicitConfigurationModel,
                                                             CoreEvent muleEvent) {
-    String implicitConfigurationProviderName = getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel);
+    String implicitConfigurationProviderName =
+        getImplicitConfigurationProviderName(muleContext, extensionModel, implicitConfigurationModel);
     return extensionRegistry.getConfigurationProvider(implicitConfigurationProviderName).orElseGet(() -> {
       synchronized (extensionModel) {
         // check that another thread didn't beat us to create the instance

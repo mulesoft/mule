@@ -93,7 +93,6 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     validateArtifactLicense(policyClassLoader.getClassLoader(), artifactPlugins, licenseValidator);
 
     return new DefaultPolicyTemplate(policyClassLoader.getArtifactId(), descriptor, policyClassLoader,
-                                     artifactPlugins,
                                      resolveOwnArtifactPlugins(artifactPlugins, ownResolvedPluginDescriptors,
                                                                ownPolicyClassLoader));
   }

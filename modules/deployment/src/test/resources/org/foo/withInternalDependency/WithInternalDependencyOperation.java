@@ -8,16 +8,32 @@
 package org.foo.withInternalDependency;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.foo.withInternalDependency.internal.InternalRegistryBean;
+
+import javax.inject.Inject;
 
 public class WithInternalDependencyOperation {
 
-  public WithInternalDependencyOperation() {}
+//  @Parameter
+//  @Expression
+//  boolean isInternalDependencyInjectedIntoFunctions = false;
+
+  @Inject
+  private InternalRegistryBean registryBean;
 
   @MediaType(value = TEXT_PLAIN, strict = false)
-  public String checkDependency(@Config WithInternalDependencyExtension config) {
-    System.out.println("Test plugin extension says: " + config.checkDependency());
-    return config.checkDependency();
+  public String checkDependency(@Config WithInternalDependencyExtension config) throws Exception {
+//    if (!isInternalDependencyInjectedIntoFunctions) {
+//      throw new NullPointerException("registryBean is null (has not been injected into the extension expression functions)");
+//    }
+    config.checkExtensionInjection();
+    if (registryBean == null) {
+      throw new NullPointerException("registryBean is null (has not been injected into the extension operations)");
+    }
+    return "registryBean has been injected into the extension, its operations and it's functions";
   }
+
 }

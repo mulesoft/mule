@@ -351,7 +351,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     extensionWithInternalDependencyJarFile = new ExtensionCompiler()
         .compiling(getResourceFile("/org/foo/withInternalDependency/WithInternalDependencyExtension.java"),
-                   getResourceFile("/org/foo/withInternalDependency/WithInternalDependencyOperation.java"))
+                   getResourceFile("/org/foo/withInternalDependency/WithInternalDependencyOperation.java"),
+                   getResourceFile("/org/foo/withInternalDependency/internal/InternalRegistryBean.java"),
+                   getResourceFile("/org/foo/withInternalDependency/internal/WithInternalDependencyFunctions.java"))
         .including(getResourceFile("/org/foo/withInternalDependency/registry-bootstrap.properties"),
                    "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
         .compile("mule-module-with-internal-dependency-4.0-SNAPSHOT.jar", "1.0.0");

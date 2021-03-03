@@ -7,29 +7,38 @@
 
 package org.foo.withInternalDependency;
 
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.ExpressionFunctions;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.foo.withInternalDependency.internal.InternalRegistryBean;
+import org.foo.withInternalDependency.internal.WithInternalDependencyFunctions;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
+import java.lang.String;
 import javax.inject.Inject;
 
 /**
  * Extension for testing purposes that declares an internal bean dependency.
  */
 @Extension(name = "WithInternalDependency")
+@ExpressionFunctions(WithInternalDependencyFunctions.class)
 @Operations({WithInternalDependencyOperation.class})
 public class WithInternalDependencyExtension {
+
+//  @Parameter
+//  @Expression
+//  boolean isInternalDependencyInjectedIntoFunctions = false;
 
   @Inject
   private InternalRegistryBean registryBean;
 
-  public WithInternalDependencyExtension() {}
-
-  public String checkDependency() {
+  public void checkExtensionInjection() {
+//    if (!isInternalDependencyInjectedIntoFunctions) {
+//      throw new NullPointerException("registryBean is null (has not been injected into the extension expression functions)");
+//    }
     if (registryBean == null) {
-      throw new NullPointerException("registryBean is null (has not been injected)");
+      throw new NullPointerException("registryBean is null (has not been injected into the extension)");
     }
-    return "registryBean has been injected";
   }
 }
