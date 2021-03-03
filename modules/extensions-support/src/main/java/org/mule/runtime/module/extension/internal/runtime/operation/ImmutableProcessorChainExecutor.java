@@ -6,35 +6,24 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.util.Optional.ofNullable;
-import static java.util.function.Function.identity;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
-import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
-import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
-import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import reactor.util.context.Context;
 
 /**
  * An implementation of {@link Chain} that wraps a {@link Processor} and allows to execute it

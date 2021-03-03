@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 
@@ -13,17 +14,20 @@ import static java.util.Optional.of;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 
-public class ImmutableProcessorChildContextChainExecutor implements ChildContextChain {
+public class ImmutableProcessorChildContextChainExecutor implements ChildContextChain, HasMessageProcessors {
 
   /**
    * Processor that will be executed upon calling process
@@ -57,7 +61,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
 
   @Override
   public void process(String correlationId, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
-    Optional<ComponentLocation> location = of(chain.getLocation());
+    Optional<ComponentLocation> location = ofNullable(chain.getLocation());
     BaseEventContext newContext = child(oldContext, location, correlationId);
     CoreEvent eventWithCorrelationId = quickCopy(newContext, originalEvent);
     new ChainExecutor(chain, originalEvent, eventWithCorrelationId, onSuccess, onError).execute();
@@ -76,5 +80,10 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
   @Override
   public void process(Result input, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
     this.delegate.process(input, onSuccess, onError);
+  }
+
+  @Override
+  public List<Processor> getMessageProcessors() {
+    return chain.getMessageProcessors();
   }
 }
