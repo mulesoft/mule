@@ -21,6 +21,7 @@ import static net.bytebuddy.matcher.ElementMatchers.isConstructor;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -136,8 +137,8 @@ public class MethodExecutorGenerator {
   }
 
   private Class<MethodExecutor> generateExecutorClass(String executorName, Method method, File generatedByteCodeFile) {
-    final CompositeClassLoader executorClassLoader = new CompositeClassLoader(method.getDeclaringClass().getClassLoader(),
-                                                                              getClass().getClassLoader());
+    final CompositeClassLoader executorClassLoader = from(method.getDeclaringClass().getClassLoader(),
+                                                          getClass().getClassLoader());
     try {
       return (Class<MethodExecutor>) forName(executorName, true, executorClassLoader);
     } catch (ClassNotFoundException e) {
