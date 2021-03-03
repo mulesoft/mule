@@ -194,10 +194,6 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
     };
   }
 
-  private boolean isInterceptable(ReactiveProcessor component) {
-    return component instanceof Component && ((Component) component).getLocation() != null;
-  }
-
   @Override
   protected InternalEvent removeResolvedParameters(InternalEvent event) {
     if (internalParametersFrom(event).containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
