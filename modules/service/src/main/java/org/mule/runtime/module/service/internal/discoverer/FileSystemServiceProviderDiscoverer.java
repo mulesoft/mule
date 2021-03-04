@@ -52,11 +52,13 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   /**
    * Creates a new instance.
    *
-   * @param containerClassLoader               container artifact classLoader. Non null.
-   * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
-   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
-   * @param targetServicesFolder               {@link File} where services are exploded and would be discovered. Non null.
+   * @param containerClassLoader container artifact classLoader. Non null.
+   * @param serviceClassLoaderFactory factory used to create service's classloaders. Non null.
+   * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
+   *        {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator} in order to check the state of the
+   *        descriptor once loaded.
+   * @param targetServicesFolder {@link File} where services are exploded and would be discovered. Non null.
    */
   public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
                                              ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
@@ -70,10 +72,12 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   /**
    * Creates a new instance that discover services from Mule Runtime services folder.
    *
-   * @param containerClassLoader               container artifact classLoader. Non null.
-   * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
-   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
-   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
+   * @param containerClassLoader container artifact classLoader. Non null.
+   * @param serviceClassLoaderFactory factory used to create service's classloaders. Non null.
+   * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
+   *        {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator} in order to check the state of the
+   *        descriptor once loaded.
    */
   public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
                                              ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,

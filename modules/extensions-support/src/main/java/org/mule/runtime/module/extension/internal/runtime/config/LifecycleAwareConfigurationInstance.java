@@ -252,8 +252,8 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
   }
 
   /**
-   * Propagates this lifecycle phase into the the {@link #value}. Also triggers a
-   * {@link ConfigurationInstanceNotification} that is being stopped.
+   * Propagates this lifecycle phase into the the {@link #value}. Also triggers a {@link ConfigurationInstanceNotification} that
+   * is being stopped.
    *
    * @throws MuleException if an exception is found
    */

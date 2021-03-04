@@ -85,7 +85,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
     @Override
     public void enrich(ExtensionLoadingContext extensionLoadingContext) {
       BaseDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-      //TODO MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
+      // TODO MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
       if (!isASTMode(declaration)) {
         Optional<ExtensionTypeDescriptorModelProperty> property =
             declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);

@@ -69,14 +69,12 @@ public class ClassPathClassifierContext {
    *        {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @param testInclusions {@link List} of Maven coordinates to be included in application class loader. In format
    *        {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
-   * @param applicationSharedLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be
-   *        added to the sharedLib {@link ArtifactClassLoader}
+   * @param applicationSharedLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to
+   *        be added to the sharedLib {@link ArtifactClassLoader}
    * @param exportPluginClasses {@link List} of {@link Class} to be exported in addition to the ones already exported by the
    *        plugin, for testing purposes only.
-   * @param testRunnerPluginUrls {@link List} of {@link URL}s to be appended to the application
-   *        {@link ArtifactClassLoader}
-   * @param extensionMetadataGenerationEnabled if while building the a plugin
-   *        {@link ArtifactClassLoader} for an
+   * @param testRunnerPluginUrls {@link List} of {@link URL}s to be appended to the application {@link ArtifactClassLoader}
+   * @param extensionMetadataGenerationEnabled if while building the a plugin {@link ArtifactClassLoader} for an
    *        {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
    * @param applicationLibCoordinates
    * @param testRunnerExportedLibCoordinates
@@ -202,40 +200,40 @@ public class ClassPathClassifierContext {
   }
 
   /**
-   * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>} in order to be added to the sharedLib
-   *         {@link ArtifactClassLoader}
+   * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} or
+   *         {@code <groupId>:<artifactId>:<classifier>} in order to be added to the sharedLib {@link ArtifactClassLoader}
    */
   public List<String> getApplicationSharedLibCoordinates() {
     return this.applicationSharedLibCoordinates;
   }
 
   /**
-   * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>} in order to be added to the application
-   *         {@link ArtifactClassLoader}
+   * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} or
+   *         {@code <groupId>:<artifactId>:<classifier>} in order to be added to the application {@link ArtifactClassLoader}
    */
   public List<String> getApplicationLibCoordinates() {
     return this.applicationLibCoordinates;
   }
 
   /**
-   * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>} in order to be exported by the test runner
-   *         {@link ArtifactClassLoader}
+   * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} or
+   *         {@code <groupId>:<artifactId>:<classifier>} in order to be exported by the test runner {@link ArtifactClassLoader}
    */
   public List<String> getTestRunnerExportedLibCoordinates() {
     return testRunnerExportedLibCoordinates;
   }
 
   /**
-   * @return {@link List} of {@link URL}s to be appended to the application
-   *         {@link ArtifactClassLoader} in addition to the ones classified.
+   * @return {@link List} of {@link URL}s to be appended to the application {@link ArtifactClassLoader} in addition to the ones
+   *         classified.
    */
   public List<URL> getTestRunnerPluginUrls() {
     return this.testRunnerPluginUrls;
   }
 
   /**
-   * @return {@code true} if while building the a plugin {@link ArtifactClassLoader}
-   *         for an {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
+   * @return {@code true} if while building the a plugin {@link ArtifactClassLoader} for an
+   *         {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
    */
   public boolean isExtensionMetadataGenerationEnabled() {
     return extensionMetadataGenerationEnabled;

@@ -48,7 +48,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   /**
    * Links the given {@link ValueResolver} to the given identifying {@code key}.
    *
-   * @param key      a non-blank {@code key}
+   * @param key a non-blank {@code key}
    * @param resolver a not {@code null} {@link ValueResolver}
    * @return this resolver set to allow chaining
    * @throws IllegalStateException if the {@code key} was already associated to a {@code resolver}
@@ -74,8 +74,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    * @param resolvers a not {@code null} {@link Map} of {@code key}-{@link ValueResolver}
    * @return this resolver set to allow chaining
    * @throws IllegalStateException if any of the {@code key}s were already associated to a {@code resolver}
-   * @throws IllegalArgumentException if either {@code key} is empty or {@code resolver} is {@code null},
-   * on any of the entries.
+   * @throws IllegalArgumentException if either {@code key} is empty or {@code resolver} is {@code null}, on any of the entries.
    * @see ResolverSet#add(String, ValueResolver)
    */
   public ResolverSet addAll(Map<String, ValueResolver<?>> resolvers) {
@@ -118,8 +117,8 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   }
 
   /**
-   * Creates a new instance of {@link ResolverSet} containing all the resolvers
-   * of both {@code this} {@link ResolverSet} and the given {@code resolverSet}
+   * Creates a new instance of {@link ResolverSet} containing all the resolvers of both {@code this} {@link ResolverSet} and the
+   * given {@code resolverSet}
    *
    * @param resolverSet a {@link ResolverSet} to merge with {@code this} {@link ResolverSet}
    * @return a new instance of {@link ResolverSet} containing all the resolvers.

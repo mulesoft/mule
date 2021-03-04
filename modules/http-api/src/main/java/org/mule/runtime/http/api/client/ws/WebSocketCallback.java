@@ -29,12 +29,12 @@ public interface WebSocketCallback {
   void onConnect(WebSocket webSocket);
 
   /**
-   * Invoked then the given {@code webSocket} is closed. This method will be invoked whether the socket was
-   * closed locally or remotely.
+   * Invoked then the given {@code webSocket} is closed. This method will be invoked whether the socket was closed locally or
+   * remotely.
    *
    * @param webSocket the closed {@link WebSocket}
-   * @param code      the close code used
-   * @param reason    the reason provided
+   * @param code the close code used
+   * @param reason the reason provided
    */
   void onClose(WebSocket webSocket, WebSocketCloseCode code, String reason);
 
@@ -42,7 +42,7 @@ public interface WebSocketCallback {
    * Invoked when the given {@code webSocket} receives data.
    *
    * @param webSocket the {@link WebSocket} that received the data
-   * @param content   the received content
+   * @param content the received content
    */
   void onMessage(WebSocket webSocket, TypedValue<InputStream> content);
 

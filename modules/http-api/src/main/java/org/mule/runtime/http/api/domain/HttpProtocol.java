@@ -12,6 +12,7 @@ package org.mule.runtime.http.api.domain;
  * @since 4.0
  */
 public enum HttpProtocol {
+
   HTTP_0_9("HTTP/0.9"), HTTP_1_0("HTTP/1.0"), HTTP_1_1("HTTP/1.1");
 
   private final String protocolName;

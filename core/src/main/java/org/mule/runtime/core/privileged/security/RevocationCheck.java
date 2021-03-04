@@ -23,8 +23,7 @@ import javax.net.ssl.ManagerFactoryParameters;
 public interface RevocationCheck {
 
   /**
-   * Configures trust store factory parameters for certificate revocation checking according to
-   * the method implementation.
+   * Configures trust store factory parameters for certificate revocation checking according to the method implementation.
    *
    * @param trustStore the trust store configured for the corresponding TLS context
    * @param defaultTrustAnchors the default trusted CAs from the JVM

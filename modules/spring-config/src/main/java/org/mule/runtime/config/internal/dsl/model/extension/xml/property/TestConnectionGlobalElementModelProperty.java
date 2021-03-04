@@ -9,8 +9,8 @@ package org.mule.runtime.config.internal.dsl.model.extension.xml.property;
 import org.mule.runtime.api.meta.model.ModelProperty;
 
 /**
- * Marker element to determine if any of the global elements of the current Smart Connector should be macro expanded holding
- * the original bean name from the application. By doing so, the most internal macro expanded element will be (always) a java SDK
+ * Marker element to determine if any of the global elements of the current Smart Connector should be macro expanded holding the
+ * original bean name from the application. By doing so, the most internal macro expanded element will be (always) a java SDK
  * component to which tooling could be able to execute test connection.
  *
  * @since 4.0

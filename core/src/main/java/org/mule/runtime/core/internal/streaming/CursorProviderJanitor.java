@@ -36,9 +36,9 @@ public class CursorProviderJanitor {
   /**
    * Creates a new instance
    *
-   * @param provider         the {@link CursorProvider} which resources are freed
+   * @param provider the {@link CursorProvider} which resources are freed
    * @param openCursorsCount an {@link AtomicInteger} to decrement each time a cursor is released
-   * @param statistics       a {@link MutableStreamingStatistics}
+   * @param statistics a {@link MutableStreamingStatistics}
    */
   public CursorProviderJanitor(CursorProvider provider, AtomicInteger openCursorsCount, MutableStreamingStatistics statistics) {
     this.provider = provider;

@@ -43,8 +43,8 @@ import org.mule.sdk.api.runtime.operation.Result;
 import java.util.function.Supplier;
 
 /**
- * Coordinates all the moving parts necessary to provision and execute a {@link SampleDataProvider},
- * handling possible errors and transforming the output into a {@link Message}
+ * Coordinates all the moving parts necessary to provision and execute a {@link SampleDataProvider}, handling possible errors and
+ * transforming the output into a {@link Message}
  *
  * @since 4.4.0
  */
@@ -64,7 +64,7 @@ public class SampleDataProviderMediator {
    * Creates a new instance of the mediator
    *
    * @param componentModel container model which is a {@link ParameterizedModel} and {@link EnrichableModel}
-   * @param muleContext    context to be able to initialize {@link SampleDataProvider} if necessary
+   * @param muleContext context to be able to initialize {@link SampleDataProvider} if necessary
    */
   public SampleDataProviderMediator(ExtensionModel extensionModel,
                                     ComponentModel componentModel,
@@ -85,12 +85,12 @@ public class SampleDataProviderMediator {
   /**
    * Resolves the sample data
    *
-   * @param parameterValueResolver parameter resolver required if the associated {@link SampleDataProvider} requires
-   *                               the value of parameters from the same parameter container.
-   * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
-   *                               {@link SampleDataProvider}
-   * @param configurationSupplier  supplier of configuration instance related to the container and used, if necessary, by the
-   *                               {@link SampleDataProvider}
+   * @param parameterValueResolver parameter resolver required if the associated {@link SampleDataProvider} requires the value of
+   *        parameters from the same parameter container.
+   * @param connectionSupplier supplier of connection instances related to the container and used, if necessary, by the
+   *        {@link SampleDataProvider}
+   * @param configurationSupplier supplier of configuration instance related to the container and used, if necessary, by the
+   *        {@link SampleDataProvider}
    * @return a {@link Message} carrying the sample data
    * @throws SampleDataException if an error occurs resolving the sample data
    */
@@ -104,14 +104,14 @@ public class SampleDataProviderMediator {
   /**
    * Resolves the sample data
    *
-   * @param parameterValueResolver       parameter resolver required if the associated {@link SampleDataProvider} requires
-   *                                     the value of parameters from the same parameter container.
-   * @param connectionSupplier           supplier of connection instances related to the container and used, if necessary,
-   *                                     by the {@link SampleDataProvider}
-   * @param configurationSupplier        supplier of configuration instance related to the container and used, if necessary,
-   *                                     by the  {@link SampleDataProvider}
-   * @param connectionProviderSupplier   the connection provider in charge of providing the connection given by the
-   *                                     connection supplier.
+   * @param parameterValueResolver parameter resolver required if the associated {@link SampleDataProvider} requires the value of
+   *        parameters from the same parameter container.
+   * @param connectionSupplier supplier of connection instances related to the container and used, if necessary, by the
+   *        {@link SampleDataProvider}
+   * @param configurationSupplier supplier of configuration instance related to the container and used, if necessary, by the
+   *        {@link SampleDataProvider}
+   * @param connectionProviderSupplier the connection provider in charge of providing the connection given by the connection
+   *        supplier.
    *
    * @return a {@link Message} carrying the sample data
    * @throws SampleDataException if an error occurs resolving the sample data

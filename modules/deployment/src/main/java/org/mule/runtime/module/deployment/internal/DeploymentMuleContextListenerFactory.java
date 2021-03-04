@@ -14,8 +14,7 @@ import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
 
 /**
- * Creates {@link MuleContextListener} instances to tied the mule context lifecycle to the deployment
- * lifecycle.
+ * Creates {@link MuleContextListener} instances to tied the mule context lifecycle to the deployment lifecycle.
  */
 public class DeploymentMuleContextListenerFactory implements MuleContextListenerFactory {
 

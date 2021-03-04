@@ -38,8 +38,8 @@ import reactor.util.context.Context;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s
- * {@link ProcessorInterceptor#around(ComponentLocation, Map, InterceptionEvent, InterceptionAction)
- * around} method for a {@link Processor} into the {@code Reactor} pipeline.
+ * {@link ProcessorInterceptor#around(ComponentLocation, Map, InterceptionEvent, InterceptionAction) around} method for a
+ * {@link Processor} into the {@code Reactor} pipeline.
  *
  * @since 4.0
  */

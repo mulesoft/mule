@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@link ExtensionModelValidator} which validates that the exported packages for the current extension exports
- * API declared packages and doesn't export packages declared as internal.
+ * {@link ExtensionModelValidator} which validates that the exported packages for the current extension exports API declared
+ * packages and doesn't export packages declared as internal.
  *
  * @since 4.1
  */
@@ -53,7 +53,7 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
       exportedPackages
           .forEach((packageName, classes) -> {
             if (packageName.contains(".api.") || packageName.endsWith(".api")) {
-              //valid package
+              // valid package
             } else if (packageName.contains(".internal.") || packageName.endsWith(".internal")) {
               internalPackages.put(packageName, classes);
             } else {

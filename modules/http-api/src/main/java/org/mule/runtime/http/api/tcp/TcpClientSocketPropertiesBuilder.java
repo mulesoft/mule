@@ -25,8 +25,8 @@ public final class TcpClientSocketPropertiesBuilder {
   TcpClientSocketPropertiesBuilder() {}
 
   /**
-   * Defines the size of the buffer to use when sending data. See {@link TcpSocketProperties#getSendBufferSize()}.
-   * If not set, transport defaults will be used.
+   * Defines the size of the buffer to use when sending data. See {@link TcpSocketProperties#getSendBufferSize()}. If not set,
+   * transport defaults will be used.
    *
    * @param sendBufferSize size of the buffer (in bytes).
    * @return this builder
@@ -37,8 +37,8 @@ public final class TcpClientSocketPropertiesBuilder {
   }
 
   /**
-   * Defines the size of the buffer to use when receiving data. See {@link TcpSocketProperties#getReceiveBufferSize()}.
-   * If not set, transport defaults will be used.
+   * Defines the size of the buffer to use when receiving data. See {@link TcpSocketProperties#getReceiveBufferSize()}. If not
+   * set, transport defaults will be used.
    *
    * @param receiveBufferSize size of the buffer (in bytes).
    * @return this builder
@@ -49,8 +49,8 @@ public final class TcpClientSocketPropertiesBuilder {
   }
 
   /**
-   * Defines the SO_TIMEOUT value for client sockets. See {@link TcpSocketProperties#getClientTimeout()}.
-   * If not set, transport defaults will be used.
+   * Defines the SO_TIMEOUT value for client sockets. See {@link TcpSocketProperties#getClientTimeout()}. If not set, transport
+   * defaults will be used.
    *
    * @param clientTimeout the timeout (in milliseconds).
    * @return this builder
@@ -61,8 +61,8 @@ public final class TcpClientSocketPropertiesBuilder {
   }
 
   /**
-   * Defines whether data should be collected or not before sending. See {@link TcpSocketProperties#getSendTcpNoDelay()}.
-   * Default value is true.
+   * Defines whether data should be collected or not before sending. See {@link TcpSocketProperties#getSendTcpNoDelay()}. Default
+   * value is true.
    *
    * @param sendTcpNoDelay whether to send everything or collect data
    * @return this builder
@@ -85,8 +85,7 @@ public final class TcpClientSocketPropertiesBuilder {
   }
 
   /**
-   * Defines the SO_KEEPALIVE behaviour for open sockets. See {@link TcpSocketProperties#getKeepAlive()}.
-   * Default value is true.
+   * Defines the SO_KEEPALIVE behaviour for open sockets. See {@link TcpSocketProperties#getKeepAlive()}. Default value is true.
    *
    * @param keepAlive
    * @return
@@ -97,8 +96,8 @@ public final class TcpClientSocketPropertiesBuilder {
   }
 
   /**
-   * Defines how long to wait for the outbound connection to be created. See {@link TcpClientSocketProperties#getConnectionTimeout()}.
-   * Default value is 30000.
+   * Defines how long to wait for the outbound connection to be created. See
+   * {@link TcpClientSocketProperties#getConnectionTimeout()}. Default value is 30000.
    *
    * @param connectionTimeout timeout (in milliseconds)
    * @return this builder

@@ -16,12 +16,12 @@ import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
  * By implementing this listener interface and registering the object with the
- * {@link NotificationListenerRegistry#registerListener(NotificationListener)} You can receive
- * {@link FunctionalTestNotification}s from the {@link FunctionalTestProcessor}.
+ * {@link NotificationListenerRegistry#registerListener(NotificationListener)} You can receive {@link FunctionalTestNotification}s
+ * from the {@link FunctionalTestProcessor}.
  *
- * This Notification contains the current {@link CoreEvent}, {@link FlowConstruct} and reply message. The resource identifier for this
- * event is the service name that received the message. This means you can register to listen to Notifications from a selected
- * {@link FunctionalTestProcessor}. i.e. <code>
+ * This Notification contains the current {@link CoreEvent}, {@link FlowConstruct} and reply message. The resource identifier for
+ * this event is the service name that received the message. This means you can register to listen to Notifications from a
+ * selected {@link FunctionalTestProcessor}. i.e. <code>
  * muleContext.registerListener(this, "*JmsTestCompoennt");
  * </code>
  *

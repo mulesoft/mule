@@ -80,8 +80,8 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
   }
 
   /**
-   * Retrieves the {@link ResourceOwnerOAuthContext} for the given {@code config}. If no such context yet exists,
-   * then it performs the OAuth authorization and returns the resulting context.
+   * Retrieves the {@link ResourceOwnerOAuthContext} for the given {@code config}. If no such context yet exists, then it performs
+   * the OAuth authorization and returns the resulting context.
    *
    * @param config a {@link PlatformManagedOAuthConfig}
    * @return the {@link ResourceOwnerOAuthContext} for the given {@code config}.

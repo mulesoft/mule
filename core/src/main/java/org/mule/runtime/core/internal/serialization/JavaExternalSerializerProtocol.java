@@ -21,8 +21,8 @@ import java.io.OutputStream;
 import java.io.Serializable;
 
 /**
- * Implementation of {@link SerializationProtocol} that uses Java's default serialization mechanism. This means
- * that exceptions will come from serializing objects that do not implement {@link Serializable}
+ * Implementation of {@link SerializationProtocol} that uses Java's default serialization mechanism. This means that exceptions
+ * will come from serializing objects that do not implement {@link Serializable}
  */
 public class JavaExternalSerializerProtocol extends AbstractSerializationProtocol {
 
@@ -52,7 +52,7 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
    */
   @Override
   protected byte[] doSerialize(Object object) throws Exception {
-    //TODO: MULE-11939
+    // TODO: MULE-11939
     if (object instanceof CursorStreamProvider) {
       try (CursorStream cursor = ((CursorStreamProvider) object).openCursor()) {
         return org.apache.commons.lang3.SerializationUtils.serialize(toByteArray(cursor));

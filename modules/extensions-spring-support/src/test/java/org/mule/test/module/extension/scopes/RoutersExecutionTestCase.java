@@ -109,8 +109,8 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
   }
 
   /**
-   * Executes the same flow concurrently to check that no race condition exists because
-   * two different instances of Chain are being used
+   * Executes the same flow concurrently to check that no race condition exists because two different instances of Chain are being
+   * used
    */
   @Test
   public void concurrentRouterExecution() throws Exception {

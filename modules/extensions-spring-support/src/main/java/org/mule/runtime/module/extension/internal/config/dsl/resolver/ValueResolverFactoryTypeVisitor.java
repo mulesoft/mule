@@ -47,8 +47,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
 /**
- * A {@link MetadataTypeVisitor} implementation that creates a {@link ValueResolver} instances
- * depending on a parameter {@link MetadataType}.
+ * A {@link MetadataTypeVisitor} implementation that creates a {@link ValueResolver} instances depending on a parameter
+ * {@link MetadataType}.
  *
  * @since 4.2
  */

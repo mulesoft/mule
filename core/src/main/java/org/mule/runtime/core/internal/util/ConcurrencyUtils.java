@@ -33,12 +33,12 @@ public class ConcurrencyUtils {
   }
 
   /**
-   * Returns the value of the given {@code supplier} between the boundaries of
-   * the given {@code lock}. It guarantees that the lock is released
+   * Returns the value of the given {@code supplier} between the boundaries of the given {@code lock}. It guarantees that the lock
+   * is released
    *
-   * @param lock     a {@link Lock}
+   * @param lock a {@link Lock}
    * @param supplier a {@link CheckedSupplier}
-   * @param <T>      the generic type of the returned value
+   * @param <T> the generic type of the returned value
    * @return the supplied value
    * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
@@ -53,10 +53,9 @@ public class ConcurrencyUtils {
   }
 
   /**
-   * Execute the given {@code delegate} between the boundaries of
-   * the given {@code lock}. It guarantees that the lock is released
+   * Execute the given {@code delegate} between the boundaries of the given {@code lock}. It guarantees that the lock is released
    *
-   * @param lock     a {@link Lock}
+   * @param lock a {@link Lock}
    * @param delegate a {@link CheckedRunnable}
    * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
@@ -74,7 +73,7 @@ public class ConcurrencyUtils {
    * Returns a {@link CompletableFuture} already exceptionally completed with the given {@code throwable}
    *
    * @param throwable the {@link Throwable} that completed the future
-   * @param <T>       the future's generic type
+   * @param <T> the future's generic type
    * @return an exceptionally completed future
    * @since 4.3.0
    */

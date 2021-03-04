@@ -16,8 +16,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Base class for streaming buffers with basic functionality to allow {@link Cursor cursors}
- * to have concurrent access to the stream's content
+ * Base class for streaming buffers with basic functionality to allow {@link Cursor cursors} to have concurrent access to the
+ * stream's content
  *
  * @since 4.0
  */

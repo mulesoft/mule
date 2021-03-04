@@ -45,7 +45,7 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
    *
    * @param executionContext the {@link ExecutionContext} for the operation to be executed
    * @throws IllegalArgumentException if the {@code operationContext} already contains a parameter of key
-   *                                  {@link ExtensionProperties#CONNECTION_PARAM}
+   *         {@link ExtensionProperties#CONNECTION_PARAM}
    */
   @Override
   public void before(ExecutionContext<ComponentModel> executionContext) throws Exception {
@@ -76,9 +76,8 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
   }
 
   /**
-   * Closes the connection according to the command set through {@link #setCloseCommand(ExecutionContext, Runnable)}.
-   * Interception API requires the connection to be closed at this point so that it's available across the entire
-   * interception cycle.
+   * Closes the connection according to the command set through {@link #setCloseCommand(ExecutionContext, Runnable)}. Interception
+   * API requires the connection to be closed at this point so that it's available across the entire interception cycle.
    */
   @Override
   public void after(ExecutionContext<ComponentModel> executionContext, Object result) {

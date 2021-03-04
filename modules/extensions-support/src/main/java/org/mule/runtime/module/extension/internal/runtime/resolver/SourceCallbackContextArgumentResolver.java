@@ -17,8 +17,8 @@ import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySo
 
 /**
  * An {@link ArgumentResolver} which returns a {@link SourceCallbackContext} which is and adapted
- * {@link org.mule.sdk.api.runtime.source.SourceCallbackContext} registered as an {@link ExecutionContext} variable
- * under the key {@link ExtensionProperties#SOURCE_CALLBACK_CONTEXT_PARAM}.
+ * {@link org.mule.sdk.api.runtime.source.SourceCallbackContext} registered as an {@link ExecutionContext} variable under the key
+ * {@link ExtensionProperties#SOURCE_CALLBACK_CONTEXT_PARAM}.
  * <p>
  * If no such variable exists, then it returns {@code null}
  *

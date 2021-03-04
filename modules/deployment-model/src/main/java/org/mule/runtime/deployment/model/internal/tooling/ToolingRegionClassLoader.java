@@ -15,8 +15,8 @@ import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 /**
- * Tooling implementation of a {@link org.mule.runtime.module.artifact.api.classloader.RegionClassLoader} that allows
- * to override some behaviour.
+ * Tooling implementation of a {@link org.mule.runtime.module.artifact.api.classloader.RegionClassLoader} that allows to override
+ * some behaviour.
  */
 public class ToolingRegionClassLoader extends RegionClassLoader {
 
@@ -47,7 +47,7 @@ public class ToolingRegionClassLoader extends RegionClassLoader {
                                         artifactDescriptor,
                                         parent,
                                         lookupPolicy, () -> {
-                                        }); //No op resource releaser
+                                        }); // No op resource releaser
   }
 
   private ToolingRegionClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, ClassLoader parent,

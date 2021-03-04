@@ -79,7 +79,7 @@ final class ExtensionRegistry {
   /**
    * Registers the given {@code extension}
    *
-   * @param name           the registration name you want for the {@code extension}
+   * @param name the registration name you want for the {@code extension}
    * @param extensionModel a {@link ExtensionModel}
    */
   void registerExtension(String name, ExtensionModel extensionModel) {
@@ -95,7 +95,7 @@ final class ExtensionRegistry {
 
   /**
    * @return an {@link Optional} with the {@link ExtensionModel} which name and vendor equals {@code extensionName} and
-   * {@code vendor}
+   *         {@code vendor}
    */
   Optional<ExtensionModel> getExtension(String extensionName) {
     return Optional.ofNullable(extensions.get(new ExtensionEntityKey(extensionName)));

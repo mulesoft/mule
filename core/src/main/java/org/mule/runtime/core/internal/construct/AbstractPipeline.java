@@ -358,7 +358,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                 sinkRecorder.next(right(Throwable.class, e));
               }
               if (isWithinProcessToApply) {
-                // When the event that entered the pipeline has been emitted by a Mono, the pipeline downstream can be safely completed,
+                // When the event that entered the pipeline has been emitted by a Mono, the pipeline downstream can be safely
+                // completed,
                 // in order to cover the case of both error and event being null (see BaseEventContext.success()).
                 sinkRecorder.complete();
               }

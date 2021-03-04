@@ -55,14 +55,14 @@ public class ReconnectionUtils {
   }
 
   /**
-   * To fix reconnection for paged operations that fail after the first page, the connection exception is intercepted at
-   * the {@link PagingProviderProducer} and enriched with additional information. This method reads that information and
-   * determines if the operation should be retried.
+   * To fix reconnection for paged operations that fail after the first page, the connection exception is intercepted at the
+   * {@link PagingProviderProducer} and enriched with additional information. This method reads that information and determines if
+   * the operation should be retried.
    *
-   * This method first checks if the operation was involved in a transaction. If so, it returns false.
-   * Then it checks that the context trying to retry this operation has the same config as the operation itself. This is
-   * to prevent other components from retrying the operation. If the config names do no match, it returns false.
-   * Otherwise or if the connection exception was not enriched, this method returns true.
+   * This method first checks if the operation was involved in a transaction. If so, it returns false. Then it checks that the
+   * context trying to retry this operation has the same config as the operation itself. This is to prevent other components from
+   * retrying the operation. If the config names do no match, it returns false. Otherwise or if the connection exception was not
+   * enriched, this method returns true.
    *
    * @param connectionException the {@link ConnectionException} thrown during the execution of the operation
    * @param contextConfigName the config name for the context that is attempting to retry the operation

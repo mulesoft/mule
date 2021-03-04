@@ -11,8 +11,8 @@ import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import java.util.function.Supplier;
 
 /**
- * {@link Supplier} implementation which returns a {@link NullMetadataResolver} instance.
- * This supplier always returns the same instance.
+ * {@link Supplier} implementation which returns a {@link NullMetadataResolver} instance. This supplier always returns the same
+ * instance.
  *
  * @since 4.0
  */

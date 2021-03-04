@@ -12,8 +12,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.artifact.api.Artifact;
 
 /**
- * An artifact context contains all the information related to an {@link Artifact} that contains
- * configuration.
+ * An artifact context contains all the information related to an {@link Artifact} that contains configuration.
  *
  * @since 4.0
  */

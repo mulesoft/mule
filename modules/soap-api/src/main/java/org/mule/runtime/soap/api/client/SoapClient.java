@@ -40,7 +40,8 @@ public interface SoapClient extends Startable, Stoppable {
   SoapResponse consume(SoapRequest request);
 
   /**
-   * @return a {@link SoapMetadataResolver} that can resolve the INPUT and OUTPUT metadata for the different Web Service Operations.
+   * @return a {@link SoapMetadataResolver} that can resolve the INPUT and OUTPUT metadata for the different Web Service
+   *         Operations.
    */
   SoapMetadataResolver getMetadataResolver();
 }

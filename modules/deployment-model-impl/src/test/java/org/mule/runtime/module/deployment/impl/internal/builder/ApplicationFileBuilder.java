@@ -58,7 +58,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
   /**
    * Creates a new builder
    *
-   * @param artifactId           artifact identifier. Non empty.
+   * @param artifactId artifact identifier. Non empty.
    * @param upperCaseInExtension whether the extension is in uppercase
    */
   public ApplicationFileBuilder(String artifactId, boolean upperCaseInExtension) {
@@ -78,7 +78,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
   /**
    * Create a new builder from another instance and different ID.
    *
-   * @param id     artifact identifier. Non empty.
+   * @param id artifact identifier. Non empty.
    * @param source instance used as template to build the new one. Non null.
    */
   public ApplicationFileBuilder(String id, ApplicationFileBuilder source) {
@@ -109,7 +109,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
   /**
    * Adds a property into the application properties file.
    *
-   * @param propertyName  name fo the property to add. Non empty
+   * @param propertyName name fo the property to add. Non empty
    * @param propertyValue value of the property to add. Non null.
    * @return the same builder instance
    */
@@ -125,7 +125,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
    * Adds a resource file to the artifact folder.
    *
    * @param resourceFile class file from a external file or test resource. Non empty.
-   * @param targetFile   name to use on the added resource. Non empty.
+   * @param targetFile name to use on the added resource. Non empty.
    * @return the same builder instance
    */
   public ApplicationFileBuilder usingResource(String resourceFile, String targetFile) {

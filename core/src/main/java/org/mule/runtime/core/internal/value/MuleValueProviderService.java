@@ -31,11 +31,11 @@ import java.util.Set;
 import javax.inject.Inject;
 
 /**
- * Default implementation of the {@link ValueProviderService}, which provides the capability to resolve {@link Value values}
- * for any capable element in the application, using it's {@link Location}.
+ * Default implementation of the {@link ValueProviderService}, which provides the capability to resolve {@link Value values} for
+ * any capable element in the application, using it's {@link Location}.
  * <p>
- * Requires the injection of the {@link MuleContext}, to be able to lookup the component inside the Mule App flows using
- * the given {@link Location}
+ * Requires the injection of the {@link MuleContext}, to be able to lookup the component inside the Mule App flows using the given
+ * {@link Location}
  *
  * @since 4.0
  */
@@ -53,11 +53,12 @@ public class MuleValueProviderService implements ValueProviderService {
   }
 
   /**
-   * Executes the {@link Value} resolving logic and wraps the result into a {@link ValueResult}. In case that
-   * the resolving finished
+   * Executes the {@link Value} resolving logic and wraps the result into a {@link ValueResult}. In case that the resolving
+   * finished
    *
    * @param valueSupplier supplier which encapsulates the {@link Value} resolution logic.
-   * @return A {@link ValueResult} indicating providing the {@link Set} of {@link Value values} or the produced {@link ResolvingFailure failure}.
+   * @return A {@link ValueResult} indicating providing the {@link Set} of {@link Value values} or the produced
+   *         {@link ResolvingFailure failure}.
    */
   private ValueResult getValueResult(ValueResultSupplier valueSupplier) {
     ValueResult result;

@@ -26,9 +26,9 @@ public class ParameterExtractor implements ParameterValueVisitor {
   private static final ObjectMapper objectMapper;
 
   static {
-    //This was added to handle complex parameters and transforming from a Map<String, Object>
+    // This was added to handle complex parameters and transforming from a Map<String, Object>
     // to the actual object of type defined my the model.
-    //TODO: CMTS-108
+    // TODO: CMTS-108
     objectMapper = new ObjectMapper();
     objectMapper.registerModule(new DateTimeModule());
     objectMapper.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));

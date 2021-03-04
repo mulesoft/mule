@@ -27,8 +27,8 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Resolves the metadata keys for a given Soap Extension {@link ForwardingSoapClient} connection.
  * <p>
- * Retrieves all the services that are available to hit and for each service will retrieve all available Operations that
- * the user can execute.
+ * Retrieves all the services that are available to hit and for each service will retrieve all available Operations that the user
+ * can execute.
  *
  * @since 4.0
  */
@@ -37,8 +37,8 @@ public final class InvokeKeysResolver extends BaseInvokeResolver implements Type
   /**
    * {@inheritDoc}
    *
-   * Resolves multi-level metadata keys with the services available to hit and for each of the services exposes all
-   * available operations.
+   * Resolves multi-level metadata keys with the services available to hit and for each of the services exposes all available
+   * operations.
    */
   @Override
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {

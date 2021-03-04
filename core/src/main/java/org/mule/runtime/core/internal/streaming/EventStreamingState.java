@@ -36,7 +36,7 @@ public class EventStreamingState {
    * <p>
    * Consumers of this method must discard the passed {@code provider} and used the returned one instead
    *
-   * @param provider    a {@link ManagedCursorProvider}
+   * @param provider a {@link ManagedCursorProvider}
    * @param ghostBuster the {@link StreamingGhostBuster} used to do early reclamation of the {@code provider}
    * @return the {@link ManagedCursorProvider} that must continue to be used
    */

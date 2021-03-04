@@ -29,10 +29,9 @@ public class FunctionalUtils extends org.mule.runtime.api.util.FunctionalUtils {
   }
 
   /**
-   * Executes the given {@code task}, feeding any thrown exceptions into the given
-   * {@code exceptionHandler}
+   * Executes the given {@code task}, feeding any thrown exceptions into the given {@code exceptionHandler}
    *
-   * @param task             a task
+   * @param task a task
    * @param exceptionHandler an exception {@link Consumer}
    */
   public static void safely(CheckedRunnable task, Consumer<Exception> exceptionHandler) {

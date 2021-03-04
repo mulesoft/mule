@@ -57,8 +57,8 @@ public interface XmlArtifactDeclarationLoader {
   /**
    * Provides an instance of the default implementation of the {@link XmlArtifactDeclarationLoader}.
    *
-   * @param context a {@link DslResolvingContext} that provides access to all the {@link ExtensionModel extensions}
-   *                required for loading a given {@code artifact config} to an {@link ArtifactDeclaration}
+   * @param context a {@link DslResolvingContext} that provides access to all the {@link ExtensionModel extensions} required for
+   *        loading a given {@code artifact config} to an {@link ArtifactDeclaration}
    * @return an instance of the default implementation of the {@link XmlArtifactDeclarationLoader}
    */
   static XmlArtifactDeclarationLoader getDefault(DslResolvingContext context) {

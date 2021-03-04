@@ -111,8 +111,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder extensionsManagerConfigurationBuilder;
   /**
    * This is the {@link IsolatedClassLoaderExtensionsManagerConfigurationBuilder} used when there is a need to reload the
-   * extension models for a specific test class. When {@link #mustRegenerateExtensionModels()} returns true, the extension
-   * models will be reloaded and this configuration builder will be used.
+   * extension models for a specific test class. When {@link #mustRegenerateExtensionModels()} returns true, the extension models
+   * will be reloaded and this configuration builder will be used.
    */
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder reloadableExtensionsManagerConfigurationBuilder;
 
@@ -289,9 +289,9 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   }
 
   /**
-   * Subclasses can override this method so that extension models used are regenerated before running its tests. For example,
-   * some part of a extension model might only be created if a certain system property is in place, so the test classes that
-   * test that feature will have to generate the extension model when the property is already set.
+   * Subclasses can override this method so that extension models used are regenerated before running its tests. For example, some
+   * part of a extension model might only be created if a certain system property is in place, so the test classes that test that
+   * feature will have to generate the extension model when the property is already set.
    *
    * @return whether the tests on this class need for extensions model to be generated again.
    */

@@ -77,8 +77,8 @@ public class ArtifactFactoryUtils {
   }
 
   /**
-   * If the output of {@link #getMuleContext(DeployableArtifact)} over the given {@code artifact} is present, then consume it
-   * with the given {@code consumer}
+   * If the output of {@link #getMuleContext(DeployableArtifact)} over the given {@code artifact} is present, then consume it with
+   * the given {@code consumer}
    *
    * @param artifact an artifact
    * @param consumer a {@link MuleContext} {@link CheckedConsumer}

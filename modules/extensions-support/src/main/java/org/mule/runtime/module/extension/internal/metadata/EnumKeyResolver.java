@@ -20,8 +20,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- * {@link TypeKeysResolver} implementation which resolves automatically {@link MetadataKey}s for {@link Enum} based
- * MetadataKey Id parameters.
+ * {@link TypeKeysResolver} implementation which resolves automatically {@link MetadataKey}s for {@link Enum} based MetadataKey Id
+ * parameters.
  *
  * @since 4.0
  * @see TypeKeysResolver

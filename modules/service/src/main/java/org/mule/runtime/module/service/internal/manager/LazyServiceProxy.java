@@ -40,8 +40,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 
 /**
- * A {@link Service} proxy which allows to defer the actual load and creation of the service until the first invokation of
- * one of its contract methods. Lifecycle will also be applied lazily.
+ * A {@link Service} proxy which allows to defer the actual load and creation of the service until the first invokation of one of
+ * its contract methods. Lifecycle will also be applied lazily.
  * <p>
  * Use in tandem with the {@link LazyServiceAssembly} for a truly lazy effect.
  *
@@ -62,7 +62,7 @@ public class LazyServiceProxy implements InvocationHandler {
   /**
    * Creates a new proxy based on the given {@code assembly} and {@code serviceRegistry}
    *
-   * @param assembly        the {@link ServiceAssembly}
+   * @param assembly the {@link ServiceAssembly}
    * @param serviceRegistry the {@link ServiceRegistry}
    * @return a new {@link Service} proxy
    */
@@ -92,8 +92,7 @@ public class LazyServiceProxy implements InvocationHandler {
   }
 
   /**
-   * Creates a new proxy {@link Service} equivalent to this one, but to be used in the context of a deployed
-   * application.
+   * Creates a new proxy {@link Service} equivalent to this one, but to be used in the context of a deployed application.
    *
    * @param methodInvoker The {@link MethodInvoker} to use
    * @return a new application specific proxy

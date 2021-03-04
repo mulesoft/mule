@@ -30,7 +30,7 @@ import java.util.Map;
  *
  * @param <T> class of the implementation builder
  *
- * since 4.1
+ *        since 4.1
  */
 public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
 
@@ -150,8 +150,8 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
   }
 
   /**
-     * @return current instance. Used just to avoid compilation warnings.
-     */
+   * @return current instance. Used just to avoid compilation warnings.
+   */
   protected T getThis() {
     return (T) this;
   }

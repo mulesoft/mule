@@ -35,8 +35,8 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
- * A specialization of {@link BaseOAuthConnectionProviderObjectBuilder} to wrap the {@link ConnectionProvider}
- * into {@link ClientCredentialsConnectionProviderWrapper} instances.
+ * A specialization of {@link BaseOAuthConnectionProviderObjectBuilder} to wrap the {@link ConnectionProvider} into
+ * {@link ClientCredentialsConnectionProviderWrapper} instances.
  *
  * @since 4.2.1
  */

@@ -13,8 +13,8 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
- * Tests if a {@link String} is equal to another string, regardless of the line breaks,helpful when dealing with
- * cross-platform tests
+ * Tests if a {@link String} is equal to another string, regardless of the line breaks,helpful when dealing with cross-platform
+ * tests
  *
  * @since 4.0
  */

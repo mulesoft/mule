@@ -11,7 +11,8 @@ import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
 
 /**
- * Discovers {@link MuleModule} searching for {@link #MODULE_PROPERTIES} and {@link #TEST_MODULE_PROPERTIES} files resources available in a given classloader.
+ * Discovers {@link MuleModule} searching for {@link #MODULE_PROPERTIES} and {@link #TEST_MODULE_PROPERTIES} files resources
+ * available in a given classloader.
  *
  * @since 4.0
  */

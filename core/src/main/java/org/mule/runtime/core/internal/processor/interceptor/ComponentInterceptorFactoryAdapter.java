@@ -29,8 +29,8 @@ interface ComponentInterceptorFactoryAdapter extends Supplier<ComponentIntercept
   boolean isInterceptable(ReactiveProcessor component);
 
   /**
-   * Determines if an {@link ComponentInterceptorAdapter} shall be created by this factory to be applied to a component based on some of
-   * its attributes.
+   * Determines if an {@link ComponentInterceptorAdapter} shall be created by this factory to be applied to a component based on
+   * some of its attributes.
    *
    * @param location the location and identification properties of the to-be intercepted component in the mule app configuration.
    * @return {@code true} if this handler must be applied to the component with the provided parameters, {@code false} otherwise.

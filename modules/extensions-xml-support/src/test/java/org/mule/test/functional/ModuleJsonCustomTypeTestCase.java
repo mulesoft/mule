@@ -121,8 +121,8 @@ public class ModuleJsonCustomTypeTestCase extends AbstractCeXmlExtensionMuleArti
   }
 
   /**
-   * Validations are done with DW scripts within the module being consumed here.
-   * (the module is targeted by the method {@link #getModulePath()})
+   * Validations are done with DW scripts within the module being consumed here. (the module is targeted by the method
+   * {@link #getModulePath()})
    *
    * @param muleEvent
    */

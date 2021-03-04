@@ -54,7 +54,7 @@ public class InjectParamsFromContextServiceMethodInvoker extends DefaultMethodIn
   /**
    * Creates a new instance
    *
-   * @param registry    the {@link Registry} to use for resolving injectable parameters. Non null.
+   * @param registry the {@link Registry} to use for resolving injectable parameters. Non null.
    */
   public InjectParamsFromContextServiceMethodInvoker(Registry registry) {
     checkArgument(registry != null, "registry cannot be null");

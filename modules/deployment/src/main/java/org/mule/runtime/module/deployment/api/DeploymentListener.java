@@ -74,7 +74,8 @@ public interface DeploymentListener {
    * Notifies that a redeploy for a given artifact has started.
    * <p/>
    * After this notification is sent, the artifact will be redeployed along with any child artifact. If all the artifacts has been
-   * redeployed successfully, then {@link #onRedeploymentSuccess(String)} will be invoked. Otherwise {@link #onRedeploymentFailure(String, Throwable)} will be invoked. Same notifications will be fired for child artifacts.
+   * redeployed successfully, then {@link #onRedeploymentSuccess(String)} will be invoked. Otherwise
+   * {@link #onRedeploymentFailure(String, Throwable)} will be invoked. Same notifications will be fired for child artifacts.
    * <p/>
    * A special scenario is when redeploying a domain bundle, an application existing in the old version of the bundle is not
    * available anymore. In that case, the redeployment of the mentioned application will fail, but the redeployment of the domain

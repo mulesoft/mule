@@ -9,8 +9,9 @@ package org.mule.runtime.http.api.client.proxy;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 /**
- * Builder of {@link ProxyConfig.NtlmProxyConfig}s. Instances can only be obtained using {@link ProxyConfig.NtlmProxyConfig#builder()}.
- * At the very least, a host, port, username, password and NTLM domain must be provided.
+ * Builder of {@link ProxyConfig.NtlmProxyConfig}s. Instances can only be obtained using
+ * {@link ProxyConfig.NtlmProxyConfig#builder()}. At the very least, a host, port, username, password and NTLM domain must be
+ * provided.
  *
  * @since 4.0
  */

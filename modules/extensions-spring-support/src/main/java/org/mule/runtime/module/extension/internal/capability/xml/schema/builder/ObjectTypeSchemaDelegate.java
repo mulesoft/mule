@@ -78,7 +78,8 @@ final class ObjectTypeSchemaDelegate {
    * vary depending on the properties of the type itself along with the properties associated to the parameter.
    * <p>
    * This method serves as a resolver for all that logic, creating the required element for the parameter with complex type.
-   *  @param type the {@link ObjectType} of the parameter for which the element is being created
+   * 
+   * @param type the {@link ObjectType} of the parameter for which the element is being created
    * @param paramSyntax the {@link DslElementSyntax} of the parameter for which the element is being created
    * @param paramDsl the {@link ParameterDslConfiguration} associated to the parameter, if any is present.
    * @param description the documentation associated to the parameter
@@ -290,7 +291,7 @@ final class ObjectTypeSchemaDelegate {
         .map(customDsl -> new QName(builder.getNamespaceUri(customDsl.getPrefix()), customDsl.getType(), customDsl.getPrefix()));
 
     if (customBaseQName.isPresent()) {
-      //baseType was redefined by the user
+      // baseType was redefined by the user
       return customBaseQName.get();
     }
 
@@ -425,7 +426,7 @@ final class ObjectTypeSchemaDelegate {
       QName substitutionGroup = getAbstractElementSubstitutionGroup(typeDsl, baseDsl);
       abstractElement.setSubstitutionGroup(substitutionGroup);
     }
-    //If user defined, substitutionGroup will be overridden
+    // If user defined, substitutionGroup will be overridden
     getSubstitutionGroup(type)
         .ifPresent((substitutionGroup) -> abstractElement
             .setSubstitutionGroup(builder.resolveSubstitutionGroup(substitutionGroup)));

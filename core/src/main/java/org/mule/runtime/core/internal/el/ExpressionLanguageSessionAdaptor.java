@@ -16,8 +16,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import java.util.Iterator;
 
 /**
- * Adaptor of {@link org.mule.runtime.api.el.ExpressionLanguageSession} that adapt API to
- * throw ExpressionRuntimeException.
+ * Adaptor of {@link org.mule.runtime.api.el.ExpressionLanguageSession} that adapt API to throw ExpressionRuntimeException.
  *
  * @since 1.2
  */

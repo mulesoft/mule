@@ -14,8 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Extends the {@link ProcessingStrategy} contract with implementation methods which should not be exposed
- * as part of the core API
+ * Extends the {@link ProcessingStrategy} contract with implementation methods which should not be exposed as part of the core API
  *
  * @since 4.3.0
  */
@@ -24,8 +23,8 @@ public interface ProcessingStrategyAdapter extends ProcessingStrategy {
   /**
    * Returns a {@link Function} that implementations will use to decorate {@link ScheduledExecutorService} instances.
    * <p>
-   * Notice that which schedulers get decorated and which are not is up to each implementation. No guarantees should be
-   * expected around that.
+   * Notice that which schedulers get decorated and which are not is up to each implementation. No guarantees should be expected
+   * around that.
    *
    * @return a decorator function
    */
@@ -34,16 +33,16 @@ public interface ProcessingStrategyAdapter extends ProcessingStrategy {
   /**
    * Sets the {@link Function} that implementations will use to decorate {@link ScheduledExecutorService} instances.
    * <p>
-   * Notice that which schedulers get decorated and which are not is up to each implementation. No guarantees should be
-   * expected around that.
+   * Notice that which schedulers get decorated and which are not is up to each implementation. No guarantees should be expected
+   * around that.
    *
    * @param schedulerDecorator a decoration function
    */
   void setSchedulerDecorator(Function<ScheduledExecutorService, ScheduledExecutorService> schedulerDecorator);
 
   /**
-   * Sets a {@link Consumer} that will be invoked each time a new message is dispatch through {@code this} processing strategy
-   * but before the pipeline processes it.
+   * Sets a {@link Consumer} that will be invoked each time a new message is dispatch through {@code this} processing strategy but
+   * before the pipeline processes it.
    *
    * @param eventConsumer a {@link CoreEvent} {@link Consumer}
    */

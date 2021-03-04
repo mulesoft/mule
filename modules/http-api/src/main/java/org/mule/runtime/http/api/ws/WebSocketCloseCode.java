@@ -21,8 +21,7 @@ public enum WebSocketCloseCode {
    */
   NORMAL_CLOSURE(1000),
   /**
-   * Indicates that an endpoint is "going away", such as a server going down, or a browser having navigated away from
-   * a page.
+   * Indicates that an endpoint is "going away", such as a server going down, or a browser having navigated away from a page.
    */
   ENDPOINT_GOING_DOWN(1001),
   /**
@@ -30,8 +29,8 @@ public enum WebSocketCloseCode {
    */
   PROTOCOL_ERROR(1002),
   /**
-   * Indicates that an endpoint is terminating the connection because it has received a type of data it cannot accept
-   * (e.g. an endpoint that understands only text data may send this if it receives a binary message.)
+   * Indicates that an endpoint is terminating the connection because it has received a type of data it cannot accept (e.g. an
+   * endpoint that understands only text data may send this if it receives a binary message.)
    */
   INVALID_DATA(1003),
   /**

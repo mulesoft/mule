@@ -47,7 +47,7 @@ public final class ReflectiveHttpConfigBasedRequester {
   /**
    * Performs a GET request to the URL passed as parameter with a set of headers.
    *
-   * @param url     the URL to be requested
+   * @param url the URL to be requested
    * @param headers a set of headers that are going to be bounded to the request
    * @return a {@link Pair} in which the first element is the response and the second is a set of response headers.
    */
@@ -58,9 +58,9 @@ public final class ReflectiveHttpConfigBasedRequester {
   /**
    * Performs a PORT request to the URL passed as parameter with a set of headers and a body content.
    *
-   * @param url     the URL to be requested
+   * @param url the URL to be requested
    * @param headers a set of headers that are going to be bounded to the request
-   * @param body    the content body bounded to the request.
+   * @param body the content body bounded to the request.
    * @return a {@link Pair} in which the first element is the response and the second is a set of response headers.
    */
   public Pair<InputStream, Map<String, String>> post(String url, Map<String, String> headers, InputStream body) {

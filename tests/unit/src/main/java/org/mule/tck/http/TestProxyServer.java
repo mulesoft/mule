@@ -22,9 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of an HTTP proxy server for testing purposes. The server will accept many connections,
- * which are expected to send a CONNECT request if they are HTTPS in which case the request is consumed and a 200 OK answer returned,
- * then it acts as a tunnel between the client and the provided localhost target port. If stopped it will close active threads and
+ * Implementation of an HTTP proxy server for testing purposes. The server will accept many connections, which are expected to
+ * send a CONNECT request if they are HTTPS in which case the request is consumed and a 200 OK answer returned, then it acts as a
+ * tunnel between the client and the provided localhost target port. If stopped it will close active threads and
  * connectionHandlers.
  */
 public class TestProxyServer {

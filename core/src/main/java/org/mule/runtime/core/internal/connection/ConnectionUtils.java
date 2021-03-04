@@ -40,7 +40,7 @@ public final class ConnectionUtils {
    * Invokes the {@link ConnectionProvider#connect()} method on the given {@code delegate}.
    *
    * @param delegate a {@link ConnectionProvider}
-   * @param <C>      the generic type of the returned connection
+   * @param <C> the generic type of the returned connection
    * @return a connection
    * @throws ConnectionException
    */

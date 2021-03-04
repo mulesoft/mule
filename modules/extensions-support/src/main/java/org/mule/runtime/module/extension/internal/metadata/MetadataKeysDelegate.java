@@ -48,8 +48,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
- * Metadata service delegate implementations that handles the resolution
- * of a {@link ComponentModel} {@link MetadataKeysContainer}
+ * Metadata service delegate implementations that handles the resolution of a {@link ComponentModel} {@link MetadataKeysContainer}
  *
  * @since 4.0
  */
@@ -68,12 +67,11 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
    * representing them as a list of {@link MetadataKey}.
    * <p>
    * If no {@link MetadataKeyId} is present in the component's input parameters, then a {@link NullMetadataKey} is returned.
-   * Otherwise, the {@link TypeKeysResolver#getKeys} associated with the current Component will be invoked to obtain
-   * the keys
+   * Otherwise, the {@link TypeKeysResolver#getKeys} associated with the current Component will be invoked to obtain the keys
    *
    * @param context current {@link MetadataContext} that will be used by the {@link TypeKeysResolver}
    * @return Successful {@link MetadataResult} if the keys are obtained without errors Failure {@link MetadataResult} when no
-   * Dynamic keys are a available or the retrieval fails for any reason
+   *         Dynamic keys are a available or the retrieval fails for any reason
    */
   MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context, ReflectionCache reflectionCache) {
     return getMetadataKeys(context, null, reflectionCache);
@@ -168,9 +166,9 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
    * Given a {@link MetadataKey}, this is navigated recursively cloning each {@link MetadataKey} of the tree structure creating a
    * {@link MultilevelMetadataKeyBuilder} and adding the partName of each {@link MetadataKey} found.
    *
-   * @param key              {@link MetadataKey} to be cloned and enriched
+   * @param key {@link MetadataKey} to be cloned and enriched
    * @param partOrderMapping {@link Map} that contains the mapping of the name of each part of the {@link MetadataKey}
-   * @param level            the current level of the part of the {@link MetadataKey} to be cloned and enriched
+   * @param level the current level of the part of the {@link MetadataKey} to be cloned and enriched
    * @return a {@link MetadataKeyBuilder} with the cloned and enriched keys
    */
   private MetadataKeyBuilder cloneAndEnrichMetadataKey(MetadataKey key, Map<Integer, ParameterModel> partOrderMapping,

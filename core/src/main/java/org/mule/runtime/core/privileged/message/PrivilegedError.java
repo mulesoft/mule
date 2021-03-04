@@ -13,14 +13,15 @@ import java.util.List;
 
 /**
  * Extends the {@link Error} interface, adding privileged methods.
+ * 
  * @since 4.4
  */
 @NoImplement
 public interface PrivilegedError extends Error {
 
   /**
-   * List of errors that where identified as underlying causes of this error.
-   * For instance, the until-successful scope may throw a retry exhausted error including the error that caused the exhaustion as a suppressed error.
+   * List of errors that where identified as underlying causes of this error. For instance, the until-successful scope may throw a
+   * retry exhausted error including the error that caused the exhaustion as a suppressed error.
    *
    * Can be an empty list if no underlying causes exist.
    *

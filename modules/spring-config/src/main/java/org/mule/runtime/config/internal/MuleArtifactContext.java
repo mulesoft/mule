@@ -519,9 +519,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   /**
    * Creates the definition for all the objects to be created form the enabled components in the {@code applicationModel}.
    *
-   * @param beanFactory      the bean factory in which definition must be created.
+   * @param beanFactory the bean factory in which definition must be created.
    * @param applicationModel the artifact application model.
-   * @param mustBeRoot       if the component must be root to be created.
+   * @param mustBeRoot if the component must be root to be created.
    * @return an order list of the created bean names. The order must be respected for the creation of the objects.
    */
   protected List<Pair<String, ComponentAst>> createApplicationComponents(DefaultListableBeanFactory beanFactory,

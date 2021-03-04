@@ -103,8 +103,8 @@ public class HttpServerConfiguration {
     }
 
     /**
-     * Required exclusively for HTTPS, this defines through a {@link TlsContextFactory} all the TLS related data to establish
-     * such connections. Set to {@code null} by default.
+     * Required exclusively for HTTPS, this defines through a {@link TlsContextFactory} all the TLS related data to establish such
+     * connections. Set to {@code null} by default.
      *
      * @param tlsContextFactory a {@link TlsContextFactory} with the required data.
      * @return this builder

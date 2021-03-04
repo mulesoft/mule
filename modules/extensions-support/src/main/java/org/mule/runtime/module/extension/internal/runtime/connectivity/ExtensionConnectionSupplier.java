@@ -32,8 +32,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 /**
- * A bridge between the execution of a {@link ComponentModel} and the {@link ConnectionManager} which provides
- * the connections that it needs.
+ * A bridge between the execution of a {@link ComponentModel} and the {@link ConnectionManager} which provides the connections
+ * that it needs.
  * <p>
  * It handles connection provisioning and transaction support
  *
@@ -53,7 +53,7 @@ public class ExtensionConnectionSupplier {
    *
    * @param executionContext an {@link ExecutionContextAdapter}
    * @return a {@link ConnectionHandler}
-   * @throws ConnectionException  if connection could not be obtained
+   * @throws ConnectionException if connection could not be obtained
    * @throws TransactionException if something is wrong with the transaction
    */
   public ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext)

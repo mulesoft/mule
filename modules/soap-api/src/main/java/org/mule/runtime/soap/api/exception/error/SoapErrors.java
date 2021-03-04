@@ -36,7 +36,7 @@ public enum SoapErrors implements ErrorTypeDefinition<SoapErrors> {
   BAD_RESPONSE,
 
   /**
-   *  a problem occurred while sending the request.
+   * a problem occurred while sending the request.
    */
   CANNOT_DISPATCH,
 

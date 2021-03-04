@@ -53,10 +53,10 @@ public interface MuleRegistry extends Registry {
    * This method will return a list of {@link org.mule.runtime.core.api.transformer.Transformer} objects that accept the given
    * input and return the given output type of object
    * <p/>
-   * All {@link Transformer}s found will have a source that is compatible with source parameter
-   * (since if a transformer can transform a super type, it should be able to transform any type that extends it)
-   * and a target such that target parameter isCompatibleWith() the {@link Transformer}'s one
-   * (since if we want a transformer that returns an specific type, it should return exactly that type or any type that extends it.)
+   * All {@link Transformer}s found will have a source that is compatible with source parameter (since if a transformer can
+   * transform a super type, it should be able to transform any type that extends it) and a target such that target parameter
+   * isCompatibleWith() the {@link Transformer}'s one (since if we want a transformer that returns an specific type, it should
+   * return exactly that type or any type that extends it.)
    *
    * @param source The desired input type for the transformer
    * @param result the desired output type for the transformer

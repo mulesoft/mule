@@ -27,11 +27,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
- * A lazy version of a {@link ExecutionContext} which resolves the values of the parameters
- * of the operation on demand.
- * The laziness of this class is meant for cases where the resolution of a parameters are wanted to
- * be isolated between each other, so when resolving a parameter value, does not matter if other
- * parameters have invalid values.
+ * A lazy version of a {@link ExecutionContext} which resolves the values of the parameters of the operation on demand. The
+ * laziness of this class is meant for cases where the resolution of a parameters are wanted to be isolated between each other, so
+ * when resolving a parameter value, does not matter if other parameters have invalid values.
  *
  * @param <M> the generic type of of the model which represents the component beign executed
  * @since 4.0

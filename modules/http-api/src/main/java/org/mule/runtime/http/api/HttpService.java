@@ -41,8 +41,8 @@ public interface HttpService extends Service {
   RequestMatcherRegistryBuilder getRequestMatcherRegistryBuilder();
 
   /**
-   * Returns a new {@link WebSocketBroadcaster}. Instances are not be assumed reusable. Unless specific implementation
-   * says otherwise, create a new broadcaster per each message to be broadcasted.
+   * Returns a new {@link WebSocketBroadcaster}. Instances are not be assumed reusable. Unless specific implementation says
+   * otherwise, create a new broadcaster per each message to be broadcasted.
    *
    * @return A new {@link WebSocketBroadcaster}
    * @since 4.2.0

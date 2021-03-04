@@ -36,7 +36,8 @@ public interface ComponentUtils {
                                                         Component component) {
     Optional<Component> objectFoundOptional = componentLocator.find(component.getRootContainerLocation());
     Optional<FlowConstruct> flowConstruct = objectFoundOptional.flatMap(objectFound -> objectFound instanceof FlowConstruct
-        ? of((FlowConstruct) objectFound) : empty()).filter(object -> object != null);
+        ? of((FlowConstruct) objectFound)
+        : empty()).filter(object -> object != null);
 
     return flowConstruct;
   }

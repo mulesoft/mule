@@ -19,12 +19,12 @@ import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
 
 /**
- * It is in charge of resolving connector's operations and retrieving metadata and sample data for all
- * components related to the same session configuration. The session configuration should be
- * defined by multiple global elements, including Configurations, Connections, etc.
+ * It is in charge of resolving connector's operations and retrieving metadata and sample data for all components related to the
+ * same session configuration. The session configuration should be defined by multiple global elements, including Configurations,
+ * Connections, etc.
  * <p/>
- * This session provides the possibility to avoid having a full artifact configuration before being able to
- * gather metadata from the connector.
+ * This session provides the possibility to avoid having a full artifact configuration before being able to gather metadata from
+ * the connector.
  * <p/>
  *
  * @since 4.4.0
@@ -44,11 +44,10 @@ public interface DeclarationSession {
   /**
    * Retrieve all {@link org.mule.runtime.api.value.Value} that can be configured for the given parameter.
    *
-   * @param parameterizedElementDeclaration a {@link ParameterizedElementDeclaration} for the component from which
-   *                  the available values can be used on the parameter {@param providerName}. In case the value
-   *                  provider requires any acting parameters to be able to resolve this values, those parameters
-   *                  should be populated in this declaration. Also, if the Component requires values from a Configuration,
-   *                  then its reference name should be specified in the declaration.
+   * @param parameterizedElementDeclaration a {@link ParameterizedElementDeclaration} for the component from which the available
+   *        values can be used on the parameter {@param providerName}. In case the value provider requires any acting parameters
+   *        to be able to resolve this values, those parameters should be populated in this declaration. Also, if the Component
+   *        requires values from a Configuration, then its reference name should be specified in the declaration.
    * @param providerName the name of the value provider for which to resolve the {@link org.mule.runtime.api.value.Value}s
    * @return a {@link ValueResult} with the accepted parameter values to use
    * @throws BundleNotFoundException if any of the dependencies defined for the session could not be resolved
@@ -58,7 +57,8 @@ public interface DeclarationSession {
   /**
    * Returns the list of keys that can be resolved associated to the specified component.
    *
-   * @param component the location of the {@link org.mule.runtime.api.metadata.MetadataKeyProvider} component to query for its available keys
+   * @param component the location of the {@link org.mule.runtime.api.metadata.MetadataKeyProvider} component to query for its
+   *        available keys
    * @return Successful {@link MetadataResult} if the keys are successfully resolved Failure {@link MetadataResult} if there is an
    *         error while resolving the keys
    * @throws BundleNotFoundException if any of the dependencies defined for the session could not be resolved
@@ -66,9 +66,8 @@ public interface DeclarationSession {
   MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration component);
 
   /**
-   * Retrieve all the dynamic metadata for the given component.
-   * It includes input parameters, output (payload) and output attributes.
-   * If a metadata key is needed all parts of the key must be provided.
+   * Retrieve all the dynamic metadata for the given component. It includes input parameters, output (payload) and output
+   * attributes. If a metadata key is needed all parts of the key must be provided.
    *
    * @param component the component whose dynamic metadata types are required
    * @return a {@link MetadataResult} of {@link ComponentMetadataTypesDescriptor} containing all the dynamic types

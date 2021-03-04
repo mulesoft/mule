@@ -48,7 +48,8 @@ public final class SourceTypeWrapper<T extends Source> extends TypeWrapper imple
     this.aClass = aClass;
     this.sourceGenerics =
         new LazyValue<>(() -> IntrospectionUtils.getSuperClassGenerics(aClass, Source.class.isAssignableFrom(aClass)
-            ? Source.class : org.mule.sdk.api.runtime.source.Source.class)
+            ? Source.class
+            : org.mule.sdk.api.runtime.source.Source.class)
             .stream()
             .map(e -> new TypeWrapper(e, typeLoader))
             .collect(toList()));

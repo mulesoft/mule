@@ -78,8 +78,8 @@ public interface HttpServer {
   void enableTls(TlsContextFactory tlsContextFactory);
 
   /**
-   * Disable TLS dynamically. It should work for when the TLS was dynamically enabled or even when the TLS
-   * was statically configured in the listener configuration section of the application.
+   * Disable TLS dynamically. It should work for when the TLS was dynamically enabled or even when the TLS was statically
+   * configured in the listener configuration section of the application.
    */
   void disableTls();
 

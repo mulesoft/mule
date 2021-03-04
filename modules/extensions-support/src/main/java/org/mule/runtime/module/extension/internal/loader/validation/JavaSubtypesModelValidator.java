@@ -29,8 +29,7 @@ import java.util.Set;
 /**
  * {@link ExtensionModelValidator} which applies to {@link ExtensionModel}s.
  * <p>
- * This validator checks that all of the extension's {@link ExtensionModel#getSubTypes()}
- * are instantiable
+ * This validator checks that all of the extension's {@link ExtensionModel#getSubTypes()} are instantiable
  *
  * @since 4.0
  */

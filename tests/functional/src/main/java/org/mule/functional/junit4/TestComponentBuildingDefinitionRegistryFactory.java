@@ -22,8 +22,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Test implementation of {@link ComponentBuildingDefinitionRegistryFactory} which cache created 
- * factory and return same instance by extension models collection.
+ * Test implementation of {@link ComponentBuildingDefinitionRegistryFactory} which cache created factory and return same instance
+ * by extension models collection.
  * 
  * @since 4.4.0
  */

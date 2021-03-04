@@ -13,10 +13,9 @@ import org.mule.runtime.api.meta.NamedObject;
 import java.io.InputStream;
 
 /**
- * {@code EncryptionStrategy} can be used to provide different types of Encryption strategy objects.
- * These can be configured with different information relevant with the encryption method being used,
- * for example for Password Based Encryption (PBE) a password, salt, iteration count and algorithm
- * may be set on the strategy.
+ * {@code EncryptionStrategy} can be used to provide different types of Encryption strategy objects. These can be configured with
+ * different information relevant with the encryption method being used, for example for Password Based Encryption (PBE) a
+ * password, salt, iteration count and algorithm may be set on the strategy.
  *
  * @since 4.0
  */

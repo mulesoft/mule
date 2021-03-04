@@ -24,7 +24,7 @@ public final class SoapOperationExecutorFactory implements CompletableComponentE
    * Creates a new executor for soap operations.
    *
    * @param operationModel the model of the operation to be executed
-   * @param parameters     parameters for initializing the executor
+   * @param parameters parameters for initializing the executor
    * @return a new {@link SoapOperationExecutor}
    */
 

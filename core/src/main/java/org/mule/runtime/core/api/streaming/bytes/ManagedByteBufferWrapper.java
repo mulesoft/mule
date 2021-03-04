@@ -13,8 +13,7 @@ import java.nio.ByteBuffer;
 /**
  * Wraps a {@link ByteBuffer} that is being managed the runtime.
  * <p>
- * Once all consumers are done with it and the buffer is no longer needed, the {@link #release()} method <b>MUST</b> be
- * invoked.
+ * Once all consumers are done with it and the buffer is no longer needed, the {@link #release()} method <b>MUST</b> be invoked.
  *
  * @since 4.3.0
  */
@@ -26,7 +25,7 @@ public class ManagedByteBufferWrapper {
   /**
    * Creates a new instance
    *
-   * @param delegate      the managed {@link ByteBuffer}
+   * @param delegate the managed {@link ByteBuffer}
    * @param releaseAction action to be executed when the {@link #release()} method is invoked
    */
   public ManagedByteBufferWrapper(ByteBuffer delegate, CheckedConsumer<ManagedByteBufferWrapper> releaseAction) {

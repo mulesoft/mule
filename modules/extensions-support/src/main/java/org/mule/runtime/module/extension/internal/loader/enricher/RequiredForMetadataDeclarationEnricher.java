@@ -30,9 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link DeclarationEnricher} implementation which introspect Configurations and Connection Provides and looks
- * for parameters declared as {@link RequiredForMetadata}. If at least one is detected a {@link RequiredForMetadataModelProperty}
- * will be added in the config or connection provider indicating which are the required parameters for metadata resolution.
+ * {@link DeclarationEnricher} implementation which introspect Configurations and Connection Provides and looks for parameters
+ * declared as {@link RequiredForMetadata}. If at least one is detected a {@link RequiredForMetadataModelProperty} will be added
+ * in the config or connection provider indicating which are the required parameters for metadata resolution.
  *
  * @since 4.2.0
  */
@@ -69,8 +69,8 @@ public class RequiredForMetadataDeclarationEnricher implements DeclarationEnrich
   /**
    * Filters the parameters of the given declaration and retrieves the ones that are required for Metadata Resolution.
    *
-   * In case the annotation {@link RequiredForMetadata} is not present in any parameter, then, all will be considered as
-   * required for metadata (Except from the Infrastructure parameters, which are never required for metadata).
+   * In case the annotation {@link RequiredForMetadata} is not present in any parameter, then, all will be considered as required
+   * for metadata (Except from the Infrastructure parameters, which are never required for metadata).
    */
   private List<String> getParametersNameRequiredForMetadata(WithParametersDeclaration declaration) {
     List<String> nonInfrastructureParameterNames = new ArrayList<>();
@@ -78,7 +78,7 @@ public class RequiredForMetadataDeclarationEnricher implements DeclarationEnrich
         declaration.getAllParameters()
             .stream()
             .filter(pd -> !pd.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
-            .peek(pd -> nonInfrastructureParameterNames.add(pd.getName())) //Add now in case this list is empty
+            .peek(pd -> nonInfrastructureParameterNames.add(pd.getName())) // Add now in case this list is empty
             .filter(p -> p.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
                 .map(
                      mp -> mp.getExtensionParameter().isAnnotatedWith(RequiredForMetadata.class))

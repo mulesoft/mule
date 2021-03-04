@@ -26,8 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of {@link #resolve(ValueResolvingContext)} it return a
- * {@link Map} of values with the outcome of each original resolver.
+ * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of
+ * {@link #resolve(ValueResolvingContext)} it return a {@link Map} of values with the outcome of each original resolver.
  * <p/>
  * This class implements {@link Lifecycle} and propagates those events to each of the {@code resolvers}
  *

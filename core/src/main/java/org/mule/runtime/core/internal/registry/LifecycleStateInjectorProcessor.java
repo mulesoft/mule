@@ -11,11 +11,11 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateAware;
 import org.mule.runtime.core.privileged.registry.InjectProcessor;
 
 /**
- * Injects the MuleContext object for objects stored in the {@link Registry} where the
- * object registered implements {@link org.mule.runtime.core.api.context.MuleContextAware}.
+ * Injects the MuleContext object for objects stored in the {@link Registry} where the object registered implements
+ * {@link org.mule.runtime.core.api.context.MuleContextAware}.
  *
- * @deprecated as of 3.7.0 since these are only used by {@link Registry} which is also deprecated.
- * Use post processors for currently supported registries instead
+ * @deprecated as of 3.7.0 since these are only used by {@link Registry} which is also deprecated. Use post processors for
+ *             currently supported registries instead
  */
 @Deprecated
 public class LifecycleStateInjectorProcessor implements InjectProcessor {

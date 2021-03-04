@@ -18,11 +18,9 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
- * {@link ValueResolver} implementation for {@link TypedValue} that are not resolved from an
- * expression.
+ * {@link ValueResolver} implementation for {@link TypedValue} that are not resolved from an expression.
  * <p>
- * This {@link TypedValueValueResolverWrapper} delegates the resolution to the given {@link ValueResolver} from
- * the constructor.
+ * This {@link TypedValueValueResolverWrapper} delegates the resolution to the given {@link ValueResolver} from the constructor.
  *
  * @since 4.0
  * @see TypedValue

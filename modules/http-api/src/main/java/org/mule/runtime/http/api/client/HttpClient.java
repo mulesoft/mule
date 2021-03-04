@@ -86,12 +86,12 @@ public interface HttpClient {
 
   /**
    * Sends a HttpRequest without blocking the current thread. When a response is available or the request times out the returned
-   * {@link CompletableFuture} will be completed. Be aware that the response body processing will be deferred so that the response can
-   * be processed even when a large body is still being received. If the full response is needed right away then the provided
+   * {@link CompletableFuture} will be completed. Be aware that the response body processing will be deferred so that the response
+   * can be processed even when a large body is still being received. If the full response is needed right away then the provided
    * {@link HttpResponse} must be read in a different thread so that it does not block the {@link HttpClient} threads handling the
    * response. It's therefore recommended to use {@link CompletableFuture#get()} or any of the async methods available, such as
-   * {@link CompletableFuture#whenCompleteAsync(BiConsumer, Executor)}, to handle the response is those scenarios since they guarantee
-   * executing on a different thread.
+   * {@link CompletableFuture#whenCompleteAsync(BiConsumer, Executor)}, to handle the response is those scenarios since they
+   * guarantee executing on a different thread.
    *
    * @param request the {@link HttpRequest} to send
    * @param responseTimeout the time (in milliseconds) to wait for a response
@@ -122,12 +122,12 @@ public interface HttpClient {
 
   /**
    * Sends a HttpRequest without blocking the current thread. When a response is available or the request times out the returned
-   * {@link CompletableFuture} will be completed. Be aware that the response body processing will be deferred so that the response can
-   * be processed even when a large body is still being received. If the full response is needed right away then the provided
+   * {@link CompletableFuture} will be completed. Be aware that the response body processing will be deferred so that the response
+   * can be processed even when a large body is still being received. If the full response is needed right away then the provided
    * {@link HttpResponse} must be read in a different thread so that it does not block the {@link HttpClient} threads handling the
    * response. It's therefore recommended to use {@link CompletableFuture#get()} or any of the async methods available, such as
-   * {@link CompletableFuture#whenCompleteAsync(BiConsumer, Executor)}, to handle the response is those scenarios since they guarantee
-   * executing on a different thread.
+   * {@link CompletableFuture#whenCompleteAsync(BiConsumer, Executor)}, to handle the response is those scenarios since they
+   * guarantee executing on a different thread.
    *
    * @param request the {@link HttpRequest} to send
    * @param options the {@link HttpRequestOptions} to use
@@ -138,9 +138,9 @@ public interface HttpClient {
   /**
    * Opens a new WebSocket by adding the proper upgrade header to the given {@code request}
    *
-   * @param request        a {@link HttpRequest} to the target WebSocket endpoint
-   * @param socketId       the id of the obtained socket
-   * @param callback       the callback that will receive the associated  socket events
+   * @param request a {@link HttpRequest} to the target WebSocket endpoint
+   * @param socketId the id of the obtained socket
+   * @param callback the callback that will receive the associated socket events
    * @return a future {@link WebSocket}
    * @since 4.2.0
    */
@@ -153,10 +153,10 @@ public interface HttpClient {
   /**
    * Opens a new WebSocket by adding the proper upgrade header to the given {@code request}
    *
-   * @param request        a {@link HttpRequest} to the target WebSocket endpoint
+   * @param request a {@link HttpRequest} to the target WebSocket endpoint
    * @param requestOptions the request options
-   * @param socketId       the id of the obtained socket
-   * @param callback       the callback that will receive the associated  socket events
+   * @param socketId the id of the obtained socket
+   * @param callback the callback that will receive the associated socket events
    * @return a future {@link WebSocket}
    * @since 4.2.0
    */

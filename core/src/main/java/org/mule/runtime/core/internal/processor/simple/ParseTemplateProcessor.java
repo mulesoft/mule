@@ -60,7 +60,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
   @Override
   public void initialise() throws InitialisationException {
-    //Check if both content and location are defined. If so, raise exception due to ambiguity.
+    // Check if both content and location are defined. If so, raise exception due to ambiguity.
     if (content != null && location != null) {
       throw new InitialisationException(createStaticMessage("Can't define both location and content at the same time"), this);
     }
@@ -105,7 +105,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
   private void guessMimeType() {
     MediaType fromLocationMediaType = parse(mimetypesFileTypeMap.getContentType(location));
-    //This is because BINARY is the default value returned if nothing can be resolved. We should not force the value.
+    // This is because BINARY is the default value returned if nothing can be resolved. We should not force the value.
     if (!BINARY.equals(fromLocationMediaType)) {
       outputMimeType = fromLocationMediaType;
     }

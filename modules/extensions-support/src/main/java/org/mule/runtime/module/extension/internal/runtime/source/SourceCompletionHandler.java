@@ -23,11 +23,10 @@ public interface SourceCompletionHandler {
   /**
    * Invoked on successful completion of flow processing.
    * <p>
-   * Exceptions found while processing are to be notified through
-   * the {@code exceptionCallback}, which might (depending on {@code HandledCompletionExceptionResult})
-   * produce a new value as the result of handling such error
+   * Exceptions found while processing are to be notified through the {@code exceptionCallback}, which might (depending on
+   * {@code HandledCompletionExceptionResult}) produce a new value as the result of handling such error
    *
-   * @param event    the result of the flow execution
+   * @param event the result of the flow execution
    * @param callback the callback to be completed as a result
    */
   void onCompletion(CoreEvent event, Map<String, Object> parameters, CompletableCallback<Void> callback);
@@ -36,15 +35,14 @@ public interface SourceCompletionHandler {
    * Invoked when a failure occurs during the flow processing
    *
    * @param exception the exception thrown during processing
-   * @param callback  the callback to be completed as a result
+   * @param callback the callback to be completed as a result
    */
   void onFailure(MessagingException exception, Map<String, Object> parameters, CompletableCallback<Void> callback);
 
   void onTerminate(Either<MessagingException, CoreEvent> eventOrException) throws Exception;
 
   /**
-   * Resolves the set of parameters of the response function of the source against
-   * the supplied {@code Event}.
+   * Resolves the set of parameters of the response function of the source against the supplied {@code Event}.
    *
    * @param event the {@code Event} with the result of the successful flow processing.
    * @return the response function parameters with it's values.
@@ -52,8 +50,7 @@ public interface SourceCompletionHandler {
   Map<String, Object> createResponseParameters(CoreEvent event) throws MessagingException;
 
   /**
-   * Resolves the set of parameters of the failure response function of the source against
-   * the supplied {@code Event}.
+   * Resolves the set of parameters of the failure response function of the source against the supplied {@code Event}.
    *
    * @param event the {@code Event} with the result of the failed flow processing.
    * @return the failed response function parameters with it's values.

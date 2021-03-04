@@ -11,8 +11,8 @@ import org.mule.runtime.core.internal.registry.Registry;
 import java.util.List;
 
 /**
- * A non reusable object which determines the correct order in which a particular {@link LifecyclePhase}
- * should be applied to a provided list of objects.
+ * A non reusable object which determines the correct order in which a particular {@link LifecyclePhase} should be applied to a
+ * provided list of objects.
  *
  * @since 4.2.0
  */
@@ -21,7 +21,7 @@ public interface LifecycleObjectSorter {
   /**
    * Adds the given {@code object} to the list to be sorted
    *
-   * @param name   the name under which the object is registered in the {@link Registry}
+   * @param name the name under which the object is registered in the {@link Registry}
    * @param object the object
    */
   void addObject(String name, Object object);

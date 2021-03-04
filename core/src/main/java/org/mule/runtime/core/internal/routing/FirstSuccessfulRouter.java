@@ -101,7 +101,8 @@ class FirstSuccessfulRouter {
     downstreamFlux = Flux.<Either<Throwable, CoreEvent>>create(sink -> {
       downstreamRecorder.accept(sink);
       // Upstream chains subscription delayed until downstream sink is recorded. This handles the transaction-enabled case, in
-      // which the subscribing thread is the one that runs the whole chain. Check UntilSuccessfulRouter for more implementation details.
+      // which the subscribing thread is the one that runs the whole chain. Check UntilSuccessfulRouter for more implementation
+      // details.
       subscribeUpstreamChains(downstreamContextReference.get());
 
     })

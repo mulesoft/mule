@@ -14,8 +14,8 @@ import org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener;
 /**
  * Builder that allows to configure the attributes for the {@link PlatformManagedOAuthDancer}
  * <p>
- * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios.
- * Backwards compatibility is not guaranteed.
+ * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios. Backwards
+ * compatibility is not guaranteed.
  *
  * @since 4.3.0
  */

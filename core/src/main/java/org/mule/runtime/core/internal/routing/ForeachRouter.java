@@ -86,7 +86,7 @@ class ForeachRouter {
 
         })
         .doOnComplete(() -> {
-          //TODO MULE-18170
+          // TODO MULE-18170
           if (inflightEvents.get() == 0) {
             completeRouter();
           } else {

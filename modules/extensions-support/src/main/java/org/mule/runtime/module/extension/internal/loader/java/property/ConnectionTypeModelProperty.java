@@ -15,8 +15,8 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeW
 import java.lang.ref.WeakReference;
 
 /**
- * A {@link ModelProperty} meant to be used on {@link ConnectionProviderModel connection provider models},
- * which indicates the type of the produced connections
+ * A {@link ModelProperty} meant to be used on {@link ConnectionProviderModel connection provider models}, which indicates the
+ * type of the produced connections
  *
  * @since 4.0
  */

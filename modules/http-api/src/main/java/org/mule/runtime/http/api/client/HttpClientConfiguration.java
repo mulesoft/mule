@@ -103,8 +103,8 @@ public class HttpClientConfiguration {
     private Boolean decompress;
 
     /**
-     * Required exclusively for HTTPS, this defines through a {@link TlsContextFactory} all the TLS related data to establish
-     * such connections. Set to {@code null} by default.
+     * Required exclusively for HTTPS, this defines through a {@link TlsContextFactory} all the TLS related data to establish such
+     * connections. Set to {@code null} by default.
      *
      * @param tlsContextFactory a {@link TlsContextFactory} with the required data.
      * @return this builder
@@ -173,8 +173,8 @@ public class HttpClientConfiguration {
     }
 
     /**
-     * Defines whether the HTTP response should be streamed, meaning processing will continue as soon as all headers are parsed and
-     * the body populated as it arrives. Default is {@code false}.
+     * Defines whether the HTTP response should be streamed, meaning processing will continue as soon as all headers are parsed
+     * and the body populated as it arrives. Default is {@code false}.
      * <p/>
      * When streaming is enabled, because of the internal buffer used to hold the arriving body chunks, the response MUST be
      * eventually read or the worker threads handling the chunks will block waiting to allocate them. Likewise, read/write speed
@@ -212,7 +212,7 @@ public class HttpClientConfiguration {
     }
 
     /**
-     * Defines whether responses should be decompressed automatically by the {@link HttpClient}, {@code false} by default. Note 
+     * Defines whether responses should be decompressed automatically by the {@link HttpClient}, {@code false} by default. Note
      * that only GZIP encoding is supported.
      *
      * @param decompress whether or not responses should be decompressed

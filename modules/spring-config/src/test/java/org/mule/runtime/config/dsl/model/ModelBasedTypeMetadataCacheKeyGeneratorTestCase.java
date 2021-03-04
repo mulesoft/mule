@@ -392,8 +392,8 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     final String newConfigName = "myNewConfig";
     ArtifactDeclaration baseApp = getBaseApp();
     ArtifactDeclaration app = ElementDeclarer.newArtifact()
-        .withGlobalElement(baseApp.getGlobalElements().get(0)) //config
-        .withGlobalElement(baseApp.getGlobalElements().get(1)) //flow
+        .withGlobalElement(baseApp.getGlobalElements().get(0)) // config
+        .withGlobalElement(baseApp.getGlobalElements().get(1)) // flow
         .withGlobalElement(
                            newElementDeclarer.newConfiguration(CONFIGURATION_NAME)
                                .withRefName(newConfigName)

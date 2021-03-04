@@ -156,8 +156,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   protected abstract void doRollback() throws TransactionException;
 
   /**
-   * Fires a server notification to all registered
-   * {@link TransactionNotificationListener}s.
+   * Fires a server notification to all registered {@link TransactionNotificationListener}s.
    *
    */
   protected void fireNotification(TransactionNotification notification) {

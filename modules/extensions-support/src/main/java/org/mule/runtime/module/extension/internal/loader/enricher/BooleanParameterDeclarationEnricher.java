@@ -26,8 +26,8 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
  * {@link DeclarationEnricher} implementation that walks through all the {@link BooleanType} parameters and sets them as optional.
  * It also enriches those parameters with a default value of "false" if they don't have one.
  *
- * If the parameter was annotated with {@link ConfigOverride}, no default value will be set because it will
- * interfere with {@link ConfigOverride}'s purpose.
+ * If the parameter was annotated with {@link ConfigOverride}, no default value will be set because it will interfere with
+ * {@link ConfigOverride}'s purpose.
  *
  * @since 4.0
  */

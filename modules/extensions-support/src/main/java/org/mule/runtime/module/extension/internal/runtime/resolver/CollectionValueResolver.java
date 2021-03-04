@@ -29,9 +29,8 @@ import javax.inject.Inject;
 import com.google.common.collect.ImmutableList;
 
 /**
- * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation
- * of {@link #resolve(ValueResolvingContext)} it return a {@link Collection} of values with the outcome
- * of each original resolver.
+ * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of
+ * {@link #resolve(ValueResolvingContext)} it return a {@link Collection} of values with the outcome of each original resolver.
  * <p/>
  * This class implements {@link Lifecycle} and propagates those events to each of the {@code resolvers}
  *

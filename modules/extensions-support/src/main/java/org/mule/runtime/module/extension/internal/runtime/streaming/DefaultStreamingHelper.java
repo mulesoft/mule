@@ -43,9 +43,9 @@ public class DefaultStreamingHelper implements StreamingHelper {
   /**
    * Creates a new instance
    *
-   * @param cursorStreamProviderFactory   the {@link CursorStreamProviderFactory} to be used for byte streaming
+   * @param cursorStreamProviderFactory the {@link CursorStreamProviderFactory} to be used for byte streaming
    * @param cursorIteratorProviderFactory the {@link CursorIteratorProviderFactory} to be used for object streaming
-   * @param event                         the {@link CoreEvent} being currently executed
+   * @param event the {@link CoreEvent} being currently executed
    */
   public DefaultStreamingHelper(CursorStreamProviderFactory cursorStreamProviderFactory,
                                 CursorIteratorProviderFactory cursorIteratorProviderFactory,

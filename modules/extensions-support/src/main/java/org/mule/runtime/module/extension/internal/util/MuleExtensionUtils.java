@@ -122,7 +122,7 @@ public class MuleExtensionUtils {
    * Returns {@code true} if any of the items in {@code resolvers} return true for the {@link ValueResolver#isDynamic()} method
    *
    * @param resolvers a {@link Iterable} with instances of {@link ValueResolver}
-   * @param <T>       the generic type of the {@link ValueResolver} items
+   * @param <T> the generic type of the {@link ValueResolver} items
    * @return {@code true} if at least one {@link ValueResolver} is dynamic, {@code false} otherwise
    */
   public static <T extends Object> boolean hasAnyDynamic(Iterable<ValueResolver<T>> resolvers) {
@@ -161,7 +161,7 @@ public class MuleExtensionUtils {
    * {@link ConfigurationModel#getConnectionProviders()} level and finally the ones at
    * {@link ExtensionModel#getConnectionProviders()}
    *
-   * @param extensionModel     the {@link ExtensionModel} which owns the {@code configurationModel}
+   * @param extensionModel the {@link ExtensionModel} which owns the {@code configurationModel}
    * @param configurationModel a {@link ConfigurationModel}
    * @return a {@link List}. Might be empty but will never be {@code null}
    */
@@ -209,8 +209,8 @@ public class MuleExtensionUtils {
    * Executes the given {@code callable} using the {@link ClassLoader} associated to the {@code extensionModel}
    *
    * @param extensionModel a {@link ExtensionModel}
-   * @param callable       a {@link Callable}
-   * @param <T>            the generic type of the {@code callable}'s return type
+   * @param callable a {@link Callable}
+   * @param <T> the generic type of the {@code callable}'s return type
    * @return the value returned by the {@code callable}
    * @throws Exception if the {@code callable} fails to execute
    */
@@ -530,8 +530,8 @@ public class MuleExtensionUtils {
   }
 
   /**
-   * Tests the given {@code enrichableModel} for a {@link ImplementingTypeModelProperty} and if present it
-   * returns the enclosed implementing type.
+   * Tests the given {@code enrichableModel} for a {@link ImplementingTypeModelProperty} and if present it returns the enclosed
+   * implementing type.
    *
    * @param enrichableModel the provider to get the implemented type from
    * @return an {@link Optional} that either has the provider implementing type, or is empty

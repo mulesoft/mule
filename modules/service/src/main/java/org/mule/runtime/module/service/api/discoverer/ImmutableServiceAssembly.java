@@ -24,9 +24,9 @@ public class ImmutableServiceAssembly implements ServiceAssembly {
   /**
    * Creates a new instance
    *
-   * @param name            the service's name
+   * @param name the service's name
    * @param serviceProvider the {@link ServiceProvider}
-   * @param classLoader     the service {@link ClassLoader}
+   * @param classLoader the service {@link ClassLoader}
    * @param serviceContract the {@link Service} contract that is being fulfilled.
    */
   public ImmutableServiceAssembly(String name, ServiceProvider serviceProvider,

@@ -61,7 +61,7 @@ abstract class AbstractXmlResourceFactory implements DslResourceFactory {
    * Delegate method which should contain the actual logic to generate the resource
    *
    * @param extensionModel the {@link ExtensionModel} that requires the resource
-   * @param xmlDslModel    the extension's {@link XmlDslModel}
+   * @param xmlDslModel the extension's {@link XmlDslModel}
    * @param context
    * @return a {@link GeneratedResource}
    */

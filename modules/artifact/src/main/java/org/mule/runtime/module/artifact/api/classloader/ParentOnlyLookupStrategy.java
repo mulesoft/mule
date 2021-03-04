@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Defines a {@link LookupStrategy} that given a classloader, will search on that classloader's parent
- * without searching on the provided classloader.
+ * Defines a {@link LookupStrategy} that given a classloader, will search on that classloader's parent without searching on the
+ * provided classloader.
  */
 public class ParentOnlyLookupStrategy implements LookupStrategy {
 

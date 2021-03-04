@@ -41,16 +41,14 @@ public interface ExtensionManager {
   void registerExtension(ExtensionModel extensionModel);
 
   /**
-   * Returns an immutable {@link Set} listing all the discovered
-   * {@link ExtensionModel extensionModels}.
+   * Returns an immutable {@link Set} listing all the discovered {@link ExtensionModel extensionModels}.
    *
    * @return an immutable {@link Set}. Will not be {@code null} but might be empty
    */
   Set<ExtensionModel> getExtensions();
 
   /**
-   * Returns an {@link Optional} {@link ExtensionModel} which
-   * name equals {@code extensionName}.
+   * Returns an {@link Optional} {@link ExtensionModel} which name equals {@code extensionName}.
    *
    * @param extensionName the name of the extensions you want.
    * @return an {@link Optional}. It will be empty if no such extension is registered
@@ -68,21 +66,21 @@ public interface ExtensionManager {
    * updated for the returned {@link ConfigurationInstance}
    *
    * @param configurationProviderName the name of a previously registered {@link ConfigurationProvider}
-   * @param event                     the current Event
+   * @param event the current Event
    * @return a {@link ConfigurationInstance}
    */
   ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent event);
 
   /**
-   * Delegates into {@link #getConfigurationProvider(ExtensionModel, ComponentModel, CoreEvent)} to locate a suitable provider
-   * and uses the given {@code muleEvent} to obtain a {@link ConfigurationInstance} out of it.
+   * Delegates into {@link #getConfigurationProvider(ExtensionModel, ComponentModel, CoreEvent)} to locate a suitable provider and
+   * uses the given {@code muleEvent} to obtain a {@link ConfigurationInstance} out of it.
    * <p>
    * By the mere fact of this configuration being returned, the value of {@link ConfigurationStats#getLastUsedMillis()} will be
    * updated for the returned {@link ConfigurationInstance}
    *
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
    * @param componentModel the {@link ComponentModel} associated to a {@link ConfigurationInstance}
-   * @param muleEvent      the current Event
+   * @param muleEvent the current Event
    * @return an {@link Optional} for a {@link ConfigurationInstance}
    * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
    */
@@ -93,8 +91,7 @@ public interface ExtensionManager {
   /**
    * Returns an optional {@link ConfigurationProvider} for the given {@code extensionModel} and {@code componentModel}.
    * <p>
-   * Because no {@link ConfigurationProvider} is specified, the following algorithm will be applied to
-   * try and determine the
+   * Because no {@link ConfigurationProvider} is specified, the following algorithm will be applied to try and determine the
    * instance to be returned:
    * <ul>
    * <li>If <b>one</b> (and only one) {@link ConfigurationProvider} is registered, capable of handing configurations of the given
@@ -110,7 +107,7 @@ public interface ExtensionManager {
    *
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
    * @param componentModel the {@link ComponentModel} associated to a {@link ConfigurationInstance}
-   * @param muleEvent      the current Event
+   * @param muleEvent the current Event
    * @return an {@link Optional} for a {@link ConfigurationProvider}
    * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
    * @since 4.3.0
@@ -151,7 +148,7 @@ public interface ExtensionManager {
   /**
    * Performs actions related to the disposal of the configuration in the extension manager
    *
-   * @param key           the key for the configuration to be disposed
+   * @param key the key for the configuration to be disposed
    * @param configuration the configuration to be disposed.
    */
   default void disposeConfiguration(String key, ConfigurationInstance configuration) {}

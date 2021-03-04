@@ -26,7 +26,8 @@ public interface DynamicallySerializableComponent extends DynamicallyComponent, 
    * This method is declared so that CGLib can intercept it.
    * 
    * @see Serializable
-   * @see <a href="https://github.com/cglib/cglib/wiki/How-To#cglib-and-java-serialization">https://github.com/cglib/cglib/wiki/How-To#cglib-and-java-serialization<a>
+   * @see <a href=
+   *      "https://github.com/cglib/cglib/wiki/How-To#cglib-and-java-serialization">https://github.com/cglib/cglib/wiki/How-To#cglib-and-java-serialization<a>
    */
   Object writeReplace() throws ObjectStreamException;
 }

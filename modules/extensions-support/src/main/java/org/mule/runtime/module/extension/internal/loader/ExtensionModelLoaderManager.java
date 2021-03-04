@@ -11,7 +11,8 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 
 /**
- * Manages the lifecycle of the {@link org.mule.runtime.extension.api.loader.ExtensionModelLoader} available in the {@link ExtensionModelLoaderRepository}.
+ * Manages the lifecycle of the {@link org.mule.runtime.extension.api.loader.ExtensionModelLoader} available in the
+ * {@link ExtensionModelLoaderRepository}.
  *
  * @since 4.0
  */

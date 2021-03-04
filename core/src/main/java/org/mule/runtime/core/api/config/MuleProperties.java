@@ -163,19 +163,21 @@ public class MuleProperties {
 
   /**
    * @deprecated since 4.2.1. This key doesn't exist anymore. Use {@link #OBJECT_EXTENSION_AUTH_CODE_HANDLER} or
-   * {@link #OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER} instead
+   *             {@link #OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER} instead
    */
   @Deprecated
   public static final String OBJECT_EXTENSION_OAUTH_MANAGER = "extensions.oauth.manager";
 
   /**
    * Registry key for the {@code AuthorizationCodeOAuthHandler}
+   * 
    * @since 4.2.1
    */
   public static final String OBJECT_EXTENSION_AUTH_CODE_HANDLER = "extensions.authCode.handler";
 
   /**
    * Registry key for the {@code ClientCredentialsOAuthHandler}
+   * 
    * @since 4.2.1
    */
   public static final String OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER = "extensions.clientCredentials.handler";
@@ -183,8 +185,8 @@ public class MuleProperties {
   /**
    * Registry key for the {@code PlatformManagedOAuthHandler}
    * <p>
-   * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios.
-   * Backwards compatibility is not guaranteed.
+   * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios. Backwards
+   * compatibility is not guaranteed.
    *
    * @since 4.3.0
    */
@@ -231,6 +233,7 @@ public class MuleProperties {
 
   /**
    * The prefix for any Mule-specific properties set in the system properties
+   * 
    * @deprecated since 4.2. Use {@link MuleSystemProperties#SYSTEM_PROPERTY_PREFIX} instead
    */
   @Deprecated
@@ -268,6 +271,7 @@ public class MuleProperties {
 
   /**
    * System property key for the default size of a streaming buffer bucket
+   * 
    * @since 4.1.4
    * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_STREAMING_BUCKET_SIZE} instead
    */

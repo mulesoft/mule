@@ -108,8 +108,8 @@ public class MavenUtils {
     try {
       possibleUrl = getUrlWithinJar(artifactFile, mavenMetadataFilePath);
       /*
-       * A specific implementation of JarURLConnection is required to read jar content because not all implementations
-       * support ways to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
+       * A specific implementation of JarURLConnection is required to read jar content because not all implementations support
+       * ways to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
        */
       JarURLConnection jarConnection =
           new sun.net.www.protocol.jar.JarURLConnection(possibleUrl, new sun.net.www.protocol.jar.Handler());
@@ -160,8 +160,8 @@ public class MavenUtils {
    *
    * @param artifactFolder folder containing the exploded artifact file.
    * @return the {@link Properties} from the {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES} file if available
-   * @throws ArtifactDescriptorCreateException if the folder does not contain a {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES}
-   *                                           file or the file can' be loaded
+   * @throws ArtifactDescriptorCreateException if the folder does not contain a
+   *         {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES} file or the file can' be loaded
    */
   public static Properties getPomPropertiesFolder(File artifactFolder) {
     final File artifactPomProperties = lookupPomPropertiesMavenLocation(artifactFolder);
@@ -181,8 +181,8 @@ public class MavenUtils {
    *
    * @param artifactFile the artifact file to search for the pom file.
    * @return the {@link Properties} from the {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES} file if available
-   * @throws ArtifactDescriptorCreateException if the folder does not contain a {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES}
-   *                                           file or the file can' be loaded
+   * @throws ArtifactDescriptorCreateException if the folder does not contain a
+   *         {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES} file or the file can' be loaded
    */
   public static Properties getPomPropertiesFromJar(File artifactFile) {
     String pomPropertiesFilePath = MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_POM_PROPERTIES;
@@ -250,7 +250,7 @@ public class MavenUtils {
    * Creates the pom properties file for a deployable artifact inside the artifact exploded folder
    *
    * @param artifactFolder the deployable artifact folder
-   * @param model          the pom model
+   * @param model the pom model
    */
   public static void createDeployablePomProperties(File artifactFolder, Model model) {
     Properties pomProperties = new Properties();

@@ -12,8 +12,8 @@ import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.HttpMessageBuilder;
 
 /**
- * Builder of {@link HttpResponse}s. Instances can only be obtained using {@link HttpResponse#builder()}.
- * By default, the status code is 200 with empty reason phrase, headers and entity.
+ * Builder of {@link HttpResponse}s. Instances can only be obtained using {@link HttpResponse#builder()}. By default, the status
+ * code is 200 with empty reason phrase, headers and entity.
  *
  * @since 4.0
  */

@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
  * <li>{@link ClassPathClassifier}: classifies the classpath URLs and builds the {@link List} or {@link java.net.URL}s for each
  * {@link ClassLoader}</li>
  * <p/>
- * The object built by this builder is a {@link ArtifactClassLoaderHolder} that references the
- * {@link ArtifactClassLoader} for the application, plugins and container.
+ * The object built by this builder is a {@link ArtifactClassLoaderHolder} that references the {@link ArtifactClassLoader} for the
+ * application, plugins and container.
  *
  * @since 4.0
  */
@@ -69,8 +69,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
   private List<String> extraBootPackages;
 
   /**
-   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>}
-   * in order to be added to the sharedLib {@link ArtifactClassLoader}
+   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or
+   * {@code <groupId>:<artifactId>:<classifier>} in order to be added to the sharedLib {@link ArtifactClassLoader}
    *
    * @param applicationSharedLibCoordinates {@link List} of Maven coordinates to add
    * @return this
@@ -81,8 +81,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>}
-   * in order to be added to the application {@link ArtifactClassLoader}
+   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or
+   * {@code <groupId>:<artifactId>:<classifier>} in order to be added to the application {@link ArtifactClassLoader}
    *
    * @param applicationLibCoordinates {@link List} of Maven coordinates to add
    * @return this
@@ -93,9 +93,9 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>}
-   * in order to be exported on the test runner's {@link ArtifactClassLoader} in addition to test classes and resources from the
-   * module being tested
+   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or
+   * {@code <groupId>:<artifactId>:<classifier>} in order to be exported on the test runner's {@link ArtifactClassLoader} in
+   * addition to test classes and resources from the module being tested
    *
    * @param testRunnerExportedLibCoordinates {@link List} of Maven coordinates to add
    * @return this
@@ -243,8 +243,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Sets to {@code true} if while building the a plugin {@link ArtifactClassLoader}
-   * for an {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
+   * Sets to {@code true} if while building the a plugin {@link ArtifactClassLoader} for an
+   * {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
    *
    * @param extensionMetadataGenerationEnabled {@code boolean} to enable Extension metadata generation.
    * @return this
@@ -255,11 +255,11 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Sets a {@link List} of {@link URL}s to be appended to the application
-   * {@link ArtifactClassLoader} in addition to the ones classified.
+   * Sets a {@link List} of {@link URL}s to be appended to the application {@link ArtifactClassLoader} in addition to the ones
+   * classified.
    *
-   * @param {@link List} of {@link URL}s to be appended to the application
-   *        {@link ArtifactClassLoader} in addition to the ones classified.
+   * @param {@link List} of {@link URL}s to be appended to the application {@link ArtifactClassLoader} in addition to the ones
+   *        classified.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setTestRunnerPluginUrls(List<URL> testRunnerPluginUrls) {
@@ -268,8 +268,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Builds the {@link ArtifactClassLoaderHolder} with the
-   * {@link ArtifactClassLoader}s for application, plugins and container.
+   * Builds the {@link ArtifactClassLoaderHolder} with the {@link ArtifactClassLoader}s for application, plugins and container.
    *
    * @return a {@link ArtifactClassLoaderHolder} as output of the classification process.
    * @throws {@link IOException} if there was an error while creating the classification context

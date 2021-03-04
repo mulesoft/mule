@@ -35,16 +35,15 @@ public interface ThreadNotificationService {
   void addThreadNotificationElement(ThreadNotificationElement notification);
 
   /**
-   * Takes a {@link Collection} of {@link ThreadNotificationElement} to retrieve
-   * all of their statistics.
+   * Takes a {@link Collection} of {@link ThreadNotificationElement} to retrieve all of their statistics.
    *
    * @param notifications
    */
   void addThreadNotificationElements(Collection<ThreadNotificationElement> notifications);
 
   /**
-   * Retrieves stats notification as String. For each transition, it shows the total of
-   * transitions, the latency, the average and standard deviation of this latency.
+   * Retrieves stats notification as String. For each transition, it shows the total of transitions, the latency, the average and
+   * standard deviation of this latency.
    *
    * @return string with retrieved statistics
    */

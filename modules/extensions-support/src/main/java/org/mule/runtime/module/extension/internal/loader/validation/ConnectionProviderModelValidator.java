@@ -40,8 +40,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 /**
- * {@link ExtensionModelValidator} which applies to {@link ExtensionModel}s which either contains {@link ConnectionProviderModel}s,
- * {@link OperationModel}s which require a connection or both.
+ * {@link ExtensionModelValidator} which applies to {@link ExtensionModel}s which either contains
+ * {@link ConnectionProviderModel}s, {@link OperationModel}s which require a connection or both.
  * <p>
  * This validator makes sure that:
  * <ul>

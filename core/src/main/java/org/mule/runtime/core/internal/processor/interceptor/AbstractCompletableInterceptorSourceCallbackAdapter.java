@@ -82,7 +82,7 @@ public abstract class AbstractCompletableInterceptorSourceCallbackAdapter<T exte
   /**
    * Applies the result of the before interception to the given result
    *
-   * @param event  Resulting event of the before interception
+   * @param event Resulting event of the before interception
    * @param result Input result of the source
    * @return Result with the before event applied
    */

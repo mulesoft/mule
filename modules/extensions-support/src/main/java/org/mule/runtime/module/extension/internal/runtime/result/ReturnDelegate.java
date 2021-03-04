@@ -11,8 +11,8 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
- * A delegate interface to decouple a {@link CompletableComponentExecutor}'s return value from how it is transformed
- * into an {@link CoreEvent} to be handed back into the pipeline
+ * A delegate interface to decouple a {@link CompletableComponentExecutor}'s return value from how it is transformed into an
+ * {@link CoreEvent} to be handed back into the pipeline
  *
  * @since 4.0
  */

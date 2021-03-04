@@ -54,9 +54,11 @@ public final class TemplateParser {
                                                               new PatternInfo(CURLY_TEMPLATE_STYLE, "\\{[^\\{\\}}]+\\}", "{",
                                                                               "}"),
 
-                                                              // Such a complex regex is needed to support nested expressions, otherwise we
+                                                              // Such a complex regex is needed to support nested expressions,
+                                                              // otherwise we
                                                               // have to do this manually or using an ANTLR grammar etc.
-                                                              // TODO MULE-14603 - Expression Regex fails on detect expression when this have an unbalanced opening bracket
+                                                              // TODO MULE-14603 - Expression Regex fails on detect expression
+                                                              // when this have an unbalanced opening bracket
                                                               // Support for 6 levels (5 nested)
                                                               WIGGLY_MULE_TEMPLATE_STYLE,
                                                               new PatternInfo(WIGGLY_MULE_TEMPLATE_STYLE,

@@ -22,8 +22,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
 /**
- * Generic contract for classes that adds descriptions to a declaration using a {@link ProcessingEnvironment} to
- * enrich the descriptions with the javadocs extracted from the extension's acting classes.
+ * Generic contract for classes that adds descriptions to a declaration using a {@link ProcessingEnvironment} to enrich the
+ * descriptions with the javadocs extracted from the extension's acting classes.
  * <p>
  * This is necessary because such documentation is not available on runtime.
  *

@@ -52,11 +52,11 @@ public final class ConfigurationInstanceFactory<T> {
   /**
    * Creates a new instance which provides instances derived from the given {@code configurationModel} and {@code resolverSet}
    *
-   * @param extensionModel     the {@link ExtensionModel} that owns the {@code configurationModel}
+   * @param extensionModel the {@link ExtensionModel} that owns the {@code configurationModel}
    * @param configurationModel the {@link ConfigurationModel} that describes the configurations to be created
-   * @param resolverSet        the {@link ResolverSet} which provides the values for the configuration's parameters
-   * @param expressionManager  the {@link ExpressionManager} used to create a session used to evaluate the attributes.
-   * @param context            the current {@link MuleContext}
+   * @param resolverSet the {@link ResolverSet} which provides the values for the configuration's parameters
+   * @param expressionManager the {@link ExpressionManager} used to create a session used to evaluate the attributes.
+   * @param context the current {@link MuleContext}
    */
   public ConfigurationInstanceFactory(ExtensionModel extensionModel,
                                       ConfigurationModel configurationModel,
@@ -76,8 +76,8 @@ public final class ConfigurationInstanceFactory<T> {
    * This method overload allows specifying a {@link ValueResolver} to provide the {@link ConnectionProvider} that the
    * configuration will use to obtain connections. If the connection does not need such a concept you can provide a {@code null}
    *
-   * @param name     the name of the configuration to return
-   * @param event    the current {@link CoreEvent}
+   * @param name the name of the configuration to return
+   * @param event the current {@link CoreEvent}
    * @param resolver a {@link ValueResolver} to provide the {@link ConnectionProvider} or {@code null}
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
@@ -107,9 +107,9 @@ public final class ConfigurationInstanceFactory<T> {
   /**
    * Creates a new instance using the given {@code resolverSetResult} to obtain the configuration's parameter values
    *
-   * @param name                       the name of the configuration to return
-   * @param configValues               the {@link ResolverSetResult} with the evaluated config parameters values
-   * @param event                      the current {@link CoreEvent}
+   * @param name the name of the configuration to return
+   * @param configValues the {@link ResolverSetResult} with the evaluated config parameters values
+   * @param event the current {@link CoreEvent}
    * @param connectionProviderResolver an optional resolver to obtain a {@link ConnectionProvider}
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
@@ -144,10 +144,10 @@ public final class ConfigurationInstanceFactory<T> {
    * Creates a new instance using the given {@code configValues} and {@code connectionProviderValues} to obtain the
    * configuration's parameter values
    *
-   * @param name                     the name of the configuration to return
-   * @param configValues             the {@link ResolverSetResult} with the evaluated config parameters values
-   * @param event                    the current {@link CoreEvent}
-   * @param resolver                 a resolver to obtain a {@link ConnectionProvider}
+   * @param name the name of the configuration to return
+   * @param configValues the {@link ResolverSetResult} with the evaluated config parameters values
+   * @param event the current {@link CoreEvent}
+   * @param resolver a resolver to obtain a {@link ConnectionProvider}
    * @param connectionProviderValues e {@link ResolverSetResult} with the evaluated connection parameters values
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered

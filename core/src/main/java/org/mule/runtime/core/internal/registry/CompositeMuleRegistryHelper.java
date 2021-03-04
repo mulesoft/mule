@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 
 /**
  * Composes {@link MuleRegistryHelper} of application that includes the {@link MuleRegistryHelper} of a domain.
+ * 
  * @since 4.1.4
  */
 public class CompositeMuleRegistryHelper extends MuleRegistryHelper {

@@ -13,8 +13,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import java.io.InputStream;
 
 /**
- * Indicates that an {@link InputStream} or {@link CursorStreamProvider} was expected
- * but something else was found.
+ * Indicates that an {@link InputStream} or {@link CursorStreamProvider} was expected but something else was found.
  *
  * @since 4.0
  */

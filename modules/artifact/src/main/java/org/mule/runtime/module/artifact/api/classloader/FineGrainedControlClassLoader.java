@@ -219,8 +219,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
 
   /**
    * Prevents jar caching for this classloader, mainly to fix the static ResourceBundle mess/cache that keeps connections open no
-   * matter what.
-   * It also prevents file descriptor leaks when accessing through SPI to implementations bundled in the application.
+   * matter what. It also prevents file descriptor leaks when accessing through SPI to implementations bundled in the application.
    */
   private static class NonCachingJarResourceURLStreamHandler extends Handler {
 

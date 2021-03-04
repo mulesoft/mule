@@ -23,7 +23,7 @@ public class StaticLiteralValueResolver<T> implements ValueResolver<Literal<T>> 
    * Creates a new instance
    *
    * @param value the literal value
-   * @param type  the type of the value represented by the literal
+   * @param type the type of the value represented by the literal
    */
   public StaticLiteralValueResolver(String value, Class<T> type) {
     literal = new ImmutableLiteral<>(value, type);

@@ -17,8 +17,7 @@ import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import java.util.function.Consumer;
 
 /**
- * Channels exceptions through the
- * {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, CoreEvent)}.
+ * Channels exceptions through the {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, CoreEvent)}.
  *
  * @since 4.0
  */

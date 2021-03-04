@@ -66,8 +66,8 @@ public class DeclarationOperation {
   }
 
   /**
-   * Deserializer of the declaration for a whole map of declarations, where the result represents a map with all the
-   * <operation/>s of the current <module/>
+   * Deserializer of the declaration for a whole map of declarations, where the result represents a map with all the <operation/>s
+   * of the current <module/>
    *
    * @param json String representation of a {@link Map<String,DeclarationOperation>}
    * @return a {@link Map<String, DeclarationOperation>} where each key is an operation of the current <module/>

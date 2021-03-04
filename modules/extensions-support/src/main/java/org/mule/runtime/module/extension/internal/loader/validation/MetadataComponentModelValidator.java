@@ -80,8 +80,8 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
 
-    //TODO - MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
-    //This is skipped if the extension is loaded with java, but it doesn't have classes which means AST Mode
+    // TODO - MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
+    // This is skipped if the extension is loaded with java, but it doesn't have classes which means AST Mode
     Optional<ExtensionTypeDescriptorModelProperty> property =
         extensionModel.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
     if (property.isPresent()) {

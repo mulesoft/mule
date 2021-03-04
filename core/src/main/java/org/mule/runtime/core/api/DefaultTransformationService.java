@@ -59,7 +59,8 @@ public class DefaultTransformationService implements TransformationService {
    * @param outputDataType the desired return type
    * @return The converted payload of this message. Note that this method will not alter the payload of this message *unless* the
    *         payload is an InputStream in which case the stream will be read and the payload will become the fully read stream.
-   * @throws MessageTransformerException if a transformer cannot be found or there is an error during transformation of the payload
+   * @throws MessageTransformerException if a transformer cannot be found or there is an error during transformation of the
+   *         payload
    */
   private Message internalTransform(Message message, DataType outputDataType) throws MessageTransformerException {
     checkNotNull(message, "Message cannot be null");
@@ -104,7 +105,8 @@ public class DefaultTransformationService implements TransformationService {
    * @return The converted payload of this message. Note that this method will not alter the payload of this message <b>unless</b>
    *         the payload is an {@link InputStream} in which case the stream will be read and the payload will become the fully
    *         read stream.
-   * @throws MessageTransformerException if a transformer cannot be found or there is an error during transformation of the payload.
+   * @throws MessageTransformerException if a transformer cannot be found or there is an error during transformation of the
+   *         payload.
    */
   @SuppressWarnings("unchecked")
   protected <T> T getPayload(Message message, DataType resultType, Charset encoding) throws MessageTransformerException {

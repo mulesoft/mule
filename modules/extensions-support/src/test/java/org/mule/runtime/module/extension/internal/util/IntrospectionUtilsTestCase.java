@@ -388,8 +388,8 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     MetadataType payloadType = messageType.getPayloadType().get();
     MetadataType attributesTypes = messageType.getAttributesType().get();
 
-    //These assertions are too simple, but AST Loader doesn't enrich with the same annotations as the Java does
-    //making impossible to do an equals assertion.
+    // These assertions are too simple, but AST Loader doesn't enrich with the same annotations as the Java does
+    // making impossible to do an equals assertion.
     assertThat(payloadType.getAnnotation(TypeIdAnnotation.class).get().getValue(), is(Banana.class.getName()));
     assertThat(attributesTypes.getAnnotation(TypeIdAnnotation.class).get().getValue(), is(Apple.class.getName()));
   }

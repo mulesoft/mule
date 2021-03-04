@@ -33,11 +33,10 @@ public class TransformationGraphLookupStrategy {
   }
 
   /**
-   * Looks for {@link Converter} to convert from the source to the target data types.
-   * All {@link Converter}s found will have a source that is compatible with source parameter
-   * (since if a converter can convert a super type, it should be able to convert any type that extends it)
-   * and a target such that target parameter isCompatibleWith() the {@link Converter}'s one
-   * (since if we want a converter that returns an specific type, it should return exactly that type or any type that extends it.)
+   * Looks for {@link Converter} to convert from the source to the target data types. All {@link Converter}s found will have a
+   * source that is compatible with source parameter (since if a converter can convert a super type, it should be able to convert
+   * any type that extends it) and a target such that target parameter isCompatibleWith() the {@link Converter}'s one (since if we
+   * want a converter that returns an specific type, it should return exactly that type or any type that extends it.)
    *
    * @param source data type to be converted
    * @param target data type to be converted to
@@ -53,7 +52,7 @@ public class TransformationGraphLookupStrategy {
       return converters;
     }
 
-    //Since we should have all possible transformations we should check for them all.
+    // Since we should have all possible transformations we should check for them all.
     List<DataType> compatibleSourceVertexes = graph.getSuperVertexes(source);
     List<DataType> compatibleTargetVertexes = graph.getSubVertexes(target);
 
@@ -70,7 +69,7 @@ public class TransformationGraphLookupStrategy {
   }
 
   private List<Converter> createConverters(List<List<TransformationEdge>> transformationPaths) {
-    //Using a set instead of a list for when a path of just one converter is found multiple times.
+    // Using a set instead of a list for when a path of just one converter is found multiple times.
     Set<Converter> converters = new HashSet<>();
 
     for (List<TransformationEdge> transformationPath : transformationPaths) {

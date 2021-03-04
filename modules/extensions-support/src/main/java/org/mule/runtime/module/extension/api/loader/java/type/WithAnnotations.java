@@ -23,17 +23,17 @@ public interface WithAnnotations {
    * Retrieves an annotation of the {@link WithAnnotations} component
    *
    * @param annotationClass Of the annotation to retrieve
-   * @param <A>             The annotation type
+   * @param <A> The annotation type
    * @return The {@link Optional} annotation to retrieve
    */
   <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass);
 
   /**
-   * Returns an optional {@link AnnotationValueFetcher} which encapsulates the logic of obtaining annotations values
-   * when executing with classes or with the Java AST.
+   * Returns an optional {@link AnnotationValueFetcher} which encapsulates the logic of obtaining annotations values when
+   * executing with classes or with the Java AST.
    *
    * @param annotationClass Of the annotation to retrieve
-   * @param <A>             The annotation type
+   * @param <A> The annotation type
    * @return The {@link Optional} {@link AnnotationValueFetcher} to retrieve
    * @since 4.1
    */

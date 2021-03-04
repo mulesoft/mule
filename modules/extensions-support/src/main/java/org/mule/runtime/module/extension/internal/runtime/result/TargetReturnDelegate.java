@@ -23,8 +23,8 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
- * An implementation of {@link AbstractReturnDelegate} which evaluates the {@link #targetValue} expressions and sets the output
- * as a variable which key is taken from the {@link #target} field.
+ * An implementation of {@link AbstractReturnDelegate} which evaluates the {@link #targetValue} expressions and sets the output as
+ * a variable which key is taken from the {@link #target} field.
  * <p>
  * The original message payload is not modified.
  *

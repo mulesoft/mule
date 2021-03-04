@@ -23,12 +23,12 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Base implementation of a {@link ByteBufferManager} which makes sure that the total memory footprints of all
- * the {@link ByteBuffer buffers} obtained through this class do not exceed a maximum cap.
+ * Base implementation of a {@link ByteBufferManager} which makes sure that the total memory footprints of all the
+ * {@link ByteBuffer buffers} obtained through this class do not exceed a maximum cap.
  * <p>
  * Said memory cap can be given through either the {@link MuleSystemProperties#MULE_STREAMING_MAX_MEMORY} or
- * {@link MuleSystemProperties#MULE_STREAMING_MAX_HEAP_PERCENTAGE} system properties. If none is set, the cap will
- * default to 70% of the total heap.
+ * {@link MuleSystemProperties#MULE_STREAMING_MAX_HEAP_PERCENTAGE} system properties. If none is set, the cap will default to 70%
+ * of the total heap.
  * <p>
  * Implementations of this class <b>MUST</b> always implement their allocation logic through the {@link #allocateIfFits(int)}
  * method.
@@ -52,7 +52,7 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
   /**
    * Creates a new instance
    *
-   * @param memoryManager the {@link MemoryManager}  through which heap status is obtained
+   * @param memoryManager the {@link MemoryManager} through which heap status is obtained
    */
   public MemoryBoundByteBufferManager(MemoryManager memoryManager) {
     maxStreamingMemory = calculateMaxStreamingMemory(memoryManager);
@@ -79,8 +79,8 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
   }
 
   /**
-   * Tries to allocate the {@link ByteBuffer} by delegating to {@link #allocateIfFits(int)}. If the memory cap is exceeded
-   * a {@link MaxStreamingMemoryExceededException} is thrown.
+   * Tries to allocate the {@link ByteBuffer} by delegating to {@link #allocateIfFits(int)}. If the memory cap is exceeded a
+   * {@link MaxStreamingMemoryExceededException} is thrown.
    *
    * @param capacity the capacity of the returned buffer
    * @return a {@link ByteBuffer}

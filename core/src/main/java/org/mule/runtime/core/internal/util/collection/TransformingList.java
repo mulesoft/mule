@@ -14,8 +14,7 @@ import java.util.ListIterator;
 import java.util.function.Function;
 
 /**
- * Specialization of {@link TransformingCollection} for collections that implement the {@link List}
- * interface.
+ * Specialization of {@link TransformingCollection} for collections that implement the {@link List} interface.
  *
  * @param <T> the generic type of the transformed collection's item
  * @since 4.4.0
@@ -36,8 +35,8 @@ public class TransformingList<T> extends TransformingCollection<T> implements Li
   }
 
   /**
-   * Creates a new instance in which the given {@code transform} will <b>ONLY</b> be applied to
-   * items which are not instances of the {@code targetType}
+   * Creates a new instance in which the given {@code transform} will <b>ONLY</b> be applied to items which are not instances of
+   * the {@code targetType}
    *
    * @param delegate the decorated list
    * @param transformer the transformer

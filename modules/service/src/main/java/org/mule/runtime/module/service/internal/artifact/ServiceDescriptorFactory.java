@@ -32,7 +32,8 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
    * Creates a new factory
    *
    * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
-   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
+   *        {@link ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
    */
   public ServiceDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository,
                                   ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {

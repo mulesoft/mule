@@ -13,8 +13,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.artifact.api.Artifact;
 
 /**
- * An artifact context contains all the information related to an {@link Artifact} that contains
- * configuration.
+ * An artifact context contains all the information related to an {@link Artifact} that contains configuration.
  * <p/>
  * This object holds the created {@link MuleContext} and the {@link MuleArtifactContext} which holds the information related to
  * the application configuration and resources.

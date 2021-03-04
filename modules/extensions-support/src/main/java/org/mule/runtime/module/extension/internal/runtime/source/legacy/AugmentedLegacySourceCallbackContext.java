@@ -12,8 +12,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import java.util.List;
 
 /**
- * Augments the legacy {@link SourceCallbackContext} contract with internal behavior we don't want exposed
- * on the public API
+ * Augments the legacy {@link SourceCallbackContext} contract with internal behavior we don't want exposed on the public API
  *
  * @since 4.4.0
  */

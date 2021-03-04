@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Takes Mule policy descriptor into account when building the context.
  * 
- *  @since 4.1
+ * @since 4.1
  */
 public class PolicyMuleContextBuilder extends SupportsPropertiesMuleContextBuilder {
 

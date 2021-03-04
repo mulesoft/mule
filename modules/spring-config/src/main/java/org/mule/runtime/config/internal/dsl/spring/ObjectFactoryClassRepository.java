@@ -38,12 +38,12 @@ import net.sf.cglib.proxy.MethodInterceptor;
  */
 public class ObjectFactoryClassRepository {
 
-  //This only works because the cache uses an identity hashCode() and equals() for keys when they are configured as weak.
-  //(check com.github.benmanes.caffeine.cache.Caffeine.weakKeys javadoc).
-  //If that is not the case, this will never work because we want to compare class loaders by instance.
-  //The idea for this cache is to avoid the creation of multiple CompositeClassLoader instances with the same delegates.
-  //That is because CGLIB enhancer uses the composite class loader to define the enhanced class and every new instance loads
-  //the same defined class over and over again, causing metaspace OOM in some scenarios.
+  // This only works because the cache uses an identity hashCode() and equals() for keys when they are configured as weak.
+  // (check com.github.benmanes.caffeine.cache.Caffeine.weakKeys javadoc).
+  // If that is not the case, this will never work because we want to compare class loaders by instance.
+  // The idea for this cache is to avoid the creation of multiple CompositeClassLoader instances with the same delegates.
+  // That is because CGLIB enhancer uses the composite class loader to define the enhanced class and every new instance loads
+  // the same defined class over and over again, causing metaspace OOM in some scenarios.
   private static final LoadingCache<ClassLoader, ClassLoader> COMPOSITE_CL_CACHE = newBuilder()
       .weakKeys()
       .weakValues()
@@ -53,12 +53,12 @@ public class ObjectFactoryClassRepository {
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
    * {@code Class} instance should not be reused for another {@link ComponentBuildingDefinition}.
    *
-   * @param componentBuildingDefinition          the definition on how to build the component
-   * @param objectFactoryType                    the {@link ObjectFactory} of the component
-   * @param createdObjectType                    the type of object created by the {@code ObjectFactory}
-   * @param isLazyInitFunction                   function that defines if the object created by the component can be created lazily
-   * @param instancePostCreationFunctionOptional function to do custom processing of the created instance by the {@code ObjectFactory}.
-   *                                             When there's no need for post processing this value must be {@link Optional#empty()}
+   * @param componentBuildingDefinition the definition on how to build the component
+   * @param objectFactoryType the {@link ObjectFactory} of the component
+   * @param createdObjectType the type of object created by the {@code ObjectFactory}
+   * @param isLazyInitFunction function that defines if the object created by the component can be created lazily
+   * @param instancePostCreationFunctionOptional function to do custom processing of the created instance by the
+   *        {@code ObjectFactory}. When there's no need for post processing this value must be {@link Optional#empty()}
    * @return the {@code FactoryBean} class to be used by spring for the provided configuration.
    */
   public Class<ObjectFactory> getObjectFactoryClass(ComponentBuildingDefinition componentBuildingDefinition,

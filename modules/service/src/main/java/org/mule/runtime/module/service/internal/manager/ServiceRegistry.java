@@ -28,10 +28,9 @@ import javax.inject.Named;
 import javax.inject.Qualifier;
 
 /**
- * Keeps track of {@link Service} implementations and is capable of injecting them into {@link ServiceProvider} instances
- * with fields annotated with {@link Inject}. Optionality is supported by using {@link Optional} type when declared a field
- * with {@link Inject}. Method injection as {@link Qualifier} and {@link Named} annotations are not
- * supported.
+ * Keeps track of {@link Service} implementations and is capable of injecting them into {@link ServiceProvider} instances with
+ * fields annotated with {@link Inject}. Optionality is supported by using {@link Optional} type when declared a field with
+ * {@link Inject}. Method injection as {@link Qualifier} and {@link Named} annotations are not supported.
  *
  * @since 4.2
  */
@@ -90,7 +89,7 @@ public class ServiceRegistry {
   /**
    * Tracks the given {@code service}
    *
-   * @param service  the {@link Service} to be tracked
+   * @param service the {@link Service} to be tracked
    * @param assembly the {@code service}'s {@link ServiceAssembly}
    */
   public void register(Service service, ServiceAssembly assembly) {

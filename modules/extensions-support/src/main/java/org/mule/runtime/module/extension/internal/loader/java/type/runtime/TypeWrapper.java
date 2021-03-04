@@ -142,8 +142,8 @@ public class TypeWrapper implements Type {
   }
 
   /**
-  * {@inheritDoc}
-  */
+   * {@inheritDoc}
+   */
   @Override
   public List<FieldElement> getAnnotatedFields(Class<? extends Annotation>... annotations) {
     return getFields().stream().filter(field -> of(annotations).anyMatch(field::isAnnotatedWith)).collect(toList());

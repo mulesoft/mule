@@ -49,9 +49,9 @@ import java.util.Set;
  * <li>Parameter of an {@link SourceCallbackModel}</li>
  * </ul>
  * <p>
- * These types should comply that for each parameter they contain, there must exist a getter method for that parameter.
- * The vice versa is also required, that implies the fact that for each getter method, there should exist a field named with the
- * getter convention.
+ * These types should comply that for each parameter they contain, there must exist a getter method for that parameter. The vice
+ * versa is also required, that implies the fact that for each getter method, there should exist a field named with the getter
+ * convention.
  *
  * @since 4.0
  */

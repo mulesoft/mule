@@ -51,8 +51,8 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
   }
 
   /**
-   * Contributes to a {@link ParameterDeclarer} if the type of the given parameter is one of the registered
-   * as {@link StackableType wrapper types}
+   * Contributes to a {@link ParameterDeclarer} if the type of the given parameter is one of the registered as
+   * {@link StackableType wrapper types}
    *
    * @param parameter {@link ExtensionParameter} with introspected information of the Java parameter
    * @param declarer declarer to be enriched

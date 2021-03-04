@@ -20,7 +20,7 @@ public interface ModelLoaderDelegateFactory {
    * Returns a new {@link ModelLoaderDelegate} instance based on the given {@link ExtensionElement} and version.
    *
    * @param extensionElement representing the extension class
-   * @param version          the extension's version
+   * @param version the extension's version
    * @return a new {@link ModelLoaderDelegate}
    */
   ModelLoaderDelegate getLoader(ExtensionElement extensionElement, String version);

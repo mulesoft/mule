@@ -38,8 +38,8 @@ public abstract class ConnectionProviderObjectBuilder<C>
   /**
    * Creates a new instances which produces instances based on the given {@code providerModel} and {@code resolverSet}
    *
-   * @param providerModel     the {@link ConnectionProviderModel} which describes the instances to be produced
-   * @param resolverSet       a {@link ResolverSet} to populate the values
+   * @param providerModel the {@link ConnectionProviderModel} which describes the instances to be produced
+   * @param resolverSet a {@link ResolverSet} to populate the values
    */
   public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                          ResolverSet resolverSet,

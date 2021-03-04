@@ -24,14 +24,14 @@ public final class SourcePolicyTestUtils {
   private SourcePolicyTestUtils() {}
 
   /**
-   * Generates a {@link CompletableCallback} that will block execution until it is completed and feeds it into the
-   * provided {@code callbackConsumer}.
+   * Generates a {@link CompletableCallback} that will block execution until it is completed and feeds it into the provided
+   * {@code callbackConsumer}.
    * <p>
    * If the callback completes normally, this method returns the completion value. If it completes exceptionally, then the
    * obtained {@link Throwable} is thrown
    *
    * @param callbackConsumer a consumer that will use the generated callback
-   * @param <T>              the callback's generic type
+   * @param <T> the callback's generic type
    * @return the completion value
    * @throws Throwable if the callback completes exceptionally
    */
@@ -69,7 +69,7 @@ public final class SourcePolicyTestUtils {
    * Returns a Mockito {@link Answer} that operates into a {@link CompletableCallback} argument assumed to be on arg index 2.
    *
    * @param callbackConsumer the consumer that will process the callback
-   * @param <T>              the generic type of the answer
+   * @param <T> the generic type of the answer
    * @return a Mockito {@link Answer}
    */
   public static <T> Answer<T> onCallback(Consumer<CompletableCallback<T>> callbackConsumer) {
@@ -81,7 +81,7 @@ public final class SourcePolicyTestUtils {
    * given {@code argIndex}.
    *
    * @param callbackConsumer the consumer that will process the callback
-   * @param <T>              the generic type of the answer
+   * @param <T> the generic type of the answer
    * @return a Mockito {@link Answer}
    */
   public static <T> Answer<T> onCallback(Consumer<CompletableCallback<T>> callbackConsumer, int argIndex) {

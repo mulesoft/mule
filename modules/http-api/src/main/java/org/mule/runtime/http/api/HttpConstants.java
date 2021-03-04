@@ -21,6 +21,7 @@ public class HttpConstants {
   }
 
   public enum Protocol {
+
     HTTP("http", 80), HTTPS("https", 443);
 
     private final String scheme;
@@ -45,6 +46,7 @@ public class HttpConstants {
   public static final String ALL_INTERFACES_IP = "0.0.0.0";
 
   public enum HttpStatus {
+
     CONTINUE(100, "Continue"),
 
     SWITCHING_PROTOCOLS(101, "Switching Protocols"),

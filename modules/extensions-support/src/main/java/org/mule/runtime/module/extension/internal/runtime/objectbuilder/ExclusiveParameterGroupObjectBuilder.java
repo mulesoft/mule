@@ -28,8 +28,8 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 /**
- * {@link DefaultObjectBuilder} extension that validates that the built object complies with
- * the rules specified in {@link org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals}
+ * {@link DefaultObjectBuilder} extension that validates that the built object complies with the rules specified in
+ * {@link org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals}
  *
  * @since 4.0
  */

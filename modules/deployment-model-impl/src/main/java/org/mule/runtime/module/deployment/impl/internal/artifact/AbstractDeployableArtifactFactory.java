@@ -35,8 +35,10 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
    * Creates a new {@link AbstractDeployableArtifactFactory}
    * 
    * @param licenseValidator the license validator to use for plugins.
-   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
-   * @param runtimeLockFactory {@link LockFactory} for Runtime, a unique and shared lock factory to be used between different artifacts.
+   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
+   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   * @param runtimeLockFactory {@link LockFactory} for Runtime, a unique and shared lock factory to be used between different
+   *        artifacts.
    */
   public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator,
                                            LockFactory runtimeLockFactory) {

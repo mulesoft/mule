@@ -21,7 +21,7 @@ import org.junit.Test;
 
 public class ModuleXsdCustomTypeTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
-  //the order matters when describing a type, and ImmutableMap guarantees it
+  // the order matters when describing a type, and ImmutableMap guarantees it
   private static final ImmutableMap<String, Object> USER_DATA = ImmutableMap.<String, Object>builder()
       .put("name", "somename")
       .put("kind", "somekind")
@@ -87,8 +87,8 @@ public class ModuleXsdCustomTypeTestCase extends AbstractCeXmlExtensionMuleArtif
 
 
   /**
-   * Validations are done with DW scripts within the module being consumed here.
-   * (the module is targeted by the method {@link #getModulePath()})
+   * Validations are done with DW scripts within the module being consumed here. (the module is targeted by the method
+   * {@link #getModulePath()})
    *
    * @param muleEvent
    */

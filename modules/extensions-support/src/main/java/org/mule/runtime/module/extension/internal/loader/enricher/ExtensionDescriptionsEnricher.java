@@ -31,8 +31,9 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 
 /**
- * Declarer that adds descriptions to a {@link ExtensionDeclaration} by using the SDK generated <strong>extensions-descriptions.xml</strong>
- * file which persists the descriptions for each element (Configurations, Providers, Operations, Parameters, ...) in the extension.
+ * Declarer that adds descriptions to a {@link ExtensionDeclaration} by using the SDK generated
+ * <strong>extensions-descriptions.xml</strong> file which persists the descriptions for each element (Configurations, Providers,
+ * Operations, Parameters, ...) in the extension.
  * <p>
  * This is necessary because such documentation is not available once the extension source code is compiled.
  * <p>
@@ -69,7 +70,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
    * Fills all the descriptions in the provided {@link ExtensionDeclaration} based on the
    * <strong>extensions-descriptions.xml</strong> file.
    *
-   * @param declaration   the declaration to describe.
+   * @param declaration the declaration to describe.
    * @param documentation the extension documentation with its corresponding description.
    */
   private void document(ExtensionDeclaration declaration, XmlExtensionDocumentation documentation) {

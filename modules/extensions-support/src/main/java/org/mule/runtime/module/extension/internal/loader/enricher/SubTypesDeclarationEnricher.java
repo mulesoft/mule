@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Test the extension type to be annotated with {@link SubTypeMapping}, in which case it adds an
- * {@link ImportedTypeModel} on the extension level.
+ * Test the extension type to be annotated with {@link SubTypeMapping}, in which case it adds an {@link ImportedTypeModel} on the
+ * extension level.
  *
  * @since 4.0
  */

@@ -84,8 +84,8 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   private ArtifactClassLoader ownerClassLoader;
 
   /**
-   * Region specific {@link ResourceReleaser} to add behaviour in the {@link RegionClassLoader#dispose()} execution.
-   * By default it will prompt a gc in the JVM if possible to release the softkeys cleared in the caches.
+   * Region specific {@link ResourceReleaser} to add behaviour in the {@link RegionClassLoader#dispose()} execution. By default it
+   * will prompt a gc in the JVM if possible to release the softkeys cleared in the caches.
    *
    * This behaviour can be changed by extending {@link RegionClassLoader} and calling the provided protected constructor
    */
@@ -114,7 +114,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    * @param parent parent classloader for the region. Non null
    * @param lookupPolicy lookup policy to use on the region
    * @param regionResourceReleaser {@link ResourceReleaser} to be called after invocating {@link RegionClassLoader#dispose()}
-   * */
+   */
   protected RegionClassLoader(String artifactId,
                               ArtifactDescriptor artifactDescriptor,
                               ClassLoader parent,
@@ -414,7 +414,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     disposeClassLoader(ownerClassLoader);
     super.dispose();
 
-    //System.gc() by default
+    // System.gc() by default
     regionResourceReleaser.release();
   }
 

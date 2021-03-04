@@ -28,15 +28,15 @@ public interface ConfigurationProviderFactory {
   /**
    * Creates a new {@link ConfigurationProvider} which servers instances of a dynamic configuration
    *
-   * @param name                       the provider's name
-   * @param extensionModel             the {@link ExtensionModel} which owns the {@code configurationModel}
-   * @param configurationModel         the {@link ConfigurationModel} that describes the configuration instances to be returned
-   * @param resolverSet                a {@link ResolverSet} for the configuration's attributes
+   * @param name the provider's name
+   * @param extensionModel the {@link ExtensionModel} which owns the {@code configurationModel}
+   * @param configurationModel the {@link ConfigurationModel} that describes the configuration instances to be returned
+   * @param resolverSet a {@link ResolverSet} for the configuration's attributes
    * @param connectionProviderResolver a {@link ValueResolver} to obtain a {@link ConnectionProvider}
-   * @param expirationPolicy           an {@link ExpirationPolicy} in case the configuration is dynamic
-   * @param reflectionCache            the {@link ReflectionCache} used to improve reflection lookups performance
-   * @param expressionManager          the {@link ExpressionManager} used to create a session used to evaluate the attributes.
-   * @param muleContext                the {@link MuleContext} that will own the configuration instances
+   * @param expirationPolicy an {@link ExpirationPolicy} in case the configuration is dynamic
+   * @param reflectionCache the {@link ReflectionCache} used to improve reflection lookups performance
+   * @param expressionManager the {@link ExpressionManager} used to create a session used to evaluate the attributes.
+   * @param muleContext the {@link MuleContext} that will own the configuration instances
    *
    * @return a {@link ConfigurationProvider}
    * @throws Exception if anything goes wrong
@@ -56,12 +56,12 @@ public interface ConfigurationProviderFactory {
   /**
    * Creates a new {@link ConfigurationProvider} which servers a static configuration instance
    *
-   * @param name                       the provider's name
-   * @param extensionModel             the {@link ExtensionModel} which owns the {@code configurationModel}
-   * @param configurationModel         the {@link ConfigurationModel} that describes the configuration instances to be returned
-   * @param resolverSet                a {@link ResolverSet} for the configuration's attributes
+   * @param name the provider's name
+   * @param extensionModel the {@link ExtensionModel} which owns the {@code configurationModel}
+   * @param configurationModel the {@link ConfigurationModel} that describes the configuration instances to be returned
+   * @param resolverSet a {@link ResolverSet} for the configuration's attributes
    * @param connectionProviderResolver A {@link ValueResolver} to obtain a {@link ConnectionProvider}
-   * @param muleContext                the {@link MuleContext} that will own the configuration instances
+   * @param muleContext the {@link MuleContext} that will own the configuration instances
    * @return a {@link ConfigurationProvider}
    * @throws Exception if anything goes wrong
    */

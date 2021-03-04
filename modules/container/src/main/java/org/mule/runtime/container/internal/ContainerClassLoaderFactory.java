@@ -184,8 +184,8 @@ public class ContainerClassLoaderFactory {
   }
 
   /**
-   * Returns  the {@link LookupStrategy} if the one to use for the exportedPackage is other than
-   * a {@link ContainerOnlyLookupStrategy} or null.
+   * Returns the {@link LookupStrategy} if the one to use for the exportedPackage is other than a
+   * {@link ContainerOnlyLookupStrategy} or null.
    *
    * @param exportedPackage name of the package
    * @return

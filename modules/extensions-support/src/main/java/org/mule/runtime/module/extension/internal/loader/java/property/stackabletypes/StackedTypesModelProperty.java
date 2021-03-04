@@ -17,8 +17,8 @@ import java.util.Set;
 import java.util.Stack;
 
 /**
- * {@link ModelProperty} implementation which communicates which are the true types of a certain parameter, due
- * that these ones are erased from the {@link ParameterModel}.
+ * {@link ModelProperty} implementation which communicates which are the true types of a certain parameter, due that these ones
+ * are erased from the {@link ParameterModel}.
  * </p>
  * The model property through {@link StackedTypesModelProperty#getValueResolverFactory()} will communicate the {@link Stack} of
  * erased types for the parameter.
@@ -58,9 +58,9 @@ public class StackedTypesModelProperty implements ModelProperty {
   }
 
   /**
-   * This gives the {@link Stack} of {@link StackableType}, which represents the erased types for a parameter.
-   * For example, if a parameter was originally: {@code ParameterResolver<TypedValue<String>>}, this {@link Stack}
-   * will contain the following content {@code TypedValue -> ParameterResolver}
+   * This gives the {@link Stack} of {@link StackableType}, which represents the erased types for a parameter. For example, if a
+   * parameter was originally: {@code ParameterResolver<TypedValue<String>>}, this {@link Stack} will contain the following
+   * content {@code TypedValue -> ParameterResolver}
    *
    * @return The {@link Stack} of {@link StackableType wrapper types} for the enriched parameter
    */

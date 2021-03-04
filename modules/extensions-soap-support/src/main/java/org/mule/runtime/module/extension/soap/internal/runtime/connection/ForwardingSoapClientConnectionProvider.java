@@ -33,13 +33,12 @@ import javax.inject.Inject;
 import java.util.List;
 
 /**
- * {@link ConnectionProvider} implementation that handles {@link ForwardingSoapClient} connections,
- * which are created from a {@link List} of {@link WebServiceDefinition}s. Each {@link WebServiceDefinition} describe
- * one service with which instances created by this provider will be capable to connect to.
+ * {@link ConnectionProvider} implementation that handles {@link ForwardingSoapClient} connections, which are created from a
+ * {@link List} of {@link WebServiceDefinition}s. Each {@link WebServiceDefinition} describe one service with which instances
+ * created by this provider will be capable to connect to.
  * <p>
- * This Provider centralize the logic and polling mechanism to provision and release
- * connection for each of the clients that required to be created, while remaining abstracted
- * from the concerns of actually manage those connections.
+ * This Provider centralize the logic and polling mechanism to provision and release connection for each of the clients that
+ * required to be created, while remaining abstracted from the concerns of actually manage those connections.
  *
  * @since 4.0
  */
@@ -86,8 +85,8 @@ public class ForwardingSoapClientConnectionProvider implements ConnectionProvide
   }
 
   /**
-   * Disconnects a {@link ForwardingSoapClient} connection, by shutting down each one of the services
-   * that the provided instance manages.
+   * Disconnects a {@link ForwardingSoapClient} connection, by shutting down each one of the services that the provided instance
+   * manages.
    *
    * @param connection a {@link ForwardingSoapClient} instance to disconnect,
    */

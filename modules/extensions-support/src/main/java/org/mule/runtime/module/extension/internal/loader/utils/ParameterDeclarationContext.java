@@ -9,8 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.utils;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
 
 /**
- * Utility class for parameter declaration to be able to give metadata of from which component
- * this parameter is part of.
+ * Utility class for parameter declaration to be able to give metadata of from which component this parameter is part of.
  *
  * @since 4.0
  */

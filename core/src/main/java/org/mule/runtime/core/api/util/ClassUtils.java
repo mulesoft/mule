@@ -123,7 +123,7 @@ public class ClassUtils {
    * will fail with details information of the problem and classloading state.
    *
    * @param resourceName the resource to load.
-   * @param classLoader  the classloader used to load the resource.
+   * @param classLoader the classloader used to load the resource.
    * @return the {@link URL} pointing to the resource.
    */
   public static URL getResourceOrFail(final String resourceName, ClassLoader classLoader, boolean tryAbsolutePath) {
@@ -188,7 +188,7 @@ public class ClassUtils {
    * </ul>
    * Search stops as soon as any of the mentioned classLoaders has found a matching resource.
    *
-   * @param resourceName        resource being searched. Non empty.
+   * @param resourceName resource being searched. Non empty.
    * @param fallbackClassLoader classloader used to fallback the search. Non null.
    * @return a non null {@link Enumeration} containing the found resources. Can be empty.
    */
@@ -239,7 +239,7 @@ public class ClassUtils {
    * <li>From the {@link Class#getClassLoader() callingClass.getClassLoader() }
    * </ul>
    *
-   * @param className    The name of the class to load
+   * @param className The name of the class to load
    * @param callingClass The Class object of the calling object
    * @return The Class instance
    * @throws ClassNotFoundException If the class cannot be found anywhere.
@@ -259,9 +259,9 @@ public class ClassUtils {
    * <li>From the {@link Class#getClassLoader() callingClass.getClassLoader() }
    * </ul>
    *
-   * @param className    The name of the class to load
+   * @param className The name of the class to load
    * @param callingClass The Class object of the calling object
-   * @param type         the class type to expect to load
+   * @param type the class type to expect to load
    * @return The Class instance
    * @throws ClassNotFoundException If the class cannot be found anywhere.
    */
@@ -331,7 +331,7 @@ public class ClassUtils {
    * <p/>
    * This method must be used when the resource to load it's dependant on user configuration.
    *
-   * @param className   the name of the class to load
+   * @param className the name of the class to load
    * @param classLoader the loader to load it from
    * @return the instance of the class
    * @throws ClassNotFoundException if the class is not available in the class loader
@@ -502,8 +502,8 @@ public class ClassUtils {
    * Returns a matching method for the given name and parameters on the given class If the parameterTypes arguments is null it
    * will return the first matching method on the class.
    *
-   * @param clazz          the class to find the method on
-   * @param name           the method name to find
+   * @param clazz the class to find the method on
+   * @param name the method name to find
    * @param parameterTypes an array of argument types or null
    * @return the Method object or null if none was found
    */
@@ -531,7 +531,7 @@ public class ClassUtils {
   /**
    * Returns available constructor in the target class that as the parameters specified.
    *
-   * @param clazz      the class to search
+   * @param clazz the class to search
    * @param paramTypes the param types to match against
    * @param exactMatch should exact types be used (i.e. equals rather than isAssignableFrom.)
    * @return The matching constructor or null if no matching constructor is found
@@ -567,7 +567,7 @@ public class ClassUtils {
   /**
    * Can be used by serice endpoints to select which service to use based on what's loaded on the classpath
    *
-   * @param className    The class name to look for
+   * @param className The class name to look for
    * @param currentClass the calling class
    * @return true if the class is on the path
    */
@@ -623,10 +623,10 @@ public class ClassUtils {
    * matchOnObject argument is true and there is a parameter of type Object in c1 then the method returns false. If acceptNulls
    * argument is true, null values are accepted in c2.
    *
-   * @param c1            parameter types array
-   * @param c2            parameter types array
+   * @param c1 parameter types array
+   * @param c2 parameter types array
    * @param matchOnObject return false if there is a parameter of type Object in c1
-   * @param acceptNulls   allows null parameter types in c2
+   * @param acceptNulls allows null parameter types in c2
    * @return true if arrays are the same size and the types assignable from c2 to c1
    */
   public static boolean compare(Class[] c1, Class[] c2, boolean matchOnObject, boolean acceptNulls) {
@@ -791,11 +791,11 @@ public class ClassUtils {
    * The value that this method adds over something like {@link Class#isInstance(Object)} is that it also considers the case in
    * which {@code type} and {@code value} are evaluate by {@link #isWrapperAndPrimitivePair(Class, Class)} as {@code true}
    *
-   * @param type  the {@link Class} you want to check the {@code value against}
+   * @param type the {@link Class} you want to check the {@code value against}
    * @param value an instance you want to verify is instance of {@code type}
-   * @param <T>   the generic type of {@code type}
+   * @param <T> the generic type of {@code type}
    * @return {@code true} if {@code value} is an instance of {@code type} or if they are a wrapper-primitive pair. {@code false}
-   * otherwise
+   *         otherwise
    */
   public static <T> boolean isInstance(Class<T> type, Object value) {
     if (value == null) {
@@ -838,7 +838,7 @@ public class ClassUtils {
    * Checks that the given {@code type} is a primitive wrapper such as {@link Double}, {@link Boolean}, {@link Integer}, etc
    *
    * @param type the {@link Class} that is presumed to be a primitive wrapper
-   * @param <T>  the generic type of the argument
+   * @param <T> the generic type of the argument
    * @return {@code true} if {@code type} is a primitive wrapper. {@code false} otherwise
    */
   private static <T> boolean isPrimitiveWrapper(Class<T> type) {
@@ -852,8 +852,9 @@ public class ClassUtils {
    * before executing this method
    *
    * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
-   * @param runnable    a closure
-   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually using {@link #setContextClassLoader(Thread, ClassLoader, ClassLoader)} instead
+   * @param runnable a closure
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually using
+   *             {@link #setContextClassLoader(Thread, ClassLoader, ClassLoader)} instead
    */
   @Deprecated
   public static void withContextClassLoader(ClassLoader classLoader, Runnable runnable) {
@@ -877,7 +878,7 @@ public class ClassUtils {
    * from a coding POV, but it does add a performance overhead.
    *
    * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
-   * @param callable    a {@link Callable}
+   * @param callable a {@link Callable}
    * @return the value that the {@code callable} produced
    */
   public static <T> T withContextClassLoader(ClassLoader classLoader, Callable<T> callable) {
@@ -902,12 +903,12 @@ public class ClassUtils {
    * are not critical performance wise. This is because all the lambdas and functional abstraction it relies on are really nice
    * from a coding POV, but it does add a performance overhead.
    *
-   * @param classLoader           the context {@link ClassLoader} on which the {@code runnable} should be executed
-   * @param runnable              a {@link Runnable}
+   * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
+   * @param runnable a {@link Runnable}
    * @param expectedExceptionType the type of exception which is expected to be thrown
-   * @param exceptionHandler      a {@link ExceptionHandler} in case an unexpected exception is found instead
-   * @param <T>                   the generic type of the return value
-   * @param <E>                   the generic type of the expected exception
+   * @param exceptionHandler a {@link ExceptionHandler} in case an unexpected exception is found instead
+   * @param <T> the generic type of the return value
+   * @param <E> the generic type of the expected exception
    * @throws E if the expected exception is actually thrown
    */
   public static <T, E extends Exception> void withContextClassLoader(ClassLoader classLoader, Runnable runnable,
@@ -944,12 +945,12 @@ public class ClassUtils {
    * are not critical performance wise. This is because all the lambdas and functional abstraction it relies on are really nice
    * from a coding POV, but it does add a performance overhead.
    *
-   * @param classLoader           the context {@link ClassLoader} on which the {@code runnable} should be executed
-   * @param callable              a {@link Callable}
+   * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
+   * @param callable a {@link Callable}
    * @param expectedExceptionType the type of exception which is expected to be thrown
-   * @param exceptionHandler      a {@link ExceptionHandler} in case an unexpected exception is found instead
-   * @param <T>                   the generic type of the return value
-   * @param <E>                   the generic type of the expected exception
+   * @param exceptionHandler a {@link ExceptionHandler} in case an unexpected exception is found instead
+   * @param <T> the generic type of the return value
+   * @param <E> the generic type of the expected exception
    * @return a value returned by either the {@code callable} or the {@code exceptionHandler}
    * @throws E if the expected exception is actually thrown
    */
@@ -972,31 +973,32 @@ public class ClassUtils {
   }
 
   /**
-   * Sets {@code newClassLoader} as the context class loader for the {@code thread}, as long as said classloader is not the
-   * same instance as {@code currentClassLoader}.
+   * Sets {@code newClassLoader} as the context class loader for the {@code thread}, as long as said classloader is not the same
+   * instance as {@code currentClassLoader}.
    * <p>
-   * Since obtaining and setting the context classloader from a thread are expensive operations, the purpose of this method
-   * is to avoid performing those operations when possible, which is why the two classloaders are tested not to be the same
-   * before performing the set operation. For this method to make sense, {@code currentClassLoader} should actually be the
-   * current context classloader from the {@code thread}.
+   * Since obtaining and setting the context classloader from a thread are expensive operations, the purpose of this method is to
+   * avoid performing those operations when possible, which is why the two classloaders are tested not to be the same before
+   * performing the set operation. For this method to make sense, {@code currentClassLoader} should actually be the current
+   * context classloader from the {@code thread}.
    * <p>
    * This is how a typical use should look like:
+   * 
    * <pre>
-   *   Thread thread = Thread.currentThread();
-   *   ClassLoader currentClassLoader = thread.getContextClassLoader();
-   *   ClassLoader newClassLoader = getNewContextClassLoader(); // this one depends on your logic
-   *   ClassUtils.setContextClassLoader(thread, currentClassLoader, newClassLoader);
-   *   try {
-   *     // execute your logic
-   *   } finally {
-   *     // set things back as they were by reversing the arguments order
-   *     ClassUtils.setContextClassLoader(thread, newClassLoader, currentClassLoader);
-   *   }
+   * Thread thread = Thread.currentThread();
+   * ClassLoader currentClassLoader = thread.getContextClassLoader();
+   * ClassLoader newClassLoader = getNewContextClassLoader(); // this one depends on your logic
+   * ClassUtils.setContextClassLoader(thread, currentClassLoader, newClassLoader);
+   * try {
+   *   // execute your logic
+   * } finally {
+   *   // set things back as they were by reversing the arguments order
+   *   ClassUtils.setContextClassLoader(thread, newClassLoader, currentClassLoader);
+   * }
    * </pre>
    *
-   * @param thread             the thread which context classloader is to be changed
+   * @param thread the thread which context classloader is to be changed
    * @param currentClassLoader the thread's current context classloader
-   * @param newClassLoader     the new classloader to be set
+   * @param newClassLoader the new classloader to be set
    * @since 4.3.0
    */
   public static void setContextClassLoader(Thread thread, ClassLoader currentClassLoader, ClassLoader newClassLoader) {
@@ -1008,7 +1010,7 @@ public class ClassUtils {
   /**
    * Wraps the given function {@code f} so that results for a given input are cached in the given Map.
    *
-   * @param f     the function to memoize
+   * @param f the function to memoize
    * @param cache the map where cached values are stored
    * @return the memoized function
    */

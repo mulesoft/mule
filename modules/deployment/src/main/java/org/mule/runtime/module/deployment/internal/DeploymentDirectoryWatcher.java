@@ -77,10 +77,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
       new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
 
   /**
-   * Property used to change the deployment mode to deploy only the indicated applications with no redeployment.
-   * mule -M-Dmule.deploy.applications=app1:app2:app3
-   * This can also be done passing an additional command line option (deprecated) like:
-   *  mule -app app1:app2:app3 will restrict deployment only to those specified apps.
+   * Property used to change the deployment mode to deploy only the indicated applications with no redeployment. mule
+   * -M-Dmule.deploy.applications=app1:app2:app3 This can also be done passing an additional command line option (deprecated)
+   * like: mule -app app1:app2:app3 will restrict deployment only to those specified apps.
    */
   public static final String DEPLOYMENT_APPLICATION_PROPERTY = "mule.deploy.applications";
 

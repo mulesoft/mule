@@ -165,9 +165,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       doLogException("Caught exception in Exception Strategy: " + t.getMessage(), t);
       return;
     }
-    //First check if exception was not logged already
+    // First check if exception was not logged already
     if (resolvedException.getFirst().getExceptionInfo().isAlreadyLogged()) {
-      //Don't log anything, error while getting root or exception already logged.
+      // Don't log anything, error while getting root or exception already logged.
       return;
     }
     doLogException(resolvedException.getSecond(), null);
@@ -208,8 +208,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   }
 
   /**
-   * Fires a server notification to all registered
-   * {@link ExceptionNotificationListener} eventManager.
+   * Fires a server notification to all registered {@link ExceptionNotificationListener} eventManager.
    *
    * @param notification the notification to fire.
    */

@@ -38,13 +38,12 @@ public class Once {
   /**
    * Executes a given {@link CheckedConsumer} only once.
    * <p>
-   * Once the {@link #consumeOnce(Object)} method has been successfully executed, subsequent invocations to
-   * such method will have no effect, even if the supplied value is different. Notice that the key word here
-   * is {@code successfully}. If the method fails, each invocation to {@link #consumeOnce(Object)}  WILL run the delegate
-   * until it completes successfully.
+   * Once the {@link #consumeOnce(Object)} method has been successfully executed, subsequent invocations to such method will have
+   * no effect, even if the supplied value is different. Notice that the key word here is {@code successfully}. If the method
+   * fails, each invocation to {@link #consumeOnce(Object)} WILL run the delegate until it completes successfully.
    * <p>
-   * Instances are thread safe, which means that if two threads are competing for the first successful invocation, only
-   * one will prevail and the other one will get a no-op execution.
+   * Instances are thread safe, which means that if two threads are competing for the first successful invocation, only one will
+   * prevail and the other one will get a no-op execution.
    *
    * @since 4.0
    */
@@ -72,12 +71,12 @@ public class Once {
   /**
    * Executes a given {@link CheckedRunnable} only once.
    * <p>
-   * Once the {@link #runOnce()} method has been successfully executed, subsequent invocations to
-   * such method will have no effect. Notice that the key word here is {@code successfully}. If the method fails,
-   * each invocation to {@link #runOnce()} WILL run the delegate until it completes successfully.
+   * Once the {@link #runOnce()} method has been successfully executed, subsequent invocations to such method will have no effect.
+   * Notice that the key word here is {@code successfully}. If the method fails, each invocation to {@link #runOnce()} WILL run
+   * the delegate until it completes successfully.
    * <p>
-   * Instances are thread safe, which means that if two threads are competing for the first successful invocation, only
-   * one will prevail and the other one will get a no-op execution.
+   * Instances are thread safe, which means that if two threads are competing for the first successful invocation, only one will
+   * prevail and the other one will get a no-op execution.
    *
    * @since 4.0
    */

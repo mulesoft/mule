@@ -40,8 +40,8 @@ public interface HttpAuthenticationBuilder {
   HttpAuthenticationBuilder password(String password);
 
   /**
-   * Defines whether or not the authentication should be done from the first request. Default value is {@code true}, if {@code false}
-   * the request will be done awaiting a 401 response with authentication details to start the process.
+   * Defines whether or not the authentication should be done from the first request. Default value is {@code true}, if
+   * {@code false} the request will be done awaiting a 401 response with authentication details to start the process.
    *
    * @param preemptive whether or not the authentication process should be started at once
    * @return this builder

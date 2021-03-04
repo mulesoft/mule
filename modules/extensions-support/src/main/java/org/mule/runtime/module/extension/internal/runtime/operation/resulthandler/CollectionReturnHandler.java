@@ -21,8 +21,7 @@ import java.util.Collection;
 /**
  * {@link ReturnHandler} implementation for collections
  * <p>
- * When creates the {@link Message.Builder} it configures the correct {@link DataType} basing on the original
- * {@link MetadataType}
+ * When creates the {@link Message.Builder} it configures the correct {@link DataType} basing on the original {@link MetadataType}
  *
  * @since 4.1
  */

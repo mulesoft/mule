@@ -21,11 +21,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Defers the creation of an {@link ExpressionLanguageSessionAdaptor} until the moment in which it's actually asked
- * to resolve an expression.
+ * Defers the creation of an {@link ExpressionLanguageSessionAdaptor} until the moment in which it's actually asked to resolve an
+ * expression.
  * <p>
- * A {@link CheckedSupplier} will be used to obtain the delegate. The supplier will only be invoked <b>once</b> and
- * the return value will be cached.
+ * A {@link CheckedSupplier} will be used to obtain the delegate. The supplier will only be invoked <b>once</b> and the return
+ * value will be cached.
  *
  * @since 4.2.0
  */

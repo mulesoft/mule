@@ -17,8 +17,8 @@ import java.util.Optional;
 import java.util.Properties;
 
 /**
- * Implementation that allows to create an artifact descriptor for an application from an artifact folder but also
- * from a {@link MuleApplicationModel}.
+ * Implementation that allows to create an artifact descriptor for an application from an artifact folder but also from a
+ * {@link MuleApplicationModel}.
  * <p/>
  * It also provides a factory method to create the {@link MuleApplicationModel} from an artifact folder.
  *

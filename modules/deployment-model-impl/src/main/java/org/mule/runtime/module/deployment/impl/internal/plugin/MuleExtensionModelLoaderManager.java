@@ -58,10 +58,11 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
   }
 
   /**
-   * Will look through SPI every class that implements the {@code providerClass} and if there are repeated IDs, it will
-   * collect them all to throw an exception with the detailed message.
+   * Will look through SPI every class that implements the {@code providerClass} and if there are repeated IDs, it will collect
+   * them all to throw an exception with the detailed message.
    * <p/>
    * The exception, if thrown, will have the following message:
+   * 
    * <pre>
    *   There are several loaders that return the same ID when looking up providers for 'org.mule.runtime.module.artifact.ExtensionModelLoader'. Full error list:
    *   ID [some-id] is being returned by the following classes [org.foo.FooLoader, org.bar.BarLoader]
@@ -83,7 +84,8 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
         .entrySet().stream().filter(entry -> entry.getValue().size() > 1)
         .forEach(
                  entry -> {
-                   // At this point we are sure there are at least 2 classes that return the same ID, we will append it to the builder
+                   // At this point we are sure there are at least 2 classes that return the same ID, we will append it to the
+                   // builder
                    final String classes = entry.getValue().stream()
                        .map(extensionModelLoader -> extensionModelLoader.getClass().getName()).collect(Collectors.joining(", "));
                    sb.append(lineSeparator()).append("ID [").append(entry.getKey())

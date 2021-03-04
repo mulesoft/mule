@@ -37,9 +37,8 @@ import javax.xml.namespace.QName;
 import org.reactivestreams.Publisher;
 
 /**
- * An {@link ValueResolver} which wraps the given {@link Processor} in a {@link Chain},
- * using the event of the current {@link ValueResolvingContext}.
- * This resolver returns new instances per every invocation
+ * An {@link ValueResolver} which wraps the given {@link Processor} in a {@link Chain}, using the event of the current
+ * {@link ValueResolvingContext}. This resolver returns new instances per every invocation
  *
  * @since 4.0
  */

@@ -18,8 +18,8 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- * Transforms {@link InputStream input streams} into byte arrays. Streams are accepted in either its
- * natural {@link InputStream} form or as a {@link CursorStreamProvider}
+ * Transforms {@link InputStream input streams} into byte arrays. Streams are accepted in either its natural {@link InputStream}
+ * form or as a {@link CursorStreamProvider}
  *
  * @since 4.0
  */

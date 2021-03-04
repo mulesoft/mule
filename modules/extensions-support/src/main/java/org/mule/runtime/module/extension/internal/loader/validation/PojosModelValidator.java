@@ -103,6 +103,7 @@ public class PojosModelValidator implements ExtensionModelValidator {
 
   private Optional<Type> getFirstGenericType(Type typeWithGenerics) {
     return !CollectionUtils.isEmpty(typeWithGenerics.getGenerics())
-        ? Optional.ofNullable(typeWithGenerics.getGenerics().get(0).getConcreteType()) : Optional.empty();
+        ? Optional.ofNullable(typeWithGenerics.getGenerics().get(0).getConcreteType())
+        : Optional.empty();
   }
 }

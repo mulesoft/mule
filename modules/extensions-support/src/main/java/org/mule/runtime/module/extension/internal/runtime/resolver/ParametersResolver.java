@@ -150,7 +150,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   }
 
   /**
-   * Constructs a {@link ResolverSet} from the parameters groups, using {@link #toValueResolver(Object, Set)} to process the values.
+   * Constructs a {@link ResolverSet} from the parameters groups, using {@link #toValueResolver(Object, Set)} to process the
+   * values.
    *
    * @return a {@link ResolverSet}
    */
@@ -469,7 +470,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
    * <p>
    * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
    *
-   * @param value           the value to expose
+   * @param value the value to expose
    * @param modelProperties of the value's parameter
    * @return a {@link ValueResolver}
    */

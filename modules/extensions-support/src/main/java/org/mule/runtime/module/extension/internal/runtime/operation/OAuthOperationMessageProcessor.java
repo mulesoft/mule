@@ -28,14 +28,12 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.List;
 
 /**
- * A specialization of {@link OperationMessageProcessor} for operations which might be running
- * with an OAuth enabled {@link ConnectionProvider}.
+ * A specialization of {@link OperationMessageProcessor} for operations which might be running with an OAuth enabled
+ * {@link ConnectionProvider}.
  * <p>
- * If handles {@link AccessTokenExpiredException}s and executes the refresh token flow
- * and retries accordingly.
+ * If handles {@link AccessTokenExpiredException}s and executes the refresh token flow and retries accordingly.
  * <p>
- * If the operation was not configured with an OAuth enabled connection provider, then it
- * behaves the same as its parent class
+ * If the operation was not configured with an OAuth enabled connection provider, then it behaves the same as its parent class
  *
  * @since 4.0
  */

@@ -40,7 +40,7 @@ public class DateTimeModule extends SimpleModule {
   private static final Version VERSION = Version.unknownVersion();
 
   DateTimeModule() {
-    //This is copied from the behavior in Runtime to avoid inconsistencies.
+    // This is copied from the behavior in Runtime to avoid inconsistencies.
     addDeserializer(LocalDate.class,
                     new DateTimeDeserializer<>(LocalDate.class,
                                                d -> LocalDate.of(d.getYear(), d.getMonthOfYear(), d.getDayOfMonth())));
@@ -77,7 +77,7 @@ public class DateTimeModule extends SimpleModule {
     public T deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
       if (p.hasToken(JsonToken.VALUE_STRING)) {
         String string = p.getText().trim();
-        //This is copied from the behavior in Runtime to avoid inconsistencies.
+        // This is copied from the behavior in Runtime to avoid inconsistencies.
         try {
           return mapper.apply(ISODateTimeFormat.dateTimeParser().withOffsetParsed().parseDateTime(string));
         } catch (DateTimeParseException e) {

@@ -160,8 +160,8 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
   }
 
   /**
-   * Since the classloader for this tests is different from the one that actually initialize the components
-   * the STARTED/STOPPED information is retrieved building a key with the source status in the correct environment.
+   * Since the classloader for this tests is different from the one that actually initialize the components the STARTED/STOPPED
+   * information is retrieved building a key with the source status in the correct environment.
    */
   @Test
   public void sourcesMustNotStartWhenResolvingMetadata() {
@@ -171,8 +171,8 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
   }
 
   /**
-   * Since the classloader for this tests is different from the one that actually initialize the components
-   * the STARTED/STOPPED information is retrieved building a key with the source status in the correct environment.
+   * Since the classloader for this tests is different from the one that actually initialize the components the STARTED/STOPPED
+   * information is retrieved building a key with the source status in the correct environment.
    */
   @Test
   public void sourcesMustStartConnectionProvidersWhenResolvingMetadata() {

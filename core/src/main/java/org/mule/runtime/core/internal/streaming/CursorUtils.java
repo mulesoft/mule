@@ -21,12 +21,11 @@ public final class CursorUtils {
   /**
    * Used to get the original {@link CursorProvider} when {@link CursorProviderDecorator} is used.
    * <p>
-   * If {@code cursorProvider} is a decorator, then the {@link CursorProviderDecorator#getDelegate()} will be invoked
-   * recursively until a non-decorator delegate is found. If {@code cursorProvider} is not a decorator, then that same instance
-   * is returned.
+   * If {@code cursorProvider} is a decorator, then the {@link CursorProviderDecorator#getDelegate()} will be invoked recursively
+   * until a non-decorator delegate is found. If {@code cursorProvider} is not a decorator, then that same instance is returned.
    *
    * @param cursorProvider a provider which may or may not be a {@link CursorProviderDecorator}
-   * @param <T>            the generic {@link Cursor} type as defined in {@link CursorProvider}
+   * @param <T> the generic {@link Cursor} type as defined in {@link CursorProvider}
    * @return a non-decorator {@link CursorProvider}
    */
   public static <T extends Cursor> CursorProvider<T> unwrap(CursorProvider<T> cursorProvider) {

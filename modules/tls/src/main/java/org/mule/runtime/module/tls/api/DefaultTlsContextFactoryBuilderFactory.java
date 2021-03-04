@@ -19,8 +19,8 @@ import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
 /**
- * Default implementation of {@link AbstractTlsContextFactoryBuilderFactory} which has a default TLS context. This is injected into
- * each new {@link TlsContextFactoryBuilder} so that a single instance is exposed.
+ * Default implementation of {@link AbstractTlsContextFactoryBuilderFactory} which has a default TLS context. This is injected
+ * into each new {@link TlsContextFactoryBuilder} so that a single instance is exposed.
  *
  * @since 4.0
  */

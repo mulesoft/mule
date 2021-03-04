@@ -43,7 +43,7 @@ public class MavenClassLoaderModelLoaderDependenciesTestCase extends MavenClassL
   public static void setUp() throws Exception {
     GlobalConfigLoader.reset();
 
-    //Install all dependencies
+    // Install all dependencies
     File dependenciesFolder =
         new File(MavenClassLoaderModelLoaderDependenciesTestCase.class.getClassLoader().getResource("dependencies").toURI());
     for (File dependencyFile : dependenciesFolder.listFiles()) {

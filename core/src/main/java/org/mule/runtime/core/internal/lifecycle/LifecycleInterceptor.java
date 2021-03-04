@@ -35,8 +35,8 @@ public interface LifecycleInterceptor {
    *
    * @param phase the phase that was applied
    * @param object the target object
-   * @param exceptionThrownOptional an optional with an exception. If present then there was an error execution the phase, otherwise the
-   *        phase execution was successful
+   * @param exceptionThrownOptional an optional with an exception. If present then there was an error execution the phase,
+   *        otherwise the phase execution was successful
    */
   void afterPhaseExecution(LifecyclePhase phase, Object object, Optional<Exception> exceptionThrownOptional);
 

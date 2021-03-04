@@ -61,7 +61,8 @@ public class AbstractParameterResolverExecutor {
       final ResolverSet resolverSet =
           ParametersResolver.fromValues(parametersMap,
                                         muleContext,
-                                        // Required parameters should be validated by the resolver factory instead of this resolver
+                                        // Required parameters should be validated by the resolver factory instead of this
+                                        // resolver
                                         true,
                                         reflectionCache,
                                         expressionManager,

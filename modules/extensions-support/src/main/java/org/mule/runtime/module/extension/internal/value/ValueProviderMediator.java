@@ -36,8 +36,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * Resolves a parameter's {@link Value values} by coordinating the several moving parts that are affected by the
- * {@link Value} fetching process, so that such pieces can remain decoupled.
+ * Resolves a parameter's {@link Value values} by coordinating the several moving parts that are affected by the {@link Value}
+ * fetching process, so that such pieces can remain decoupled.
  *
  * @since 4.0
  */
@@ -61,12 +61,12 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
   }
 
   /**
-   * Given the name of a parameter or parameter group, and if the parameter supports it, this will try to resolve
-   * the {@link Value values} for the parameter.
+   * Given the name of a parameter or parameter group, and if the parameter supports it, this will try to resolve the {@link Value
+   * values} for the parameter.
    *
-   * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
-   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires
-   *                               the value of parameters from the same parameter container.
+   * @param parameterName the name of the parameter to resolve their possible {@link Value values}
+   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires the value of
+   *        parameters from the same parameter container.
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */
@@ -76,16 +76,16 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
   }
 
   /**
-   * Given the name of a parameter or parameter group, and if the parameter supports it, this will try to resolve
-   * the {@link Value values} for the parameter.
+   * Given the name of a parameter or parameter group, and if the parameter supports it, this will try to resolve the {@link Value
+   * values} for the parameter.
    *
-   * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
-   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires
-   *                               the value of parameters from the same parameter container.
-   * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
-   *                               {@link ValueProvider}
-   * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
-   *                               {@link ValueProvider}
+   * @param parameterName the name of the parameter to resolve their possible {@link Value values}
+   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires the value of
+   *        parameters from the same parameter container.
+   * @param connectionSupplier supplier of connection instances related to the container and used, if necessary, by the
+   *        {@link ValueProvider}
+   * @param configurationSupplier supplier of connection instances related to the container and used, if necessary, by the
+   *        {@link ValueProvider}
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */
@@ -96,17 +96,17 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
   }
 
   /**
-   * Given the name of a parameter or parameter group, and if the parameter supports it, this will try to resolve
-   * the {@link Value values} for the parameter.
+   * Given the name of a parameter or parameter group, and if the parameter supports it, this will try to resolve the {@link Value
+   * values} for the parameter.
    *
-   * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
-   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires
-   *                               the value of parameters from the same parameter container.
-   * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
-   *                               {@link ValueProvider}
-   * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
-   *                               {@link ValueProvider}
-   * @param connectionProvider     the connection provider in charge of providing the connection given by the connection supplier.
+   * @param parameterName the name of the parameter to resolve their possible {@link Value values}
+   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires the value of
+   *        parameters from the same parameter container.
+   * @param connectionSupplier supplier of connection instances related to the container and used, if necessary, by the
+   *        {@link ValueProvider}
+   * @param configurationSupplier supplier of connection instances related to the container and used, if necessary, by the
+   *        {@link ValueProvider}
+   * @param connectionProvider the connection provider in charge of providing the connection given by the connection supplier.
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */

@@ -29,13 +29,13 @@ class ManagedCursorStreamDecorator extends CursorStream {
   private final AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
-   * Creates a new instance. Notice that it receives a {@code managedCursorProvider} so that a hard reference is kept
-   * during the lifespan of this cursor. This prevents the {@link StreamingGhostBuster} from closing the provider in corner
-   * cases in which this cursor is still referenced but the provider is not.
+   * Creates a new instance. Notice that it receives a {@code managedCursorProvider} so that a hard reference is kept during the
+   * lifespan of this cursor. This prevents the {@link StreamingGhostBuster} from closing the provider in corner cases in which
+   * this cursor is still referenced but the provider is not.
    *
    * @param managedCursorProvider the managed provider that opened this cursor
-   * @param delegate              the delegate cursor
-   * @param janitor               the cursor's janitor object
+   * @param delegate the delegate cursor
+   * @param janitor the cursor's janitor object
    */
   ManagedCursorStreamDecorator(ManagedCursorStreamProvider managedCursorProvider,
                                CursorStream delegate,

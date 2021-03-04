@@ -14,8 +14,8 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 
 /**
- * {@link ParameterModel} simple value extractor.
- * Only accepts parameters of type {@ParameterSimpleValue} otherwise an exception is thrown.
+ * {@link ParameterModel} simple value extractor. Only accepts parameters of type {@ParameterSimpleValue} otherwise an exception
+ * is thrown.
  */
 public class ParameterSimpleValueExtractor implements ParameterValueVisitor {
 

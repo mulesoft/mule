@@ -19,8 +19,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 /**
- * Transforms instances of {@link LocalDateTime} and {@link LocalDate} into instances of
- * {@link Date}
+ * Transforms instances of {@link LocalDateTime} and {@link LocalDate} into instances of {@link Date}
  *
  * @since 4.0
  */

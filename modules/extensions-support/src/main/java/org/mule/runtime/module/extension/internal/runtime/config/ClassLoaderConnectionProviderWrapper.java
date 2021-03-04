@@ -33,9 +33,9 @@ public class ClassLoaderConnectionProviderWrapper<C> extends AbstractConnectionP
   /**
    * Creates a new wrapper for the given {@code provider}
    *
-   * @param provider    the delegate
+   * @param provider the delegate
    * @param classLoader the {@link ClassLoader} to use
-   * @param <C>         the generic type of the connections the delegate produces
+   * @param <C> the generic type of the connections the delegate produces
    * @return a new instance
    */
   public static <C> ClassLoaderConnectionProviderWrapper<C> newInstance(ConnectionProvider<C> provider, ClassLoader classLoader) {

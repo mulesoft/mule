@@ -43,8 +43,8 @@ import org.slf4j.Logger;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
- * A {@link ValueResolver} wrapper which defaults to obtaining the value from the current {@link ConfigurationInstance}
- * if the given {@link ValueResolver delegate} results in a {@code null} value.
+ * A {@link ValueResolver} wrapper which defaults to obtaining the value from the current {@link ConfigurationInstance} if the
+ * given {@link ValueResolver delegate} results in a {@code null} value.
  *
  * @param <T> the generic type of the produced values.
  * @since 4.0
@@ -200,13 +200,12 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
   }
 
   /**
-   * Retrieves the value of the parameter of name {@code parameterName} obtained from the {@code delegate} or
-   * from {@link ConfigurationInstance#getValue() config instance} if the {@code delegate} produces a
-   * {@code null} value.
+   * Retrieves the value of the parameter of name {@code parameterName} obtained from the {@code delegate} or from
+   * {@link ConfigurationInstance#getValue() config instance} if the {@code delegate} produces a {@code null} value.
    *
-   * @param instance        the {@link ConfigurationInstance config} from where the parameter value will be obtained
-   * @return the value of the parameter with name {@code parameterName} obtained from the {@code delegate} or
-   * from {@link ConfigurationInstance#getValue() config instance} if the {@code delegate} produces a {@code null} value.
+   * @param instance the {@link ConfigurationInstance config} from where the parameter value will be obtained
+   * @return the value of the parameter with name {@code parameterName} obtained from the {@code delegate} or from
+   *         {@link ConfigurationInstance#getValue() config instance} if the {@code delegate} produces a {@code null} value.
    */
   private T resolveConfigOverrideParameter(ConfigurationInstance instance) {
     try {

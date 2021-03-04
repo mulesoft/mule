@@ -92,8 +92,8 @@ public class SoapInvokeOperationDeclarer {
    * Declares the invoke operation.
    *
    * @param configDeclarer the soap config declarer
-   * @param loader         a {@link ClassTypeLoader} to load some parameters types.
-   * @param soapErrors     the {@link ErrorModel}s that this operation can throw.
+   * @param loader a {@link ClassTypeLoader} to load some parameters types.
+   * @param soapErrors the {@link ErrorModel}s that this operation can throw.
    */
   void declare(ConfigurationDeclarer configDeclarer, ClassTypeLoader loader, Set<ErrorModel> soapErrors) {
 
@@ -155,7 +155,7 @@ public class SoapInvokeOperationDeclarer {
    * Given the Invoke Operation Declarer declares the parameters for the soap request.
    *
    * @param operation the invoke operation declarer.
-   * @param loader    a {@link ClassTypeLoader} to load some parameters types.
+   * @param loader a {@link ClassTypeLoader} to load some parameters types.
    */
   private void declareRequestParameters(OperationDeclarer operation, ClassTypeLoader loader) {
     ParameterGroupDeclarer message = operation.onParameterGroup(MESSAGE_GROUP)

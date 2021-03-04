@@ -48,7 +48,7 @@ public class JavaDocReader {
    * Extracts the JavaDoc of an element and parses it returning a easy to consume {@link JavaDocModel}
    *
    * @param processingEnv The current {@link ProcessEnvironment}
-   * @param element       Element to introspect
+   * @param element Element to introspect
    * @return A {@link JavaDocModel} representing the {@link Element} JavaDoc.
    */
   public static JavaDocModel parseJavaDoc(ProcessingEnvironment processingEnv, Element element) {
@@ -121,7 +121,8 @@ public class JavaDocReader {
   }
 
   /**
-   * Removes all HTML from the text and converts anchor to asciidoc valid links. For example: <a href="url">Inner</a> becomes url[Inner].
+   * Removes all HTML from the text and converts anchor to asciidoc valid links. For example: <a href="url">Inner</a> becomes
+   * url[Inner].
    */
   private static String removeHTML(String text) {
     String textWithAnchors = Jsoup.clean(text, WHITELIST);

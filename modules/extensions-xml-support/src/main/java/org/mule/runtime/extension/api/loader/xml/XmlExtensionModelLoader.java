@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementation of {@link ExtensionModelLoader} for those plugins that have an ID that matches with {@link #DESCRIBER_ID},
- * which implies that are extensions built through XML.
+ * Implementation of {@link ExtensionModelLoader} for those plugins that have an ID that matches with {@link #DESCRIBER_ID}, which
+ * implies that are extensions built through XML.
  *
  * @since 4.0
  */
@@ -50,15 +50,15 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
   public static final String RESOURCE_XML = "resource-xml";
 
   /**
-   * Attribute to look for in the parametrized attributes picked up from the descriptor.
-   * If present, with a boolean value, describes whether the XML of the connector should be valid (or not).
+   * Attribute to look for in the parametrized attributes picked up from the descriptor. If present, with a boolean value,
+   * describes whether the XML of the connector should be valid (or not).
    */
   public static final String VALIDATE_XML = "validate-xml";
 
   /**
-   * Attribute to look for in the parametrized attributes picked up from the descriptor.
-   * Points to a file which contains the expected {@link MetadataType} of all <operation/>s, which will be used to describe the
-   * <output/>'s type. If absent, then it defaults to the  
+   * Attribute to look for in the parametrized attributes picked up from the descriptor. Points to a file which contains the
+   * expected {@link MetadataType} of all <operation/>s, which will be used to describe the <output/>'s type. If absent, then it
+   * defaults to the
    */
   public static final String RESOURCE_DECLARATION = "resource-declaration";
 
@@ -69,6 +69,7 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
 
   /**
    * The ID which represents {@code this} loader that will be used to execute the lookup when reading the descriptor file.
+   * 
    * @see MulePluginModel#getExtensionModelLoaderDescriptor()
    */
   public static final String DESCRIBER_ID = "xml-based";

@@ -13,8 +13,8 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import java.util.Iterator;
 
 /**
- * Specialization of {@link CursorProviderFactory} which creates {@link CursorIteratorProvider} instances
- * out of {@link Iterator} instances
+ * Specialization of {@link CursorProviderFactory} which creates {@link CursorIteratorProvider} instances out of {@link Iterator}
+ * instances
  *
  * @since 4.0
  */

@@ -122,9 +122,10 @@ public class DeploymentPropertiesUtils {
   }
 
   /**
-   * This method resolves the deploymentProperties for a certain artifact. There is one deployment.properties file for each artifact (domain/app).
+   * This method resolves the deploymentProperties for a certain artifact. There is one deployment.properties file for each
+   * artifact (domain/app).
    *
-   * @param artifactName         name of the artifact.
+   * @param artifactName name of the artifact.
    * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
    * @return deployment properties
    * @throws IOException
@@ -135,9 +136,10 @@ public class DeploymentPropertiesUtils {
   }
 
   /**
-   * This method resolves the deploymentProperties for a flow of a certain app. There is one flow.deployment.properties file for all flows of an app.
+   * This method resolves the deploymentProperties for a flow of a certain app. There is one flow.deployment.properties file for
+   * all flows of an app.
    *
-   * @param appName         name of the application that contains the flows.
+   * @param appName name of the application that contains the flows.
    * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
    * @return deployment properties
    * @throws IOException

@@ -21,16 +21,16 @@ public class FlowBackPressureEventsAccumulatedException extends FlowBackPressure
   private static final long serialVersionUID = 7149961265248945243L;
 
   /**
-   * Create a new {@link FlowBackPressureEventsAccumulatedException} with no cause. This is typically use when a
-   * stream based processing exerts back-pressure without throwing an exception.
+   * Create a new {@link FlowBackPressureEventsAccumulatedException} with no cause. This is typically use when a stream based
+   * processing exerts back-pressure without throwing an exception.
    */
   public FlowBackPressureEventsAccumulatedException(Component flow, BackPressureReason reason) {
     super(flow, reason);
   }
 
   /**
-   * Create a new {@link FlowBackPressureEventsAccumulatedException} with a cause. This is typically use when a non-stream
-   * based processing strategy is in use and back-pressure is identified by a {@link RejectedExecutionException}.
+   * Create a new {@link FlowBackPressureEventsAccumulatedException} with a cause. This is typically use when a non-stream based
+   * processing strategy is in use and back-pressure is identified by a {@link RejectedExecutionException}.
    */
   public FlowBackPressureEventsAccumulatedException(Component flow, BackPressureReason reason, Throwable cause) {
     super(flow, reason, cause);

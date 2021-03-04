@@ -9,8 +9,7 @@ package org.mule.runtime.core.internal.util.queue;
 import java.io.Serializable;
 
 /**
- * Wrapper for QueueStore so the cache in {@link AbstractQueueManager} gets cleaned up when a
- * queue is not longer used.
+ * Wrapper for QueueStore so the cache in {@link AbstractQueueManager} gets cleaned up when a queue is not longer used.
  */
 public class CacheAwareQueueStore implements QueueStore {
 

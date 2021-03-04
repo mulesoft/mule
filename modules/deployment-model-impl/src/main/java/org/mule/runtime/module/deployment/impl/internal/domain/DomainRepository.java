@@ -35,8 +35,8 @@ public interface DomainRepository {
   boolean contains(String name);
 
   /**
-   * Gets a domain compatible with the given bundle descriptor. The version must be compatible
-   * (see {@link BundleDescriptorUtils#isCompatibleVersion(String, String)} for more information).
+   * Gets a domain compatible with the given bundle descriptor. The version must be compatible (see
+   * {@link BundleDescriptorUtils#isCompatibleVersion(String, String)} for more information).
    *
    * @param descriptor Descriptor of the domain to find.
    * @return a {@link Domain} corresponding to the given descriptor or null is no such domain exists.
@@ -47,8 +47,8 @@ public interface DomainRepository {
   Domain getCompatibleDomain(BundleDescriptor descriptor) throws DomainNotFoundException, AmbiguousDomainReferenceException;
 
   /**
-   * Checks if exists a domain compatible with the given bundle descriptor. The version must be compatible
-   * (see {@link BundleDescriptorUtils#isCompatibleVersion(String, String)} for more information).
+   * Checks if exists a domain compatible with the given bundle descriptor. The version must be compatible (see
+   * {@link BundleDescriptorUtils#isCompatibleVersion(String, String)} for more information).
    *
    * @param descriptor Descriptor of the domain to find.
    * @return <tt>true</tt> if this repository contains a domain for the specified descriptor, or <tt>false</tt> otherwise.

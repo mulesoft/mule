@@ -63,9 +63,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Enriches OAuth enabled {@link ConnectionProviderDeclaration}s with further
- * properties and behaviour which are specific to the Java runtime implementation of the
- * Extensions API
+ * Enriches OAuth enabled {@link ConnectionProviderDeclaration}s with further properties and behaviour which are specific to the
+ * Java runtime implementation of the Extensions API
  *
  * @since 4.0
  */

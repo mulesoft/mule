@@ -75,7 +75,8 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
   }
 
   /**
-   * Adds a new dependency that will be visible only to the plugin defined by the groupId and artifactId of the {@link ArtifactPluginFileBuilder}.
+   * Adds a new dependency that will be visible only to the plugin defined by the groupId and artifactId of the
+   * {@link ArtifactPluginFileBuilder}.
    *
    * @param dependencyFileBuilder shared dependency.
    * @return the same builder instance
@@ -93,7 +94,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
   /**
    * Adds a property into the application deployment properties file.
    *
-   * @param propertyName  name of the property to add. Non empty
+   * @param propertyName name of the property to add. Non empty
    * @param propertyValue value of the property to add. Non null.
    * @return the same builder instance
    */

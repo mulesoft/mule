@@ -21,7 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * A decorator that turns any {@link CursorProvider} into an {@link IdentifiableCursorProvider}.
  * <p>
  * If the decoratee is already an {@link IdentifiableCursorProvider} or ({@link CursorProviderDecorator} of one), then this
- * decorator will yield the same id as the input identifiable provider. If this is not the case, an ID will be generaetd.mvn -Dtest=ClosedCursorProviderTestCase test
+ * decorator will yield the same id as the input identifiable provider. If this is not the case, an ID will be generaetd.mvn
+ * -Dtest=ClosedCursorProviderTestCase test
  * <p>
  * Instances are to be created through the {@link #of(CursorProvider)} factory method.
  *
@@ -44,7 +45,7 @@ public abstract class IdentifiableCursorProviderDecorator<T extends Cursor> exte
    * identifiable. If such delegate is found, then the same {@code id} will be reused. Otherwise, one will be generated.
    *
    * @param cursorProvider the decoratee
-   * @param <T>            the generic {@link Cursor} type
+   * @param <T> the generic {@link Cursor} type
    * @return a new decorator.
    */
   public static <T extends Cursor> IdentifiableCursorProviderDecorator<T> of(CursorProvider<T> cursorProvider) {

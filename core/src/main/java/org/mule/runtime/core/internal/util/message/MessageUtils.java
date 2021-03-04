@@ -336,7 +336,8 @@ public final class MessageUtils {
    * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
-   * @deprecated since 4.4.0. Use {@link #toMessage(Result, MediaType, CursorProviderFactory, BaseEventContext, ComponentLocation)} instead
+   * @deprecated since 4.4.0. Use
+   *             {@link #toMessage(Result, MediaType, CursorProviderFactory, BaseEventContext, ComponentLocation)} instead
    */
   @Deprecated
   public static Message toMessage(org.mule.runtime.extension.api.runtime.operation.Result<?, ?> result,
@@ -358,7 +359,9 @@ public final class MessageUtils {
    * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
-   * @deprecated since 4.4.0. Use {@link #toMessage(Result, MediaType, CursorProviderFactory, BaseEventContext, DataType, ComponentLocation)} instead
+   * @deprecated since 4.4.0. Use
+   *             {@link #toMessage(Result, MediaType, CursorProviderFactory, BaseEventContext, DataType, ComponentLocation)}
+   *             instead
    */
   @Deprecated
   public static Message toMessage(org.mule.runtime.extension.api.runtime.operation.Result<?, ?> result,
@@ -382,7 +385,8 @@ public final class MessageUtils {
    * @param event Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
-   * @deprecated since 4.4.0. Use {@link #toMessage(Result, MediaType, CursorProviderFactory, CoreEvent, ComponentLocation)} instead
+   * @deprecated since 4.4.0. Use {@link #toMessage(Result, MediaType, CursorProviderFactory, CoreEvent, ComponentLocation)}
+   *             instead
    */
   @Deprecated
   public static Message toMessage(org.mule.runtime.extension.api.runtime.operation.Result<?, ?> result,
@@ -404,7 +408,8 @@ public final class MessageUtils {
    * @param event Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
-   * @deprecated since 4.4.0. Use {@link #toMessage(Result, MediaType, CursorProviderFactory, CoreEvent, DataType, ComponentLocation)} instead
+   * @deprecated since 4.4.0. Use
+   *             {@link #toMessage(Result, MediaType, CursorProviderFactory, CoreEvent, DataType, ComponentLocation)} instead
    */
   @Deprecated
   public static Message toMessage(org.mule.runtime.extension.api.runtime.operation.Result<?, ?> result,
@@ -424,7 +429,8 @@ public final class MessageUtils {
    * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
    * @param eventContext the toot context of the {@link CoreEvent} which originated the results being transformed
    * @return a {@link List} of {@link Message}
-   * @deprecated since 4.4.0. Use {@link #messageCollection(Collection, CursorProviderFactory, BaseEventContext, ComponentLocation)}
+   * @deprecated since 4.4.0. Use
+   *             {@link #messageCollection(Collection, CursorProviderFactory, BaseEventContext, ComponentLocation)}
    */
   public static List<Message> toMessageCollection(Collection<org.mule.runtime.extension.api.runtime.operation.Result> results,
                                                   CursorProviderFactory cursorProviderFactory,
@@ -440,8 +446,7 @@ public final class MessageUtils {
 
   /**
    * Returns a {@link Function} which receives a value expected to be a legacy
-   * {@link org.mule.runtime.extension.api.runtime.operation.Result} and transforms it to a
-   * {@link Message}
+   * {@link org.mule.runtime.extension.api.runtime.operation.Result} and transforms it to a {@link Message}
    *
    * @param cursorProviderFactory a {@link CursorProviderFactory} in case the value is streaming
    * @param eventContext the current {@link EventContext}
@@ -457,8 +462,7 @@ public final class MessageUtils {
   }
 
   /**
-   * Returns a {@link Function} which receives a value expected to be {@link Result} and transforms it to a
-   * {@link Message}
+   * Returns a {@link Function} which receives a value expected to be {@link Result} and transforms it to a {@link Message}
    *
    * @param cursorProviderFactory a {@link CursorProviderFactory} in case the value is streaming
    * @param eventContext the current {@link EventContext}
@@ -480,7 +484,8 @@ public final class MessageUtils {
    * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
    * @param eventContext the root context of the {@link CoreEvent} which originated the results being transformed
    * @return a similar collection of {@link Message}
-   * @deprecated since 4.4.0. Use {@link #messageIterator(Iterator, CursorProviderFactory, BaseEventContext, ComponentLocation)} instead
+   * @deprecated since 4.4.0. Use {@link #messageIterator(Iterator, CursorProviderFactory, BaseEventContext, ComponentLocation)}
+   *             instead
    */
   @Deprecated
   public static Iterator<Message> toMessageIterator(Iterator<org.mule.runtime.extension.api.runtime.operation.Result> results,

@@ -10,6 +10,7 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 /**
  * Allows to get notified about certain events related to an OAuth dance with Client Credentials grant type
+ * 
  * @since 4.2.1
  * @deprecated since 4.2.2. Use {@link org.mule.runtime.oauth.api.listener.ClientCredentialsListener} instead
  */

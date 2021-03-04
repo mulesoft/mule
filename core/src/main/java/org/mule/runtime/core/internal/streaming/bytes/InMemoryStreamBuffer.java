@@ -23,12 +23,10 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 /**
- * An implementation of {@link AbstractInputStreamBuffer} which holds the buffered
- * information in memory.
+ * An implementation of {@link AbstractInputStreamBuffer} which holds the buffered information in memory.
  * <p>
- * If the buffer does not have enough capacity to hold all the data, then it will
- * expanded up to a certain threshold configured in the constructor. Once that threshold
- * is reached, a {@link StreamingBufferSizeExceededException} will be thrown. If no threshold
+ * If the buffer does not have enough capacity to hold all the data, then it will expanded up to a certain threshold configured in
+ * the constructor. Once that threshold is reached, a {@link StreamingBufferSizeExceededException} will be thrown. If no threshold
  * is provided, then the buffer will be allowed to grow indefinitely.
  *
  * @since 4.0
@@ -134,9 +132,8 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   }
 
   /**
-   * {@inheritDoc}
-   * If {@code buffer} doesn't have any remaining capacity, then {@link #expandBuffer()}
-   * is invoked before attempting to consume new information.
+   * {@inheritDoc} If {@code buffer} doesn't have any remaining capacity, then {@link #expandBuffer()} is invoked before
+   * attempting to consume new information.
    *
    * @throws StreamingBufferSizeExceededException if the buffer is not big enough and cannot be expanded
    */

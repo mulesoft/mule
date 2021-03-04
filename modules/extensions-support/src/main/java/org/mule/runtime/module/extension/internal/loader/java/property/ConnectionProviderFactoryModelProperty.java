@@ -11,8 +11,8 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 
 /**
- * A {@link ModelProperty} meant to be used on {@link ConnectionProviderModel connection provider models},
- * which provides access to a {@link ConnectionProviderFactory} used to create such providers
+ * A {@link ModelProperty} meant to be used on {@link ConnectionProviderModel connection provider models}, which provides access
+ * to a {@link ConnectionProviderFactory} used to create such providers
  *
  * @since 4.0
  */
@@ -22,6 +22,7 @@ public final class ConnectionProviderFactoryModelProperty implements ModelProper
 
   /**
    * Creates a new instance
+   * 
    * @param connectionProviderFactory a {@link ConnectionProviderFactory}
    */
   public ConnectionProviderFactoryModelProperty(

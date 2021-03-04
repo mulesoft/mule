@@ -12,8 +12,8 @@ import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 
 /**
- * A {@link ModelProperty} meant to be used on {@link SourceModel source models},
- * which provides access to a {@link SourceFactory} used to create a message source
+ * A {@link ModelProperty} meant to be used on {@link SourceModel source models}, which provides access to a {@link SourceFactory}
+ * used to create a message source
  *
  * @since 4.0
  */

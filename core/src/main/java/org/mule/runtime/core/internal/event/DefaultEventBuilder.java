@@ -391,7 +391,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private transient LazyValue<BindingContext> bindingContextBuilder =
         new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
 
-    //Needed for deserialization with kryo
+    // Needed for deserialization with kryo
     private InternalEventImplementation() {
       this.context = null;
       this.session = null;
@@ -505,7 +505,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     /**
      * Returns the message contents for logging
      *
-     * @param encoding    the encoding to use when converting bytes to a string, if necessary
+     * @param encoding the encoding to use when converting bytes to a string, if necessary
      * @param muleContext the Mule node.
      * @return the message contents as a string
      * @throws MuleException if the message cannot be converted into a string

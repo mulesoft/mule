@@ -15,8 +15,8 @@ import java.util.Optional;
 /**
  * Base class for applying the decorator pattern over instances of a {@link CursorProvider}.
  * <p>
- * All decorators <b>MUST</b> extend this class so that the framework can leverage the {@link #getDelegate()} method in order
- * to traverse the decorators chain in order to asses if certain behaviors are already applied or to reach the originally wrapped
+ * All decorators <b>MUST</b> extend this class so that the framework can leverage the {@link #getDelegate()} method in order to
+ * traverse the decorators chain in order to asses if certain behaviors are already applied or to reach the originally wrapped
  * instance.
  *
  * @param <T> the generic {@link Cursor} type as defined in {@link CursorProvider}

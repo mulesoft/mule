@@ -19,8 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * Defines a {@link ModuleRepository} that uses a {@link ModuleDiscoverer} to find the available
- * modules.
+ * Defines a {@link ModuleRepository} that uses a {@link ModuleDiscoverer} to find the available modules.
  */
 public class DefaultModuleRepository implements ModuleRepository {
 

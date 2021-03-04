@@ -20,8 +20,7 @@ import java.util.concurrent.Executor;
 /**
  * Context for processing one message from a {@link MessageSource}.
  *
- * Mule {@link MessageSource} implementations should create one instance of MessageProcessContext
- * per message that generates.
+ * Mule {@link MessageSource} implementations should create one instance of MessageProcessContext per message that generates.
  *
  * MessageProcessContext is responsible for - Define if the incoming message can be processed in a separate thread - Provide
  * access to the {@link MessageSource} of the message - Provide access to the {@link FlowConstruct} were the message is going to

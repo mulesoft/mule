@@ -42,7 +42,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
    * Creates a new instance
    *
    * @param configurationDependencyResolver the configuration dependency resolver
-   * @param springRegistry                  the context spring registry
+   * @param springRegistry the context spring registry
    */
   public DefaultBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
                                        SpringRegistry springRegistry) {
@@ -80,8 +80,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
   }
 
   /**
-   * If the target object implements {@link InjectedDependenciesProvider}, then the custom dependencies
-   * declared by it are added.
+   * If the target object implements {@link InjectedDependenciesProvider}, then the custom dependencies declared by it are added.
    */
   private void addDeclaredDependencies(Object object, Set<String> processedKeys,
                                        DependencyNode node) {

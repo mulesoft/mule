@@ -14,8 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Session variables wrapper {@link Map} for exposing Session variables via an
- * {@link ExtendedExpressionLanguageAdaptor}
+ * Session variables wrapper {@link Map} for exposing Session variables via an {@link ExtendedExpressionLanguageAdaptor}
  */
 public final class SessionVariableMapContext extends AbstractMapContext<Object> {
 

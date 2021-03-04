@@ -38,9 +38,9 @@ public interface ConnectionManager {
    * If a binding already exists for the {@code config} then this one replaces the previous one. All connections produced by the
    * previous binding are closed.
    *
-   * @param config             the config that acts as the binding key
+   * @param config the config that acts as the binding key
    * @param connectionProvider the {@link ConnectionProvider} that produces the connections
-   * @param <C>       the generic type of the connections to be produced
+   * @param <C> the generic type of the connections to be produced
    */
   <C> void bind(Object config, ConnectionProvider<C> connectionProvider);
 
@@ -75,7 +75,7 @@ public interface ConnectionManager {
    * {@link ConnectionHandler#release()} method on it.
    *
    * @param config a config for which a binding has been established through {@link #bind(Object, ConnectionProvider)}
-   * @param <C>    the generic type of the returned connection
+   * @param <C> the generic type of the returned connection
    * @return a {@link ConnectionHandler} wrapping the produced connection
    * @throws ConnectionException if the connection could not be established or if no such binding exists for the {@code config}
    */
@@ -84,26 +84,25 @@ public interface ConnectionManager {
   /**
    * Tests connectivity of the given {@code connectionProvider}.
    * <p>
-   * The {@code connectionProvider} is expected to be fully initialised and functional. However,
-   * it is not required for it to have been registered through the {@link #bind(Object, ConnectionProvider)}
-   * method.
+   * The {@code connectionProvider} is expected to be fully initialised and functional. However, it is not required for it to have
+   * been registered through the {@link #bind(Object, ConnectionProvider)} method.
    *
    * @param connectionProvider a {@link ConnectionProvider}
-   * @param <C>                the generic type of the connections produced by the {@code connectionProvider}
-   * @return a {@link  ConnectionValidationResult}
+   * @param <C> the generic type of the connections produced by the {@code connectionProvider}
+   * @return a {@link ConnectionValidationResult}
    */
   <C> ConnectionValidationResult testConnectivity(ConnectionProvider<C> connectionProvider);
 
   /**
    * Validates the given {@code connection}
    * <p>
-   * The {@code connection} has to have been obtained through the given {@code connectionHandler}, and the handler
-   * has to have been obtained through {@code this} instance
+   * The {@code connection} has to have been obtained through the given {@code connectionHandler}, and the handler has to have
+   * been obtained through {@code this} instance
    *
    * @param connection the connection to validate
-   *                   @param connectionHandler the connection's handler
-   * @param <C>                the generic type of the validated connection
-   * @return a {@link  ConnectionValidationResult}
+   * @param connectionHandler the connection's handler
+   * @param <C> the generic type of the validated connection
+   * @return a {@link ConnectionValidationResult}
    * @throws IllegalArgumentException if any of the preconditions are not met
    */
   <C> ConnectionValidationResult testConnectivity(C connection, ConnectionHandler<C> connectionHandler);
@@ -111,10 +110,9 @@ public interface ConnectionManager {
   /**
    * Tests connectivity for the given {@code configurationInstance}.
    * <p>
-   * The {@code connectionProvider} is expected to be fully initialised and functional. It is not
-   * required for the config wrapped by the {@code configurationInstance} to have been registered
-   * through the {@link #bind(Object, ConnectionProvider)} method. However, if it has been, then
-   * the test will be performed using the resources allocated by such registration.
+   * The {@code connectionProvider} is expected to be fully initialised and functional. It is not required for the config wrapped
+   * by the {@code configurationInstance} to have been registered through the {@link #bind(Object, ConnectionProvider)} method.
+   * However, if it has been, then the test will be performed using the resources allocated by such registration.
    *
    * @param configurationInstance a {@link ConfigurationInstance}
    * @return a {@link ConnectionValidationResult}

@@ -89,7 +89,7 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
    * @param appArchiveUri
    * @param appProperties
    * @throws IOException
-     */
+   */
   void deploy(URI appArchiveUri, Properties appProperties) throws IOException;
 
   /**

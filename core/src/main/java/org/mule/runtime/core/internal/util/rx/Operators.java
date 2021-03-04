@@ -61,12 +61,13 @@ public final class Operators {
    * Returns a function that transforms a {@link CoreEvent} into another one in which the result of evaluating the
    * {@code targetValueExpression} over the {@code originalEvent} is added as a variable of key {@code target}.
    *
-   * @param originalEvent         the event on which the expression is evaluated
-   * @param target                the name of the variable in which the result is put
+   * @param originalEvent the event on which the expression is evaluated
+   * @param target the name of the variable in which the result is put
    * @param targetValueExpression the expression to evaluate
-   * @param expressionManager     the {@link ExpressionManager} used for the evaluation
+   * @param expressionManager the {@link ExpressionManager} used for the evaluation
    * @return a {@link Function}
-   * @deprecated since 4.3.0. Use {@link #outputToTarget(CoreEvent, CoreEvent, String, CompiledExpression, ExpressionLanguage)} instead
+   * @deprecated since 4.3.0. Use {@link #outputToTarget(CoreEvent, CoreEvent, String, CompiledExpression, ExpressionLanguage)}
+   *             instead
    */
   @Deprecated
   public static Function<CoreEvent, CoreEvent> outputToTarget(CoreEvent originalEvent, String target,
@@ -83,11 +84,11 @@ public final class Operators {
   }
 
   /**
-   * Returns a new {@code CoreEvent}in which the result of evaluating the
-   * {@code targetValueExpression} over the {@code originalEvent} was added as a variable of key {@code target}.
+   * Returns a new {@code CoreEvent}in which the result of evaluating the {@code targetValueExpression} over the
+   * {@code originalEvent} was added as a variable of key {@code target}.
    *
-   * @param originalEvent         the event on which the expression is evaluated
-   * @param target                the name of the variable in which the result is put
+   * @param originalEvent the event on which the expression is evaluated
+   * @param target the name of the variable in which the result is put
    * @param targetValueExpression the expression to evaluate
    * @return a new {@link CoreEvent}
    */

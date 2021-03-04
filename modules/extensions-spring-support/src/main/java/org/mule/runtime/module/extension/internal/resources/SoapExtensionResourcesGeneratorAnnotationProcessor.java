@@ -20,8 +20,8 @@ import javax.annotation.processing.SupportedSourceVersion;
 
 
 /**
- * {@link BaseExtensionResourcesGeneratorAnnotationProcessor} implementation for SOAP BASED Extensions that use the
- * soap extensions api classes and annotations.
+ * {@link BaseExtensionResourcesGeneratorAnnotationProcessor} implementation for SOAP BASED Extensions that use the soap
+ * extensions api classes and annotations.
  *
  * @since 4.0.0
  */

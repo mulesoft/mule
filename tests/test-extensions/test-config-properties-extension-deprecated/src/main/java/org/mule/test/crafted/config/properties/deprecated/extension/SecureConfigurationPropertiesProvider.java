@@ -56,14 +56,13 @@ public class SecureConfigurationPropertiesProvider extends DefaultConfigurationP
   /**
    * Returns the configuration property loaded from the file with the given key.
    * <p/>
-   * MULE-15032:
-   * There are 2 special keys used for testing purposes: "lifecycle::initialize" and "lifecycle::dispose".
-   * If this custom configuration properties provider is loaded by SPI in any integration test, asking for a property
-   * with any of those keys will return the number of times this provider was initialized or disposed.
-   * This was added as a workaround for testing that those phases were actually being applied to the ConfigurationPropertiesProviders when
-   * creating or clearing an ApplicationModel.
-   * keep in mind that this extension is only intended for testing purposes and this behaviour will not be replicated for
-   * any productive code.
+   * MULE-15032: There are 2 special keys used for testing purposes: "lifecycle::initialize" and "lifecycle::dispose". If this
+   * custom configuration properties provider is loaded by SPI in any integration test, asking for a property with any of those
+   * keys will return the number of times this provider was initialized or disposed. This was added as a workaround for testing
+   * that those phases were actually being applied to the ConfigurationPropertiesProviders when creating or clearing an
+   * ApplicationModel. keep in mind that this extension is only intended for testing purposes and this behaviour will not be
+   * replicated for any productive code.
+   * 
    * @param configurationAttributeKey
    * @return an Optional with the value of the given key or {@link Optional#empty()} otherwise.
    */

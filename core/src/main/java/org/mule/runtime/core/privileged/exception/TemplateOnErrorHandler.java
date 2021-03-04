@@ -392,7 +392,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   /**
-   * Evaluates if the {@link #errorTypeMatcher} matches against any of the provided {@link PrivilegedError#getSuppressedErrors()} error types.
+   * Evaluates if the {@link #errorTypeMatcher} matches against any of the provided {@link PrivilegedError#getSuppressedErrors()}
+   * error types.
+   * 
    * @param error {@link Error} that will be evaluated.
    * @return True if at least one match is found.
    */
@@ -409,6 +411,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   /**
    * If it was not previously logged, logs a warning about a suppressed {@link ErrorType} match.
+   * 
    * @param eventErrorType Unsuppressed {@link ErrorType} (recommended match).
    * @param suppressedErrorType Suppressed {@link ErrorType} that has been matched.
    */

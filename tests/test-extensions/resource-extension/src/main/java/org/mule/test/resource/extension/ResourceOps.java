@@ -56,8 +56,8 @@ public class ResourceOps {
   }
 
   /**
-   * This operation depends on the fake HTTP service to provide resource access through it and validate how the service classloader
-   * behaves. It should only be used when the fake HTTP service is available.
+   * This operation depends on the fake HTTP service to provide resource access through it and validate how the service
+   * classloader behaves. It should only be used when the fake HTTP service is available.
    *
    * @param resource the MANIFEST resource to load
    * @return the Bundle-Description of the MANIFEST or an empty String if not found

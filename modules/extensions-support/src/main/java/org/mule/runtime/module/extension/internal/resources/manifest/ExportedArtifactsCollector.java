@@ -95,8 +95,8 @@ final public class ExportedArtifactsCollector {
   }
 
   /**
-   * @return A {@link Map} of default java package names that the extension should export and indicates which
-   * are the classes that makes the package to be exported.
+   * @return A {@link Map} of default java package names that the extension should export and indicates which are the classes that
+   *         makes the package to be exported.
    */
   public Map<String, Collection<String>> getDetailedExportedPackages() {
     collectDefault();

@@ -15,8 +15,8 @@ import java.util.function.Supplier;
 /**
  * Result of a successful execution of a {@link SourcePolicy}.
  *
- * It contains the {@link CoreEvent} result of the flow execution and the response parameters and error response parameters to be sent
- * by the source.
+ * It contains the {@link CoreEvent} result of the flow execution and the response parameters and error response parameters to be
+ * sent by the source.
  *
  * @since 4.0
  */

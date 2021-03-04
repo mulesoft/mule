@@ -18,11 +18,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Implementation of {@link LifecycleAwareValueResolverWrapper} which depending on the lifecycle state
- * of the muleContext, applies the Initialise and Start phases on the returned objects.
+ * Implementation of {@link LifecycleAwareValueResolverWrapper} which depending on the lifecycle state of the muleContext, applies
+ * the Initialise and Start phases on the returned objects.
  * <p>
- * This resolver keeps track of all the returned values, making sure that lifecycle is only applied once
- * on each possible return value.
+ * This resolver keeps track of all the returned values, making sure that lifecycle is only applied once on each possible return
+ * value.
  *
  * @param <T> the generic type of the returned values
  * @since 4.1
@@ -35,7 +35,7 @@ public class LifecycleInitialiserValueResolverWrapper<T> extends LifecycleAwareV
   /**
    * Creates a new instance
    *
-   * @param delegate    the delegate resolver
+   * @param delegate the delegate resolver
    * @param muleContext the current {@link MuleContext}
    */
   public LifecycleInitialiserValueResolverWrapper(ValueResolver<T> delegate, MuleContext muleContext) {

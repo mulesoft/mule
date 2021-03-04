@@ -36,7 +36,7 @@ public class ConnectionArgumentResolver implements ArgumentResolver<Object> {
    * @param executionContext an {@link ExecutionContext}
    * @return the connection
    * @throws IllegalArgumentException if the connection was not set
-   * @throws ClassCastException       if {@code executionContext} is not an {@link ExecutionContextAdapter}
+   * @throws ClassCastException if {@code executionContext} is not an {@link ExecutionContextAdapter}
    */
   @Override
   public Object resolve(ExecutionContext executionContext) {

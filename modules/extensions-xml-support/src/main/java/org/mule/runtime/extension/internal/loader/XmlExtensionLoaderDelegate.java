@@ -239,11 +239,11 @@ public final class XmlExtensionLoaderDelegate {
   private Map<String, DeclarationOperation> declarationMap;
 
   /**
-   * @param modulePath      relative path to a file that will be loaded from the current {@link ClassLoader}. Non null.
-   * @param validateXml     true if the XML of the Smart Connector must ve valid, false otherwise. It will be false at runtime, as the
-   *                        packaging of a connector will previously validate it's XML.
+   * @param modulePath relative path to a file that will be loaded from the current {@link ClassLoader}. Non null.
+   * @param validateXml true if the XML of the Smart Connector must ve valid, false otherwise. It will be false at runtime, as the
+   *        packaging of a connector will previously validate it's XML.
    * @param declarationPath relative path to a file that contains the {@link MetadataType}s of all <operations/>.
-   * @param resourcesPaths  set of resources that will be exported in the {@link ExtensionModel}
+   * @param resourcesPaths set of resources that will be exported in the {@link ExtensionModel}
    */
   public XmlExtensionLoaderDelegate(String modulePath, boolean validateXml, Optional<String> declarationPath,
                                     List<String> resourcesPaths) {
@@ -351,7 +351,7 @@ public final class XmlExtensionLoaderDelegate {
    * Transforms the current <module/> by stripping out the <body/>'s content, so that there are not parsing errors, to generate a
    * simpler {@link ExtensionModel} if there are references to the TNS prefix defined by the {@link #XMLNS_TNS}.
    *
-   * @param resource             <module/>'s resource
+   * @param resource <module/>'s resource
    * @param extensionModelHelper with the complete list of extensions the current module depends on
    * @return an {@link ExtensionModel} if there's a {@link #XMLNS_TNS} defined, {@link Optional#empty()} otherwise
    * @throws IOException if it fails reading the resource
@@ -751,7 +751,7 @@ public final class XmlExtensionLoaderDelegate {
    * Throws exception if a <property/> for a configuration or connection have the same name.
    *
    * @param configurationProperties properties that will go in the configuration
-   * @param connectionProperties    properties that will go in the connection
+   * @param connectionProperties properties that will go in the connection
    */
   private void validateProperties(List<ComponentAst> configurationProperties, List<ComponentAst> connectionProperties) {
     final List<String> connectionPropertiesNames =
@@ -777,11 +777,11 @@ public final class XmlExtensionLoaderDelegate {
    * Adds a connection provider if (a) there's at least one global element that has test connection or (b) there's at least one
    * <property/> that has been placed within a <connection/> wrapper in the <module/> element.
    *
-   * @param configurationDeclarer        declarer to add the {@link ConnectionProviderDeclarer} if applies.
-   * @param connectionProperties         collection of <property/>s that should be added to the {@link ConnectionProviderDeclarer}.
+   * @param configurationDeclarer declarer to add the {@link ConnectionProviderDeclarer} if applies.
+   * @param connectionProperties collection of <property/>s that should be added to the {@link ConnectionProviderDeclarer}.
    * @param globalElementsComponentModel collection of global elements where through
-   *                                     {@link #getTestConnectionGlobalElement(ConfigurationDeclarer, List, Set)} will look for one that supports test
-   *                                     connectivity.
+   *        {@link #getTestConnectionGlobalElement(ConfigurationDeclarer, List, Set)} will look for one that supports test
+   *        connectivity.
    */
   private void addConnectionProvider(ConfigurationDeclarer configurationDeclarer,
                                      List<ComponentAst> connectionProperties,
@@ -938,9 +938,9 @@ public final class XmlExtensionLoaderDelegate {
    * Goes over the {@code innerComponents} collection checking if any reference is a {@link MacroExpansionModuleModel#TNS_PREFIX},
    * in which case it adds an edge to the current vertex {@code sourceOperationVertex}
    *
-   * @param directedGraph         graph to contain all the vertex operations and linkage with other operations
+   * @param directedGraph graph to contain all the vertex operations and linkage with other operations
    * @param sourceOperationVertex current vertex we are working on
-   * @param innerComponents       collection of elements to introspect and assembly the graph with
+   * @param innerComponents collection of elements to introspect and assembly the graph with
    */
   private void fillGraphWithTnsReferences(Graph<String, DefaultEdge> directedGraph, String sourceOperationVertex,
                                           final Stream<ComponentAst> innerComponents) {

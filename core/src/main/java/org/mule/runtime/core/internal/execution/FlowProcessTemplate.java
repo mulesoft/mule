@@ -65,9 +65,9 @@ public interface FlowProcessTemplate extends MessageSourceResponseParametersProc
    * <p>
    * This method is executed within the flow so if it fails it will trigger the exception strategy.
    *
-   * @param response   the result of the flow execution
+   * @param response the result of the flow execution
    * @param parameters the resolved set of parameters required to send the response.
-   * @param callback   the callback used to signal completion
+   * @param callback the callback used to signal completion
    */
   void sendResponseToClient(CoreEvent response, Map<String, Object> parameters, CompletableCallback<Void> callback);
 
@@ -75,9 +75,9 @@ public interface FlowProcessTemplate extends MessageSourceResponseParametersProc
   /**
    * Template method to send a failure response after processing the message.
    *
-   * @param exception  exception thrown during the flow execution.
+   * @param exception exception thrown during the flow execution.
    * @param parameters the resolved set of parameters required to send the failure response.
-   * @param callback   the callback used to signal completion
+   * @param callback the callback used to signal completion
    */
   void sendFailureResponseToClient(MessagingException exception,
                                    Map<String, Object> parameters,
@@ -89,10 +89,10 @@ public interface FlowProcessTemplate extends MessageSourceResponseParametersProc
    * This method will always be executed and the {@code either} parameter will indicate the result of the execution.
    *
    * @param either that communicates the result of the flow execution.
-   *               <ul>
-   *               <li>{@link CoreEvent} if the execution finished correctly</li>
-   *               <li>{@link MessagingException} if an error occurred during the execution</li>
-   *               </ul>
+   *        <ul>
+   *        <li>{@link CoreEvent} if the execution finished correctly</li>
+   *        <li>{@link MessagingException} if an error occurred during the execution</li>
+   *        </ul>
    */
   void afterPhaseExecution(Either<MessagingException, CoreEvent> either);
 }

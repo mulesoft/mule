@@ -37,9 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default implementation of a {@link MetadataCacheManager}.
- * This implementation provides a way of managing persistent {@link MetadataCache}s
- * that are stored at container-level using the ObjectStore as handler for the persistence.
+ * Default implementation of a {@link MetadataCacheManager}. This implementation provides a way of managing persistent
+ * {@link MetadataCache}s that are stored at container-level using the ObjectStore as handler for the persistence.
  *
  * Cache's are <b>never evicted</b>, and will be cleared only when an explicit disposal is invoked.
  *

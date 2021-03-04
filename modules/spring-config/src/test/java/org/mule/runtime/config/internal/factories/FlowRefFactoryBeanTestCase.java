@@ -327,7 +327,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
                                    .setScope(BeanDefinition.SCOPE_PROTOTYPE)
                                    .getBeanDefinition();
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);
-    //Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
+    // Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
     Flow concurrentCallerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
     ProcessingStrategy concurrentCallerFlowProcessingStrategy = mock(ProcessingStrategy.class);
     when(locator.find(Location.builder().globalName("concurrentFlow").build())).thenReturn(of(concurrentCallerFlow));

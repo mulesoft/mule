@@ -27,9 +27,9 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
    * language implementation should provided access to the message.
    * <p>
-   * This version of {@code evaluate} allows {@link CoreEvent} or {@link InternalMessage} mutation performed within the expression to
-   * be maintained post-evaluation via the use of a result {@link CoreEvent.Builder} which should be created
-   * from the original event before being passed and then used to construct the post-evaluation event.
+   * This version of {@code evaluate} allows {@link CoreEvent} or {@link InternalMessage} mutation performed within the expression
+   * to be maintained post-evaluation via the use of a result {@link CoreEvent.Builder} which should be created from the original
+   * event before being passed and then used to construct the post-evaluation event.
    *
    * @param expression the expression to be executed
    * @param event the current event being processed

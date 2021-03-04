@@ -117,8 +117,8 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   }
 
   /**
-   * Implementation for a configuration provider won't take into account the partialKey as it is defined
-   * only at the operation/source level the key.
+   * Implementation for a configuration provider won't take into account the partialKey as it is defined only at the
+   * operation/source level the key.
    *
    * {@inheritDoc}
    */

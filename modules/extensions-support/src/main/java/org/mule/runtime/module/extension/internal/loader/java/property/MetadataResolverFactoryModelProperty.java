@@ -13,8 +13,7 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import java.util.function.Supplier;
 
 /**
- * A model property which allows the enriched component to specify its
- * own {@link MetadataResolverFactory}
+ * A model property which allows the enriched component to specify its own {@link MetadataResolverFactory}
  *
  * @since 4.0
  */

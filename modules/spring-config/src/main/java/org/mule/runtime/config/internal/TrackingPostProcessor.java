@@ -17,8 +17,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
- * {@link BeanPostProcessor} that keeps track of the beans created after a certain point in order to later
- * allow them to be disposed (in the right dependency order).
+ * {@link BeanPostProcessor} that keeps track of the beans created after a certain point in order to later allow them to be
+ * disposed (in the right dependency order).
  */
 public class TrackingPostProcessor implements BeanPostProcessor {
 

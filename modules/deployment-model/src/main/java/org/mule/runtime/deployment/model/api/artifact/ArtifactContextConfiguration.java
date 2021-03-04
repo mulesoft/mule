@@ -244,7 +244,8 @@ public final class ArtifactContextConfiguration {
     }
 
     /**
-     * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize access on different deployable artifacts to the same resources.
+     * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize
+     *        access on different deployable artifacts to the same resources.
      * @return the builder
      */
     public ArtifactContextConfigurationBuilder setRuntimeLockFactory(LockFactory runtimeLockFactory) {

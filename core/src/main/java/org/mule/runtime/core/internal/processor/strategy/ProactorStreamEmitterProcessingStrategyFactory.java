@@ -35,11 +35,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * Creates {@link AsyncProcessingStrategyFactory} instance that implements the proactor pattern by
- * de-multiplexing incoming events onto a multiple emitter using the {@link SchedulerService#cpuLightScheduler()} to process these
- * events from each emitter. In contrast to the {@link AbstractStreamProcessingStrategyFactory} the proactor pattern treats
- * {@link ReactiveProcessor.ProcessingType#CPU_INTENSIVE} and {@link ReactiveProcessor.ProcessingType#BLOCKING} processors differently and schedules there execution
- * on dedicated {@link SchedulerService#cpuIntensiveScheduler()} and {@link SchedulerService#ioScheduler()} ()} schedulers.
+ * Creates {@link AsyncProcessingStrategyFactory} instance that implements the proactor pattern by de-multiplexing incoming events
+ * onto a multiple emitter using the {@link SchedulerService#cpuLightScheduler()} to process these events from each emitter. In
+ * contrast to the {@link AbstractStreamProcessingStrategyFactory} the proactor pattern treats
+ * {@link ReactiveProcessor.ProcessingType#CPU_INTENSIVE} and {@link ReactiveProcessor.ProcessingType#BLOCKING} processors
+ * differently and schedules there execution on dedicated {@link SchedulerService#cpuIntensiveScheduler()} and
+ * {@link SchedulerService#ioScheduler()} ()} schedulers.
  * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
