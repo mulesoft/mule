@@ -91,10 +91,6 @@
             <artifactId>reflections</artifactId>
         </dependency>
         <dependency>
-            <groupId>jboss</groupId>
-            <artifactId>javassist</artifactId>
-        </dependency>
-        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>${jodaTimeVersion}</version>
