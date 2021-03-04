@@ -6,9 +6,15 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static java.io.File.separator;
 import static org.apache.commons.lang3.SystemUtils.getUserDir;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.runtime.core.internal.util.FilenameUtils.fileWithPathComponents;
+import static org.mule.runtime.core.internal.util.FilenameUtils.normalizeDecodedPath;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -22,26 +28,25 @@ public class FilenameUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testFileWithPathComponentsNullParameter() {
-    File result = FilenameUtils.fileWithPathComponents(null);
+    File result = fileWithPathComponents(null);
     assertNull(result);
   }
 
   @Test
   public void testFileWithNullElements() {
-    File tempDir = getBuidDirectory();
-    File result = FilenameUtils.fileWithPathComponents(new String[] {tempDir.getAbsolutePath(), "tmp", null, "bar"});
+    File tempDir = getBuildDirectory();
+    File result = fileWithPathComponents(new String[] {tempDir.getAbsolutePath(), "tmp", null, "bar"});
 
     // make sure that we can validate the test result on all platforms.
     String resultNormalized = result.getAbsolutePath().replace(File.separatorChar, '|');
-    String excpected = tempDir.getAbsolutePath().replace(File.separatorChar, '|') + "|tmp|bar";
-    assertEquals(excpected, resultNormalized);
+    String expected = tempDir.getAbsolutePath().replace(File.separatorChar, '|') + "|tmp|bar";
+    assertEquals(expected, resultNormalized);
   }
 
   @Test
   public void testFileWithPathComponents() {
-    String tempDirPath = getBuidDirectory().getAbsolutePath();
-
-    File result = FilenameUtils.fileWithPathComponents(new String[] {tempDirPath, "tmp", "foo", "bar"});
+    String tempDirPath = getBuildDirectory().getAbsolutePath();
+    File result = fileWithPathComponents(new String[] {tempDirPath, "tmp", "foo", "bar"});
 
     // make sure that we can validate the test result on all platforms.
     String resultNormalized = result.getAbsolutePath().replace(File.separatorChar, '|');
@@ -52,8 +57,26 @@ public class FilenameUtilsTestCase extends AbstractMuleTestCase {
   /**
    * Used to obtain base directory used in tests. Uses the build directory; "target" in the current working directory.
    */
-  private File getBuidDirectory() {
-    return FileUtils.newFile(getUserDir(), "target");
+  private File getBuildDirectory() {
+    return newFile(getUserDir(), "target");
+  }
+
+  @Test
+  public void doesNotAddSlashAtBeginningInWindows() {
+    String path = "file:/C:/ProgramFiles/zaraza";
+    assertThat(normalizeDecodedPath(path, true), is("C:/ProgramFiles/zaraza"));
+  }
+
+  @Test
+  public void addsSlashAtBeginningInUnix() {
+    String path = "file:/etc/zaraza";
+    assertThat(normalizeDecodedPath(path, false), is("/etc/zaraza"));
+  }
+
+  @Test
+  public void addsSlashAtBeginningInWindowsWhenSharedPath() {
+    String path = "file://SERVER/zaraza";
+    assertThat(normalizeDecodedPath(path, true), is(separator + "/SERVER/zaraza"));
   }
 
 }
