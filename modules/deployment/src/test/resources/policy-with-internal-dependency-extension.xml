@@ -7,15 +7,11 @@
       http://www.mulesoft.org/schema/mule/test-policy http://www.mulesoft.org/schema/mule/test-policy/current/mule-test-policy.xsd
       http://www.mulesoft.org/schema/mule/with-internal-dependency http://www.mulesoft.org/schema/mule/with-internal-dependency/current/mule-with-internal-dependency.xsd">
 
-<!--    <with-internal-dependency:config name="default" isInternalDependencyInjectedIntoFunctions="true"/>-->
-
     <test-policy:proxy name="with-internal-dependency-extension">
         <test-policy:operation>
                 <test-policy:execute-next/>
                 <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
-            <with-internal-dependency:check-dependency/>
-<!--                <with-internal-dependency:check-dependency config-ref="default"/>-->
-<!--                <with-internal-dependency:check-dependency isInternalDependencyInjectedIntoFunctions="true"/>-->
+                <with-internal-dependency:injection-check/>
         </test-policy:operation>
     </test-policy:proxy>
 </mule>

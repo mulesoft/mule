@@ -23,6 +23,6 @@ public class StatefulOperationConfigOverrideTestCase extends AbstractExtensionFu
   @Test
   public void statefulOverride() throws Exception {
     String response = flowRunner("statefulOverride").run().getMessage().getPayload().getValue().toString();
-    assertThat(response, equalTo("implicit-config-implicit 42"));
+    assertThat(response, equalTo(muleContext.getId().concat("-implicit-config-implicit 42")));
   }
 }

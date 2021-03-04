@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 
+import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.IsCollectionContaining;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -37,8 +38,9 @@ public class ImplicitConfigsAreCreatedOnceTestCase extends AbstractExtensionFunc
 
     assertThat(configs, hasSize(5));
     List<String> names = configs.stream().map(ConfigurationProvider::getName).collect(toList());
-    assertThat(names, hasItems("implicitExclusive-bleconf-implicit",
-                               "implicitExclusive-blaconf-implicit",
+    String muleContextId = muleContext.getId();
+    assertThat(names, hasItems(muleContextId.concat("-implicitExclusive-bleconf-implicit"),
+                               muleContextId.concat("-implicitExclusive-blaconf-implicit"),
                                "blaexplicit",
                                "blaexplicit2",
                                "bleexplicit"));

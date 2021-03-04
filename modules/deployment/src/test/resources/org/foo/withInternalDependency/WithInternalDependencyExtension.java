@@ -26,17 +26,10 @@ import javax.inject.Inject;
 @Operations({WithInternalDependencyOperation.class})
 public class WithInternalDependencyExtension {
 
-//  @Parameter
-//  @Expression
-//  boolean isInternalDependencyInjectedIntoFunctions = false;
-
   @Inject
   private InternalRegistryBean registryBean;
 
   public void checkExtensionInjection() {
-//    if (!isInternalDependencyInjectedIntoFunctions) {
-//      throw new NullPointerException("registryBean is null (has not been injected into the extension expression functions)");
-//    }
     if (registryBean == null) {
       throw new NullPointerException("registryBean is null (has not been injected into the extension)");
     }

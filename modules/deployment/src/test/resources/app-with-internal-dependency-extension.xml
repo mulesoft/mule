@@ -5,8 +5,6 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
       http://www.mulesoft.org/schema/mule/with-internal-dependency http://www.mulesoft.org/schema/mule/with-internal-dependency/current/mule-with-internal-dependency.xsd">
 
-<!--    <with-internal-dependency:config name="default" isInternalDependencyInjectedIntoFunctions="#[isInternalDependencyInjectedIntoFunctions()]" />-->
-
     <flow name="main">
         <scheduler>
             <scheduling-strategy>
@@ -14,8 +12,6 @@
             </scheduling-strategy>
         </scheduler>
         <set-payload value=""/>
-        <with-internal-dependency:check-dependency/>
-<!--        <with-internal-dependency:check-dependency config-ref="default"/>-->
-<!--            <with-internal-dependency:check-dependency isInternalDependencyInjectedIntoFunctions="#[isInternalDependencyInjectedIntoFunctions()]"/>-->
+        <with-internal-dependency:injection-check/>
     </flow>
 </mule>

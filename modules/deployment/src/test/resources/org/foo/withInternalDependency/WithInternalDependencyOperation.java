@@ -17,23 +17,16 @@ import javax.inject.Inject;
 
 public class WithInternalDependencyOperation {
 
-//  @Parameter
-//  @Expression
-//  boolean isInternalDependencyInjectedIntoFunctions = false;
-
   @Inject
   private InternalRegistryBean registryBean;
 
   @MediaType(value = TEXT_PLAIN, strict = false)
-  public String checkDependency(@Config WithInternalDependencyExtension config) throws Exception {
-//    if (!isInternalDependencyInjectedIntoFunctions) {
-//      throw new NullPointerException("registryBean is null (has not been injected into the extension expression functions)");
-//    }
+  public String injectionCheck(@Config WithInternalDependencyExtension config) throws Exception {
     config.checkExtensionInjection();
     if (registryBean == null) {
       throw new NullPointerException("registryBean is null (has not been injected into the extension operations)");
     }
-    return "registryBean has been injected into the extension, its operations and it's functions";
+    return "registryBean has been injected into the extension, its operations and it's EL functions";
   }
 
 }
