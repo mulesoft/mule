@@ -59,27 +59,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.inject.Inject;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -96,7 +78,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -163,6 +144,26 @@ import org.mule.runtime.module.extension.internal.runtime.result.VoidReturnDeleg
 import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import javax.inject.Inject;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -734,8 +735,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
 
     sdkInternalContext.setConfiguration(location, eventId, resolveConfiguration(event));
-    final Map<String, Object> resolutionResult =
-        getResolutionResult(event, sdkInternalContext.getConfiguration(location, eventId));
+
+    final Map<String, Object> resolutionResult;
+    if (shouldUsePrecalculatedContext(event)) {
+      resolutionResult = getPrecalculatedContext(event).getParameters();
+    } else {
+      resolutionResult = getResolutionResult(event, sdkInternalContext.getConfiguration(location, eventId));
+    }
+
     sdkInternalContext.setResolutionResult(location, eventId, resolutionResult);
     sdkInternalContext.setPolicyToApply(location, eventId, location != null
         ? policyManager.createOperationPolicy(this, event, () -> resolutionResult)
