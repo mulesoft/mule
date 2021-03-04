@@ -27,7 +27,7 @@ public interface ArtifactFactory<T extends Artifact> {
   /**
    * Creates an Artifact
    *
-   * @param artifactDir directory where the artifact is located
+   * @param artifactDir          directory where the artifact is located
    * @param deploymentProperties deployment properties for configuration management
    * @return the newly created Artifact
    */

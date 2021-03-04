@@ -28,9 +28,9 @@ public abstract class AbstractAnnotatedDeclarationEnricher implements Declaratio
    * <p/>
    * This method works in conjunction with {@link #extractImplementingTypeProperty(BaseDeclaration)}
    *
-   * @param declaration a {@link BaseDeclaration} to be enriched
+   * @param declaration    a {@link BaseDeclaration} to be enriched
    * @param annotationType the type of the annotation you want
-   * @param <A> the annotation's generic type
+   * @param <A>            the annotation's generic type
    * @return an {@link Annotation} or {@code null} if the annotation is not present or the {@code declaration} doesn't have a
    *         backing annotated type
    */

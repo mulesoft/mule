@@ -30,8 +30,8 @@ public class CreateBeanDefinitionRequest {
   private final Supplier<ObjectTypeVisitor> typeVisitorRetriever;
 
   /**
-   * @param parentComponentModel the container element of the holder for the configuration attributes defined by the user
-   * @param componentModel the holder for the configuration attributes defined by the user
+   * @param parentComponentModel        the container element of the holder for the configuration attributes defined by the user
+   * @param componentModel              the holder for the configuration attributes defined by the user
    * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
    */
   public CreateBeanDefinitionRequest(List<ComponentAst> componentModelHierarchy,

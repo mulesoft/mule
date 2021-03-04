@@ -25,10 +25,10 @@ final class FilteredCompositeErrorTypeRepository implements ErrorTypeRepository 
   /**
    * Creates a new {@link FilteredCompositeErrorTypeRepository} instance
    *
-   * @param childErrorTypeRepository {@link ErrorTypeRepository} considered as the main one
+   * @param childErrorTypeRepository  {@link ErrorTypeRepository} considered as the main one
    * @param parentErrorTypeRepository {@link ErrorTypeRepository} considered as the secondary one, is a request can't be handled
-   *        by the main {@link ErrorTypeRepository}, this one will be used
-   * @param namespaceFromParent only errors with this namespace will be seen form the {@code parentErrorTypeRepository}
+   *                                  by the main {@link ErrorTypeRepository}, this one will be used
+   * @param namespaceFromParent       only errors with this namespace will be seen form the {@code parentErrorTypeRepository}
    */
   public FilteredCompositeErrorTypeRepository(ErrorTypeRepository childErrorTypeRepository,
                                               ErrorTypeRepository parentErrorTypeRepository,

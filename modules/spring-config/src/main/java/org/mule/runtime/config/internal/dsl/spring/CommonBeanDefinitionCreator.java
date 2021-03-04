@@ -149,7 +149,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
    * Populates the passed beanAnnotations with the other passed parameters.
    *
    * @param beanAnnotations the map with annotations to populate
-   * @param metadata the parser metadata for the object being created
+   * @param metadata        the parser metadata for the object being created
    */
   public static void addMetadataAnnotationsFromDocAttributes(Map<QName, Object> beanAnnotations,
                                                              ComponentMetadataAst metadata) {

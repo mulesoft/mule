@@ -31,7 +31,7 @@ public class ArtifactExtensionManagerConfigurationBuilder extends AbstractConfig
   /**
    * Creates an instance of the configuration builder.
    *
-   * @param artifactPlugins {@link List} of {@link ArtifactPlugin ArtifactPlugins} to be registered.
+   * @param artifactPlugins         {@link List} of {@link ArtifactPlugin ArtifactPlugins} to be registered.
    * @param extensionManagerFactory creates the extension manager for this artifact. Non null.
    */
   public ArtifactExtensionManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins,

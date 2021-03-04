@@ -48,7 +48,7 @@ public class CursorManager {
    * Becomes aware of the given {@code provider} and returns a replacement provider which is managed by the runtime, allowing for
    * automatic resource handling
    *
-   * @param provider the provider to be tracked
+   * @param provider     the provider to be tracked
    * @param ownerContext the root context of the event that created the provider
    * @return a {@link CursorProvider}
    */

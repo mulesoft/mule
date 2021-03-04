@@ -39,8 +39,8 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
 
   /**
    * @param supportedArtifactType type of the artifact to support. This attributes defines which types of registry bootstrap
-   *        entries will be created depending on the entry applyToArtifactType parameter value.
-   * @param muleContext {@code MuleContext} in which the objects will be registered
+   *                              entries will be created depending on the entry applyToArtifactType parameter value.
+   * @param muleContext           {@code MuleContext} in which the objects will be registered
    */
   public SimpleRegistryBootstrap(ArtifactType supportedArtifactType, MuleContext muleContext) {
     super(supportedArtifactType, muleContext);

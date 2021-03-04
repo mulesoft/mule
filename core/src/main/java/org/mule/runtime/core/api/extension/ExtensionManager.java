@@ -66,7 +66,7 @@ public interface ExtensionManager {
    * updated for the returned {@link ConfigurationInstance}
    *
    * @param configurationProviderName the name of a previously registered {@link ConfigurationProvider}
-   * @param event the current Event
+   * @param event                     the current Event
    * @return a {@link ConfigurationInstance}
    */
   ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent event);
@@ -80,7 +80,7 @@ public interface ExtensionManager {
    *
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
    * @param componentModel the {@link ComponentModel} associated to a {@link ConfigurationInstance}
-   * @param muleEvent the current Event
+   * @param muleEvent      the current Event
    * @return an {@link Optional} for a {@link ConfigurationInstance}
    * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
    */
@@ -107,7 +107,7 @@ public interface ExtensionManager {
    *
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
    * @param componentModel the {@link ComponentModel} associated to a {@link ConfigurationInstance}
-   * @param muleEvent the current Event
+   * @param muleEvent      the current Event
    * @return an {@link Optional} for a {@link ConfigurationProvider}
    * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
    * @since 4.3.0
@@ -148,7 +148,7 @@ public interface ExtensionManager {
   /**
    * Performs actions related to the disposal of the configuration in the extension manager
    *
-   * @param key the key for the configuration to be disposed
+   * @param key           the key for the configuration to be disposed
    * @param configuration the configuration to be disposed.
    */
   default void disposeConfiguration(String key, ConfigurationInstance configuration) {}

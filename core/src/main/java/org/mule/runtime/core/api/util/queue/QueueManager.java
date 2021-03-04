@@ -39,7 +39,7 @@ public interface QueueManager extends Startable, Stoppable {
    * Specifies a {@link QueueConfiguration} for the queue which name matches queueName
    *
    * @param queueName the name of a {@link Queue}
-   * @param config an instance of {@link QueueConfiguration}
+   * @param config    an instance of {@link QueueConfiguration}
    */
   void setQueueConfiguration(String queueName, QueueConfiguration config);
 

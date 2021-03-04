@@ -34,8 +34,8 @@ class ManagedCursorIterator<T> implements CursorIterator<T> {
    * this cursor is still referenced but the provider is not.
    *
    * @param managedCursorIteratorProvider the managed provider that opened this cursor
-   * @param delegate the delegate cursor
-   * @param janitor the cursor's janitor object
+   * @param delegate                      the delegate cursor
+   * @param janitor                       the cursor's janitor object
    */
   ManagedCursorIterator(ManagedCursorIteratorProvider managedCursorIteratorProvider,
                         CursorIterator<T> delegate,

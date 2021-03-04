@@ -29,7 +29,7 @@ public class SpringLifecycleObjectSorter extends DefaultLifecycleObjectSorter {
    * Creates a new instance
    *
    * @param orderedLifecycleTypes an ordered array specifying a type based order
-   * @param registry a {@link SpringRegistry}
+   * @param registry              a {@link SpringRegistry}
    */
   public SpringLifecycleObjectSorter(Class<?>[] orderedLifecycleTypes, SpringRegistry registry) {
     super(orderedLifecycleTypes);

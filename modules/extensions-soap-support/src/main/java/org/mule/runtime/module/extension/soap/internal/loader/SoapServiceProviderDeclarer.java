@@ -52,8 +52,8 @@ public class SoapServiceProviderDeclarer {
   /**
    * Declares a new connection provider for a configuration given a {@link SoapServiceProviderWrapper} declaration.
    *
-   * @param configDeclarer the configuration declarer that will own the provider
-   * @param provider a {@link SoapServiceProviderWrapper} that describes the {@link SoapServiceProvider} Type.
+   * @param configDeclarer      the configuration declarer that will own the provider
+   * @param provider            a {@link SoapServiceProviderWrapper} that describes the {@link SoapServiceProvider} Type.
    * @param hasCustomTransports if declares custom transport or not.
    */
   public void declare(ConfigurationDeclarer configDeclarer, SoapServiceProviderWrapper provider, boolean hasCustomTransports) {

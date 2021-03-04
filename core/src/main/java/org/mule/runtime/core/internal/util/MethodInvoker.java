@@ -24,7 +24,7 @@ public interface MethodInvoker {
    *
    * @param object the target object
    * @param method the method to be invoked
-   * @param args the supplied arguments
+   * @param args   the supplied arguments
    * @return the return value
    * @throws Throwable if the method fails
    */

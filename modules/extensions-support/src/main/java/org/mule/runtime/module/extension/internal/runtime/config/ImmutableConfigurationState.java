@@ -24,7 +24,7 @@ public class ImmutableConfigurationState implements ConfigurationState {
   /**
    * Creates a new instance
    *
-   * @param configParameters the config parameters
+   * @param configParameters     the config parameters
    * @param connectionParameters the connection parameters
    */
   public ImmutableConfigurationState(Map<String, Object> configParameters, Map<String, Object> connectionParameters) {

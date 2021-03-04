@@ -39,7 +39,7 @@ public class StackableTypesValueResolverFactory {
    * Given a expression value, the expected type and the stack of {@link StackableType wrapper types}, iterates it and creates all
    * the required {@link ValueResolver} and stacks them is necessary.
    *
-   * @param expression Expression value for the expression based value resolver.
+   * @param expression   Expression value for the expression based value resolver.
    * @param expectedType The expected type of the expression resolution
    * @return The expression based {@link ValueResolver}
    */

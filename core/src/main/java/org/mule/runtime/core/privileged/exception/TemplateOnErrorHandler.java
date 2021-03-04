@@ -412,7 +412,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   /**
    * If it was not previously logged, logs a warning about a suppressed {@link ErrorType} match.
    * 
-   * @param eventErrorType Unsuppressed {@link ErrorType} (recommended match).
+   * @param eventErrorType      Unsuppressed {@link ErrorType} (recommended match).
    * @param suppressedErrorType Suppressed {@link ErrorType} that has been matched.
    */
   private void warnAboutSuppressedErrorTypeMatch(ErrorType eventErrorType, ErrorType suppressedErrorType) {

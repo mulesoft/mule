@@ -69,7 +69,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   /**
    * Adds a property into the plugin properties file.
    *
-   * @param propertyName name fo the property to add. Non empty
+   * @param propertyName  name fo the property to add. Non empty
    * @param propertyValue value of the property to add. Non null.
    * @return the same builder instance
    */
@@ -85,7 +85,8 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    * Adds a describer into the plugin describer file.
    *
    * @param mulePluginModel the describer to store under
-   *        {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR} file
+   *                        {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR}
+   *                        file
    * @return the same builder instance
    */
   public ArtifactPluginFileBuilder describedBy(MulePluginModel mulePluginModel) {
@@ -99,7 +100,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    * Adds a class file to the artifact classes folder.
    *
    * @param classFile class file to include. Non null.
-   * @param alias path where the file must be added inside the app file
+   * @param alias     path where the file must be added inside the app file
    * @return the same builder instance
    */
   @Override

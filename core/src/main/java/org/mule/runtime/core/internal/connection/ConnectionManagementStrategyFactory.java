@@ -33,7 +33,7 @@ final class ConnectionManagementStrategyFactory {
    * Creates a new instance
    *
    * @param defaultPoolingProfile the {@link PoolingProfile} that will be used to configure the pool of connections
-   * @param muleContext the owning {@link MuleContext}
+   * @param muleContext           the owning {@link MuleContext}
    */
   ConnectionManagementStrategyFactory(PoolingProfile defaultPoolingProfile, MuleContext muleContext) {
     this.defaultPoolingProfile = defaultPoolingProfile;
@@ -44,7 +44,7 @@ final class ConnectionManagementStrategyFactory {
    * Returns the management strategy that should be used for the given {@code connectionProvider}
    *
    * @param connectionProvider a {@link ConnectionProvider}
-   * @param <C> the generic type of the connections to be managed
+   * @param <C>                the generic type of the connections to be managed
    * @return a {@link ConnectionManagementStrategy}
    */
   public <C> ConnectionManagementStrategy<C> getStrategy(ConnectionProvider<C> connectionProvider) {

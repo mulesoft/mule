@@ -234,9 +234,10 @@ public class XaTransaction extends AbstractTransaction {
   }
 
   /**
-   * @param key Must be the provider of the resource object. i.e. for JDBC it's the XADataSource, for JMS is the
-   *        XAConnectionFactory. It can be a wrapper in which case should be a {@link XaResourceFactoryHolder} to be able to
-   *        determine correctly if there's already a resource for that {@link javax.transaction.xa.XAResource} provider.
+   * @param key      Must be the provider of the resource object. i.e. for JDBC it's the XADataSource, for JMS is the
+   *                 XAConnectionFactory. It can be a wrapper in which case should be a {@link XaResourceFactoryHolder} to be able
+   *                 to determine correctly if there's already a resource for that {@link javax.transaction.xa.XAResource}
+   *                 provider.
    * @param resource the resource object. It must be an {@link javax.transaction.xa.XAResource} or a {@link MuleXaObject}
    * @throws TransactionException
    */

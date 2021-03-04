@@ -128,9 +128,9 @@ public class RunnerConfiguration {
   /**
    * Reads the attribute from the klass annotated and does a flatMap with the list of values.
    *
-   * @param name attribute/method name of the annotation {@link ArtifactClassLoaderRunnerConfig} to be obtained
+   * @param name  attribute/method name of the annotation {@link ArtifactClassLoaderRunnerConfig} to be obtained
    * @param klass {@link Class} from where the annotated attribute will be read
-   * @param <E> generic type
+   * @param <E>   generic type
    * @return {@link List} of values
    */
   private static <E> List<E> readAttributeFromHierarchy(String name, Class<?> klass) {

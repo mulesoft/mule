@@ -129,7 +129,7 @@ public class ContainerClassLoaderFactory {
    * Creates the container lookup policy to be used by child class loaders.
    *
    * @param parentClassLoader classloader used as parent of the container's. Is the classLoader that will load Mule classes.
-   * @param muleModules list of modules that would be used to register in the filter based of the class loader.
+   * @param muleModules       list of modules that would be used to register in the filter based of the class loader.
    * @return a non null {@link ClassLoaderLookupPolicy} that contains the lookup policies for boot, system packages. plus exported
    *         packages by the given list of {@link MuleModule}.
    */
@@ -144,10 +144,10 @@ public class ContainerClassLoaderFactory {
   /**
    * Creates an {@link ArtifactClassLoader} that always resolves resources by delegating to the parentClassLoader.
    *
-   * @param parentClassLoader the parent {@link ClassLoader} for the container
-   * @param muleModules the list of {@link MuleModule}s to be used for defining the filter
+   * @param parentClassLoader     the parent {@link ClassLoader} for the container
+   * @param muleModules           the list of {@link MuleModule}s to be used for defining the filter
    * @param containerLookupPolicy the {@link ClassLoaderLookupPolicy} to be used by the container
-   * @param artifactDescriptor descriptor for the artifact owning the created class loader instance.
+   * @param artifactDescriptor    descriptor for the artifact owning the created class loader instance.
    * @return a {@link ArtifactClassLoader} to be used in a {@link FilteringContainerClassLoader}
    */
   protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader, List<MuleModule> muleModules,
@@ -162,7 +162,7 @@ public class ContainerClassLoaderFactory {
    * Creates a {@link Map<String, LookupStrategy>} for the packages exported on the container.
    *
    * @param containerClassLoader class loader containing container's classes. Non null.
-   * @param modules to be used for collecting the exported packages. Non null
+   * @param modules              to be used for collecting the exported packages. Non null
    * @return a {@link Map<String, LookupStrategy>} for the packages exported on the container
    */
   private Map<String, LookupStrategy> buildClassLoaderLookupStrategy(ClassLoader containerClassLoader,
@@ -207,10 +207,10 @@ public class ContainerClassLoaderFactory {
    * Creates a {@link FilteringArtifactClassLoader} to filter the {@link ArtifactClassLoader} containerClassLoader given based on
    * {@link List<MuleModule>} of muleModules.
    *
-   * @param parentClassLoader the parent {@link ClassLoader} for the container
-   * @param muleModules the list of {@link MuleModule}s to be used for defining the filter
+   * @param parentClassLoader    the parent {@link ClassLoader} for the container
+   * @param muleModules          the list of {@link MuleModule}s to be used for defining the filter
    * @param containerClassLoader the {@link ArtifactClassLoader} for the container that will be used to delegate by the
-   *        {@link FilteringContainerClassLoader}
+   *                             {@link FilteringContainerClassLoader}
    * @return a {@link FilteringContainerClassLoader} that would be the one used as the parent of plugins and applications
    *         {@link ArtifactClassLoader}
    */

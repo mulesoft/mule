@@ -47,7 +47,7 @@ public class ErrorsModelFactory {
   /**
    * Creates a new instance of the factory
    *
-   * @param errorTypesEnum an {@link ErrorTypeDefinition} implementation indicating all the errors from an extension
+   * @param errorTypesEnum     an {@link ErrorTypeDefinition} implementation indicating all the errors from an extension
    * @param extensionNamespace the namespace for the {@link ErrorModel} to be generated
    */
   public ErrorsModelFactory(ErrorTypeDefinition<?>[] errorTypesEnum, String extensionNamespace)

@@ -38,9 +38,9 @@ public interface ParsingDelegate<M extends MetadataType, T> {
    * <p>
    * This method should only be invoked if {@link #accepts(MetadataType)} returns {@code true} for the same {@code metadataType}
    *
-   * @param key the parsed entity key
+   * @param key          the parsed entity key
    * @param metadataType a {@link MetadataType}
-   * @param elementDsl the {@link DslElementSyntax} of the parsed element
+   * @param elementDsl   the {@link DslElementSyntax} of the parsed element
    * @return
    */
   T parse(String key, M metadataType, DslElementSyntax elementDsl);

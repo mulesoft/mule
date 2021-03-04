@@ -29,7 +29,7 @@ public class WebSocketClosedException extends WebSocketRuntimeException {
    * Creates a new instance
    *
    * @param webSocket the referred {@link WebSocket}
-   * @param cause the exception's cause
+   * @param cause     the exception's cause
    */
   public WebSocketClosedException(WebSocket webSocket, Throwable cause) {
     super("WebSocket " + webSocket.getId() + " has already been closed.", webSocket, cause);

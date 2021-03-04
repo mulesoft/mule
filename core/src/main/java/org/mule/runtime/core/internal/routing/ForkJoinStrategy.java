@@ -39,7 +39,7 @@ public interface ForkJoinStrategy {
   /**
    * Processes {@code n} routing pairs and aggregates the result as defined in the strategy implementation.
    *
-   * @param original the original event
+   * @param original     the original event
    * @param routingPairs the routing pairs to be processed
    * @return the aggregated result of processing the routing pairs
    */

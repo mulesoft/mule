@@ -31,7 +31,7 @@ public interface AnnotationValueFetcher<A extends Annotation> {
    * Returns a {@link List} of {@link E} values of an {@link Annotation} property
    * 
    * @param function A function which executes the logic of retrieving the property value.
-   * @param <E> The array type.
+   * @param <E>      The array type.
    * @return The list with the values
    */
   <E> List<E> getArrayValue(Function<A, E[]> function);
@@ -72,7 +72,7 @@ public interface AnnotationValueFetcher<A extends Annotation> {
    * Returns the {@link Enum} value of an annotation property
    *
    * @param function A function which executes the logic of retrieving the property value.
-   * @param <E> The {@link Enum} type
+   * @param <E>      The {@link Enum} type
    * @return The {@link Enum} value
    */
   <E extends Enum> E getEnumValue(Function<A, E> function);
@@ -81,7 +81,7 @@ public interface AnnotationValueFetcher<A extends Annotation> {
    * Returns a {@link AnnotationValueFetcher} from an {@link Annotation} inside the current {@link Annotation}
    * 
    * @param function A function which executes the logic of retrieving the property value.
-   * @param <E> The {@link Annotation} type
+   * @param <E>      The {@link Annotation} type
    * @return The {@link AnnotationValueFetcher} wrapping the inner annotation
    */
   <E extends Annotation> AnnotationValueFetcher<E> getInnerAnnotation(Function<A, E> function);
@@ -90,7 +90,7 @@ public interface AnnotationValueFetcher<A extends Annotation> {
    * Returns a list of {@link AnnotationValueFetcher} from an {@link Annotation} inside the current {@link Annotation}
    * 
    * @param function A function which executes the logic of retrieving the property value.
-   * @param <E> The {@link Annotation} type
+   * @param <E>      The {@link Annotation} type
    * @return The list {@link AnnotationValueFetcher} wrapping the inner annotations
    */
   <E extends Annotation> List<AnnotationValueFetcher<E>> getInnerAnnotations(Function<A, E[]> function);

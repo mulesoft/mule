@@ -31,9 +31,9 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * to be maintained post-evaluation via the use of a result {@link CoreEvent.Builder} which should be created from the original
    * event before being passed and then used to construct the post-evaluation event.
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
-   * @param eventBuilder event builder instance used to mutate the current message or event.
+   * @param expression        the expression to be executed
+   * @param event             the current event being processed
+   * @param eventBuilder      event builder instance used to mutate the current message or event.
    * @param componentLocation the location of the component where the event is being processed
    * @return the result of execution of the expression.
    * @deprecated Mutation via expressions is deprecated.
@@ -51,13 +51,13 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * {@link InternalMessage} mutation performed within the expression will impact within the context of expression evaluation but
    * will not mutated the {@code event} parameter.
    *
-   * @param expression one or more expressions embedded in a literal string i.e. "Value is #[mel:xpath://foo] other value is
-   *        #[mel:header:foo]."
-   * @param event The current event being processed
+   * @param expression        one or more expressions embedded in a literal string i.e. "Value is #[mel:xpath://foo] other value
+   *                          is #[mel:header:foo]."
+   * @param event             The current event being processed
    * @param componentLocation the location of the component where the event is being processed
    * @return the result of the evaluation
    * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and 'failIfNull is set
-   *         to true.
+   *                                    to true.
    * @deprecated Parsing of expressions is deprecated. Use standard evaluation instead.
    */
   @Deprecated

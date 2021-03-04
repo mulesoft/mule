@@ -72,7 +72,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * {@link OutputTypeResolver}, if one is available to resolve the output {@link MetadataType}.
    *
    * @param context current {@link MetadataContext} that will be used by the {@link InputTypeResolver}
-   * @param key {@link MetadataKey} of the type which's structure has to be resolved
+   * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return Success with an {@link OutputMetadataDescriptor} representing the Component's output metadata, resolved using the
    *         {@link OutputTypeResolver} if one is available to resolve its {@link MetadataType}. Failure if the dynamic resolution
    *         fails for any reason.
@@ -123,7 +123,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * output using the {@link OutputTypeResolver} associated to the current component.
    *
    * @param context {@link MetadataContext} of the Metadata resolution
-   * @param key {@link MetadataKey} of the type which's structure has to be resolved
+   * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return a {@link MetadataResult} with the {@link MetadataType} of the component's output
    */
   private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final Object key) {
@@ -156,7 +156,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * output {@link Message#getAttributes()} using the {@link OutputTypeResolver} associated to the current component.
    *
    * @param context {@link MetadataContext} of the Metadata resolution
-   * @param key {@link MetadataKey} of the type which's structure has to be resolved
+   * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return a {@link MetadataResult} with the {@link MetadataType} of the components output {@link Message#getAttributes()}
    */
   private MetadataResult<MetadataType> getOutputAttributesMetadata(final MetadataContext context, Object key) {

@@ -31,7 +31,7 @@ public class ToolingApplicationDescriptorFactory extends ApplicationDescriptorFa
    * Creates an instance of the factory.
    *
    * @param artifactPluginDescriptorLoader {@link ArtifactPluginDescriptorLoader} to load the descriptor for plugins.
-   * @param descriptorLoaderRepository {@link DescriptorLoaderRepository} to get the descriptor loader implementation.
+   * @param descriptorLoaderRepository     {@link DescriptorLoaderRepository} to get the descriptor loader implementation.
    */
   public ToolingApplicationDescriptorFactory(
                                              ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,

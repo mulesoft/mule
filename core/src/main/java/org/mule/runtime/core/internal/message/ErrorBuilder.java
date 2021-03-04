@@ -98,7 +98,7 @@ public final class ErrorBuilder {
    * account possible suppressions.
    * 
    * @param muleException (must be the result of a
-   *        {@link org.mule.runtime.api.exception.ExceptionHelper#getRootMuleException(Throwable)} call.
+   *                      {@link org.mule.runtime.api.exception.ExceptionHelper#getRootMuleException(Throwable)} call.
    */
   private void updateErrorDescription(MuleException muleException) {
     MuleException muleRoot = muleException;

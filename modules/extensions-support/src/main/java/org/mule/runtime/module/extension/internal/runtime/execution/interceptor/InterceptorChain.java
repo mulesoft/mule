@@ -70,7 +70,7 @@ public interface InterceptorChain {
    * {@link ExecutorCallback#complete(Object)} will never be invoked here.
    *
    * @param executionContext the {@link ExecutionContext}
-   * @param callback nullable callback in which errors are to be notified
+   * @param callback         nullable callback in which errors are to be notified
    * @return {@code null} if all interceptors executed successfully or a {@link Throwable} if one of them fails
    */
   Throwable before(ExecutionContext executionContext, ExecutorCallback callback);
@@ -82,7 +82,7 @@ public interface InterceptorChain {
    * fail
    *
    * @param executionContext the {@link ExecutionContext}
-   * @param result the operation's result
+   * @param result           the operation's result
    */
   void onSuccess(ExecutionContext executionContext, Object result);
 
@@ -99,7 +99,7 @@ public interface InterceptorChain {
    * This method returns the {@link Throwable} returned by the last interceptor.
    *
    * @param executionContext the {@link ExecutionContext}
-   * @param t the exception found
+   * @param t                the exception found
    * @return the {@link Throwable} that this chain's consumer should handle.
    */
   Throwable onError(ExecutionContext executionContext, Throwable t);

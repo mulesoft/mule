@@ -47,7 +47,7 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
    * Creates a composed extension manager
    *
    * @param parentExtensionManager extension manager for the parent artifact. Non null
-   * @param childExtensionManager extension manager for the child artifact. Non null
+   * @param childExtensionManager  extension manager for the child artifact. Non null
    */
   public CompositeArtifactExtensionManager(ExtensionManager parentExtensionManager,
                                            ExtensionManager childExtensionManager) {

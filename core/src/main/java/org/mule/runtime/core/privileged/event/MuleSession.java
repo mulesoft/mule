@@ -27,7 +27,7 @@ public interface MuleSession extends Serializable {
   /**
    * Will set a session scope property.
    * 
-   * @param key the key for the object data being stored on the session
+   * @param key   the key for the object data being stored on the session
    * @param value the value of the session data
    */
   void setProperty(String key, Serializable value);
@@ -35,8 +35,8 @@ public interface MuleSession extends Serializable {
   /**
    * Will set a session scope property.
    *
-   * @param key the key for the object data being stored on the session
-   * @param value the value of the session data
+   * @param key      the key for the object data being stored on the session
+   * @param value    the value of the session data
    * @param dataType the data type for the property value
    */
   void setProperty(String key, Serializable value, DataType dataType);

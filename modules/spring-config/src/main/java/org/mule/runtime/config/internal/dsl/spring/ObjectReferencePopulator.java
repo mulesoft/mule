@@ -55,7 +55,7 @@ class ObjectReferencePopulator {
 
 
   /**
-   * @param type the type of the object to be popoulated with
+   * @param type           the type of the object to be popoulated with
    * @param typeIdConsumer a {@code Consumer} that will be provided with the identifier of the object to populate
    */
   public void populate(Class<?> type, Consumer<String> typeIdConsumer) {

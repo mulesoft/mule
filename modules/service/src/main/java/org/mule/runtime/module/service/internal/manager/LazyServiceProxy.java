@@ -62,7 +62,7 @@ public class LazyServiceProxy implements InvocationHandler {
   /**
    * Creates a new proxy based on the given {@code assembly} and {@code serviceRegistry}
    *
-   * @param assembly the {@link ServiceAssembly}
+   * @param assembly        the {@link ServiceAssembly}
    * @param serviceRegistry the {@link ServiceRegistry}
    * @return a new {@link Service} proxy
    */

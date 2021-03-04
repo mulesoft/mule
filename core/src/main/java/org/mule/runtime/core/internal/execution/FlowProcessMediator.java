@@ -304,7 +304,7 @@ public class FlowProcessMediator implements Initialisable {
    * logic.
    *
    * @param template the processing template being used
-   * @param event the event that caused the backpressure signal to be fired
+   * @param event    the event that caused the backpressure signal to be fired
    * @return an exception mapper that notifies the {@link FlowConstruct} response listener of the backpressure signal
    */
   protected Either<SourcePolicyFailureResult, SourcePolicySuccessResult> mapBackPressureExceptionToPolicyFailureResult(
@@ -575,10 +575,10 @@ public class FlowProcessMediator implements Initialisable {
   /**
    * This method will not throw any {@link Exception}.
    *
-   * @param ctx the {@link DefaultFlowProcessMediatorContext}
+   * @param ctx    the {@link DefaultFlowProcessMediatorContext}
    * @param result the outcome of trying to send the response of the source through the source. In the case of error, only
-   *        {@link MessagingException} or {@link SourceErrorException} are valid values on the {@code left} side of this
-   *        parameter.
+   *               {@link MessagingException} or {@link SourceErrorException} are valid values on the {@code left} side of this
+   *               parameter.
    */
   private void onTerminate(Pipeline flowConstruct, DefaultFlowProcessMediatorContext ctx, Either<Throwable, CoreEvent> result) {
     safely(result.mapLeft(throwable -> {

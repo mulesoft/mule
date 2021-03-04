@@ -38,9 +38,9 @@ public interface ConnectionManager {
    * If a binding already exists for the {@code config} then this one replaces the previous one. All connections produced by the
    * previous binding are closed.
    *
-   * @param config the config that acts as the binding key
+   * @param config             the config that acts as the binding key
    * @param connectionProvider the {@link ConnectionProvider} that produces the connections
-   * @param <C> the generic type of the connections to be produced
+   * @param <C>                the generic type of the connections to be produced
    */
   <C> void bind(Object config, ConnectionProvider<C> connectionProvider);
 
@@ -75,7 +75,7 @@ public interface ConnectionManager {
    * {@link ConnectionHandler#release()} method on it.
    *
    * @param config a config for which a binding has been established through {@link #bind(Object, ConnectionProvider)}
-   * @param <C> the generic type of the returned connection
+   * @param <C>    the generic type of the returned connection
    * @return a {@link ConnectionHandler} wrapping the produced connection
    * @throws ConnectionException if the connection could not be established or if no such binding exists for the {@code config}
    */
@@ -88,7 +88,7 @@ public interface ConnectionManager {
    * been registered through the {@link #bind(Object, ConnectionProvider)} method.
    *
    * @param connectionProvider a {@link ConnectionProvider}
-   * @param <C> the generic type of the connections produced by the {@code connectionProvider}
+   * @param <C>                the generic type of the connections produced by the {@code connectionProvider}
    * @return a {@link ConnectionValidationResult}
    */
   <C> ConnectionValidationResult testConnectivity(ConnectionProvider<C> connectionProvider);
@@ -99,9 +99,9 @@ public interface ConnectionManager {
    * The {@code connection} has to have been obtained through the given {@code connectionHandler}, and the handler has to have
    * been obtained through {@code this} instance
    *
-   * @param connection the connection to validate
+   * @param connection        the connection to validate
    * @param connectionHandler the connection's handler
-   * @param <C> the generic type of the validated connection
+   * @param <C>               the generic type of the validated connection
    * @return a {@link ConnectionValidationResult}
    * @throws IllegalArgumentException if any of the preconditions are not met
    */

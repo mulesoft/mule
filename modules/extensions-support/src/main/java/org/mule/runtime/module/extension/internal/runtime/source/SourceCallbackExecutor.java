@@ -24,10 +24,10 @@ interface SourceCallbackExecutor {
   /**
    * Executes the callback
    *
-   * @param event the result {@link CoreEvent}
+   * @param event      the result {@link CoreEvent}
    * @param parameters the callback's parameters
-   * @param context a {@link SourceCallbackContext} @return the callback's result
-   * @param callback the callback on which the result is to be signaled
+   * @param context    a {@link SourceCallbackContext} @return the callback's result
+   * @param callback   the callback on which the result is to be signaled
    */
   void execute(CoreEvent event,
                Map<String, Object> parameters,

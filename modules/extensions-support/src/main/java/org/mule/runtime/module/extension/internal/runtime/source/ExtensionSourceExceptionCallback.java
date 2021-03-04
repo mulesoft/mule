@@ -31,8 +31,8 @@ class ExtensionSourceExceptionCallback implements ExceptionCallback {
   /**
    * Creates a new instance
    *
-   * @param completionCallback the callback used to send the failure response
-   * @param event the related {@link CoreEvent}
+   * @param completionCallback    the callback used to send the failure response
+   * @param event                 the related {@link CoreEvent}
    * @param errorResponseCallback a {@link Consumer} which acts as a callback for the {@link CoreEvent} which results
    * @param messageProcessContext
    */

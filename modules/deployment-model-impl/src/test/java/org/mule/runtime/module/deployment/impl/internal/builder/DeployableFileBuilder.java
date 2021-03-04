@@ -94,7 +94,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
   /**
    * Adds a property into the application deployment properties file.
    *
-   * @param propertyName name of the property to add. Non empty
+   * @param propertyName  name of the property to add. Non empty
    * @param propertyValue value of the property to add. Non null.
    * @return the same builder instance
    */

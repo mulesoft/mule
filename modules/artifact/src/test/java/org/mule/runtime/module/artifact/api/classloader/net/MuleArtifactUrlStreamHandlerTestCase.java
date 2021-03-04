@@ -148,7 +148,7 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
    * into the desired {@code compressedFile} location.
    *
    * @param folderToCompress directory to compress
-   * @param compressedFile expected file to be write while compressing the folder
+   * @param compressedFile   expected file to be write while compressing the folder
    * @throws IOException if there was an error writing the ZIP
    */
   private void compressFolder(final Path folderToCompress, final File compressedFile) throws IOException {

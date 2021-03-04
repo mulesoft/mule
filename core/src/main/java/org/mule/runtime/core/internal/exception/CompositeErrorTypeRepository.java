@@ -31,9 +31,9 @@ public final class CompositeErrorTypeRepository implements ErrorTypeRepository {
   /**
    * Creates a new {@link CompositeErrorTypeRepository} instance
    *
-   * @param childErrorTypeRepository {@link ErrorTypeRepository} considered as the main one
+   * @param childErrorTypeRepository  {@link ErrorTypeRepository} considered as the main one
    * @param parentErrorTypeRepository {@link ErrorTypeRepository} considered as the secondary one, is a request can't be handled
-   *        by the main {@link ErrorTypeRepository}, this one will be used
+   *                                  by the main {@link ErrorTypeRepository}, this one will be used
    */
   public CompositeErrorTypeRepository(ErrorTypeRepository childErrorTypeRepository,
                                       ErrorTypeRepository parentErrorTypeRepository) {

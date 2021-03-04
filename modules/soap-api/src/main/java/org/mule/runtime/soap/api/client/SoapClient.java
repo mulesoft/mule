@@ -23,7 +23,7 @@ public interface SoapClient extends Startable, Stoppable {
   /**
    * Sends a {@link SoapRequest} blocking the current thread until a response is available or the request times out.
    *
-   * @param request a {@link SoapRequest} instance.
+   * @param request    a {@link SoapRequest} instance.
    * @param dispatcher a {@link MessageDispatcher} that will be used to dispatch the {@link SoapRequest}
    * @return a {@link SoapResponse} instance with the XML content and Headers if any.
    */

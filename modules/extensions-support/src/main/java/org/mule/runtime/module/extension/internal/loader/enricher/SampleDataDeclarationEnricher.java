@@ -122,7 +122,7 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
    * {@link SampleDataProviderFactoryModelPropertyBuilder} that the correspondent {@link SampleDataProvider} will require a
    * connection.
    *
-   * @param modelPropertyBuilder the model property builder
+   * @param modelPropertyBuilder     the model property builder
    * @param parameterizableComponent component to introspect
    */
   private Optional<Field> enrichWithConnection(SampleDataProviderFactoryModelPropertyBuilder modelPropertyBuilder,
@@ -143,7 +143,7 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
    * {@link SampleDataProviderFactoryModelPropertyBuilder} that the correspondent {@link SampleDataProvider} will require a
    * config.
    *
-   * @param modelPropertyBuilder the property builder
+   * @param modelPropertyBuilder     the property builder
    * @param parameterizableComponent component to introspect
    */
   private Optional<Field> enrichWithConfiguration(SampleDataProviderFactoryModelPropertyBuilder modelPropertyBuilder,

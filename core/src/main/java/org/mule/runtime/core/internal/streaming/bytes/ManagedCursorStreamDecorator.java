@@ -34,8 +34,8 @@ class ManagedCursorStreamDecorator extends CursorStream {
    * this cursor is still referenced but the provider is not.
    *
    * @param managedCursorProvider the managed provider that opened this cursor
-   * @param delegate the delegate cursor
-   * @param janitor the cursor's janitor object
+   * @param delegate              the delegate cursor
+   * @param janitor               the cursor's janitor object
    */
   ManagedCursorStreamDecorator(ManagedCursorStreamProvider managedCursorProvider,
                                CursorStream delegate,

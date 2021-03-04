@@ -33,9 +33,9 @@ public class TransformingIterator<T> implements Iterator<T> {
   /**
    * Creates a new instance
    *
-   * @param delegate the decorated iterator
+   * @param delegate    the decorated iterator
    * @param transformer the transformer function
-   * @param <T> the generic type of the transformed items
+   * @param <T>         the generic type of the transformed items
    * @return a new {@link TransformingIterator}
    */
   public static <T> TransformingIterator<T> from(Iterator<?> delegate, Function<Object, T> transformer) {

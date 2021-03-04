@@ -39,7 +39,7 @@ public final class IllegalCompiledExpression implements CompiledExpression {
   /**
    * Creates a new instance
    *
-   * @param expression the expressions that couldn't be compiled
+   * @param expression           the expressions that couldn't be compiled
    * @param compilationException the actual compilation exception
    */
   public IllegalCompiledExpression(String expression, ExpressionCompilationException compilationException) {

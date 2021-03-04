@@ -55,7 +55,7 @@ public class ToolingApplicationClassLoaderBuilder
    * {@code artifactClassLoaderBuilder} is used for building the common parts of artifacts.
    *
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
-   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the application's region. Non null
+   * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the application's region. Non null
    */
   public ToolingApplicationClassLoaderBuilder(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
                                               RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
@@ -97,8 +97,8 @@ public class ToolingApplicationClassLoaderBuilder
 
   /**
    * @param parentClassLoader parent class loader for the artifact class loader that should have all the {@link URL}s needed from
-   *        tooling side when loading the {@link ExtensionModel}. Among those, there will be mule-api, extensions-api,
-   *        extensions-support and so on.
+   *                          tooling side when loading the {@link ExtensionModel}. Among those, there will be mule-api,
+   *                          extensions-api, extensions-support and so on.
    * @return the builder
    */
   public ToolingApplicationClassLoaderBuilder setParentClassLoader(ArtifactClassLoader parentClassLoader) {
@@ -108,7 +108,7 @@ public class ToolingApplicationClassLoaderBuilder
 
   /**
    * @param domainArtifactClassLoader domain parent class loader for the artifact class loader. It will check for plugins to
-   *        define the parent lookup policy if a domain parent artifact class loader has been set.
+   *                                  define the parent lookup policy if a domain parent artifact class loader has been set.
    * @return the builder
    */
   public ToolingApplicationClassLoaderBuilder setDomainParentClassLoader(ArtifactClassLoader domainArtifactClassLoader) {

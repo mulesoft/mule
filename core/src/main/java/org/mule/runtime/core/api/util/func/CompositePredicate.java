@@ -28,7 +28,7 @@ public final class CompositePredicate<T> implements Predicate<T> {
    * the returned instance will return {@code true} for any value
    *
    * @param predicates the predicates to aggregate
-   * @param <T> the generic type of the predicate
+   * @param <T>        the generic type of the predicate
    * @return a new {@link CompositePredicate}
    */
   public static <T> CompositePredicate<T> of(Predicate<T>... predicates) {

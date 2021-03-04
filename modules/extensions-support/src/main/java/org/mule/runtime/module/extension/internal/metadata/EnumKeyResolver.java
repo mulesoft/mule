@@ -32,7 +32,7 @@ public final class EnumKeyResolver implements TypeKeysResolver {
   private final String categoryName;
 
   /**
-   * @param anEnum An {@link Enum} represented by a {@link EnumAnnotation} of a {@link MetadataType}
+   * @param anEnum       An {@link Enum} represented by a {@link EnumAnnotation} of a {@link MetadataType}
    * @param categoryName Category name of the current {@link TypeKeysResolver}
    */
   EnumKeyResolver(EnumAnnotation anEnum, String categoryName) {

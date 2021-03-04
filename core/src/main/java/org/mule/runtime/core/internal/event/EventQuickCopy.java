@@ -37,7 +37,7 @@ public final class EventQuickCopy {
    * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link CoreEvent}
    * needs a new context.
    *
-   * @param event existing event to use as a template to create builder instance
+   * @param event   existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
    * @return new {@link CoreEvent} instance.
    */
@@ -59,7 +59,7 @@ public final class EventQuickCopy {
    * method should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same
    * {@link PrivilegedEvent} needs a new context.
    *
-   * @param event existing event to use as a template to create builder instance
+   * @param event   existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
    * @return new {@link PrivilegedEvent} instance.
    */

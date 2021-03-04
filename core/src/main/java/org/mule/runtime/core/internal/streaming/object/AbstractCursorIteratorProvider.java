@@ -35,7 +35,7 @@ public abstract class AbstractCursorIteratorProvider implements CursorIteratorPr
   /**
    * Creates a new instance
    *
-   * @param stream the original stream to be decorated
+   * @param stream              the original stream to be decorated
    * @param originatingLocation indicates where the provider was created
    */
   public AbstractCursorIteratorProvider(Iterator<?> stream, ComponentLocation originatingLocation,

@@ -43,7 +43,7 @@ public final class DefaultArtifactClassLoaderFilter implements ArtifactClassLoad
    * Creates a new classLoader filter
    *
    * @param exportedClassPackages class package names to export. Can be empty
-   * @param exportedResources resource file names to export. Can be empty
+   * @param exportedResources     resource file names to export. Can be empty
    */
   public DefaultArtifactClassLoaderFilter(Set<String> exportedClassPackages, Set<String> exportedResources) {
     checkArgument(exportedClassPackages != null, "Exported class packages cannot be null");

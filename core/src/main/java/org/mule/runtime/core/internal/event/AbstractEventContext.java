@@ -84,9 +84,9 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   /**
    *
-   * @param exceptionHandler exception handler to to handle errors before propagation of errors to response listeners.
+   * @param exceptionHandler   exception handler to to handle errors before propagation of errors to response listeners.
    * @param externalCompletion optional future that allows an external entity (e.g. a source) to signal completion of response
-   *        processing and delay termination.
+   *                           processing and delay termination.
    */
   public AbstractEventContext(FlowExceptionHandler exceptionHandler, int depthLevel,
                               Optional<CompletableFuture<Void>> externalCompletion) {

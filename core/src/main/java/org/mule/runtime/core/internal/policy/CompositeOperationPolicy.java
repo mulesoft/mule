@@ -82,13 +82,13 @@ public class CompositeOperationPolicy
    * won't be able to change the response parameters of the source and the original response parameters generated from the source
    * will be used.
    *
-   * @param operation the operation on which the policies will be applied
-   * @param parameterizedPolicies list of {@link Policy} to chain together.
+   * @param operation                            the operation on which the policies will be applied
+   * @param parameterizedPolicies                list of {@link Policy} to chain together.
    * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
-   * @param operationPolicyProcessorFactory factory for creating each {@link OperationPolicy} from a {@link Policy}.
-   * @param completionCallbackScheduler the executor where the completion of the policy flux will happen.
-   * @param shutdownTimeout how long to wait for pending items to finish processing before actually completing the flux for the
-   *        policy.
+   * @param operationPolicyProcessorFactory      factory for creating each {@link OperationPolicy} from a {@link Policy}.
+   * @param completionCallbackScheduler          the executor where the completion of the policy flux will happen.
+   * @param shutdownTimeout                      how long to wait for pending items to finish processing before actually
+   *                                             completing the flux for the policy.
    */
   public CompositeOperationPolicy(Component operation, List<Policy> parameterizedPolicies,
                                   Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
@@ -228,9 +228,9 @@ public class CompositeOperationPolicy
    * Always uses the stored result of {@code processNextOperation} so all the chains after the operation execution are executed
    * with the actual operation result and not a modified version from another policy.
    *
-   * @param policy the policy to execute.
+   * @param policy        the policy to execute.
    * @param nextProcessor the processor to execute when the policy next-processor gets executed
-   * @param eventPub the event to use to execute the policy chain.
+   * @param eventPub      the event to use to execute the policy chain.
    */
   @Override
   protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {

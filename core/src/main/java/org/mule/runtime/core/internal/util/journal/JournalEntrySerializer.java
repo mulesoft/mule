@@ -22,7 +22,7 @@ public interface JournalEntrySerializer<T, K extends JournalEntry<T>> {
   K deserialize(DataInputStream inputStream) throws IOException;
 
   /**
-   * @param journalEntry journal entry to serialize
+   * @param journalEntry     journal entry to serialize
    * @param dataOutputStream destination for the serialization
    */
   void serialize(K journalEntry, DataOutputStream dataOutputStream);

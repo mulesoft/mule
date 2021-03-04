@@ -41,10 +41,10 @@ public class TransactionBindingDelegate {
   }
 
   /**
-   * @param txKey the transaction key
+   * @param txKey                     the transaction key
    * @param connectionHandlerSupplier {@link Supplier} to get the {@link ConnectionHandler} of the current component
    * @return The {@link ConnectionHandler} that has be bound to the transaction.
-   * @throws ConnectionException if a problem occurred retrieving the {@link ConnectionHandler}
+   * @throws ConnectionException  if a problem occurred retrieving the {@link ConnectionHandler}
    * @throws TransactionException if the connection could not be bound to the current transaction
    */
   public <T extends TransactionalConnection> ConnectionHandler<T> getBoundResource(boolean lazyConnections,

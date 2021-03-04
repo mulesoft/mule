@@ -201,7 +201,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
    *
-   * @param type the {@link Class} being introspected
+   * @param type       the {@link Class} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    */
@@ -532,7 +532,7 @@ public final class IntrospectionUtils {
   /**
    * Returns an array of {@link MetadataType} representing each of the given {@link Method}'s argument types.
    *
-   * @param method a not {@code null} {@link Method}
+   * @param method     a not {@code null} {@link Method}
    * @param typeLoader a {@link ClassTypeLoader} to be used to create the returned {@link MetadataType}s
    * @return an array of {@link MetadataType} matching the method's arguments. If the method doesn't take any, then the array will
    *         be empty
@@ -557,7 +557,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} describing the given {@link Field}'s type
    *
-   * @param field a not {@code null} {@link Field}
+   * @param field      a not {@code null} {@link Field}
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType} matching the field's type
    * @throws IllegalArgumentException if field is {@code null}
@@ -593,12 +593,12 @@ public final class IntrospectionUtils {
   /**
    * Resolves and returns the field value of an object instance
    *
-   * @param object The object where grab the field value
-   * @param fieldName The name of the field to obtain the value
+   * @param object          The object where grab the field value
+   * @param fieldName       The name of the field to obtain the value
    * @param reflectionCache the cache for expensive reflection lookups
    * @return The value of the field with the given fieldName and object instance
    * @throws IllegalAccessException if is unavailable to access to the field
-   * @throws NoSuchFieldException if the field doesn't exist in the given object instance
+   * @throws NoSuchFieldException   if the field doesn't exist in the given object instance
    */
   public static Object getFieldValue(Object object, String fieldName, ReflectionCache reflectionCache)
       throws IllegalAccessException, NoSuchFieldException {
@@ -815,7 +815,7 @@ public final class IntrospectionUtils {
   /**
    * Determines if the given {@code type} is assignable from any of the {@code matchingTypes}
    *
-   * @param type a {@link Class}
+   * @param type          a {@link Class}
    * @param matchingTypes a collection of {@link Class classes} to test against
    * @return whether the type is assignable or not
    */
@@ -919,7 +919,7 @@ public final class IntrospectionUtils {
    *
    * @param declaringClass the type to introspect
    * @param annotationType the annotation you're looking for
-   * @param superClasses whether to consider supper classes or not
+   * @param superClasses   whether to consider supper classes or not
    * @return a {@link Collection} of {@link Method}s
    */
   public static Collection<Method> getMethodsAnnotatedWith(Class<?> declaringClass,
@@ -1030,7 +1030,7 @@ public final class IntrospectionUtils {
    * return
    *
    * @param element an annotated member
-   * @param <T> the generic type of the element
+   * @param <T>     the generic type of the element
    * @return an alias name
    */
   public static <T extends AnnotatedElement & Member> String getAlias(T element) {
@@ -1160,7 +1160,7 @@ public final class IntrospectionUtils {
    * Given a {@link MetadataType} it adds all the {@link Class} that are related from that type. This includes generics of an
    * {@link ArrayType}, open restriction of an {@link ObjectType} as well as its fields.
    *
-   * @param type {@link MetadataType} to inspect
+   * @param type                 {@link MetadataType} to inspect
    * @param extensionClassLoader extension class loader
    * @return {@link Set<Class<?>>} with the classes reachable from the {@code type}
    */
@@ -1277,7 +1277,7 @@ public final class IntrospectionUtils {
    * Given a {@link Set} of Annotation classes and a {@link MetadataType} that describes a component parameter, indicates if the
    * parameter is considered as a multilevel {@link MetadataKeyId}
    *
-   * @param annotations of the parameter
+   * @param annotations   of the parameter
    * @param parameterType of the parameter
    * @return a boolean indicating if the Parameter is considered as a multilevel {@link MetadataKeyId}
    */
@@ -1291,7 +1291,7 @@ public final class IntrospectionUtils {
    * <p>
    * To be a parameter container means that the parameter is a {@link ParameterGroup} or a multilevel {@link MetadataKeyId}.
    *
-   * @param annotations of the component parameter
+   * @param annotations   of the component parameter
    * @param parameterType of the component parameter
    * @return a boolean indicating if the parameter is considered as a parameter container
    */
@@ -1392,7 +1392,7 @@ public final class IntrospectionUtils {
   /**
    * Resolves the correspondent {@link ConnectionProviderModel} for a given {@link ConnectionProvider} instance.
    *
-   * @param connectionProvider connection provider class
+   * @param connectionProvider     connection provider class
    * @param allConnectionProviders list of available {@link ConnectionProviderModel}
    * @return an {@link Optional} value of the {@link ConnectionProviderModel}
    */
@@ -1456,10 +1456,10 @@ public final class IntrospectionUtils {
    * {@link RefName}, {@link DefaultEncoding} and {@link RuntimeVersion} respectively if present and the {@code model} contains
    * the {@link DeclaringMemberModelProperty}.
    *
-   * @param model enriched with {@link InjectedFieldModelProperty}
-   * @param target object in which the fields are going to be set
-   * @param configName to be injected into the {@link String} field annotated with {@link RefName}
-   * @param encoding to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   * @param model       enriched with {@link InjectedFieldModelProperty}
+   * @param target      object in which the fields are going to be set
+   * @param configName  to be injected into the {@link String} field annotated with {@link RefName}
+   * @param encoding    to be injected into the {@link String} field annotated with {@link DefaultEncoding}
    * @param muleVersion to be injected into the {@link MuleVersion} field annotated with {@link RuntimeVersion}
    */
   public static void injectFields(EnrichableModel model, Object target, String configName, String encoding,
@@ -1473,8 +1473,8 @@ public final class IntrospectionUtils {
    * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} if the {@code model}
    * contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
    *
-   * @param model enriched with {@link DefaultEncodingModelProperty}
-   * @param target object in which the fields are going to be set
+   * @param model    enriched with {@link DefaultEncodingModelProperty}
+   * @param target   object in which the fields are going to be set
    * @param encoding to be injected into the {@link String} field annotated with {@link DefaultEncoding}
    */
   public static void injectDefaultEncoding(EnrichableModel model, Object target, String encoding) {
@@ -1486,10 +1486,10 @@ public final class IntrospectionUtils {
    * Sets the {@link MuleVersion} into the field of the {@code target} annotated {@link RuntimeVersion} if the {@code model}
    * contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
    *
-   * @param model enriched with {@link DefaultEncodingModelProperty}
-   * @param target object in which the fields are going to be set
+   * @param model       enriched with {@link DefaultEncodingModelProperty}
+   * @param target      object in which the fields are going to be set
    * @param muleVersion {@link MuleVersion} to be injected into the {@link MuleVersion} field annotated with
-   *        {@link RuntimeVersion}
+   *                    {@link RuntimeVersion}
    */
   public static void injectRuntimeVersion(EnrichableModel model, Object target, MuleVersion muleVersion) {
     injectFieldFromModelProperty(target, muleVersion, model.getModelProperty(RuntimeVersionModelProperty.class),
@@ -1500,13 +1500,13 @@ public final class IntrospectionUtils {
    * Sets the {@code configName}, {@code encoding} and {@link MuleVersion} into the fields of the target annotated with
    * {@link RefName}, {@link DefaultEncoding} and {@link RuntimeVersion} respectively if present.
    *
-   * @param target object in which the fields are going to be set
-   * @param configName to be injected into the {@link String} field annotated with {@link RefName}
-   * @param encoding to be injected into the {@link String} field annotated with {@link DefaultEncoding}
-   * @param muleVersion to be injected into the {@link MuleVersion} field annotated with {@link RuntimeVersion}
+   * @param target          object in which the fields are going to be set
+   * @param configName      to be injected into the {@link String} field annotated with {@link RefName}
+   * @param encoding        to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   * @param muleVersion     to be injected into the {@link MuleVersion} field annotated with {@link RuntimeVersion}
    * @param reflectionCache the cache for expensive reflection lookups
    * @throws IllegalModelDefinitionException if there is more than one field annotated with {@link DefaultEncoding} or
-   *         {@link RuntimeVersion}
+   *                                         {@link RuntimeVersion}
    */
   public static void injectFields(Object target, String configName, String encoding, MuleVersion muleVersion,
                                   ReflectionCache reflectionCache) {
@@ -1522,8 +1522,8 @@ public final class IntrospectionUtils {
    * The {@code target} object is expected to have only one field annotated with {@link RefName} and that field is required to be
    * a String.
    *
-   * @param target object in which the value are going to be set
-   * @param configName the value to be injected
+   * @param target          object in which the value are going to be set
+   * @param configName      the value to be injected
    * @param reflectionCache the cache for expensive reflection lookups
    */
   public static void injectRefName(Object target, String configName, ReflectionCache reflectionCache) {
@@ -1533,7 +1533,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link FieldSetter} for a field in the {@code target} annotated {@link DefaultEncoding} (if present)
    *
-   * @param target object in which the fields are going to be set
+   * @param target          object in which the fields are going to be set
    * @param reflectionCache the cache for expensive reflection lookups
    * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
@@ -1547,7 +1547,7 @@ public final class IntrospectionUtils {
    * <p>
    * The {@code target} object is expected to have only one field of such type.
    *
-   * @param target object in which the value are going to be set
+   * @param target            object in which the value are going to be set
    * @param componentLocation the value to be injected
    */
   public static void injectComponentLocation(Object target, ComponentLocation componentLocation) {
@@ -1650,9 +1650,9 @@ public final class IntrospectionUtils {
    * Sets the given {@code value} into the {@code target}, if it contains a field named {@code fieldName}. Nothing happens if such
    * field doesn't exist.
    *
-   * @param target the object in which the value is to be set
-   * @param value the value to set
-   * @param fieldName the name of the target field
+   * @param target          the object in which the value is to be set
+   * @param value           the value to set
+   * @param fieldName       the name of the target field
    * @param reflectionCache the {@link ReflectionCache} used to introspect the {@code target}
    * @since 4.4.0
    */
@@ -1667,8 +1667,8 @@ public final class IntrospectionUtils {
    * Sets the given {@code value} into the {@code target} {@code field}
    *
    * @param target the object in which the value is to be set
-   * @param value the value to set
-   * @param field the field in which the value is to be set
+   * @param value  the value to set
+   * @param field  the field in which the value is to be set
    * @since 4.4.0
    */
   public static void setValueIntoField(Object target, Object value, Field field) {

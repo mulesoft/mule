@@ -94,7 +94,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
    * Executes the operation per the specification in this classes' javadoc
    *
    * @param executor an {@link CompletableComponentExecutor}
-   * @param context the {@link ExecutionContextAdapter} for the {@code executor} to use
+   * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */

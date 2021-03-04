@@ -561,7 +561,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
    * Fires a server notification to all registered {@link CustomNotificationListener} notificationManager.
    *
    * @param notification the notification to fire. This must be of type {@link CustomNotification} otherwise an exception will be
-   *        thrown.
+   *                     thrown.
    * @throws UnsupportedOperationException if the notification fired is not a {@link CustomNotification}
    */
   private void fireNotification(AbstractServerNotification notification) {
@@ -578,7 +578,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
    * service invocations
    *
    * @param securityManager the security manager used by this Mule instance to authenticate and authorise incoming and outgoing
-   *        event traffic and service invocations
+   *                        event traffic and service invocations
    */
   @Override
   public void setSecurityManager(SecurityManager securityManager) {

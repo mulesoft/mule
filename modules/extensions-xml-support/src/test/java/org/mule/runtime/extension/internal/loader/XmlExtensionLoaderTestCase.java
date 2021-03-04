@@ -93,7 +93,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   /**
    * @param validateXml whether the XML must be valid while loading the extension model or not. Useful to determine if the default
-   *        values are properly feed when reading the document.
+   *                    values are properly feed when reading the document.
    */
   public XmlExtensionLoaderTestCase(boolean validateXml) {
     this.validateXml = validateXml;
@@ -578,7 +578,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
    * If {@link #validateXml} is true, the XML of the smart connector must be validated when reading it. False otherwise. Useful to
    * simulate the {@link ExtensionModel} generation of a connector that has malformed message processors in the <body/> element.
    *
-   * @param modulePath relative path to the XML connector.
+   * @param modulePath        relative path to the XML connector.
    * @param expectedResources list of resources to export
    * @return an {@link ExtensionModel}
    */

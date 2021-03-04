@@ -69,9 +69,9 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
    * {@link CoreDslConstants#RAISE_ERROR_IDENTIFIER} or {@link ApplicationModel#ERROR_MAPPING_IDENTIFIER} If it is, then asserts
    * the correct namespace of it (as XML <module/>s can throw exceptions of the the same namespace).
    *
-   * @param namespace namespace of the <module/>
-   * @param operationModel current operation of the <module/>
-   * @param componentModel XML element to validate, or its child elements.
+   * @param namespace        namespace of the <module/>
+   * @param operationModel   current operation of the <module/>
+   * @param componentModel   XML element to validate, or its child elements.
    * @param problemsReporter gatherer of errors
    */
   private void searchAndValidate(String namespace, OperationModel operationModel, ComponentAst componentModel,

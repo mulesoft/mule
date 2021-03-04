@@ -67,16 +67,16 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
   /**
    * Creates a new instance
    *
-   * @param extensionModel the {@link ExtensionModel} of the owning component
+   * @param extensionModel        the {@link ExtensionModel} of the owning component
    * @param configurationInstance an {@link Optional} {@link ConfigurationInstance} in case the component requires a config
-   * @param sourceModel the model of the {@code source}
-   * @param source a {@link Source} instance
-   * @param method the method to be executed
+   * @param sourceModel           the model of the {@code source}
+   * @param source                a {@link Source} instance
+   * @param method                the method to be executed
    * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the owning source
-   * @param streamingManager the application's {@link StreamingManager}
-   * @param component the source {@link Component}
-   * @param muleContext the current {@link MuleContext}
-   * @param sourceCallbackModel the callback's model
+   * @param streamingManager      the application's {@link StreamingManager}
+   * @param component             the source {@link Component}
+   * @param muleContext           the current {@link MuleContext}
+   * @param sourceCallbackModel   the callback's model
    */
   public DefaultSourceCallbackExecutor(ExtensionModel extensionModel,
                                        Optional<ConfigurationInstance> configurationInstance,

@@ -187,7 +187,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * itself. This implementation logs the the message itself to the logs if it is not null
    *
    * @param event The MuleEvent currently being processed
-   * @param t the fatal exception to log
+   * @param t     the fatal exception to log
    */
   protected void logFatal(CoreEvent event, Throwable t) {
     if (statistics != null && statistics.isEnabled()) {

@@ -23,9 +23,9 @@ public interface HttpResponseReadyCallback {
   /**
    * Method to send response to the client.
    *
-   * @param response HTTP response content.
+   * @param response               HTTP response content.
    * @param responseStatusCallback callback to be called if there's a failure while sending the response or when it is
-   *        successfully sent.
+   *                               successfully sent.
    */
   void responseReady(HttpResponse response, ResponseStatusCallback responseStatusCallback);
 
@@ -35,10 +35,10 @@ public interface HttpResponseReadyCallback {
    * HTTP body will be written through the returned {@link Writer}. The connection will remain open until the {@link Writer} is
    * closed.
    *
-   * @param response HTTP response content
+   * @param response               HTTP response content
    * @param responseStatusCallback callback to be called if there's a failure while sending the response or when it is
-   *        successfully sent.
-   * @param encoding the encoding the {@link Writer} will use
+   *                               successfully sent.
+   * @param encoding               the encoding the {@link Writer} will use
    * @return an HTTP body {@link Writer}
    *
    * @since 4.2

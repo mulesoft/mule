@@ -32,7 +32,7 @@ public class MinMuleVersionArtifactDescriptorValidator implements ArtifactDescri
    * Creates an instance of this validator.
    *
    * @param validateMinMuleVersionWithSemanticVersion {@code true} uses semantic version for checking
-   *        {@link ArtifactDescriptor#getMinMuleVersion()}.
+   *                                                  {@link ArtifactDescriptor#getMinMuleVersion()}.
    */
   public MinMuleVersionArtifactDescriptorValidator(boolean validateMinMuleVersionWithSemanticVersion) {
     this.validateMinMuleVersionWithSemanticVersion = validateMinMuleVersionWithSemanticVersion;
@@ -42,8 +42,8 @@ public class MinMuleVersionArtifactDescriptorValidator implements ArtifactDescri
    * Creates an instance of this validator.
    *
    * @param validateMinMuleVersionWithSemanticVersion {@code true} uses semantic version for checking
-   *        {@link ArtifactDescriptor#getMinMuleVersion()}.
-   * @param muleRuntimeVersionSupplier {@link Supplier} to get Mule Runtime version. Non null.
+   *                                                  {@link ArtifactDescriptor#getMinMuleVersion()}.
+   * @param muleRuntimeVersionSupplier                {@link Supplier} to get Mule Runtime version. Non null.
    */
   public MinMuleVersionArtifactDescriptorValidator(boolean validateMinMuleVersionWithSemanticVersion,
                                                    Supplier<String> muleRuntimeVersionSupplier) {

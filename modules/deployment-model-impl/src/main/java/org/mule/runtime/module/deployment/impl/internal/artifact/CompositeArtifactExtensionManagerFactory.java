@@ -32,10 +32,10 @@ public class CompositeArtifactExtensionManagerFactory extends ArtifactExtensionM
   /**
    * Creates a new factory
    *
-   * @param parentArtifact application on which the policies are applied. Non null.
+   * @param parentArtifact                 application on which the policies are applied. Non null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
-   * @param artifactPlugins artifact plugins deployed inside the artifact. Non null.
-   * @param extensionManagerFactory creates the {@link ExtensionManager} for the artifact. Non null
+   * @param artifactPlugins                artifact plugins deployed inside the artifact. Non null.
+   * @param extensionManagerFactory        creates the {@link ExtensionManager} for the artifact. Non null
    */
   public CompositeArtifactExtensionManagerFactory(DeployableArtifact parentArtifact,
                                                   ExtensionModelLoaderRepository extensionModelLoaderRepository,

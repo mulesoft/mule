@@ -86,9 +86,9 @@ public class DefaultToolingService implements ToolingService {
   private ArtifactFileWriter artifactFileWriter;
 
   /**
-   * @param domainRepository {@link DomainRepository} to look up for already deployed domains.
-   * @param domainFactory factory for creating the {@link Domain}
-   * @param applicationFactory factory for creating the {@link Application}
+   * @param domainRepository             {@link DomainRepository} to look up for already deployed domains.
+   * @param domainFactory                factory for creating the {@link Domain}
+   * @param applicationFactory           factory for creating the {@link Application}
    * @param applicationDescriptorFactory {@link ToolingApplicationDescriptorFactory} to load the application descriptor.
    */
   public DefaultToolingService(DomainRepository domainRepository,

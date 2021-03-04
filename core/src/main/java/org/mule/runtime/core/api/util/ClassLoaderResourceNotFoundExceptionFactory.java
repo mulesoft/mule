@@ -24,8 +24,8 @@ public interface ClassLoaderResourceNotFoundExceptionFactory {
   /**
    * Creates a {@link ResourceNotFoundException}
    *
-   * @param resourceName the resource to load.
-   * @param classLoader the classloader to use for loading the resource.
+   * @param resourceName      the resource to load.
+   * @param classLoader       the classloader to use for loading the resource.
    * @param triedAbsolutePath if the resource was tried to be loaded from an absolute path as well.
    * @return a new {@link ResourceNotFoundException}
    */
@@ -35,7 +35,7 @@ public interface ClassLoaderResourceNotFoundExceptionFactory {
   /**
    * Creates a {@link ClassNotFoundException}
    *
-   * @param className the class to load
+   * @param className   the class to load
    * @param classLoader the classloader to use for loading the class.
    * @return a new {@link ClassNotFoundException}
    */

@@ -25,7 +25,7 @@ public class ManagedByteBufferWrapper {
   /**
    * Creates a new instance
    *
-   * @param delegate the managed {@link ByteBuffer}
+   * @param delegate      the managed {@link ByteBuffer}
    * @param releaseAction action to be executed when the {@link #release()} method is invoked
    */
   public ManagedByteBufferWrapper(ByteBuffer delegate, CheckedConsumer<ManagedByteBufferWrapper> releaseAction) {

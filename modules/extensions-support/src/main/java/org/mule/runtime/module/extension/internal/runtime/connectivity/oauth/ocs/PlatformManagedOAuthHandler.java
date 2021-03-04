@@ -50,7 +50,7 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
   /**
    * Returns a {@link PlatformManagedOAuthDancer} configured after the given {@code config}
    *
-   * @param config an {@link PlatformManagedOAuthConfig}
+   * @param config    an {@link PlatformManagedOAuthConfig}
    * @param listeners a list of {@link PlatformManagedOAuthStateListener listeners} to be registered into the dancer
    * @return a {@link PlatformManagedOAuthDancer}
    */

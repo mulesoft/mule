@@ -1709,7 +1709,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
    * prevent the directory watcher to redeploy the artifact multiple times.
    *
    * @param timestamp time value in milliseconds of the original file's last modified time
-   * @param file file to update
+   * @param file      file to update
    */
   protected void updateFileModifiedTime(long timestamp, File file) {
     ReentrantLock deploymentLock = deploymentService.getLock();

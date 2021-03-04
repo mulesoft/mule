@@ -91,7 +91,7 @@ public interface CoreEvent extends Serializable, Event {
    * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link CoreEvent}
    * needs a new context.
    *
-   * @param event existing event to use as a template to create builder instance
+   * @param event   existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
    * @return new builder instance.
    */
@@ -129,7 +129,7 @@ public interface CoreEvent extends Serializable, Event {
     /**
      * Add a variable.
      *
-     * @param key the key of the variable to add.
+     * @param key   the key of the variable to add.
      * @param value the value of the variable to add. {@code null} values are supported.
      * @return the builder instance.
      */
@@ -138,8 +138,8 @@ public interface CoreEvent extends Serializable, Event {
     /**
      * Add a variable.
      *
-     * @param key the key of the variable to add.
-     * @param value the value of the variable to add. {@code null} values are supported.
+     * @param key       the key of the variable to add.
+     * @param value     the value of the variable to add. {@code null} values are supported.
      * @param mediaType additional metadata about the {@code value} type.
      * @return the builder instance
      */
@@ -150,7 +150,7 @@ public interface CoreEvent extends Serializable, Event {
      * <p>
      * This should be the preferred implementation when the value to be added is already held in the form of a {@link TypedValue}
      *
-     * @param key the key of the variable to add.
+     * @param key   the key of the variable to add.
      * @param value the value of the variable to add. {@code null} values are supported.
      * @return the builder instance
      * @since 4.3.0
@@ -221,9 +221,9 @@ public interface CoreEvent extends Serializable, Event {
    * Helper method to get the value of a given variable in a null-safe manner such that {@code null} is returned for non-existent
    * variables rather than a {@link NoSuchElementException} exception being thrown.
    *
-   * @param key the key of the variable to retrieve.
+   * @param key   the key of the variable to retrieve.
    * @param event the event from which to retrieve a variable with the given key.
-   * @param <T> the variable type
+   * @param <T>   the variable type
    * @return the value of the variables if it exists otherwise {@code null}.
    */
   static <T> T getVariableValueOrNull(String key, CoreEvent event) {

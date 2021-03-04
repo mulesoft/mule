@@ -448,8 +448,8 @@ public final class SchemaBuilder {
    * <xs:element minOccurs="0" maxOccurs="1" ref="ns:global-abstract-type-name"></xs:element> </xs:choice> </xs:complexType>
    * <p/>
    *
-   * @param typeDsl {@link DslElementSyntax} of the referenced type
-   * @param type the {@link MetadataType type} of the base element that will be referenced
+   * @param typeDsl   {@link DslElementSyntax} of the referenced type
+   * @param type      the {@link MetadataType type} of the base element that will be referenced
    * @param minOccurs {@link BigInteger#ZERO} if the {@code group} is optional or {@link BigInteger#ONE} if required
    * @param maxOccurs the maximum number of occurrences for this group
    * @return a {@link ExplicitGroup Choice} group with the necessary options for this case
@@ -532,8 +532,8 @@ public final class SchemaBuilder {
    * <p>
    * <xs:element type="ns:org.mule.test.OtherType" substitutionGroup="ns:abstract-type-name" name="other-type"></xs:element>
    *
-   * @param typeDsl {@link DslElementSyntax} of the referenced {@code type}
-   * @param type {@link MetadataType} of the referenced {@code type}
+   * @param typeDsl    {@link DslElementSyntax} of the referenced {@code type}
+   * @param type       {@link MetadataType} of the referenced {@code type}
    * @param isRequired whether or not the element element is required
    * @return the {@link TopLevelElement element} representing the reference
    */

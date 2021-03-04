@@ -160,8 +160,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   /**
    * Creates a new instance for the given {@code method}
    *
-   * @param parameterGroupModels {@link List} of {@link ParameterGroupModel} from the corresponding model
-   * @param method the {@link Method} to be called
+   * @param parameterGroupModels      {@link List} of {@link ParameterGroupModel} from the corresponding model
+   * @param method                    the {@link Method} to be called
    * @param componentDecoratorFactory
    */
   public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method,

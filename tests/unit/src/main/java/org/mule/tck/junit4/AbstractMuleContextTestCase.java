@@ -538,7 +538,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * Uses {@link org.mule.runtime.api.transformation.TransformationService} to get representation of a message for a given
    * {@link DataType}
    *
-   * @param message message to get payload from
+   * @param message  message to get payload from
    * @param dataType dataType to be transformed to
    * @return representation of the message payload of the required dataType
    * @throws Exception if there is an unexpected error obtaining the payload representation
@@ -552,7 +552,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * {@link Class}
    *
    * @param message message to get payload from
-   * @param clazz type of the payload to be transformed to
+   * @param clazz   type of the payload to be transformed to
    * @return representation of the message payload of the required class
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */

@@ -20,7 +20,7 @@ public interface SourcePolicyProcessorFactory {
   /**
    * Creates an {@link SourcePolicy}.
    *
-   * @param policy the policy from which the {@link SourcePolicy} gets created.
+   * @param policy        the policy from which the {@link SourcePolicy} gets created.
    * @param nextProcessor the next processor in the chain.
    * @return an {@link SourcePolicy} that performs the common logic related to policies.
    */

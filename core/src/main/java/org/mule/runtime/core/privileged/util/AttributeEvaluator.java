@@ -53,7 +53,7 @@ public final class AttributeEvaluator {
   /**
    * Creates a new Attribute Evaluator instance with a given attribute value and the expected {@link DataType}
    *
-   * @param attributeValue the value for an attribute, this value can be treated as expression, parse_expression or static.
+   * @param attributeValue   the value for an attribute, this value can be treated as expression, parse_expression or static.
    * @param expectedDataType specifies that the expression should be evaluated a coerced to the given expected {@link DataType}.
    */
   public AttributeEvaluator(String attributeValue, DataType expectedDataType) {

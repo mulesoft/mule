@@ -21,7 +21,7 @@ public interface LifecycleObjectSorter {
   /**
    * Adds the given {@code object} to the list to be sorted
    *
-   * @param name the name under which the object is registered in the {@link Registry}
+   * @param name   the name under which the object is registered in the {@link Registry}
    * @param object the object
    */
   void addObject(String name, Object object);

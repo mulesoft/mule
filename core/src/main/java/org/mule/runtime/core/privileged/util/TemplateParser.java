@@ -102,7 +102,7 @@ public final class TemplateParser {
    * Matches one or more templates against a Map of key value pairs. If a value for a template is not found in the map the
    * template is left as is in the return String
    *
-   * @param props the key/value pairs to match against
+   * @param props    the key/value pairs to match against
    * @param template the string containing the template place holders i.e. My name is ${name}
    * @return the parsed String
    */
@@ -362,7 +362,7 @@ public final class TemplateParser {
    * Matches one or more templates against a Map of key value pairs. If a value for a template is not found in the map the
    * template is left as is in the return String
    *
-   * @param props the key/value pairs to match against
+   * @param props     the key/value pairs to match against
    * @param templates A List of templates
    * @return the parsed String
    */
@@ -380,7 +380,7 @@ public final class TemplateParser {
    * Matches one or more templates against a Map of key value pairs. If a value for a template is not found in the map the
    * template is left as is in the return String
    *
-   * @param props the key/value pairs to match against
+   * @param props     the key/value pairs to match against
    * @param templates A Map of templates. The values for each map entry will be parsed
    * @return the parsed String
    */

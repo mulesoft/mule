@@ -74,7 +74,7 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
    * Create a new builder from another instance and different ID.
    *
    * @param artifactId artifact identifier. Non empty.
-   * @param source instance used as template to build the new one. Non null.
+   * @param source     instance used as template to build the new one. Non null.
    */
   public DomainFileBuilder(String artifactId, DomainFileBuilder source) {
     super(artifactId, source);
@@ -93,7 +93,7 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
   /**
    * Adds a property into the plugin properties file.
    *
-   * @param propertyName name fo the property to add. Non empty
+   * @param propertyName  name fo the property to add. Non empty
    * @param propertyValue value of the property to add. Non null.
    * @return the same builder instance
    */

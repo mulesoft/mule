@@ -28,8 +28,8 @@ public class PluginExtendedDeploymentProperties extends ExtendedDeploymentProper
    * Plugin extended deployment properties which also provides the {@link ArtifactDescriptor} where the plugin has been declared
    * as dependency.
    *
-   * @param deploymentProperties the original properties passed from deployment service. Can be null.
-   * @param pluginBundleDescriptor the plugin bundle descriptor resolved from the deployable artifact descriptor. Not null.
+   * @param deploymentProperties         the original properties passed from deployment service. Can be null.
+   * @param pluginBundleDescriptor       the plugin bundle descriptor resolved from the deployable artifact descriptor. Not null.
    * @param deployableArtifactDescriptor the container in which the plugin is declared as dependency. Not null.
    */
   public PluginExtendedDeploymentProperties(Properties deploymentProperties,

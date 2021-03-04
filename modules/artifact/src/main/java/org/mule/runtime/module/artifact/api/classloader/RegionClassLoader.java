@@ -94,10 +94,10 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   /**
    * Creates a new region.
    *
-   * @param artifactId artifact unique ID for the artifact owning the created class loader instance. Non empty.
+   * @param artifactId         artifact unique ID for the artifact owning the created class loader instance. Non empty.
    * @param artifactDescriptor descriptor for the artifact owning the created class loader instance. Non null.
-   * @param parent parent classloader for the region. Non null
-   * @param lookupPolicy lookup policy to use on the region
+   * @param parent             parent classloader for the region. Non null
+   * @param lookupPolicy       lookup policy to use on the region
    */
   public RegionClassLoader(String artifactId,
                            ArtifactDescriptor artifactDescriptor,
@@ -109,10 +109,10 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   /**
    * Constructor to be called by extending classes and override the {@link ClassLoaderResourceReleaser} resourceReleaser.
    *
-   * @param artifactId artifact unique ID for the artifact owning the created class loader instance. Non empty.
-   * @param artifactDescriptor descriptor for the artifact owning the created class loader instance. Non null.
-   * @param parent parent classloader for the region. Non null
-   * @param lookupPolicy lookup policy to use on the region
+   * @param artifactId             artifact unique ID for the artifact owning the created class loader instance. Non empty.
+   * @param artifactDescriptor     descriptor for the artifact owning the created class loader instance. Non null.
+   * @param parent                 parent classloader for the region. Non null
+   * @param lookupPolicy           lookup policy to use on the region
    * @param regionResourceReleaser {@link ResourceReleaser} to be called after invocating {@link RegionClassLoader#dispose()}
    */
   protected RegionClassLoader(String artifactId,
@@ -133,7 +133,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    * Adds a class loader to the region.
    *
    * @param artifactClassLoader classloader to add. Non null.
-   * @param filter filter used to provide access to the added classloader. Non null
+   * @param filter              filter used to provide access to the added classloader. Non null
    * @throws IllegalArgumentException if the class loader is already a region member.
    */
   public void addClassLoader(ArtifactClassLoader artifactClassLoader, ArtifactClassLoaderFilter filter) {
@@ -217,7 +217,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    * @param artifactClassLoader class loader to remove. Non null
    * @return true if the class loader is a region member and was removed, false if it is not a region member.
    * @throws IllegalArgumentException if the class loader is the region owner or is a regiion member that exports packages or
-   *         resources.
+   *                                  resources.
    */
   public boolean removeClassLoader(ArtifactClassLoader artifactClassLoader) {
     checkArgument(artifactClassLoader != null, "artifactClassLoader cannot be null");

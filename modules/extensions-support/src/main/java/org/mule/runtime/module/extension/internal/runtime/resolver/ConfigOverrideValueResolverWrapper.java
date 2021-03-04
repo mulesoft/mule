@@ -69,10 +69,11 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ValueResolver delegate} used to obtain a value in the first place. Only if this {@code delegate}
-   *        returns a {@code null} value will the resolution using a {@link ConfigurationInstance config} will be attempted.
+   * @param delegate        the {@link ValueResolver delegate} used to obtain a value in the first place. Only if this
+   *                        {@code delegate} returns a {@code null} value will the resolution using a {@link ConfigurationInstance
+   *                        config} will be attempted.
    * @param reflectionCache the cache for expensive reflection lookups
-   * @param <T> the generic type of the produced values.
+   * @param <T>             the generic type of the produced values.
    * @return a new instance of {@link ConfigOverrideValueResolverWrapper}
    */
   public static <T> ValueResolver<T> of(ValueResolver<T> delegate, String parameterName, Class<?> parameterType,
@@ -87,10 +88,11 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ValueResolver delegate} used to obtain a value in the first place. Only if this {@code delegate}
-   *        returns a {@code null} value will the resolution using a {@link ConfigurationInstance config} will be attempted.
+   * @param delegate        the {@link ValueResolver delegate} used to obtain a value in the first place. Only if this
+   *                        {@code delegate} returns a {@code null} value will the resolution using a {@link ConfigurationInstance
+   *                        config} will be attempted.
    * @param reflectionCache the cache for expensive reflection lookups
-   * @param <T> the generic type of the produced values.
+   * @param <T>             the generic type of the produced values.
    * @return a new instance of {@link ConfigOverrideValueResolverWrapper}
    */
   public static <T> ValueResolver<T> of(ValueResolver<T> delegate, String parameterName, MetadataType parameterType,

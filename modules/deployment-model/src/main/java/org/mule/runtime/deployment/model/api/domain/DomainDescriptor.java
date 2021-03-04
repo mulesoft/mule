@@ -35,7 +35,7 @@ public class DomainDescriptor extends DeployableArtifactDescriptor {
   /**
    * Creates a new domain descriptor
    *
-   * @param name domain name. Non empty.
+   * @param name                 domain name. Non empty.
    * @param deploymentProperties deploymentProperties
    */
   public DomainDescriptor(String name, Optional<Properties> deploymentProperties) {

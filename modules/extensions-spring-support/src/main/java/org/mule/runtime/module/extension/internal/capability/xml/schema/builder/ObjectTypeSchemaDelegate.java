@@ -79,12 +79,12 @@ final class ObjectTypeSchemaDelegate {
    * <p>
    * This method serves as a resolver for all that logic, creating the required element for the parameter with complex type.
    * 
-   * @param type the {@link ObjectType} of the parameter for which the element is being created
+   * @param type        the {@link ObjectType} of the parameter for which the element is being created
    * @param paramSyntax the {@link DslElementSyntax} of the parameter for which the element is being created
-   * @param paramDsl the {@link ParameterDslConfiguration} associated to the parameter, if any is present.
+   * @param paramDsl    the {@link ParameterDslConfiguration} associated to the parameter, if any is present.
    * @param description the documentation associated to the parameter
-   * @param all the {@link ExplicitGroup group} the generated element should belong to
-   * @param required whether or not the element should be required
+   * @param all         the {@link ExplicitGroup group} the generated element should belong to
+   * @param required    whether or not the element should be required
    */
   void generatePojoElement(ObjectType type, DslElementSyntax paramSyntax, ParameterDslConfiguration paramDsl,
                            String description, List<TopLevelElement> all, boolean required) {
@@ -226,8 +226,8 @@ final class ObjectTypeSchemaDelegate {
    * If an abstract or concrete {@link TopLevelElement} declaration are required for this type, then they will also be registered.
    * This method is idempotent for any given {@code type}
    *
-   * @param type a {@link MetadataType} describing a pojo type
-   * @param baseType a {@link MetadataType} describing a pojo's base type
+   * @param type        a {@link MetadataType} describing a pojo type
+   * @param baseType    a {@link MetadataType} describing a pojo's base type
    * @param description the type's description
    * @return the reference name of the complexType
    */
@@ -255,8 +255,8 @@ final class ObjectTypeSchemaDelegate {
   /**
    * Registers the {@link TopLevelComplexType} associated to the given {@link ObjectType} in the current namespace
    *
-   * @param type the {@link ObjectType} that will be represented by the registered {@link ComplexType}
-   * @param baseType the {@code base} for the {@link ComplexType} {@code extension} declaration
+   * @param type        the {@link ObjectType} that will be represented by the registered {@link ComplexType}
+   * @param baseType    the {@code base} for the {@link ComplexType} {@code extension} declaration
    * @param description
    * @return a new {@link ComplexType} declaration for the given {@link ObjectType}
    */

@@ -63,19 +63,19 @@ public interface Transformer extends Processor, Initialisable, Disposable, Namea
    * @param src the data to transform
    * @return the transformed data
    * @throws TransformerException if a error occurs transforming the data or if the expected returnClass isn't the same as the
-   *         transformed data
+   *                              transformed data
    */
   Object transform(Object src) throws TransformerException;
 
   /**
    * Transforms the supplied data and returns the result
    *
-   * @param src the data to transform
+   * @param src      the data to transform
    * @param encoding the encoding to use by this transformer. many transformations will not need encoding unless dealing with text
-   *        so you only need to use this method if yo wish to customize the encoding
+   *                 so you only need to use this method if yo wish to customize the encoding
    * @return the transformed data
    * @throws TransformerException if a error occurs transforming the data or if the expected returnClass isn't the same as the
-   *         transformed data
+   *                              transformed data
    */
   Object transform(Object src, Charset encoding) throws TransformerException;
 

@@ -45,7 +45,7 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
    *
    * @param executionContext the {@link ExecutionContext} for the operation to be executed
    * @throws IllegalArgumentException if the {@code operationContext} already contains a parameter of key
-   *         {@link ExtensionProperties#CONNECTION_PARAM}
+   *                                  {@link ExtensionProperties#CONNECTION_PARAM}
    */
   @Override
   public void before(ExecutionContext<ComponentModel> executionContext) throws Exception {

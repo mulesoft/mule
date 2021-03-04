@@ -53,12 +53,12 @@ public class ErrorHandlerContextManager {
    * <p>
    * Used by OnError handlers to obtain it's current {@link ErrorHandlerContext}.
    * 
-   * @param handler The onError handler making this call.
-   *        </p>
-   *        <p>
-   *        Note that {@link #addContext(FlowExceptionHandler, MessagingException, Consumer, Consumer)} must be previously
-   *        invoked.
-   *        </p>
+   * @param handler   The onError handler making this call.
+   *                  </p>
+   *                  <p>
+   *                  Note that {@link #addContext(FlowExceptionHandler, MessagingException, Consumer, Consumer)} must be
+   *                  previously invoked.
+   *                  </p>
    * @param coreEvent The {@link CoreEvent} that the onError handler is processing.
    * @return An {@link ErrorHandlerContext} instance.
    */
@@ -69,10 +69,10 @@ public class ErrorHandlerContextManager {
   /**
    * Used by OnError handlers to store its {@link ErrorHandlerContext} when handling a {@link MessagingException}.
    * 
-   * @param handler The OnError handler invoking this method.
-   * @param exception The {@link MessagingException} being handled.
+   * @param handler         The OnError handler invoking this method.
+   * @param exception       The {@link MessagingException} being handled.
    * @param successCallback Callback that will be invoked if the exception is successfully handled by the OnError handler.
-   * @param errorCallback Callback that will be invoked if the exception is could not be handled by the OnError handler.
+   * @param errorCallback   Callback that will be invoked if the exception is could not be handled by the OnError handler.
    * @return The {@link CoreEvent} whose processing caused the {@link MessagingException}.
    * @see #resolveHandling(FlowExceptionHandler, CoreEvent)
    * @see #resolveHandling(FlowExceptionHandler, MessagingException)
@@ -99,7 +99,7 @@ public class ErrorHandlerContextManager {
    * </p>
    * 
    * @param handler The OnErrorHandler invoking this method.
-   * @param result The {@link CoreEvent} resulting from the handling.
+   * @param result  The {@link CoreEvent} resulting from the handling.
    */
   public static void resolveHandling(FlowExceptionHandler handler, CoreEvent result) {
     ErrorHandlerContext errorHandlerContext = from(result).items.get(getParameterId(result, handler)).removeFirst();
@@ -124,7 +124,7 @@ public class ErrorHandlerContextManager {
    * Note that {@link #addContext(FlowExceptionHandler, MessagingException, Consumer, Consumer)} must be previously invoked.
    * </p>
    * 
-   * @param handler The OnErrorHandler invoking this method.
+   * @param handler   The OnErrorHandler invoking this method.
    * @param exception The {@link MessagingException} resultant from the handling attempt.
    */
   public static void resolveHandling(FlowExceptionHandler handler, MessagingException exception) {
@@ -137,7 +137,7 @@ public class ErrorHandlerContextManager {
    * Constructs the key that will be used to store a {@link ErrorHandlerContextManager} instance as an {@link CoreEvent} internal
    * parameter.
    * 
-   * @param event The {@link CoreEvent} where the {@link ErrorHandlerContextManager} instance will be stored.
+   * @param event   The {@link CoreEvent} where the {@link ErrorHandlerContextManager} instance will be stored.
    * @param handler The OnError handler requesting an {@link ErrorHandlerContext} storage.
    * @return The key that will be used to store a {@link ErrorHandlerContextManager} instance.
    * @see #addContext(FlowExceptionHandler, MessagingException, Consumer, Consumer)

@@ -52,7 +52,7 @@ public class ArtifactDescriptor {
   /**
    * Creates a new descriptor for a named artifact
    *
-   * @param name artifact name. Non empty.
+   * @param name                 artifact name. Non empty.
    * @param deploymentProperties properties provided for the deployment process.
    */
   public ArtifactDescriptor(String name, Optional<Properties> deploymentProperties) {

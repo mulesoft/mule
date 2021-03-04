@@ -394,7 +394,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   /**
    * Builds an error event and communicates it through the {@link BaseEventContext}
    *
-   * @param event the event for which an error was caused
+   * @param event            the event for which an error was caused
    * @param wrappedException the wrapped inside a {@link FlowBackPressureException} cause exception
    */
   private void notifyBackpressureException(CoreEvent event, FlowBackPressureException wrappedException) {

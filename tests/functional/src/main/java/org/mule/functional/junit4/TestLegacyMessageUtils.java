@@ -30,7 +30,7 @@ public class TestLegacyMessageUtils {
    * Gets an outbound property from the message.
    *
    * @param message message used to obtain the data from. Must be a {@link InternalMessage}
-   * @param name the name or key of the property. This must be non-null.
+   * @param name    the name or key of the property. This must be non-null.
    * @return the property value or null if the property does not exist in the specified scope
    * @throws {@link IllegalStateException} if there is any problem accessing the legacy message API using reflection
    */
@@ -49,13 +49,14 @@ public class TestLegacyMessageUtils {
    * scope specified. The method will also type check against the default value to ensure that the value is of the correct type.
    * If null is used for the default value no type checking is done.
    *
-   * @param <T> the defaultValue type ,this is used to validate the property value type
-   * @param message message used to obtain the data from. Must be a {@link InternalMessage}
-   * @param name the name or key of the property. This must be non-null.
+   * @param <T>          the defaultValue type ,this is used to validate the property value type
+   * @param message      message used to obtain the data from. Must be a {@link InternalMessage}
+   * @param name         the name or key of the property. This must be non-null.
    * @param defaultValue the value to return if the property is not in the scope provided. Can be null
    * @return the property value or the defaultValue if the property does not exist in the specified scope
    * @throws IllegalArgumentException if the value for the property key is not assignable from the defaultValue type
-   * @throws {@link IllegalStateException} if there is any problem accessing the legacy message API using reflection
+   * @throws {@link                   IllegalStateException} if there is any problem accessing the legacy message API using
+   *                                  reflection
    */
   public static <T extends Serializable> T getOutboundProperty(Message message, String name, T defaultValue) {
     try {
@@ -71,7 +72,7 @@ public class TestLegacyMessageUtils {
    * Gets an outbound property data type from the message.
    *
    * @param message message used to obtain the data from. Must be a {@link InternalMessage}
-   * @param name the name or key of the property. This must be non-null.
+   * @param name    the name or key of the property. This must be non-null.
    * @return the property data type or null if the property does not exist in the specified scope
    * @throws {@link IllegalStateException} if there is any problem accessing the legacy message API using reflection
    */
@@ -89,7 +90,7 @@ public class TestLegacyMessageUtils {
    * Gets an inbound property from the message.
    *
    * @param message message used to obtain the data from. Must be a {@link InternalMessage}
-   * @param name the name or key of the property. This must be non-null.
+   * @param name    the name or key of the property. This must be non-null.
    * @return the property value or null if the property does not exist in the specified scope
    * @throws {@link IllegalStateException} if there is any problem accessing the legacy message API using reflection
    */

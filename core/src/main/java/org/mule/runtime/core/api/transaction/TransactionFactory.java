@@ -38,7 +38,7 @@ public interface TransactionFactory {
    *
    * @return a new Transaction
    * @throws TransactionException if the transaction cannot be created or begun
-   * @param applicationName will be part of the notification
+   * @param applicationName        will be part of the notification
    * @param notificationDispatcher allows the Mule container to fire notifications
    */
   default Transaction beginTransaction(String applicationName, NotificationDispatcher notificationDispatcher,

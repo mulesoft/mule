@@ -193,7 +193,7 @@ public final class TlsConfiguration extends AbstractComponent
   // and not a close fit to actual use (imho).
 
   /**
-   * @param anon If the connection is anonymous then we don't care about client keys
+   * @param anon      If the connection is anonymous then we don't care about client keys
    * @param namespace Namespace to use for global properties (for JSSE use JSSE_NAMESPACE)
    * @throws CreateException ON initialisation problems
    */

@@ -53,7 +53,7 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
   /**
    * Used for testing purposes
    *
-   * @param muleContext a {@link MuleContext}
+   * @param muleContext       a {@link MuleContext}
    * @param connectionManager the {@link ConnectionManager} to use for validating the connection.
    */
   ExtensionConnectivityTestingStrategy(ConnectionManager connectionManager, MuleContext muleContext) {

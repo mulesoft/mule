@@ -44,7 +44,7 @@ final class CachedConnectionManagementStrategy<C> extends ConnectionManagementSt
    * Creates a new instance
    *
    * @param connectionProvider the {@link ConnectionProvider} used to manage the connections
-   * @param muleContext the owning {@link MuleContext}
+   * @param muleContext        the owning {@link MuleContext}
    */
   CachedConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, MuleContext muleContext) {
     super(connectionProvider, muleContext);

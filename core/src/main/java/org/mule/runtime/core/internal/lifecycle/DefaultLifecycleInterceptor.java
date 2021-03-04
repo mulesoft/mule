@@ -36,8 +36,8 @@ public class DefaultLifecycleInterceptor implements LifecycleInterceptor {
   /**
    * Creates a new instance.
    * 
-   * @param initialPhase the phase to track for execution failures.
-   * @param finalPhase the phase to prevent if the {@code trackingPhase} finished with errors.
+   * @param initialPhase               the phase to track for execution failures.
+   * @param finalPhase                 the phase to prevent if the {@code trackingPhase} finished with errors.
    * @param initialPhaseLifecycleClass the {@code trackingPhase} interface.
    */
   public DefaultLifecycleInterceptor(String initialPhase, String finalPhase, Class initialPhaseLifecycleClass) {
@@ -53,7 +53,7 @@ public class DefaultLifecycleInterceptor implements LifecycleInterceptor {
    * <p>
    * If all three of the above conditions are met, then this method returns {@code false}. Otherwise, it returns {@code true}
    *
-   * @param phase the phase being applied
+   * @param phase  the phase being applied
    * @param object the target object
    * @return whether the {@code phase} should be applied on the {@code object}
    */
@@ -79,10 +79,10 @@ public class DefaultLifecycleInterceptor implements LifecycleInterceptor {
    * If the {@code phase} name is {@code trackingPhase} then it tracks the given {@code object} as successful on the
    * {@code trackingPhase}.
    *
-   * @param phase the phase that was applied
-   * @param object the target object
+   * @param phase                   the phase that was applied
+   * @param object                  the target object
    * @param exceptionThrownOptional an optional with an exception. If present then there was an error execution the phase,
-   *        otherwise the phase execution was successful
+   *                                otherwise the phase execution was successful
    */
   @Override
   public void afterPhaseExecution(LifecyclePhase phase, Object object, Optional<Exception> exceptionThrownOptional) {

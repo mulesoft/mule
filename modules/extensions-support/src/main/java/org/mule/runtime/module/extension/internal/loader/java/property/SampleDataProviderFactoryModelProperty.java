@@ -38,11 +38,11 @@ public final class SampleDataProviderFactoryModelProperty implements ModelProper
   private final List<InjectableParameterInfo> injectableParameters;
 
   /**
-   * @param sampleDataProvider the {@link SampleDataProvider} class.
+   * @param sampleDataProvider   the {@link SampleDataProvider} class.
    * @param injectableParameters the parameters that should be injected inside the {@link SampleDataProvider} to be able to
-   *        resolve the sample data
-   * @param connectionField the field inside the {@link SampleDataProvider} which is considered as a connection
-   * @param configField the field inside the {@link SampleDataProvider} which is considered as a configuration
+   *                             resolve the sample data
+   * @param connectionField      the field inside the {@link SampleDataProvider} which is considered as a connection
+   * @param configField          the field inside the {@link SampleDataProvider} which is considered as a configuration
    */
   private SampleDataProviderFactoryModelProperty(Class<? extends SampleDataProvider> sampleDataProvider,
                                                  List<InjectableParameterInfo> injectableParameters,

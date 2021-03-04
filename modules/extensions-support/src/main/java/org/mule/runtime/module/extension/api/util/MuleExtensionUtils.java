@@ -46,7 +46,7 @@ public class MuleExtensionUtils {
    * @param clazz fully qualified name of the class to load.
    * @return an {@link ExtensionModel} that represents the class being loaded
    * @throws IllegalArgumentException if there are missing entries in {@code attributes} or the type of any of them does not apply
-   *         to the expected one.
+   *                                  to the expected one.
    */
   public static ExtensionModel loadExtension(Class<?> clazz) {
     return loadExtension(clazz, new SmallMap<>());
@@ -55,12 +55,12 @@ public class MuleExtensionUtils {
   /**
    * Loads a extension model
    *
-   * @param clazz fully qualified name of the class to load.
+   * @param clazz  fully qualified name of the class to load.
    * @param params a set of attributes to work with in each concrete implementation of {@link ExtensionModelLoader}, which will be
-   *        responsible of extracting the mandatory parameters (while casting, if needed).
+   *               responsible of extracting the mandatory parameters (while casting, if needed).
    * @return an {@link ExtensionModel} that represents the class being loaded
    * @throws IllegalArgumentException if there are missing entries in {@code attributes} or the type of any of them does not apply
-   *         to the expected one.
+   *                                  to the expected one.
    */
   public static ExtensionModel loadExtension(Class<?> clazz, Map<String, Object> params) {
     params.put(TYPE_PROPERTY_NAME, clazz.getName());

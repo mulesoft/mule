@@ -86,8 +86,8 @@ public interface HttpServer {
   /**
    * Adds a {@link RequestHandler} on the given path and for the given methods.
    *
-   * @param methods a list of methods to match
-   * @param path the path to match
+   * @param methods        a list of methods to match
+   * @param path           the path to match
    * @param requestHandler the handler to execute upon a matching request
    * @return a {@link RequestHandlerManager} for the handler
    */
@@ -97,7 +97,7 @@ public interface HttpServer {
   /**
    * Adds a {@link RequestHandler} on the given path and for all methods.
    *
-   * @param path the path to match
+   * @param path           the path to match
    * @param requestHandler the handler to execute upon a matching request
    * @return a {@link RequestHandlerManager} for the handler
    */

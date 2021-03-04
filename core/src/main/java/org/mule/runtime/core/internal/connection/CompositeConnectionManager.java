@@ -45,9 +45,9 @@ public class CompositeConnectionManager implements ConnectionManager, Connection
   /**
    * Creates a new instance of {@link CompositeConnectionManager}
    *
-   * @param childConnectionManager {@link ConnectionManager} considered as the main one
+   * @param childConnectionManager  {@link ConnectionManager} considered as the main one
    * @param parentConnectionManager {@link ConnectionManager} considered as the secondary one, is a request can't be handled by
-   *        the main {@link ConnectionManager}, this one will be used
+   *                                the main {@link ConnectionManager}, this one will be used
    */
   public CompositeConnectionManager(ConnectionManagerAdapter childConnectionManager,
                                     ConnectionManagerAdapter parentConnectionManager) {

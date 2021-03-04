@@ -36,9 +36,9 @@ public final class CompositeClassNotFoundException extends ClassNotFoundExceptio
   /**
    * Builds the exception.
    *
-   * @param className the name of the class that was trying to be loaded.
+   * @param className      the name of the class that was trying to be loaded.
    * @param lookupStrategy the lookupStrategy that was used to load the class.
-   * @param exceptions the exceptions thrown by each individual classloader that was used for the loading.
+   * @param exceptions     the exceptions thrown by each individual classloader that was used for the loading.
    */
   public CompositeClassNotFoundException(String className, LookupStrategy lookupStrategy,
                                          List<ClassNotFoundException> exceptions) {

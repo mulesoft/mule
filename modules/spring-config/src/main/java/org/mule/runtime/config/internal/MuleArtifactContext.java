@@ -182,15 +182,15 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
    * registry implementation to wraps the spring ApplicationContext
    *
-   * @param muleContext the {@link MuleContext} that own this context
+   * @param muleContext                                the {@link MuleContext} that own this context
    * @param artifactConfigResources
-   * @param artifactDeclaration the mule configuration defined programmatically
-   * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *        org.mule.runtime.config.internal.SpringRegistry
+   * @param artifactDeclaration                        the mule configuration defined programmatically
+   * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
+   *                                                   org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties
    * @param artifactProperties
    * @param artifactType
-   * @param disableXmlValidations {@code true} when loading XML configs it will not apply validations.
+   * @param disableXmlValidations                      {@code true} when loading XML configs it will not apply validations.
    * @param componentBuildingDefinitionRegistryFactory
    * @since 3.7.0
    */
@@ -519,9 +519,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   /**
    * Creates the definition for all the objects to be created form the enabled components in the {@code applicationModel}.
    *
-   * @param beanFactory the bean factory in which definition must be created.
+   * @param beanFactory      the bean factory in which definition must be created.
    * @param applicationModel the artifact application model.
-   * @param mustBeRoot if the component must be root to be created.
+   * @param mustBeRoot       if the component must be root to be created.
    * @return an order list of the created bean names. The order must be respected for the creation of the objects.
    */
   protected List<Pair<String, ComponentAst>> createApplicationComponents(DefaultListableBeanFactory beanFactory,

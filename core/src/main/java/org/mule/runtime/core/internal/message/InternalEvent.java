@@ -153,7 +153,7 @@ public interface InternalEvent extends PrivilegedEvent {
     /**
      * Adds an internal parameter.
      *
-     * @param key the parameter key
+     * @param key   the parameter key
      * @param value the parameter value
      * @return the builder instance
      */

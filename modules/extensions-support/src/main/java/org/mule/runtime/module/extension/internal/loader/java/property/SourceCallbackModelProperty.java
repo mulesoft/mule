@@ -29,7 +29,7 @@ public final class SourceCallbackModelProperty implements ModelProperty {
    * Creates a new instance
    *
    * @param onSuccessMethod an {@link Optional} with a reference to the success callback method
-   * @param onErrorMethod an {@link Optional} with a reference to the error callback method
+   * @param onErrorMethod   an {@link Optional} with a reference to the error callback method
    */
   public SourceCallbackModelProperty(Optional<Method> onSuccessMethod,
                                      Optional<Method> onErrorMethod,

@@ -40,7 +40,7 @@ public class MuleLoggerContextFactory {
    * Builds a new {@link LoggerContext} for the given {@code classLoader} and {@code selector}
    *
    * @param classLoader the classloader of the artifact this logger context is for.
-   * @param selector the selector to bew used when building the loggers for the new context.
+   * @param selector    the selector to bew used when building the loggers for the new context.
    * @return
    */
   public LoggerContext build(final ClassLoader classLoader, final ContextSelector selector, boolean logSeparationEnabled) {

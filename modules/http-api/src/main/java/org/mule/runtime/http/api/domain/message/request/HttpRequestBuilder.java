@@ -103,7 +103,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   /**
    * Includes a new queryParam to be sent in the desired {@link HttpMessage}.
    *
-   * @param name the name of the HTTP queryParam
+   * @param name  the name of the HTTP queryParam
    * @param value the value of the HTTP queryParam
    * @return this builder
    */

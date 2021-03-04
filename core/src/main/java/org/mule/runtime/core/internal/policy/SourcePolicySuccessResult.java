@@ -29,8 +29,8 @@ public class SourcePolicySuccessResult implements SourcePolicyResult {
   /**
    * Creates a new successful result from a policy execution.
    *
-   * @param result the result of the flow execution.
-   * @param responseParameters the response parameters to be sent by the source.
+   * @param result                                   the result of the flow execution.
+   * @param responseParameters                       the response parameters to be sent by the source.
    * @param messageSourceResponseParametersProcessor a processor to create response parameters from an {@link CoreEvent}
    */
   public SourcePolicySuccessResult(CoreEvent result, Supplier<Map<String, Object>> responseParameters,

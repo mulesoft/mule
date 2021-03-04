@@ -78,7 +78,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
    * Prepares a property with the given key and value to be sent as an inbound property of the {@link Message} to the configured
    * flow.
    *
-   * @param key the key of the inbound property to add
+   * @param key   the key of the inbound property to add
    * @param value the value of the inbound property to add
    * @return this {@link FlowRunner}
    * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
@@ -108,7 +108,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
    * Prepares a property with the given key and value to be sent as an outbound property of the {@link Message} to the configured
    * flow.
    *
-   * @param key the key of the outbound property to add
+   * @param key   the key of the outbound property to add
    * @param value the value of the outbound property to add
    * @return this {@link FlowRunner}
    * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
@@ -123,7 +123,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
   /**
    * Prepares an attachment with the given key and value to be sent in the {@link Message} to the configured flow.
    *
-   * @param key the key of the attachment to add
+   * @param key   the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
    * @return this {@link FlowRunner}
    * @deprecated Transport infrastructure is deprecated.
@@ -139,7 +139,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
    * Prepares a property with the given key and value to be sent as a session property of the {@link Message} to the configured
    * flow.
    *
-   * @param key the key of the session property to add
+   * @param key   the key of the session property to add
    * @param value the value of the session property to add
    * @return this {@link FlowRunner}
    * @deprecated Transport infrastructure is deprecated.
@@ -188,7 +188,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
   /**
    * Prepares a flow variable with the given key and value to be set in the {@link Message} to the configured flow.
    *
-   * @param key the key of the flow variable to put
+   * @param key   the key of the flow variable to put
    * @param value the value of the flow variable to put
    * @return this {@link FlowRunner}
    */
@@ -201,8 +201,8 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
   /**
    * Prepares a flow variable with the given key and value to be set in the {@link Message} to the configured flow.
    *
-   * @param key the key of the flow variable to put
-   * @param value the value of the flow variable to put
+   * @param key      the key of the flow variable to put
+   * @param value    the value of the flow variable to put
    * @param dataType the value data type
    * @return this {@link FlowRunner}
    */

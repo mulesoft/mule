@@ -163,7 +163,7 @@ public class ValueResolvingContext implements AutoCloseable {
     /**
      * Adds a property to the {@link ValueResolvingContext} to be built.
      *
-     * @param propertyName the name of the property to be stored in the context
+     * @param propertyName  the name of the property to be stored in the context
      * @param propertyValue the value of the property to be stored in the context
      * @return this builder
      */

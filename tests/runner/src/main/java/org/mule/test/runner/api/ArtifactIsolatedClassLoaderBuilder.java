@@ -155,7 +155,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * packages. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
    * @param excludedArtifacts Maven artifacts to be excluded from artifact class loaders created here due to they are going to be
-   *        added as boot packages. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
+   *                          added as boot packages. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setExcludedArtifacts(Set<String> excludedArtifacts) {
@@ -168,7 +168,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * addition to the pre-defined ones.
    * 
    * @param extraBootPackages {@link List} of {@link String}s containing the extra boot packages defined to be appended to the
-   *        container in addition to the pre-defined ones.
+   *                          container in addition to the pre-defined ones.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setExtraBootPackages(List<String> extraBootPackages) {
@@ -181,7 +181,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * addition to the pre-defined ones.
    *
    * @param extraPrivilegedArtifacts {@link List} of {@link String}s containing the extra privileged artifacts defined to be
-   *        appended to the container in addition to the pre-defined ones.
+   *                                 appended to the container in addition to the pre-defined ones.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setExtraPrivilegedArtifacts(Set<String> extraPrivilegedArtifacts) {
@@ -195,7 +195,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * <p/>
    *
    * @param providedExclusions Maven artifacts to be excluded from the {@code provided} scope direct dependencies of the
-   *        rootArtifact. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
+   *                           rootArtifact. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setProvidedExclusions(final Set<String> providedExclusions) {
@@ -208,7 +208,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
    * @param testExclusions {@link Set} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
-   *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
+   *                       format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setTestExclusions(final Set<String> testExclusions) {
@@ -221,7 +221,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
    * @param testInclusions {@link Set} of inclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
-   *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
+   *                       format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setTestInclusions(final Set<String> testInclusions) {
@@ -234,7 +234,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * for testing purposes only.
    *
    * @param exportPluginClasses of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their
-   *        APIs, for testing purposes only.
+   *                            APIs, for testing purposes only.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setExportPluginClasses(final Set<Class> exportPluginClasses) {
@@ -259,7 +259,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * classified.
    *
    * @param {@link List} of {@link URL}s to be appended to the application {@link ArtifactClassLoader} in addition to the ones
-   *        classified.
+   *               classified.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setTestRunnerPluginUrls(List<URL> testRunnerPluginUrls) {

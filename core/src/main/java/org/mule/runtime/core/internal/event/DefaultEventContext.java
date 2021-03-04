@@ -59,7 +59,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * typically used in {@code flow-ref} type scenarios where a the referenced Flow should complete the child context, but should
    * not complete the parent context
    *
-   * @param parent the parent context
+   * @param parent            the parent context
    * @param componentLocation he location of the component that creates the child context and operates on result if available.
    * @return a new child context
    */
@@ -73,9 +73,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * typically used in {@code flow-ref} type scenarios where a the referenced Flow should complete the child context, but should
    * not complete the parent context
    *
-   * @param parent the parent context
+   * @param parent            the parent context
    * @param componentLocation the location of the component that creates the child context and operates on result if available.
-   * @param exceptionHandler used to handle {@link MessagingException}'s.
+   * @param exceptionHandler  used to handle {@link MessagingException}'s.
    * @return a new child context
    */
   public static BaseEventContext child(BaseEventContext parent, Optional<ComponentLocation> componentLocation,
@@ -158,12 +158,12 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   /**
    * Builds a new execution context with the given parameters.
    *
-   * @param flow the flow that processes events of this context.
-   * @param location the location of the component that received the first message for this context.
-   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
-   *        context, if available.
+   * @param flow               the flow that processes events of this context.
+   * @param location           the location of the component that received the first message for this context.
+   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
+   *                           this context, if available.
    * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
-   *        depend on completion of source.
+   *                           depend on completion of source.
    */
   public DefaultEventContext(FlowConstruct flow, ComponentLocation location, String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion) {
@@ -185,14 +185,14 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   /**
    * Builds a new execution context with the given parameters.
    *
-   * @param flow the flow that processes events of this context.
-   * @param exceptionHandler the exception handler that will deal with an error context. This will be used instead of the one from
-   *        the given {@code flow}
-   * @param location the location of the component that received the first message for this context.
-   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
-   *        context, if available.
+   * @param flow               the flow that processes events of this context.
+   * @param exceptionHandler   the exception handler that will deal with an error context. This will be used instead of the one
+   *                           from the given {@code flow}
+   * @param location           the location of the component that received the first message for this context.
+   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
+   *                           this context, if available.
    * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
-   *        depend on completion of source.
+   *                           depend on completion of source.
    */
   public DefaultEventContext(FlowConstruct flow, FlowExceptionHandler exceptionHandler, ComponentLocation location,
                              String correlationId, Optional<CompletableFuture<Void>> externalCompletion) {
@@ -214,13 +214,13 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   /**
    * Builds a new execution context with the given parameters.
    *
-   * @param id the unique id for this event context.
-   * @param serverId the id of the running mule server
-   * @param location the location of the component that received the first message for this context.
-   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
-   *        context, if available.
+   * @param id                 the unique id for this event context.
+   * @param serverId           the id of the running mule server
+   * @param location           the location of the component that received the first message for this context.
+   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
+   *                           this context, if available.
    * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
-   *        depend on completion of source.
+   *                           depend on completion of source.
    */
   public DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion) {
@@ -230,14 +230,14 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   /**
    * Builds a new execution context with the given parameters.
    *
-   * @param id the unique id for this event context.
-   * @param serverId the id of the running mule server
-   * @param location the location of the component that received the first message for this context.
-   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
-   *        context, if available.
+   * @param id                 the unique id for this event context.
+   * @param serverId           the id of the running mule server
+   * @param location           the location of the component that received the first message for this context.
+   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
+   *                           this context, if available.
    * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
-   *        depend on completion of source.
-   * @param exceptionHandler the exception handler that will deal with an error context
+   *                           depend on completion of source.
+   * @param exceptionHandler   the exception handler that will deal with an error context
    *
    * @deprecated since 4.3.0, use {@link #DefaultEventContext(String, String, ComponentLocation, String, Optional)} instead and
    *             rely on the provided {@code processor} to do the error handling.
@@ -269,7 +269,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * <p>
    * Consumers of this method <b>MUST</b> discard the passed {@code provider} and continue using the returned one instead.
    *
-   * @param provider a {@link CursorStreamProvider}
+   * @param provider    a {@link CursorStreamProvider}
    * @param ghostBuster the {@link StreamingGhostBuster}
    * @return a tracked {@link CursorProvider}.
    * @since 4.3.0

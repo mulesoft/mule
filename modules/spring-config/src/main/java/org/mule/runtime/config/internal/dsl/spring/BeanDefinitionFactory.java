@@ -105,7 +105,7 @@ public class BeanDefinitionFactory {
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
-   *        artifact.
+   *                                            artifact.
    * @param errorTypeRepository
    */
   public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
@@ -130,11 +130,11 @@ public class BeanDefinitionFactory {
    * Creates a {@code BeanDefinition} for the {@code ComponentModel}.
    *
    * @param springComponentModels a {@link Map} created {@link ComponentAst} and {@link SpringComponentModel}
-   * @param parentComponentModel the container of the component model from which we want to create the bean definition.
-   * @param componentModel the component model from which we want to create the bean definition.
-   * @param registry the bean registry since it may be required to get other bean definitions to create this one or to register
-   *        the bean definition.
-   * @param componentLocator where the locations of any {@link Component}'s locations must be registered
+   * @param parentComponentModel  the container of the component model from which we want to create the bean definition.
+   * @param componentModel        the component model from which we want to create the bean definition.
+   * @param registry              the bean registry since it may be required to get other bean definitions to create this one or
+   *                              to register the bean definition.
+   * @param componentLocator      where the locations of any {@link Component}'s locations must be registered
    */
   public void resolveComponent(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                List<ComponentAst> componentModelHierarchy,

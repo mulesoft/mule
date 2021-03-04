@@ -38,8 +38,8 @@ public class ExtensionResolvingContext {
    * Retrieves the configuration for the related component
    *
    * @param configurationSupplier Supplies optional configurations
-   * @param connectionManager {@link ConnectionManager} which is able to find a connection for the component using the
-   *        {@param configInstance}
+   * @param connectionManager     {@link ConnectionManager} which is able to find a connection for the component using the
+   *                              {@param configInstance}
    */
   public ExtensionResolvingContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
                                    ConnectionManager connectionManager) {

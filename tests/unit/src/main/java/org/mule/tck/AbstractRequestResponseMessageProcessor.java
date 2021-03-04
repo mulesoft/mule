@@ -116,8 +116,8 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    * when processing is successful as well as if an exception is thrown. successful result and in the case of an exception being
    * thrown.
    *
-   * @param event the result of request and response processing. Note that this includes the request and response processing of
-   *        the rest of the Flow following this message processor too.
+   * @param event     the result of request and response processing. Note that this includes the request and response processing
+   *                  of the rest of the Flow following this message processor too.
    * @param exception the exception thrown during processing if any. If not exception was thrown then this parameter is null
    */
   protected void processFinally(CoreEvent event, MessagingException exception) {

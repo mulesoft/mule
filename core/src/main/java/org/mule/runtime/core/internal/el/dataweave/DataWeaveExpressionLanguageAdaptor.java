@@ -202,7 +202,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
    *
    * @param expression the expression to sanitize before running
    * @param evaluation the function to evaluate the expression with
-   * @param <T> the type that the function returns
+   * @param <T>        the type that the function returns
    * @return the result of the evaluation
    */
   private <T> T sanitizeAndEvaluate(String expression, Function<String, T> evaluation) {

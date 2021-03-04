@@ -28,14 +28,14 @@ public class TransformerBootstrapProperty extends AbstractBootstrapProperty {
   /**
    * Creates a bootstrap property
    *
-   * @param service service that provides the property. Not null.
-   * @param artifactTypes defines what is the artifact this bootstrap object applies to
-   * @param optional indicates whether or not the bootstrapped transformer is optional. When a bootstrap object is optional, any
-   *        error creating it will be ignored.
-   * @param name name assigned to the transformer. Can be null.
-   * @param className className of the bootstrapped transformer. Not empty.
+   * @param service         service that provides the property. Not null.
+   * @param artifactTypes   defines what is the artifact this bootstrap object applies to
+   * @param optional        indicates whether or not the bootstrapped transformer is optional. When a bootstrap object is
+   *                        optional, any error creating it will be ignored.
+   * @param name            name assigned to the transformer. Can be null.
+   * @param className       className of the bootstrapped transformer. Not empty.
    * @param returnClassName name of the transformer return class. Can be null.
-   * @param mimeType transformer returned mimeType. Can be null
+   * @param mimeType        transformer returned mimeType. Can be null
    */
   public TransformerBootstrapProperty(BootstrapService service, Set<ArtifactType> artifactTypes, boolean optional, String name,
                                       String className, String returnClassName, String mimeType) {

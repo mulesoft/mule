@@ -30,7 +30,7 @@ public interface ExpressionLanguageContext {
   /**
    * Adds an alias that requires access to internal Mule API
    *
-   * @param alias name to be aliased
+   * @param alias      name to be aliased
    * @param expression expression to replace the alias.
    */
   void addInternalAlias(String alias, String expression);

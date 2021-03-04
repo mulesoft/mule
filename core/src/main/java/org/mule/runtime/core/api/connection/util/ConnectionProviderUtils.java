@@ -38,7 +38,7 @@ public final class ConnectionProviderUtils {
    * returned, even if such value is actually a {@link ConnectionProviderWrapper}
    *
    * @param connectionProvider connection provider to unwrap
-   * @param stopClass optional stop condition
+   * @param stopClass          optional stop condition
    * @return the wrapped instance when {@code connectionProvider} is a {@link ConnectionProviderWrapper}, the same
    *         {@code connectionProvider} otherwise.
    */

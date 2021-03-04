@@ -470,7 +470,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
    * <p>
    * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
    *
-   * @param value the value to expose
+   * @param value           the value to expose
    * @param modelProperties of the value's parameter
    * @return a {@link ValueResolver}
    */

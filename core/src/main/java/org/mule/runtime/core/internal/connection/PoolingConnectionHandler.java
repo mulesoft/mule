@@ -38,7 +38,7 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
    * Creates a new instance
    *
    * @param connection the connection to be wrapped
-   * @param pool the pool from which the {@code connection} was obtained and to which it has to be returned
+   * @param pool       the pool from which the {@code connection} was obtained and to which it has to be returned
    */
   PoolingConnectionHandler(C connection, ObjectPool<C> pool, PoolingListener poolingListener,
                            ConnectionProvider connectionProvider) {

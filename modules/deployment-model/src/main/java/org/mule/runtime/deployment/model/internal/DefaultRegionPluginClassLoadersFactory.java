@@ -55,7 +55,7 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
    * Creates a new factory
    *
    * @param artifactPluginClassLoaderFactory factory to create class loaders for each used plugin. Non be not null.
-   * @param moduleRepository provides access to the modules available on the container. Non null.
+   * @param moduleRepository                 provides access to the modules available on the container. Non null.
    */
   public DefaultRegionPluginClassLoadersFactory(ArtifactClassLoaderFactory artifactPluginClassLoaderFactory,
                                                 ModuleRepository moduleRepository) {
@@ -88,7 +88,7 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
 
   /**
    * @param parentArtifactId identifier of the artifact that owns the plugin. Non empty.
-   * @param pluginName name of the plugin. Non empty.
+   * @param pluginName       name of the plugin. Non empty.
    * @return the unique identifier for the plugin inside the parent artifact.
    */
   public static String getArtifactPluginId(String parentArtifactId, String pluginName) {

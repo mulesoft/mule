@@ -54,9 +54,9 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
   private int journalOperations = 0;
 
   /**
-   * @param journalFile journal file to use. Will be created if it doesn't exists. If exists then transaction entries will get
-   *        loaded from it.
-   * @param journalEntrySerializer serializer for {@link JournalEntry}
+   * @param journalFile                  journal file to use. Will be created if it doesn't exists. If exists then transaction
+   *                                     entries will get loaded from it.
+   * @param journalEntrySerializer       serializer for {@link JournalEntry}
    * @param transactionCompletePredicate a callback to determine if a transaction is complete.
    */
   public TransactionJournalFile(File journalFile, JournalEntrySerializer journalEntrySerializer,

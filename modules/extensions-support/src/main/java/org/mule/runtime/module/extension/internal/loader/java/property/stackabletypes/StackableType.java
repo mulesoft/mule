@@ -31,11 +31,11 @@ public class StackableType {
    * Creates a new instance. If a factory is not provided it will be considered that the correspondent type doesn't support
    * {@link ValueResolver} of the factory type.
    *
-   * @param type The represented type
+   * @param type                           The represented type
    * @param expressionBasedResolverFactory A factory that creates instances of expression based {@link ValueResolver value
-   *        resolvers}
-   * @param staticResolverFactory A factory that creates instances of static {@link ValueResolver value resolvers}
-   * @param delegateResolverFactory A factory that create instances of {@link ValueResolver value resolver} wrappers
+   *                                       resolvers}
+   * @param staticResolverFactory          A factory that creates instances of static {@link ValueResolver value resolvers}
+   * @param delegateResolverFactory        A factory that create instances of {@link ValueResolver value resolver} wrappers
    */
   private StackableType(Type type, ExpressionBasedResolverFactory expressionBasedResolverFactory,
                         StaticResolverFactory staticResolverFactory, DelegateResolverFactory delegateResolverFactory) {

@@ -42,7 +42,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
    * Creates a new instance
    *
    * @param configurationDependencyResolver the configuration dependency resolver
-   * @param springRegistry the context spring registry
+   * @param springRegistry                  the context spring registry
    */
   public DefaultBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
                                        SpringRegistry springRegistry) {

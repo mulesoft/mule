@@ -35,7 +35,7 @@ public class LifecycleInitialiserValueResolverWrapper<T> extends LifecycleAwareV
   /**
    * Creates a new instance
    *
-   * @param delegate the delegate resolver
+   * @param delegate    the delegate resolver
    * @param muleContext the current {@link MuleContext}
    */
   public LifecycleInitialiserValueResolverWrapper(ValueResolver<T> delegate, MuleContext muleContext) {

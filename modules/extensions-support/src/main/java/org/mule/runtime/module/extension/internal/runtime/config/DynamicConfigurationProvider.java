@@ -92,15 +92,15 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   /**
    * Creates a new instance
    *
-   * @param name this provider's name
-   * @param extension the model that owns the {@code configurationModel}
-   * @param config the model for the returned configurations
-   * @param resolverSet the {@link ResolverSet} that provides the configuration's parameter values
+   * @param name                       this provider's name
+   * @param extension                  the model that owns the {@code configurationModel}
+   * @param config                     the model for the returned configurations
+   * @param resolverSet                the {@link ResolverSet} that provides the configuration's parameter values
    * @param connectionProviderResolver a {@link ValueResolver} used to obtain a {@link ConnectionProvider}
-   * @param expirationPolicy the {@link ExpirationPolicy} for the unused instances
-   * @param reflectionCache the {@link ReflectionCache} used to improve reflection lookups performance
-   * @param expressionManager the {@link ExpressionManager} used to create a session used to evaluate the attributes.
-   * @param muleContext the {@link MuleContext} that will own the configuration instances
+   * @param expirationPolicy           the {@link ExpirationPolicy} for the unused instances
+   * @param reflectionCache            the {@link ReflectionCache} used to improve reflection lookups performance
+   * @param expressionManager          the {@link ExpressionManager} used to create a session used to evaluate the attributes.
+   * @param muleContext                the {@link MuleContext} that will own the configuration instances
    */
   public DynamicConfigurationProvider(String name,
                                       ExtensionModel extension,

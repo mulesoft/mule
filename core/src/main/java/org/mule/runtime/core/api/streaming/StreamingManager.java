@@ -48,7 +48,7 @@ public interface StreamingManager {
    * Becomes aware of the given {@code provider} and returns a replacement provider which is managed by the runtime, allowing for
    * automatic resource handling
    *
-   * @param provider the provider to be tracked
+   * @param provider                the provider to be tracked
    * @param creatorRootEventContext the event context on which the stream was created
    * @return a {@link CursorProvider}
    */
@@ -58,7 +58,7 @@ public interface StreamingManager {
    * Becomes aware of the given {@code provider} and returns a replacement provider which is managed by the runtime, allowing for
    * automatic resource handling
    *
-   * @param provider the provider to be tracked
+   * @param provider     the provider to be tracked
    * @param creatorEvent the event that created the provider
    * @return a {@link CursorProvider}
    * @deprecated Use {@link #manage(CursorProvider, EventContext)} instead.
@@ -73,7 +73,7 @@ public interface StreamingManager {
    * If {@code inputStream} is a {@link Cursor} then nothing happens. Use {@link #manage(CursorProvider, CoreEvent)} for those
    * cases.
    *
-   * @param inputStream the stream to track
+   * @param inputStream             the stream to track
    * @param creatorRootEventContext the event context on which the stream was created
    * @deprecated since 4.2.2 - 4.3.0. Use {@link #manage(Closeable, EventContext)} instead
    */
@@ -87,7 +87,7 @@ public interface StreamingManager {
    * If {@code closeable} is a {@link Cursor} then nothing happens. Use {@link #manage(CursorProvider, CoreEvent)} for those
    * cases.
    *
-   * @param closeable a closeable stream to be tracked
+   * @param closeable               a closeable stream to be tracked
    * @param creatorRootEventContext the event context on which the stream was created
    */
   void manage(Closeable closeable, EventContext creatorRootEventContext);
@@ -99,7 +99,7 @@ public interface StreamingManager {
    * If {@code inputStream} is a {@link Cursor} then nothing happens. Use {@link #manage(CursorProvider, CoreEvent)} for those
    * cases.
    *
-   * @param inputStream the stream to track
+   * @param inputStream  the stream to track
    * @param creatorEvent the event on which the stream was created
    *
    * @deprecated Use {@link #manage(InputStream, EventContext)} instead

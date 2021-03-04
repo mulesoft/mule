@@ -369,7 +369,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
      * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty} if the parsedParameter is annotated
      * either as {@link MetadataKeyId} or {@link MetadataKeyPart}
      *
-     * @param element the method annotated parameter parsed
+     * @param element         the method annotated parameter parsed
      * @param baseDeclaration the {@link ParameterDeclarer} associated to the parsed parameter
      */
     private void parseMetadataKeyAnnotations(ExtensionParameter element, BaseDeclaration baseDeclaration,

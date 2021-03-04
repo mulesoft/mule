@@ -25,7 +25,7 @@ public interface RevocationCheck {
   /**
    * Configures trust store factory parameters for certificate revocation checking according to the method implementation.
    *
-   * @param trustStore the trust store configured for the corresponding TLS context
+   * @param trustStore          the trust store configured for the corresponding TLS context
    * @param defaultTrustAnchors the default trusted CAs from the JVM
    * @return the configured trust manager factory parameters
    */

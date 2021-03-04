@@ -49,9 +49,11 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   /**
    * Creates a new factory
    *
-   * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
+   *                                           null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
-   *        {@link ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
+   *                                           {@link ArtifactDescriptorValidator} in order to check the state of the descriptor
+   *                                           once loaded.
    */
   public AbstractArtifactDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository,
                                            ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
@@ -95,7 +97,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
    * Loads a descriptor from an artifact model
    *
    * @param artifactLocation folder where the artifact is located, it can be a folder or file depending on the artifact type.
-   * @param artifactModel model representing the artifact.
+   * @param artifactModel    model representing the artifact.
    * @return a descriptor matching the provided model.
    */
   protected final T loadFromJsonDescriptor(File artifactLocation, M artifactModel, Optional<Properties> deploymentProperties) {
@@ -146,15 +148,15 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   /**
    * Allows subclasses to customize descriptor based on the provided model
    *
-   * @param artifactModel artifact model created from the JSON descriptor
-   * @param descriptor descriptor created from the model and configured with common attributes
+   * @param artifactModel    artifact model created from the JSON descriptor
+   * @param descriptor       descriptor created from the model and configured with common attributes
    * @param artifactLocation folder where the artifact is located, it can be a folder or file depending on the artifact type.
    */
   protected abstract void doDescriptorConfig(M artifactModel, T descriptor, File artifactLocation);
 
   /**
-   * @param artifactLocation folder where the artifact is located, it can be a folder or file depending on the artifact type.
-   * @param name name for the created artifact
+   * @param artifactLocation     folder where the artifact is located, it can be a folder or file depending on the artifact type.
+   * @param name                 name for the created artifact
    * @param deploymentProperties properties provided for the deployment process.
    * @return a new descriptor of the type required by the factory.
    */

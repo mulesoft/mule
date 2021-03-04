@@ -42,7 +42,7 @@ public final class BufferedCursorStream extends AbstractCursorStream {
    * Creates a new instance
    *
    * @param streamBuffer the buffer which provides data
-   * @param provider the {@link CursorStreamProvider} for the {@link CursorStream cursors} that will consume this buffer
+   * @param provider     the {@link CursorStreamProvider} for the {@link CursorStream cursors} that will consume this buffer
    */
   public BufferedCursorStream(InputStreamBuffer streamBuffer, CursorStreamProvider provider) {
     super(provider);

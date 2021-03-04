@@ -76,7 +76,7 @@ public class SourceAdapterFactory {
    * @param configurationInstance an {@link Optional} {@link ConfigurationInstance} in case the source requires a config
    * @param sourceCallbackFactory a {@link SourceCallbackFactory}
    *
-   * @param restarting indicates if the creation of the adapter was triggered after by a restart
+   * @param restarting            indicates if the creation of the adapter was triggered after by a restart
    *
    * @return a new {@link SourceAdapter}
    */

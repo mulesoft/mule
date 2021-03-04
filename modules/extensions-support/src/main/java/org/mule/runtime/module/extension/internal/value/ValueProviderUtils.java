@@ -43,7 +43,7 @@ public class ValueProviderUtils {
    * Given a {@link Value}, this is navigated recursively cloning each {@link Value} of the tree structure creating a
    * {@link ValueBuilder} and adding the partName of each {@link Value} found.
    *
-   * @param value {@link Value} to be cloned and enriched
+   * @param value            {@link Value} to be cloned and enriched
    * @param partOrderMapping {@link Map} that contains the mapping of the name of each part of the {@link Value}
    * @return a {@link ValueBuilder} with the cloned and enriched values
    */
@@ -59,9 +59,9 @@ public class ValueProviderUtils {
    * Given a {@link Value}, this is navigated recursively cloning each {@link Value} of the tree structure creating a
    * {@link ValueBuilder} and adding the partName of each {@link Value} found.
    *
-   * @param value {@link Value} to be cloned and enriched
+   * @param value            {@link Value} to be cloned and enriched
    * @param partOrderMapping {@link Map} that contains the mapping of the name of each part of the {@link Value}
-   * @param level the current level of the part of the {@link Value} to be cloned and enriched
+   * @param level            the current level of the part of the {@link Value} to be cloned and enriched
    * @return a {@link ValueBuilder} with the cloned and enriched values
    */
   static ValueBuilder cloneAndEnrichValue(Value value, Map<Integer, String> partOrderMapping, int level) {

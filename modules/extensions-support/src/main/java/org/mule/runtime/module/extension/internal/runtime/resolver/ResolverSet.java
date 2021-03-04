@@ -48,10 +48,10 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   /**
    * Links the given {@link ValueResolver} to the given identifying {@code key}.
    *
-   * @param key a non-blank {@code key}
+   * @param key      a non-blank {@code key}
    * @param resolver a not {@code null} {@link ValueResolver}
    * @return this resolver set to allow chaining
-   * @throws IllegalStateException if the {@code key} was already associated to a {@code resolver}
+   * @throws IllegalStateException    if the {@code key} was already associated to a {@code resolver}
    * @throws IllegalArgumentException if either {@code key} is empty or {@code resolver} is {@code null}
    */
   public ResolverSet add(String key, ValueResolver resolver) {
@@ -73,7 +73,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    *
    * @param resolvers a not {@code null} {@link Map} of {@code key}-{@link ValueResolver}
    * @return this resolver set to allow chaining
-   * @throws IllegalStateException if any of the {@code key}s were already associated to a {@code resolver}
+   * @throws IllegalStateException    if any of the {@code key}s were already associated to a {@code resolver}
    * @throws IllegalArgumentException if either {@code key} is empty or {@code resolver} is {@code null}, on any of the entries.
    * @see ResolverSet#add(String, ValueResolver)
    */
@@ -122,7 +122,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    *
    * @param resolverSet a {@link ResolverSet} to merge with {@code this} {@link ResolverSet}
    * @return a new instance of {@link ResolverSet} containing all the resolvers.
-   * @throws IllegalStateException if a duplicated {@code key} is found during the merge
+   * @throws IllegalStateException    if a duplicated {@code key} is found during the merge
    * @throws IllegalArgumentException if the given {@code resolverSet} is {@code null}
    */
   public ResolverSet merge(ResolverSet resolverSet) {

@@ -24,7 +24,7 @@ public class ExceptionMapping implements Comparable<ExceptionMapping> {
    * Creates a new {@link ExceptionMapping} instance.
    *
    * @param exceptionType exception type to related to the error type.
-   * @param errorType error type associated with the exception type.
+   * @param errorType     error type associated with the exception type.
    */
   public ExceptionMapping(Class<? extends Throwable> exceptionType, ErrorType errorType) {
     checkState(exceptionType != null, "exceptionType type cannot be null");

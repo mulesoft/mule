@@ -34,9 +34,9 @@ public interface OAuthService extends Service {
    * Creates a builder for an {@link ClientCredentialsOAuthDancer} for client credentials grant type. The dancer will use the
    * given {@code lockProvider} and {@code tokensStore} to manage its internal state.
    *
-   * @param lockProvider a factory for {@link Lock}s, uniquely identified by the {@code name} passed to
-   *        {@link LockFactory#createLock(String)}.
-   * @param tokensStore the repository for the tokens for the returned {@link ClientCredentialsOAuthDancer dancer}.
+   * @param lockProvider        a factory for {@link Lock}s, uniquely identified by the {@code name} passed to
+   *                            {@link LockFactory#createLock(String)}.
+   * @param tokensStore         the repository for the tokens for the returned {@link ClientCredentialsOAuthDancer dancer}.
    * @param expressionEvaluator the object used to evaluate expressions.
    * @return a builder for a client-credentials grant type dancer.
    */
@@ -48,9 +48,9 @@ public interface OAuthService extends Service {
    * Creates a builder for an {@link AuthorizationCodeOAuthDancer} for authorization code grant type. The dancer will use the
    * given {@code lockProvider} and {@code tokensStore} to manage its internal state.
    *
-   * @param lockProvider a factory for {@link Lock}s, uniquely identified by the {@code name} passed to
-   *        {@link LockFactory#createLock(String)}.
-   * @param tokensStore the repository for the tokens for the returned {@link AuthorizationCodeOAuthDancer dancer}.
+   * @param lockProvider        a factory for {@link Lock}s, uniquely identified by the {@code name} passed to
+   *                            {@link LockFactory#createLock(String)}.
+   * @param tokensStore         the repository for the tokens for the returned {@link AuthorizationCodeOAuthDancer dancer}.
    * @param expressionEvaluator the object used to evaluate expressions.
    * @return a builder for an authorization-code grant type dancer.
    */
@@ -65,9 +65,9 @@ public interface OAuthService extends Service {
    * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios. Backwards
    * compatibility is not guaranteed.
    *
-   * @param lockFactory a factory for {@link Lock}s, uniquely identified by the {@code name} passed to
-   *        {@link LockFactory#createLock(String)}.
-   * @param tokensStore the repository for the tokens for the returned {@link ClientCredentialsOAuthDancer dancer}.
+   * @param lockFactory         a factory for {@link Lock}s, uniquely identified by the {@code name} passed to
+   *                            {@link LockFactory#createLock(String)}.
+   * @param tokensStore         the repository for the tokens for the returned {@link ClientCredentialsOAuthDancer dancer}.
    * @param expressionEvaluator the object used to evaluate expressions.
    * @return a builder for a client-credentials grant type dancer.
    * @since 4.3.0

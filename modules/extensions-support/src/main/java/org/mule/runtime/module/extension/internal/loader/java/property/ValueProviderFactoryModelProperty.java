@@ -39,11 +39,11 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
   private final List<InjectableParameterInfo> injectableParameters;
 
   /**
-   * @param valueProvider the {@link ValueProvider} class.
+   * @param valueProvider        the {@link ValueProvider} class.
    * @param injectableParameters the parameters that should be injected inside the {@link ValueProvider} to be able to resolve the
-   *        {@link Value values}
-   * @param connectionField the field inside the {@link ValueProvider} which is considered as a connection
-   * @param configField the field inside the {@link ValueProvider} which is considered as a configuration
+   *                             {@link Value values}
+   * @param connectionField      the field inside the {@link ValueProvider} which is considered as a connection
+   * @param configField          the field inside the {@link ValueProvider} which is considered as a configuration
    */
   private ValueProviderFactoryModelProperty(Class<? extends ValueProvider> valueProvider,
                                             List<InjectableParameterInfo> injectableParameters,

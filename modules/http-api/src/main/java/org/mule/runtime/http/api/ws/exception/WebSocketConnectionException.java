@@ -29,7 +29,7 @@ public class WebSocketConnectionException extends WebSocketRuntimeException {
    * Creates a new instance
    *
    * @param webSocket the referred {@link WebSocket}
-   * @param cause the exception's cause
+   * @param cause     the exception's cause
    */
   public WebSocketConnectionException(WebSocket webSocket, Throwable cause) {
     super("WebSocket " + webSocket.getId() + " connection is not usable.", webSocket, cause);

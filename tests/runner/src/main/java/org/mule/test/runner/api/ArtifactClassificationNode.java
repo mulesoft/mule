@@ -32,11 +32,11 @@ public class ArtifactClassificationNode {
   /**
    * Creates an instance of the classification.
    *
-   * @param artifact the classified {@link Artifact}
-   * @param urls list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}
-   * @param exportClasses list of {@link Class}es that would be used for exporting as extra classes to the plugin
+   * @param artifact             the classified {@link Artifact}
+   * @param urls                 list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}
+   * @param exportClasses        list of {@link Class}es that would be used for exporting as extra classes to the plugin
    * @param artifactDependencies list of {@link ArtifactClassificationNode} plugin dependencies references for this artifact
-   *        classified
+   *                             classified
    */
   public ArtifactClassificationNode(Artifact artifact, List<URL> urls, List<Class> exportClasses,
                                     List<ArtifactClassificationNode> artifactDependencies) {

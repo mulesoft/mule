@@ -86,7 +86,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   /**
    * Configures the flow to run inside a transaction.
    *
-   * @param action The action to do at the start of the transactional block. See {@link TransactionConfig} constants.
+   * @param action  The action to do at the start of the transactional block. See {@link TransactionConfig} constants.
    * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
    * @return this {@link FlowRunner}
    */

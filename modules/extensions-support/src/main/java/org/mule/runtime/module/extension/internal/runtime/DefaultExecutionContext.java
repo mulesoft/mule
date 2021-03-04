@@ -60,15 +60,15 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   /**
    * Creates a new instance with the given state
    *
-   * @param configuration the {@link ConfigurationInstance} that the operation will use
-   * @param parameters the parameters that the operation will use
-   * @param componentModel the {@link ComponentModel} for the component being executed
-   * @param event the current {@link CoreEvent}
+   * @param configuration         the {@link ConfigurationInstance} that the operation will use
+   * @param parameters            the parameters that the operation will use
+   * @param componentModel        the {@link ComponentModel} for the component being executed
+   * @param event                 the current {@link CoreEvent}
    * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the executed component
-   * @param streamingManager the application's {@link StreamingManager}
-   * @param component the {@link Component component} executing
-   * @param retryPolicyTemplate the reconnection strategy to use in case of connectivity problems
-   * @param muleContext the current {@link MuleContext}
+   * @param streamingManager      the application's {@link StreamingManager}
+   * @param component             the {@link Component component} executing
+   * @param retryPolicyTemplate   the reconnection strategy to use in case of connectivity problems
+   * @param muleContext           the current {@link MuleContext}
    */
   public DefaultExecutionContext(ExtensionModel extensionModel,
                                  Optional<ConfigurationInstance> configuration,

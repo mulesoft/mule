@@ -35,7 +35,7 @@ public interface MetadataCacheManager {
   /**
    * Replaces the old binding of the given {@code id} with the new {@code cache} element.
    *
-   * @param id the cache identifier hash string
+   * @param id    the cache identifier hash string
    * @param cache the new {@link MetadataCache} value bound to the given id
    */
   void updateCache(String id, MetadataCache cache);

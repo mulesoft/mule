@@ -26,7 +26,7 @@ public interface InputStreamBuffer {
    * If no information is available at all, then it returns {@code null}
    *
    * @param position the stream position from which the data should be read
-   * @param length how many bytes to read
+   * @param length   how many bytes to read
    * @return A {@link ByteBuffer} with up to {@code length} bytes of information or {@code null} if no information available at
    *         all
    */

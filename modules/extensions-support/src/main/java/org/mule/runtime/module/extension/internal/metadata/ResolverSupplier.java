@@ -40,7 +40,7 @@ public final class ResolverSupplier<T extends NamedTypeResolver> implements Supp
    * {@link NullMetadataResolverSupplier}.
    *
    * @param aClass The from which the {@link Supplier} will create instances
-   * @param <T> The {@link Class} type
+   * @param <T>    The {@link Class} type
    */
   public static <T extends NamedTypeResolver> Supplier<T> of(Class<T> aClass) {
     checkArgument(aClass != null, "The class can't be null");

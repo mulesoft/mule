@@ -21,7 +21,7 @@ class ObjectBuilderUtils {
    * Creates a new instance of the given {@code prototypeClass}
    *
    * @param prototypeClass the class of the object to create
-   * @param <T> the generic type of the {@code prototypeClass}
+   * @param <T>            the generic type of the {@code prototypeClass}
    * @return a new instance
    */
   public static <T> T createInstance(Class<T> prototypeClass) {

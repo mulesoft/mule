@@ -31,8 +31,8 @@ public class StreamPerEventSink implements Sink {
   /**
    * Creates a {@link StreamPerEventSink}.
    *
-   * @param processor the processor to process events emitted onto stream, typically this processor will represent the flow
-   *        pipeline.
+   * @param processor     the processor to process events emitted onto stream, typically this processor will represent the flow
+   *                      pipeline.
    * @param eventConsumer event consumer called just before {@link CoreEvent}'s emission.
    */
   public StreamPerEventSink(ReactiveProcessor processor, Consumer<CoreEvent> eventConsumer) {

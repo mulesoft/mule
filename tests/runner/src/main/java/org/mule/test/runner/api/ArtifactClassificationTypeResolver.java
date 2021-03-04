@@ -105,7 +105,7 @@ public class ArtifactClassificationTypeResolver {
    * Checks if the {@link ClassLoader} has the resource given.
    *
    * @param classLoader {@link ClassLoader} in order to check if the resource exists, can be null.
-   * @param resource name of the resource to look for.
+   * @param resource    name of the resource to look for.
    * @return
    */
   private boolean hasResource(ClassLoader classLoader, String resource) {

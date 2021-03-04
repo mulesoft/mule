@@ -31,7 +31,7 @@ public interface ExecutionMediator<M extends ComponentModel> {
    * Coordinates the execution of the {@code executor} using the given {@code context}
    *
    * @param executor an {@link CompletableComponentExecutor}
-   * @param context an {@link ExecutionContextAdapter}
+   * @param context  an {@link ExecutionContextAdapter}
    * @param callback
    */
   void execute(CompletableComponentExecutor<M> executor,

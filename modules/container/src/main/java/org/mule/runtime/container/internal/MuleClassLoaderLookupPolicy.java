@@ -38,9 +38,9 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   /**
    * Creates a new lookup policy based on the provided configuration.
    *
-   * @param lookupStrategies lookup strategy to use with specific packages. Non null.
+   * @param lookupStrategies   lookup strategy to use with specific packages. Non null.
    * @param rootSystemPackages packages that must use {@link ContainerOnlyLookupStrategy}. Any inner package extending from a
-   *        system package root will use the same approach.
+   *                           system package root will use the same approach.
    */
   public MuleClassLoaderLookupPolicy(Map<String, LookupStrategy> lookupStrategies, Set<String> rootSystemPackages) {
     checkArgument(lookupStrategies != null, "Lookup strategies cannot be null");

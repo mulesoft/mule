@@ -118,9 +118,9 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
   /**
    * Creates a new instance
    *
-   * @param name this configuration's name
-   * @param model the {@link ConfigurationModel} for this instance
-   * @param value the actual configuration instance
+   * @param name               this configuration's name
+   * @param model              the {@link ConfigurationModel} for this instance
+   * @param value              the actual configuration instance
    * @param connectionProvider an {@link Optional} containing the {@link ConnectionProvider} to use
    */
   public LifecycleAwareConfigurationInstance(String name,

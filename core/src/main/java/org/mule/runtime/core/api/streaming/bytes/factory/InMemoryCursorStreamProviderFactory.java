@@ -33,7 +33,7 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
   /**
    * Creates a new instance
    *
-   * @param config the config for the generated providers
+   * @param config        the config for the generated providers
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
   public InMemoryCursorStreamProviderFactory(ByteBufferManager bufferManager,

@@ -93,11 +93,11 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
   /**
    * Creates a new instance
    *
-   * @param componentModel the component which produces the return value
+   * @param componentModel            the component which produces the return value
    * @param componentDecoratorFactory
-   * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be
-   *        {@code null}
-   * @param muleContext the {@link MuleContext} of the owning application
+   * @param cursorProviderFactory     the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can
+   *                                  be {@code null}
+   * @param muleContext               the {@link MuleContext} of the owning application
    */
   protected AbstractReturnDelegate(ComponentModel componentModel,
                                    CursorComponentDecoratorFactory componentDecoratorFactory,
@@ -273,7 +273,7 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
    * If provided, mimeType and encoding configured as operation parameters will take precedence over what comes with the message's
    * {@link DataType}.
    *
-   * @param value the operation's value
+   * @param value           the operation's value
    * @param contextMimeType the mimeType specified in the operation
    * @param contextEncoding the encoding specified in the operation
    * @return the resolved {@link MediaType}

@@ -46,7 +46,7 @@ public class TestBootstrapServiceDiscovererConfigurationBuilder extends Abstract
    *
    * @param containerClassLoader class loader corresponding to the container where the test is running. Non null.
    * @param executionClassLoader class loader corresponding to the isolates test. Non null
-   * @param pluginClassLoaders class loaders corresponding to plugins deployed in the test (without any filtering). Non null.
+   * @param pluginClassLoaders   class loaders corresponding to plugins deployed in the test (without any filtering). Non null.
    */
   public TestBootstrapServiceDiscovererConfigurationBuilder(ClassLoader containerClassLoader, ClassLoader executionClassLoader,
                                                             List<ArtifactClassLoader> pluginClassLoaders) {

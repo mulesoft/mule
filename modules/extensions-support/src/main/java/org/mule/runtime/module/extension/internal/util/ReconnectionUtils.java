@@ -34,7 +34,7 @@ public class ReconnectionUtils {
   };
 
   /**
-   * @param t the {@link Throwable} thrown during the execution of the operation
+   * @param t       the {@link Throwable} thrown during the execution of the operation
    * @param context the {@link ExecutionContextAdapter} that contains the context information about the operation's execution
    * @return whether or not the operation should be retried
    *
@@ -65,7 +65,7 @@ public class ReconnectionUtils {
    * enriched, this method returns true.
    *
    * @param connectionException the {@link ConnectionException} thrown during the execution of the operation
-   * @param contextConfigName the config name for the context that is attempting to retry the operation
+   * @param contextConfigName   the config name for the context that is attempting to retry the operation
    * @return whether or not the operation should be retried
    */
   private static boolean isConnectionExceptionFromCurrentComponent(ConnectionException connectionException,

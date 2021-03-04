@@ -33,9 +33,9 @@ public class RequiredParameterValueResolverWrapper<T> extends LifecycleAwareValu
   /**
    * Creates a new instance
    *
-   * @param delegate the wrapped {@link ValueResolver}
+   * @param delegate      the wrapped {@link ValueResolver}
    * @param parameterName the name of the parameter this resolver is associated to
-   * @param literalValue the evaluated expression
+   * @param literalValue  the evaluated expression
    */
   public RequiredParameterValueResolverWrapper(ValueResolver<T> delegate,
                                                String parameterName,
@@ -50,7 +50,7 @@ public class RequiredParameterValueResolverWrapper<T> extends LifecycleAwareValu
   /**
    * Creates a new instance
    *
-   * @param delegate the wrapped {@link ValueResolver}
+   * @param delegate      the wrapped {@link ValueResolver}
    * @param parameterName the name of the parameter this resolver is associated to
    */
   public RequiredParameterValueResolverWrapper(ValueResolver<T> delegate,

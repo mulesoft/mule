@@ -33,10 +33,10 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
    * Retrieves the configuration for the related component
    *
    * @param configurationSupplier Supplier of optional configurations
-   * @param connectionManager {@link ConnectionManager} which is able to find a connection for the component using the
-   *        {@param configInstance}
-   * @param cache instance of the {@link MetadataCache} for this context
-   * @param typeLoader instance of a {@link ClassTypeLoader} in the context of this extension
+   * @param connectionManager     {@link ConnectionManager} which is able to find a connection for the component using the
+   *                              {@param configInstance}
+   * @param cache                 instance of the {@link MetadataCache} for this context
+   * @param typeLoader            instance of a {@link ClassTypeLoader} in the context of this extension
    */
   public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
                                 ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader) {

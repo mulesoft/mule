@@ -70,7 +70,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
    * Fills all the descriptions in the provided {@link ExtensionDeclaration} based on the
    * <strong>extensions-descriptions.xml</strong> file.
    *
-   * @param declaration the declaration to describe.
+   * @param declaration   the declaration to describe.
    * @param documentation the extension documentation with its corresponding description.
    */
   private void document(ExtensionDeclaration declaration, XmlExtensionDocumentation documentation) {

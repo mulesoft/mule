@@ -66,7 +66,7 @@ final class DsqlQueryMetadataResolver implements OutputTypeResolver {
    * {@link DsqlQuery#getType() type}.
    *
    * @param context {@link MetadataContext} of the MetaData resolution
-   * @param query the {@link DsqlQuery} to resolve the output metadata from.
+   * @param query   the {@link DsqlQuery} to resolve the output metadata from.
    */
   @Override
   public MetadataType getOutputType(MetadataContext context, Object query)

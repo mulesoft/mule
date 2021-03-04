@@ -68,7 +68,7 @@ public interface ToolingService extends Initialisable, Stoppable {
    * logs are muted.
    *
    * @param applicationLocation location of the application content. The application content may be a folder holding an exploded
-   *        structure for an application or may be a zip file containing the resources of the application.
+   *                            structure for an application or may be a zip file containing the resources of the application.
    * @return the created application.
    * @throws IOException
    */
@@ -92,8 +92,8 @@ public interface ToolingService extends Initialisable, Stoppable {
    * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY} so the application
    * logs are muted.
    *
-   * @param applicationLocation location of the application content. The application content may be a folder holding an exploded
-   *        structure for an application or may be a zip file containing the resources of the application.
+   * @param applicationLocation  location of the application content. The application content may be a folder holding an exploded
+   *                             structure for an application or may be a zip file containing the resources of the application.
    * @param deploymentProperties defines the deployment properties to be used when deploying the application.
    * @return the created application.
    * @throws IOException
@@ -116,7 +116,7 @@ public interface ToolingService extends Initialisable, Stoppable {
   /**
    * Creates an application but from the content byte[], see {@link #createApplication(File, Optional)} for more details.
    *
-   * @param appContent the content of the application.
+   * @param appContent           the content of the application.
    * @param deploymentProperties defines the deployment properties to be used when deploying the application.
    * @return the created application.
    * @throws IOException
@@ -141,8 +141,8 @@ public interface ToolingService extends Initialisable, Stoppable {
    * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY} so the domain logs
    * are muted.
    *
-   * @param domainLocation location of the domain content. The domain content may be a folder holding an exploded structure for an
-   *        domain or may be a jar file containing the resources of the domain.
+   * @param domainLocation       location of the domain content. The domain content may be a folder holding an exploded structure
+   *                             for an domain or may be a jar file containing the resources of the domain.
    * @param deploymentProperties defines the deployment properties to be used when deploying the domain.
    * @return the created domain.
    * @throws IOException
@@ -168,7 +168,7 @@ public interface ToolingService extends Initialisable, Stoppable {
    * are muted.
    *
    * @param domainLocation location of the domain content. The domain content may be a folder holding an exploded structure for an
-   *        domain or may be a jar file containing the resources of the domain.
+   *                       domain or may be a jar file containing the resources of the domain.
    * @return the created domain.
    * @throws IOException
    */
@@ -190,7 +190,7 @@ public interface ToolingService extends Initialisable, Stoppable {
   /**
    * Creates a domain but from the content byte[], see {@link #createDomain(File)} for more details.
    *
-   * @param domainContent the content of the domain.
+   * @param domainContent        the content of the domain.
    * @param deploymentProperties defines the deployment properties to be used when deploying the application.
    * @return the created domain.
    * @throws IOException

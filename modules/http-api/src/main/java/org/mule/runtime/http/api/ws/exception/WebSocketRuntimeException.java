@@ -32,7 +32,7 @@ public abstract class WebSocketRuntimeException extends MuleRuntimeException {
   /**
    * Creates a new instance
    *
-   * @param message the exception message
+   * @param message   the exception message
    * @param webSocket the referred {@link WebSocket}
    */
   public WebSocketRuntimeException(String message, WebSocket webSocket) {
@@ -40,9 +40,9 @@ public abstract class WebSocketRuntimeException extends MuleRuntimeException {
   }
 
   /**
-   * @param message the exception message
+   * @param message   the exception message
    * @param webSocket the referred {@link WebSocket}
-   * @param cause this exception's cause
+   * @param cause     this exception's cause
    */
   public WebSocketRuntimeException(String message, WebSocket webSocket, Throwable cause) {
     super(createStaticMessage(message), cause);

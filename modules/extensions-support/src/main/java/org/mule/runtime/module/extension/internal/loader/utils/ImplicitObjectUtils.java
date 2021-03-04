@@ -41,7 +41,7 @@ public final class ImplicitObjectUtils {
    * <p>
    * If a {@link ParameterModel} returns {@code null} for {@link ParameterModel#getDefaultValue()} then it's ignored
    *
-   * @param model a model holding the {@link ParameterModel}s to consider
+   * @param model       a model holding the {@link ParameterModel}s to consider
    * @param muleContext the Mule node.
    * @return a {@link ResolverSet}
    */

@@ -16,7 +16,7 @@ public interface SystemExceptionHandler {
   /**
    * Take some action when a system exception has occurred (i.e., there was no message in play when the exception occurred).
    *
-   * @param exception which occurred
+   * @param exception      which occurred
    * @param rollbackMethod will be called if transactions are not used in order to achieve atomic message delivery
    */
   void handleException(Exception exception, RollbackSourceCallback rollbackMethod);
@@ -31,7 +31,7 @@ public interface SystemExceptionHandler {
   /**
    * Take some action when a system exception has occurred (i.e., there was no message in play when the exception occurred).
    *
-   * @param exception which occurred
+   * @param exception         which occurred
    * @param componentLocation the {@link ComponentLocation} which produced the exception
    *
    * @since 4.4.0

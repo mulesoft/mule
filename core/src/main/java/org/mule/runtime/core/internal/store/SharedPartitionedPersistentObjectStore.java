@@ -64,8 +64,8 @@ public class SharedPartitionedPersistentObjectStore<T extends Serializable> exte
    * Creates a shared partitioned persistent object store.
    *
    * @param workingDirectory {@link File} where to store this OS data. Not null.
-   * @param lockFactory {@link LockFactory} an external lock factory to synchronize the access to this partitioned persistent
-   *        object store.
+   * @param lockFactory      {@link LockFactory} an external lock factory to synchronize the access to this partitioned persistent
+   *                         object store.
    */
   public SharedPartitionedPersistentObjectStore(File workingDirectory, LockFactory lockFactory) {
     super(partitionsByName);

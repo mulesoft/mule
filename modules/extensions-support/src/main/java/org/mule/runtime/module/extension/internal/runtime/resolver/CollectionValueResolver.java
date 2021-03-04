@@ -49,7 +49,7 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
    * Creates a new instance
    *
    * @param collectionType the {@link Class} for a concrete {@link Collection} type with a default constructor
-   * @param resolvers a not {@code null} {@link List} of resolvers
+   * @param resolvers      a not {@code null} {@link List} of resolvers
    */
   public CollectionValueResolver(Class<? extends Collection> collectionType, List<ValueResolver<T>> resolvers) {
     checkInstantiable(collectionType, new ReflectionCache());

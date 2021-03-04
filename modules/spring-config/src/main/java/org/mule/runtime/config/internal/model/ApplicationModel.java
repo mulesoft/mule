@@ -170,11 +170,11 @@ public class ApplicationModel implements ArtifactAst {
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactAst the mule artifact configuration content.
-   * @param deploymentProperties values for replacement of properties in the DSL
+   * @param artifactAst                   the mule artifact configuration content.
+   * @param deploymentProperties          values for replacement of properties in the DSL
    * @param parentConfigurationProperties the {@link ConfigurationProperties} of the parent artifact. For instance, application
-   *        will receive the domain resolver.
-   * @param externalResourceProvider the provider for configuration properties files and ${file::name.txt} placeholders
+   *                                      will receive the domain resolver.
+   * @param externalResourceProvider      the provider for configuration properties files and ${file::name.txt} placeholders
    */
   public ApplicationModel(ArtifactAst artifactAst,
                           Map<String, String> deploymentProperties,
@@ -241,7 +241,7 @@ public class ApplicationModel implements ArtifactAst {
    *
    * @param ast
    * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to check if the element has to be
-   *        expanded.
+   *                        expanded.
    */
   private ArtifactAst doXmlSdk1MacroExpansion(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
     return new MacroExpansionModulesModel(ast, extensionModels).expand();

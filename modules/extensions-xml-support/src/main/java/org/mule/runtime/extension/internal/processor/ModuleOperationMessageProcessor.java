@@ -178,7 +178,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
    * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, CoreEvent)} we need to store the
    * {@link MetadataType} per parameter, so that the {@link DataType} can be generated.
    *
-   * @param parameters list of parameters taken from the XML
+   * @param parameters      list of parameters taken from the XML
    * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}
    * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(CoreEvent, String, MetadataType)}
    */

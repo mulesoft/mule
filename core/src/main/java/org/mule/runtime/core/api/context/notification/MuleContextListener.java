@@ -24,7 +24,7 @@ public interface MuleContextListener {
   /**
    * Notifies after initialization of a {@link MuleContext} instance.
    *
-   * @param context initialized context
+   * @param context  initialized context
    * @param registry the registry of the initialized context
    */
   void onInitialization(MuleContext context, Registry registry);

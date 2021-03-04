@@ -89,7 +89,7 @@ public class ServiceRegistry {
   /**
    * Tracks the given {@code service}
    *
-   * @param service the {@link Service} to be tracked
+   * @param service  the {@link Service} to be tracked
    * @param assembly the {@code service}'s {@link ServiceAssembly}
    */
   public void register(Service service, ServiceAssembly assembly) {

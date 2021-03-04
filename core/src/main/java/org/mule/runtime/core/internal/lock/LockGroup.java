@@ -30,7 +30,7 @@ public interface LockGroup extends Disposable {
   /**
    * Tries to acquire the lock for a certain amount of time
    *
-   * @param timeout the time in timeUnit to wait until the lock is acquired
+   * @param timeout  the time in timeUnit to wait until the lock is acquired
    * @param timeUnit the time unit of timeout
    * @return true if the lock was successfully acquired, false otherwise
    * @throws java.lang.InterruptedException if thread was interrupted during the lock acquisition

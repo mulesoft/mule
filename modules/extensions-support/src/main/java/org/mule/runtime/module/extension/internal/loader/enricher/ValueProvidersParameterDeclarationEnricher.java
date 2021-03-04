@@ -129,8 +129,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
   /**
    * Enriches a parameter that has an associated {@link ValueProvider}
    *
-   * @param resolverClass the class of the {@link ValueProvider}
-   * @param paramDeclaration {@link ParameterDeclaration} or {@link ParameterGroupDeclaration} paramDeclaration
+   * @param resolverClass           the class of the {@link ValueProvider}
+   * @param paramDeclaration        {@link ParameterDeclaration} or {@link ParameterGroupDeclaration} paramDeclaration
    * @param containerParameterNames parameters container's names
    */
   private void enrichParameter(OfValues resolverClass,
@@ -169,7 +169,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
    * {@link Connection}, if this is true this method will indicate to the {@link ValueProviderFactoryModelPropertyBuilder} that
    * the correspondent {@link ValueProvider} will require a connection.
    *
-   * @param modelPropertyBuilder Options Resolver Model Property Builder
+   * @param modelPropertyBuilder     Options Resolver Model Property Builder
    * @param parameterizableComponent component to introspect
    */
   private Optional<Field> enrichWithConnection(ValueProviderFactoryModelPropertyBuilder modelPropertyBuilder,
@@ -188,7 +188,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
    * if this is true this method will indicate to the {@link ValueProviderFactoryModelPropertyBuilder} that the correspondent
    * {@link ValueProvider} will require a config.
    *
-   * @param modelPropertyBuilder Options Resolver Model Property Builder
+   * @param modelPropertyBuilder     Options Resolver Model Property Builder
    * @param parameterizableComponent component to introspect
    */
   private Optional<Field> enrichWithConfiguration(ValueProviderFactoryModelPropertyBuilder modelPropertyBuilder,

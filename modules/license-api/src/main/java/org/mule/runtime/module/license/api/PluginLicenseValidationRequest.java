@@ -24,13 +24,13 @@ public class PluginLicenseValidationRequest {
   /**
    * Creates a new {@link PluginLicenseValidationRequest}
    * 
-   * @param entitlement the required entitlement within the license
-   * @param pluginVersion the plugin version
-   * @param pluginProvider the plugin provider name
-   * @param pluginName the plugin name
-   * @param allowsEvaluation true if the plugin allows running with an evaluation license, false otherwise
+   * @param entitlement         the required entitlement within the license
+   * @param pluginVersion       the plugin version
+   * @param pluginProvider      the plugin provider name
+   * @param pluginName          the plugin name
+   * @param allowsEvaluation    true if the plugin allows running with an evaluation license, false otherwise
    * @param artifactClassLoader the class loader of the artifact that holds the customer license
-   * @param pluginClassLoader the plugin class loader that holds the provider license key
+   * @param pluginClassLoader   the plugin class loader that holds the provider license key
    */
   private PluginLicenseValidationRequest(String entitlement, String pluginVersion, String pluginProvider, String pluginName,
                                          boolean allowsEvaluation,

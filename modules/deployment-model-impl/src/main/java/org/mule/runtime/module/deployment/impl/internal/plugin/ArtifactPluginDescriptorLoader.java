@@ -37,7 +37,7 @@ public class ArtifactPluginDescriptorLoader {
    * 
    * @return the plugin {@code ArtifactPluginDescriptor}
    * @throws IOException if there was a problem trying to read the artifact plugin zip file or using the {@code unpackDestination}
-   *         location
+   *                     location
    */
   public ArtifactPluginDescriptor load(File plugin) throws IOException {
     checkArgument(plugin != null, "plugin zip cannot be null");
@@ -50,13 +50,13 @@ public class ArtifactPluginDescriptorLoader {
   /**
    * Load a {@code ArtifactPluginDescriptor} from an artifact plugin {@link File}.
    *
-   * @param pluginFile the artifact plugin bundle file.
-   * @param pluginBundleDescriptor the plugin bundle descriptor resolved from the deployable artifact descriptor.
+   * @param pluginFile                   the artifact plugin bundle file.
+   * @param pluginBundleDescriptor       the plugin bundle descriptor resolved from the deployable artifact descriptor.
    * @param deployableArtifactDescriptor container where the plugin has been declared as dependency.
    *
    * @return the plugin {@code ArtifactPluginDescriptor}
    * @throws IOException if there was a problem trying to read the artifact plugin zip file or using the {@code unpackDestination}
-   *         location
+   *                     location
    */
   public ArtifactPluginDescriptor load(File pluginFile, BundleDescriptor pluginBundleDescriptor,
                                        ArtifactDescriptor deployableArtifactDescriptor)

@@ -52,8 +52,8 @@ public class ArtifactFactoryUtils {
    * Validates plugin licenses within the artifact.
    *
    * @param artifactClassLoader the classloader of the artifact
-   * @param artifactPlugins the list of plugins
-   * @param licenseValidator the license validator to use for validating the license
+   * @param artifactPlugins     the list of plugins
+   * @param licenseValidator    the license validator to use for validating the license
    */
   public static void validateArtifactLicense(ClassLoader artifactClassLoader, List<ArtifactPlugin> artifactPlugins,
                                              LicenseValidator licenseValidator) {

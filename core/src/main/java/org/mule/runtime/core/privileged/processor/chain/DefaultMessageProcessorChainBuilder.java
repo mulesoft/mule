@@ -230,8 +230,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
    * Helper method to create a lazy processor from a chain builder so the chain builder can get access to a
    * {@link FlowConstruct}{@link ProcessingStrategy}.
    *
-   * @param chainBuilder the chain builder
-   * @param muleContext the context
+   * @param chainBuilder               the chain builder
+   * @param muleContext                the context
    * @param processingStrategySupplier a supplier of the processing strategy.
    * @return a lazy processor that will build the chain upon the first request.
    */

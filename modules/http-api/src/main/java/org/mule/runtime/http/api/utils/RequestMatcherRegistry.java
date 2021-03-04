@@ -27,7 +27,7 @@ public interface RequestMatcherRegistry<T> {
    * whether any collisions exists with the already registered objects.
    *
    * @param matcher the {@link PathAndMethodRequestMatcher} to associate with the {@code item}
-   * @param item the object to register under the {@code matcher}
+   * @param item    the object to register under the {@code matcher}
    * @throws MatcherCollisionException if a collision is found
    */
   RequestMatcherRegistryEntry add(PathAndMethodRequestMatcher matcher, T item);
@@ -46,7 +46,7 @@ public interface RequestMatcherRegistry<T> {
    * {@link PathAndMethodRequestMatcher PathAndMethodRequestMatchers}.
    *
    * @param method the HTTP method to match against
-   * @param path the full path to match against (must not contain wildcard or parametrization)
+   * @param path   the full path to match against (must not contain wildcard or parametrization)
    * @return the matching registered object
    */
   default T find(String method, String path) {

@@ -22,7 +22,7 @@ public class SdkSourceAdapterFactory {
    * {@link org.mule.runtime.extension.api.runtime.source.Source}, an adapter of it is return. Otherwise, this method fails.
    *
    * @param source a source that can either be a {@link Source} or a legacy
-   *        {@link org.mule.runtime.extension.api.runtime.source.Source}.
+   *               {@link org.mule.runtime.extension.api.runtime.source.Source}.
    * @return a {@link Source} that represents the given object.
    */
   public static Source createAdapter(Object source) {

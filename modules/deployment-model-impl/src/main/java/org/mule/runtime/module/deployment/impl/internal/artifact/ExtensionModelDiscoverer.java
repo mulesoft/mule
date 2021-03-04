@@ -41,8 +41,8 @@ public class ExtensionModelDiscoverer {
    * For each artifactPlugin discovers the {@link ExtensionModel}.
    *
    * @param loaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders.
-   * @param artifactPlugins {@link Pair} of {@link ArtifactPluginDescriptor} and {@link ArtifactClassLoader} for artifact plugins
-   *        deployed inside the artifact. Non null.
+   * @param artifactPlugins  {@link Pair} of {@link ArtifactPluginDescriptor} and {@link ArtifactClassLoader} for artifact plugins
+   *                         deployed inside the artifact. Non null.
    * @return {@link Set} of {@link Pair} carrying the {@link ArtifactPluginDescriptor} and it's corresponding
    *         {@link ExtensionModel}.
    */
@@ -54,9 +54,9 @@ public class ExtensionModelDiscoverer {
   /**
    * For each artifactPlugin discovers the {@link ExtensionModel}.
    *
-   * @param loaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders.
-   * @param artifactPlugins {@link Pair} of {@link ArtifactPluginDescriptor} and {@link ArtifactClassLoader} for artifact plugins
-   *        deployed inside the artifact. Non null.
+   * @param loaderRepository         {@link ExtensionModelLoaderRepository} with the available extension loaders.
+   * @param artifactPlugins          {@link Pair} of {@link ArtifactPluginDescriptor} and {@link ArtifactClassLoader} for artifact
+   *                                 plugins deployed inside the artifact. Non null.
    * @param parentArtifactExtensions {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions
    * @return {@link Set} of {@link Pair} carrying the {@link ArtifactPluginDescriptor} and it's corresponding
    *         {@link ExtensionModel}.
@@ -105,11 +105,11 @@ public class ExtensionModelDiscoverer {
    * {@link ExtensionModelLoader} which {@link ExtensionModelLoader#getId() ID} matches the plugin's descriptor ID.
    *
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders.
-   * @param loaderDescriber a descriptor that contains parametrization to construct an {@link ExtensionModel}
-   * @param extensions with the previously generated {@link ExtensionModel}s that will be used to generate the current
-   *        {@link ExtensionModel} and store it in {@code extensions} once generated.
-   * @param artifactClassloader the loaded artifact {@link ClassLoader} to find the required resources.
-   * @param artifactName the name of the artifact being loaded.
+   * @param loaderDescriber                a descriptor that contains parametrization to construct an {@link ExtensionModel}
+   * @param extensions                     with the previously generated {@link ExtensionModel}s that will be used to generate the
+   *                                       current {@link ExtensionModel} and store it in {@code extensions} once generated.
+   * @param artifactClassloader            the loaded artifact {@link ClassLoader} to find the required resources.
+   * @param artifactName                   the name of the artifact being loaded.
    * @throws IllegalArgumentException there is no {@link ExtensionModelLoader} for the ID in the {@link MulePluginModel}.
    */
   private ExtensionModel discoverExtensionThroughJsonDescriber(ExtensionModelLoaderRepository extensionModelLoaderRepository,

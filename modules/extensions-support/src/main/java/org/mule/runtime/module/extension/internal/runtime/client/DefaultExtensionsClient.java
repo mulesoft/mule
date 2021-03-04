@@ -52,7 +52,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
    * enables to perform the dynamic operation execution with the same event that the SDK operation using the
    * {@link ExtensionsClient} receives.
    *
-   * @param event the current execution event.
+   * @param event                                     the current execution event.
    * @param extensionsClientProcessorsStrategyFactory the factory used to get the appropriate operation message processor strategy
    */
   public DefaultExtensionsClient(CoreEvent event,

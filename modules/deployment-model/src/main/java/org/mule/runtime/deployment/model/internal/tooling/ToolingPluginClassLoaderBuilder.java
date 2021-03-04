@@ -57,9 +57,9 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
    * {@inheritDoc}
    *
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
-   * @param artifactPluginDescriptor desired plugin to generate an {@link ArtifactClassLoader} for.
+   * @param artifactPluginDescriptor   desired plugin to generate an {@link ArtifactClassLoader} for.
    * @param pluginDependenciesResolver resolver for the plugins on which the {@code artifactPluginDescriptor} declares it depends.
-   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the policy's region. Non null
+   * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the policy's region. Non null
    * @see #build()
    */
   public ToolingPluginClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
@@ -79,8 +79,8 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
 
   /**
    * @param parentClassLoader parent class loader for the artifact class loader that should have all the {@link URL}s needed from
-   *        tooling side when loading the {@link ExtensionModel}. Among those, there will be mule-api, extensions-api,
-   *        extensions-support and so on.
+   *                          tooling side when loading the {@link ExtensionModel}. Among those, there will be mule-api,
+   *                          extensions-api, extensions-support and so on.
    * @return the builder
    */
   public ToolingPluginClassLoaderBuilder setParentClassLoader(ArtifactClassLoader parentClassLoader) {
@@ -125,9 +125,9 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
   }
 
   /**
-   * @param artifactPluginDescriptor to look for within the collection of {@link ArtifactClassLoader}s
+   * @param artifactPluginDescriptor   to look for within the collection of {@link ArtifactClassLoader}s
    * @param artifactPluginClassLoaders plugins class loaders to look for, at least one of them must contain the
-   *        {@code pluginDescriptor}.
+   *                                   {@code pluginDescriptor}.
    * @return the {@link ArtifactClassLoader} that was generated for the {@code artifactPluginDescriptor}
    * @throws PluginResolutionError if the plugin wasn't found in the collection of {@code artifactPluginClassLoaders}
    */

@@ -22,7 +22,7 @@ public interface AttributeEvaluatorDelegate<T> {
   /**
    * Resolves the attribute's value.
    *
-   * @param event the current event being processed.
+   * @param event   the current event being processed.
    * @param manager the expression manager used to evaluate the values.
    * @return a new resolved {@link TypedValue}.
    */

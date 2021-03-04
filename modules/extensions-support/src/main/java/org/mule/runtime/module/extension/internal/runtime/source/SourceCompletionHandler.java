@@ -26,7 +26,7 @@ public interface SourceCompletionHandler {
    * Exceptions found while processing are to be notified through the {@code exceptionCallback}, which might (depending on
    * {@code HandledCompletionExceptionResult}) produce a new value as the result of handling such error
    *
-   * @param event the result of the flow execution
+   * @param event    the result of the flow execution
    * @param callback the callback to be completed as a result
    */
   void onCompletion(CoreEvent event, Map<String, Object> parameters, CompletableCallback<Void> callback);
@@ -35,7 +35,7 @@ public interface SourceCompletionHandler {
    * Invoked when a failure occurs during the flow processing
    *
    * @param exception the exception thrown during processing
-   * @param callback the callback to be completed as a result
+   * @param callback  the callback to be completed as a result
    */
   void onFailure(MessagingException exception, Map<String, Object> parameters, CompletableCallback<Void> callback);
 

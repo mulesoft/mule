@@ -41,8 +41,8 @@ public abstract class AbstractCursorStreamProvider extends AbstractComponent imp
   /**
    * Creates a new instance
    *
-   * @param wrappedStream the original stream to be decorated
-   * @param originatingLocation indicates where the provider was created
+   * @param wrappedStream            the original stream to be decorated
+   * @param originatingLocation      indicates where the provider was created
    * @param trackCursorProviderClose if the provider should save the stack trace from where it was closed
    */
   public AbstractCursorStreamProvider(InputStream wrappedStream, ComponentLocation originatingLocation,

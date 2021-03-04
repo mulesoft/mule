@@ -30,7 +30,7 @@ public class DeclarationOperation {
   /**
    * Declaration Operation represents an operation of the <module/>
    *
-   * @param output {@link MetadataType}'s output of an <operation/>
+   * @param output           {@link MetadataType}'s output of an <operation/>
    * @param outputAttributes {@link MetadataType}'s output's attribute of an <operation/>
    */
   public DeclarationOperation(MetadataType output, MetadataType outputAttributes) {

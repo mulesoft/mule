@@ -126,9 +126,9 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
      * If the result of those finding throws repeated stereotypes, then it will reduce that collection by taking the intersection,
      * making its usage within the smart connector compliant.
      *
-     * @param componentModels elements of the smart connector to read the possible usages of the parametrization
+     * @param componentModels      elements of the smart connector to read the possible usages of the parametrization
      * @param parameterDeclaration parameter used to look up in the elements' usages, and the one that will hold the stereotypes
-     *        if found.
+     *                             if found.
      */
     private void traverseProperty(Stream<ComponentAst> componentModels,
                                   ParameterDeclaration parameterDeclaration) {

@@ -95,7 +95,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * {@link Optional#empty()} is returned.
    *
    * @param context current {@link MetadataContext} that will be used by the {@link InputTypeResolver}
-   * @param key {@link MetadataKey} of the type which's structure has to be resolved
+   * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return Success with an {@link Optional} {@link TypeMetadataDescriptor} representing the Component's Content metadata,
    *         resolved using the {@link InputTypeResolver} if one is available to resolve its {@link MetadataType}, returning
    *         {@link Optional#empty()} if no Content parameter is present Failure if the dynamic resolution fails for any reason.
@@ -120,7 +120,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * {@code parameter} using the {@link InputTypeResolver} associated to the current component.
    *
    * @param context {@link MetadataContext} of the MetaData resolution
-   * @param key {@link MetadataKey} of the type which's structure has to be resolved
+   * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return a {@link MetadataResult} with the {@link MetadataType} of the {@code parameter}.
    */
   private MetadataResult<MetadataType> getParameterMetadata(ParameterModel parameter, MetadataContext context, Object key) {

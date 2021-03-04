@@ -54,7 +54,7 @@ public class DetectCyclesTestCase extends AbstractMuleTestCase {
 
   /**
    * @param validateXml whether the XML must be valid while loading the extension model or not. Useful to determine if the default
-   *        values are properly feed when reading the document.
+   *                    values are properly feed when reading the document.
    */
   public DetectCyclesTestCase(boolean validateXml) {
     this.validateXml = validateXml;

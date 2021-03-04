@@ -31,7 +31,7 @@ public class ReconnectableConnectionProviderWrapper<C> extends AbstractConnectio
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ConnectionProvider} to be wrapped
+   * @param delegate           the {@link ConnectionProvider} to be wrapped
    * @param reconnectionConfig The {@link ReconnectionConfig} for retrying failed connection attempts
    */
   public ReconnectableConnectionProviderWrapper(ConnectionProvider<C> delegate, ReconnectionConfig reconnectionConfig) {

@@ -21,7 +21,7 @@ public interface ReturnDelegate {
   /**
    * Adapts the {@code value} into an {@link CoreEvent}
    *
-   * @param value the value to be returned
+   * @param value            the value to be returned
    * @param operationContext the {@link ExecutionContextAdapter} on which the operation was executed
    * @return a {@link CoreEvent} carrying the operation's result
    */

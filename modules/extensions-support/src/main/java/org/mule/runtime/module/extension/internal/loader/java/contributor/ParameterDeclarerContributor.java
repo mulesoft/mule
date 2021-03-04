@@ -23,8 +23,8 @@ public interface ParameterDeclarerContributor {
    * Given an {@link ExtensionParameter} describing the parameter it self and a {@link ParameterDeclarationContext} gives the
    * chance to contribute to the {@link ParameterDeclarer}
    *
-   * @param parameter {@link ExtensionParameter} with introspected information of the Java parameter
-   * @param declarer declarer to be enriched
+   * @param parameter          {@link ExtensionParameter} with introspected information of the Java parameter
+   * @param declarer           declarer to be enriched
    * @param declarationContext context of the parameter to be declared
    */
   void contribute(ExtensionParameter parameter, ParameterDeclarer declarer, ParameterDeclarationContext declarationContext);

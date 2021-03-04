@@ -49,7 +49,7 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
    *
    * @param context a {@link ValueResolvingContext}
    * @return the registry value associated with {@link #key}
-   * @throws MuleException if an error occurred fetching the value
+   * @throws MuleException          if an error occurred fetching the value
    * @throws ConfigurationException if no object is registered under {@link #key}
    */
   @Override

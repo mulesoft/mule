@@ -69,7 +69,7 @@ public final class LoaderDescriber {
   /**
    * Stores the {@code value} under the {@key} in the {@code attributes} internal state.
    *
-   * @param key key with which the specified value is to be associated. Non blank nor null.
+   * @param key   key with which the specified value is to be associated. Non blank nor null.
    * @param value value to be associated with the specified key
    */
   private void addAttribute(String key, Object value) {

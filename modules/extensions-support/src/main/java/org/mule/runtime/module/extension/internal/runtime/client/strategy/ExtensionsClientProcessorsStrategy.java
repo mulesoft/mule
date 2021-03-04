@@ -24,7 +24,7 @@ public interface ExtensionsClientProcessorsStrategy {
    *
    * @param extensionName the name of the extension to run the operation.
    * @param operationName the name of the operation to run.
-   * @param parameters the operation parameters used to run the operation
+   * @param parameters    the operation parameters used to run the operation
    */
   OperationMessageProcessor getOperationMessageProcessor(String extensionName, String operationName,
                                                          OperationParameters parameters);

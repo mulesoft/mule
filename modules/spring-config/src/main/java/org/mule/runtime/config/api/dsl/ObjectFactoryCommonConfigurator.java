@@ -29,9 +29,9 @@ public interface ObjectFactoryCommonConfigurator<T> {
   /**
    * Configures the {@code object} instance using the {@code parameters} populated from the configuration.
    *
-   * @param object the instance to be configured
+   * @param object     the instance to be configured
    * @param parameters the set of parameters configured in the component model according to the
-   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}
+   *                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}
    */
   void configure(T object, Map<String, Object> parameters);
 

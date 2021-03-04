@@ -148,7 +148,7 @@ public final class MetadataMediator<T extends ComponentModel> {
    * Resolves the {@link ComponentMetadataDescriptor} for the associated {@code context} using the specified {@code key}
    *
    * @param context current {@link MetadataContext} that will be used by the metadata resolvers.
-   * @param key {@link MetadataKey} of the type which's structure has to be resolved, used both for input and output types
+   * @param key     {@link MetadataKey} of the type which's structure has to be resolved, used both for input and output types
    * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors Failure {@link MetadataResult}
    *         when the Metadata retrieval of any element fails for any reason
    */
@@ -251,8 +251,8 @@ public final class MetadataMediator<T extends ComponentModel> {
    * Resolves the {@link ComponentMetadataDescriptor} for the associated {@code context} using static and dynamic resolving of the
    * Component parameters, attributes and output.
    *
-   * @param context current {@link MetadataContext} that will be used by the {@link InputTypeResolver} and
-   *        {@link OutputTypeResolver}
+   * @param context  current {@link MetadataContext} that will be used by the {@link InputTypeResolver} and
+   *                 {@link OutputTypeResolver}
    * @param keyValue {@link Object} resolved {@link MetadataKey} object
    * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors Failure {@link MetadataResult}
    *         when the Metadata retrieval of any element fails for any reason
@@ -292,7 +292,7 @@ public final class MetadataMediator<T extends ComponentModel> {
   /**
    * Returns a {@link ComponentModel} with its types resolved.
    *
-   * @param inputMetadataDescriptor {@link InputMetadataDescriptor} describes the input parameters of the component
+   * @param inputMetadataDescriptor  {@link InputMetadataDescriptor} describes the input parameters of the component
    * @param outputMetadataDescriptor {@link OutputMetadataDescriptor} describes the component output
    * @return model with its types resolved by the metadata resolution process
    */

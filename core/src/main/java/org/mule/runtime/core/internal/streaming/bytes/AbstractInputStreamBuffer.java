@@ -39,7 +39,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   /**
    * Creates a new instance
    *
-   * @param stream The stream being buffered. This is the original data source
+   * @param stream        The stream being buffered. This is the original data source
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
   public AbstractInputStreamBuffer(InputStream stream, ByteBufferManager bufferManager) {

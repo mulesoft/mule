@@ -68,7 +68,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * several values, multiple calls to this method using the same header name will accumulate the values and all of them will be
    * sent.
    *
-   * @param name the name of the HTTP header
+   * @param name  the name of the HTTP header
    * @param value the value of the HTTP header
    * @return this builder
    */
@@ -80,7 +80,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
   /**
    * Includes a new header with multiple values to be sent in the desired {@link HttpMessage}.
    *
-   * @param name the name of the HTTP header
+   * @param name   the name of the HTTP header
    * @param values the values of the HTTP header
    * @return this builder
    */

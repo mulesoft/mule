@@ -29,7 +29,7 @@ public class EventInternalContextResolver<CTX> {
   Supplier<CTX> initialContextSupplier;
 
   /**
-   * @param key with which this contexts are stores inside the event
+   * @param key                    with which this contexts are stores inside the event
    * @param initialContextSupplier supplies the initial context state
    */
   public EventInternalContextResolver(String key, Supplier<CTX> initialContextSupplier) {

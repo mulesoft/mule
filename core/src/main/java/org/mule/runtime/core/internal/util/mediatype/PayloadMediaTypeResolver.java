@@ -28,10 +28,10 @@ public class PayloadMediaTypeResolver {
   /**
    * Creates a new instance
    *
-   * @param defaultEncoding the default encoding used by the system
+   * @param defaultEncoding  the default encoding used by the system
    * @param defaultMediaType the default {@link MediaType} to use in case one is not specified
-   * @param encoding encoding to be used
-   * @param mimeType mimeType to be used
+   * @param encoding         encoding to be used
+   * @param mimeType         mimeType to be used
    */
   public PayloadMediaTypeResolver(Charset defaultEncoding,
                                   MediaType defaultMediaType,

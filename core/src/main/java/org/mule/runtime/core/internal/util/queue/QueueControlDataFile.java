@@ -33,8 +33,8 @@ public class QueueControlDataFile {
    * Creates a QueueControlDataFile for storing / retrieving information
    *
    * @param queueFileProvider file provider to use to store control data
-   * @param firstFile first queue file. Used for write and read in case there is no control data yet.
-   * @param secondFile second queue file.
+   * @param firstFile         first queue file. Used for write and read in case there is no control data yet.
+   * @param secondFile        second queue file.
    */
   public QueueControlDataFile(QueueFileProvider queueFileProvider, File firstFile, File secondFile) {
     this.queueFileProvider = queueFileProvider;
@@ -62,7 +62,7 @@ public class QueueControlDataFile {
    * Updates the control data
    *
    * @param writeFile file that is used for writing
-   * @param readFile file that is used for reading
+   * @param readFile  file that is used for reading
    */
   public void writeControlData(File writeFile, File readFile) {
     try {

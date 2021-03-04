@@ -32,10 +32,10 @@ public class FilteringContainerClassLoader extends FilteringArtifactClassLoader 
   /**
    * Creates a new instance
    *
-   * @param parent The parent class loader
+   * @param parent               The parent class loader
    * @param containerClassLoader delegate classLoader. Not null.
-   * @param filter filter used to determine which classes and resources are exported on the delegate classLoader.
-   * @param exportedServices service providers that will be available from the filtered class loader. Non null.
+   * @param filter               filter used to determine which classes and resources are exported on the delegate classLoader.
+   * @param exportedServices     service providers that will be available from the filtered class loader. Non null.
    */
   public FilteringContainerClassLoader(ClassLoader parent, ArtifactClassLoader containerClassLoader, ClassLoaderFilter filter,
                                        List<ExportedService> exportedServices) {
@@ -46,8 +46,8 @@ public class FilteringContainerClassLoader extends FilteringArtifactClassLoader 
    * Creates a new instance
    *
    * @param containerClassLoader delegate classLoader. Not null.
-   * @param filter filter used to determine which classes and resources are exported on the delegate classLoader.
-   * @param exportedServices service providers that will be available from the filtered class loader. Non null.
+   * @param filter               filter used to determine which classes and resources are exported on the delegate classLoader.
+   * @param exportedServices     service providers that will be available from the filtered class loader. Non null.
    */
   public FilteringContainerClassLoader(ArtifactClassLoader containerClassLoader, ClassLoaderFilter filter,
                                        List<ExportedService> exportedServices) {

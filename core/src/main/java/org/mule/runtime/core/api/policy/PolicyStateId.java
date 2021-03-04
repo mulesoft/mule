@@ -27,7 +27,7 @@ public final class PolicyStateId {
    * Creates a new policy state id.
    *
    * @param executionIdentifier identifier of the execution of the policy
-   * @param policyId identifier of the policy
+   * @param policyId            identifier of the policy
    */
   public PolicyStateId(String executionIdentifier, String policyId) {
     checkArgument(!isEmpty(executionIdentifier), "executionIdentifier cannot be null or empty");

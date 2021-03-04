@@ -68,18 +68,20 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   /**
    * Creates a new policy instance
    *
-   * @param application application artifact owning the created policy. Non null
-   * @param template policy template from which the instance will be created. Non null
-   * @param parametrization parameters used to configure the created instance. Non null
-   * @param serviceRepository repository of available services. Non null.
-   * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
-   * @param artifactPlugins artifact plugins deployed only inside the policy. Non null.
-   * @param ownArtifactPlugins artifact plugins the policy depends on. Non null.
-   * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
-   * @param muleContextListener the listener to execute for specific events that occur on the {@link MuleContext} of the policy.
-   *        May be {@code null}.
+   * @param application                                application artifact owning the created policy. Non null
+   * @param template                                   policy template from which the instance will be created. Non null
+   * @param parametrization                            parameters used to configure the created instance. Non null
+   * @param serviceRepository                          repository of available services. Non null.
+   * @param classLoaderRepository                      contains the registered classloaders that can be used to load serialized
+   *                                                   classes. Non null.
+   * @param artifactPlugins                            artifact plugins deployed only inside the policy. Non null.
+   * @param ownArtifactPlugins                         artifact plugins the policy depends on. Non null.
+   * @param extensionModelLoaderRepository             {@link ExtensionModelLoaderRepository} with the available extension
+   *                                                   loaders. Non null.
+   * @param muleContextListener                        the listener to execute for specific events that occur on the
+   *                                                   {@link MuleContext} of the policy. May be {@code null}.
    * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    */
   public DefaultApplicationPolicyInstance(Application application, PolicyTemplate template,
                                           PolicyParametrization parametrization,

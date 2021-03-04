@@ -53,7 +53,7 @@ public class ExtensionConnectionSupplier {
    *
    * @param executionContext an {@link ExecutionContextAdapter}
    * @return a {@link ConnectionHandler}
-   * @throws ConnectionException if connection could not be obtained
+   * @throws ConnectionException  if connection could not be obtained
    * @throws TransactionException if something is wrong with the transaction
    */
   public ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext)

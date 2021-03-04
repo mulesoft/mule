@@ -71,7 +71,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
   /**
    * @param artifactId unique identifier for this artifact. For instance, for Applications, it can be the app name. Must be not
-   *        null.
+   *                   null.
    * @return the builder
    */
   public T setArtifactId(String artifactId) {
@@ -170,7 +170,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   /**
    * Creates the class loader for the artifact being built.
    *
-   * @param artifactId identifies the artifact being created. Non empty.
+   * @param artifactId        identifies the artifact being created. Non empty.
    * @param regionClassLoader class loader containing the artifact and dependant class loaders. Non null.
    * @return
    */

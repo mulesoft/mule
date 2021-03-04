@@ -27,7 +27,7 @@ public class PluginExtendedClassLoaderModelAttributes extends ExtendedClassLoade
   /**
    * Creates an instance of this extended attributes for the given descriptor.
    *
-   * @param originalAttributes the original {@link Map} of attributes. No null.
+   * @param originalAttributes           the original {@link Map} of attributes. No null.
    * @param deployableArtifactDescriptor {@link ArtifactDescriptor} which declares the plugin dependency. Not null.
    */
   public PluginExtendedClassLoaderModelAttributes(Map originalAttributes,

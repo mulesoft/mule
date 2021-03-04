@@ -45,7 +45,7 @@ public abstract class IdentifiableCursorProviderDecorator<T extends Cursor> exte
    * identifiable. If such delegate is found, then the same {@code id} will be reused. Otherwise, one will be generated.
    *
    * @param cursorProvider the decoratee
-   * @param <T> the generic {@link Cursor} type
+   * @param <T>            the generic {@link Cursor} type
    * @return a new decorator.
    */
   public static <T extends Cursor> IdentifiableCursorProviderDecorator<T> of(CursorProvider<T> cursorProvider) {

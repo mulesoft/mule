@@ -24,8 +24,8 @@ public class InMemoryCursorIteratorProvider extends AbstractCursorIteratorProvid
   /**
    * Creates a new instance
    *
-   * @param stream the stream to buffer from
-   * @param config the config of the generated buffer
+   * @param stream              the stream to buffer from
+   * @param config              the config of the generated buffer
    * @param originatingLocation indicates where the cursor was created
    * 
    * @since 4.3.0

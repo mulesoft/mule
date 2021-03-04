@@ -27,7 +27,7 @@ public class OperationComponentModelModelProperty implements ModelProperty {
    * element to be later macro expanded into a Mule application.
    *
    * @param operationComponentModel <operation/> element represented through {@link ComponentAst}s.
-   * @param bodyComponentModel <body/> element with all the {@link Processor} represented through {@link ComponentAst}s.
+   * @param bodyComponentModel      <body/> element with all the {@link Processor} represented through {@link ComponentAst}s.
    */
   public OperationComponentModelModelProperty(ComponentAst operationComponentModel, ComponentAst bodyComponentModel) {
     this.operationComponentModel = operationComponentModel;

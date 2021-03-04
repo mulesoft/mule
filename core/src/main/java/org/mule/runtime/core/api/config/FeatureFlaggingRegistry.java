@@ -67,9 +67,9 @@ public class FeatureFlaggingRegistry {
    * 
    * @see FeatureFlaggingService
    * 
-   * @param feature Name representing the registered feature
+   * @param feature   Name representing the registered feature
    * @param condition This predicate will be evaluated at deployment time. The {@link MuleContext} corresponds to the context that
-   *        is being created for this application.
+   *                  is being created for this application.
    */
   public void registerFeature(Feature feature, Predicate<MuleContext> condition) {
     if (feature == null) {

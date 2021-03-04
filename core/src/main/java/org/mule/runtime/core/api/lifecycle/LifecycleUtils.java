@@ -65,7 +65,7 @@ public class LifecycleUtils {
    * It checks if the {@code object} implements {@link MuleContextAware}, in which case it will invoke
    * {@link MuleContextAware#setMuleContext(MuleContext)} with the given {@code muleContext}.
    *
-   * @param object the object you're trying to initialise
+   * @param object      the object you're trying to initialise
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
    * @throws IllegalArgumentException if {@code MuleContext} is {@code null}
@@ -83,8 +83,8 @@ public class LifecycleUtils {
    * <p>
    * Also depending on the value of the {@code inject} argument, it will perform dependency injection on the {@code object}
    *
-   * @param object the object you're trying to initialise
-   * @param inject whether it should perform dependency injection on the {@code object} before actually initialising it
+   * @param object      the object you're trying to initialise
+   * @param inject      whether it should perform dependency injection on the {@code object} before actually initialising it
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
    * @throws IllegalArgumentException if {@code MuleContext} is {@code null}
@@ -131,7 +131,7 @@ public class LifecycleUtils {
   /**
    * For each item in the {@code objects} collection, it invokes {@link #initialiseIfNeeded(Object, MuleContext)}
    *
-   * @param objects the list of objects to be initialised
+   * @param objects     the list of objects to be initialised
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
    */
@@ -145,8 +145,8 @@ public class LifecycleUtils {
    * <p>
    * Also depending on the value of the {@code inject} argument, it will perform dependency injection on the {@code objects}
    *
-   * @param objects the list of objects to be initialised
-   * @param inject whether it should perform dependency injection on the {@code object} before actually initialising it
+   * @param objects     the list of objects to be initialised
+   * @param inject      whether it should perform dependency injection on the {@code object} before actually initialising it
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
    */
@@ -201,7 +201,7 @@ public class LifecycleUtils {
    * the provided {@code logger} and processing will continue
    *
    * @param objects the list of objects to be stopped
-   * @param logger the {@link Logger} in which any exception found is to be logged
+   * @param logger  the {@link Logger} in which any exception found is to be logged
    */
   public static void safeStopIfNeeded(Collection<? extends Object> objects, Logger logger) {
     try {
@@ -265,7 +265,7 @@ public class LifecycleUtils {
   /**
    * Verifies that the given {@code muleContext} is not stopped or in the process of stopping
    *
-   * @param muleContext the {@link MuleContext} to test
+   * @param muleContext  the {@link MuleContext} to test
    * @param errorMessage the message of the {@link Exception} to be thrown if the assertion fails
    * @throws IllegalStateException if the {@code muleContext} is stopped or stopping
    * @since 4.0
@@ -309,7 +309,7 @@ public class LifecycleUtils {
   /**
    * Sets an objects {@link MuleContext} if it implements {@link MuleContextAware}.
    *
-   * @param object the object to inject the {@link MuleContext} into.
+   * @param object      the object to inject the {@link MuleContext} into.
    * @param muleContext the {@link MuleContext} in which the object is defined.
    * @throws InitialisationException
    */
@@ -323,7 +323,7 @@ public class LifecycleUtils {
   /**
    * Sets an objects {@link MuleContext} if it implements {@link MuleContextAware}.
    *
-   * @param objects the objects to inject the {@link MuleContext} into.
+   * @param objects     the objects to inject the {@link MuleContext} into.
    * @param muleContext the {@link MuleContext} in which the object is defined.
    * @throws InitialisationException
    */

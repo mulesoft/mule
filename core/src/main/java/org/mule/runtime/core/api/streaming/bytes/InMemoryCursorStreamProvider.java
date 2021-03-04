@@ -25,10 +25,10 @@ public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProv
   /**
    * Creates a new instance
    *
-   * @param wrappedStream the stream to buffer from
-   * @param config the config of the generated buffer
-   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
-   * @param originatingLocation indicates where the cursor was created
+   * @param wrappedStream            the stream to buffer from
+   * @param config                   the config of the generated buffer
+   * @param bufferManager            the {@link ByteBufferManager} that will be used to allocate all buffers
+   * @param originatingLocation      indicates where the cursor was created
    * @param trackCursorProviderClose if the provider should save the stack trace from where it was closed
    *
    * @since 4.3.0
@@ -46,7 +46,7 @@ public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProv
    * Creates a new instance
    *
    * @param wrappedStream the stream to buffer from
-   * @param config the config of the generated buffer
+   * @param config        the config of the generated buffer
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    * 
    * @deprecated On 4.3.0, please use

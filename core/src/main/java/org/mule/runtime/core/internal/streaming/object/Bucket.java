@@ -31,7 +31,7 @@ public class Bucket<T> implements Serializable {
   /**
    * Creates a new instance
    *
-   * @param index the bucket's index.
+   * @param index    the bucket's index.
    * @param capacity the bucket's capacity.
    */
   public Bucket(int index, int capacity) {

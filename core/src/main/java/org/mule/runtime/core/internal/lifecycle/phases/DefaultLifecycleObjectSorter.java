@@ -59,7 +59,7 @@ public class DefaultLifecycleObjectSorter implements LifecycleObjectSorter {
    * Implementors are free to add additional objects to the bucket, in any particular position. This default implementation
    * however only adds the given one at the end of the list
    *
-   * @param name the name under which the object is registered in the {@link Registry}
+   * @param name   the name under which the object is registered in the {@link Registry}
    * @param object the object
    * @param bucket the bucket in which the object(s) are to be added
    * @return how many objects were added

@@ -29,7 +29,7 @@ public interface ComponentUtils {
    * Returns the {@link FlowConstruct} of the root container element if there is one. Otherwise return {@link Optional#empty()}
    *
    * @param componentLocator the locator for the {@link FlowConstruct}
-   * @param component the component that may be configured within a {@link FlowConstruct}
+   * @param component        the component that may be configured within a {@link FlowConstruct}
    * @return the {@link FlowConstruct} of the root container element if there is one. Otherwise return {@link Optional#empty()}
    */
   static Optional<FlowConstruct> getFromAnnotatedObject(ConfigurationComponentLocator componentLocator,
@@ -47,7 +47,7 @@ public interface ComponentUtils {
    * fails.
    *
    * @param componentLocator the locator for the {@link FlowConstruct}
-   * @param component the component that may be configured within a {@link FlowConstruct}
+   * @param component        the component that may be configured within a {@link FlowConstruct}
    * @return the {@link FlowConstruct} of the root container element. If the root container is not a {@link FlowConstruct} then it
    *         fails.
    */

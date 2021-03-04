@@ -35,9 +35,9 @@ public interface ExpressionLanguageSessionAdaptor extends AutoCloseable {
    * Evaluates an expression according to the parameters used during construction, the global bindings and the {@link DataType} of
    * the expected result.
    *
-   * @param expression the EL expression
+   * @param expression         the EL expression
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
-   *        type.
+   *                           type.
    * @return the result of the expression plus its type
    * @throws ExpressionExecutionException or during transformation or during transformation
    */
@@ -47,8 +47,8 @@ public interface ExpressionLanguageSessionAdaptor extends AutoCloseable {
    * Evaluates an expression according to the parameters used during construction and the global bindings.
    *
    * @param expression the EL expression
-   * @param timeout how long to wait for the expression to be evaluated, in milliseconds. If the evaluation takes more than this
-   *        time, an {@link ExpressionExecutionException} will be thrown.
+   * @param timeout    how long to wait for the expression to be evaluated, in milliseconds. If the evaluation takes more than
+   *                   this time, an {@link ExpressionExecutionException} will be thrown.
    * @return the result of the expression plus its type
    * @throws ExpressionExecutionException when an error occurs during evaluation
    */
@@ -90,9 +90,9 @@ public interface ExpressionLanguageSessionAdaptor extends AutoCloseable {
    * Evaluates an expression according to the parameters used during construction, the global bindings and the {@link DataType} of
    * the expected result.
    *
-   * @param expression the EL expression
+   * @param expression         the EL expression
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
-   *        type.
+   *                           type.
    * @return the result of the expression plus its type
    * @throws ExpressionExecutionException or during transformation or during transformation
    *
@@ -104,8 +104,8 @@ public interface ExpressionLanguageSessionAdaptor extends AutoCloseable {
    * Evaluates an expression according to the parameters used during construction and the global bindings.
    *
    * @param expression the EL expression
-   * @param timeout how long to wait for the expression to be evaluated, in milliseconds. If the evaluation takes more than this
-   *        time, an {@link ExpressionExecutionException} will be thrown.
+   * @param timeout    how long to wait for the expression to be evaluated, in milliseconds. If the evaluation takes more than
+   *                   this time, an {@link ExpressionExecutionException} will be thrown.
    * @return the result of the expression plus its type
    * @throws ExpressionExecutionException when an error occurs during evaluation
    *

@@ -33,7 +33,7 @@ public interface LazyComponentInitializer {
    * filter.
    *
    * @param componentLocationFilter {@link ComponentLocationFilter} to select the {@link Component} to be initialized and they
-   *        dependent ones.
+   *                                dependent ones.
    * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
    */
   void initializeComponents(ComponentLocationFilter componentLocationFilter);

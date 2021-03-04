@@ -51,7 +51,7 @@ public class SourceConnectionManager {
    * Obtains a new connection for the given {@code config}
    *
    * @param config the config that will own the connection
-   * @param <T> the connection's generic type
+   * @param <T>    the connection's generic type
    * @return the obtained connection
    * @throws ConnectionException if a connection could not be obtained
    */
@@ -115,7 +115,7 @@ public class SourceConnectionManager {
    * Returns the {@link ConnectionHandler} from which the given {@code connection} was obtained
    *
    * @param connection a connection
-   * @param <T> the connection's generic type
+   * @param <T>        the connection's generic type
    * @return an {@link Optional} {@link ConnectionHandler}, {@link Optional#empty()} if the connection was not obtained through
    *         this component
    */

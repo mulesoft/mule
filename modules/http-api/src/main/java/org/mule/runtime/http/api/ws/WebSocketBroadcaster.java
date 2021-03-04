@@ -34,8 +34,8 @@ public interface WebSocketBroadcaster {
    * <p>
    * Sockets that are either closed or have lost connection will be discarded.
    *
-   * @param sockets the {@link WebSocket sockets} to broadcast to
-   * @param content the content to be sent
+   * @param sockets       the {@link WebSocket sockets} to broadcast to
+   * @param content       the content to be sent
    * @param errorCallback an error notification callback. It will be invoked once per failing socket
    * @return a {@link CompletableFuture} to be completed when the message has been broadcast to all {@code sockets}
    */
@@ -54,8 +54,8 @@ public interface WebSocketBroadcaster {
    * Socket that have lost connection to the remote system and support reconnection will be reconnected using the given
    * {@code retryPolicyTemplate} and {@code reconnectionScheduler}
    *
-   * @param sockets the {@link WebSocket sockets} to broadcast to
-   * @param content the content to be sent
+   * @param sockets       the {@link WebSocket sockets} to broadcast to
+   * @param content       the content to be sent
    * @param errorCallback an error notification callback. It will be invoked once per failing socket
    * @return a {@link CompletableFuture} to be completed when the message has been broadcast to all {@code sockets}
    * @since 4.2.2

@@ -62,7 +62,7 @@ public final class ComponentBuildingDefinitionUtils {
   /**
    * Retrieve the {@link ComponentBuildingDefinition}s from a set of extension models.
    *
-   * @param extensionModels the set of extension models.
+   * @param extensionModels     the set of extension models.
    * @param dslResolvingContext
    * @return the list of {@link ComponentBuildingDefinition}s to be used for creating components declared by the extension models.
    */

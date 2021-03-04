@@ -56,7 +56,7 @@ public class PropertyNotFoundException extends MuleRuntimeException {
    * able to resolve a key
    *
    * @param propertyNotFoundException exception thrown by the parent resolver.
-   * @param resolverKeyPair the resolver descriptor and the key that was not able to resolve.
+   * @param resolverKeyPair           the resolver descriptor and the key that was not able to resolve.
    */
   public PropertyNotFoundException(PropertyNotFoundException propertyNotFoundException,
                                    Pair<String, String> resolverKeyPair) {

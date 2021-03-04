@@ -44,10 +44,10 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
   /**
    * Creates a new instance
    *
-   * @param mapType the {@link Class} for a concrete {@link Map} type with a default constructor
-   * @param keyResolvers a not {@code null} {@link List} of resolvers for map key params
+   * @param mapType        the {@link Class} for a concrete {@link Map} type with a default constructor
+   * @param keyResolvers   a not {@code null} {@link List} of resolvers for map key params
    * @param valueResolvers a not {@code null} {@link List} of resolvers for map value params
-   * @param muleContext the artifact {@link MuleContext} that will be used for initialisation of resolvers
+   * @param muleContext    the artifact {@link MuleContext} that will be used for initialisation of resolvers
    */
   public MapValueResolver(Class<? extends Map> mapType, List<ValueResolver<K>> keyResolvers,
                           List<ValueResolver<V>> valueResolvers, ReflectionCache reflectionCache, MuleContext muleContext) {

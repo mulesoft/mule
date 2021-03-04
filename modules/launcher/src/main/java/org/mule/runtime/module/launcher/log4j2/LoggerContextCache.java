@@ -104,7 +104,8 @@ final class LoggerContextCache implements Disposable {
    * @param classLoader {@link MuleLoggerContext} owner {@link ClassLoader}
    * @return Cached {@link MuleLoggerContext} instance.
    * @throws RecursiveLoggerContextInstantiationException If the {@link MuleLoggerContext} that should be returned is already
-   *         under construction (indicates recursive {{@link #getLoggerContext(ClassLoader)}} call).
+   *                                                      under construction (indicates recursive
+   *                                                      {{@link #getLoggerContext(ClassLoader)}} call).
    */
   LoggerContext getLoggerContext(final ClassLoader classLoader) {
     LoggerContext ctx;
@@ -234,7 +235,7 @@ final class LoggerContextCache implements Disposable {
    * 
    * @param classLoader {@link ClassLoader} that owns the {@link MuleLoggerContext}
    * @throws RecursiveLoggerContextInstantiationException if a {@link MuleLoggerContext} is already under construction for the
-   *         given {@link ClassLoader}
+   *                                                      given {@link ClassLoader}
    */
   private void startLoggerContextConstruction(ClassLoader classLoader) {
     if (isLoggerContextUnderConstruction()) {

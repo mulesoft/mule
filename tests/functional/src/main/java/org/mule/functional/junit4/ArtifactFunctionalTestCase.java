@@ -215,7 +215,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
    * Returns an instance of a given service if available
    *
    * @param serviceClass class of service to look for. Non null.
-   * @param <T> service class
+   * @param <T>          service class
    * @return an instance of the provided service type if it was declared as a dependency on the test, null otherwise.
    */
   protected <T extends Service> T getService(Class<T> serviceClass) {

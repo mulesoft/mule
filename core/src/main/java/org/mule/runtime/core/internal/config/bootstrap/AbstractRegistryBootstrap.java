@@ -118,8 +118,8 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
 
   /**
    * @param artifactType type of artifact. Bootstrap entries may be associated to an specific type of artifact. If it's not
-   *        associated to the related artifact it will be ignored.
-   * @param muleContext the {@code MuleContext} of the artifact.
+   *                     associated to the related artifact it will be ignored.
+   * @param muleContext  the {@code MuleContext} of the artifact.
    */
   public AbstractRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext) {
     this.artifactType = artifactType;

@@ -37,9 +37,9 @@ public class ExtensionParsingContext {
   /**
    * Register an {@link ObjectType} to indicate it has already being parsed for the given {@code name} and {@code namespace}
    *
-   * @param name the {@code name} associated to the parsed {@code type}
+   * @param name      the {@code name} associated to the parsed {@code type}
    * @param namespace the {@code namespace} associated to the parsed {@code type}
-   * @param type the parsed {@link ObjectType type}
+   * @param type      the parsed {@link ObjectType type}
    * @return {@code true} if the object was registered, {@code false} if a previous definition existed
    */
   public boolean registerObjectType(String name, String namespace, ObjectType type) {
@@ -47,7 +47,7 @@ public class ExtensionParsingContext {
   }
 
   /**
-   * @param name the {@code name} of the element
+   * @param name      the {@code name} of the element
    * @param namespace the {@code namespace} of the element
    * @return {@code true} if an {@link ObjectType} with the given {@code name} and {@code namespace} was registered in the current
    *         context

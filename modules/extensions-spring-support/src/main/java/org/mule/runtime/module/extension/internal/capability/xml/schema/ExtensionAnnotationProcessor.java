@@ -51,9 +51,9 @@ public final class ExtensionAnnotationProcessor {
   /**
    * Returns the {@link Class} object that is associated to the {@code typeElement}
    *
-   * @param typeElement a {@link TypeElement} which represents a {@link Class}
+   * @param typeElement           a {@link TypeElement} which represents a {@link Class}
    * @param processingEnvironment the current {@link ProcessingEnvironment}
-   * @param <T> the generic type of the returned {@link Class}
+   * @param <T>                   the generic type of the returned {@link Class}
    * @return the {@link Class} represented by {@code typeElement}
    */
   public <T> Optional<Class<T>> classFor(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
@@ -67,7 +67,7 @@ public final class ExtensionAnnotationProcessor {
   /**
    * Returns the name of the class represented by the {@code typeElement}
    * 
-   * @param typeElement a {@link TypeElement}
+   * @param typeElement           a {@link TypeElement}
    * @param processingEnvironment the {@link ProcessingEnvironment}
    * @return A class name
    */
@@ -78,7 +78,7 @@ public final class ExtensionAnnotationProcessor {
   /**
    * Returns the {@link TypeElement}s in the {@code roundEnvironment} which are annotated with {@code annotationType}
    *
-   * @param annotationType the type of the {@link Annotation}
+   * @param annotationType   the type of the {@link Annotation}
    * @param roundEnvironment the current {@link RoundEnvironment}
    * @return a {@link Set} with the {@link TypeElement}s annotated with {@code annotationType}
    */
@@ -156,9 +156,9 @@ public final class ExtensionAnnotationProcessor {
    * Traverses the arguments of {@code method} and for each argument annotated with {@link ParameterGroup} it invokes
    * {@link #getOperationParameterGroupDocumentation(TypeElement, Map, ProcessingEnvironment)}
    *
-   * @param env the current {@link ProcessingEnvironment}
+   * @param env    the current {@link ProcessingEnvironment}
    * @param method the operation method being processed
-   * @param docs a {@link Map} which keys are attribute names and values are their documentation
+   * @param docs   a {@link Map} which keys are attribute names and values are their documentation
    */
   private void parseOperationParameterGroups(ProcessingEnvironment env, ExecutableElement method, Map<String, String> docs) {
     for (VariableElement variable : method.getParameters()) {
@@ -182,8 +182,8 @@ public final class ExtensionAnnotationProcessor {
    * Extracts the documentation of the parameters in a group described by {@code groupElement}. The obtained docs are added to
    * {@code parameterDocs}
    *
-   * @param groupElement a {@link TypeElement} representing the parameter group
-   * @param parameterDocs a {@link Map} which keys are attribute names and values are their documentation
+   * @param groupElement          a {@link TypeElement} representing the parameter group
+   * @param parameterDocs         a {@link Map} which keys are attribute names and values are their documentation
    * @param processingEnvironment the current {@link ProcessingEnvironment}
    */
   private void getOperationParameterGroupDocumentation(TypeElement groupElement, final Map<String, String> parameterDocs,

@@ -24,11 +24,11 @@ public interface ArtifactAgnosticServiceBuilder<T extends ArtifactAgnosticServic
    * If the dependency is a regular jar file, it will be made available to all extensions since the only possible jar dependency
    * that may be added are specific clients jar for executing the created service like jdbc drivers or JMS clients.
    *
-   * @param groupId group id of the artifact
-   * @param artifactId artifact id of the artifact
+   * @param groupId         group id of the artifact
+   * @param artifactId      artifact id of the artifact
    * @param artifactVersion version of the artifact
-   * @param classifier classifier of the artifact
-   * @param type type of the artifact
+   * @param classifier      classifier of the artifact
+   * @param type            type of the artifact
    * @return the builder
    */
   T addDependency(String groupId, String artifactId, String artifactVersion, String classifier, String type);

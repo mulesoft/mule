@@ -41,8 +41,8 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
   /**
    * Populates the passed beanAnnotations with the other passed parameters.
    *
-   * @param beanAnnotations the map with annotations to populate
-   * @param sourceCode the source code representation of the element definition.
+   * @param beanAnnotations  the map with annotations to populate
+   * @param sourceCode       the source code representation of the element definition.
    * @param customAttributes the custom attributes of the element definition.
    *
    * @deprecated Use {@link #addMetadataAnnotationsFromDocAttributes(String, Map, String, Map)} instead
@@ -70,8 +70,8 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
    * Populates the passed beanAnnotations with the other passed parameters.
    *
    * @param beanAnnotations the map with annotations to populate
-   * @param sourceCode the source code representation of the element definition.
-   * @param docAttributes the doc attributes of the element definition.
+   * @param sourceCode      the source code representation of the element definition.
+   * @param docAttributes   the doc attributes of the element definition.
    * @deprecated Use {@link #addMetadataAnnotationsFromDocAttributes(String, Map, String, Map)} instead
    */
   @Deprecated

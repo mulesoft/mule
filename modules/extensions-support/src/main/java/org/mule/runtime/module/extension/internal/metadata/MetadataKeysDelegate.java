@@ -166,9 +166,9 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
    * Given a {@link MetadataKey}, this is navigated recursively cloning each {@link MetadataKey} of the tree structure creating a
    * {@link MultilevelMetadataKeyBuilder} and adding the partName of each {@link MetadataKey} found.
    *
-   * @param key {@link MetadataKey} to be cloned and enriched
+   * @param key              {@link MetadataKey} to be cloned and enriched
    * @param partOrderMapping {@link Map} that contains the mapping of the name of each part of the {@link MetadataKey}
-   * @param level the current level of the part of the {@link MetadataKey} to be cloned and enriched
+   * @param level            the current level of the part of the {@link MetadataKey} to be cloned and enriched
    * @return a {@link MetadataKeyBuilder} with the cloned and enriched keys
    */
   private MetadataKeyBuilder cloneAndEnrichMetadataKey(MetadataKey key, Map<Integer, ParameterModel> partOrderMapping,

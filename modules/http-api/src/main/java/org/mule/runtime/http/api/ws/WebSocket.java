@@ -96,7 +96,7 @@ public interface WebSocket {
    * with an {@link javax.naming.OperationNotSupportedException}.
    *
    * @param retryPolicyTemplate the retry policy to use while reconnecting
-   * @param scheduler the scheduler on which reconnection work should happen
+   * @param scheduler           the scheduler on which reconnection work should happen
    * @return a {@link CompletableFuture} with the newly generated {@link WebSocket}
    * @since 4.2.2
    */
@@ -124,7 +124,7 @@ public interface WebSocket {
   /**
    * Sends the given {@code content} to the remote peer.
    *
-   * @param content the content to be sent
+   * @param content   the content to be sent
    * @param mediaType the content's {@link MediaType}
    * @return a {@link CompletableFuture}
    */
@@ -181,7 +181,7 @@ public interface WebSocket {
   /**
    * Closes {@code this} socket
    *
-   * @param code {@link WebSocketCloseCode} the close code
+   * @param code   {@link WebSocketCloseCode} the close code
    * @param reason the reason why it's being closed
    * @return a {@link CompletableFuture}
    */

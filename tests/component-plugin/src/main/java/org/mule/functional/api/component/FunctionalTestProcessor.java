@@ -197,7 +197,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
    * {@link #getAppendString()} can contain expressions.
    *
    * @param contents the string vlaue of the current message payload
-   * @param event the current event
+   * @param event    the current event
    * @return a concatenated string of the current payload and the appendString
    */
   protected String append(String contents, CoreEvent event) {
@@ -349,7 +349,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
    * property to true.
    *
    * @param throwException true if an exception should always be thrown from this instance. If the {@link #getReturnData()}
-   *        property is set and is of type java.lang.Exception, that exception will be thrown.
+   *                       property is set and is of type java.lang.Exception, that exception will be thrown.
    */
   public void setThrowException(boolean throwException) {
     this.throwException = throwException;

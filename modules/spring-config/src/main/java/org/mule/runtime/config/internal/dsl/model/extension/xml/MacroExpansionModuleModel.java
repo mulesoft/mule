@@ -114,8 +114,8 @@ public class MacroExpansionModuleModel {
    * From a mutable {@code applicationModel}, it will store it to apply changes when the {@link #expand()} method is executed.
    *
    * @param applicationModel to modify given the usages of elements that belong to the {@link ExtensionModel}s contained in the
-   *        {@code extensions} map.
-   * @param extensionModel the {@link ExtensionModel}s to macro expand in the parameterized {@link ApplicationModel}
+   *                         {@code extensions} map.
+   * @param extensionModel   the {@link ExtensionModel}s to macro expand in the parameterized {@link ApplicationModel}
    */
   MacroExpansionModuleModel(ArtifactAst applicationModel, ExtensionModel extensionModel) {
     this.applicationModel = applicationModel;
@@ -353,14 +353,15 @@ public class MacroExpansionModuleModel {
    * Takes a one liner call to any given message processor, expand it to creating a "module-operation-chain" scope which has the
    * set of properties, the set of parameters and the list of message processors to execute.
    *
-   * @param operationRefModel message processor that will be replaced by a scope element named "module-operation-chain".
-   * @param operationModel operation that provides both the <parameter/>s and content of the <body/>
+   * @param operationRefModel         message processor that will be replaced by a scope element named "module-operation-chain".
+   * @param operationModel            operation that provides both the <parameter/>s and content of the <body/>
    * @param moduleGlobalElementsNames collection with the global components names (such as <http:config name="a"../>, <file:config
-   *        name="b"../>, <file:matcher name="c"../> and so on) that are contained within the <module/> that will be macro
-   *        expanded
-   * @param configRefParentTnsName parent reference to the global element if exists (it might not be global elements in the
-   *        current module). Useful when replacing {@link #TNS_PREFIX} operations, as the references to the global elements will
-   *        be those of the rootest element of the operations consumed by the app.
+   *                                  name="b"../>, <file:matcher name="c"../> and so on) that are contained within the <module/>
+   *                                  that will be macro expanded
+   * @param configRefParentTnsName    parent reference to the global element if exists (it might not be global elements in the
+   *                                  current module). Useful when replacing {@link #TNS_PREFIX} operations, as the references to
+   *                                  the global elements will be those of the rootest element of the operations consumed by the
+   *                                  app.
    * @return a new component model that represents the old placeholder but expanded with the content of the <body/>
    */
   private ComponentAst expandOperation(ComponentAst operationRefModel,
@@ -443,7 +444,7 @@ public class MacroExpansionModuleModel {
    * Assembly an expression to validate if the macro expansion of the current <module> can be directly replaced by the literals
    * value
    *
-   * @param name of the parameter (either a <property> or a <parameter>)
+   * @param name   of the parameter (either a <property> or a <parameter>)
    * @param prefix binding to append for the expression to be replaced in the <module>'s code
    * @return the expression that access a variable through a direct binding (aka: a "static expression", as it doesn't use the
    *         {@link CoreEvent})
@@ -494,7 +495,7 @@ public class MacroExpansionModuleModel {
    * {@link ModuleOperationMessageProcessorChain#MODULE_CONNECTION_GLOBAL_ELEMENT_NAME}.
    *
    * @param configRefComponentModel root element of the current XML config (global element of the parameterized operation)
-   * @param configurationModel configuration model of the current element
+   * @param configurationModel      configuration model of the current element
    * @return a map of properties to be added in the macro expanded <operation/>
    */
   private Map<String, String> extractConnectionProperties(ComponentAst configRefComponentModel,

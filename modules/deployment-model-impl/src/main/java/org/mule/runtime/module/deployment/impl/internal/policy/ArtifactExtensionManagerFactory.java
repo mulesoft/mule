@@ -38,9 +38,9 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
   /**
    * Creates a extensionManager factory
    *
-   * @param artifactPlugins artifact plugins deployed inside the artifact. Non null.
+   * @param artifactPlugins                artifact plugins deployed inside the artifact. Non null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
-   * @param extensionManagerFactory creates the {@link ExtensionManager} for the artifact. Non null
+   * @param extensionManagerFactory        creates the {@link ExtensionManager} for the artifact. Non null
    */
   public ArtifactExtensionManagerFactory(List<ArtifactPlugin> artifactPlugins,
                                          ExtensionModelLoaderRepository extensionModelLoaderRepository,

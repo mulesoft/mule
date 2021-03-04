@@ -217,7 +217,7 @@ public final class ClassLoaderModel {
     /**
      * Indicates which Java packages are exported as privileged API on the model.
      *
-     * @param packages Java packages names to export. Non null.
+     * @param packages    Java packages names to export. Non null.
      * @param artifactIds artifact IDs that have access to the privileged API. No null.
      * @return same builder instance.
      */

@@ -25,7 +25,7 @@ public interface ArtifactDescriptorFactory<T extends ArtifactDescriptor> {
   /**
    * Creates an artifact descriptor from a folder.
    *
-   * @param artifactFolder an existing folder containing artifact files
+   * @param artifactFolder       an existing folder containing artifact files
    * @param deploymentProperties properties provided for the deployment process.
    * @return a non null descriptor
    * @throws ArtifactDescriptorCreateException if the factory is not able to create a descriptor from the folder.

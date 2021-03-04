@@ -47,11 +47,11 @@ public interface SampleDataService {
    * Returns a sample output {@link Message} for a specific component referenced by its {@code extensionName} and
    * {@code componentName}.
    *
-   * @param extensionName the name of the extension in which the component is defined
-   * @param componentName the name of the component that supplies the sample
-   * @param parameters the parameters supplied to the underlying {@link SampleDataProvider}
+   * @param extensionName                 the name of the extension in which the component is defined
+   * @param componentName                 the name of the component that supplies the sample
+   * @param parameters                    the parameters supplied to the underlying {@link SampleDataProvider}
    * @param configurationInstanceSupplier supplies the config for underlying {@link SampleDataProvider} which requires
-   *        connectivity or config
+   *                                      connectivity or config
    * @return @return a sample output {@link Message}
    * @throws SampleDataException if the resolution fails
    */

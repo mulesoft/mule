@@ -27,7 +27,7 @@ public interface WebSocketConnectionHandler {
   /**
    * Invoked when the {@code socket} is established
    *
-   * @param socket the established {@link WebSocket}
+   * @param socket  the established {@link WebSocket}
    * @param request the inbound {@link WebSocketRequest request}
    * @throws WebSocketConnectionRejectedException if the connection is refused by the owning server
    */
@@ -36,10 +36,10 @@ public interface WebSocketConnectionHandler {
   /**
    * Invoked when the {@code socket} is closed. This method will be invoked whether the socket was closed locally or remotely.
    *
-   * @param socket the established {@link WebSocket}
-   * @param request the inbound {@link WebSocketRequest request}
+   * @param socket    the established {@link WebSocket}
+   * @param request   the inbound {@link WebSocketRequest request}
    * @param closeCode the close code used
-   * @param reason the reason provided
+   * @param reason    the reason provided
    */
   void onClose(WebSocket socket, WebSocketRequest request, WebSocketCloseCode closeCode, String reason);
 }

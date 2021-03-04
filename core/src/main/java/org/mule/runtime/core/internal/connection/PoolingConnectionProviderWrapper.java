@@ -26,8 +26,8 @@ public final class PoolingConnectionProviderWrapper<C> extends ReconnectableConn
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ConnectionProvider} to be wrapped
-   * @param poolingProfile a not {@code null} {@link PoolingProfile}
+   * @param delegate           the {@link ConnectionProvider} to be wrapped
+   * @param poolingProfile     a not {@code null} {@link PoolingProfile}
    * @param reconnectionConfig a {@link ReconnectionConfig}
    */
   public PoolingConnectionProviderWrapper(ConnectionProvider<C> delegate,

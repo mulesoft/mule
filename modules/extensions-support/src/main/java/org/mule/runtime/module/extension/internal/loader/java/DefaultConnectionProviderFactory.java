@@ -34,10 +34,10 @@ final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFac
   /**
    * Creates a new instance which creates {@link ConnectionProvider} instances of the given {@code providerClass}
    *
-   * @param providerClass the {@link Class} of the created {@link ConnectionProvider providers}
+   * @param providerClass        the {@link Class} of the created {@link ConnectionProvider providers}
    * @param extensionClassLoader the {@link ClassLoader} on which the extension is loaded
    * @throws IllegalModelDefinitionException if {@code providerClass} doesn't implement the {@link ConnectionProvider} interface
-   * @throws IllegalArgumentException if {@code providerClass} is not an instantiable type
+   * @throws IllegalArgumentException        if {@code providerClass} is not an instantiable type
    */
   DefaultConnectionProviderFactory(Class<?> providerClass, ClassLoader extensionClassLoader) {
     this.extensionClassLoader = new WeakReference<>(extensionClassLoader);

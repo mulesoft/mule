@@ -114,7 +114,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * Finds a connection and applies the {@link Function} passed as parameter.
    *
    * @param function a function that receives a connection as input and returns a value.
-   * @param <R> the return type of the function
+   * @param <R>      the return type of the function
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
