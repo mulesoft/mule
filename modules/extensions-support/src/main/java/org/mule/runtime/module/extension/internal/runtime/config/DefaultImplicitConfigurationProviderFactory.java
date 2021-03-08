@@ -56,7 +56,8 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
           + "' and none can be created automatically. Please define one");
     }
 
-    final String providerName = getImplicitConfigurationProviderName(muleContext.getId(), extensionModel, implicitConfigurationModel);
+    final String providerName =
+        getImplicitConfigurationProviderName(muleContext.getId(), extensionModel, implicitConfigurationModel);
     Callable<ResolverSet> resolverSetCallable =
         () -> buildImplicitResolverSet(implicitConfigurationModel, reflectionCache, expressionManager, muleContext);
     ClassLoader pluginClassloader = getClassLoader(extensionModel);

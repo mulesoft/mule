@@ -190,7 +190,8 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     if (!config.isPresent() && requiresConfig(extensionModel, componentModel)) {
       throw new NoConfigRefFoundException(extensionModel, componentModel);
     }
-    return config.flatMap(c -> getConfigurationProvider(getImplicitConfigurationProviderName(muleContext.getId(), extensionModel, c)));
+    return config
+        .flatMap(c -> getConfigurationProvider(getImplicitConfigurationProviderName(muleContext.getId(), extensionModel, c)));
   }
 
   /**
