@@ -107,7 +107,6 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
     assertThat(successCalls.get(), is(0));
     assertThat(errorCalls.get(), is(1));
     assertThat(errorEvent.get().getMessage().getPayload().getValue(), is(ERROR_PAYLOAD));
-    // CHECK
     assertThat(errorEvent.get().getCorrelationId(), is(not(TEST_CORRELATION_ID)));
   }
 
@@ -128,7 +127,6 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
     assertThat(successCalls.get(), is(0));
     assertThat(errorCalls.get(), is(1));
     assertThat(errorEvent.get().getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
-    // CHECK
     assertThat(errorEvent.get().getCorrelationId(), is(TEST_CORRELATION_ID));
   }
 

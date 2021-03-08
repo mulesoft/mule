@@ -10,8 +10,6 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 
-import static java.util.Optional.of;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
