@@ -12,6 +12,7 @@ import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.internal.util.FilenameUtils.normalizeDecodedPath;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.compression.InvalidZipFileException;
 
@@ -199,18 +200,11 @@ public class FileUtils {
    */
   public static String normalizeFilePath(URL url, String encoding) throws UnsupportedEncodingException {
     String resource = URLDecoder.decode(url.toExternalForm(), encoding);
-    if (resource != null) {
-      if (resource.startsWith("file:/")) {
-        resource = resource.substring(6);
-
-        if (!IS_OS_WINDOWS && !resource.startsWith(File.separator)) {
-          resource = File.separator + resource;
-        }
-      }
+    if (logger.isDebugEnabled()) {
+      logger.debug("Decoded URL: '{}'", resource);
     }
-    return resource;
+    return normalizeDecodedPath(resource, IS_OS_WINDOWS);
   }
-
 
   /**
    * Delete a file tree recursively.
