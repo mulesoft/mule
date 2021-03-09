@@ -166,7 +166,6 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     mockTransaction.setXA(true);
     getInstance().bindTransaction(mockTransaction);
     MuleTransactionConfig config = new MuleTransactionConfig(ACTION_NONE);
-
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
     assertThat(result, is(RETURN_VALUE));
@@ -174,7 +173,6 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     verify(mockTransaction).resume();
     verify(mockTransaction, never()).commit();
     verify(mockTransaction, never()).rollback();
-    assertThat(TransactionCoordination.getInstance().getTransaction(), nullValue());
   }
 
   @Test
