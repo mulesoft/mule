@@ -74,6 +74,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   private String partitionName;
   private final BidiMap realKeyToUUIDIndex = new TreeBidiMap();
 
+  // The purpose of this lock is to ensure consistency between the realKeyToUUIDIndex above and the file system, not the
+  // consistency of the store itself.
   private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
   private final Lock rLock = rwLock.readLock();
   private final Lock wLock = rwLock.writeLock();
