@@ -236,7 +236,7 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
     flow.initialise();
     flow.start();
 
-    getInstance().bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 5));
+    getInstance().bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
 
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(DefaultMuleException.class));

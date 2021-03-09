@@ -20,15 +20,15 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-<<<<<<< HEAD
-=======
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
->>>>>>> 466e32f763e... MULE-17078: Remove dependency of transactions infrastructure on the MuleContext (#8136)
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_PROPAGATE;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
@@ -43,11 +43,6 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.testmodels.mule.TestTransaction;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;

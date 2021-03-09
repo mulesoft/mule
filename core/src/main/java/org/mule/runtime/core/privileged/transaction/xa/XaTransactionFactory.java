@@ -50,7 +50,7 @@ public class XaTransactionFactory implements ExternalTransactionAwareTransaction
   /**
    * Create a Mule transaction that represents a transaction started outside of Mule
    *
-   * @deprecated since 4.2.3. Use {@link #joinExternalTransaction(String, NotificationDispatcher, TransactionManager, int)} instead
+   * @deprecated since 4.2.3. Use {@link #joinExternalTransaction(String, NotificationDispatcher, TransactionManager)} instead
    */
   @Deprecated
   public Transaction joinExternalTransaction(MuleContext muleContext) throws TransactionException {
@@ -61,8 +61,7 @@ public class XaTransactionFactory implements ExternalTransactionAwareTransaction
       }
       XaTransaction xat = new ExternalXaTransaction(muleContext.getConfiguration().getId(), txManager,
                                                     ((MuleContextWithRegistry) muleContext).getRegistry()
-                                                        .lookupObject(NotificationDispatcher.class),
-                                                    0);
+                                                        .lookupObject(NotificationDispatcher.class));
       xat.begin();
       return xat;
     } catch (Exception e) {
@@ -75,14 +74,13 @@ public class XaTransactionFactory implements ExternalTransactionAwareTransaction
    */
   @Override
   public Transaction joinExternalTransaction(String applicationName, NotificationDispatcher notificationFirer,
-                                             TransactionManager transactionManager, int timeout)
+                                             TransactionManager transactionManager)
       throws TransactionException {
     try {
       if (transactionManager.getTransaction() == null) {
         return null;
       }
-      XaTransaction xat = new ExternalXaTransaction(applicationName, transactionManager, notificationFirer,
-                                                    timeout);
+      XaTransaction xat = new ExternalXaTransaction(applicationName, transactionManager, notificationFirer);
 
       xat.begin();
       return xat;

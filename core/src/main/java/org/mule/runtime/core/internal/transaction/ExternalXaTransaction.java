@@ -31,9 +31,8 @@ public class ExternalXaTransaction extends XaTransaction {
   private static final Logger LOGGER = getLogger(ExternalXaTransaction.class);
 
   public ExternalXaTransaction(String applicationName, TransactionManager transactionManager,
-                               NotificationDispatcher notificationFirer,
-                               int timeout) {
-    super(applicationName, transactionManager, notificationFirer, timeout);
+                               NotificationDispatcher notificationFirer) {
+    super(applicationName, transactionManager, notificationFirer);
   }
 
   @Override

@@ -171,7 +171,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     flow.start();
 
     getInstance()
-        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), DEFAULT_TIMEOUT));
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
 
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(DefaultMuleException.class));

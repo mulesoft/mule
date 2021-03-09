@@ -185,8 +185,8 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     mockExternalTransactionFactory = mock(ExternalTransactionAwareTransactionFactory.class);
     config.setFactory(mockExternalTransactionFactory);
     Transaction externalTransaction = mock(Transaction.class);
-    when(mockExternalTransactionFactory.joinExternalTransaction(applicationName, notificationDispatcher, transactionManager,
-                                                                DEFAULT_TIMEOUT)).thenReturn(externalTransaction);
+    when(mockExternalTransactionFactory.joinExternalTransaction(applicationName, notificationDispatcher, transactionManager))
+        .thenReturn(externalTransaction);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
     assertThat(result, is(RETURN_VALUE));
