@@ -7,31 +7,20 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
-
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.processor.AbstractProcessor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -71,12 +60,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
   }
 
   private ComponentLocation getLocation() {
-    DefaultComponentLocation processorLocation =
-        (DefaultComponentLocation) ((AbstractComponent) getMessageProcessors().get(0)).getLocation();
-    List<DefaultComponentLocation.DefaultLocationPart> parts =
-        processorLocation.getParts().subList(0, processorLocation.getParts().size() - 2).stream()
-            .map(part -> (DefaultComponentLocation.DefaultLocationPart) part).collect(toList());
-    return new DefaultComponentLocation(processorLocation.getName(), parts);
+    return chain.getLocation();
   }
 
   private void setSdkInternalContextValues(CoreEvent eventWithCorrelationId) {
@@ -84,17 +68,23 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     SdkInternalContext sdkInternalContext = from(eventWithCorrelationId);
     sdkInternalContext.putContext(location, eventId);
     SdkInternalContext.OperationExecutionParams params =
-            sdkInternalContext.getOperationExecutionParams(location, originalEvent.getContext().getId());
+        sdkInternalContext.getOperationExecutionParams(location, originalEvent.getContext().getId());
     sdkInternalContext.setOperationExecutionParams(location, eventId, params.getConfiguration(), params.getParameters(),
-            eventWithCorrelationId, params.getCallback(),
-            params.getExecutionContextAdapter());
-
+                                                   eventWithCorrelationId, params.getCallback(),
+                                                   params.getExecutionContextAdapter());
   }
 
 
   @Override
   public void process(final String correlationId, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
     BaseEventContext newContext = child(oldContext, ofNullable(location), correlationId);
+    newContext.onComplete((ev, t) -> {
+      if (ev != null) {
+        oldContext.success(ev);
+      } else {
+        oldContext.error(t);
+      }
+    });
     CoreEvent eventWithCorrelationId = quickCopy(newContext, originalEvent);
     setSdkInternalContextValues(eventWithCorrelationId);
     new ChainExecutor(chain, originalEvent, eventWithCorrelationId, onSuccess, onError).execute();

@@ -72,6 +72,7 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
           .findFirst()
           .ifPresent(chain -> parameters.put(chain.getName(),
                                              new ProcessorChainValueResolver(nestedChain)));
+      nestedChain.setAnnotations(this.getAnnotations());
     } else {
       nestedChain = null;
     }
