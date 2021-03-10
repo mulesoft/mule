@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcessors {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ImmutableProcessorChainExecutor.class);
-
   /**
    * Processor that will be executed upon calling process
    */

@@ -68,7 +68,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   public static BaseEventContext child(BaseEventContext parent, Optional<ComponentLocation> componentLocation,
-                                       String correlationId) {
+                                       final String correlationId) {
     return child(parent, componentLocation, NullExceptionHandler.getInstance(), correlationId);
   }
 
@@ -89,7 +89,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   public static BaseEventContext child(BaseEventContext parent, Optional<ComponentLocation> componentLocation,
-                                       FlowExceptionHandler exceptionHandler, String correlationId) {
+                                       FlowExceptionHandler exceptionHandler, final String correlationId) {
     BaseEventContext child = new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler,
                                                    parent.getDepthLevel() + 1, correlationId);
     if (parent instanceof AbstractEventContext) {
@@ -324,7 +324,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private final Optional<String> correlationId;
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
-                              FlowExceptionHandler messagingExceptionHandler, int depthLevel, String correlationId) {
+                              FlowExceptionHandler messagingExceptionHandler, int depthLevel, final String correlationId) {
       super(messagingExceptionHandler, depthLevel, empty());
       this.flowCallStack = parent.getFlowCallStack().clone();
       this.root = parent.getRootContext();
