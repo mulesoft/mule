@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -18,6 +18,7 @@ import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain;
+import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 
 import java.util.List;
@@ -65,7 +66,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
 
   private void setSdkInternalContextValues(CoreEvent eventWithCorrelationId) {
     final String eventId = eventWithCorrelationId.getContext().getId();
-    SdkInternalContext sdkInternalContext = from(eventWithCorrelationId);
+    SdkInternalContext sdkInternalContext = SdkInternalContext.from(eventWithCorrelationId);
     sdkInternalContext.putContext(location, eventId);
     SdkInternalContext.OperationExecutionParams params =
         sdkInternalContext.getOperationExecutionParams(location, originalEvent.getContext().getId());
@@ -74,9 +75,14 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
                                                    params.getExecutionContextAdapter());
   }
 
+  private EventedResult resultWithPreviousCorrelationId(EventedResult result) {
+    CoreEvent resultEvent = ((EventedResult) result).getEvent();
+    CoreEvent resultWithouCorrelationId =
+        CoreEvent.builder(originalEvent).variables(resultEvent.getVariables()).message(resultEvent.getMessage()).build();
+    return EventedResult.from(resultWithouCorrelationId);
+  }
 
-  @Override
-  public void process(final String correlationId, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
+  private EventContext createCorrelationIdContext(String correlationId) {
     BaseEventContext newContext = child(oldContext, ofNullable(location), correlationId);
     newContext.onComplete((ev, t) -> {
       if (ev != null) {
@@ -85,9 +91,24 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
         oldContext.error(t);
       }
     });
-    CoreEvent eventWithCorrelationId = quickCopy(newContext, originalEvent);
+    return newContext;
+  }
+
+
+  @Override
+  public void process(final String correlationId, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
+    CoreEvent eventWithCorrelationId = quickCopy(createCorrelationIdContext(correlationId), originalEvent);
     setSdkInternalContextValues(eventWithCorrelationId);
-    new ChainExecutor(chain, originalEvent, eventWithCorrelationId, onSuccess, onError).execute();
+
+    new ChainExecutor(chain, originalEvent, eventWithCorrelationId,
+                      result -> onSuccess.accept(resultWithPreviousCorrelationId((EventedResult) result)),
+                      (t, res) -> {
+                        if (res instanceof EventedResult) {
+                          onError.accept(t, resultWithPreviousCorrelationId((EventedResult) res));
+                        } else {
+                          onError.accept(t, res);
+                        }
+                      }).execute();
   }
 
   @Override
