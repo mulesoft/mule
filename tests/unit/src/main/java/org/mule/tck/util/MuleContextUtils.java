@@ -85,7 +85,7 @@ public class MuleContextUtils {
     }
 
     @Override
-    public <T> T inject(T object) throws MuleException {
+    public <T> T inject(T object) {
       for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class))) {
         Class<?> dependencyType = field.getType();
 
@@ -222,8 +222,7 @@ public class MuleContextUtils {
       injectableObjects.put(ExtendedExpressionManager.class, muleContext.getExpressionManager());
       injectableObjects.put(StreamingManager.class, muleContext.getRegistry().lookupObject(StreamingManager.class));
       injectableObjects.put(ObjectStoreManager.class, muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER));
-      injectableObjects.put(NotificationDispatcher.class,
-                            muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
+      injectableObjects.put(NotificationDispatcher.class, getNotificationDispatcher(muleContext));
       injectableObjects.put(NotificationListenerRegistry.class, notificationListenerRegistry);
       injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
       injectableObjects.put(ConfigurationProperties.class, configProps);

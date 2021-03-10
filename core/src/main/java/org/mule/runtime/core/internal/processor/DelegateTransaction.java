@@ -8,30 +8,57 @@ package org.mule.runtime.core.internal.processor;
 
 import static java.util.Optional.empty;
 
+import java.util.Optional;
+
+import javax.transaction.TransactionManager;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.privileged.transaction.AbstractTransaction;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
-
-import java.util.Optional;
 
 /**
  * Transaction placeholder to replace with proper transaction once transactional resource is discovered by mule
  */
 public class DelegateTransaction extends AbstractTransaction {
 
+  private static final Integer DEFAULT_TRANSACTION_TIMEOUT = 30000;
+
   private Transaction delegate = new NullTransaction();
 
+
+  private TransactionManager transactionManager;
+
+
+
+  private SingleResourceTransactionFactoryManager transactionFactoryManager;
+
+  /**
+   * @deprecated since 4.3.0. Use
+   *             {@link #DelegateTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager, int)}
+   *             instead
+   */
+  @Deprecated
   public DelegateTransaction(MuleContext muleContext) {
     super(muleContext);
   }
 
+  public DelegateTransaction(String applicationName, NotificationDispatcher notificationFirer,
+                             SingleResourceTransactionFactoryManager transactionFactoryManager,
+                             TransactionManager transactionManager) {
+    super(applicationName, notificationFirer);
+    this.transactionFactoryManager = transactionFactoryManager;
+    this.transactionManager = transactionManager;
+  }
+
   @Override
-  protected void doBegin() throws TransactionException {}
+  protected void doBegin() {}
 
   @Override
   protected void doCommit() throws TransactionException {
@@ -84,12 +111,12 @@ public class DelegateTransaction extends AbstractTransaction {
       throw new TransactionException(CoreMessages
           .createStaticMessage("Single resource transaction has already a resource bound"));
     }
-    TransactionFactory transactionFactory = muleContext.getTransactionFactoryManager().getTransactionFactoryFor(key.getClass());
+    TransactionFactory transactionFactory = transactionFactoryManager.getTransactionFactoryFor(key.getClass());
     this.unbindTransaction();
-    int timeout = delegate.getTimeout();
-    this.delegate = transactionFactory.beginTransaction(muleContext);
-    delegate.setTimeout(timeout);
-    delegate.bindResource(key, resource);
+    this.delegate = transactionFactory.beginTransaction(applicationName, notificationFirer, transactionFactoryManager,
+                                                        transactionManager);
+    this.delegate.setTimeout(timeout);
+    this.delegate.bindResource(key, resource);
     ((TransactionAdapter) delegate).setComponentLocation(componentLocation);
   }
 
@@ -139,10 +166,10 @@ public class DelegateTransaction extends AbstractTransaction {
 
   private class NullTransaction implements TransactionAdapter {
 
-    private int timeout = muleContext.getConfiguration().getDefaultTransactionTimeout();
+    private Integer timeout;
 
     @Override
-    public void begin() throws TransactionException {}
+    public void begin() {}
 
     @Override
     public void commit() throws TransactionException {}
@@ -151,27 +178,31 @@ public class DelegateTransaction extends AbstractTransaction {
     public void rollback() throws TransactionException {}
 
     @Override
-    public int getStatus() throws TransactionException {
+    public int getStatus() {
       return Transaction.STATUS_UNKNOWN;
     }
 
     @Override
-    public boolean isBegun() throws TransactionException {
+    public boolean isBegun() {
       return false;
     }
 
     @Override
-    public boolean isRolledBack() throws TransactionException {
+    public boolean isRolledBack() {
       return false;
     }
 
     @Override
-    public boolean isCommitted() throws TransactionException {
+    public boolean isCommitted() {
       return false;
     }
 
     @Override
     public int getTimeout() {
+      if (timeout != null) {
+        return timeout;
+      }
+      timeout = DEFAULT_TRANSACTION_TIMEOUT;
       return timeout;
     }
 
@@ -196,13 +227,13 @@ public class DelegateTransaction extends AbstractTransaction {
     }
 
     @Override
-    public void bindResource(Object key, Object resource) throws TransactionException {}
+    public void bindResource(Object key, Object resource) {}
 
     @Override
-    public void setRollbackOnly() throws TransactionException {}
+    public void setRollbackOnly() {}
 
     @Override
-    public boolean isRollbackOnly() throws TransactionException {
+    public boolean isRollbackOnly() {
       return false;
     }
 
@@ -212,10 +243,10 @@ public class DelegateTransaction extends AbstractTransaction {
     }
 
     @Override
-    public void resume() throws TransactionException {}
+    public void resume() {}
 
     @Override
-    public javax.transaction.Transaction suspend() throws TransactionException {
+    public javax.transaction.Transaction suspend() {
       return null;
     }
 

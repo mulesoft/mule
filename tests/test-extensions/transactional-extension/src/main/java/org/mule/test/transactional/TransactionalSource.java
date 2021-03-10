@@ -9,7 +9,6 @@ package org.mule.test.transactional;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
@@ -51,7 +50,7 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
   }
 
   @Override
-  public void onStart(SourceCallback<TestTransactionalConnection, Object> sourceCallback) throws MuleException {
+  public void onStart(SourceCallback<TestTransactionalConnection, Object> sourceCallback) {
     connectExecutor = newFixedThreadPool(1);
     connectExecutor.execute(() -> {
       SourceCallbackContext ctx = sourceCallback.createContext();
@@ -83,7 +82,7 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
 
   @OnSuccess
   public void onSuccess(SourceCallbackContext ctx)
-      throws InterruptedException, TransactionException {
+      throws TransactionException {
     ctx.getTransactionHandle().commit();
     isSuccess = true;
   }

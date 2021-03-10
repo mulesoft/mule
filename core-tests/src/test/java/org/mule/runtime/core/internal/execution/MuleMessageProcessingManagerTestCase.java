@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -83,10 +84,12 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleTestCase {
     when(mockMuleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
 
     when(completeMessageProcessTemplateAndContext.getTransactionConfig()).thenReturn(empty());
+    when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
   }
 
   @Test
   public void nullMessageProcessPhaseInRegistry() throws Exception {
+    when(mockMuleContext.getTransactionManager()).thenReturn(null);
     processAndVerifyDefaultPhasesUsingRegistryPhases(null);
   }
 
