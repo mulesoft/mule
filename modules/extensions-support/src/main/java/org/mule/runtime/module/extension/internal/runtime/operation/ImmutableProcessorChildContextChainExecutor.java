@@ -13,6 +13,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -75,11 +76,12 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
                                                    params.getExecutionContextAdapter());
   }
 
+  private CoreEvent withPreviousCorrelationid(CoreEvent event) {
+    return CoreEvent.builder(originalEvent).variables(event.getVariables()).message(event.getMessage()).build();
+  }
+
   private EventedResult resultWithPreviousCorrelationId(EventedResult result) {
-    CoreEvent resultEvent = ((EventedResult) result).getEvent();
-    CoreEvent resultWithouCorrelationId =
-        CoreEvent.builder(originalEvent).variables(resultEvent.getVariables()).message(resultEvent.getMessage()).build();
-    return EventedResult.from(resultWithouCorrelationId);
+    return EventedResult.from(withPreviousCorrelationid(result.getEvent()));
   }
 
   private EventContext createCorrelationIdContext(String correlationId) {
@@ -103,11 +105,10 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     new ChainExecutor(chain, originalEvent, eventWithCorrelationId,
                       result -> onSuccess.accept(resultWithPreviousCorrelationId((EventedResult) result)),
                       (t, res) -> {
-                        if (res instanceof EventedResult) {
-                          onError.accept(t, resultWithPreviousCorrelationId((EventedResult) res));
-                        } else {
-                          onError.accept(t, res);
+                        if (t instanceof MessagingException) {
+                          t = new MessagingException(withPreviousCorrelationid(((MessagingException) t).getEvent()), t);
                         }
+                        onError.accept(t, resultWithPreviousCorrelationId((EventedResult) res));
                       }).execute();
   }
 
