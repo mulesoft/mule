@@ -7,14 +7,18 @@
 
 package org.mule.runtime.core.internal.routing;
 
+import static java.lang.Integer.getInteger;
+import static java.lang.Runtime.getRuntime;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
-import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SCOPES_DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static reactor.core.publisher.Flux.fromIterable;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -27,9 +31,9 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.Iterator;
 import java.util.List;
 
-import org.reactivestreams.Publisher;
-
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 /**
  * <p>
@@ -46,6 +50,11 @@ import javax.inject.Inject;
  * @since 4.2.0
  */
 public class ParallelForEach extends AbstractForkJoinRouter {
+
+  private static final int DEFAULT_MAX_CONCURRENCY =
+      getInteger(SYSTEM_PROPERTY_PREFIX + ParallelForEach.class.getName() + ".DEFAULT_MAX_CONCURRENCY",
+                 getInteger(SCOPES_DEFAULT_MAX_CONCURRENCY,
+                            getRuntime().availableProcessors() * getRuntime().availableProcessors()));
 
   @Inject
   protected StreamingManager streamingManager;

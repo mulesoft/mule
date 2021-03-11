@@ -2645,7 +2645,7 @@
                     <xsd:attribute name="maxConcurrency" type="substitutableInt">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The maximum concurrency. This value determines the maximum level of parallelism that will be used by this router. By default all routes will run in parallel (assuming available resources) but this can be limited or sequential behaviour achieved via the use of this attribute.
+                                The maximum concurrency. This value determines the maximum level of parallelism that will be used by this router.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>

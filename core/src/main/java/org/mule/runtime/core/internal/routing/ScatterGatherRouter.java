@@ -7,7 +7,12 @@
 
 package org.mule.runtime.core.internal.routing;
 
+import static java.lang.Integer.getInteger;
+import static java.lang.Math.min;
+import static java.lang.Runtime.getRuntime;
 import static java.util.Collections.emptyList;
+import static org.mule.runtime.api.util.MuleSystemProperties.SCOPES_DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEndpointsForRouter;
@@ -46,6 +51,11 @@ import org.reactivestreams.Publisher;
  * @since 3.5.0
  */
 public class ScatterGatherRouter extends AbstractForkJoinRouter implements Router {
+
+  private static final int DEFAULT_MAX_CONCURRENCY =
+      getInteger(SYSTEM_PROPERTY_PREFIX + ScatterGatherRouter.class.getName() + ".DEFAULT_MAX_CONCURRENCY",
+                 getInteger(SCOPES_DEFAULT_MAX_CONCURRENCY,
+                            getRuntime().availableProcessors() * getRuntime().availableProcessors()));
 
   private List<MessageProcessorChain> routes = emptyList();
 
@@ -88,7 +98,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
 
   @Override
   protected int getDefaultMaxConcurrency() {
-    return routes.size();
+    return min(DEFAULT_MAX_CONCURRENCY, routes.size());
   }
 
   @Override

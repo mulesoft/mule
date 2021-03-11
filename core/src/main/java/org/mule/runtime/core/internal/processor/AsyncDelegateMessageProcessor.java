@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static java.lang.Integer.getInteger;
+import static java.lang.Runtime.getRuntime;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.yield;
 import static java.util.Collections.emptyList;
@@ -14,6 +16,8 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.api.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.api.util.MuleSystemProperties.SCOPES_DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -88,6 +92,11 @@ import reactor.core.publisher.Flux;
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     implements Scope, Initialisable, Startable, Stoppable {
 
+  private static final int DEFAULT_MAX_CONCURRENCY =
+      getInteger(SYSTEM_PROPERTY_PREFIX + AsyncDelegateMessageProcessor.class.getName() + ".DEFAULT_MAX_CONCURRENCY",
+                 getInteger(SCOPES_DEFAULT_MAX_CONCURRENCY,
+                            getRuntime().availableProcessors() * getRuntime().availableProcessors()));
+
   @Inject
   private MuleContext muleContext;
   @Inject
@@ -122,19 +131,16 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   public void initialise() throws InitialisationException {
     Component rootContainer = getFromAnnotatedObject(componentLocator, this).orElse(null);
     if (rootContainer instanceof Pipeline) {
-      if (maxConcurrency != null) {
-        ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
+      ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
 
-        if (flowPsFactory instanceof AsyncProcessingStrategyFactory) {
-          ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrency(maxConcurrency);
-        } else {
-          logger.warn("{} does not support 'maxConcurrency'. Ignoring the value.", flowPsFactory.getClass().getSimpleName());
-        }
-        processingStrategy = flowPsFactory.create(getMuleContext(), getLocation().getLocation());
+      if (flowPsFactory instanceof AsyncProcessingStrategyFactory) {
+        ((AsyncProcessingStrategyFactory) flowPsFactory)
+            .setMaxConcurrency(maxConcurrency != null ? maxConcurrency : DEFAULT_MAX_CONCURRENCY);
       } else {
-        ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
-        processingStrategy = flowPsFactory.create(getMuleContext(), getLocation().getLocation());
+        logger.warn("{} does not support 'maxConcurrency'. Ignoring the value.", flowPsFactory.getClass().getSimpleName());
       }
+
+      processingStrategy = flowPsFactory.create(getMuleContext(), getLocation().getLocation());
     } else {
       processingStrategy = createDefaultProcessingStrategyFactory().create(getMuleContext(), getLocation().getLocation());
     }
