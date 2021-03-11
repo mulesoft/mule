@@ -104,8 +104,14 @@ public interface PrivilegedEvent extends CoreEvent {
       MDC.remove(CORRELATION_ID_MDC_KEY);
     } else {
       MDC.put(CORRELATION_ID_MDC_KEY, event.getCorrelationId());
+      Map<String, String> loggingVariables = event.getLoggingVariables();
+      if (loggingVariables != null) {
+        loggingVariables.forEach(MDC::put);
+      }
     }
   }
+
+  Map<String, String> getLoggingVariables();
 
   /**
    * Returns the contents of the message as a byte array.
@@ -279,6 +285,8 @@ public interface PrivilegedEvent extends CoreEvent {
 
     @Override
     Builder removeVariable(String key);
+
+    Builder addLoggingVariable(String key, String value);
 
     @Override
     Builder clearVariables();
