@@ -10,8 +10,13 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
+import org.mule.sdk.api.annotation.mapping.ParameterMapping;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
+<<<<<<< HEAD
 import org.mule.test.values.extension.resolver.SimpleLegacyValueProvider;
+=======
+import org.mule.test.values.extension.resolver.SdkSimpleValueProvider;
+>>>>>>> asdads
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
 import org.mule.test.values.extension.resolver.WithComplexActingParameter;
 import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
@@ -102,4 +107,9 @@ public class ValuesOperations {
 
   public void withVPOptionalParameterWithDefaultValue(@OfValues(WithOptionalParametersWithDefaultValueProvider.class) String providedParameters,
                                                       @Optional(defaultValue = "OPERATION_DEFAULT_VALUE") String optionalValue) {}
+
+  public void withVPOptionalParameterWithDefaultValuew(@org.mule.sdk.api.annotation.values.OfValues(
+      value = SdkSimpleValueProvider.class,
+      mapping = {@ParameterMapping(parameterName = "asd", containerName = "papa", fieldPath = "asd.qwe.asd"),
+          @ParameterMapping(parameterName = "ooo", containerName = "eee", fieldPath = "ee.qq.cacx")}) String papapa) {}
 }

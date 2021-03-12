@@ -56,4 +56,10 @@
             <sample-data:complex payload="my payload" attributes="my attributes" />
         </sample-data:complex-acting-parameter>
     </flow>
+
+    <flow name="complexActingParameterNew">
+        <sample-data:complex-acting-parameter>
+            <sample-data:complex payload="my payload" />
+        </sample-data:complex-acting-parameter>
+    </flow>
 </mule>
