@@ -110,6 +110,6 @@ public class ValuesOperations {
 
   public void withVPOptionalParameterWithDefaultValuew(@org.mule.sdk.api.annotation.values.OfValues(
       value = SdkSimpleValueProvider.class,
-      mapping = {@ParameterMapping(parameterName = "asd", containerName = "papa", fieldPath = "asd.qwe.asd"),
-          @ParameterMapping(parameterName = "ooo", containerName = "eee", fieldPath = "ee.qq.cacx")}) String papapa) {}
+      mapping = {@ParameterMapping(providerParameter = "asd", componentParameter = "papa", fieldPath = "asd.qwe.asd"),
+          @ParameterMapping(providerParameter = "ooo", componentParameter = "eee", fieldPath = "ee.qq.cacx")}) String papapa) {}
 }
