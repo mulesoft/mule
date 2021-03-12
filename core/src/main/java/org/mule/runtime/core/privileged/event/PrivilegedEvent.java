@@ -286,10 +286,14 @@ public interface PrivilegedEvent extends CoreEvent {
     @Override
     Builder removeVariable(String key);
 
-    Builder addLoggingVariable(String key, String value);
-
     @Override
     Builder clearVariables();
+
+    Builder addLoggingVariable(String key, String value);
+
+    Builder removeLoggingVariable(String key);
+
+    Builder clearLoggingVariables();
 
     @Override
     @Deprecated

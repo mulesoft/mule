@@ -63,6 +63,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.slf4j.MDC;
+
 public class DefaultEventBuilder implements InternalEvent.Builder {
 
   private BaseEventContext context;
@@ -215,6 +217,28 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       loggingVariables = new CaseInsensitiveHashMap<>();
     }
     loggingVariables.put(key, value);
+    modified = true;
+    return this;
+  }
+
+  @Override
+  public PrivilegedEvent.Builder removeLoggingVariable(String key) {
+    if (loggingVariables == null) {
+      return this;
+    }
+    loggingVariables.remove(key);
+    MDC.remove(key);
+    modified = true;
+    return this;
+  }
+
+  @Override
+  public PrivilegedEvent.Builder clearLoggingVariables() {
+    if (loggingVariables == null) {
+      return this;
+    }
+    loggingVariables.forEach((k, v) -> MDC.remove(k));
+    loggingVariables.clear();
     modified = true;
     return this;
   }
