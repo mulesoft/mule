@@ -100,7 +100,7 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
   /**
    * Implementations should use this method to actually create the output value
    *
-   * @param inputStream a stream
+   * @param inputStream  a stream
    * @param eventContext the context of the event on which the stream was opened
    * @return a resolved value
    */
@@ -110,7 +110,7 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
    * Implementations should use this method to actually create the output value
    *
    * @param inputStream a stream
-   * @param event the event on which the stream was opened
+   * @param event       the event on which the stream was opened
    * @return a resolved value
    * @deprecated Use {@link #resolve(InputStream, EventContext, ComponentLocation)} instead.
    */

@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link Producer} to stream the contents of a {@link Queue} A polling timeout
- * value might be specified, otherwise the default value of 5000 milliseconds will be assumed
+ * Implementation of {@link Producer} to stream the contents of a {@link Queue} A polling timeout value might be specified,
+ * otherwise the default value of 5000 milliseconds will be assumed
  */
 public class QueueProducer<T> implements Producer<T> {
 

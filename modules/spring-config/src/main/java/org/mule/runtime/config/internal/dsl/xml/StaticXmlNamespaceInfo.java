@@ -26,7 +26,7 @@ public final class StaticXmlNamespaceInfo implements XmlNamespaceInfo {
    * Creates a new instance
    *
    * @param namespaceUriPrefix the value to be returned by {@link #getNamespaceUriPrefix()}
-   * @param namespace the value to be returned by {@link #getNamespace()}
+   * @param namespace          the value to be returned by {@link #getNamespace()}
    */
   public StaticXmlNamespaceInfo(String namespaceUriPrefix, String namespace) {
     this.namespaceUriPrefix = namespaceUriPrefix;

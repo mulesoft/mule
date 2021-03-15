@@ -97,14 +97,14 @@ public class ArtifactHelperUtils {
 
       private ConfigAwareModel<T> configAwareModel(Object ownerModel, Object model) {
 
-        //This has to be done because we actually don't have a way to validate classes in compile time.
-        //Since there is no relationship between the ElementDeclaration and the Model, we have no way of forcing all
-        //generics to comply
-        //One case were this used to fail is for example:
-        //Optional<ComponentModel> model = findModel(extensionModel, configurationElementDeclaration);
-        //Here, T is expected to be a ComponentModel but when the configurationElementDeclaration is found in the ExtensionModel
-        //actually references a ConfigurationModel. Hence, the casting fails and we have a runtime error.
-        //With this try-catch block, we should return empty() instead of failing.
+        // This has to be done because we actually don't have a way to validate classes in compile time.
+        // Since there is no relationship between the ElementDeclaration and the Model, we have no way of forcing all
+        // generics to comply
+        // One case were this used to fail is for example:
+        // Optional<ComponentModel> model = findModel(extensionModel, configurationElementDeclaration);
+        // Here, T is expected to be a ComponentModel but when the configurationElementDeclaration is found in the ExtensionModel
+        // actually references a ConfigurationModel. Hence, the casting fails and we have a runtime error.
+        // With this try-catch block, we should return empty() instead of failing.
         T castedModel;
         try {
           castedModel = (T) model;

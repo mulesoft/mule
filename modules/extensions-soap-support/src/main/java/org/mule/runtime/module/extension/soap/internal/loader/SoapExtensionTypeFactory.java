@@ -12,8 +12,8 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapExtensionTypeWrapper;
 
 /**
- * Method Factory Pattern implementation that creates {@link ExtensionElement} for a Soap Extension from a {@link Class} that
- * uses the Soap Extensions API.
+ * Method Factory Pattern implementation that creates {@link ExtensionElement} for a Soap Extension from a {@link Class} that uses
+ * the Soap Extensions API.
  *
  * @since 4.0
  */

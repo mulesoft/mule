@@ -30,14 +30,15 @@ public class ArtifactsUrlClassification {
 
   /**
    * Creates a instance with the list of {@link URL}s classified in container, plugins and application.
-   *  @param containerUrls             list of {@link URL} that define the artifacts that would be loaded with the container
+   * 
+   * @param containerUrls             list of {@link URL} that define the artifacts that would be loaded with the container
    *                                  {@link ClassLoader}. Not null.
    * @param serviceUrlClassifications for each plugin discovered a list of {@link ArtifactUrlClassification} that defines the
    *                                  artifact that would be loaded by the service {@link ClassLoader}. Not null.
-   * @param testRunnerLibUrls         list of {@link URL} that define the artifacts that would be loaded with the test runner plugin
-   *                                  {@link ClassLoader}. Not null.
+   * @param testRunnerLibUrls         list of {@link URL} that define the artifacts that would be loaded with the test runner
+   *                                  plugin {@link ClassLoader}. Not null.
    * @param applicationLibUrls
-   * @param applicationSharedLibUrls       of {@link URL} that define the artifacts that would be loaded with the shareLib
+   * @param applicationSharedLibUrls  of {@link URL} that define the artifacts that would be loaded with the shareLib
    *                                  {@link ClassLoader}
    * @param pluginUrlClassifications  for each plugin discovered a list of {@link PluginUrlClassification} that defines the
    *                                  artifact that would be loaded by the plugin {@link ClassLoader}. Not null.

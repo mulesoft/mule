@@ -96,7 +96,7 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
   private ConfigurationDeclarer getConfigDeclarer(ExtensionDeclarer declarer,
                                                   SoapExtensionTypeWrapper<?> extension,
                                                   Set<ErrorModel> soapErrors) {
-    //TODO - MULE-14311 - Make loader work in compile time
+    // TODO - MULE-14311 - Make loader work in compile time
     Class<?> clazz = extension.getDeclaringClass().get();
     TypeAwareConfigurationFactory configurationFactory = new TypeAwareConfigurationFactory(clazz, clazz.getClassLoader());
 

@@ -34,8 +34,8 @@ public interface DslElementModelFactory {
    * Provides a default implementation of the {@link DslElementModelFactory}
    *
    * @param context the {@link DslResolvingContext} to be used when performing a
-   *        {@link org.mule.runtime.api.component.ComponentIdentifier#getNamespace namespace} or
-   *        {@link ElementDeclaration#getName} based lookup for a given {@link ExtensionModel}.
+   *                {@link org.mule.runtime.api.component.ComponentIdentifier#getNamespace namespace} or
+   *                {@link ElementDeclaration#getName} based lookup for a given {@link ExtensionModel}.
    * @return a default implementation of the {@link DslElementModelFactory}
    */
   static DslElementModelFactory getDefault(DslResolvingContext context) {
@@ -51,7 +51,7 @@ public interface DslElementModelFactory {
    * {@link SourceModel}
    *
    * @param elementDeclaration the {@link ElementDeclaration} for which its {@link DslElementModel} representation is required.
-   * @param <T> the expected model type of the {@link DslElementModel element}
+   * @param <T>                the expected model type of the {@link DslElementModel element}
    * @return a {@link DslElementModel} representation of the {@link ElementDeclaration} if one is possible to be built based on
    *         the {@link ExtensionModel extensions} provided as resolution context, or {@link Optional#empty} if no
    *         {@link DslElementModel} could be created for the given {@code applicationElement} with the current extensions
@@ -68,8 +68,8 @@ public interface DslElementModelFactory {
    * {@link OperationModel}, {@link SourceModel} or an {@link ObjectType} than can be expressed as an explicit top level element.
    *
    * @param componentConfiguration the {@link ComponentConfiguration} for which its {@link DslElementModel} representation is
-   *        required.
-   * @param <T> the expected model type of the {@link DslElementModel element}
+   *                               required.
+   * @param <T>                    the expected model type of the {@link DslElementModel element}
    * @return a {@link DslElementModel} representation of the {@link ComponentConfiguration} if one is possible to be built based
    *         on the {@link ExtensionModel extensions} provided as resolution context, or {@link Optional#empty} if no
    *         {@link DslElementModel} could be created for the given {@code applicationElement} with the current extensions
@@ -89,7 +89,7 @@ public interface DslElementModelFactory {
    * {@link OperationModel}, {@link SourceModel} or an {@link ObjectType} than can be expressed as an explicit top level element.
    *
    * @param componentConfiguration the {@link ComponentAst} for which its {@link DslElementModel} representation is required.
-   * @param <T> the expected model type of the {@link DslElementModel element}
+   * @param <T>                    the expected model type of the {@link DslElementModel element}
    * @return a {@link DslElementModel} representation of the {@link ComponentAst} if one is possible to be built based on the
    *         {@link ExtensionModel extensions} provided as resolution context, or {@link Optional#empty} if no
    *         {@link DslElementModel} could be created for the given {@code applicationElement} with the current extensions

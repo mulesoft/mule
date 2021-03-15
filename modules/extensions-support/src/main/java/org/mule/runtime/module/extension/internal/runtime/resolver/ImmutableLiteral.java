@@ -26,7 +26,7 @@ public final class ImmutableLiteral<T> implements Literal<T> {
    * Creates a new instance
    *
    * @param value the literal value
-   * @param type the type of the value the literal represents
+   * @param type  the type of the value the literal represents
    */
   public ImmutableLiteral(String value, Class<T> type) {
     this.value = ofNullable(value);

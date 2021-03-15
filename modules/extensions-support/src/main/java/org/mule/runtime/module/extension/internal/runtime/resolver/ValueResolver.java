@@ -27,8 +27,8 @@ public interface ValueResolver<T> {
   T resolve(ValueResolvingContext context) throws MuleException;
 
   /**
-   * Returns {@code false} if subsequent invocations to {@link #resolve(ValueResolvingContext)} will return the same value.
-   * Notice that if it returns {@code true}, then it might return different values per invocation but that's not guaranteed.
+   * Returns {@code false} if subsequent invocations to {@link #resolve(ValueResolvingContext)} will return the same value. Notice
+   * that if it returns {@code true}, then it might return different values per invocation but that's not guaranteed.
    *
    * @return whether the resolved value changes based or the resolution context or not
    */

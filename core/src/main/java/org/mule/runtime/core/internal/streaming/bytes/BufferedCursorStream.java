@@ -17,8 +17,8 @@ import java.nio.ByteBuffer;
 /**
  * A {@link CursorStream} which pulls its data from an {@link InputStreamBuffer}.
  * <p>
- * To reduce contention on the {@link InputStreamBuffer}, this class also uses a local intermediate
- * memory buffer which size must be configured
+ * To reduce contention on the {@link InputStreamBuffer}, this class also uses a local intermediate memory buffer which size must
+ * be configured
  *
  * @see InputStreamBuffer
  * @since 4.0
@@ -31,8 +31,8 @@ public final class BufferedCursorStream extends AbstractCursorStream {
   private final InputStreamBuffer streamBuffer;
 
   /**
-   * Intermediate buffer between this cursor and the {@code traversableBuffer}. This reduces contention
-   * on the {@code traversableBuffer}
+   * Intermediate buffer between this cursor and the {@code traversableBuffer}. This reduces contention on the
+   * {@code traversableBuffer}
    */
   private ByteBuffer localBuffer = NULL_BUFFER;
   private long rangeStart = 0;
@@ -41,8 +41,8 @@ public final class BufferedCursorStream extends AbstractCursorStream {
   /**
    * Creates a new instance
    *
-   * @param streamBuffer  the buffer which provides data
-   * @param provider the {@link CursorStreamProvider} for the {@link CursorStream cursors} that will consume this buffer
+   * @param streamBuffer the buffer which provides data
+   * @param provider     the {@link CursorStreamProvider} for the {@link CursorStream cursors} that will consume this buffer
    */
   public BufferedCursorStream(InputStreamBuffer streamBuffer, CursorStreamProvider provider) {
     super(provider);

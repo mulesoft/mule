@@ -103,7 +103,7 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
    * Determines if a bundle descriptor is compatible with another one.
    *
    * @param available bundle descriptor that is available to use.
-   * @param expected bundle descriptor that is expected.
+   * @param expected  bundle descriptor that is expected.
    * @return true if match in group and artifact id, have the same classifier and the versions are compatible, false otherwise.
    */
   public static boolean isCompatibleBundle(BundleDescriptor available, BundleDescriptor expected) {

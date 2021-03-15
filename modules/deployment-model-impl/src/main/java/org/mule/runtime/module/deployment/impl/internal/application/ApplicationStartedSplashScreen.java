@@ -46,7 +46,7 @@ public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<
   }
 
   protected void listLibraries(ApplicationDescriptor descriptor) {
-    // Excludes the application URL 
+    // Excludes the application URL
     URL[] urls = descriptor.getClassLoaderModel().getUrls();
     urls = Arrays.copyOfRange(urls, 1, urls.length);
 

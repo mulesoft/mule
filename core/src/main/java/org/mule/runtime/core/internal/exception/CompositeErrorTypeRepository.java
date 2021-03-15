@@ -18,8 +18,8 @@ import java.util.Optional;
 /**
  * {@link ErrorTypeRepository} implementation which composes two {@link ErrorTypeRepository} in a hierarchy manner.
  * <p>
- * If the this repository can't process a request with the {@link CompositeErrorTypeRepository#childErrorTypeRepository},
- * it will fallback to the {@link CompositeErrorTypeRepository#parentErrorTypeRepository}
+ * If the this repository can't process a request with the {@link CompositeErrorTypeRepository#childErrorTypeRepository}, it will
+ * fallback to the {@link CompositeErrorTypeRepository#parentErrorTypeRepository}
  *
  * @since 4.0
  */
@@ -32,8 +32,8 @@ public final class CompositeErrorTypeRepository implements ErrorTypeRepository {
    * Creates a new {@link CompositeErrorTypeRepository} instance
    *
    * @param childErrorTypeRepository  {@link ErrorTypeRepository} considered as the main one
-   * @param parentErrorTypeRepository {@link ErrorTypeRepository} considered as the secondary one, is a request
-   *                                  can't be handled by the main {@link ErrorTypeRepository}, this one will be used
+   * @param parentErrorTypeRepository {@link ErrorTypeRepository} considered as the secondary one, is a request can't be handled
+   *                                  by the main {@link ErrorTypeRepository}, this one will be used
    */
   public CompositeErrorTypeRepository(ErrorTypeRepository childErrorTypeRepository,
                                       ErrorTypeRepository parentErrorTypeRepository) {

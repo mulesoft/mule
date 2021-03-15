@@ -33,7 +33,7 @@ public class InvalidComponentIdException extends MuleException {
 
   /**
    * @param message the exception message
-   * @param code {@link FailureCode} associated to the exception
+   * @param code    {@link FailureCode} associated to the exception
    */
   InvalidComponentIdException(I18nMessage message, FailureCode code) {
     super(message);
@@ -42,7 +42,7 @@ public class InvalidComponentIdException extends MuleException {
 
   /**
    * @param message the exception message
-   * @param cause the exception that cause this exception to be thrown
+   * @param cause   the exception that cause this exception to be thrown
    */
   InvalidComponentIdException(I18nMessage message, Throwable cause) {
     super(message, cause);
@@ -51,8 +51,8 @@ public class InvalidComponentIdException extends MuleException {
 
   /**
    * @param message the exception message
-   * @param cause the exception that cause this exception to be thrown
-   * @param code {@link FailureCode} associated to the exception
+   * @param cause   the exception that cause this exception to be thrown
+   * @param code    {@link FailureCode} associated to the exception
    */
   InvalidComponentIdException(I18nMessage message, Throwable cause, FailureCode code) {
     super(message, cause);

@@ -37,8 +37,7 @@ public class PrivateOperationsModelProperty implements ModelProperty {
   }
 
   /**
-   * Returns the {@link OperationModel} that matches
-   * the given name.
+   * Returns the {@link OperationModel} that matches the given name.
    *
    * @param name case sensitive operation name
    * @return an {@link Optional} {@link OperationModel}

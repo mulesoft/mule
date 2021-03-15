@@ -9,8 +9,7 @@ package org.mule.runtime.core.internal.util.queue;
 import java.io.Serializable;
 
 /**
- * Extension of {@link QueueStore} required to be able to recover a queue store base on a
- * transaction journal.
+ * Extension of {@link QueueStore} required to be able to recover a queue store base on a transaction journal.
  */
 public interface RecoverableQueueStore extends QueueStore {
 

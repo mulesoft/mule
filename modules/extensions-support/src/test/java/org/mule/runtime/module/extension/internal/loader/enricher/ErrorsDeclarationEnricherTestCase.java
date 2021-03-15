@@ -205,6 +205,7 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
     public static class ErrorTypeProviderWithInvalidErrors implements ErrorTypeProvider {
 
       public enum WrongErrors implements ErrorTypeDefinition<org.mule.runtime.extension.api.error.MuleErrors> {
+
         WHATEVER {
 
           @Override

@@ -20,8 +20,8 @@ public interface EnricherDataTypePropagator {
   /**
    * Propagates {@link org.mule.runtime.api.metadata.DataType} on message enrichment
    *
-   * @param event event being enriched
-   * @param typedValue value used to enrich the message
+   * @param event              event being enriched
+   * @param typedValue         value used to enrich the message
    * @param compiledExpression assignment expression used for enrichment
    * @return true if propagation was done, false otherwise
    */

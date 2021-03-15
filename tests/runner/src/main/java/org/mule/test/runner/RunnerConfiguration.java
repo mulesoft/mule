@@ -91,12 +91,13 @@ public class RunnerConfiguration {
   /**
    * Creates an instance of the the configuration by reading the class annotated with {@link ArtifactClassLoaderRunnerConfig}.
    * <p/>
-   * Configuration is created by searching in the class hierarchy for {@code testClass} which classes are annotated with {@link ArtifactClassLoaderRunnerConfig}
-   * and creating a new configuration for the test. Some configuration attributes, as {@value PROVIDED_EXCLUSIONS}, {@value TEST_EXCLUSIONS} and {@value TEST_INCLUSIONS}, are
-   * the result of collecting the same attribute from all the configured classes/interfaces in the test class's hierarchy.
+   * Configuration is created by searching in the class hierarchy for {@code testClass} which classes are annotated with
+   * {@link ArtifactClassLoaderRunnerConfig} and creating a new configuration for the test. Some configuration attributes, as
+   * {@value PROVIDED_EXCLUSIONS}, {@value TEST_EXCLUSIONS} and {@value TEST_INCLUSIONS}, are the result of collecting the same
+   * attribute from all the configured classes/interfaces in the test class's hierarchy.
    * <p/>
-   * The rest of the attributes, {@value EXPORT_PLUGIN_CLASSES}, {@value SHARED_RUNTIME_LIBS} and {@value EXTRA_PRIVILEGED_ARTIFACTS},
-   * are taken from the first class in the hierarchy that is configured.
+   * The rest of the attributes, {@value EXPORT_PLUGIN_CLASSES}, {@value SHARED_RUNTIME_LIBS} and
+   * {@value EXTRA_PRIVILEGED_ARTIFACTS}, are taken from the first class in the hierarchy that is configured.
    *
    * @param testClass Test {@link Class} annotated
    * @return a {@link RunnerConfiguration}
@@ -127,9 +128,9 @@ public class RunnerConfiguration {
   /**
    * Reads the attribute from the klass annotated and does a flatMap with the list of values.
    *
-   * @param name attribute/method name of the annotation {@link ArtifactClassLoaderRunnerConfig} to be obtained
+   * @param name  attribute/method name of the annotation {@link ArtifactClassLoaderRunnerConfig} to be obtained
    * @param klass {@link Class} from where the annotated attribute will be read
-   * @param <E> generic type
+   * @param <E>   generic type
    * @return {@link List} of values
    */
   private static <E> List<E> readAttributeFromHierarchy(String name, Class<?> klass) {

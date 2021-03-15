@@ -10,7 +10,8 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 import java.util.Properties;
 
 /**
- * Allows to associate context through deployment properties without changing the API for {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader}.
+ * Allows to associate context through deployment properties without changing the API for
+ * {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader}.
  *
  * @since 4.2.0
  */

@@ -530,8 +530,8 @@ public class MuleExtensionUtils {
   }
 
   /**
-   * Tests the given {@code enrichableModel} for a {@link ImplementingTypeModelProperty} and if present it
-   * returns the enclosed implementing type.
+   * Tests the given {@code enrichableModel} for a {@link ImplementingTypeModelProperty} and if present it returns the enclosed
+   * implementing type.
    *
    * @param enrichableModel the provider to get the implemented type from
    * @return an {@link Optional} that either has the provider implementing type, or is empty

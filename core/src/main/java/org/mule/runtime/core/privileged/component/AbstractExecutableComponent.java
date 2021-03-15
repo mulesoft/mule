@@ -95,9 +95,9 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
    * Streams will be closed and resources cleaned up when when the existing root {@link org.mule.runtime.api.event.EventContext}
    * completes.
    *
-   * @param event the input to execute the component
+   * @param event                 the input to execute the component
    * @param childEventContributor allows to perform any modifications on the event to be built right before executing this
-   *        component with it.
+   *                              component with it.
    * @return a {@link Event} with the content of the result
    * @throws ComponentExecutionException if there is an unhandled error within the execution
    */

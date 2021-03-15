@@ -28,8 +28,8 @@ import org.reactivestreams.Publisher;
 /**
  * Base class for {@link ProcessingStrategy} decorators.
  * <p>
- * This class implements {@link Lifecycle} so that all phases are propagated to the {@link #delegate} if it
- * implements the corresponding interfaces.
+ * This class implements {@link Lifecycle} so that all phases are propagated to the {@link #delegate} if it implements the
+ * corresponding interfaces.
  *
  * @since 4.3.0
  */

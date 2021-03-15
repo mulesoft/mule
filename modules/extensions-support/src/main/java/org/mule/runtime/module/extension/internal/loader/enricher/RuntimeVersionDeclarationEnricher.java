@@ -16,8 +16,8 @@ import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import java.lang.reflect.Field;
 
 /**
- * {@link DeclarationEnricher} which looks at classes with fields annotated with {@link RuntimeVersion}. It validates
- * that the annotations is used properly and if so it adds a {@link RuntimeVersionModelProperty}.
+ * {@link DeclarationEnricher} which looks at classes with fields annotated with {@link RuntimeVersion}. It validates that the
+ * annotations is used properly and if so it adds a {@link RuntimeVersionModelProperty}.
  * <p>
  * If the {@link RuntimeVersion} annotation is used in a way which breaks the rules set on its javadoc, an
  * {@link IllegalConfigurationModelDefinitionException} will be thrown.

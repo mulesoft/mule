@@ -10,9 +10,8 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 
 /**
- * Marker {@link ModelProperty} for indicating that the component has been declared
- * using a developer-defined custom {@link StereotypeModel} instead of having
- * the default stereotype for the component.
+ * Marker {@link ModelProperty} for indicating that the component has been declared using a developer-defined custom
+ * {@link StereotypeModel} instead of having the default stereotype for the component.
  *
  * @since 4.2.0
  */

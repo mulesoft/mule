@@ -26,7 +26,7 @@ public class BundleDescriptorUtils {
    * Determines if a version is compatible with another one
    *
    * @param availableVersion version that is available to use. Non empty
-   * @param expectedVersion version that is expected. Non empty
+   * @param expectedVersion  version that is expected. Non empty
    * @return true if versions are compatible, false otherwise
    */
   public static boolean isCompatibleVersion(String availableVersion, String expectedVersion) {

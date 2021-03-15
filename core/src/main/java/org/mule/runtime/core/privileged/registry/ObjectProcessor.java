@@ -13,10 +13,11 @@ import org.mule.runtime.core.internal.registry.Registry;
  * correct time.
  * <p/>
  * Developers must not implement this interface directly. Instead use either
- * {@link org.mule.runtime.core.privileged.registry.InjectProcessor} or {@link org.mule.runtime.core.privileged.registry.PreInitProcessor}.
+ * {@link org.mule.runtime.core.privileged.registry.InjectProcessor} or
+ * {@link org.mule.runtime.core.privileged.registry.PreInitProcessor}.
  *
- * @deprecated as of 3.7.0 since these are only used by {@link Registry} which is also deprecated. Use post processors
- *             for currently supported registries instead
+ * @deprecated as of 3.7.0 since these are only used by {@link Registry} which is also deprecated. Use post processors for
+ *             currently supported registries instead
  */
 @Deprecated
 public interface ObjectProcessor {

@@ -84,7 +84,7 @@ public abstract class AbstractQueueTransactionJournal<T, K extends JournalEntry<
   /**
    * Creates a {@link JournalEntry} for an update operation in the queue.
    *
-   * @param txId transaction identifier
+   * @param txId      transaction identifier
    * @param operation operation done over the queue
    * @param queueName queueName of the queue in which the operation has been done
    * @param serialize value of the operation
@@ -95,7 +95,7 @@ public abstract class AbstractQueueTransactionJournal<T, K extends JournalEntry<
   /**
    * Creates a checkpoint {@link JournalEntry}.
    *
-   * @param txId transaction identifier
+   * @param txId      transaction identifier
    * @param operation checkpoint operation
    * @return a new {@link JournalEntry}
    */

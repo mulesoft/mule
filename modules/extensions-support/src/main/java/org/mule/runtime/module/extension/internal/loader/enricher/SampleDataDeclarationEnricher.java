@@ -118,9 +118,9 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
 
   /**
    * Introspects the given {@link ParameterizableTypeWrapper parameterizableComponent} looking if this ones uses either a
-   * {@link Connection} or {@link org.mule.sdk.api.annotation.param.Connection}. If any is true this method will indicate
-   * to the {@link SampleDataProviderFactoryModelPropertyBuilder}
-   * that the correspondent {@link SampleDataProvider} will require a connection.
+   * {@link Connection} or {@link org.mule.sdk.api.annotation.param.Connection}. If any is true this method will indicate to the
+   * {@link SampleDataProviderFactoryModelPropertyBuilder} that the correspondent {@link SampleDataProvider} will require a
+   * connection.
    *
    * @param modelPropertyBuilder     the model property builder
    * @param parameterizableComponent component to introspect
@@ -140,8 +140,8 @@ public class SampleDataDeclarationEnricher extends AbstractAnnotatedDeclarationE
   /**
    * Introspects the given {@link ParameterizableTypeWrapper parameterizableComponent} looking if this ones uses either a
    * {@link Config} or {@link org.mule.sdk.api.annotation.param.Config}, if any is true this method will indicate to the
-   * {@link SampleDataProviderFactoryModelPropertyBuilder} that the correspondent {@link SampleDataProvider} will require
-   * a config.
+   * {@link SampleDataProviderFactoryModelPropertyBuilder} that the correspondent {@link SampleDataProvider} will require a
+   * config.
    *
    * @param modelPropertyBuilder     the property builder
    * @param parameterizableComponent component to introspect

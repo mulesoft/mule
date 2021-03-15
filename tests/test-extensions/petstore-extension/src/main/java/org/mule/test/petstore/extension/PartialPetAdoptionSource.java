@@ -39,7 +39,7 @@ public class PartialPetAdoptionSource extends PollingSource<String, Void> {
   private static int POLLS_TO_ADD_PET = 3;
   private List<String> pets;
 
-  //Using this annotation in order to mix the legacy and the new api and test all code flows.
+  // Using this annotation in order to mix the legacy and the new api and test all code flows.
   @org.mule.sdk.api.annotation.param.Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
   private boolean watermark;

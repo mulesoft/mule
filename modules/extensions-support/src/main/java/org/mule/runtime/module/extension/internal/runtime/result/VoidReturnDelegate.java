@@ -14,8 +14,8 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
  * An implementation of {@link ReturnDelegate} intended for operations which return {@link Void} and that were executed with a
  * {@link ExecutionContextAdapter}
  * <p/>
- * It returns the {@link CoreEvent} that {@link ExecutionContextAdapter} provides. Notices that this class will fail if used with any
- * other type of {@link ExecutionContext}
+ * It returns the {@link CoreEvent} that {@link ExecutionContextAdapter} provides. Notices that this class will fail if used with
+ * any other type of {@link ExecutionContext}
  * <p/>
  * This class is intended to be used as a singleton, use the {@link #INSTANCE} attribute to access the instance
  *

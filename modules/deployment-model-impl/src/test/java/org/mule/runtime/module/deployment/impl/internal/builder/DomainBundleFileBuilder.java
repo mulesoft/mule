@@ -37,7 +37,7 @@ public class DomainBundleFileBuilder extends AbstractArtifactFileBuilder<DomainB
    * Creates a new builder
    *
    * @param artifactId identifier for the domain bunle
-   * @param domain file for the domain artifact contained on the bundle.
+   * @param domain     file for the domain artifact contained on the bundle.
    */
   public DomainBundleFileBuilder(String artifactId, File domain) {
     super(artifactId);

@@ -118,9 +118,9 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
   /**
    * Creates a new instance
    *
-   * @param name this configuration's name
-   * @param model the {@link ConfigurationModel} for this instance
-   * @param value the actual configuration instance
+   * @param name               this configuration's name
+   * @param model              the {@link ConfigurationModel} for this instance
+   * @param value              the actual configuration instance
    * @param connectionProvider an {@link Optional} containing the {@link ConnectionProvider} to use
    */
   public LifecycleAwareConfigurationInstance(String name,
@@ -252,8 +252,8 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
   }
 
   /**
-   * Propagates this lifecycle phase into the the {@link #value}. Also triggers a
-   * {@link ConfigurationInstanceNotification} that is being stopped.
+   * Propagates this lifecycle phase into the the {@link #value}. Also triggers a {@link ConfigurationInstanceNotification} that
+   * is being stopped.
    *
    * @throws MuleException if an exception is found
    */

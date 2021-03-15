@@ -130,11 +130,11 @@ public class BeanDefinitionFactory {
    * Creates a {@code BeanDefinition} for the {@code ComponentModel}.
    *
    * @param springComponentModels a {@link Map} created {@link ComponentAst} and {@link SpringComponentModel}
-   * @param parentComponentModel        the container of the component model from which we want to create the bean definition.
-   * @param componentModel              the component model from which we want to create the bean definition.
-   * @param registry                    the bean registry since it may be required to get other bean definitions to create this one or to register
-   *                                    the bean definition.
-   * @param componentLocator            where the locations of any {@link Component}'s locations must be registered
+   * @param parentComponentModel  the container of the component model from which we want to create the bean definition.
+   * @param componentModel        the component model from which we want to create the bean definition.
+   * @param registry              the bean registry since it may be required to get other bean definitions to create this one or
+   *                              to register the bean definition.
+   * @param componentLocator      where the locations of any {@link Component}'s locations must be registered
    */
   public void resolveComponent(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                List<ComponentAst> componentModelHierarchy,
@@ -338,7 +338,7 @@ public class BeanDefinitionFactory {
    *
    * @param componentIdentifier a {@code ComponentModel} identifier.
    * @return true if there's a {@code ComponentBuildingDefinition} for the specified configuration identifier, false if there's
-   * not.
+   *         not.
    */
   public boolean hasDefinition(ComponentIdentifier componentIdentifier) {
     return isComponentIgnored(componentIdentifier)
@@ -349,8 +349,8 @@ public class BeanDefinitionFactory {
 
   /**
    * @param componentIdentifier the component identifier to check
-   * @return {@code true} if the component identifier is one of the current language construct that have specific bean definitions parsers since we don't want to include
-   * them in the parsing API.
+   * @return {@code true} if the component identifier is one of the current language construct that have specific bean definitions
+   *         parsers since we don't want to include them in the parsing API.
    */
   public boolean isLanguageConstructComponent(ComponentIdentifier componentIdentifier) {
     return customBuildersComponentIdentifiers.contains(componentIdentifier);

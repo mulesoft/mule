@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
  * Helper to access constants from {@link TransactionConfig}.
  */
 public enum TransactionConfigEnum {
+
   /**
    * Whether there is a transaction available or not, ignore it
    * <p>

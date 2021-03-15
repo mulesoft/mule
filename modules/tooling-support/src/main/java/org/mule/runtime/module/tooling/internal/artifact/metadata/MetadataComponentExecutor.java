@@ -117,18 +117,18 @@ public class MetadataComponentExecutor extends MetadataExecutor {
   @Override
   protected boolean resolverRequiresConfiguration(Optional<TypeResolversInformationModelProperty> typeResolversInformationModelProperty,
                                                   ComponentModel componentModel) {
-    //TODO MULE-15638 it is not correct the information provided by the TypeResolversInformationModelProperty model property
-    //return typeResolversInformationModelProperty
-    //.map(mp ->  {
-    //  if (mp.getOutputResolver().map(resolverInformation -> resolverInformation.isRequiresConfiguration()).orElse(false)) {
-    //    return true;
-    //  }
-    //  if (mp.getAttributesResolver().map(resolverInformation -> resolverInformation.isRequiresConfiguration()).orElse(false)) {
-    //    return true;
-    //  }
-    //  return componentModel.getAllParameterModels().stream().map(parameter -> mp.getParameterResolver(parameter.getName())
-    //          .map(resolverInformation -> resolverInformation.isRequiresConfiguration()).orElse(false)).findFirst().orElse(false);
-    //}).orElse(false);
+    // TODO MULE-15638 it is not correct the information provided by the TypeResolversInformationModelProperty model property
+    // return typeResolversInformationModelProperty
+    // .map(mp -> {
+    // if (mp.getOutputResolver().map(resolverInformation -> resolverInformation.isRequiresConfiguration()).orElse(false)) {
+    // return true;
+    // }
+    // if (mp.getAttributesResolver().map(resolverInformation -> resolverInformation.isRequiresConfiguration()).orElse(false)) {
+    // return true;
+    // }
+    // return componentModel.getAllParameterModels().stream().map(parameter -> mp.getParameterResolver(parameter.getName())
+    // .map(resolverInformation -> resolverInformation.isRequiresConfiguration()).orElse(false)).findFirst().orElse(false);
+    // }).orElse(false);
     return artifactHelper.hasParameterOfType(componentModel, CONFIG);
   }
 

@@ -16,8 +16,7 @@ import java.util.List;
 /**
  * Groups an ordered list of {@link Interceptor interceptors} that will be applied as one.
  * <p>
- * It also contains based semantics and behaviors about the nuances of how should the {@link Interceptor} contract be
- * consumed.
+ * It also contains based semantics and behaviors about the nuances of how should the {@link Interceptor} contract be consumed.
  *
  * @since 4.3.0
  */
@@ -33,8 +32,8 @@ public interface InterceptorChain {
     private Builder() {}
 
     /**
-     * Adds the given {@code interceptor} to the product chain. Interceptors will be executed in the order corresponding
-     * to invocation of this method
+     * Adds the given {@code interceptor} to the product chain. Interceptors will be executed in the order corresponding to
+     * invocation of this method
      *
      * @param interceptor the interceptor to add
      * @return {@code this} instance
@@ -79,8 +78,8 @@ public interface InterceptorChain {
   /**
    * Executes the {@link Interceptor#onSuccess(ExecutionContext, Object)} phase on each added interceptor.
    * <p>
-   * If case of an interceptor failing, the exception is logged and next interceptors are still executed. This method will
-   * never fail
+   * If case of an interceptor failing, the exception is logged and next interceptors are still executed. This method will never
+   * fail
    *
    * @param executionContext the {@link ExecutionContext}
    * @param result           the operation's result
@@ -94,8 +93,8 @@ public interface InterceptorChain {
    * for each interceptor {@code N} in which {@code 0 < N < M}, the {@link Throwable} passed into it is the one that was returned
    * by interceptor {@code N -1}.
    * <p>
-   * If case of an interceptor failing, the exception is logged and next interceptors are still executed. This method will
-   * never fail
+   * If case of an interceptor failing, the exception is logged and next interceptors are still executed. This method will never
+   * fail
    * <p>
    * This method returns the {@link Throwable} returned by the last interceptor.
    *
@@ -106,11 +105,11 @@ public interface InterceptorChain {
   Throwable onError(ExecutionContext executionContext, Throwable t);
 
   /**
-   * Executes the {@link Interceptor#after(ExecutionContext, Object)} phase on each added interceptor, using {@code null} as
-   * the second argument.
+   * Executes the {@link Interceptor#after(ExecutionContext, Object)} phase on each added interceptor, using {@code null} as the
+   * second argument.
    * <p>
-   * If case of an interceptor failing, the exception is logged and next interceptors are still executed. This method will
-   * never fail.
+   * If case of an interceptor failing, the exception is logged and next interceptors are still executed. This method will never
+   * fail.
    *
    * @param executionContext the {@link ExecutionContext}
    */

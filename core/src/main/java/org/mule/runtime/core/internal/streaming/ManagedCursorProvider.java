@@ -12,8 +12,8 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Base class for a {@link CursorProvider} decorator which makes sure that {@link Cursor cursors}
- * opened by the decorated provider are properly tracked through the {@link CursorManager}.
+ * Base class for a {@link CursorProvider} decorator which makes sure that {@link Cursor cursors} opened by the decorated provider
+ * are properly tracked through the {@link CursorManager}.
  *
  * @param <T> the generic type of the actual {@link Cursor} types that will be produced
  * @see CursorManager
@@ -57,9 +57,8 @@ public abstract class ManagedCursorProvider<T extends Cursor> extends CursorProv
   }
 
   /**
-   * Returns a managed version of the {@code cursor}. How will that cursor be managed depends on each
-   * implementation. Although it is possible that the same input {@code cursor} is returned, the assumption
-   * should be that a new instance will be returned.
+   * Returns a managed version of the {@code cursor}. How will that cursor be managed depends on each implementation. Although it
+   * is possible that the same input {@code cursor} is returned, the assumption should be that a new instance will be returned.
    *
    * @param cursor the cursor to manage
    * @return a managed {@link Cursor}

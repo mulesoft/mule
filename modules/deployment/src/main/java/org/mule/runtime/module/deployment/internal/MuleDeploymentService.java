@@ -414,12 +414,13 @@ public class MuleDeploymentService implements DeploymentService {
   /**
    * Creates a {@link DomainArchiveDeployer}. Override this method for testing purposes.
    *
-   * @param domainFactory the domainFactory to provide to the {@link DomainArchiveDeployer}.
-   * @param domainMuleDeployer the domainMuleDeployer to provide to the {@link DomainArchiveDeployer}.
-   * @param domains the domains that this DeploymentService manages.
-   * @param applicationDeployer the applicationDeployer to provide to the {@link DomainArchiveDeployer}.
+   * @param domainFactory                 the domainFactory to provide to the {@link DomainArchiveDeployer}.
+   * @param domainMuleDeployer            the domainMuleDeployer to provide to the {@link DomainArchiveDeployer}.
+   * @param domains                       the domains that this DeploymentService manages.
+   * @param applicationDeployer           the applicationDeployer to provide to the {@link DomainArchiveDeployer}.
    * @param applicationDeploymentListener the applicationDeployer listener to provide to the {@link DomainDeploymentTemplate}.
-   * @param domainDeploymentListener the domainDeploymentListener to provide to the {@link DeploymentMuleContextListenerFactory}
+   * @param domainDeploymentListener      the domainDeploymentListener to provide to the
+   *                                      {@link DeploymentMuleContextListenerFactory}
    * @return the DomainArchiveDeployer.
    */
   protected DomainArchiveDeployer createDomainArchiveDeployer(DefaultDomainFactory domainFactory,

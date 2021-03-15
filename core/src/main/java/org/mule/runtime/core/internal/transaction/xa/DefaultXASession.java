@@ -243,7 +243,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
    * Commits a dangling transaction that can be caused by the failure of one of the XAResource involved in the transaction or a
    * crash of the transaction manager.
    *
-   * @param xid transaction identifier
+   * @param xid      transaction identifier
    * @param onePhase if the commit should be done using only one phase commit
    * @throws XAException
    */

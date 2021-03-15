@@ -130,20 +130,18 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected CursorProviderFactory cursorProviderFactory;
 
   /**
-   * Only to be accessed through {@link #getValueProviderMediator()} as this is a lazy value only used
-   * in design time.
+   * Only to be accessed through {@link #getValueProviderMediator()} as this is a lazy value only used in design time.
    *
-   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not
-   * running in design time or when the underlying component doesn't support the capability in the first place
+   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not running in design time
+   * or when the underlying component doesn't support the capability in the first place
    */
   private ValueProviderMediator<T> valueProviderMediator;
 
   /**
-   * Only to be accessed through {@link #getSampleDataProviderMediator()} as this is a lazy value only used
-   * in design time.
+   * Only to be accessed through {@link #getSampleDataProviderMediator()} as this is a lazy value only used in design time.
    *
-   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not
-   * running in design time or when the underlying component doesn't support the capability in the first place
+   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not running in design time
+   * or when the underlying component doesn't support the capability in the first place
    */
   private SampleDataProviderMediator sampleDataProviderMediator;
 

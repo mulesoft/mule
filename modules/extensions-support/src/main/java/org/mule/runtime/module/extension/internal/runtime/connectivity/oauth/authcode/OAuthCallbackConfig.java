@@ -11,8 +11,7 @@ import static java.util.Optional.ofNullable;
 import java.util.Optional;
 
 /**
- * Groups the sum of all the parameters that a user configured in order to provision
- * an OAuth access token callback
+ * Groups the sum of all the parameters that a user configured in order to provision an OAuth access token callback
  *
  * @since 4.0
  */

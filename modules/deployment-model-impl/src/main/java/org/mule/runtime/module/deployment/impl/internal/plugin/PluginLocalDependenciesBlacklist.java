@@ -19,11 +19,10 @@ import org.slf4j.LoggerFactory;
 import com.vdurmont.semver4j.Semver;
 
 /**
- * Utility class to check whether a plugin should use its local resources and packages instead of the ones of the
- * artifact where it is included.
+ * Utility class to check whether a plugin should use its local resources and packages instead of the ones of the artifact where
+ * it is included.
  * <p>
- * The check was added to provide backward compatibility for artifacts that use the bug fixed in MULE-17112
- * as a feature.
+ * The check was added to provide backward compatibility for artifacts that use the bug fixed in MULE-17112 as a feature.
  * <p>
  * In order to have a way to add new artifacts to the blacklist, the check was added in a separate class.
  *
@@ -52,9 +51,9 @@ public class PluginLocalDependenciesBlacklist {
   }
 
   /**
-   * Checks if the {@link BundleDescriptor} is blacklisted. It means that exists a blacklisted bundle
-   * descriptor such that the group id and artifact id match with the artifact bundle descriptor, and which
-   * version is greater than or equal to the artifact version.
+   * Checks if the {@link BundleDescriptor} is blacklisted. It means that exists a blacklisted bundle descriptor such that the
+   * group id and artifact id match with the artifact bundle descriptor, and which version is greater than or equal to the
+   * artifact version.
    *
    * @param pluginDescriptor {@link BundleDescriptor} to search in the blacklist.
    * @return true if the {@link BundleDescriptor} is blacklisted, or false otherwise.

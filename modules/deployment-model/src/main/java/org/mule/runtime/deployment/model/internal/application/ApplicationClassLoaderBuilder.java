@@ -47,7 +47,7 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
    * {@code artifactClassLoaderBuilder} is used for building the common parts of artifacts.
    *
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
-   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the application's region. Non null
+   * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the application's region. Non null
    */
   public ApplicationClassLoaderBuilder(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
                                        RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
@@ -101,7 +101,7 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
   }
 
   /**
-   * @param domainId name of the domain where the application is deployed. Non empty.
+   * @param domainId      name of the domain where the application is deployed. Non empty.
    * @param applicationId id of the application. Non empty.
    * @return the unique identifier for the application in the container.
    */

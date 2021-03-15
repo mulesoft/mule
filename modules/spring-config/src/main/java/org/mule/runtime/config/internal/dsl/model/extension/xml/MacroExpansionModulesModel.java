@@ -55,9 +55,10 @@ public class MacroExpansionModulesModel {
    * From a mutable {@code applicationModel}, it will store it to apply changes when the {@link #expand()} method is executed.
    *
    * @param applicationModel to modify given the usages of elements that belong to the {@link ExtensionModel}s contained in the
-   *        {@code extensions} map.
-   * @param extensions set with all the loaded {@link ExtensionModel}s from the deployment that will be filtered by looking up
-   *        only those that are coming from an XML context through the {@link XmlExtensionModelProperty} property.
+   *                         {@code extensions} map.
+   * @param extensions       set with all the loaded {@link ExtensionModel}s from the deployment that will be filtered by looking
+   *                         up only those that are coming from an XML context through the {@link XmlExtensionModelProperty}
+   *                         property.
    */
   public MacroExpansionModulesModel(ArtifactAst applicationModel, Set<ExtensionModel> extensions) {
     this.applicationModel = applicationModel;
@@ -131,7 +132,7 @@ public class MacroExpansionModulesModel {
    * plain it in a simple {@link List} to be later used in the {@link #expand()} method.
    *
    * @param extensions complete set of {@link ExtensionModel}s used in the app that might or might not be macro expandable (it
-   *        will filter them.
+   *                   will filter them.
    * @return a <bold>sorted</bold> collection of {@link ExtensionModel} to macro expand. This order must not be altered.
    */
   private List<ExtensionModel> calculateExtensionByTopologicalOrder(Set<ExtensionModel> extensions) {

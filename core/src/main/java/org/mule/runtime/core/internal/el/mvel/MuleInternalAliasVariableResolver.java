@@ -19,9 +19,9 @@ public class MuleInternalAliasVariableResolver extends MuleAliasVariableResolver
   /**
    * Creates a new varaible resolver
    *
-   * @param name variable name to ve resolved.
+   * @param name       variable name to ve resolved.
    * @param expression expression used to replace the variable name
-   * @param context expression execution context.
+   * @param context    expression execution context.
    */
   MuleInternalAliasVariableResolver(String name, String expression, MVELExpressionLanguageContext context) {
     super(name, expression, context);

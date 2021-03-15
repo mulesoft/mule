@@ -39,7 +39,7 @@ public final class GroupValueSetter implements ValueSetter {
    * {@link ParameterGroupModelProperty} extracted from the given {@code model}. If {@code model} does not contain such model
    * property then an empty {@link List} is returned
    *
-   * @param model a {@link EnrichableModel} instance presumed to have the {@link ParameterGroupModelProperty}
+   * @param model           a {@link EnrichableModel} instance presumed to have the {@link ParameterGroupModelProperty}
    * @param reflectionCache the cache for expensive reflection lookups
    * @return a {@link List} with {@link ValueSetter} instances. May be empty but will never be {@code null}
    */
@@ -67,8 +67,8 @@ public final class GroupValueSetter implements ValueSetter {
   /**
    * Creates a new instance that can set values defined in the given {@code group}
    *
-   * @param groupDescriptor a {@link ParameterGroupDescriptor}
-   * @param reflectionCache the cache for expensive reflection lookups
+   * @param groupDescriptor   a {@link ParameterGroupDescriptor}
+   * @param reflectionCache   the cache for expensive reflection lookups
    * @param expressionManager the {@link ExpressionManager} used to create a session used to evaluate the attributes.
    */
   public GroupValueSetter(ParameterGroupDescriptor groupDescriptor,

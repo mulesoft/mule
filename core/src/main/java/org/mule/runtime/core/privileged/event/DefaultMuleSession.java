@@ -65,7 +65,7 @@ public final class DefaultMuleSession implements MuleSession {
    * Will set a session level property. These will either be stored and retrieved using the underlying transport mechanism of
    * stored using a default mechanism
    *
-   * @param key the key for the object data being stored on the session
+   * @param key   the key for the object data being stored on the session
    * @param value the value of the session data
    */
   @Override

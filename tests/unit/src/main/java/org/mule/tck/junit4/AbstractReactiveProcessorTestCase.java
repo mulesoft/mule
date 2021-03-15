@@ -41,8 +41,8 @@ import reactor.core.publisher.Mono;
 
 /**
  * Abstract base test case extending {@link AbstractMuleContextTestCase} to be used when a {@link Processor} or {@link Flow} that
- * implements both {@link Processor#process(CoreEvent)} and {@link Processor#apply(Publisher)} needs paramatized tests so that both
- * approaches are tested with the same test method. Test cases that extend this abstract class should use (@link
+ * implements both {@link Processor#process(CoreEvent)} and {@link Processor#apply(Publisher)} needs paramatized tests so that
+ * both approaches are tested with the same test method. Test cases that extend this abstract class should use (@link
  * {@link #process(Processor, CoreEvent)} to invoke {@link Processor}'s as part of the test, rather than invoking them directly.
  */
 @RunWith(Parameterized.class)

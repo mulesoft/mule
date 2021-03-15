@@ -291,8 +291,9 @@ public class LifecycleUtils {
   }
 
   /**
-   * Checks if the {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY} property
-   * has been set on the given {@code properties}.
+   * Checks if the
+   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY}
+   * property has been set on the given {@code properties}.
    * <p>
    * If {@code properties} is {@code null} then {@code false} is returned.
    *

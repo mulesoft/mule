@@ -62,8 +62,8 @@ public final class SourceConfigurer {
   /**
    * Create a new instance
    *
-   * @param model             the {@link SourceModel} which describes the instances that the {@link #configure(Source, Optional)} method will
-   *                          accept
+   * @param model             the {@link SourceModel} which describes the instances that the {@link #configure(Source, Optional)}
+   *                          method will accept
    * @param resolverSet       the {@link ResolverSet} used to resolve the parameters
    * @param expressionManager the {@link ExpressionManager} used to create a session used to evaluate the attributes.
    * @param properties        deployment configuration properties
@@ -77,8 +77,8 @@ public final class SourceConfigurer {
   /**
    * Create a new instance
    *
-   * @param model             the {@link SourceModel} which describes the instances that the {@link #configure(Source, Optional)} method will
-   *                          accept
+   * @param model             the {@link SourceModel} which describes the instances that the {@link #configure(Source, Optional)}
+   *                          method will accept
    * @param resolverSet       the {@link ResolverSet} used to resolve the parameters
    * @param expressionManager the {@link ExpressionManager} used to create a session used to evaluate the attributes.
    * @param properties        deployment configuration properties

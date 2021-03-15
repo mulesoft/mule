@@ -11,8 +11,8 @@ import org.mule.runtime.core.internal.registry.Registry;
 import java.util.List;
 
 /**
- * A non reusable object which determines the correct order in which a particular {@link LifecyclePhase}
- * should be applied to a provided list of objects.
+ * A non reusable object which determines the correct order in which a particular {@link LifecyclePhase} should be applied to a
+ * provided list of objects.
  *
  * @since 4.2.0
  */

@@ -76,8 +76,8 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
   private LazyValue<HttpService> httpService;
 
   /**
-   * Becomes aware of the given {@code config} and makes sure that the access token callback
-   * and authorization endpoints are provisioned.
+   * Becomes aware of the given {@code config} and makes sure that the access token callback and authorization endpoints are
+   * provisioned.
    *
    * @param config an {@link AuthorizationCodeConfig}
    */
@@ -112,8 +112,8 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
 
   /**
    * @param config an {@link OAuthConfig}
-   * @return the {@link ResourceOwnerOAuthContext} for the given {@code config} or {@link Optional#empty()}
-   * if authorization hasn't yet taken place or has been invalidated
+   * @return the {@link ResourceOwnerOAuthContext} for the given {@code config} or {@link Optional#empty()} if authorization
+   *         hasn't yet taken place or has been invalidated
    */
   public Optional<ResourceOwnerOAuthContext> getOAuthContext(AuthorizationCodeConfig config) {
     AuthorizationCodeOAuthDancer dancer = dancers.get(config.getOwnerConfigName());

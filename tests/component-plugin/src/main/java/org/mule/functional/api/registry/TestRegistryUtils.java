@@ -26,7 +26,7 @@ public class TestRegistryUtils {
   /**
    * Registers an object in the registry with a key.
    *
-   * @param key the key to store the value against. This is a non-null value
+   * @param key   the key to store the value against. This is a non-null value
    * @param value the object to store in the registry. This is a non-null value
    * @throws MuleRuntimeException wrapping a RegistrationException if an object with the same key already exists
    */

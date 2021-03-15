@@ -34,6 +34,7 @@ public interface InternalEvent extends PrivilegedEvent {
 
   /**
    * Internal parameters used by the runtime to pass information around.
+   * 
    * @deprecated since 4.3.0. Replace with {@link EventInternalContext} attributes
    */
   @Deprecated
@@ -41,6 +42,7 @@ public interface InternalEvent extends PrivilegedEvent {
 
   /**
    * Internal parameters used by the runtime to pass information around.
+   * 
    * @deprecated since 4.3.0. Replace with {@link EventInternalContext} attributes
    */
   @Deprecated
@@ -69,6 +71,7 @@ public interface InternalEvent extends PrivilegedEvent {
 
   /**
    * Sets context related to the SDK
+   * 
    * @param context an {@link EventInternalContext}
    * @since 4.3.0
    */
@@ -82,6 +85,7 @@ public interface InternalEvent extends PrivilegedEvent {
 
   /**
    * Sets context related to the foreach processor
+   * 
    * @param context an {@link EventInternalContext}
    * @since 4.4, 4.3.1
    */
@@ -149,7 +153,7 @@ public interface InternalEvent extends PrivilegedEvent {
     /**
      * Adds an internal parameter.
      *
-     * @param key the parameter key
+     * @param key   the parameter key
      * @param value the parameter value
      * @return the builder instance
      */

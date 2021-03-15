@@ -278,7 +278,7 @@ public class ArtifactContextBuilder {
    * {@code MuleContext} to be created. It may also be that the configuration files make use of this extensions.
    *
    * @param artifactPlugins collection of artifact extensions that define resources as part of the {@code MuleContext} to be
-   *        created.
+   *                        created.
    * @return the builder
    */
   public ArtifactContextBuilder setArtifactPlugins(List<ArtifactPlugin> artifactPlugins) {
@@ -320,10 +320,11 @@ public class ArtifactContextBuilder {
    * Allows to lazily create the artifact resources.
    *
    * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact
-   *        components from the configuration will be created on demand when requested. For instance, when using
-   *        {@link DefaultMuleApplication#getConnectivityTestingService()} and then invoking
-   *        {@link ConnectivityTestingService#testConnection(Location)} will cause the creation of the component requested to do
-   *        test connectivity, if it was not already created. when false, the application will be created completely at startup.
+   *                       components from the configuration will be created on demand when requested. For instance, when using
+   *                       {@link DefaultMuleApplication#getConnectivityTestingService()} and then invoking
+   *                       {@link ConnectivityTestingService#testConnection(Location)} will cause the creation of the component
+   *                       requested to do test connectivity, if it was not already created. when false, the application will be
+   *                       created completely at startup.
    * @return the builder
    */
   public ArtifactContextBuilder setEnableLazyInit(boolean enableLazyInit) {
@@ -368,7 +369,7 @@ public class ArtifactContextBuilder {
 
   /**
    * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize
-   *        access on different deployable artifacts to the same resources.
+   *                           access on different deployable artifacts to the same resources.
    * @return the builder
    */
   public ArtifactContextBuilder setRuntimeLockFactory(LockFactory runtimeLockFactory) {
@@ -391,7 +392,7 @@ public class ArtifactContextBuilder {
 
   /**
    * @return the {@code MuleContext} created with the provided configuration
-   * @throws ConfigurationException when there's a problem creating the {@code MuleContext}
+   * @throws ConfigurationException  when there's a problem creating the {@code MuleContext}
    * @throws InitialisationException when a certain configuration component failed during initialisation phase
    */
   public ArtifactContext build() throws InitialisationException, ConfigurationException {

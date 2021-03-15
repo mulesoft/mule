@@ -15,10 +15,10 @@ import java.util.Map;
 import org.apache.commons.collections.map.AbstractMapDecorator;
 
 /**
- * Allows to extends the attributes defined for a {@link org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor}
- * when it is being loaded by {@link org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader} for plugins in
- * order to use the effective {@link BundleDescriptor} resolved from the artifact that declares the plugin. This allows to
- * work with SNAPSHOT versions in order to propagate the timestamped version of the SNAPSHOT artifact.
+ * Allows to extends the attributes defined for a {@link org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor} when
+ * it is being loaded by {@link org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader} for plugins in
+ * order to use the effective {@link BundleDescriptor} resolved from the artifact that declares the plugin. This allows to work
+ * with SNAPSHOT versions in order to propagate the timestamped version of the SNAPSHOT artifact.
  *
  * @since 4.2.0
  */

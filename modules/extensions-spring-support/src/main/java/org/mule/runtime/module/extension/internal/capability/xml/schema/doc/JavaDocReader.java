@@ -121,7 +121,8 @@ public class JavaDocReader {
   }
 
   /**
-   * Removes all HTML from the text and converts anchor to asciidoc valid links. For example: <a href="url">Inner</a> becomes url[Inner].
+   * Removes all HTML from the text and converts anchor to asciidoc valid links. For example: <a href="url">Inner</a> becomes
+   * url[Inner].
    */
   private static String removeHTML(String text) {
     String textWithAnchors = Jsoup.clean(text, WHITELIST);

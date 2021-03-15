@@ -15,8 +15,8 @@ import java.util.function.Supplier;
 /**
  * Result of a successful execution of a {@link SourcePolicy}.
  *
- * It contains the {@link CoreEvent} result of the flow execution and the response parameters and error response parameters to be sent
- * by the source.
+ * It contains the {@link CoreEvent} result of the flow execution and the response parameters and error response parameters to be
+ * sent by the source.
  *
  * @since 4.0
  */
@@ -29,8 +29,8 @@ public class SourcePolicySuccessResult implements SourcePolicyResult {
   /**
    * Creates a new successful result from a policy execution.
    *
-   * @param result the result of the flow execution.
-   * @param responseParameters the response parameters to be sent by the source.
+   * @param result                                   the result of the flow execution.
+   * @param responseParameters                       the response parameters to be sent by the source.
    * @param messageSourceResponseParametersProcessor a processor to create response parameters from an {@link CoreEvent}
    */
   public SourcePolicySuccessResult(CoreEvent result, Supplier<Map<String, Object>> responseParameters,

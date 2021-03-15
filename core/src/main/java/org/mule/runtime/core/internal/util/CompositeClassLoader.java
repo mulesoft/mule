@@ -98,14 +98,14 @@ public class CompositeClassLoader extends ClassLoader {
   }
 
   /**
-  * Overrides the loadClass in order to support scenarios where a custom class loader is created in a plugin
-  * and these calls to this method explicitly.
-  *
-  * @param name    The <a href="#name">binary name</a> of the class
-  * @param resolve If <tt>true</tt> then resolve the class
-  * @return The resulting <tt>Class</tt> object
-  * @throws ClassNotFoundException If the class could not be found
-  */
+   * Overrides the loadClass in order to support scenarios where a custom class loader is created in a plugin and these calls to
+   * this method explicitly.
+   *
+   * @param name    The <a href="#name">binary name</a> of the class
+   * @param resolve If <tt>true</tt> then resolve the class
+   * @return The resulting <tt>Class</tt> object
+   * @throws ClassNotFoundException If the class could not be found
+   */
   @Override
   public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
     ClassNotFoundException firstException = null;

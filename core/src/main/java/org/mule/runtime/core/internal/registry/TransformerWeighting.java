@@ -61,8 +61,8 @@ public class TransformerWeighting implements Comparable {
    * w + 1 If there is no match -1 is returned
    *
    * @param weighting an offset weighting, by default -1 should be used
-   * @param src the src class being matched
-   * @param dest the destination class to match to
+   * @param src       the src class being matched
+   * @param dest      the destination class to match to
    * @return a weighting where 0 would be an exact match, -1 would be no match and a positive integer that defines how close the
    *         match is
    */

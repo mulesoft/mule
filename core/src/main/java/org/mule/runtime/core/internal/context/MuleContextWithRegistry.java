@@ -30,8 +30,8 @@ public interface MuleContextWithRegistry extends MuleContext {
    * <p>
    * If the {@code registry} is not a {@link MuleRegistry} it will be adapted into one.
    * <p>
-   * Notice that if the context already has a registry, it will be replaced without taking any
-   * particular lifecycle activity over it. That will be up to you.
+   * Notice that if the context already has a registry, it will be replaced without taking any particular lifecycle activity over
+   * it. That will be up to you.
    *
    * @param registry the new registry to use
    */

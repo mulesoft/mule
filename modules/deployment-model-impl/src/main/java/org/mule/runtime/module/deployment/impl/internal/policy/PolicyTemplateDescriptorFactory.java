@@ -55,9 +55,12 @@ public class PolicyTemplateDescriptorFactory
   /**
    * Creates a new factory
    *
-   * @param artifactPluginDescriptorLoader loads the artifact descriptor for plugins used on the policy template. Non null
-   * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
-   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
+   * @param artifactPluginDescriptorLoader     loads the artifact descriptor for plugins used on the policy template. Non null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
+   *                                           null
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
+   *                                           {@link ArtifactDescriptorValidator} in order to check the state of the descriptor
+   *                                           once loaded.
    */
   public PolicyTemplateDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
                                          DescriptorLoaderRepository descriptorLoaderRepository,

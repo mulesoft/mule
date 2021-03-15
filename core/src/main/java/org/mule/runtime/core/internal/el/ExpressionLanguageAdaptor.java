@@ -147,9 +147,8 @@ public interface ExpressionLanguageAdaptor {
   /**
    * Compiles the given {@code expression}.
    * <p>
-   * keep in mind that the {@code bindingContext} is used for compilation only. When evaluated, the compiled expression
-   * <b>WILL NOT</b> be evaluated against those bindings but the ones associated with current
-   * {@link ExpressionLanguageSession}
+   * keep in mind that the {@code bindingContext} is used for compilation only. When evaluated, the compiled expression <b>WILL
+   * NOT</b> be evaluated against those bindings but the ones associated with current {@link ExpressionLanguageSession}
    *
    * @param expression     the expression to compile
    * @param bindingContext a {@link BindingContext} with example bindings of the values the real expression will need

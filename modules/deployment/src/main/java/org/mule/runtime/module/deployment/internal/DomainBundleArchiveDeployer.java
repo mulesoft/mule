@@ -59,11 +59,11 @@ public class DomainBundleArchiveDeployer {
   /**
    * Creates a new deployer
    *
-   * @param deploymentListener listener to notify the deployment steps
-   * @param domainDeployer deploys the domains artifacts contained on the domain bundles
-   * @param domains maintains the deployed domain artifacts
-   * @param applicationDeployer deploys the application artifact contained on the domain bundles
-   * @param applications maintains the deployed application artifacts
+   * @param deploymentListener            listener to notify the deployment steps
+   * @param domainDeployer                deploys the domains artifacts contained on the domain bundles
+   * @param domains                       maintains the deployed domain artifacts
+   * @param applicationDeployer           deploys the application artifact contained on the domain bundles
+   * @param applications                  maintains the deployed application artifacts
    * @param domainDeploymentListener
    * @param applicationDeploymentListener
    * @param deploymentService

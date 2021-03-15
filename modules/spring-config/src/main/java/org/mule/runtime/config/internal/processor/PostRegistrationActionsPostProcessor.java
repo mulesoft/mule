@@ -33,7 +33,7 @@ public class PostRegistrationActionsPostProcessor implements BeanPostProcessor {
 
   /***
    * @param registryHelper registry helper to delegate post processing of beans.
-   * @param beanFactory the bean factory to validate the type of beans to post process
+   * @param beanFactory    the bean factory to validate the type of beans to post process
    */
   public PostRegistrationActionsPostProcessor(MuleRegistryHelper registryHelper, ConfigurableListableBeanFactory beanFactory) {
     this.registryHelper = registryHelper;
@@ -54,7 +54,7 @@ public class PostRegistrationActionsPostProcessor implements BeanPostProcessor {
    * This logic must not be applied to inner elements that are not named by the user or are instances that were created from
    * prototype bean definitions. This is to prevent beans created for a particular flow like Converters to be registered twice.
    *
-   * @param bean the bean instance
+   * @param bean     the bean instance
    * @param beanName the bean name
    * @return the bean instance
    * @throws BeansException

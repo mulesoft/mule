@@ -52,8 +52,8 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
 /**
- * Annotation processor that picks up all the extensions annotated with {@link Extension} and use a
- * {@link ResourcesGenerator} to generated the required resources.
+ * Annotation processor that picks up all the extensions annotated with {@link Extension} and use a {@link ResourcesGenerator} to
+ * generated the required resources.
  * <p>
  * This annotation processor will automatically generate and package into the output jar the XSD schema, spring bundles and
  * extension registration files necessary for mule to work with this extension.
@@ -173,15 +173,13 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   }
 
   /**
-   * During compile-time, some model validations will be performed over the plugin being compiled
-   * that are different from the ones executed at execution-time for the same plugin
-   * (being the runtime validations a subset of the ones executed at compile-time).
+   * During compile-time, some model validations will be performed over the plugin being compiled that are different from the ones
+   * executed at execution-time for the same plugin (being the runtime validations a subset of the ones executed at compile-time).
    *
-   * Ir order to skip the compile-time-only validations and load the plugin as if it was loaded
-   * on an application deploy, the user can flag the compilation as a "runtime simulation".
-   * For example, a plugin that has been developed using a 1.0 version of the SDK and fails its compilation
-   * when moving to the 1.1 version of the SDK, should never fail when using the "runtime simulation" loading mode
-   * (otherwise runtime backwards compatibility would've been broken).
+   * Ir order to skip the compile-time-only validations and load the plugin as if it was loaded on an application deploy, the user
+   * can flag the compilation as a "runtime simulation". For example, a plugin that has been developed using a 1.0 version of the
+   * SDK and fails its compilation when moving to the 1.1 version of the SDK, should never fail when using the "runtime
+   * simulation" loading mode (otherwise runtime backwards compatibility would've been broken).
    *
    * This simulation mode should be treated as an internal, test-only configuration.
    *

@@ -33,9 +33,8 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 /**
- * Extension's {@link ErrorModel} factory.
- * Given an {@link Enum} implementing {@link ErrorTypeDefinition} and the namespace of the extension validates
- * consistency and generates the correspondent {@link ErrorModel errorModels}.
+ * Extension's {@link ErrorModel} factory. Given an {@link Enum} implementing {@link ErrorTypeDefinition} and the namespace of the
+ * extension validates consistency and generates the correspondent {@link ErrorModel errorModels}.
  *
  * @since 4.0
  */

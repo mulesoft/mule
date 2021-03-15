@@ -10,8 +10,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 /**
- * Creates a processing strategy with same behavior as {@link StreamEmitterProcessingStrategyFactory} apart from the
- * fact it will process synchronously without error when a transaction is active.
+ * Creates a processing strategy with same behavior as {@link StreamEmitterProcessingStrategyFactory} apart from the fact it will
+ * process synchronously without error when a transaction is active.
  *
  * @since 4.3.0
  */

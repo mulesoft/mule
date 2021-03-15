@@ -48,7 +48,7 @@ public final class ArtifactPluginDescriptor extends DeployableArtifactDescriptor
   /**
    * Creates a new artifact plugin descriptor
    *
-   * @param name artifact plugin name. Non empty.
+   * @param name                 artifact plugin name. Non empty.
    * @param deploymentProperties deployment properties provided for the plugin
    */
   public ArtifactPluginDescriptor(String name, Optional<Properties> deploymentProperties) {

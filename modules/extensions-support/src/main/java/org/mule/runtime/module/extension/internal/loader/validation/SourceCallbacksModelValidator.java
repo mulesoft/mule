@@ -26,8 +26,8 @@ import java.util.Optional;
 import java.util.StringJoiner;
 
 /**
- * {@link ExtensionModelValidator} which verifies that the On Terminate callback for Sources is not configured
- * with not allowed parameters.
+ * {@link ExtensionModelValidator} which verifies that the On Terminate callback for Sources is not configured with not allowed
+ * parameters.
  *
  * @since 1.0
  */

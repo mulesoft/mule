@@ -145,8 +145,7 @@ public class StringUtils {
   }
 
   /**
-   * If {@code value} is not {@link #isBlank(String)}, then it feeds the value
-   * into the {@code consumer}
+   * If {@code value} is not {@link #isBlank(String)}, then it feeds the value into the {@code consumer}
    *
    * @param value    a value
    * @param consumer a String {@link Consumer}
@@ -172,7 +171,7 @@ public class StringUtils {
   /**
    * Remove trailing slash from {@code url}
    *
-   * @param url    an url
+   * @param url an url
    *
    * @since 4.3.0
    */

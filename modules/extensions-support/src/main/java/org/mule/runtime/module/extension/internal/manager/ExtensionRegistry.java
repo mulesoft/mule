@@ -95,7 +95,7 @@ final class ExtensionRegistry {
 
   /**
    * @return an {@link Optional} with the {@link ExtensionModel} which name and vendor equals {@code extensionName} and
-   * {@code vendor}
+   *         {@code vendor}
    */
   Optional<ExtensionModel> getExtension(String extensionName) {
     return Optional.ofNullable(extensions.get(new ExtensionEntityKey(extensionName)));
@@ -137,9 +137,9 @@ final class ExtensionRegistry {
    * The {@code configurationProvider} is registered under a key matching its {@link ConfigurationProvider#getName()}.
    *
    * @param configurationProvider a {@link ConfigurationProvider} to be registered
-   * @param muleContext the owner of the registry to register the configurationProvider in.
+   * @param muleContext           the owner of the registry to register the configurationProvider in.
    * @throws IllegalArgumentException if {@code configurationProvider} is {@code null}
-   * @throws MuleRuntimeException if the {@code configurationProvider} could not be registered
+   * @throws MuleRuntimeException     if the {@code configurationProvider} could not be registered
    */
   void registerConfigurationProvider(ConfigurationProvider configurationProvider, MuleContext muleContext) {
     checkArgument(configurationProvider != null, "Cannot register a null configurationProvider");

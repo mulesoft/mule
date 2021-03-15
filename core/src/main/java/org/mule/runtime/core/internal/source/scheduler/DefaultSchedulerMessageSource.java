@@ -91,7 +91,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   /**
    * @param muleContext application's context
-   * @param scheduler the scheduler
+   * @param scheduler   the scheduler
    */
   public DefaultSchedulerMessageSource(MuleContext muleContext, PeriodicScheduler scheduler,
                                        boolean disallowConcurrentExecution) {

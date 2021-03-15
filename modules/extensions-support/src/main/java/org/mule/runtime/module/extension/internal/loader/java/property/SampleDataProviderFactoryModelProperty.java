@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Private {@link ModelProperty} which communicates the {@link SampleDataProvider} of a {@link HasOutputModel}
- * model which contains a {@link SampleDataProviderModel}
+ * Private {@link ModelProperty} which communicates the {@link SampleDataProvider} of a {@link HasOutputModel} model which
+ * contains a {@link SampleDataProviderModel}
  *
  * @since 4.4.0
  */
@@ -39,8 +39,8 @@ public final class SampleDataProviderFactoryModelProperty implements ModelProper
 
   /**
    * @param sampleDataProvider   the {@link SampleDataProvider} class.
-   * @param injectableParameters the parameters that should be injected inside the {@link SampleDataProvider} to be able
-   *                             to resolve the sample data
+   * @param injectableParameters the parameters that should be injected inside the {@link SampleDataProvider} to be able to
+   *                             resolve the sample data
    * @param connectionField      the field inside the {@link SampleDataProvider} which is considered as a connection
    * @param configField          the field inside the {@link SampleDataProvider} which is considered as a configuration
    */

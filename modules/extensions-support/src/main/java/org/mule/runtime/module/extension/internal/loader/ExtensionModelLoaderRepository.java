@@ -22,6 +22,7 @@ public interface ExtensionModelLoaderRepository {
 
   /**
    * Retrieves the {@link ExtensionModelLoader} for the given {@link LoaderDescriber}.
+   * 
    * @param loaderDescriber {@link LoaderDescriber} describes the loader needed.
    * @return {@link ExtensionModelLoader} for the given {@link LoaderDescriber} or {@link Optional#empty()}.
    */

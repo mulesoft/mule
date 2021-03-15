@@ -28,10 +28,9 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
- * A {@link ReconnectableConnectionProviderWrapper} which makes sure that by the time the
- * {@link ConnectionProvider#connect()} method is invoked on the delegate, the authorization dance has
- * been completed and the {@link ClientCredentialsState} and {@link OAuthCallbackValue} fields have
- * been properly injected
+ * A {@link ReconnectableConnectionProviderWrapper} which makes sure that by the time the {@link ConnectionProvider#connect()}
+ * method is invoked on the delegate, the authorization dance has been completed and the {@link ClientCredentialsState} and
+ * {@link OAuthCallbackValue} fields have been properly injected
  *
  * @since 4.2.1
  */

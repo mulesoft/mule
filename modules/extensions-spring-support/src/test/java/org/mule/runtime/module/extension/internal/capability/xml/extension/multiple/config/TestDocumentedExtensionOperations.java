@@ -24,7 +24,7 @@ public class TestDocumentedExtensionOperations extends AbstractTestDocumentedOpe
   /**
    * This method greets a friend
    *
-   * @param friend This is one of my friends
+   * @param friend      This is one of my friends
    * @param otherFriend Some other friend
    */
   public void greetFriend(String friend, String otherFriend) {}

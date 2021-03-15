@@ -21,9 +21,9 @@ public interface DescriptorLoaderRepository {
   /**
    * Gets a descriptor loader from the repository
    *
-   * @param id identifies the loader to obtain. Non empty.
+   * @param id          identifies the loader to obtain. Non empty.
    * @param loaderClass class of {@link DescriptorLoader} to search for. No null.
-   * @param <T> type of descriptor loader to return
+   * @param <T>         type of descriptor loader to return
    * @returns a non null {@link Optional} loader of the given class and ID
    * @throws LoaderNotFoundException if there is no registered loader of type {@link T} with the provided ID.
    */

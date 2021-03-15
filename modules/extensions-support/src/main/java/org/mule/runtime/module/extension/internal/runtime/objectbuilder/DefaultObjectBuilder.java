@@ -78,7 +78,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
    * Adds a property which value is to be obtained from a {@link ValueResolver}
    *
    * @param propertyName the name of the property in which the value is to be assigned
-   * @param resolver a {@link ValueResolver} used to provide the actual value
+   * @param resolver     a {@link ValueResolver} used to provide the actual value
    * @return this builder
    * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
    */
@@ -95,7 +95,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
   /**
    * Adds a property which value is to be obtained from a {@link ValueResolver}
    *
-   * @param field the property in which the value is to be assigned
+   * @param field    the property in which the value is to be assigned
    * @param resolver a {@link ValueResolver} used to provide the actual value
    * @return this builder
    * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}

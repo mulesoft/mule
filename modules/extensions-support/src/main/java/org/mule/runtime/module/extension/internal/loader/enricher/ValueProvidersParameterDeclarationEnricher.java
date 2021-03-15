@@ -56,9 +56,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * {@link DeclarationEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for Source,
- * Operation, Configuration and Connection Provider Parameters and ParameterGroups annotated with {@link OfValues}.
- * If a parameter or parameter group is annotated, this one will have a related {@link ValueProvider}
+ * {@link DeclarationEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for Source, Operation,
+ * Configuration and Connection Provider Parameters and ParameterGroups annotated with {@link OfValues}. If a parameter or
+ * parameter group is annotated, this one will have a related {@link ValueProvider}
  *
  * @since 4.0
  */
@@ -96,12 +96,11 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
   }
 
   /**
-   * The method will look for parameters of the given {@link ParameterizedDeclaration declaration} and is a parameter or
-   * parameter group annotated with {@link OfValues} if found, a {@link ValueProviderModel} will be added to this element
-   * to communicate that values can be provided.
+   * The method will look for parameters of the given {@link ParameterizedDeclaration declaration} and is a parameter or parameter
+   * group annotated with {@link OfValues} if found, a {@link ValueProviderModel} will be added to this element to communicate
+   * that values can be provided.
    * <p>
-   * Also the {@link ParameterDeclaration parameters} of the {@link ParameterizedDeclaration declaration} will be
-   * enriched.
+   * Also the {@link ParameterDeclaration parameters} of the {@link ParameterizedDeclaration declaration} will be enriched.
    *
    * @param containerDeclaration declaration to introspect their parameters
    */
@@ -167,8 +166,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
 
   /**
    * Introspects the given {@link ParameterizableTypeWrapper parameterizableComponent} looking if this ones uses a
-   * {@link Connection}, if this is true this method will indicate to the {@link ValueProviderFactoryModelPropertyBuilder}
-   * that the correspondent {@link ValueProvider} will require a connection.
+   * {@link Connection}, if this is true this method will indicate to the {@link ValueProviderFactoryModelPropertyBuilder} that
+   * the correspondent {@link ValueProvider} will require a connection.
    *
    * @param modelPropertyBuilder     Options Resolver Model Property Builder
    * @param parameterizableComponent component to introspect
@@ -185,9 +184,9 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
   }
 
   /**
-   * Introspects the given {@link ParameterizableTypeWrapper parameterizableComponent} looking if this ones uses a
-   * {@link Config}, if this is true this method will indicate to the {@link ValueProviderFactoryModelPropertyBuilder}
-   * that the correspondent {@link ValueProvider} will require a config.
+   * Introspects the given {@link ParameterizableTypeWrapper parameterizableComponent} looking if this ones uses a {@link Config},
+   * if this is true this method will indicate to the {@link ValueProviderFactoryModelPropertyBuilder} that the correspondent
+   * {@link ValueProvider} will require a config.
    *
    * @param modelPropertyBuilder     Options Resolver Model Property Builder
    * @param parameterizableComponent component to introspect

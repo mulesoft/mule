@@ -535,7 +535,7 @@ public final class IntrospectionUtils {
    * @param method     a not {@code null} {@link Method}
    * @param typeLoader a {@link ClassTypeLoader} to be used to create the returned {@link MetadataType}s
    * @return an array of {@link MetadataType} matching the method's arguments. If the method doesn't take any, then the array will
-   * be empty
+   *         be empty
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType[] getMethodArgumentTypes(Method method, ClassTypeLoader typeLoader) {
@@ -1453,8 +1453,8 @@ public final class IntrospectionUtils {
 
   /**
    * Sets the {@code configName}, {@code encoding} and {@link MuleVersion} into the fields of the target annotated with
-   * {@link RefName}, {@link DefaultEncoding} and {@link RuntimeVersion} respectively if present and the {@code model}
-   * contains the {@link DeclaringMemberModelProperty}.
+   * {@link RefName}, {@link DefaultEncoding} and {@link RuntimeVersion} respectively if present and the {@code model} contains
+   * the {@link DeclaringMemberModelProperty}.
    *
    * @param model       enriched with {@link InjectedFieldModelProperty}
    * @param target      object in which the fields are going to be set
@@ -1470,8 +1470,8 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} if the
-   * {@code model} contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
+   * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} if the {@code model}
+   * contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
    *
    * @param model    enriched with {@link DefaultEncodingModelProperty}
    * @param target   object in which the fields are going to be set
@@ -1483,8 +1483,8 @@ public final class IntrospectionUtils {
   }
 
   /**
-   *  Sets the {@link MuleVersion} into the field of the {@code target} annotated {@link RuntimeVersion} if the
-   *  {@code model} contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
+   * Sets the {@link MuleVersion} into the field of the {@code target} annotated {@link RuntimeVersion} if the {@code model}
+   * contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
    *
    * @param model       enriched with {@link DefaultEncodingModelProperty}
    * @param target      object in which the fields are going to be set
@@ -1647,8 +1647,8 @@ public final class IntrospectionUtils {
 
 
   /**
-   * Sets the given {@code value} into the {@code target}, if it contains a field named {@code fieldName}.
-   * Nothing happens if such field doesn't exist.
+   * Sets the given {@code value} into the {@code target}, if it contains a field named {@code fieldName}. Nothing happens if such
+   * field doesn't exist.
    *
    * @param target          the object in which the value is to be set
    * @param value           the value to set

@@ -150,9 +150,9 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Creates a new instance
    *
-   * @param definitionBuilder     a {@link Builder} used as a prototype to generate new definitions
-   * @param dslResolver a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
-   * @param ctx         the {@link ExtensionParsingContext} in which {@code this} parser operates
+   * @param definitionBuilder a {@link Builder} used as a prototype to generate new definitions
+   * @param dslResolver       a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
+   * @param ctx               the {@link ExtensionParsingContext} in which {@code this} parser operates
    */
   protected ExtensionDefinitionParser(Builder definitionBuilder, DslSyntaxResolver dslResolver, ExtensionParsingContext ctx) {
     this.definitionBuilder = definitionBuilder;
@@ -162,8 +162,8 @@ public abstract class ExtensionDefinitionParser {
   }
 
   /**
-   * Creates a list of {@link ComponentBuildingDefinition} built on copies of {@link #definitionBuilder}. It also sets the
-   * parsed parsed parameters on the backing {@link AbstractExtensionObjectFactory}
+   * Creates a list of {@link ComponentBuildingDefinition} built on copies of {@link #definitionBuilder}. It also sets the parsed
+   * parsed parameters on the backing {@link AbstractExtensionObjectFactory}
    *
    * @return a list with the generated {@link ComponentBuildingDefinition}
    * @throws ConfigurationException if a parsing error occurs

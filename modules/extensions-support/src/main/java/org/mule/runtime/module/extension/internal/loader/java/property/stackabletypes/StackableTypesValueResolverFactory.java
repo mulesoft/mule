@@ -36,8 +36,8 @@ public class StackableTypesValueResolverFactory {
   }
 
   /**
-   * Given a expression value, the expected type and the stack of {@link StackableType wrapper types}, iterates it and
-   * creates all the required {@link ValueResolver} and stacks them is necessary.
+   * Given a expression value, the expected type and the stack of {@link StackableType wrapper types}, iterates it and creates all
+   * the required {@link ValueResolver} and stacks them is necessary.
    *
    * @param expression   Expression value for the expression based value resolver.
    * @param expectedType The expected type of the expression resolution
@@ -82,9 +82,9 @@ public class StackableTypesValueResolverFactory {
   }
 
   /**
-   * Given a static value, the stack of {@link StackableType stacked types} and the desired class for the static resolver, if
-   * the class is not found as the root of the parameter type, an {@link Optional#empty()} will be returned.
-   * Also, iterates it and creates all the required {@link ValueResolver} and stacks them is necessary.
+   * Given a static value, the stack of {@link StackableType stacked types} and the desired class for the static resolver, if the
+   * class is not found as the root of the parameter type, an {@link Optional#empty()} will be returned. Also, iterates it and
+   * creates all the required {@link ValueResolver} and stacks them is necessary.
    *
    * @param value The static value
    * @return The static {@link ValueResolver}

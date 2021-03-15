@@ -21,8 +21,8 @@ import java.io.Closeable;
 import java.io.InputStream;
 
 /**
- * Manages resources dedicated to perform streaming of bytes or objects, so that the runtime can keep track of them,
- * enforce policies and make sure that all resources are reclaimed once no longer needed.
+ * Manages resources dedicated to perform streaming of bytes or objects, so that the runtime can keep track of them, enforce
+ * policies and make sure that all resources are reclaimed once no longer needed.
  *
  * @since 4.0
  */
@@ -45,10 +45,10 @@ public interface StreamingManager {
   StreamingStatistics getStreamingStatistics();
 
   /**
-   * Becomes aware of the given {@code provider} and returns a replacement provider
-   * which is managed by the runtime, allowing for automatic resource handling
+   * Becomes aware of the given {@code provider} and returns a replacement provider which is managed by the runtime, allowing for
+   * automatic resource handling
    *
-   * @param provider     the provider to be tracked
+   * @param provider                the provider to be tracked
    * @param creatorRootEventContext the event context on which the stream was created
    * @return a {@link CursorProvider}
    */
@@ -58,7 +58,7 @@ public interface StreamingManager {
    * Becomes aware of the given {@code provider} and returns a replacement provider which is managed by the runtime, allowing for
    * automatic resource handling
    *
-   * @param provider the provider to be tracked
+   * @param provider     the provider to be tracked
    * @param creatorEvent the event that created the provider
    * @return a {@link CursorProvider}
    * @deprecated Use {@link #manage(CursorProvider, EventContext)} instead.
@@ -67,13 +67,13 @@ public interface StreamingManager {
   CursorProvider manage(CursorProvider provider, CoreEvent creatorEvent);
 
   /**
-   * Becomes aware of the given {@code inputStream} and makes sure it is closed
-   * by the time the given {@code creatorRootEventContext} (and all its parent events) are completed.
+   * Becomes aware of the given {@code inputStream} and makes sure it is closed by the time the given
+   * {@code creatorRootEventContext} (and all its parent events) are completed.
    * <p>
-   * If {@code inputStream} is a {@link Cursor} then nothing happens. Use
-   * {@link #manage(CursorProvider, CoreEvent)} for those cases.
+   * If {@code inputStream} is a {@link Cursor} then nothing happens. Use {@link #manage(CursorProvider, CoreEvent)} for those
+   * cases.
    *
-   * @param inputStream  the stream to track
+   * @param inputStream             the stream to track
    * @param creatorRootEventContext the event context on which the stream was created
    * @deprecated since 4.2.2 - 4.3.0. Use {@link #manage(Closeable, EventContext)} instead
    */
@@ -81,13 +81,13 @@ public interface StreamingManager {
   void manage(InputStream inputStream, EventContext creatorRootEventContext);
 
   /**
-   * Becomes aware of the given {@code closeable} stream and makes sure it is closed
-   * by the time the given {@code creatorRootEventContext} (and all its parent events) are completed.
+   * Becomes aware of the given {@code closeable} stream and makes sure it is closed by the time the given
+   * {@code creatorRootEventContext} (and all its parent events) are completed.
    * <p>
-   * If {@code closeable} is a {@link Cursor} then nothing happens. Use
-   * {@link #manage(CursorProvider, CoreEvent)} for those cases.
+   * If {@code closeable} is a {@link Cursor} then nothing happens. Use {@link #manage(CursorProvider, CoreEvent)} for those
+   * cases.
    *
-   * @param closeable  a closeable stream to be tracked
+   * @param closeable               a closeable stream to be tracked
    * @param creatorRootEventContext the event context on which the stream was created
    */
   void manage(Closeable closeable, EventContext creatorRootEventContext);
@@ -99,7 +99,7 @@ public interface StreamingManager {
    * If {@code inputStream} is a {@link Cursor} then nothing happens. Use {@link #manage(CursorProvider, CoreEvent)} for those
    * cases.
    *
-   * @param inputStream the stream to track
+   * @param inputStream  the stream to track
    * @param creatorEvent the event on which the stream was created
    *
    * @deprecated Use {@link #manage(InputStream, EventContext)} instead
@@ -108,10 +108,10 @@ public interface StreamingManager {
   void manage(InputStream inputStream, CoreEvent creatorEvent);
 
   /**
-   * Given a {@link CursorProviderFactory} that is either a {@link CursorStreamProviderFactory} or a {@link CursorIteratorProviderFactory},
-   * returns the pair of provider factories that must be used for streaming bytes and objects. This way, when you are given
-   * a provider factory for streaming objects, but those objects are or have a stream of bytes, you will also have the appropriate
-   * provider factory for those streams to be managed.
+   * Given a {@link CursorProviderFactory} that is either a {@link CursorStreamProviderFactory} or a
+   * {@link CursorIteratorProviderFactory}, returns the pair of provider factories that must be used for streaming bytes and
+   * objects. This way, when you are given a provider factory for streaming objects, but those objects are or have a stream of
+   * bytes, you will also have the appropriate provider factory for those streams to be managed.
    *
    * @param provider the provider for which you want the correspondent byte and object providers.
    * @return a pair of {@link CursorProviderFactory}s to be used, one for streaming bytes, and the other for streaming objects

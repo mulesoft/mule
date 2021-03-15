@@ -37,7 +37,7 @@ public class FtpServer extends ExternalResource {
    * Creates a new instance
    *
    * @param ftpServerPortName the name of the system property on which the port will be exposed
-   * @param baseDir the base dir for the FTP server
+   * @param baseDir           the base dir for the FTP server
    */
   public FtpServer(String ftpServerPortName, File baseDir) {
     this.baseDir = baseDir;

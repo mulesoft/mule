@@ -36,8 +36,8 @@ public class FunctionalTestModuleRepository implements ModuleRepository {
   }
 
   /**
-   * Test module discover that uses a custom implementation of a classpath module discovered in order to use a temporary folder for service module
-   * files.
+   * Test module discover that uses a custom implementation of a classpath module discovered in order to use a temporary folder
+   * for service module files.
    */
   private class TestContainerModuleDiscoverer implements ModuleDiscoverer {
 

@@ -147,7 +147,7 @@ public final class MuleTestUtils {
   /**
    * Creates a new flow and registers it in the given {@code mockComponentLocator}
    *
-   * @param mockComponentLocator a {@link Mockito#mock(Class)} {@link ConfigurationComponentLocator}
+   * @param mockComponentLocator      a {@link Mockito#mock(Class)} {@link ConfigurationComponentLocator}
    * @param processingStrategyFactory a {@link ProcessingStrategyFactory} to be used by the flow
    */
   public static Flow createAndRegisterFlow(MuleContext context, String flowName,
@@ -167,9 +167,9 @@ public final class MuleTestUtils {
    * Executes callback with a given system property set and replaces the system property with it's original value once done.
    * Useful for asserting behaviour that is dependent on the presence of a system property.
    *
-   * @param propertyName Name of system property to set
+   * @param propertyName  Name of system property to set
    * @param propertyValue Value of system property
-   * @param callback Callback implementing the the test code and assertions to be run with system property set.
+   * @param callback      Callback implementing the the test code and assertions to be run with system property set.
    * @throws Exception any exception thrown by the execution of callback
    */
   public static void testWithSystemProperty(String propertyName, String propertyValue, TestCallback callback)
@@ -197,7 +197,7 @@ public final class MuleTestUtils {
    * Useful for asserting behaviour that is dependent on the presence of a system property.
    *
    * @param properties {@link Map} of property name and property value to be set.
-   * @param callback Callback implementing the the test code and assertions to be run with system property set.
+   * @param callback   Callback implementing the the test code and assertions to be run with system property set.
    * @throws Exception any exception thrown by the execution of callback
    */
   public static void testWithSystemProperties(Map<String, String> properties, TestCallback callback)

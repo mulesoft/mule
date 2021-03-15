@@ -18,8 +18,7 @@ import java.io.File;
 public final class TempBufferFileUtils {
 
   /**
-   * Creates a temporal file for buffering. The file is stored in the system temporal
-   * folder
+   * Creates a temporal file for buffering. The file is stored in the system temporal folder
    *
    * @param name a descriptive name. Not require to contain a path nor an extension
    * @return a {@link File}

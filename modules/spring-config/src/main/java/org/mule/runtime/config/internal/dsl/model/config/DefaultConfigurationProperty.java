@@ -24,11 +24,11 @@ public class DefaultConfigurationProperty implements ConfigurationProperty {
   /**
    * Creates a new configuration value
    *
-   * @param source the source of this configuration attribute. For instance, it may be an {@link Component} if it's source was
-   *        defined in the artifact configuration or it may be the deployment properties configured at deployment time.
-   * @param key the key of the configuration attribute to reference it.
+   * @param source   the source of this configuration attribute. For instance, it may be an {@link Component} if it's source was
+   *                 defined in the artifact configuration or it may be the deployment properties configured at deployment time.
+   * @param key      the key of the configuration attribute to reference it.
    * @param rawValue the plain configuration value without resolution. A configuration value may contain reference to other
-   *        configuration attributes.
+   *                 configuration attributes.
    */
   public DefaultConfigurationProperty(Object source, String key, Object rawValue) {
     checkNotNull(source, "source cannot be null");

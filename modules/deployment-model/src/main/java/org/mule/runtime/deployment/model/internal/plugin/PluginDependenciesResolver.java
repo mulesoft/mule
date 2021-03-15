@@ -21,7 +21,7 @@ public interface PluginDependenciesResolver {
    * Resolves the dependencies between a group of plugins.
    *
    * @param providedPluginDescriptors plugins descriptors provided by a parent Mule artifact if it exists.
-   * @param descriptors plugins descriptors to resolve.
+   * @param descriptors               plugins descriptors to resolve.
    * @param isDomain
    * @return a non null list containing the plugins in resolved order.
    * @throws PluginResolutionError if at least a plugin cannot be resolved.

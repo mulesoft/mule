@@ -28,8 +28,8 @@ public interface CursorProviderFactory<T> {
    * Implementations might resolve that the given stream is/should not be buffered and thus it will return the same given stream.
    * In that case, the stream will be unaltered.
    *
-   * @param eventContext the context of the event on which buffering is talking place
-   * @param value the stream to be cursored
+   * @param eventContext        the context of the event on which buffering is talking place
+   * @param value               the stream to be cursored
    * @param originatingLocation the {@link ComponentLocation} where the cursor was created
    * @return A {@link CursorProvider} or the same given {@code inputStream}
    *
@@ -44,7 +44,7 @@ public interface CursorProviderFactory<T> {
    * In that case, the stream will be unaltered.
    *
    * @param eventContext the context of the event on which buffering is talking place
-   * @param value the stream to be cursored
+   * @param value        the stream to be cursored
    * @return A {@link CursorProvider} or the same given {@code inputStream}
    *
    * @deprecated since 4.4.0 use {@link #of(EventContext, Object, ComponentLocation)} instead.
@@ -58,8 +58,8 @@ public interface CursorProviderFactory<T> {
    * Implementations might resolve that the given stream is/should not be buffered and thus it will return the same given stream.
    * In that case, the stream will be unaltered.
    *
-   * @param event the event on which buffering is talking place
-   * @param value the stream to be cursored
+   * @param event               the event on which buffering is talking place
+   * @param value               the stream to be cursored
    * @param originatingLocation the {@link ComponentLocation} where the cursor was created
    * @return A {@link CursorProvider} or the same given {@code inputStream}
    *

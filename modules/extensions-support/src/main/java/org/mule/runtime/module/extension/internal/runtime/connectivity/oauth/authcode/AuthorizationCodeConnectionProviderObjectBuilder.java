@@ -49,8 +49,8 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * A specialization of {@link BaseOAuthConnectionProviderObjectBuilder} to wrap the {@link ConnectionProvider}
- * into {@link AuthorizationCodeConnectionProviderWrapper} instances.
+ * A specialization of {@link BaseOAuthConnectionProviderObjectBuilder} to wrap the {@link ConnectionProvider} into
+ * {@link AuthorizationCodeConnectionProviderWrapper} instances.
  *
  * @since 4.0
  */

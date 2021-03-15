@@ -76,9 +76,8 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
   }
 
   /**
-   * Closes the connection according to the command set through {@link #setCloseCommand(ExecutionContext, Runnable)}.
-   * Interception API requires the connection to be closed at this point so that it's available across the entire
-   * interception cycle.
+   * Closes the connection according to the command set through {@link #setCloseCommand(ExecutionContext, Runnable)}. Interception
+   * API requires the connection to be closed at this point so that it's available across the entire interception cycle.
    */
   @Override
   public void after(ExecutionContext<ComponentModel> executionContext, Object result) {

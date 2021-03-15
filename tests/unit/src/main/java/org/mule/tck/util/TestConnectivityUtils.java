@@ -36,6 +36,7 @@ public class TestConnectivityUtils {
 
   /**
    * Executes a test connectivity and excepts that it finish correctly
+   * 
    * @param configName name of the Config to do a test connectivity
    */
   public void assertSuccessConnection(String configName) {
@@ -43,10 +44,10 @@ public class TestConnectivityUtils {
   }
 
   /**
-   * Executes as test connectivity over a the connection bind with the given {@code configName} and asserts a failed
-   * connectivity test.
+   * Executes as test connectivity over a the connection bind with the given {@code configName} and asserts a failed connectivity
+   * test.
    *
-   * @param configName name of the Config to do a test connectivity
+   * @param configName       name of the Config to do a test connectivity
    * @param exceptionMatcher matcher to assert characteristics of the failed test connectivity
    * @param errorTypeMatcher matcher to assert characteristics of the given {@link ErrorType}
    */

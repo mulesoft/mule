@@ -31,11 +31,11 @@ public class ModuleTestConnectionTestCase extends AbstractCeXmlExtensionMuleArti
   @Parameterized.Parameters(name = "{index}: Running tests for {0} ")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
-        //infers out of the box that the petstore:config element is test-contactable
+        // infers out of the box that the petstore:config element is test-contactable
         {"modules/module-test-connection.xml"},
-        //takes the first element to do test connection as it's marked with xmlns:connection="true"
+        // takes the first element to do test connection as it's marked with xmlns:connection="true"
         {"modules/module-test-connection-multiple-configs-first.xml"},
-        //takes the second element to do test connection as it's marked with xmlns:connection="true"
+        // takes the second element to do test connection as it's marked with xmlns:connection="true"
         {"modules/module-test-connection-multiple-configs-second.xml"}
     });
   }

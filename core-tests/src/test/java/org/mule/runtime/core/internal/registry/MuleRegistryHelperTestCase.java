@@ -92,7 +92,7 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
     assertThat(trans, instanceOf(CompositeConverter.class));
     assertThat(trans.getName(), is("fruitToSeedseedToAppleappleToBananabananaToBloodOrange"));
 
-    //The same should be returned if we ask for it with compatible data types
+    // The same should be returned if we ask for it with compatible data types
     trans = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(FRUIT_DATA_TYPE, ORANGE_DATA_TYPE);
     assertThat(trans, instanceOf(CompositeConverter.class));
     assertThat(trans.getName(), is("fruitToSeedseedToAppleappleToBananabananaToBloodOrange"));

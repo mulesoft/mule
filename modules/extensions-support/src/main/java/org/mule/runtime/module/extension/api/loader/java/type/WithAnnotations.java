@@ -29,8 +29,8 @@ public interface WithAnnotations {
   <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass);
 
   /**
-   * Returns an optional {@link AnnotationValueFetcher} which encapsulates the logic of obtaining annotations values
-   * when executing with classes or with the Java AST.
+   * Returns an optional {@link AnnotationValueFetcher} which encapsulates the logic of obtaining annotations values when
+   * executing with classes or with the Java AST.
    *
    * @param annotationClass Of the annotation to retrieve
    * @param <A>             The annotation type

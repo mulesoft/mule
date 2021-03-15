@@ -24,8 +24,9 @@ import java.util.Optional;
  * Verifies if the extension is annotated with {@link Xml} and if so, enriches the {@link ExtensionDeclarer} with a
  * {@link XmlDslModel}.
  * <p>
- * To get a hold of the {@link Class} on which the {@link Xml} annotation is expected to be, the {@link ExtensionLoadingContext} will be
- * queried for such a model property. If such property is not present, then this enricher will return without any side effects
+ * To get a hold of the {@link Class} on which the {@link Xml} annotation is expected to be, the {@link ExtensionLoadingContext}
+ * will be queried for such a model property. If such property is not present, then this enricher will return without any side
+ * effects
  *
  * @since 4.0
  */

@@ -15,9 +15,9 @@ import javax.inject.Inject;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
- * Specialization of {@link DefaultLifecycleObjectSorter} which uses a {@link SpringRegistry}
- * to not only consider the provided objects but the beans on which that object depends on. This is
- * accomplished by introspecting the {@link BeanDefinition} that was derived from the {@link Inject} annotations
+ * Specialization of {@link DefaultLifecycleObjectSorter} which uses a {@link SpringRegistry} to not only consider the provided
+ * objects but the beans on which that object depends on. This is accomplished by introspecting the {@link BeanDefinition} that
+ * was derived from the {@link Inject} annotations
  *
  * @since 4.2.0
  */
@@ -37,8 +37,7 @@ public class SpringLifecycleObjectSorter extends DefaultLifecycleObjectSorter {
   }
 
   /**
-   * Adds all the dependencies of the given {@code object} first, and the actual object last
-   * {@inheritDoc}
+   * Adds all the dependencies of the given {@code object} first, and the actual object last {@inheritDoc}
    */
   @Override
   protected int doAddObject(String name, Object object, List<Object> bucket) {

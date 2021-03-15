@@ -29,7 +29,7 @@ public final class RunnerModuleUtils {
    * {@link Properties} is returned with all values.
    *
    * @return a {@link Properties} loaded with the content of the file.
-   * @throws IOException if the properties couldn't load the file.
+   * @throws IOException           if the properties couldn't load the file.
    * @throws IllegalStateException if the file couldn't be found.
    */
   public static final Properties getExcludedProperties() throws IllegalStateException, IOException {

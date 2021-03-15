@@ -24,8 +24,8 @@ public final class SourcePolicyTestUtils {
   private SourcePolicyTestUtils() {}
 
   /**
-   * Generates a {@link CompletableCallback} that will block execution until it is completed and feeds it into the
-   * provided {@code callbackConsumer}.
+   * Generates a {@link CompletableCallback} that will block execution until it is completed and feeds it into the provided
+   * {@code callbackConsumer}.
    * <p>
    * If the callback completes normally, this method returns the completion value. If it completes exceptionally, then the
    * obtained {@link Throwable} is thrown

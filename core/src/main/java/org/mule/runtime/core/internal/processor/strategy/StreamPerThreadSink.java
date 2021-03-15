@@ -57,8 +57,8 @@ public class StreamPerThreadSink implements Sink, Disposable {
   /**
    * Creates a {@link StreamPerThreadSink}.
    *
-   * @param processor the processor to process events emitted onto stream, typically this processor will represent the flow
-   *        pipeline.
+   * @param processor     the processor to process events emitted onto stream, typically this processor will represent the flow
+   *                      pipeline.
    * @param eventConsumer event consumer called just before {@link CoreEvent}'s emission.
    */
   public StreamPerThreadSink(ReactiveProcessor processor, Consumer<CoreEvent> eventConsumer, FlowConstruct flowConstruct) {

@@ -22,8 +22,8 @@ import java.net.URI;
 
 /**
  * Builder of {@link HttpRequest}s. Instances can only be obtained using {@link HttpRequest#builder()}. At the very least, the
- * request URI needs to be provided via {@link #uri(String)}. By default, GET is used as method with empty headers, query
- * params and entity.
+ * request URI needs to be provided via {@link #uri(String)}. By default, GET is used as method with empty headers, query params
+ * and entity.
  *
  * @since 4.0
  */
@@ -103,7 +103,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   /**
    * Includes a new queryParam to be sent in the desired {@link HttpMessage}.
    *
-   * @param name the name of the HTTP queryParam
+   * @param name  the name of the HTTP queryParam
    * @param value the value of the HTTP queryParam
    * @return this builder
    */

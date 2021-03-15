@@ -33,7 +33,7 @@ public final class FunctionExpressionMatcher<T, R> extends TypeSafeMatcher<T> {
    * Builds a matcher that lazily evaluates against the object returned by the given resolver {@link Function}.
    * 
    * @param resolver the function to use to get the object to run the matcher against.
-   * @param matcher the matcher to run against the resolved object.
+   * @param matcher  the matcher to run against the resolved object.
    * @return a matcher that lazily evaluates the object to match.
    */
   @Factory

@@ -9,9 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 /**
- * Groups the sum of all the parameters that a user configured in order to specify
- * in which store should the runtime store the {@link ResourceOwnerOAuthContext} instances
- * obtained through an extension
+ * Groups the sum of all the parameters that a user configured in order to specify in which store should the runtime store the
+ * {@link ResourceOwnerOAuthContext} instances obtained through an extension
  *
  * @since 4.0
  */

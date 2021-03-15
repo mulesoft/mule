@@ -35,11 +35,11 @@ import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.ManagerFactoryParameters;
 
 /**
- * Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores
- * extension points (additional tags for CRLDP and OCSP) in the certificate.
+ * Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points
+ * (additional tags for CRLDP and OCSP) in the certificate.
  *
- * Note that the signer of the CRL must be the client certificate's CA, in case that's not possible consider
- * using {@link CustomOcspResponder}.
+ * Note that the signer of the CRL must be the client certificate's CA, in case that's not possible consider using
+ * {@link CustomOcspResponder}.
  *
  * @since 4.1
  */

@@ -197,7 +197,8 @@ class ExtensionPluginMetadataGenerator {
    *
    * @param plugin                         the {@link Artifact} to generate its extension manifest if it is an extension.
    * @param extensionClass                 {@link Class} annotated with {@link Extension}
-   * @param dependencyResolver             the dependency resolver used to discover test extensions poms to find which loader to use
+   * @param dependencyResolver             the dependency resolver used to discover test extensions poms to find which loader to
+   *                                       use
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
    * @return {@link File} folder where extension manifest resources were generated
    */

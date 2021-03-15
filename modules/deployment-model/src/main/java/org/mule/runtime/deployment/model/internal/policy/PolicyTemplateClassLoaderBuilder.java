@@ -31,8 +31,8 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
    * Creates an {@link AbstractArtifactClassLoaderBuilder}.
    * 
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
-   *        null.
-   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the policy's region. Non null
+   *                                   null.
+   * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the policy's region. Non null
    */
   public PolicyTemplateClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                           RegionPluginClassLoadersFactory pluginClassLoadersFactory) {

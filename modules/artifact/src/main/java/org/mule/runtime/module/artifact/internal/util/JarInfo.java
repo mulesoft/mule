@@ -26,9 +26,9 @@ public class JarInfo {
   /**
    * Creates a new instance corresponding to a given JAR.
    *
-   * @param packages Java packages found on the JAR. Non null.
+   * @param packages  Java packages found on the JAR. Non null.
    * @param resources Java resources found on the JAR. Non null.
-   * @param services SPI services definitions found on the JAR. Non null.
+   * @param services  SPI services definitions found on the JAR. Non null.
    */
   public JarInfo(Set<String> packages, Set<String> resources, List<ExportedService> services) {
     checkArgument(packages != null, "Packages cannot be null");

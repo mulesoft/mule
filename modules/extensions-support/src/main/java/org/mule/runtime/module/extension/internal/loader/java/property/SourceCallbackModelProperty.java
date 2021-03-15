@@ -13,8 +13,8 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
- * A {@link ModelProperty} to be used in {@link SourceModel} instances, which
- * indicates that the source is listening for responses on the indicated methods.
+ * A {@link ModelProperty} to be used in {@link SourceModel} instances, which indicates that the source is listening for responses
+ * on the indicated methods.
  *
  * @since 4.0
  */

@@ -51,7 +51,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   /**
    * Creates a new provider
    *
-   * @param policyTemplateFactory used to create the policy templates for the application. Non null.
+   * @param policyTemplateFactory         used to create the policy templates for the application. Non null.
    * @param policyInstanceProviderFactory used to create the policy instances for the application. Non null.
    */
   public MuleApplicationPolicyProvider(PolicyTemplateFactory policyTemplateFactory,

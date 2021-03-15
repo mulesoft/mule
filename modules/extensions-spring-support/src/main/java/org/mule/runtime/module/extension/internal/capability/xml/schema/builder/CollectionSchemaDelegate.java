@@ -101,8 +101,8 @@ class CollectionSchemaDelegate {
       }
 
       /**
-       * For a Collection with any other type as generic.
-       * The generated {@link ComplexType} declares a sequence of child elements with an inline declaration of the type
+       * For a Collection with any other type as generic. The generated {@link ComplexType} declares a sequence of child elements
+       * with an inline declaration of the type
        *
        * @param metadataType the item's type
        */

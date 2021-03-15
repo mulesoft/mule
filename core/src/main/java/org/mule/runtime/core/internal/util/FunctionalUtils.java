@@ -29,8 +29,7 @@ public class FunctionalUtils extends org.mule.runtime.api.util.FunctionalUtils {
   }
 
   /**
-   * Executes the given {@code task}, feeding any thrown exceptions into the given
-   * {@code exceptionHandler}
+   * Executes the given {@code task}, feeding any thrown exceptions into the given {@code exceptionHandler}
    *
    * @param task             a task
    * @param exceptionHandler an exception {@link Consumer}
@@ -46,8 +45,8 @@ public class FunctionalUtils extends org.mule.runtime.api.util.FunctionalUtils {
   /**
    * Executes the given {@code task}, feeding any thrown exceptions into the given {@code exceptionHandler}
    *
-   * @param item the object to perform the task on
-   * @param task a task
+   * @param item             the object to perform the task on
+   * @param task             a task
    * @param exceptionHandler an exception {@link Consumer}
    */
   public static <T> void safely(T item, CheckedConsumer<T> task, Consumer<Exception> exceptionHandler) {

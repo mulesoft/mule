@@ -76,7 +76,7 @@ public interface SecurityManager extends Initialisable {
    * @param authentication the {@link Authentication} used to create the new {@link SecurityContext}
    * @return a new {@link SecurityContext} created by the {@link SecurityProvider} with the given {@code authentication}
    * @throws UnknownAuthenticationTypeException if no {@link SecurityProvider} is found that {@link SecurityProvider#supports} the
-   *         given {@code authentication}
+   *                                            given {@code authentication}
    */
   SecurityContext createSecurityContext(Authentication authentication) throws UnknownAuthenticationTypeException;
 

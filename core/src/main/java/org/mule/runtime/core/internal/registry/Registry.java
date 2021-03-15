@@ -81,7 +81,7 @@ public interface Registry extends Initialisable, Disposable {
   /**
    * Registers an object in the registry with a key.
    * 
-   * @param key the key to store the value against. This is a non-null value
+   * @param key   the key to store the value against. This is a non-null value
    * @param value the object to store in the registry. This is a non-null value
    * @throws RegistrationException if an object with the same key already exists
    */
@@ -90,8 +90,8 @@ public interface Registry extends Initialisable, Disposable {
   /**
    * Registers an object in the registry with a key.
    * 
-   * @param key the key to store the value against. This is a non-null value
-   * @param value the object to store in the registry. This is a non-null value
+   * @param key      the key to store the value against. This is a non-null value
+   * @param value    the object to store in the registry. This is a non-null value
    * @param metadata an implementation specific argument that can be passed into the method
    * @throws RegistrationException if an object with the same key already exists
    * @deprecated as of 3.7.0. Use {@link #registerObject(String, Object)} instead
@@ -114,7 +114,7 @@ public interface Registry extends Initialisable, Disposable {
    * @param key the name or key of the object to remove from the registry
    * @return the unregistered object or {@code null} if no object was registered under that key
    * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because the object's
-   *         lifecycle threw an exception
+   *                               lifecycle threw an exception
    */
   Object unregisterObject(String key) throws RegistrationException;
 
@@ -122,12 +122,12 @@ public interface Registry extends Initialisable, Disposable {
    * Will remove an object by name from the registry. By default the registry must apply all remaining lifecycle phases to the
    * object when it is removed.
    *
-   * @param key the name or key of the object to remove from the registry
+   * @param key      the name or key of the object to remove from the registry
    * @param metadata an implementation specific argument that can be passed into the method
    * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because the object's
-   *         lifecycle threw an exception
+   *                               lifecycle threw an exception
    * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because the object's
-   *         lifecycle threw an exception
+   *                               lifecycle threw an exception
    * @deprecated as of 3.7.0. Use {@link #unregisterObject(String)} instead
    */
   @Deprecated
@@ -148,7 +148,7 @@ public interface Registry extends Initialisable, Disposable {
    * prototype objects that are created per request and would clutter the registry with single use objects.
    *
    * @param object the object to process
-   * @param phase the specific lifecycle phase you want to fire
+   * @param phase  the specific lifecycle phase you want to fire
    * @return either the same object but with the lifecycle applied or a proxy to it
    * @throws MuleException if the registry fails to perform the lifecycle change for the object.
    */
@@ -158,9 +158,9 @@ public interface Registry extends Initialisable, Disposable {
    * Applies lifecycle phase to an object independent of the current lifecycle phase. All phases between the {@code startPhase}
    * and the {@code endPhase} will be executed.
    *
-   * @param object the object to apply lifecycle to
+   * @param object     the object to apply lifecycle to
    * @param startPhase the lifecycle phase the object is currently in. Must not be null.
-   * @param toPhase the lifecycle phase to transition the object to. Must not be null.
+   * @param toPhase    the lifecycle phase to transition the object to. Must not be null.
    * @throws MuleException if there is an exception while invoking lifecycle on the object
    */
   void applyLifecycle(Object object, String startPhase, String toPhase) throws MuleException;
@@ -173,9 +173,9 @@ public interface Registry extends Initialisable, Disposable {
    * implementation, since invoking this method might return a new instance or an already existing one. If an existing one is
    * returned, then the lifecycle might have been previously applied regardless.
    *
-   * @param key the key of the object you're looking for
+   * @param key            the key of the object you're looking for
    * @param applyLifecycle if lifecycle should be applied to the returned object. Passing {@code true} doesn't guarantee that the
-   *        lifecycle is applied
+   *                       lifecycle is applied
    * @return object or {@code null} if not found
    */
   <T> T lookupObject(String key, boolean applyLifecycle);

@@ -46,7 +46,7 @@ public final class TestArtifactClassLoaderFilter implements ArtifactClassLoaderF
    * Creates an extended {@link ClassLoaderFilter} to exporte classes that are not exported as packages in the original filter.
    *
    * @param classLoaderFilter the original filter. Not null.
-   * @param exportedClasses a {@link List} of {@link Class}es to export in addition to the original filter. Not null.
+   * @param exportedClasses   a {@link List} of {@link Class}es to export in addition to the original filter. Not null.
    */
   public TestArtifactClassLoaderFilter(final ArtifactClassLoaderFilter classLoaderFilter, final List<Class> exportedClasses) {
     checkNotNull(classLoaderFilter, "classLoaderFilter cannot be null");

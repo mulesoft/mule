@@ -150,7 +150,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   }
 
   /**
-   * Constructs a {@link ResolverSet} from the parameters groups, using {@link #toValueResolver(Object, Set)} to process the values.
+   * Constructs a {@link ResolverSet} from the parameters groups, using {@link #toValueResolver(Object, Set)} to process the
+   * values.
    *
    * @return a {@link ResolverSet}
    */

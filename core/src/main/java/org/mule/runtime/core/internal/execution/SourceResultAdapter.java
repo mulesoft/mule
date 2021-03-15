@@ -50,11 +50,11 @@ public class SourceResultAdapter {
   /**
    * Creates a new instance
    *
-   * @param result the source result
-   * @param cursorProviderFactory the {@link CursorStreamProviderFactory} used by the source
-   * @param mediaType the {@link MediaType} to set in the message
-   * @param isCollection whether the {@code result} represents a {@link List} of messages.
-   * @param correlationId the correlationId of the message to be set
+   * @param result                   the source result
+   * @param cursorProviderFactory    the {@link CursorStreamProviderFactory} used by the source
+   * @param mediaType                the {@link MediaType} to set in the message
+   * @param isCollection             whether the {@code result} represents a {@link List} of messages.
+   * @param correlationId            the correlationId of the message to be set
    * @param payloadMediaTypeResolver resolver used in case result is a {@link List} of results.
    */
   public SourceResultAdapter(Result<?, ?> result,

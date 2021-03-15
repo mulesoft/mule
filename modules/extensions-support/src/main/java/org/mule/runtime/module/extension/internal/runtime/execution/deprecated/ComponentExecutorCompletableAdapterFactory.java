@@ -37,8 +37,8 @@ import org.slf4j.Logger;
 /**
  * Adapts a legacy {@link ComponentExecutorFactory} into a {@link CompletableComponentExecutorFactory}.
  * <p>
- * The produced {@link CompletableComponentExecutor} instances will support mapping all the {@link Lifecycle} interfaces
- * to the adapted {@link ComponentExecutor}
+ * The produced {@link CompletableComponentExecutor} instances will support mapping all the {@link Lifecycle} interfaces to the
+ * adapted {@link ComponentExecutor}
  *
  * @since 4.3.0
  */
@@ -107,7 +107,8 @@ public class ComponentExecutorCompletableAdapterFactory<T extends ComponentModel
     @Override
     public Function<ExecutionContext<T>, Map<String, Object>> createArgumentResolver(T operationModel) {
       return delegate instanceof OperationArgumentResolverFactory
-          ? ((OperationArgumentResolverFactory<T>) delegate).createArgumentResolver(operationModel) : ec -> emptyMap();
+          ? ((OperationArgumentResolverFactory<T>) delegate).createArgumentResolver(operationModel)
+          : ec -> emptyMap();
     }
   }
 

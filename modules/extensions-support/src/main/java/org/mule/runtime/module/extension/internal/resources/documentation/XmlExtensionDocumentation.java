@@ -14,8 +14,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * a POJO that represents the extension-descriptions.xml file which contains the necessary annotations and setters necessary
- * to allow JAX-B serialization/deserialization.
+ * a POJO that represents the extension-descriptions.xml file which contains the necessary annotations and setters necessary to
+ * allow JAX-B serialization/deserialization.
  *
  * @since 4.0
  */

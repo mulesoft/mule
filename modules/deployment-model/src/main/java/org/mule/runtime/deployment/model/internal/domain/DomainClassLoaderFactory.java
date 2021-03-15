@@ -48,7 +48,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   /**
    * Creates a new instance
    *
-   * @param containerClassLoader parent classLoader of the created instance. Can be null.
+   * @param containerClassLoader       parent classLoader of the created instance. Can be null.
    * @param nativeLibraryFinderFactory creates {@link NativeLibraryFinder} for the created module
    *
    */

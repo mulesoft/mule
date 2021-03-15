@@ -41,10 +41,11 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
   /**
    * Creates a new instance.
    *
-   * @param serviceArtifactClassLoaders {@link List} of {@link ArtifactClassLoader}s created for services discovered
-   *                                    during classification process. The {@code artifactName} of each {@link ArtifactClassLoader} represents the
-   *                                    {@value AetherClassPathClassifier#SERVICE_PROVIDER_CLASS_NAME} defined by the service in its
-   *                                    {@value AetherClassPathClassifier##SERVICE_PROPERTIES_FILE_NAME}and it is used for instantiating the {@link ServiceProvider}.
+   * @param serviceArtifactClassLoaders {@link List} of {@link ArtifactClassLoader}s created for services discovered during
+   *                                    classification process. The {@code artifactName} of each {@link ArtifactClassLoader}
+   *                                    represents the {@value AetherClassPathClassifier#SERVICE_PROVIDER_CLASS_NAME} defined by
+   *                                    the service in its {@value AetherClassPathClassifier##SERVICE_PROPERTIES_FILE_NAME}and it
+   *                                    is used for instantiating the {@link ServiceProvider}.
    */
   public IsolatedServiceProviderDiscoverer(final List<ArtifactClassLoader> serviceArtifactClassLoaders) {
     checkNotNull(serviceArtifactClassLoaders, "serviceArtifactClassLoaders cannot be null");

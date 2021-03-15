@@ -16,8 +16,7 @@ import org.mule.sdk.api.runtime.source.SourceCallback;
 import javax.transaction.TransactionManager;
 
 /**
- * Augments the {@link SourceCallback} contract with internal behavior not to be exposed on the public
- * API
+ * Augments the {@link SourceCallback} contract with internal behavior not to be exposed on the public API
  *
  * @param <T> the generic type of the output values of the generated results
  * @param <A> the generic type of the attributes of the generated results

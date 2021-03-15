@@ -24,8 +24,8 @@ public interface ServiceRegistry {
    * Searches for implementations of a particular service class using the given class loader.
    *
    * @param providerClass a <code>Class</code>object indicating the class or interface of the service providers being detected.
-   * @param loader the class loader to be used to load provider/configuration files and instantiate provider instances. If
-   *        {@code null}, it will be up to the implementation to choose a {@link ClassLoader}
+   * @param loader        the class loader to be used to load provider/configuration files and instantiate provider instances. If
+   *                      {@code null}, it will be up to the implementation to choose a {@link ClassLoader}
    * @return A {@link Collection} that yields provider objects for the given service, in some arbitrary order.
    */
   <T> Collection<T> lookupProviders(Class<T> providerClass, ClassLoader loader);
@@ -34,8 +34,8 @@ public interface ServiceRegistry {
    * Searches for implementations of a particular service class. One and only one provider is expected to be found.
    *
    * @param providerClass a <code>Class</code>object indicating the class or interface of the service providers being detected.
-   * @param loader the class loader to be used to load provider/configuration files and instantiate provider instances. If
-   *        {@code null}, it will be up to the implementation to choose a {@link ClassLoader}
+   * @param loader        the class loader to be used to load provider/configuration files and instantiate provider instances. If
+   *                      {@code null}, it will be up to the implementation to choose a {@link ClassLoader}
    * @return An implementation of the given service.
    * @throws {@link IllegalStateException} if there's no provider found or there's more than one provider.
    */

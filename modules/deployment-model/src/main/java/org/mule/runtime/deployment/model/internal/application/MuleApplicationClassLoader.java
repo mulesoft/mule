@@ -64,8 +64,8 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
   /**
    * Collects all the plugin classloaders that are available in the deployable artifact classloader hierarchy.
    * <p/>
-   * For every class loader in the artifact class loader hierarchy, if that classloader does not contain plugins, the same classloader
-   * is added to the list.
+   * For every class loader in the artifact class loader hierarchy, if that classloader does not contain plugins, the same
+   * classloader is added to the list.
    *
    * @return a {@link List<ClassLoader>} containing all the plugin class loaders in the artifact classloader hierarchy.
    */

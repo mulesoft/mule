@@ -96,7 +96,7 @@ public abstract class AbstractObjectFactory extends AbstractComponent implements
    * properties for the resulting object
    *
    * @param muleContext the current {@link org.mule.runtime.core.api.MuleContext} instance. This can be used for performing
-   *        registry lookups applying processors to newly created objects or even firing custom notifications
+   *                    registry lookups applying processors to newly created objects or even firing custom notifications
    * @throws Exception Can throw any type of exception while creating a new object
    */
   @Override

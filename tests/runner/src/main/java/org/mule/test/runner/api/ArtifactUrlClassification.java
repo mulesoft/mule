@@ -16,8 +16,8 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * Defines the result of the classification process for a {@link Artifact}. It contains a
- * {@link List} of {@link URL}s for its {@link ArtifactClassLoader}.
+ * Defines the result of the classification process for a {@link Artifact}. It contains a {@link List} of {@link URL}s for its
+ * {@link ArtifactClassLoader}.
  *
  * @since 4.0
  */

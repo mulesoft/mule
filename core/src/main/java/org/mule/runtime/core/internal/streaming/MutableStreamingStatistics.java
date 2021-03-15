@@ -9,8 +9,7 @@ package org.mule.runtime.core.internal.streaming;
 import org.mule.runtime.core.api.streaming.StreamingStatistics;
 
 /**
- * Augmented version of the {@link StreamingStatistics} contract which allows to manipulate
- * the held values.
+ * Augmented version of the {@link StreamingStatistics} contract which allows to manipulate the held values.
  *
  * @since 4.2.0
  */

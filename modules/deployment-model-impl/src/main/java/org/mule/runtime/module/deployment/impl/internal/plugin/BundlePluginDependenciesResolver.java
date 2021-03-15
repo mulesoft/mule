@@ -60,7 +60,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
    * plugin).
    *
    * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to
-   *        resolve
+   *                                  resolve
    */
   public BundlePluginDependenciesResolver(ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory) {
     this.artifactDescriptorFactory = artifactDescriptorFactory;
@@ -190,7 +190,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
    * Goes over the elements in the {@code pluginDescriptors} collection looking if it hasn't been resolved yet.
    *
    * @param pluginDescriptors plugins to validate.
-   * @param visited plugins that are already resolved (by either the container or application initially, or by the resolver).
+   * @param visited           plugins that are already resolved (by either the container or application initially, or by the
+   *                          resolver).
    * @return the plugins that were obtained initially plus all the ones that were found.
    */
   private List<ArtifactPluginDescriptor> getArtifactsWithDependencies(List<ArtifactPluginDescriptor> pluginDescriptors,

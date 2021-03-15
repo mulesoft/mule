@@ -28,7 +28,7 @@ public final class LifecycleTransitionResult {
   /**
    * The logic for processing a collection of children
    *
-   * @param iface The lifecycle interface to be called
+   * @param iface   The lifecycle interface to be called
    * @param objects An iterator over all children that must also be called
    * @throws LifecycleException if any fail
    */

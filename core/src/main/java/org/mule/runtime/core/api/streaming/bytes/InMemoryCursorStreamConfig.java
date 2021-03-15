@@ -41,9 +41,9 @@ public final class InMemoryCursorStreamConfig {
    * Creates a new instance
    *
    * @param initialBufferSize   the buffer's initial size. Must be greater than zero bytes.
-   * @param bufferSizeIncrement the size that the buffer should gain each time it is expanded. A value of zero bytes means no expansion.
-   *                            Cannot be negative byte size.
-   * @param maxBufferSize     the maximum amount of space that the buffer can grow to. Use {@code null} for unbounded buffers
+   * @param bufferSizeIncrement the size that the buffer should gain each time it is expanded. A value of zero bytes means no
+   *                            expansion. Cannot be negative byte size.
+   * @param maxBufferSize       the maximum amount of space that the buffer can grow to. Use {@code null} for unbounded buffers
    */
   public InMemoryCursorStreamConfig(DataSize initialBufferSize, DataSize bufferSizeIncrement, DataSize maxBufferSize) {
     final int initial = initialBufferSize.toBytes();

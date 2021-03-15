@@ -116,8 +116,8 @@ public class SourceConnectionManager {
    *
    * @param connection a connection
    * @param <T>        the connection's generic type
-   * @return an {@link Optional} {@link ConnectionHandler}, {@link Optional#empty()} if the connection was not obtained
-   * through this component
+   * @return an {@link Optional} {@link ConnectionHandler}, {@link Optional#empty()} if the connection was not obtained through
+   *         this component
    */
   <T> Optional<ConnectionHandler<T>> getConnectionHandler(T connection) {
     return ofNullable(connections.getIfPresent(new Reference<>(connection)))

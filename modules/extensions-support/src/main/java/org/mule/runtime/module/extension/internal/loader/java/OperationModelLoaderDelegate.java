@@ -224,7 +224,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
         .collect(toList());
 
     if (genericTypes.isEmpty()) {
-      //This is an invalid state, but is better to fail when executing the Extension Model Validators
+      // This is an invalid state, but is better to fail when executing the Extension Model Validators
       genericTypes.add(ANY_TYPE);
       genericTypes.add(ANY_TYPE);
     }

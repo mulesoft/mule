@@ -90,8 +90,8 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
   }
 
   /**
-   * Checking if an implicit connection provider is dynamic implies that there is a suitable implicit connection provider
-   * for the extension. If that implicit provider couldn't be found, an {@link IllegalStateException} will be thrown.
+   * Checking if an implicit connection provider is dynamic implies that there is a suitable implicit connection provider for the
+   * extension. If that implicit provider couldn't be found, an {@link IllegalStateException} will be thrown.
    */
   @Override
   public boolean isDynamic() {

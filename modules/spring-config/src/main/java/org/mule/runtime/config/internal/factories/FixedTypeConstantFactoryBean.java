@@ -7,8 +7,8 @@
 package org.mule.runtime.config.internal.factories;
 
 /**
- * A specialization of {@link ConstantFactoryBean} which always returns a fix type when
- * {@link #getObjectType()} is invoked, regardless of the actual value
+ * A specialization of {@link ConstantFactoryBean} which always returns a fix type when {@link #getObjectType()} is invoked,
+ * regardless of the actual value
  *
  * @since 4.2
  */

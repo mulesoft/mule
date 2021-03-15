@@ -29,9 +29,8 @@ import javax.inject.Inject;
 import com.google.common.collect.ImmutableList;
 
 /**
- * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation
- * of {@link #resolve(ValueResolvingContext)} it return a {@link Collection} of values with the outcome
- * of each original resolver.
+ * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of
+ * {@link #resolve(ValueResolvingContext)} it return a {@link Collection} of values with the outcome of each original resolver.
  * <p/>
  * This class implements {@link Lifecycle} and propagates those events to each of the {@code resolvers}
  *
@@ -50,7 +49,7 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
    * Creates a new instance
    *
    * @param collectionType the {@link Class} for a concrete {@link Collection} type with a default constructor
-   * @param resolvers a not {@code null} {@link List} of resolvers
+   * @param resolvers      a not {@code null} {@link List} of resolvers
    */
   public CollectionValueResolver(Class<? extends Collection> collectionType, List<ValueResolver<T>> resolvers) {
     checkInstantiable(collectionType, new ReflectionCache());

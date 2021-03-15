@@ -138,7 +138,7 @@ public class CompilerUtils {
     /**
      * Indicates which source file must be compiled.
      *
-     * @param source source files. Non empty.
+     * @param source      source files. Non empty.
      * @param javaPackage the package for the sources. Non empty.
      * @return the same compiler instance
      */
@@ -202,7 +202,7 @@ public class CompilerUtils {
     /**
      * Indicates which source file must be compiled.
      *
-     * @param sources source files. Non empty.
+     * @param sources     source files. Non empty.
      * @param javaPackage the package in which the files will be placed.
      * @return the same compiler instance
      */
@@ -232,7 +232,7 @@ public class CompilerUtils {
      * Generates a JAR file form the compiled files
      *
      * @param targetFolder folder containing the compiled files. Non null.
-     * @param jarName name of the JAR file. Non empty.
+     * @param jarName      name of the JAR file. Non empty.
      * @return
      */
     protected File compressGeneratedFiles(File targetFolder, String jarName) {
@@ -304,7 +304,7 @@ public class CompilerUtils {
     /**
      * Compiles all the provided sources generating a JAR file.
      *
-     * @param jarName name of the JAR file to create. Non empty.
+     * @param jarName          name of the JAR file to create. Non empty.
      * @param extensionVersion version of the extension being compiled. Non empty.
      * @return the created file.
      */
@@ -390,7 +390,7 @@ public class CompilerUtils {
      * Configures an annotation processor to use as part of the compilation
      *
      * @param annotationProcessorClassName the class name of the annotations processor to use
-     * @param processorPath the classpath to use for the annotation processing.
+     * @param processorPath                the classpath to use for the annotation processing.
      * @return
      */
     public CompilerTaskBuilder processingAnnotations(String annotationProcessorClassName, String processorPath) {

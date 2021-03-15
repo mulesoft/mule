@@ -364,7 +364,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
 
     ClassLoaderModel classLoaderModel = buildClassLoaderModel(app);
     assertThat(classLoaderModel.getUrls().length, equalTo(5));
-    for (int i = 1; i < classLoaderModel.getUrls().length; i++) { //The first one does not count because it's the main artifact.
+    for (int i = 1; i < classLoaderModel.getUrls().length; i++) { // The first one does not count because it's the main artifact.
       org.mule.maven.client.api.model.BundleDependency dependency = resolvedDependencies.get(i - 1);
       URL url = getDummyUriFor(dependency.getDescriptor().getGroupId(),
                                dependency.getDescriptor().getArtifactId(),

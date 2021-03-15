@@ -10,8 +10,9 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 
 /**
- * Constants to be consumed across modules to generate and consume a proper {@link org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel} when working with
- * the {@link MulePluginModel#getExtensionModelLoaderDescriptor()}.
+ * Constants to be consumed across modules to generate and consume a proper
+ * {@link org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel} when working with the
+ * {@link MulePluginModel#getExtensionModelLoaderDescriptor()}.
  *
  * @since 4.0
  */
@@ -23,7 +24,8 @@ public class ArtifactDescriptorConstants {
   public static final String MULE_LOADER_ID = "mule";
 
   /**
-   * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported packages of a given artifact.
+   * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported packages of a given
+   * artifact.
    */
   public static final String EXPORTED_PACKAGES = "exportedPackages";
 
@@ -32,7 +34,8 @@ public class ArtifactDescriptorConstants {
   public static final String PRIVILEGED_ARTIFACTS_IDS = "privilegedArtifactIds";
 
   /**
-   * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported resources of a given artifact.
+   * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported resources of a given
+   * artifact.
    */
   public static final String EXPORTED_RESOURCES = "exportedResources";
 

@@ -79,7 +79,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
   /**
    * Creates a ExecutionTemplate that will manage transactional context according to configured TransactionConfig
    *
-   * @param muleContext MuleContext for this application
+   * @param muleContext       MuleContext for this application
    * @param transactionConfig transaction config for the execution context
    */
   public static <T> TransactionalExecutionTemplate<T> createTransactionalExecutionTemplate(MuleContext muleContext,
@@ -91,10 +91,10 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
   }
 
   /**
-   * Creates a ExecutionTemplate that will manage transactional context according to configured TransactionConfig.
-   * This is a template which maintains the TX logic for compatibility components.
+   * Creates a ExecutionTemplate that will manage transactional context according to configured TransactionConfig. This is a
+   * template which maintains the TX logic for compatibility components.
    *
-   * @param muleContext MuleContext for this application
+   * @param muleContext       MuleContext for this application
    * @param transactionConfig transaction config for the execution context
    */
   public static <T> TransactionalExecutionTemplate<T> createCompatibilityExecutionTemplate(MuleContext muleContext,

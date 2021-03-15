@@ -1705,8 +1705,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   /**
-   * Updates a file's last modified time to be greater than the original timestamp.
-   * It locks the deployment lock in order to prevent the directory watcher to redeploy the artifact multiple times.
+   * Updates a file's last modified time to be greater than the original timestamp. It locks the deployment lock in order to
+   * prevent the directory watcher to redeploy the artifact multiple times.
    *
    * @param timestamp time value in milliseconds of the original file's last modified time
    * @param file      file to update

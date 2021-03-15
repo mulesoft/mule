@@ -70,7 +70,7 @@ public class XmlExtensionLoaderWithDeclarationTestCase extends AbstractMuleTestC
 
   /**
    * @param validateXml whether the XML must be valid while loading the extension model or not. Useful to determine if the default
-   *        values are properly feed when reading the document.
+   *                    values are properly feed when reading the document.
    */
   public XmlExtensionLoaderWithDeclarationTestCase(boolean validateXml) {
     this.validateXml = validateXml;

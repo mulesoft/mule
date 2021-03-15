@@ -280,9 +280,9 @@ public class FakeMuleServer {
   /**
    * Deploys an application from a classpath resource
    *
-   * @param resource points to the resource to deploy. Non null.
+   * @param resource      points to the resource to deploy. Non null.
    * @param targetAppName application name used to deploy the resource. Null to maintain the original resource name
-   * @throws IOException if the resource cannot be accessed
+   * @throws IOException        if the resource cannot be accessed
    * @throws URISyntaxException
    */
   public void deploy(String resource, String targetAppName) throws IOException, URISyntaxException {
@@ -293,9 +293,9 @@ public class FakeMuleServer {
   /**
    * Deploys an application from an URL
    *
-   * @param resource points to the resource to deploy. Non null.
+   * @param resource      points to the resource to deploy. Non null.
    * @param targetAppName application name used to deploy the resource. Null to maintain the original resource name
-   * @throws IOException if the URL cannot be accessed
+   * @throws IOException        if the URL cannot be accessed
    * @throws URISyntaxException
    */
   public void deploy(URL resource, String targetAppName) throws IOException, URISyntaxException {
@@ -407,7 +407,7 @@ public class FakeMuleServer {
    * Deploys a Domain from a classpath folder
    *
    * @param domainFolder folder in which the domain is defined
-   * @param domainName name of the domain to use as domain artifact name
+   * @param domainName   name of the domain to use as domain artifact name
    * @throws URISyntaxException
    */
   public void deployDomainFromClasspathFolder(String domainFolder, String domainName) throws URISyntaxException {
@@ -434,7 +434,7 @@ public class FakeMuleServer {
    * Deploys an Application from a classpath folder
    *
    * @param appFolder folder in which the app is defined
-   * @param appName name of the domain to use as app artifact name
+   * @param appName   name of the domain to use as app artifact name
    * @throws URISyntaxException
    */
   public void deployAppFromClasspathFolder(String appFolder, String appName) throws URISyntaxException {

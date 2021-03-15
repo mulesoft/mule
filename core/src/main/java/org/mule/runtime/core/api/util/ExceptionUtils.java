@@ -45,9 +45,10 @@ public class ExceptionUtils {
    * Similar to {@link org.apache.commons.lang3.exception.ExceptionUtils#indexOfType(Throwable, Class)} but avoiding the
    * deprecated {@link org.apache.commons.lang3.exception.ExceptionUtils#getCause(Throwable)}.
    *
-   * <p>A <code>null</code> throwable returns <code>-1</code>.
-   * A <code>null</code> type returns <code>-1</code>.
-   * No match in the chain returns <code>-1</code>.</p>
+   * <p>
+   * A <code>null</code> throwable returns <code>-1</code>. A <code>null</code> type returns <code>-1</code>. No match in the
+   * chain returns <code>-1</code>.
+   * </p>
    *
    * @param throwable the throwable to inspect, may be null
    * @param type      the type to search for, subclasses match, null returns -1
@@ -63,10 +64,9 @@ public class ExceptionUtils {
    *
    * @param throwable the throwable to inspect, may be null
    * @param type      the type to search for, subclasses match, null returns -1
-   * @param fromIndex the (zero based) index of the starting position,
-   *                  negative treated as zero, larger than chain size returns -1
-   * @param subclass  if <code>true</code>, compares with {@link Class#isAssignableFrom(Class)}, otherwise compares
-   *                  using references
+   * @param fromIndex the (zero based) index of the starting position, negative treated as zero, larger than chain size returns -1
+   * @param subclass  if <code>true</code>, compares with {@link Class#isAssignableFrom(Class)}, otherwise compares using
+   *                  references
    * @return index of the <code>type</code> within throwables nested within the specified <code>throwable</code>
    */
   private static int indexOf(final Throwable throwable, final Class<?> type, int fromIndex, final boolean subclass) {

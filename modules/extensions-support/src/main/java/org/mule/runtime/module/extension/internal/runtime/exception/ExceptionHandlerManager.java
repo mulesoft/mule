@@ -22,10 +22,9 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exception
 import java.util.Optional;
 
 /**
- * Given a {@link ExtensionModel} and another {@link EnrichableModel}, this class will
- * test for a {@link ExceptionHandlerModelProperty} to determine the {@link ExceptionHandler}
- * which should be use. If no such property is available then a default {@link NullExceptionHandler}
- * is used.
+ * Given a {@link ExtensionModel} and another {@link EnrichableModel}, this class will test for a
+ * {@link ExceptionHandlerModelProperty} to determine the {@link ExceptionHandler} which should be use. If no such property is
+ * available then a default {@link NullExceptionHandler} is used.
  * <p>
  * It also contains all the logic for operations and sources {@link Throwable} process and handling.
  *
@@ -61,8 +60,8 @@ public final class ExceptionHandlerManager {
   }
 
   /**
-   * Process the {@link Throwable} parameter to obtain the correct failure and if its an exception this method will enrich it
-   * with the obtained {@link ExceptionHandler} for this manager instance.
+   * Process the {@link Throwable} parameter to obtain the correct failure and if its an exception this method will enrich it with
+   * the obtained {@link ExceptionHandler} for this manager instance.
    */
   public Throwable process(Throwable t) {
     Throwable handled = handleThrowable(t);
@@ -73,9 +72,8 @@ public final class ExceptionHandlerManager {
   /**
    * Given a {@link Throwable} instance this method will get the specific failure reason.
    * <p>
-   * If there is a {@link ConnectionException} in the stacktrace is going to be considered the main failure reason,
-   * otherwise it will check if there is a {@link SdkMethodInvocationException} wrapper exception
-   * in the stacktrace wrapping the real failure.
+   * If there is a {@link ConnectionException} in the stacktrace is going to be considered the main failure reason, otherwise it
+   * will check if there is a {@link SdkMethodInvocationException} wrapper exception in the stacktrace wrapping the real failure.
    */
   public Throwable handleThrowable(Throwable e) {
     Optional<ConnectionException> connectionException = extractConnectionException(e);

@@ -94,8 +94,11 @@ public final class ErrorBuilder {
   }
 
   /**
-   * Given a {@link MuleException}, sets the <code>description</code> field with the message of it's root cause, taking into account possible suppressions.
-   * @param muleException (must be the result of a {@link org.mule.runtime.api.exception.ExceptionHelper#getRootMuleException(Throwable)} call.
+   * Given a {@link MuleException}, sets the <code>description</code> field with the message of it's root cause, taking into
+   * account possible suppressions.
+   * 
+   * @param muleException (must be the result of a
+   *                      {@link org.mule.runtime.api.exception.ExceptionHelper#getRootMuleException(Throwable)} call.
    */
   private void updateErrorDescription(MuleException muleException) {
     MuleException muleRoot = muleException;
@@ -110,7 +113,9 @@ public final class ErrorBuilder {
   }
 
   /**
-   * Assigns to the <code>suppressedErrors</code> field all the {@link Error} instances that the given {@link MuleException} inform as suppressed.
+   * Assigns to the <code>suppressedErrors</code> field all the {@link Error} instances that the given {@link MuleException}
+   * inform as suppressed.
+   * 
    * @param muleException Given {@link MuleException}.
    * @see SuppressedMuleException
    */
@@ -162,7 +167,7 @@ public final class ErrorBuilder {
   }
 
   /**
-   *  Sets the description of the error.
+   * Sets the description of the error.
    *
    * The description if meant to be a short text that describes the error and should not contain any java specific detail.
    *
@@ -230,8 +235,8 @@ public final class ErrorBuilder {
   /**
    * Sets the child errors, if any.
    *
-   * This errors represent the failures that caused the error being created. For instance, a scatter gather may aggregate all routes
-   * and fail when any do, making the route errors available in this list.
+   * This errors represent the failures that caused the error being created. For instance, a scatter gather may aggregate all
+   * routes and fail when any do, making the route errors available in this list.
    *
    * @param errors a list of errors that caused this one
    * @return {@code this} builder

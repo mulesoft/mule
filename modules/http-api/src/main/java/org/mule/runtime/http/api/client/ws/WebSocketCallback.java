@@ -29,8 +29,8 @@ public interface WebSocketCallback {
   void onConnect(WebSocket webSocket);
 
   /**
-   * Invoked then the given {@code webSocket} is closed. This method will be invoked whether the socket was
-   * closed locally or remotely.
+   * Invoked then the given {@code webSocket} is closed. This method will be invoked whether the socket was closed locally or
+   * remotely.
    *
    * @param webSocket the closed {@link WebSocket}
    * @param code      the close code used

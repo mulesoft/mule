@@ -24,15 +24,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Represents a configurable lifecycle phase. This is a default implementation of a 'generic phase' in that is can be configured
- * to represents any phase. Instances of this phase can then be registered with a
- * {@link LifecycleManager} and by used to enforce a lifecycle phase on an object. Usually,
- * Lifecycle phases have a fixed configuration in which case a specialisation of this class should be created that initialises its
- * configuration internally.
+ * to represents any phase. Instances of this phase can then be registered with a {@link LifecycleManager} and by used to enforce
+ * a lifecycle phase on an object. Usually, Lifecycle phases have a fixed configuration in which case a specialisation of this
+ * class should be created that initialises its configuration internally.
  * <p>
- * Note that this class and {@link LifecycleTransitionResult} both make assumptions about the
- * interfaces used - the return values and exceptions. These are, currently, that the return value is either void or
- * {@link LifecycleTransitionResult} and either 0 or 1 exceptions can be thrown which are
- * either {@link InstantiationException} or {@link LifecycleException}.
+ * Note that this class and {@link LifecycleTransitionResult} both make assumptions about the interfaces used - the return values
+ * and exceptions. These are, currently, that the return value is either void or {@link LifecycleTransitionResult} and either 0 or
+ * 1 exceptions can be thrown which are either {@link InstantiationException} or {@link LifecycleException}.
  *
  * @see LifecyclePhase
  */

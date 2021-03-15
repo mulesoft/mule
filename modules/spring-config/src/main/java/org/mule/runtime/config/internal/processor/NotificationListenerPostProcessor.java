@@ -14,8 +14,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
- * A {@link BeanPostProcessor} which registers {@link NotificationListener} objects into the
- * {@link ServerNotificationManager}
+ * A {@link BeanPostProcessor} which registers {@link NotificationListener} objects into the {@link ServerNotificationManager}
  *
  * @since 3.7.0
  */

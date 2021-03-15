@@ -140,10 +140,12 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
     assertAllNumbersAdoptedExactlyOnce();
   }
 
-  /* This test checks that when a polling source with a fixed frequency scheduler with start delay is restarted, the
-  start delay is not applied again. The polling source of this test is set to fail midway through populating the pet
-  adoption list, which will provoke a restart. Without the changes made in MULE-16974, this test would fail, because the
-  start delay would be re-applied on the restart and the probe would timeout. */
+  /*
+   * This test checks that when a polling source with a fixed frequency scheduler with start delay is restarted, the start delay
+   * is not applied again. The polling source of this test is set to fail midway through populating the pet adoption list, which
+   * will provoke a restart. Without the changes made in MULE-16974, this test would fail, because the start delay would be
+   * re-applied on the restart and the probe would timeout.
+   */
   @Test
   public void whenReconnectingAfterConnectionExceptionSchedulerRunsWithoutStartDelay() throws Exception {
     startFlow("fixedFrequencyReconnectingPoll");

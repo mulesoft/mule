@@ -97,9 +97,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   private static Field LIFECYCLE_EXCEPTION_COMPONENT_FIELD;
 
   /**
-   * This is stored in order to clean the field in case a {@link LifecycleException} is thrown by the {@link MuleContext}s creation.
-   * Since the component keeps a reference to the {@link MuleContext}, and JUnit stores all thrown exceptions, if there are multiple failures
-   * with this cause in a row, it will cause an OOM Exception.
+   * This is stored in order to clean the field in case a {@link LifecycleException} is thrown by the {@link MuleContext}s
+   * creation. Since the component keeps a reference to the {@link MuleContext}, and JUnit stores all thrown exceptions, if there
+   * are multiple failures with this cause in a row, it will cause an OOM Exception.
    */
   static {
     try {
@@ -204,7 +204,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
       doSetUp();
     } catch (LifecycleException e) {
-      //Set to null in order to clean references to the muleContext and avoid OOM errors.
+      // Set to null in order to clean references to the muleContext and avoid OOM errors.
       if (LIFECYCLE_EXCEPTION_COMPONENT_FIELD != null) {
         LIFECYCLE_EXCEPTION_COMPONENT_FIELD.set(e, null);
       }
@@ -538,7 +538,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * Uses {@link org.mule.runtime.api.transformation.TransformationService} to get representation of a message for a given
    * {@link DataType}
    *
-   * @param message message to get payload from
+   * @param message  message to get payload from
    * @param dataType dataType to be transformed to
    * @return representation of the message payload of the required dataType
    * @throws Exception if there is an unexpected error obtaining the payload representation
@@ -552,7 +552,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * {@link Class}
    *
    * @param message message to get payload from
-   * @param clazz type of the payload to be transformed to
+   * @param clazz   type of the payload to be transformed to
    * @return representation of the message payload of the required class
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */

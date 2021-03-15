@@ -24,7 +24,7 @@ public class Policy {
    * Creates a new {@code ParameterizedPolicy}.
    *
    * @param policyChain the chain of {@link org.mule.runtime.core.api.processor.Processor}s to be applied.
-   * @param policyId unique id of this policy.
+   * @param policyId    unique id of this policy.
    */
   public Policy(PolicyChain policyChain, String policyId) {
     this.policyChain = policyChain;

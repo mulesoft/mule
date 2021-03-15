@@ -180,7 +180,7 @@ public final class ArtifactContextConfiguration {
 
     /**
      * @param artifactType the type of the artifact. The artifact type restricts the functionality available in the artifact
-     *        context.
+     *                     context.
      * @return {@code this} builder
      */
     public ArtifactContextConfigurationBuilder setArtifactType(ArtifactType artifactType) {
@@ -213,7 +213,7 @@ public final class ArtifactContextConfiguration {
 
     /**
      * @param serviceConfigurators list of {@link ServiceConfigurator} that register or override services in the
-     *        {@link MuleContext}.
+     *                             {@link MuleContext}.
      * @return {@code this} builder
      */
     public ArtifactContextConfigurationBuilder setServiceConfigurators(List<ServiceConfigurator> serviceConfigurators) {
@@ -232,7 +232,7 @@ public final class ArtifactContextConfiguration {
 
     /**
      * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-     *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+     *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
      * @return {@code this} builder
      *
      * @deprecated no longer used since 4.4, providers are resolved internally
@@ -244,7 +244,8 @@ public final class ArtifactContextConfiguration {
     }
 
     /**
-     * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize access on different deployable artifacts to the same resources.
+     * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize
+     *                           access on different deployable artifacts to the same resources.
      * @return the builder
      */
     public ArtifactContextConfigurationBuilder setRuntimeLockFactory(LockFactory runtimeLockFactory) {

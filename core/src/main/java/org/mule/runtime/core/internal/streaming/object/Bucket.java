@@ -41,8 +41,8 @@ public class Bucket<T> implements Serializable {
   }
 
   /**
-   * Obtains the value that was added at the given {@code index} through the {@link #add(Object)} method.
-   * If no such value was added, it will return an empty value.
+   * Obtains the value that was added at the given {@code index} through the {@link #add(Object)} method. If no such value was
+   * added, it will return an empty value.
    *
    * @param index the item's index
    * @return an {@link Optional} value

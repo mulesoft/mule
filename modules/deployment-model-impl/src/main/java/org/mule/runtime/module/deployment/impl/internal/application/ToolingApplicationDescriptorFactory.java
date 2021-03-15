@@ -17,8 +17,8 @@ import java.util.Optional;
 import java.util.Properties;
 
 /**
- * Implementation that allows to create an artifact descriptor for an application from an artifact folder but also
- * from a {@link MuleApplicationModel}.
+ * Implementation that allows to create an artifact descriptor for an application from an artifact folder but also from a
+ * {@link MuleApplicationModel}.
  * <p/>
  * It also provides a factory method to create the {@link MuleApplicationModel} from an artifact folder.
  *
@@ -31,7 +31,7 @@ public class ToolingApplicationDescriptorFactory extends ApplicationDescriptorFa
    * Creates an instance of the factory.
    *
    * @param artifactPluginDescriptorLoader {@link ArtifactPluginDescriptorLoader} to load the descriptor for plugins.
-   * @param descriptorLoaderRepository {@link DescriptorLoaderRepository} to get the descriptor loader implementation.
+   * @param descriptorLoaderRepository     {@link DescriptorLoaderRepository} to get the descriptor loader implementation.
    */
   public ToolingApplicationDescriptorFactory(
                                              ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,

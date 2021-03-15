@@ -22,9 +22,9 @@ public interface OperationExecutionFunction {
   /**
    * Executes the operation being intercepted by a policy.
    *
-   * @param parameters the set of parameters required to execute the function.
+   * @param parameters     the set of parameters required to execute the function.
    * @param operationEvent the event to use for executing the operation.
-   * @param callback a {@link ExecutorCallback} on which the operation result is to be notified on
+   * @param callback       a {@link ExecutorCallback} on which the operation result is to be notified on
    */
   void execute(Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback);
 

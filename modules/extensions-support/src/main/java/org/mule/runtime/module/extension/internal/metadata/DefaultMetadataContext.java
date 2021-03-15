@@ -19,8 +19,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Default immutable implementation of {@link MetadataContext}, it provides access to the extension configuration and
- * connection in the metadata fetch invocation.
+ * Default immutable implementation of {@link MetadataContext}, it provides access to the extension configuration and connection
+ * in the metadata fetch invocation.
  *
  * @since 4.0
  */
@@ -33,8 +33,8 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
    * Retrieves the configuration for the related component
    *
    * @param configurationSupplier Supplier of optional configurations
-   * @param connectionManager     {@link ConnectionManager} which is able to find a connection for the component using
-   *                              the {@param configInstance}
+   * @param connectionManager     {@link ConnectionManager} which is able to find a connection for the component using the
+   *                              {@param configInstance}
    * @param cache                 instance of the {@link MetadataCache} for this context
    * @param typeLoader            instance of a {@link ClassTypeLoader} in the context of this extension
    */

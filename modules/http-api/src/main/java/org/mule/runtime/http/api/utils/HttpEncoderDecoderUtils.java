@@ -99,7 +99,7 @@ public final class HttpEncoderDecoderUtils {
    * This is the inverse of {@link #encodeString(String, Charset)}.
    *
    * @param queryString the string to parse
-   * @param encoding {@link URLDecoder#decode(String, String)}.
+   * @param encoding    {@link URLDecoder#decode(String, String)}.
    * @return a map representation of the {@code queryString}
    */
   public static MultiMap<String, String> decodeUrlEncodedBody(String queryString, Charset encoding) {
@@ -127,7 +127,7 @@ public final class HttpEncoderDecoderUtils {
    * Decodes uri params from a request path
    *
    * @param pathWithUriParams path with uri param place holders
-   * @param requestPath request path
+   * @param requestPath       request path
    * @return a map with the uri params present in the request path with the values decoded.
    */
   public static Map<String, String> decodeUriParams(String pathWithUriParams, String requestPath) {
@@ -173,7 +173,7 @@ public final class HttpEncoderDecoderUtils {
    * This is the inverse of {@link #decodeUrlEncodedBody(String, Charset)}.
    *
    * @param parameters a map representation of the {@code queryString}
-   * @param encoding {@link URLDecoder#decode(String, String)}.
+   * @param encoding   {@link URLDecoder#decode(String, String)}.
    * @return the generated query string
    */
   public static String encodeString(Map parameters, Charset encoding) {
@@ -221,8 +221,8 @@ public final class HttpEncoderDecoderUtils {
   /**
    * Appends a query parameter to an URL that may or may not contain query parameters already.
    *
-   * @param url base URL to apply the new query parameter
-   * @param queryParamName query parameter name
+   * @param url             base URL to apply the new query parameter
+   * @param queryParamName  query parameter name
    * @param queryParamValue query parameter value
    * @return a new string with the query parameter appended
    */

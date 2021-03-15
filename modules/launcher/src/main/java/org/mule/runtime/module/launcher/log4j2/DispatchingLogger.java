@@ -40,16 +40,15 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
  * Suppose that class X is used in applications Y and Z. If X holds a static reference to a logger L, then all the log events are
- * going to be added into the context {@link LoggerContext} on which L fast first initialized,
- * regardless of which application generated the event.
+ * going to be added into the context {@link LoggerContext} on which L fast first initialized, regardless of which application
+ * generated the event.
  * <p/>
- * This class is a wrapper for {@link Logger} class which is capable of detecting that the log event
- * is being generated from an application which {@link LoggerContext} is different than L's, and
- * thus forward the event to the correct context.
+ * This class is a wrapper for {@link Logger} class which is capable of detecting that the log event is being generated from an
+ * application which {@link LoggerContext} is different than L's, and thus forward the event to the correct context.
  * <p/>
- * Because this class is a fix for issues in static loggers, it must not hold any reference to any {@link ClassLoader}
- * since otherwise that class loader would be GC unreachable. For that reason, it uses {@link #ownerClassLoaderHash} instead of
- * the real reference
+ * Because this class is a fix for issues in static loggers, it must not hold any reference to any {@link ClassLoader} since
+ * otherwise that class loader would be GC unreachable. For that reason, it uses {@link #ownerClassLoaderHash} instead of the real
+ * reference
  *
  * @since 3.6.0
  */
@@ -104,7 +103,8 @@ abstract class DispatchingLogger extends Logger {
           try {
             logger = resolveLogger(resolvedCtxClassLoader);
           } catch (RecursiveLoggerContextInstantiationException rle) {
-            // The required Logger is already under construction by a previous resolveLogger call. Falling back to container classloader.
+            // The required Logger is already under construction by a previous resolveLogger call. Falling back to container
+            // classloader.
             return resolveLogger(this.getClass().getClassLoader());
           }
           loggerReference.set(logger);
@@ -136,7 +136,7 @@ abstract class DispatchingLogger extends Logger {
   /**
    * @param currentClassLoader execution classloader of the logging operation
    * @return true if the logger context associated with this instance must be used for logging, false if we still need to continue
-   * searching for the right logger context
+   *         searching for the right logger context
    */
   private boolean useThisLoggerContextClassLoader(ClassLoader currentClassLoader) {
     return currentClassLoader.hashCode() == ownerClassLoaderHash;

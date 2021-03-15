@@ -27,7 +27,7 @@ public interface CursorComponentDecoratorFactory {
    * Ref: {@link PayloadStatistics#incrementInvocationCount()}.
    *
    * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
-   *        measured volume to a specific execution.
+   *                      measured volume to a specific execution.
    */
   void incrementInvocationCount(String correlationId);
 
@@ -36,9 +36,9 @@ public interface CursorComponentDecoratorFactory {
    * <p>
    * Ref: {@link PayloadStatistics#getInputObjectCount()}.
    *
-   * @param decorated the {@link Collection} to decorate.
+   * @param decorated     the {@link Collection} to decorate.
    * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
-   *        measured volume to a specific execution.
+   *                      measured volume to a specific execution.
    * @return the decorated {@link Collection}.
    */
   <T> Collection<T> decorateInput(Collection<T> decorated, String correlationId);
@@ -48,9 +48,9 @@ public interface CursorComponentDecoratorFactory {
    * <p>
    * Ref: {@link PayloadStatistics#getInputObjectCount()}.
    *
-   * @param decorated the {@link Iterator} to decorate.
+   * @param decorated     the {@link Iterator} to decorate.
    * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
-   *        measured volume to a specific execution.
+   *                      measured volume to a specific execution.
    * @return the decorated {@link Iterator}.
    */
   <T> Iterator<T> decorateInput(Iterator<T> decorated, String correlationId);
@@ -60,9 +60,9 @@ public interface CursorComponentDecoratorFactory {
    * <p>
    * Ref: {@link PayloadStatistics#getInputByteCount()}.
    *
-   * @param decorated the {@link InputStream} to decorate.
+   * @param decorated     the {@link InputStream} to decorate.
    * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
-   *        measured volume to a specific execution.
+   *                      measured volume to a specific execution.
    * @return the decorated {@link InputStream}.
    */
   InputStream decorateInput(InputStream decorated, String correlationId);
@@ -72,9 +72,9 @@ public interface CursorComponentDecoratorFactory {
    * <p>
    * Ref: {@link PayloadStatistics#getInputByteCount()}.
    *
-   * @param decorated the {@link CursorStream} to decorate.
+   * @param decorated     the {@link CursorStream} to decorate.
    * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
-   *        measured volume to a specific execution.
+   *                      measured volume to a specific execution.
    * @return the decorated {@link CursorStream}.
    */
   CursorStream decorateInput(CursorStream decorated, String correlationId);
@@ -87,9 +87,9 @@ public interface CursorComponentDecoratorFactory {
    * <p>
    * Ref: {@link PayloadStatistics#getOutputObjectCount()}.
    *
-   * @param decorated the {@link PagingProvider} to decorate.
+   * @param decorated     the {@link PagingProvider} to decorate.
    * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
-   *        measured volume to a specific execution.
+   *                      measured volume to a specific execution.
    * @return the decorated {@link PagingProvider}.
    */
   <C, T> PagingProvider<C, T> decorateOutput(PagingProvider<C, T> decorated, String correlationId);
@@ -102,9 +102,9 @@ public interface CursorComponentDecoratorFactory {
    * <p>
    * Ref: {@link PayloadStatistics#getOutputObjectCount()}.
    *
-   * @param decorated the {@link Iterator} to decorate.
+   * @param decorated     the {@link Iterator} to decorate.
    * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
-   *        measured volume to a specific execution.
+   *                      measured volume to a specific execution.
    * @return the decorated {@link Iterator}.
    */
   <T> Iterator<T> decorateOutput(Iterator<T> decorated, String correlationId);
@@ -114,9 +114,9 @@ public interface CursorComponentDecoratorFactory {
    * <p>
    * Ref: {@link PayloadStatistics#getOutputByteCount()}.
    *
-   * @param decorated the {@link InputStream} to decorate.
+   * @param decorated     the {@link InputStream} to decorate.
    * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
-   *        measured volume to a specific execution.
+   *                      measured volume to a specific execution.
    * @return the decorated {@link InputStream}.
    */
   InputStream decorateOutput(InputStream decorated, String correlationId);
@@ -126,9 +126,9 @@ public interface CursorComponentDecoratorFactory {
    * <p>
    * Ref: {@link PayloadStatistics#getOutputByteCount()}.
    *
-   * @param decorated the {@link CursorStream} to decorate.
+   * @param decorated     the {@link CursorStream} to decorate.
    * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
-   *        measured volume to a specific execution.
+   *                      measured volume to a specific execution.
    * @return the decorated {@link CursorStream}.
    */
   CursorStream decorateOutput(CursorStream decorated, String correlationId);
@@ -139,9 +139,9 @@ public interface CursorComponentDecoratorFactory {
    * <p>
    * Ref: {@link PayloadStatistics#getOutputByteCount()}, {@link PayloadStatistics#getOutputObjectCount()}.
    *
-   * @param decorated the {@link Collection} to decorate along with its elements.
+   * @param decorated     the {@link Collection} to decorate along with its elements.
    * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
-   *        measured volume to a specific execution.
+   *                      measured volume to a specific execution.
    * @return the decorated {@link Collection} with the decorated elements.
    */
   <T> Collection<T> decorateOutputCollection(Collection<T> decorated, String correlationId);
@@ -152,9 +152,9 @@ public interface CursorComponentDecoratorFactory {
    * <p>
    * Ref: {@link PayloadStatistics#getOutputByteCount()}, {@link PayloadStatistics#getOutputObjectCount()}.
    *
-   * @param decorated the {@link Iterator} to decorate along with its elements.
+   * @param decorated     the {@link Iterator} to decorate along with its elements.
    * @param correlationId information to be used in the case a detailed report needs to be obtained, allowing to match the
-   *        measured volume to a specific execution.
+   *                      measured volume to a specific execution.
    * @return the decorated {@link Iterator} with the decorated elements.
    */
   <T> Iterator<T> decorateOutputIterator(Iterator<T> decorated, String correlationId);

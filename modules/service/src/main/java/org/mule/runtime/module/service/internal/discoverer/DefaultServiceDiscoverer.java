@@ -34,7 +34,7 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
    * Creates a new instance.
    *
    * @param serviceProviderDiscoverer discovers available service providers. Non null.
-   * @param serviceResolver resolves dependencies on the discovered service providers. Non null.
+   * @param serviceResolver           resolves dependencies on the discovered service providers. Non null.
    */
   public DefaultServiceDiscoverer(ServiceProviderDiscoverer serviceProviderDiscoverer, ServiceResolver serviceResolver) {
     checkArgument(serviceProviderDiscoverer != null, "serviceProviderDiscoverer cannot be null");

@@ -240,8 +240,8 @@ public final class XmlExtensionLoaderDelegate {
 
   /**
    * @param modulePath      relative path to a file that will be loaded from the current {@link ClassLoader}. Non null.
-   * @param validateXml     true if the XML of the Smart Connector must ve valid, false otherwise. It will be false at runtime, as the
-   *                        packaging of a connector will previously validate it's XML.
+   * @param validateXml     true if the XML of the Smart Connector must ve valid, false otherwise. It will be false at runtime, as
+   *                        the packaging of a connector will previously validate it's XML.
    * @param declarationPath relative path to a file that contains the {@link MetadataType}s of all <operations/>.
    * @param resourcesPaths  set of resources that will be exported in the {@link ExtensionModel}
    */
@@ -650,7 +650,7 @@ public final class XmlExtensionLoaderDelegate {
    * Calculates all the used namespaces of the given <module/> leaving behind the (possible) cyclic reference if there are
    * {@link MacroExpansionModuleModel#TNS_PREFIX} references by removing the current namespace generation.
    *
-   * @param moduleAst AST of the <module/>
+   * @param moduleAst   AST of the <module/>
    * @param xmlDslModel the {@link XmlDslModel} for the current {@link ExtensionModel} generation
    * @return a {@link XmlExtensionModelProperty} which contains all the namespaces dependencies. Among them could be dependencies
    *         that must be macro expanded and others which might not.
@@ -778,10 +778,11 @@ public final class XmlExtensionLoaderDelegate {
    * <property/> that has been placed within a <connection/> wrapper in the <module/> element.
    *
    * @param configurationDeclarer        declarer to add the {@link ConnectionProviderDeclarer} if applies.
-   * @param connectionProperties         collection of <property/>s that should be added to the {@link ConnectionProviderDeclarer}.
+   * @param connectionProperties         collection of <property/>s that should be added to the
+   *                                     {@link ConnectionProviderDeclarer}.
    * @param globalElementsComponentModel collection of global elements where through
-   *                                     {@link #getTestConnectionGlobalElement(ConfigurationDeclarer, List, Set)} will look for one that supports test
-   *                                     connectivity.
+   *                                     {@link #getTestConnectionGlobalElement(ConfigurationDeclarer, List, Set)} will look for
+   *                                     one that supports test connectivity.
    */
   private void addConnectionProvider(ConfigurationDeclarer configurationDeclarer,
                                      List<ComponentAst> connectionProperties,
@@ -1028,7 +1029,7 @@ public final class XmlExtensionLoaderDelegate {
    * </ul>
    *
    * @param parameterizedDeclarer builder to declare the {@link ParameterDeclarer}
-   * @param param attributes to consume the values from
+   * @param param                 attributes to consume the values from
    * @return the {@link ParameterDeclarer}, being created as required or optional with a default value if applies.
    */
   private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, ComponentAst param) {

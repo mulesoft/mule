@@ -27,9 +27,9 @@ public class ExtensionTransactionalResource<T extends TransactionalConnection> i
   /**
    * Creates a new instance
    *
-   * @param connection the connection
+   * @param connection        the connection
    * @param connectionHandler the {@link ConnectionHandler} for the {@code connection}
-   * @param transaction the bound {@link Transaction}
+   * @param transaction       the bound {@link Transaction}
    */
   public ExtensionTransactionalResource(T connection, ConnectionHandler<T> connectionHandler, Transaction transaction) {
     this.connection = connection;

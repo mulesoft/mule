@@ -340,7 +340,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
               return REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
             }
 
-            // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
+            // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like
+            // in
             // an async, for instance)
             ((BaseEventContext) event.getContext()).onResponse(queuedDecrementCallback);
           } else {

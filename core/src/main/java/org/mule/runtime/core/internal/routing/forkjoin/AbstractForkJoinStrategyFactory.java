@@ -125,7 +125,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
    * Template method to be implemented by implementations that defines how the list of result {@link CoreEvent}'s should be
    * aggregated into a result {@link CoreEvent}
    *
-   * @param original the original event
+   * @param original      the original event
    * @param resultBuilder a result builder with the current state of result event builder including flow variable
    * @return the result event
    */

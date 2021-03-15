@@ -28,7 +28,7 @@ public class MapConfigurationPropertiesProvider implements ConfigurationProperti
   /**
    * Creates a new instance
    *
-   * @param properties map with properties to use.
+   * @param properties  map with properties to use.
    * @param description the description of the provider.
    */
   public MapConfigurationPropertiesProvider(Map<String, String> properties, String description) {

@@ -22,7 +22,7 @@ public interface OutputHandler {
    * written to the stream here too.
    * 
    * @param event the current event
-   * @param out the output stream to write to
+   * @param out   the output stream to write to
    * @throws IOException in case of error
    */
   void write(CoreEvent event, OutputStream out) throws IOException;

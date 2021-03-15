@@ -63,7 +63,7 @@ public class SoapServiceProviderDeclarer {
     ConnectionProviderDeclarer providerDeclarer = configDeclarer.withConnectionProvider(provider.getAlias())
         .describedAs(description)
         .withModelProperty(new ConnectionTypeModelProperty(ForwardingSoapClient.class))
-        //TODO - MULE-14311 - Make loader work in compile time
+        // TODO - MULE-14311 - Make loader work in compile time
         .withModelProperty(new ImplementingTypeModelProperty(provider.getDeclaringClass().get()))
         .withConnectionManagementType(POOLING)
         .supportsConnectivityTesting(provider.supportsConnectivityTesting());

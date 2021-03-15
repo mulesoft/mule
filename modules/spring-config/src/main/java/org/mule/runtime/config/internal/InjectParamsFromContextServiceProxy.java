@@ -52,7 +52,7 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
   /**
    * Creates a new proxy for the provided service instance.
    *
-   * @param service service instance to wrap. Non null.
+   * @param service  service instance to wrap. Non null.
    * @param registry the {@link Registry} to use for resolving injectable parameters. Non null.
    */
   public InjectParamsFromContextServiceProxy(Service service, Registry registry) {
@@ -134,7 +134,7 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
   /**
    * Creates a proxy for the provided service instance.
    *
-   * @param service service to wrap. Non null.
+   * @param service  service to wrap. Non null.
    * @param registry the {@link Registry} to use for resolving injectable parameters. Non null.
    * @return a new proxy instance.
    */

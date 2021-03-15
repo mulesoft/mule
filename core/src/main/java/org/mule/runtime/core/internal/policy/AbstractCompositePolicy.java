@@ -39,7 +39,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer> {
   /**
    * Creates a new composite policy.
    *
-   * @param policies list of {@link Policy} to chain together.
+   * @param policies              list of {@link Policy} to chain together.
    * @param parametersTransformer transformer from the operation parameters to a message and vice versa.
    */
   public AbstractCompositePolicy(List<Policy> policies,
@@ -99,10 +99,10 @@ public abstract class AbstractCompositePolicy<ParametersTransformer> {
   /**
    * Template method for executing a policy.
    *
-   * @param policy the policy to execute
+   * @param policy        the policy to execute
    * @param nextProcessor the next processor to use as the {@link PolicyNextActionMessageProcessor}. It will invoke the next
-   *        policy in the chain.
-   * @param eventPub the event to use for processing the policy.
+   *                      policy in the chain.
+   * @param eventPub      the event to use for processing the policy.
    * @return the result to use for the next policy in the chain.
    * @throws Exception if the execution of the policy fails.
    */

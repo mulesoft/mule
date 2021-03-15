@@ -37,9 +37,8 @@ import javax.xml.namespace.QName;
 import org.reactivestreams.Publisher;
 
 /**
- * An {@link ValueResolver} which wraps the given {@link Processor} in a {@link Chain},
- * using the event of the current {@link ValueResolvingContext}.
- * This resolver returns new instances per every invocation
+ * An {@link ValueResolver} which wraps the given {@link Processor} in a {@link Chain}, using the event of the current
+ * {@link ValueResolvingContext}. This resolver returns new instances per every invocation
  *
  * @since 4.0
  */
@@ -61,7 +60,7 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
    * Creates a resolver for a new chain executor with the give {@code processors}, tying the lifecycle of that chain to the
    * lifecycle of the provided {@code muleContext}.
    *
-   * @param ctx the context to tie the lifecycle of the chain to be created to
+   * @param ctx        the context to tie the lifecycle of the chain to be created to
    * @param processors the processors that will be part of the chain to create an executor for
    */
   public ProcessorChainValueResolver(MuleContext ctx, List<Processor> processors) {

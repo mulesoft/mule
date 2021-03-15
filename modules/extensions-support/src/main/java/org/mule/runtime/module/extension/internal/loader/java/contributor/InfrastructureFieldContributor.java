@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * {@link ParameterDeclarerContributor} implementation which given a {@link ExtensionParameter} which their type
- * is one of the considered as an Infrastructure Type ({@link InfrastructureTypeMapping}) changes the
- * {@link ExpressionSupport} to {@link ExpressionSupport#NOT_SUPPORTED} and adds {@link InfrastructureParameterModelProperty}
+ * {@link ParameterDeclarerContributor} implementation which given a {@link ExtensionParameter} which their type is one of the
+ * considered as an Infrastructure Type ({@link InfrastructureTypeMapping}) changes the {@link ExpressionSupport} to
+ * {@link ExpressionSupport#NOT_SUPPORTED} and adds {@link InfrastructureParameterModelProperty}
  *
  * @since 4.0
  */

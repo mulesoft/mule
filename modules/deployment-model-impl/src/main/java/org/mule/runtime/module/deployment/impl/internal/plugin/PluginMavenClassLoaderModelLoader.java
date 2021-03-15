@@ -75,14 +75,16 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
       return super.createClassLoaderModel(artifactFile, attributes, artifactType);
     }
 
-    // If it is a lightweight which uses the local repository a class-loader-model.json may be present in the META-INF/mule-artifact
+    // If it is a lightweight which uses the local repository a class-loader-model.json may be present in the
+    // META-INF/mule-artifact
     if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
       PluginExtendedClassLoaderModelAttributes pluginExtendedClassLoaderModelAttributes =
           (PluginExtendedClassLoaderModelAttributes) attributes;
       BundleDescriptor pluginBundleDescriptor =
           (BundleDescriptor) pluginExtendedClassLoaderModelAttributes.get(BundleDescriptor.class.getName());
       File rootFolder = pluginExtendedClassLoaderModelAttributes.getDeployableArtifactDescriptor().getRootFolder();
-      // mule-plugin has been found as a dependency from another mule-plugin and not present in the deployable dependency graph (system scope dependencies)
+      // mule-plugin has been found as a dependency from another mule-plugin and not present in the deployable dependency graph
+      // (system scope dependencies)
       if (rootFolder != null) {
         File muleArtifactJson =
             new File(rootFolder.getAbsolutePath(), getPathForMuleArtifactJson(pluginBundleDescriptor));

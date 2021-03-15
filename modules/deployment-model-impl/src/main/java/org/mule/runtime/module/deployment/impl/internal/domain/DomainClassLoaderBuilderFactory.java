@@ -23,8 +23,8 @@ public class DomainClassLoaderBuilderFactory {
   /**
    * Creates an {@code DomainClassLoaderBuilderFactory} to create {@code DomainClassLoaderBuilder} instances.
    *
-   * @param parentClassLoader classloader that will be the parent of the created classloaders. Non null
-   * @param domainClassLoaderFactory factory for the class loader of the artifact resources and classes
+   * @param parentClassLoader         classloader that will be the parent of the created classloaders. Non null
+   * @param domainClassLoaderFactory  factory for the class loader of the artifact resources and classes
    * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the domain's region. Non null
    */
   public DomainClassLoaderBuilderFactory(ArtifactClassLoader parentClassLoader,

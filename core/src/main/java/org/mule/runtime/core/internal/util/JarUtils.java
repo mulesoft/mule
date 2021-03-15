@@ -56,7 +56,7 @@ public final class JarUtils {
   /**
    * Loads the content of a file within a jar into a byte array.
    * 
-   * @param jarFile the jar file
+   * @param jarFile  the jar file
    * @param filePath the path to the file within the jar file
    * @return the content of the file as byte array or empty if the file does not exists within the jar file.
    * @throws IOException if there was a problem reading from the jar file.
@@ -64,8 +64,8 @@ public final class JarUtils {
   public static Optional<byte[]> loadFileContentFrom(File jarFile, String filePath) throws IOException {
     URL jsonDescriptorUrl = getUrlWithinJar(jarFile, filePath);
     /*
-     * A specific implementation of JarURLConnection is required to read jar content because not all implementations
-     * support ways to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
+     * A specific implementation of JarURLConnection is required to read jar content because not all implementations support ways
+     * to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
      */
     JarURLConnection jarConnection =
         new sun.net.www.protocol.jar.JarURLConnection(jsonDescriptorUrl, new sun.net.www.protocol.jar.Handler());
@@ -87,8 +87,8 @@ public final class JarUtils {
    */
   public static Optional<byte[]> loadFileContentFrom(URL jarFile) throws IOException {
     /*
-     * A specific implementation of JarURLConnection is required to read jar content because not all implementations
-     * support ways to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
+     * A specific implementation of JarURLConnection is required to read jar content because not all implementations support ways
+     * to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
      */
     JarURLConnection jarConnection =
         new sun.net.www.protocol.jar.JarURLConnection(jarFile, new sun.net.www.protocol.jar.Handler());
@@ -104,7 +104,7 @@ public final class JarUtils {
   /**
    * Creates an URL to a path within a jar file.
    *
-   * @param jarFile the jar file
+   * @param jarFile  the jar file
    * @param filePath the path within the jar file
    * @return an URL to the {@code filePath} within the {@code jarFile}
    * @throws MalformedURLException if the provided {@code filePath} is malformed
@@ -116,7 +116,7 @@ public final class JarUtils {
   /**
    * Gets all the URL of files within a directory
    * 
-   * @param file the jar file
+   * @param file      the jar file
    * @param directory the directory within the jar file
    * @return a collection of URLs to files within the directory {@code directory}. Empty collection if the directory does not
    *         exists or is empty.

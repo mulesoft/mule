@@ -124,7 +124,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
    *
    * @param artifactFile {@link File} where the current plugin to work with.
    * @param attributes   a set of attributes to work with, where the current implementation of this class will look for
-   *                     {@link ArtifactDescriptorConstants#EXPORTED_PACKAGES} and {@link ArtifactDescriptorConstants#EXPORTED_RESOURCES}
+   *                     {@link ArtifactDescriptorConstants#EXPORTED_PACKAGES} and
+   *                     {@link ArtifactDescriptorConstants#EXPORTED_RESOURCES}
    * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs.
    */
   @Override
@@ -487,7 +488,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
    * <p>
    * It let's implementations to add artifact specific URLs by letting them override
    * {@link #addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder)}
-   *  @param artifactFile            the artifact file for which the {@link ClassLoaderModel} is being generated.
+   * 
+   * @param artifactFile            the artifact file for which the {@link ClassLoaderModel} is being generated.
    * @param classLoaderModelBuilder the builder of the {@link ClassLoaderModel}
    * @param dependencies            the dependencies resolved for this artifact.
    * @param patches

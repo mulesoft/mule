@@ -94,7 +94,7 @@ public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPers
 
   @Override
   public Boolean shouldStart() {
-    //Getting and resetting variable
+    // Getting and resetting variable
     Boolean start = shouldStart.getAndSet(true);
     return start;
   }

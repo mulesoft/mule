@@ -21,9 +21,10 @@ public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements Polic
 
   /**
    * Creates a new factory instance
-   *  @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
-   *        null.
-   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the application's region. Non null
+   * 
+   * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
+   *                                   null.
+   * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the application's region. Non null
    */
   public ApplicationPolicyTemplateClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                                             RegionPluginClassLoadersFactory pluginClassLoadersFactory) {

@@ -29,7 +29,7 @@ public class ExpressionSplittingStrategy implements SplittingStrategy<CoreEvent,
    * Creates a new {@link ExpressionSplittingStrategy}
    * 
    * @param expressionManager expression manager to use to evaluate the expression
-   * @param expression the expression to use to split and get a collection of items
+   * @param expression        the expression to use to split and get a collection of items
    */
   public ExpressionSplittingStrategy(ExpressionManager expressionManager, String expression) {
     this.expressionManager = expressionManager;

@@ -80,7 +80,7 @@ public class MavenTestUtils {
 
     copyFile(artifactFile, new File(pathToArtifactLocationInRepo.toString(), artifactFile.getName()), true);
 
-    //Copy the pom without the classifier.
+    // Copy the pom without the classifier.
     String pomFileName = artifactFile.getName().replaceFirst("(.*\\.[0-9]*\\.[0-9]*\\.?[0-9]?).*", "$1") + ".pom";
     copyFile(pomModel.getPomFile(), new File(pathToArtifactLocationInRepo.toString(), pomFileName), true);
   }

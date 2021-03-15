@@ -21,9 +21,9 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A unique identifier for the values resolved by a {@link ValueProvider} associated with a given component.
- * The ValueProviderCacheId provides a unique hashed value for the resolved values of a value provider taking into consideration
- * all the relevant parts involved in the resolution mechanism.
+ * A unique identifier for the values resolved by a {@link ValueProvider} associated with a given component. The
+ * ValueProviderCacheId provides a unique hashed value for the resolved values of a value provider taking into consideration all
+ * the relevant parts involved in the resolution mechanism.
  *
  * A {@link ValueProviderCacheId} is expected to be immutable, except from it's attributes, which can be modified on any instance.
  * They are intended to add additional information regarding how the {@link ValueProviderCacheId} was generated, but will not

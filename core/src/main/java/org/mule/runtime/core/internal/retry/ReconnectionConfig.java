@@ -66,7 +66,7 @@ public class ReconnectionConfig extends AbstractComponent {
    *
    * @param delegate the {@link RetryPolicyTemplate} with the policy and configuration that should be finally applied
    * @return a {@link RetryPolicyTemplate} that is configured with the current deployment configuration, while using the
-   * delegate's RetryPolicy.
+   *         delegate's RetryPolicy.
    */
   public RetryPolicyTemplate getRetryPolicyTemplate(RetryPolicyTemplate delegate) {
     if (delegate == null) {
@@ -90,8 +90,8 @@ public class ReconnectionConfig extends AbstractComponent {
   }
 
   /**
-   * @return an {@link AsynchronousRetryTemplate} configured with the given {@code delegate}.
-   * This {@link RetryPolicyTemplate} will not block the execution while performing the retries.
+   * @return an {@link AsynchronousRetryTemplate} configured with the given {@code delegate}. This {@link RetryPolicyTemplate}
+   *         will not block the execution while performing the retries.
    */
   private RetryPolicyTemplate getAsyncTemplate(RetryPolicyTemplate delegate) {
     if (delegate instanceof AsynchronousRetryTemplate) {
@@ -101,8 +101,8 @@ public class ReconnectionConfig extends AbstractComponent {
   }
 
   /**
-   * @return a {@link RetryPolicyTemplate} configured with the given {@code delegate} policy, but
-   * blocking the execution while performing the retries.
+   * @return a {@link RetryPolicyTemplate} configured with the given {@code delegate} policy, but blocking the execution while
+   *         performing the retries.
    */
   private RetryPolicyTemplate getBlockingTemplate(RetryPolicyTemplate delegate) {
     if (delegate == null) {

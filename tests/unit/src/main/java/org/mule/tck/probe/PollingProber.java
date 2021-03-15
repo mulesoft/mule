@@ -29,8 +29,8 @@ public class PollingProber implements Prober {
   }
 
   /**
-   * Similar to {@link #check(long, long, CheckedSupplier)} only that this one is expecting for the probe condition
-   * to <b>NEVER</b> be met. If the condition is ever met, then an {@link AssertionError} is thrown
+   * Similar to {@link #check(long, long, CheckedSupplier)} only that this one is expecting for the probe condition to
+   * <b>NEVER</b> be met. If the condition is ever met, then an {@link AssertionError} is thrown
    */
   public static void checkNot(long timeoutMillis, long pollDelayMillis, CheckedSupplier<Boolean> probe) {
     try {

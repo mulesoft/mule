@@ -109,7 +109,7 @@ public interface MuleContext extends Lifecycle {
    * service invocations
    *
    * @param securityManager the security manager used by this Mule instance to authenticate and authorise incoming and outgoing
-   *        event traffic and service invocations
+   *                        event traffic and service invocations
    */
   void setSecurityManager(SecurityManager securityManager) throws InitialisationException;
 

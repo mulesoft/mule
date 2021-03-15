@@ -52,8 +52,8 @@ import java.util.function.Function;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
- * Metadata service delegate implementations that handles the resolution
- * of a {@link ComponentModel} {@link OutputMetadataDescriptor}
+ * Metadata service delegate implementations that handles the resolution of a {@link ComponentModel}
+ * {@link OutputMetadataDescriptor}
  *
  * @since 4.0
  */
@@ -74,8 +74,8 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * @param context current {@link MetadataContext} that will be used by the {@link InputTypeResolver}
    * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return Success with an {@link OutputMetadataDescriptor} representing the Component's output metadata, resolved using the
-   * {@link OutputTypeResolver} if one is available to resolve its {@link MetadataType}. Failure if the dynamic
-   * resolution fails for any reason.
+   *         {@link OutputTypeResolver} if one is available to resolve its {@link MetadataType}. Failure if the dynamic resolution
+   *         fails for any reason.
    */
   MetadataResult<OutputMetadataDescriptor> getOutputMetadataDescriptor(MetadataContext context, Object key) {
     if (!(model instanceof HasOutputModel)) {

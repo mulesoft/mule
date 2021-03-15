@@ -80,8 +80,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
   }
 
   /**
-   * If the target object implements {@link InjectedDependenciesProvider}, then the custom dependencies
-   * declared by it are added.
+   * If the target object implements {@link InjectedDependenciesProvider}, then the custom dependencies declared by it are added.
    */
   private void addDeclaredDependencies(Object object, Set<String> processedKeys,
                                        DependencyNode node) {

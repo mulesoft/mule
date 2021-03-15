@@ -11,8 +11,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 /**
- * A value resolver which returns the values of a {@link ConfigurationInstance} obtained through a
- * {@link ConfigurationProvider}
+ * A value resolver which returns the values of a {@link ConfigurationInstance} obtained through a {@link ConfigurationProvider}
  *
  * @param <T> the generic type of the resolved values
  * @since 4.1

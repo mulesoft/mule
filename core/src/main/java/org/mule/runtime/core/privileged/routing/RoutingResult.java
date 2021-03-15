@@ -19,8 +19,8 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import java.util.Map;
 
 /**
- * The result of routing an {@link CoreEvent} to {@code n} {@link MessageProcessorChain} routes, or {@code n}
- * {@link CoreEvent}'s to the same {@link MessageProcessorChain} route typically by using {@link ForkJoinStrategy}.
+ * The result of routing an {@link CoreEvent} to {@code n} {@link MessageProcessorChain} routes, or {@code n} {@link CoreEvent}'s
+ * to the same {@link MessageProcessorChain} route typically by using {@link ForkJoinStrategy}.
  * <p>
  * Results are indexed using the order of {@link RoutingPair} as defined by the router. With
  * {@link org.mule.runtime.core.internal.routing.ScatterGatherRouter} this is the order of routes as defined in configuration.

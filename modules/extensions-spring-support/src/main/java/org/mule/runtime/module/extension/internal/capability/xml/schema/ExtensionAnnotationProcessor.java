@@ -41,8 +41,8 @@ import java.util.Set;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * Annotation processing class that uses the {@link Processor} API to introspect and extract information from the extension
- * source code.
+ * Annotation processing class that uses the {@link Processor} API to introspect and extract information from the extension source
+ * code.
  *
  * @since 3.7.0
  */
@@ -66,7 +66,8 @@ public final class ExtensionAnnotationProcessor {
 
   /**
    * Returns the name of the class represented by the {@code typeElement}
-   * @param typeElement a {@link TypeElement}
+   * 
+   * @param typeElement           a {@link TypeElement}
    * @param processingEnvironment the {@link ProcessingEnvironment}
    * @return A class name
    */
@@ -155,9 +156,9 @@ public final class ExtensionAnnotationProcessor {
    * Traverses the arguments of {@code method} and for each argument annotated with {@link ParameterGroup} it invokes
    * {@link #getOperationParameterGroupDocumentation(TypeElement, Map, ProcessingEnvironment)}
    *
-   * @param env the current {@link ProcessingEnvironment}
+   * @param env    the current {@link ProcessingEnvironment}
    * @param method the operation method being processed
-   * @param docs a {@link Map} which keys are attribute names and values are their documentation
+   * @param docs   a {@link Map} which keys are attribute names and values are their documentation
    */
   private void parseOperationParameterGroups(ProcessingEnvironment env, ExecutableElement method, Map<String, String> docs) {
     for (VariableElement variable : method.getParameters()) {

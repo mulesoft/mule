@@ -75,7 +75,8 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
   }
 
   /**
-   * Adds a new dependency that will be visible only to the plugin defined by the groupId and artifactId of the {@link ArtifactPluginFileBuilder}.
+   * Adds a new dependency that will be visible only to the plugin defined by the groupId and artifactId of the
+   * {@link ArtifactPluginFileBuilder}.
    *
    * @param dependencyFileBuilder shared dependency.
    * @return the same builder instance

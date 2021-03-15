@@ -160,9 +160,9 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
    * If looks for the bean registered under {@code key}. If the returned bean is a prototype and {@code applyLifecycle} is
    * {@code true}, then the completed lifecycle phases are applied to the returning bean
    *
-   * @param key the key of the object you're looking for
+   * @param key            the key of the object you're looking for
    * @param applyLifecycle if lifecycle should be applied to the returned object. Passing {@code true} doesn't guarantee that the
-   *        lifecycle is applied
+   *                       lifecycle is applied
    * @return object or {@code null} if not found
    */
   @SuppressWarnings("unchecked")

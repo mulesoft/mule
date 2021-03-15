@@ -16,8 +16,8 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.reactivestreams.Publisher;
 
 /**
- * Strategy that defines how a set of {@link RoutingPair}'s each consisting of a {@link Processor} and {@link CoreEvent} will
- * be processed and a single result {@link CoreEvent} returned. This will normally be used for:
+ * Strategy that defines how a set of {@link RoutingPair}'s each consisting of a {@link Processor} and {@link CoreEvent} will be
+ * processed and a single result {@link CoreEvent} returned. This will normally be used for:
  * <ul>
  * <li>Routing {@code n} {@link CoreEvent}'s to the same {@link MessageProcessorChain}.
  * <li>Routing a single {@link CoreEvent} to {@code n} {@link MessageProcessorChain}'s.
@@ -39,7 +39,7 @@ public interface ForkJoinStrategy {
   /**
    * Processes {@code n} routing pairs and aggregates the result as defined in the strategy implementation.
    *
-   * @param original the original event
+   * @param original     the original event
    * @param routingPairs the routing pairs to be processed
    * @return the aggregated result of processing the routing pairs
    */

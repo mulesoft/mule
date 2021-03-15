@@ -54,11 +54,11 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
    * {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER} folder) to retrieve the plugin artifact locator.
    *
    * @param artifactFile {@link File} with the content of the artifact to work with. Non null
-   * @param attributes collection of attributes describing the loader. Non null.
+   * @param attributes   collection of attributes describing the loader. Non null.
    * @param artifactType the type of the artifact of the descriptor to be loaded.
    * @return a locator of the coordinates of the current plugin
    * @throws ArtifactDescriptorCreateException if the plugin is missing the {@link ArtifactPluginDescriptor#MULE_PLUGIN_POM} or
-   *         there's an issue while reading that file
+   *                                           there's an issue while reading that file
    */
   @Override
   public BundleDescriptor load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)

@@ -31,8 +31,8 @@ import java.util.function.Function;
  * Represents any data event occurring in the Mule environment. All data sent or received within the mule environment will be
  * passed between components as an Event.
  * <p>
- * Holds a Message payload and provides helper methods for obtaining the data in a format that the receiving Mule component understands. The
- * event can also maintain any number of properties that can be set and retrieved by Mule components.
+ * Holds a Message payload and provides helper methods for obtaining the data in a format that the receiving Mule component
+ * understands. The event can also maintain any number of properties that can be set and retrieved by Mule components.
  *
  * @see Message
  */
@@ -76,8 +76,7 @@ public interface CoreEvent extends Serializable, Event {
   }
 
   /**
-   * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is
-   * conserved.
+   * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is conserved.
    *
    * @param event existing event to use as a template to create builder instance
    * @return new builder instance.
@@ -89,8 +88,8 @@ public interface CoreEvent extends Serializable, Event {
   /**
    * Create new {@link Builder} based on an existing {@link CoreEvent} instance and and {@link EventContext}. A new
    * {@link EventContext} is used instead of the existing instance referenced by the existing {@link CoreEvent}. This builder
-   * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same
-   * {@link CoreEvent} needs a new context.
+   * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link CoreEvent}
+   * needs a new context.
    *
    * @param event   existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
@@ -149,8 +148,7 @@ public interface CoreEvent extends Serializable, Event {
     /**
      * Add a variable.
      * <p>
-     * This should be the preferred implementation when the value to be added is already held in the form of a
-     * {@link TypedValue}
+     * This should be the preferred implementation when the value to be added is already held in the form of a {@link TypedValue}
      *
      * @param key   the key of the variable to add.
      * @param value the value of the variable to add. {@code null} values are supported.

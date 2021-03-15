@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * {@link ParameterValueResolver} implementation for Object based components, like {@link Source sources}, configurations
- * and {@link ConnectionProvider connection providers}
+ * {@link ParameterValueResolver} implementation for Object based components, like {@link Source sources}, configurations and
+ * {@link ConnectionProvider connection providers}
  *
  * @since 4.0
  */

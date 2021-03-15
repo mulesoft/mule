@@ -38,8 +38,8 @@ public class BeanUtils {
   /**
    * Exception safe version of BeanUtils.populate()
    *
-   * @param object the object to set the properties on
-   * @param props the map of properties to set
+   * @param object      the object to set the properties on
+   * @param props       the map of properties to set
    * @param logWarnings whether exception warnings should be logged
    */
   public static void populateWithoutFail(Object object, Map props, boolean logWarnings) {
@@ -76,7 +76,7 @@ public class BeanUtils {
    * This will overlay a map of properties on a bean. This method will validate that all properties are available on the bean
    * before setting the properties
    *
-   * @param bean the bean on which to set the properties
+   * @param bean  the bean on which to set the properties
    * @param props a Map of properties to set on the bean
    * @throws IllegalAccessException
    * @throws InvocationTargetException

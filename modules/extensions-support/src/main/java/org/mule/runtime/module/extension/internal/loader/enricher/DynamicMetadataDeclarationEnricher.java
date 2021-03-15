@@ -85,7 +85,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
     @Override
     public void enrich(ExtensionLoadingContext extensionLoadingContext) {
       BaseDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-      //TODO MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
+      // TODO MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
       if (!isASTMode(declaration)) {
         Optional<ExtensionTypeDescriptorModelProperty> property =
             declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
@@ -369,7 +369,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
      * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty} if the parsedParameter is annotated
      * either as {@link MetadataKeyId} or {@link MetadataKeyPart}
      *
-     * @param element the method annotated parameter parsed
+     * @param element         the method annotated parameter parsed
      * @param baseDeclaration the {@link ParameterDeclarer} associated to the parsed parameter
      */
     private void parseMetadataKeyAnnotations(ExtensionParameter element, BaseDeclaration baseDeclaration,

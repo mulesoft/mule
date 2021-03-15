@@ -30,8 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A {@link ParameterGroupParser} which returns the values of the parameters in the group
- * as a {@link Map}
+ * A {@link ParameterGroupParser} which returns the values of the parameters in the group as a {@link Map}
  *
  * @since 4.0
  */

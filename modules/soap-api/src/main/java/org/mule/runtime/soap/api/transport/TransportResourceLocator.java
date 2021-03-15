@@ -10,8 +10,8 @@ import org.mule.runtime.soap.api.SoapService;
 import java.io.InputStream;
 
 /**
- * This interface acts as an additional layer of indirection between
- * a the WSDL fetching and the WSDL parsing by the {@link SoapService}.
+ * This interface acts as an additional layer of indirection between a the WSDL fetching and the WSDL parsing by the
+ * {@link SoapService}.
  * <p>
  * It enables the retrieval of WSDL and XSD documents that are protected somehow.
  *
@@ -20,8 +20,8 @@ import java.io.InputStream;
 public interface TransportResourceLocator {
 
   /**
-   * Given the external document url this method checks if the document can be retrieved by this
-   * {@link TransportResourceLocator} or not.
+   * Given the external document url this method checks if the document can be retrieved by this {@link TransportResourceLocator}
+   * or not.
    *
    * @param url the document's url
    * @return whether it can retrieve the document file or not.

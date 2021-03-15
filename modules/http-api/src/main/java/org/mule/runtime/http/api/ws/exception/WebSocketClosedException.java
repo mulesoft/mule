@@ -9,8 +9,8 @@ package org.mule.runtime.http.api.ws.exception;
 import org.mule.runtime.http.api.ws.WebSocket;
 
 /**
- * Specialization of {@link WebSocketRuntimeException} that indicates that the referred {@link WebSocket} has already been
- * closed and thus is not usable.
+ * Specialization of {@link WebSocketRuntimeException} that indicates that the referred {@link WebSocket} has already been closed
+ * and thus is not usable.
  *
  * @since 4.2.2
  */

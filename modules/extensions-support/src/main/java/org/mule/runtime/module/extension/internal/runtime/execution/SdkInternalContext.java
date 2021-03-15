@@ -66,7 +66,7 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
   /**
    * For a given location, this method has to always be called first, so the context for this location is properly initialized.
    *
-   * @param location the location of the operation that generated this context.
+   * @param location      the location of the operation that generated this context.
    * @param configuration the configuration of the operation.
    */
   public void setConfiguration(ComponentLocation location, String eventId,

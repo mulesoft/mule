@@ -29,8 +29,7 @@ import java.util.Optional;
 import javax.transaction.TransactionManager;
 
 /**
- * Helper class in charge of bind the Source connection to the current Transaction, if one is available.
- * Also, if the Transaction
+ * Helper class in charge of bind the Source connection to the current Transaction, if one is available. Also, if the Transaction
  *
  * @since 4.0
  */

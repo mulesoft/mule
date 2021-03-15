@@ -33,11 +33,11 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
   private boolean propagate = false;
   private boolean succeedIfNoLog = false;
 
-  //Flag to check if doLogException() was actually called. Since all the logic of the checkers is executed in that method,
-  //if it's not called, we will never fail, even if we should've.
+  // Flag to check if doLogException() was actually called. Since all the logic of the checkers is executed in that method,
+  // if it's not called, we will never fail, even if we should've.
   private boolean exceptionLogged = false;
 
-  //Flag to check if there was actually and exception handled.
+  // Flag to check if there was actually and exception handled.
   private boolean handledException = false;
 
   @Override

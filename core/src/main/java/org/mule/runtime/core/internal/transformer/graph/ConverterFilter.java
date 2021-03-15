@@ -20,8 +20,8 @@ public interface ConverterFilter {
    * Filters a list of converters
    *
    * @param converters converters to filter
-   * @param source source data type being resolved
-   * @param result result data type being resolved
+   * @param source     source data type being resolved
+   * @param result     result data type being resolved
    * @return a non null list of converters that match the specified criteria
    */
   public List<Converter> filter(List<Converter> converters, DataType source, DataType result);

@@ -18,8 +18,8 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import reactor.core.publisher.FluxSink;
 
 /**
- * Provides a unique {@link FluxSink} for each Thread in transactional context. In case of non-transactional context,
- * it delegates the request.
+ * Provides a unique {@link FluxSink} for each Thread in transactional context. In case of non-transactional context, it delegates
+ * the request.
  *
  * @param <T> the value type
  *

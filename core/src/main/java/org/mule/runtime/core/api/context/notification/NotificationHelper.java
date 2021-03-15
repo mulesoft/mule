@@ -33,11 +33,11 @@ public final class NotificationHelper {
    * Creates a new {@link NotificationHelper} that emits instances of {@code notificationClass} class.
    *
    * @param defaultNotificationHandler The {@link ServerNotificationHandler} to be used on notifications which don't relate to a
-   *        {@link CoreEvent}
-   * @param notificationClass The {@link Class} of the notifications to be fired by this helper
-   * @param dynamicNotifications If {@code true}, notifications will be fired directly to a {@link ServerNotificationHandler}
-   *        responsible to decide to emit it or not. If {@code false} the notification will be checked to be enable or not at
-   *        creation time
+   *                                   {@link CoreEvent}
+   * @param notificationClass          The {@link Class} of the notifications to be fired by this helper
+   * @param dynamicNotifications       If {@code true}, notifications will be fired directly to a
+   *                                   {@link ServerNotificationHandler} responsible to decide to emit it or not. If {@code false}
+   *                                   the notification will be checked to be enable or not at creation time
    */
   public NotificationHelper(ServerNotificationHandler defaultNotificationHandler,
                             Class<? extends Notification> notificationClass, boolean dynamicNotifications) {
@@ -60,9 +60,9 @@ public final class NotificationHelper {
    * to the given {@code event} and based on a {@link ComponentLocation}.
    *
    * @param source
-   * @param event a {@link CoreEvent}
+   * @param event    a {@link CoreEvent}
    * @param location the location of the component that generated the notification
-   * @param action the action code for the notification
+   * @param action   the action code for the notification
    */
   public void fireNotification(Component source, CoreEvent event, ComponentLocation location, int action) {
     try {

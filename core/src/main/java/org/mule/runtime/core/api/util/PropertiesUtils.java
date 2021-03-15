@@ -96,7 +96,7 @@ public final class PropertiesUtils {
   /**
    * Read in the properties from a properties file. The file may be on the file system or the classpath.
    *
-   * @param fileName - The name of the properties file
+   * @param fileName     - The name of the properties file
    * @param callingClass - The Class which is calling this method. This is used to determine the classpath.
    * @return a java.util.Properties object containing the properties.
    */
@@ -188,8 +188,8 @@ public final class PropertiesUtils {
    * Will create a map of properties where the names have a prefix Allows the callee to supply the target map so a comparator can
    * be set
    *
-   * @param props the source set of properties
-   * @param prefix the prefix to filter on
+   * @param props    the source set of properties
+   * @param prefix   the prefix to filter on
    * @param newProps return map containing the filtered list of properties or an empty map if no properties matched the prefix
    */
   public static void getPropertiesWithPrefix(Map props, String prefix, Map newProps) {
@@ -278,7 +278,7 @@ public final class PropertiesUtils {
    * Discovers properties files available on the given classloader.
    *
    * @param classLoader classloader used to find properties resources. Not null.
-   * @param resource resource to find. Not empty
+   * @param resource    resource to find. Not empty
    * @return a non null list of Properties
    * @throws IOException when a property file cannot be processed
    */

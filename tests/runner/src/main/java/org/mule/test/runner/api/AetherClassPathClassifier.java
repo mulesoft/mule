@@ -294,11 +294,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .map(pluginSharedLibDependency -> {
           try {
             return new ArtifactUrlClassification(ArtifactIdUtils
-                .toId(pluginSharedLibDependency.getArtifact()), pluginSharedLibDependency.getArtifact()
-                    .getArtifactId(), Lists.newArrayList(dependencyResolver
-                        .resolveArtifact(pluginSharedLibDependency.getArtifact(),
-                                         rootArtifactRemoteRepositories)
-                        .getArtifact().getFile().toURI().toURL()));
+                .toId(pluginSharedLibDependency.getArtifact()),
+                                                 pluginSharedLibDependency.getArtifact()
+                                                     .getArtifactId(),
+                                                 Lists.newArrayList(dependencyResolver
+                                                     .resolveArtifact(pluginSharedLibDependency.getArtifact(),
+                                                                      rootArtifactRemoteRepositories)
+                                                     .getArtifact().getFile().toURI().toURL()));
           } catch (Exception e) {
             throw new IllegalStateException("Error while resolving dependency '" + pluginSharedLibDependency
                 + "' as application shared lib", e);
@@ -401,11 +403,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           Artifact artifact = dependency.getArtifact();
           String artifactId = toId(artifact);
           return (!serviceUrlClassifications.stream()
-              // Services may have ended up with a highest version due to transitive dependencies... therefore comparing without version
+              // Services may have ended up with a highest version due to transitive dependencies... therefore comparing without
+              // version
               .anyMatch(artifactUrlClassification -> artifactUrlClassification.getArtifactId()
                   .equals(toVersionlessId(artifact)))
               && !pluginUrlClassifications.stream()
-                  // Plugins may have ended up with a highest version due to transitive dependencies... therefore comparing without version
+                  // Plugins may have ended up with a highest version due to transitive dependencies... therefore comparing
+                  // without version
                   .anyMatch(artifactUrlClassification -> artifactUrlClassification.getArtifactId()
                       .equals(toVersionlessId(artifact)))
               && !applicationSharedLibUrls.stream()
@@ -864,7 +868,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param classifier         of the artifact to be found
    * @param directDependencies the rootArtifact direct {@link Dependency}s
    * @return {@link Optional} {@link Dependency} to the dependency. Could be empty it if not present in the list of direct
-   * dependencies
+   *         dependencies
    */
   private Optional<Dependency> findDirectDependency(String groupId, String artifactId, Optional<String> classifier,
                                                     List<Dependency> directDependencies) {
@@ -934,7 +938,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param rootArtifact       {@link Artifact} that defines the current artifact that requested to build this class loaders
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @return {@link Dependency} representing the artifact if declared as direct dependency or rootArtifact if they match it or
-   * {@link Optional#EMPTY} if couldn't found the dependency.
+   *         {@link Optional#EMPTY} if couldn't found the dependency.
    * @throws {@link IllegalArgumentException} if artifactCoords are not in the expected format
    */
   private Optional<Dependency> discoverDependency(String artifactCoords, Artifact rootArtifact,
@@ -982,7 +986,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    *
    * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
    * @param directDependencies             {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
-   * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact @return {@link URL}s for application class loader
+   * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact @return {@link URL}s for
+   *                                       application class loader
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
    */
   private List<URL> buildTestRunnerUrlClassification(ClassPathClassifierContext context,
@@ -1202,8 +1207,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   /**
    * Finds the corresponding {@link URL} in class path grouped by folder {@link Map} for the given artifact {@link File}.
    *
-   * @param classpathFolders     a {@link Map} that has as entry the folder of the artifacts from class path and value a {@link List}
-   *                             with the artifacts (jar, tests.jar, etc).
+   * @param classpathFolders     a {@link Map} that has as entry the folder of the artifacts from class path and value a
+   *                             {@link List} with the artifacts (jar, tests.jar, etc).
    * @param artifactResolvedFile the {@link Artifact} resolved from the Maven dependencies and resolved as SNAPSHOT
    * @return {@link URL} for the artifact found in the class path or {@code null}
    */

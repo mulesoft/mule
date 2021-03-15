@@ -30,8 +30,8 @@ import org.slf4j.Logger;
 /**
  * {@link ConnectionManager} implementation which composes two {@link ConnectionManager} in a hierarchy manner.
  * <p>
- * If the this manager can't process a request with the {@link CompositeConnectionManager#childConnectionManager},
- * it will fallback to the {@link CompositeConnectionManager#parentConnectionManager}
+ * If the this manager can't process a request with the {@link CompositeConnectionManager#childConnectionManager}, it will
+ * fallback to the {@link CompositeConnectionManager#parentConnectionManager}
  *
  * @since 4.0
  */
@@ -46,8 +46,8 @@ public class CompositeConnectionManager implements ConnectionManager, Connection
    * Creates a new instance of {@link CompositeConnectionManager}
    *
    * @param childConnectionManager  {@link ConnectionManager} considered as the main one
-   * @param parentConnectionManager {@link ConnectionManager} considered as the secondary one, is a request
-   *                                can't be handled by the main {@link ConnectionManager}, this one will be used
+   * @param parentConnectionManager {@link ConnectionManager} considered as the secondary one, is a request can't be handled by
+   *                                the main {@link ConnectionManager}, this one will be used
    */
   public CompositeConnectionManager(ConnectionManagerAdapter childConnectionManager,
                                     ConnectionManagerAdapter parentConnectionManager) {

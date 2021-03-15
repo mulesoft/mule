@@ -268,7 +268,8 @@ public final class ParameterModelsLoaderDelegate {
                                                                  new ParameterGroupDescriptor(groupName, type,
                                                                                               groupParameter.getType()
                                                                                                   .asMetadataType(),
-                                                                                              //TODO: Eliminate dependency to Annotated Elements
+                                                                                              // TODO: Eliminate dependency to
+                                                                                              // Annotated Elements
                                                                                               groupParameter.getDeclaringElement()
                                                                                                   .orElse(null),
                                                                                               groupParameter)));

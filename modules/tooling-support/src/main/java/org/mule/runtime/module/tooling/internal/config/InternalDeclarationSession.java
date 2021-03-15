@@ -241,7 +241,7 @@ public class InternalDeclarationSession implements DeclarationSession {
 
   @Override
   public void dispose() {
-    //do nothing
+    // do nothing
   }
 
 }

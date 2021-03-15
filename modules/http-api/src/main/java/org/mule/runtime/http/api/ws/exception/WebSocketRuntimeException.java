@@ -18,9 +18,9 @@ import java.util.Optional;
 /**
  * Base class for {@link RuntimeException} implementations that refer to a specific {@link WebSocket}.
  * <p>
- * Because {@link WebSocket} is not {@link Serializable}, it is not guaranteed that the referred socket will
- * always be available, reason why the {@link #getWebSocket()} method returns an {@link Optional}. It will always be
- * possible however to recover the socket's ID.
+ * Because {@link WebSocket} is not {@link Serializable}, it is not guaranteed that the referred socket will always be available,
+ * reason why the {@link #getWebSocket()} method returns an {@link Optional}. It will always be possible however to recover the
+ * socket's ID.
  *
  * @since 4.2.2
  */

@@ -16,8 +16,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * An implementation of {@link ClientCredentialsState} which registers an {@link ClientCredentialsListener}
- * in order to get updated state when a refresh token operation is completed.
+ * An implementation of {@link ClientCredentialsState} which registers an {@link ClientCredentialsListener} in order to get
+ * updated state when a refresh token operation is completed.
  *
  * @since 4.2.1
  */

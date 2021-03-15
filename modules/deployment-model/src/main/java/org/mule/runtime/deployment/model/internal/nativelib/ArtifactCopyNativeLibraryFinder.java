@@ -41,7 +41,7 @@ public class ArtifactCopyNativeLibraryFinder implements NativeLibraryFinder {
    * Creates a new native library finder
    *
    * @param tempFolder folder where native lib files should be temporarily installed on each deployment.
-   * @param urls all the URLs that are included in the artifact classloader
+   * @param urls       all the URLs that are included in the artifact classloader
    */
   public ArtifactCopyNativeLibraryFinder(File tempFolder, URL[] urls) {
     this.urls = urls;

@@ -28,11 +28,12 @@ public interface ImplicitConnectionProviderFactory {
    * and {@code configurationModel}
    *
    * @param configName the name of the configuration that will own the returned {@link ConnectionProvider}
-   * @param event the {@link CoreEvent} that will be used to evaluate any default parameters that requires resolving an expression
-   * @param <T> the generic type of the connections that the returned provider produces
+   * @param event      the {@link CoreEvent} that will be used to evaluate any default parameters that requires resolving an
+   *                   expression
+   * @param <T>        the generic type of the connections that the returned provider produces
    * @return a {@link ConnectionProvider}
    * @throws IllegalArgumentException if the {@code extensionModel} doesn't have any {@link ConnectionProviderModel} which can be
-   *         used implicitly
+   *                                  used implicitly
    */
   <T> Pair<ConnectionProvider<T>, ResolverSetResult> createImplicitConnectionProvider(String configName, CoreEvent event);
 

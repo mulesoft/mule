@@ -52,8 +52,8 @@ public class ArtifactFactoryUtils {
    * Validates plugin licenses within the artifact.
    *
    * @param artifactClassLoader the classloader of the artifact
-   * @param artifactPlugins the list of plugins
-   * @param licenseValidator the license validator to use for validating the license
+   * @param artifactPlugins     the list of plugins
+   * @param licenseValidator    the license validator to use for validating the license
    */
   public static void validateArtifactLicense(ClassLoader artifactClassLoader, List<ArtifactPlugin> artifactPlugins,
                                              LicenseValidator licenseValidator) {
@@ -77,8 +77,8 @@ public class ArtifactFactoryUtils {
   }
 
   /**
-   * If the output of {@link #getMuleContext(DeployableArtifact)} over the given {@code artifact} is present, then consume it
-   * with the given {@code consumer}
+   * If the output of {@link #getMuleContext(DeployableArtifact)} over the given {@code artifact} is present, then consume it with
+   * the given {@code consumer}
    *
    * @param artifact an artifact
    * @param consumer a {@link MuleContext} {@link CheckedConsumer}

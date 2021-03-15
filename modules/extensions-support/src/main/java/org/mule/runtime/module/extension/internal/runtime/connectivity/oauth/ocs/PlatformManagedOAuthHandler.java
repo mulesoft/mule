@@ -50,7 +50,7 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
   /**
    * Returns a {@link PlatformManagedOAuthDancer} configured after the given {@code config}
    *
-   * @param config an {@link PlatformManagedOAuthConfig}
+   * @param config    an {@link PlatformManagedOAuthConfig}
    * @param listeners a list of {@link PlatformManagedOAuthStateListener listeners} to be registered into the dancer
    * @return a {@link PlatformManagedOAuthDancer}
    */
@@ -80,8 +80,8 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
   }
 
   /**
-   * Retrieves the {@link ResourceOwnerOAuthContext} for the given {@code config}. If no such context yet exists,
-   * then it performs the OAuth authorization and returns the resulting context.
+   * Retrieves the {@link ResourceOwnerOAuthContext} for the given {@code config}. If no such context yet exists, then it performs
+   * the OAuth authorization and returns the resulting context.
    *
    * @param config a {@link PlatformManagedOAuthConfig}
    * @return the {@link ResourceOwnerOAuthContext} for the given {@code config}.

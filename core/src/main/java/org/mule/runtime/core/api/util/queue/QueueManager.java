@@ -28,8 +28,8 @@ public interface QueueManager extends Startable, Stoppable {
   QueueSession getQueueSession();
 
   /**
-   * Sets the default {@link QueueConfiguration} for any created {@link Queue} for which a custom
-   * configuration hasn't been specified
+   * Sets the default {@link QueueConfiguration} for any created {@link Queue} for which a custom configuration hasn't been
+   * specified
    *
    * @param config an instance of {@link QueueConfiguration}
    */

@@ -391,7 +391,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private transient LazyValue<BindingContext> bindingContextBuilder =
         new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
 
-    //Needed for deserialization with kryo
+    // Needed for deserialization with kryo
     private InternalEventImplementation() {
       this.context = null;
       this.session = null;

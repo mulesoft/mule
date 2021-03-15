@@ -23,7 +23,7 @@ public class InMemoryCursorIteratorProviderFactory extends AbstractCursorIterato
   /**
    * Creates a new instance
    *
-   * @param config        the config for the generated providers
+   * @param config the config for the generated providers
    */
   public InMemoryCursorIteratorProviderFactory(InMemoryCursorIteratorConfig config, StreamingManager streamingManager) {
     super(streamingManager);

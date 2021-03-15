@@ -12,19 +12,19 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 /**
- * Contract for parameter declarer contributors, this contributors are injected in the declaration of
- * {@link ParameterModel}s to be able to enrich the models in declaring time.
+ * Contract for parameter declarer contributors, this contributors are injected in the declaration of {@link ParameterModel}s to
+ * be able to enrich the models in declaring time.
  *
  * @since 4.0
  */
 public interface ParameterDeclarerContributor {
 
   /**
-   * Given an {@link ExtensionParameter} describing the parameter it self and a {@link ParameterDeclarationContext}
-   * gives the chance to contribute to the {@link ParameterDeclarer}
+   * Given an {@link ExtensionParameter} describing the parameter it self and a {@link ParameterDeclarationContext} gives the
+   * chance to contribute to the {@link ParameterDeclarer}
    *
-   * @param parameter {@link ExtensionParameter} with introspected information of the Java parameter
-   * @param declarer declarer to be enriched
+   * @param parameter          {@link ExtensionParameter} with introspected information of the Java parameter
+   * @param declarer           declarer to be enriched
    * @param declarationContext context of the parameter to be declared
    */
   void contribute(ExtensionParameter parameter, ParameterDeclarer declarer, ParameterDeclarationContext declarationContext);

@@ -42,8 +42,8 @@ import java.util.Optional;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
- * Metadata service delegate implementations that handles the resolution
- * of a {@link ComponentModel} {@link InputMetadataDescriptor}
+ * Metadata service delegate implementations that handles the resolution of a {@link ComponentModel}
+ * {@link InputMetadataDescriptor}
  *
  * @since 4.0
  */
@@ -58,7 +58,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * static {@link MetadataType} and ignoring if any parameter has a dynamic type.
    *
    * @return A {@link List} containing a {@link MetadataResult} of {@link TypeMetadataDescriptor} for each input parameter using
-   * only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
+   *         only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
    */
   MetadataResult<InputMetadataDescriptor> getInputMetadataDescriptors(MetadataContext context, Object key) {
     InputMetadataDescriptor.InputMetadataDescriptorBuilder input = InputMetadataDescriptor.builder();
@@ -90,15 +90,15 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
   }
 
   /**
-   * Creates a {@link TypeMetadataDescriptor} representing the Component's Content metadata using the
-   * {@link InputTypeResolver}, if one is available to resolve the {@link MetadataType}. If no the Component has no Content
-   * parameter, then {@link Optional#empty()} is returned.
+   * Creates a {@link TypeMetadataDescriptor} representing the Component's Content metadata using the {@link InputTypeResolver},
+   * if one is available to resolve the {@link MetadataType}. If no the Component has no Content parameter, then
+   * {@link Optional#empty()} is returned.
    *
    * @param context current {@link MetadataContext} that will be used by the {@link InputTypeResolver}
    * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return Success with an {@link Optional} {@link TypeMetadataDescriptor} representing the Component's Content metadata,
-   * resolved using the {@link InputTypeResolver} if one is available to resolve its {@link MetadataType}, returning
-   * {@link Optional#empty()} if no Content parameter is present Failure if the dynamic resolution fails for any reason.
+   *         resolved using the {@link InputTypeResolver} if one is available to resolve its {@link MetadataType}, returning
+   *         {@link Optional#empty()} if no Content parameter is present Failure if the dynamic resolution fails for any reason.
    */
   private MetadataResult<ParameterMetadataDescriptor> getParameterMetadataDescriptor(ParameterModel parameter,
                                                                                      MetadataContext context, Object key) {

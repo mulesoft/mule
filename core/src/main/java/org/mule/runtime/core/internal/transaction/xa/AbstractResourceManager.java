@@ -107,7 +107,7 @@ public abstract class AbstractResourceManager {
         return waitForAllTxToStop(timeoutMSecs);
       case SHUTDOWN_MODE_ROLLBACK:
         throw new UnsupportedOperationException();
-        // return rollBackOrForward();
+      // return rollBackOrForward();
       case SHUTDOWN_MODE_KILL:
         return true;
       default:

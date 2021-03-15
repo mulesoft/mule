@@ -13,8 +13,7 @@ import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 import java.util.Iterator;
 
 /**
- * An implementation of {@link AbstractCursorIteratorProvider} which yields
- * cursors that only use memory for buffering
+ * An implementation of {@link AbstractCursorIteratorProvider} which yields cursors that only use memory for buffering
  *
  * @since 4.0
  */
@@ -25,10 +24,10 @@ public class InMemoryCursorIteratorProvider extends AbstractCursorIteratorProvid
   /**
    * Creates a new instance
    *
-   * @param stream the stream to buffer from
-   * @param config        the config of the generated buffer
+   * @param stream              the stream to buffer from
+   * @param config              the config of the generated buffer
    * @param originatingLocation indicates where the cursor was created
-   *                            
+   * 
    * @since 4.3.0
    */
   public InMemoryCursorIteratorProvider(Iterator stream, InMemoryCursorIteratorConfig config,
@@ -43,7 +42,8 @@ public class InMemoryCursorIteratorProvider extends AbstractCursorIteratorProvid
    *
    * @param stream the stream to buffer from
    * @param config the config of the generated buffer
-   * @deprecated On 4.3.0, please use {@link #InMemoryCursorIteratorProvider(Iterator, InMemoryCursorIteratorConfig, ComponentLocation, boolean)}
+   * @deprecated On 4.3.0, please use
+   *             {@link #InMemoryCursorIteratorProvider(Iterator, InMemoryCursorIteratorConfig, ComponentLocation, boolean)}
    *             instead.
    */
   public InMemoryCursorIteratorProvider(Iterator stream, InMemoryCursorIteratorConfig config) {

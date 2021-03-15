@@ -27,9 +27,9 @@ import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import java.util.List;
 
 /**
- * Enriches all parameters of type {@link ObjectStore} adding the {@link MuleStereotypes#OBJECT_STORE} stereotype
- * if not already present. If at least one parameter of that type is found, it also makes sure that {@link ObjectStore} is
- * registered as an imported type
+ * Enriches all parameters of type {@link ObjectStore} adding the {@link MuleStereotypes#OBJECT_STORE} stereotype if not already
+ * present. If at least one parameter of that type is found, it also makes sure that {@link ObjectStore} is registered as an
+ * imported type
  *
  * @since 4.1
  */

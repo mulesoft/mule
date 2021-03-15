@@ -100,10 +100,12 @@ final class LoggerContextCache implements Disposable {
 
   /**
    * Returns the {@link MuleLoggerContext} for a given {@link ClassLoader}, maintaining an internal cache.
+   * 
    * @param classLoader {@link MuleLoggerContext} owner {@link ClassLoader}
    * @return Cached {@link MuleLoggerContext} instance.
-   * @throws RecursiveLoggerContextInstantiationException If the {@link MuleLoggerContext} that should be returned is
-   * already under construction (indicates recursive {{@link #getLoggerContext(ClassLoader)}} call).
+   * @throws RecursiveLoggerContextInstantiationException If the {@link MuleLoggerContext} that should be returned is already
+   *                                                      under construction (indicates recursive
+   *                                                      {{@link #getLoggerContext(ClassLoader)}} call).
    */
   LoggerContext getLoggerContext(final ClassLoader classLoader) {
     LoggerContext ctx;
@@ -230,8 +232,10 @@ final class LoggerContextCache implements Disposable {
 
   /**
    * Registers that a {@link MuleLoggerContext} is under construction, rejecting recursive calls
+   * 
    * @param classLoader {@link ClassLoader} that owns the {@link MuleLoggerContext}
-   * @throws RecursiveLoggerContextInstantiationException if a {@link MuleLoggerContext} is already under construction for the given {@link ClassLoader}
+   * @throws RecursiveLoggerContextInstantiationException if a {@link MuleLoggerContext} is already under construction for the
+   *                                                      given {@link ClassLoader}
    */
   private void startLoggerContextConstruction(ClassLoader classLoader) {
     if (isLoggerContextUnderConstruction()) {
@@ -258,6 +262,7 @@ final class LoggerContextCache implements Disposable {
 
   /**
    * {{@link #isLoggerContextUnderConstruction}} setter method
+   * 
    * @param loggerContextUnderConstruction value to set
    */
   private void setLoggerContextUnderConstruction(Boolean loggerContextUnderConstruction) {

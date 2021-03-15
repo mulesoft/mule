@@ -23,9 +23,8 @@ import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.ManagerFactoryParameters;
 
 /**
- * Uses the standard JVM certificate revocation checks, which depend on the certificate having the
- * corresponding extension points (additional tags for CRLDP or OCSP), and the availability
- * of revocation servers.
+ * Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points
+ * (additional tags for CRLDP or OCSP), and the availability of revocation servers.
  *
  * @since 4.1
  */

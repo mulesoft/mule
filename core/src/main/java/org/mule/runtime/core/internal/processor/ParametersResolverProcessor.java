@@ -27,7 +27,7 @@ public interface ParametersResolverProcessor<T extends ComponentModel> {
    * Resolve the parameters of this operation before executing it. This is useful to do any handling of any synthetic parameters
    * of an operation before actually calling it.
    *
-   * @param eventBuilder a builder for the event to enter the processor for whom parameters are to be resolved
+   * @param eventBuilder    a builder for the event to enter the processor for whom parameters are to be resolved
    * @param afterConfigurer the action to perform after resolving the parameters on the builder.
    * @throws MuleException for any exception that occurs while resolving the parameters
    */
@@ -39,7 +39,8 @@ public interface ParametersResolverProcessor<T extends ComponentModel> {
    * Perform the required cleanup a the parameters in an {@link ExecutionContext} resolved by calling
    * {@link #resolveParameters(CoreEvent.Builder, BiConsumer)}.
    * <p>
-   * It is mandatory to call this when the parameters are no longer needed when using {@link #resolveParameters(CoreEvent.Builder, BiConsumer)}.
+   * It is mandatory to call this when the parameters are no longer needed when using
+   * {@link #resolveParameters(CoreEvent.Builder, BiConsumer)}.
    *
    * @param executionContext the context that contains the resolved parameters
    */

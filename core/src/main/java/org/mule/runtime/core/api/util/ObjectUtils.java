@@ -35,7 +35,7 @@ public class ObjectUtils {
    * Gets a String from a value in a null-safe manner.
    * <p/>
    *
-   * @param answer the object value
+   * @param answer       the object value
    * @param defaultValue the default to use if null or of incorrect type
    * @return the value as a String, or the defaultValue
    */
@@ -51,7 +51,7 @@ public class ObjectUtils {
    * Gets a boolean from a value in a null-safe manner.
    * <p/>
    *
-   * @param answer the object value
+   * @param answer       the object value
    * @param defaultValue the default to use if null or of incorrect type
    * @return the value as a boolean, or the defaultValue
    */
@@ -81,7 +81,7 @@ public class ObjectUtils {
    * Gets a byte from a value in a null-safe manner.
    * <p/>
    *
-   * @param answer the object value
+   * @param answer       the object value
    * @param defaultValue the default to use if null or of incorrect type
    * @return the value as a byte, or the defaultValue
    */
@@ -107,7 +107,7 @@ public class ObjectUtils {
    * Gets a short from a value in a null-safe manner.
    * <p/>
    *
-   * @param answer the object value
+   * @param answer       the object value
    * @param defaultValue the default to use if null or of incorrect type
    * @return the value as a short, or the defaultValue
    */
@@ -133,7 +133,7 @@ public class ObjectUtils {
    * Gets a int from a value in a null-safe manner.
    * <p/>
    *
-   * @param answer the object value
+   * @param answer       the object value
    * @param defaultValue the default to use if null or of incorrect type
    * @return the value as a int, or the defaultValue
    */
@@ -159,7 +159,7 @@ public class ObjectUtils {
    * Gets a long from a value in a null-safe manner.
    * <p/>
    *
-   * @param answer the object value
+   * @param answer       the object value
    * @param defaultValue the default to use if null or of incorrect type
    * @return the value as a long, or the defaultValue
    */
@@ -186,7 +186,7 @@ public class ObjectUtils {
    * Gets a float from a value in a null-safe manner.
    * <p/>
    *
-   * @param answer the object value
+   * @param answer       the object value
    * @param defaultValue the default to use if null or of incorrect type
    * @return the value as a float, or the defaultValue
    */
@@ -213,7 +213,7 @@ public class ObjectUtils {
    * Gets a double from a value in a null-safe manner.
    * <p/>
    *
-   * @param answer the object value
+   * @param answer       the object value
    * @param defaultValue the default to use if null or of incorrect type
    * @return the value as a double, or the defaultValue
    */

@@ -122,7 +122,7 @@ public interface PrivilegedEvent extends CoreEvent {
    * Transforms the message into the requested format. The transformer used is the one configured on the endpoint through which
    * this event was received.
    *
-   * @param outputType The requested output type.
+   * @param outputType  The requested output type.
    * @param muleContext the Mule node.
    * @return the message transformed into it's recognized or expected format.
    * @throws MessageTransformerException if a failure occurs in the transformer
@@ -146,7 +146,7 @@ public interface PrivilegedEvent extends CoreEvent {
   /**
    * Returns the message contents as a string
    *
-   * @param encoding the encoding to use when converting the message to string
+   * @param encoding    the encoding to use when converting the message to string
    * @param muleContext the Mule node.
    * @return the message contents as a string
    * @throws MuleException if the message cannot be converted into a string
@@ -188,7 +188,7 @@ public interface PrivilegedEvent extends CoreEvent {
    * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link CoreEvent}
    * needs a new context.
    *
-   * @param event existing event to use as a template to create builder instance
+   * @param event   existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
    * @return new builder instance.
    */

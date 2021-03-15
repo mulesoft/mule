@@ -64,7 +64,7 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
     final Set<Class<?>> validatedTypes = new HashSet<>();
-    //TODO - MULE-14401 - Make InjectedFieldsModelValidator work in AST Mode
+    // TODO - MULE-14401 - Make InjectedFieldsModelValidator work in AST Mode
     boolean isASTMode = !extensionModel.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
         .map(mp -> mp.getType().getDeclaringClass().isPresent())
         .orElse(false);

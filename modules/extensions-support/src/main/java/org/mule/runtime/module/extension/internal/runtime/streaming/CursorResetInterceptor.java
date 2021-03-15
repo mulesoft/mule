@@ -24,12 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This interceptor tracks all the {@link Cursor cursors} that were resolved as parameters of a given operation
- * execution and the position they were in <b>before</b> the execution.
+ * This interceptor tracks all the {@link Cursor cursors} that were resolved as parameters of a given operation execution and the
+ * position they were in <b>before</b> the execution.
  *
- * If the operation fails with a {@link ConnectionException}, then the SDK will attempt to reconnect. This interceptor
- * makes sure that all those cursors are set back on their original positions before the retry is attempted, since otherwise,
- * the stream would be corrupted and the repeatable promise broken.
+ * If the operation fails with a {@link ConnectionException}, then the SDK will attempt to reconnect. This interceptor makes sure
+ * that all those cursors are set back on their original positions before the retry is attempted, since otherwise, the stream
+ * would be corrupted and the repeatable promise broken.
  *
  * @since 4.1
  */

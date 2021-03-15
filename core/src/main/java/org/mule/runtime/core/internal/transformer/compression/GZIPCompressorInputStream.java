@@ -119,7 +119,7 @@ public class GZIPCompressorInputStream extends DeflaterInputStream {
   /**
    * Writes GZIP member trailer to a byte array, starting at a given offset.
    *
-   * @param buf The buffer to write the trailer to.
+   * @param buf    The buffer to write the trailer to.
    * @param offset The offset from which to start writing.
    * @return The amount of bytes that were written.
    * @throws IOException If an I/O error is produced.
@@ -133,8 +133,8 @@ public class GZIPCompressorInputStream extends DeflaterInputStream {
   /**
    * Writes integer in Intel byte order to a byte array, starting at a given offset.
    *
-   * @param i The integer to write.
-   * @param buf The buffer to write the integer to.
+   * @param i      The integer to write.
+   * @param buf    The buffer to write the integer to.
    * @param offset The offset from which to start writing.
    * @return The amount of bytes written.
    * @throws IOException If an I/O error is produced.
@@ -148,8 +148,8 @@ public class GZIPCompressorInputStream extends DeflaterInputStream {
   /**
    * Writes short integer in Intel byte order to a byte array, starting at a given offset.
    *
-   * @param s The short to write.
-   * @param buf The buffer to write the integer to.
+   * @param s      The short to write.
+   * @param buf    The buffer to write the integer to.
    * @param offset The offset from which to start writing.
    * @return The amount of bytes written.
    * @throws IOException If an I/O error is produced.

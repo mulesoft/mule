@@ -42,8 +42,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ResourceReleaser implementation used for every artifact created on the container that is loaded dynamically as it has
- * to use {@link java.sql.DriverManager} to unregister {@link Driver} registered by the artifact class loader.
+ * ResourceReleaser implementation used for every artifact created on the container that is loaded dynamically as it has to use
+ * {@link java.sql.DriverManager} to unregister {@link Driver} registered by the artifact class loader.
  * <p>
  * <p/>
  * IMPORTANT: this class is on a different package than the rest of the classes in this module. The reason of that is that this
@@ -90,7 +90,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
   /**
    * @param driver the JDBC driver to check its {@link ClassLoader} for.
    * @return {@code true} if the {@link ClassLoader} of the driver is a descendant of the {@link ClassLoader} of this releaser,
-   * {@code false} otherwise.
+   *         {@code false} otherwise.
    */
   private boolean isDriverLoadedByThisClassLoader(Driver driver) {
     ClassLoader driverClassLoader = driver.getClass().getClassLoader();
@@ -297,12 +297,11 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
       ClassLoader undeployedArtifactClassLoader = this.getClass().getClassLoader();
 
-      /* IMPORTANT: this is done to avoid metaspace OOM caused by oracle driver
-      thread leak. This is only meant to stop TimerThread threads spawned
-      by oracle driver's HAManager class. This timer cannot be fetched
-      by reflection because, in order to do so, other oracle dependencies
-      would be required.
-      * */
+      /*
+       * IMPORTANT: this is done to avoid metaspace OOM caused by oracle driver thread leak. This is only meant to stop
+       * TimerThread threads spawned by oracle driver's HAManager class. This timer cannot be fetched by reflection because, in
+       * order to do so, other oracle dependencies would be required.
+       */
       for (Thread thread : threads) {
         if (isOracleTimerThread(undeployedArtifactClassLoader, thread)) {
           try {

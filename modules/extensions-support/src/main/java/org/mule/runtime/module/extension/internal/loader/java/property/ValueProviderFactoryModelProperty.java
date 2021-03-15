@@ -26,8 +26,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * Private {@link ModelProperty} which communicates the {@link ValueProvider} of a parameter or parameter
- * model which contains a {@link ValueProviderModel} indicating that provides a {@link Set} of {@link Value values}
+ * Private {@link ModelProperty} which communicates the {@link ValueProvider} of a parameter or parameter model which contains a
+ * {@link ValueProviderModel} indicating that provides a {@link Set} of {@link Value values}
  *
  * @since 4.0
  */
@@ -40,8 +40,8 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
   /**
    * @param valueProvider        the {@link ValueProvider} class.
-   * @param injectableParameters the parameters that should be injected inside the {@link ValueProvider} to be able
-   *                             to resolve the {@link Value values}
+   * @param injectableParameters the parameters that should be injected inside the {@link ValueProvider} to be able to resolve the
+   *                             {@link Value values}
    * @param connectionField      the field inside the {@link ValueProvider} which is considered as a connection
    * @param configField          the field inside the {@link ValueProvider} which is considered as a configuration
    */
@@ -60,6 +60,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
   /**
    * Creates a new builder to be able to easily build a {@link ValueProviderFactoryModelProperty}
+   * 
    * @param valuesProvider the {@link Class} of a {@link ValueProvider} implementation
    *
    * @return a new {@link ValueProviderFactoryModelPropertyBuilder}

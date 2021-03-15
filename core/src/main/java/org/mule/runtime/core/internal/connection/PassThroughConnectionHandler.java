@@ -32,7 +32,7 @@ final class PassThroughConnectionHandler<C> implements ConnectionHandlerAdapter<
   /**
    * Creates a new instance
    *
-   * @param connection the connection to be returned by {@link #getConnection()}
+   * @param connection         the connection to be returned by {@link #getConnection()}
    * @param connectionProvider the {@link ConnectionProvider} used to manage the connection
    */
   PassThroughConnectionHandler(C connection, ConnectionProvider<C> connectionProvider) {

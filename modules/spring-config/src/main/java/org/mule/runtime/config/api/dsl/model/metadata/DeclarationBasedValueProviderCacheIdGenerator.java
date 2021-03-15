@@ -37,7 +37,7 @@ public class DeclarationBasedValueProviderCacheIdGenerator implements ValueProvi
     return elementModelFactory.create(containerComponent).flatMap(dsl -> delegate.getIdForResolvedValues(dsl, parameterName));
   }
 
-  //Consider refactoring this in the future to make things simpler. MULE-18743
+  // Consider refactoring this in the future to make things simpler. MULE-18743
   protected Optional<ValueProviderCacheId> getIdForDependency(ElementDeclaration elementDeclaration) {
     return elementModelFactory.create(elementDeclaration).flatMap(delegate::resolveIdForInjectedElement);
   }

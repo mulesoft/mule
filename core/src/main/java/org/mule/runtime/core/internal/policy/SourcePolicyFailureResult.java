@@ -26,7 +26,7 @@ public class SourcePolicyFailureResult implements SourcePolicyResult {
   /**
    * Creates a new failed policy result.
    *
-   * @param messagingException the exception thrown by the policy chain
+   * @param messagingException      the exception thrown by the policy chain
    * @param errorResponseParameters the error response parameters to be used by the source to send the response
    */
   public SourcePolicyFailureResult(MessagingException messagingException, Supplier<Map<String, Object>> errorResponseParameters) {

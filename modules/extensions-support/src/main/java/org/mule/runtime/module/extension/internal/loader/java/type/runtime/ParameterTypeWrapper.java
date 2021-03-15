@@ -19,8 +19,7 @@ import java.io.Serializable;
 import org.springframework.core.ResolvableType;
 
 /**
- * Wrapper for {@link Class} of parameter method that provide utility methods to facilitate the introspection of the
- * {@link Class}
+ * Wrapper for {@link Class} of parameter method that provide utility methods to facilitate the introspection of the {@link Class}
  *
  * @since 4.2
  */

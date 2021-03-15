@@ -75,7 +75,7 @@ public class TransformerUtils {
   /**
    * Builds a list of Transformers.
    *
-   * @param names - a list of transformers separated by commands
+   * @param names       - a list of transformers separated by commands
    * @param muleContext the current muleContext. This is used to look up transformers in the registry
    * @return a list (possibly empty) of transformers or
    * @throws MuleException if any of the transformers cannot be found
@@ -103,7 +103,7 @@ public class TransformerUtils {
    * Checks whether a given value is a valid output for a transformer.
    *
    * @param transformer the transformer used to validate
-   * @param value the output value
+   * @param value       the output value
    * @throws TransformerException if the output value is of a unexpected type.
    */
   public static void checkTransformerReturnClass(Transformer transformer, Object value) throws TransformerException {

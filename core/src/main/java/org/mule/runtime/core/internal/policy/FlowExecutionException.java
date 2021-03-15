@@ -22,8 +22,8 @@ public class FlowExecutionException extends MessagingException {
   /**
    * Creates a new {@link FlowExecutionException}.
    *
-   * @param event the event result of the flow execution
-   * @param cause the cause of the failure
+   * @param event            the event result of the flow execution
+   * @param cause            the cause of the failure
    * @param failingComponent the component that failed
    */
   public FlowExecutionException(CoreEvent event, Throwable cause, Component failingComponent) {

@@ -25,8 +25,8 @@ import org.mule.test.marvel.ironman.IronMan;
 import javax.inject.Inject;
 
 /**
- * Default extension to test cursor streams and lists. Given Dr. Strange's ability to use the eye of Agamotto
- * to reverse and advance time, he's uniquely positioned to manipulate such streams
+ * Default extension to test cursor streams and lists. Given Dr. Strange's ability to use the eye of Agamotto to reverse and
+ * advance time, he's uniquely positioned to manipulate such streams
  */
 @Configuration(name = CONFIG_NAME)
 @Operations(DrStrangeOperations.class)

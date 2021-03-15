@@ -234,12 +234,11 @@ public class XaTransaction extends AbstractTransaction {
   }
 
   /**
-   * @param key Must be the provider of the resource object. i.e. for JDBC it's the XADataSource, for JMS is the
-   *        XAConnectionFactory. It can be a wrapper in which case should be a
-   *        {@link XaResourceFactoryHolder} to be able to determine correctly if there's already a
-   *        resource for that {@link javax.transaction.xa.XAResource} provider.
-   * @param resource the resource object. It must be an {@link javax.transaction.xa.XAResource} or a
-   *        {@link MuleXaObject}
+   * @param key      Must be the provider of the resource object. i.e. for JDBC it's the XADataSource, for JMS is the
+   *                 XAConnectionFactory. It can be a wrapper in which case should be a {@link XaResourceFactoryHolder} to be able
+   *                 to determine correctly if there's already a resource for that {@link javax.transaction.xa.XAResource}
+   *                 provider.
+   * @param resource the resource object. It must be an {@link javax.transaction.xa.XAResource} or a {@link MuleXaObject}
    * @throws TransactionException
    */
   @Override
@@ -394,13 +393,15 @@ public class XaTransaction extends AbstractTransaction {
 
   private ResourceKey getResourceEntry(Object resourceFactory) {
     resourceFactory = (resourceFactory instanceof XaResourceFactoryHolder
-        ? ((XaResourceFactoryHolder) resourceFactory).getHoldObject() : resourceFactory);
+        ? ((XaResourceFactoryHolder) resourceFactory).getHoldObject()
+        : resourceFactory);
     return new ResourceKey(resourceFactory, null);
   }
 
   private ResourceKey getResourceEntry(Object resourceFactory, Object resource) {
     resourceFactory = (resourceFactory instanceof XaResourceFactoryHolder
-        ? ((XaResourceFactoryHolder) resourceFactory).getHoldObject() : resourceFactory);
+        ? ((XaResourceFactoryHolder) resourceFactory).getHoldObject()
+        : resourceFactory);
     return new ResourceKey(resourceFactory, resource);
   }
 

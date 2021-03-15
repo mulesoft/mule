@@ -67,21 +67,21 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
-    //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentOutputMetadata(component).get();
+    // MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentOutputMetadata(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForComponentOutputMetadata(component).get();
     MetadataCacheId dslBasedId =
         createDslBasedGenerator(app, dslFactory).getIdForComponentOutputMetadata(dslFactory.create(component).get()).get();
-    //MetadataCacheId declarationBasedId =
-    //    createDeclarationBasedGenerator(declaration).getIdForComponentOutputMetadata(elementDeclaration).get();
+    // MetadataCacheId declarationBasedId =
+    // createDeclarationBasedGenerator(declaration).getIdForComponentOutputMetadata(elementDeclaration).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
-    //TODO: ADD THIS CHECK MULE-18685
-    //assertThat(dslBasedId, equalTo(declarationBasedId));
+    // TODO: ADD THIS CHECK MULE-18685
+    // assertThat(dslBasedId, equalTo(declarationBasedId));
 
-    //TODO: ADD THIS CHECK MULE-18636
-    //assertThat(declarationBasedId, astBasedId);
+    // TODO: ADD THIS CHECK MULE-18636
+    // assertThat(declarationBasedId, astBasedId);
 
-    //Any should be fine
+    // Any should be fine
     return modelBasedId;
   }
 
@@ -94,22 +94,22 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
-    //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentAttributesMetadata(component).get();
+    // MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentAttributesMetadata(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForComponentAttributesMetadata(component).get();
     MetadataCacheId dslBasedId =
         createDslBasedGenerator(app, dslFactory).getIdForComponentAttributesMetadata(dslFactory.create(component).get()).get();
-    //MetadataCacheId declarationBasedId =
-    //    createDeclarationBasedGenerator(declaration).getIdForComponentAttributesMetadata(elementDeclaration).get();
+    // MetadataCacheId declarationBasedId =
+    // createDeclarationBasedGenerator(declaration).getIdForComponentAttributesMetadata(elementDeclaration).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
 
-    //TODO: ADD THIS CHECK MULE-18685
-    //assertThat(dslBasedId, equalTo(declarationBasedId));
+    // TODO: ADD THIS CHECK MULE-18685
+    // assertThat(dslBasedId, equalTo(declarationBasedId));
 
-    //TODO: ADD THIS CHECK MULE-18636
-    //assertThat(declarationBasedId, astBasedId);
+    // TODO: ADD THIS CHECK MULE-18636
+    // assertThat(declarationBasedId, astBasedId);
 
-    //Any should be fine
+    // Any should be fine
     return modelBasedId;
   }
 
@@ -122,22 +122,22 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
-    //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentInputMetadata(component).get();
+    // MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentInputMetadata(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForComponentInputMetadata(component, parameterName).get();
     MetadataCacheId dslBasedId = createDslBasedGenerator(app, dslFactory)
         .getIdForComponentInputMetadata(dslFactory.create(component).get(), parameterName).get();
-    //MetadataCacheId declarationBasedId =
-    //    createDeclarationBasedGenerator(declaration).getIdForComponentInputMetadata(elementDeclaration, parameterName).get();
+    // MetadataCacheId declarationBasedId =
+    // createDeclarationBasedGenerator(declaration).getIdForComponentInputMetadata(elementDeclaration, parameterName).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
 
-    //TODO: ADD THIS CHECK MULE-18685
-    //assertThat(dslBasedId, equalTo(declarationBasedId));
+    // TODO: ADD THIS CHECK MULE-18685
+    // assertThat(dslBasedId, equalTo(declarationBasedId));
 
-    //TODO: ADD THIS CHECK MULE-18636
-    //assertThat(declarationBasedId, astBasedId);
+    // TODO: ADD THIS CHECK MULE-18636
+    // assertThat(declarationBasedId, astBasedId);
 
-    //Any should be fine
+    // Any should be fine
     return modelBasedId;
   }
 
@@ -149,22 +149,22 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
-    //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentMetadata(component).get();
+    // MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForComponentMetadata(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForComponentMetadata(component).get();
     MetadataCacheId dslBasedId =
         createDslBasedGenerator(app, dslFactory).getIdForComponentMetadata(dslFactory.create(component).get()).get();
-    //MetadataCacheId declarationBasedId =
-    //    createDeclarationBasedGenerator(declaration).getIdForComponentMetadata(elementDeclaration).get();
+    // MetadataCacheId declarationBasedId =
+    // createDeclarationBasedGenerator(declaration).getIdForComponentMetadata(elementDeclaration).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
 
-    //TODO: ADD THIS CHECK MULE-18685
-    //assertThat(dslBasedId, equalTo(declarationBasedId));
+    // TODO: ADD THIS CHECK MULE-18685
+    // assertThat(dslBasedId, equalTo(declarationBasedId));
 
-    //TODO: ADD THIS CHECK MULE-18636
-    //assertThat(declarationBasedId, astBasedId);
+    // TODO: ADD THIS CHECK MULE-18636
+    // assertThat(declarationBasedId, astBasedId);
 
-    //Any should be fine
+    // Any should be fine
     return modelBasedId;
   }
 
@@ -176,22 +176,22 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
-    //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForMetadataKeys(component).get();
+    // MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForMetadataKeys(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForMetadataKeys(component).get();
     MetadataCacheId dslBasedId =
         createDslBasedGenerator(app, dslFactory).getIdForMetadataKeys(dslFactory.create(component).get()).get();
-    //MetadataCacheId declarationBasedId =
-    //    createDeclarationBasedGenerator(declaration).getIdForMetadataKeys(elementDeclaration).get();
+    // MetadataCacheId declarationBasedId =
+    // createDeclarationBasedGenerator(declaration).getIdForMetadataKeys(elementDeclaration).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
 
-    //TODO: ADD THIS CHECK MULE-18685
-    //assertThat(dslBasedId, equalTo(declarationBasedId));
+    // TODO: ADD THIS CHECK MULE-18685
+    // assertThat(dslBasedId, equalTo(declarationBasedId));
 
-    //TODO: ADD THIS CHECK MULE-18636
-    //assertThat(declarationBasedId, astBasedId);
+    // TODO: ADD THIS CHECK MULE-18636
+    // assertThat(declarationBasedId, astBasedId);
 
-    //Any should be fine
+    // Any should be fine
     return modelBasedId;
   }
 
@@ -203,22 +203,22 @@ public abstract class AbstractMetadataCacheIdGeneratorTestCase extends AbstractD
 
     ElementDeclaration elementDeclaration = declaration.findElement(builderFromStringRepresentation(location).build()).get();
 
-    //MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForGlobalMetadata(component).get();
+    // MetadataCacheId astBasedId = createAstBasedGenerator(app).getIdForGlobalMetadata(component).get();
     MetadataCacheId modelBasedId = createModelBasedGenerator(app).getIdForGlobalMetadata(component).get();
     MetadataCacheId dslBasedId =
         createDslBasedGenerator(app, dslFactory).getIdForGlobalMetadata(dslFactory.create(component).get()).get();
-    //MetadataCacheId declarationBasedId =
-    //    createDeclarationBasedGenerator(declaration).getIdForGlobalMetadata(elementDeclaration).get();
+    // MetadataCacheId declarationBasedId =
+    // createDeclarationBasedGenerator(declaration).getIdForGlobalMetadata(elementDeclaration).get();
 
     assertThat(modelBasedId, equalTo(dslBasedId));
 
-    //TODO: ADD THIS CHECK MULE-18685
-    //assertThat(dslBasedId, equalTo(declarationBasedId));
+    // TODO: ADD THIS CHECK MULE-18685
+    // assertThat(dslBasedId, equalTo(declarationBasedId));
 
-    //TODO: ADD THIS CHECK MULE-18636
-    //assertThat(declarationBasedId, astBasedId);
+    // TODO: ADD THIS CHECK MULE-18636
+    // assertThat(declarationBasedId, astBasedId);
 
-    //Any should be fine
+    // Any should be fine
     return modelBasedId;
   }
 

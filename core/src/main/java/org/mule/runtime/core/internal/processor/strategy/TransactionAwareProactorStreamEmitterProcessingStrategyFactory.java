@@ -11,8 +11,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.StreamEmitterProcessingStrategyFactory.StreamEmitterProcessingStrategy;
 
 /**
- * Creates a processing strategy with same behavior as {@link ProactorStreamEmitterProcessingStrategyFactory} apart from the
- * fact it will process synchronously without error when a transaction is active.
+ * Creates a processing strategy with same behavior as {@link ProactorStreamEmitterProcessingStrategyFactory} apart from the fact
+ * it will process synchronously without error when a transaction is active.
  *
  * @since 4.0
  */

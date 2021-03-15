@@ -29,9 +29,9 @@ import reactor.core.publisher.Mono;
  * Base implementation of a {@link org.mule.runtime.core.api.processor.Processor} that may performs processing during both the
  * request and response processing phases while supporting non-blocking execution.
  * <p>
- * In order to define the process during the request phase you should override the
- * {@link #processRequest(CoreEvent)} method. Symmetrically, if you need to define a process to be executed
- * during the response phase, then you should override the {@link #processResponse(CoreEvent)} method.
+ * In order to define the process during the request phase you should override the {@link #processRequest(CoreEvent)} method.
+ * Symmetrically, if you need to define a process to be executed during the response phase, then you should override the
+ * {@link #processResponse(CoreEvent)} method.
  * <p>
  * In some cases you'll have some code that should be always executed, even if an error occurs, for those cases you should
  * override the {@link #processFinally(CoreEvent, MessagingException)} method.
@@ -116,8 +116,8 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    * when processing is successful as well as if an exception is thrown. successful result and in the case of an exception being
    * thrown.
    *
-   * @param event the result of request and response processing. Note that this includes the request and response processing of
-   *        the rest of the Flow following this message processor too.
+   * @param event     the result of request and response processing. Note that this includes the request and response processing
+   *                  of the rest of the Flow following this message processor too.
    * @param exception the exception thrown during processing if any. If not exception was thrown then this parameter is null
    */
   protected void processFinally(CoreEvent event, MessagingException exception) {

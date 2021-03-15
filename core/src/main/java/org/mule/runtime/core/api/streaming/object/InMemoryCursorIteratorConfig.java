@@ -38,7 +38,7 @@ public final class InMemoryCursorIteratorConfig {
    * @param initialBufferSize   the buffer's initial size. Must be greater than zero
    * @param bufferSizeIncrement the size that the buffer should gain each time it is expanded. A value of zero means no expansion.
    *                            Cannot be lower than zero.
-   * @param maxBufferSize     the maximum amount of space that the buffer can grow to. Use {@code null} for unbounded buffers
+   * @param maxBufferSize       the maximum amount of space that the buffer can grow to. Use {@code null} for unbounded buffers
    * @throws IllegalArgumentException if any of the given arguments is invalid
    */
   public InMemoryCursorIteratorConfig(int initialBufferSize, int bufferSizeIncrement, int maxBufferSize) {

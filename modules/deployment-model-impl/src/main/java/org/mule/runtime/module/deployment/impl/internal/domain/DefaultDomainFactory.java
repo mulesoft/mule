@@ -52,14 +52,14 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   /**
    * Creates a new domain factory
    *
-   * @param domainDescriptorFactory creates descriptors for the new domains. Non null.
-   * @param domainManager tracks the domains deployed on the container. Non null.
-   * @param classLoaderRepository contains all the class loaders in the container. Non null.
-   * @param serviceRepository repository of available services. Non null.
-   * @param pluginDependenciesResolver resolver for the plugins on which the {@code artifactPluginDescriptor} declares it depends.
-   *        Non null.
+   * @param domainDescriptorFactory         creates descriptors for the new domains. Non null.
+   * @param domainManager                   tracks the domains deployed on the container. Non null.
+   * @param classLoaderRepository           contains all the class loaders in the container. Non null.
+   * @param serviceRepository               repository of available services. Non null.
+   * @param pluginDependenciesResolver      resolver for the plugins on which the {@code artifactPluginDescriptor} declares it
+   *                                        depends. Non null.
    * @param domainClassLoaderBuilderFactory creates builders to build the classloaders for each domain. Non null.
-   * @param extensionModelLoaderManager manager capable of resolve {@link ExtensionModel extension models}. Non null.
+   * @param extensionModelLoaderManager     manager capable of resolve {@link ExtensionModel extension models}. Non null.
    */
   public DefaultDomainFactory(DomainDescriptorFactory domainDescriptorFactory,
                               DomainManager domainManager,

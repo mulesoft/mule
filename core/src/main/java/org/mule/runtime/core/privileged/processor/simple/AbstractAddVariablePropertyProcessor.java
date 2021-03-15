@@ -108,17 +108,17 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   /**
    * Adds the property with its value and dataType to a property or variables scope.
    *
-   * @param event event to which property is to be added
+   * @param event        event to which property is to be added
    * @param propertyName name of the property or variable to add
-   * @param value value of the property or variable to add
-   * @param dataType data type of the property or variable to add
+   * @param value        value of the property or variable to add
+   * @param dataType     data type of the property or variable to add
    */
   protected abstract PrivilegedEvent addProperty(PrivilegedEvent event, String propertyName, T value, DataType dataType);
 
   /**
    * Removes the property from a property or variables scope.
    *
-   * @param event event to which property is to be removed
+   * @param event        event to which property is to be removed
    * @param propertyName name of the property or variable to remove
    */
   protected abstract PrivilegedEvent removeProperty(PrivilegedEvent event, String propertyName);

@@ -83,8 +83,8 @@ public class IOUtils {
    *
    * @param resourceName The name of the resource to load
    * @param callingClass The Class object of the calling object
-   * @param tryAsFile - try to load the resource from the local file system
-   * @param tryAsUrl - try to load the resource as a URL
+   * @param tryAsFile    - try to load the resource from the local file system
+   * @param tryAsUrl     - try to load the resource as a URL
    * @return an InputStream to the resource or null if resource not found
    * @throws java.io.IOException IO error
    */
@@ -124,8 +124,8 @@ public class IOUtils {
    *
    * @param resourceName The name of the resource to load
    * @param callingClass The Class object of the calling object
-   * @param tryAsFile - try to load the resource from the local file system
-   * @param tryAsUrl - try to load the resource as a Url string
+   * @param tryAsFile    - try to load the resource from the local file system
+   * @param tryAsUrl     - try to load the resource as a Url string
    * @return an URL to the resource or null if resource not found
    */
   public static URL getResourceAsUrl(final String resourceName, final Class callingClass, boolean tryAsFile, boolean tryAsUrl) {
@@ -283,8 +283,8 @@ public class IOUtils {
   /**
    * Transforms an Object into a DataHandler of its corresponding type.
    *
-   * @param name the name of the attachment being handled
-   * @param object the attachment to be handled
+   * @param name        the name of the attachment being handled
+   * @param object      the attachment to be handled
    * @param contentType the Content-Type of the attachment that is being handled
    * @return a {@link DataHandler} of the corresponding attachment
    * @throws IOException if the transformation fails.

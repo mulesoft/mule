@@ -25,7 +25,7 @@ public interface ConnectionManagerAdapter extends ConnectionManager, Lifecycle {
    * Returns the {@link RetryPolicyTemplate} that should be applied to the given {@code connectionProvider}
    *
    * @param connectionProvider a {@link ConnectionProvider}
-   * @param <C> the generic type of the connection returned by the provider
+   * @param <C>                the generic type of the connection returned by the provider
    * @return a {@link RetryPolicyTemplate}
    */
   <C> RetryPolicyTemplate getRetryTemplateFor(ConnectionProvider<C> connectionProvider);
@@ -34,7 +34,7 @@ public interface ConnectionManagerAdapter extends ConnectionManager, Lifecycle {
    * Returns the {@link ReconnectionConfig} that should be applied to the given {@code connectionProvider}
    *
    * @param connectionProvider a {@link ConnectionProvider}
-   * @param <C> the generic type of the connection returned by the provider
+   * @param <C>                the generic type of the connection returned by the provider
    * @return a {@link ReconnectionConfig}
    */
   <C> ReconnectionConfig getReconnectionConfigFor(ConnectionProvider<C> connectionProvider);

@@ -22,9 +22,9 @@ public final class MetadataResolverUtils {
   /**
    * Gets the value provided by a {@link CheckedSupplier} taking into account that an OAuth access token refresh may be needed.
    *
-   * @param metadataContext     metadata context used by the supplier to provide a value
-   * @param metadataSupplier    supplier that provides the value
-   * @param <T>                 the type of value the supplier provider
+   * @param metadataContext  metadata context used by the supplier to provide a value
+   * @param metadataSupplier supplier that provides the value
+   * @param <T>              the type of value the supplier provider
    * @throws Exception
    */
   public static <T> T resolveWithOAuthRefresh(MetadataContext metadataContext, CheckedSupplier<T> metadataSupplier)

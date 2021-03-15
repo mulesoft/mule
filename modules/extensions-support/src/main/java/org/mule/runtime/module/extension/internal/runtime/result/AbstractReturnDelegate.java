@@ -95,8 +95,8 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
    *
    * @param componentModel            the component which produces the return value
    * @param componentDecoratorFactory
-   * @param cursorProviderFactory     the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be
-   *                                  {@code null}
+   * @param cursorProviderFactory     the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can
+   *                                  be {@code null}
    * @param muleContext               the {@link MuleContext} of the owning application
    */
   protected AbstractReturnDelegate(ComponentModel componentModel,

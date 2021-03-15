@@ -113,7 +113,7 @@ class UntilSuccessfulRouter {
           innerRecorder.next(eventWithCurrentContext(event, ctx));
         })
         .doOnComplete(() -> {
-          //TODO MULE-18170
+          // TODO MULE-18170
           if (inflightEvents.get() == 0) {
             completeRouter();
           } else {
@@ -244,7 +244,7 @@ class UntilSuccessfulRouter {
    * Insert the ctx as the event's current {@link RetryContext}, and updates the {@link CoreEvent} internal parameters.
    *
    * @param event the current retrial {@link CoreEvent}
-   * @param ctx the current {@link RetryContext}
+   * @param ctx   the current {@link RetryContext}
    * @return the {@link CoreEvent} with the retry context saved as internal parameter
    */
   private CoreEvent eventWithCurrentContext(CoreEvent event, RetryContext ctx) {

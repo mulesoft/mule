@@ -32,7 +32,7 @@ public class DefaultConnectionProviderWrapper<C> extends AbstractConnectionProvi
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ConnectionProvider} to be wrapped
+   * @param delegate    the {@link ConnectionProvider} to be wrapped
    * @param muleContext the owning {@link MuleContext}
    */
   public DefaultConnectionProviderWrapper(ConnectionProvider<C> delegate, MuleContext muleContext) {

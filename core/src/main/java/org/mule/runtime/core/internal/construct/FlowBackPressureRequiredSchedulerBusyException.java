@@ -21,8 +21,8 @@ public class FlowBackPressureRequiredSchedulerBusyException extends FlowBackPres
   private static final long serialVersionUID = -2762699363241225531L;
 
   /**
-   * Create a new {@link FlowBackPressureRequiredSchedulerBusyException} with no cause. This is typically use when a
-   * stream based processing exerts back-pressure without throwing an exception.
+   * Create a new {@link FlowBackPressureRequiredSchedulerBusyException} with no cause. This is typically use when a stream based
+   * processing exerts back-pressure without throwing an exception.
    */
   public FlowBackPressureRequiredSchedulerBusyException(Component flow, BackPressureReason reason) {
     super(flow, reason);

@@ -71,7 +71,8 @@ public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends Abst
                                                          .put(TYPE_PROPERTY_NAME,
                                                               TestExtensionWithDocumentationAndMultipleConfig.class.getName())
                                                          .put(VERSION, "4.0.0")
-                                                         // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+                                                         // TODO MULE-14517: This workaround should be replaced for a better and
+                                                         // more complete mechanism
                                                          .put(COMPILATION_MODE, true)
                                                          .build());
     String generatedSchema = new DefaultExtensionSchemaGenerator().generate(model, DslResolvingContext.getDefault(emptySet()));

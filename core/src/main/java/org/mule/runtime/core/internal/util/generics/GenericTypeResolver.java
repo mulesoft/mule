@@ -61,7 +61,7 @@ public abstract class GenericTypeResolver {
    * Determine the target type for the given generic parameter type.
    *
    * @param methodParam the method parameter specification
-   * @param clazz the class to resolve type variables against
+   * @param clazz       the class to resolve type variables against
    * @return the corresponding generic parameter or return type
    */
   public static Class<?> resolveParameterType(MethodParameter methodParam, Class clazz) {
@@ -78,7 +78,7 @@ public abstract class GenericTypeResolver {
    * Determine the target type for the generic return type of the given method.
    *
    * @param method the method to introspect
-   * @param clazz the class to resolve type variables against
+   * @param clazz  the class to resolve type variables against
    * @return the corresponding generic parameter or return type
    */
   public static Class<?> resolveReturnType(Method method, Class clazz) {
@@ -92,7 +92,7 @@ public abstract class GenericTypeResolver {
    * Resolve the single type argument of the given generic interface against the given target class which is assumed to implement
    * the generic interface and possibly declare a concrete type for its type variable.
    *
-   * @param clazz the target class to check against
+   * @param clazz      the target class to check against
    * @param genericIfc the generic interface to resolve the type argument from
    * @return the resolved type of the argument, or <code>null</code> if not resolvable
    */
@@ -112,7 +112,7 @@ public abstract class GenericTypeResolver {
    * Resolve the type arguments of the given generic interface against the given target class which is assumed to implement the
    * generic interface and possibly declare concrete types for its type variables.
    *
-   * @param clazz the target class to check against
+   * @param clazz      the target class to check against
    * @param genericIfc the generic interface to resolve the type argument from
    * @return the resolved type of each argument, with the array size matching the number of actual type arguments, or
    *         <code>null</code> if not resolvable
@@ -155,7 +155,7 @@ public abstract class GenericTypeResolver {
   /**
    * Resolve the specified generic type against the given TypeVariable map.
    *
-   * @param genericType the generic type to resolve
+   * @param genericType     the generic type to resolve
    * @param typeVariableMap the TypeVariable Map to resolved against
    * @return the type if it resolves to a Class, or <code>Object.class</code> otherwise
    */
@@ -167,7 +167,7 @@ public abstract class GenericTypeResolver {
   /**
    * Determine the raw type for the given generic parameter type.
    *
-   * @param genericType the generic type to resolve
+   * @param genericType     the generic type to resolve
    * @param typeVariableMap the TypeVariable Map to resolved against
    * @return the resolved raw type
    */

@@ -94,7 +94,7 @@ public class ErrorTypeLocator {
    * If no mapping is available then the {@link #lookupErrorType(Throwable)} rules applies.
    *
    * @param componentIdentifier the identifier of the component that throw the exception.
-   * @param exception the exception thrown by the component.
+   * @param exception           the exception thrown by the component.
    * @return the error type related to the exception based on the component mappings. If there's no mapping then the error type
    *         related to UNKNOWN will be returned.
    */
@@ -109,7 +109,7 @@ public class ErrorTypeLocator {
    * If no mapping is available then the {@link #lookupErrorType(Throwable)} rules applies.
    *
    * @param componentIdentifier the identifier of the component that throw the exception.
-   * @param exception the exception thrown by the component.
+   * @param exception           the exception thrown by the component.
    * @return the error type related to the exception based on the component mappings. If there's no mapping then the error type
    *         related to UNKNOWN will be returned.
    */
@@ -133,7 +133,7 @@ public class ErrorTypeLocator {
    * Adds an {@link ExceptionMapper} for a particular component identified by a {@link ComponentIdentifier}.
    *
    * @param componentIdentifier identifier of a component.
-   * @param exceptionMapper exception mapper for the component.
+   * @param exceptionMapper     exception mapper for the component.
    */
   public void addComponentExceptionMapper(ComponentIdentifier componentIdentifier, ExceptionMapper exceptionMapper) {
     this.componentExceptionMappers.put(componentIdentifier, exceptionMapper);
@@ -182,7 +182,7 @@ public class ErrorTypeLocator {
      * Adds an {@link ExceptionMapper} for a particular component identified by the componentIdentifier.
      *
      * @param componentIdentifier identifier of a component.
-     * @param exceptionMapper exception mapper for the component.
+     * @param exceptionMapper     exception mapper for the component.
      * @return {@code this} builder.
      */
     public Builder addComponentExceptionMapper(ComponentIdentifier componentIdentifier, ExceptionMapper exceptionMapper) {

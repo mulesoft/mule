@@ -72,11 +72,11 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ValueResolver} to wrap
-   * @param type the type of the value this resolver returns
+   * @param delegate        the {@link ValueResolver} to wrap
+   * @param type            the type of the value this resolver returns
    * @param reflectionCache the cache for expensive reflection lookups
-   * @param muleContext the current {@link MuleContext}
-   * @param <T> the generic type of the produced values
+   * @param muleContext     the current {@link MuleContext}
+   * @param <T>             the generic type of the produced values
    * @return a new null safe {@link ValueResolver}
    * @throws IllegalParameterModelDefinitionException if used on parameters of not supported types
    */

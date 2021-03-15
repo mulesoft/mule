@@ -26,7 +26,7 @@ public interface BootstrapService {
   /**
    * Instantiates a class using the service's class loader
    *
-   * @param name fully qualified class name to instantiate
+   * @param name            fully qualified class name to instantiate
    * @param constructorArgs constructor arguments
    * @return a non null instance of the given class
    * @throws ClassNotFoundException

@@ -15,8 +15,8 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
- * A private {@link ModelProperty} to be used on OAuth enabled {@link ConnectionProviderModel}s
- * to indicate which fields are to be used as callback values
+ * A private {@link ModelProperty} to be used on OAuth enabled {@link ConnectionProviderModel}s to indicate which fields are to be
+ * used as callback values
  *
  * @since 4.0
  * @see OAuthCallbackValue
@@ -27,16 +27,16 @@ public class OAuthCallbackValuesModelProperty implements ModelProperty {
 
   /**
    * Creates a new instance
-   * @param callbackValues a {@link Map} in which the keys are {@link Field}s and the values are the expressions
-   *                       that will generate their values
+   * 
+   * @param callbackValues a {@link Map} in which the keys are {@link Field}s and the values are the expressions that will
+   *                       generate their values
    */
   public OAuthCallbackValuesModelProperty(Map<Field, String> callbackValues) {
     this.callbackValues = unmodifiableMap(callbackValues);
   }
 
   /**
-   * @return a {@link Map} in which the keys are {@link Field}s and the values are the expressions
-   *                       that will generate their values
+   * @return a {@link Map} in which the keys are {@link Field}s and the values are the expressions that will generate their values
    */
   public Map<Field, String> getCallbackValues() {
     return callbackValues;
@@ -44,6 +44,7 @@ public class OAuthCallbackValuesModelProperty implements ModelProperty {
 
   /**
    * {@inheritDoc}
+   * 
    * @return {@code oauthCallbackValues}
    */
   @Override
@@ -53,6 +54,7 @@ public class OAuthCallbackValuesModelProperty implements ModelProperty {
 
   /**
    * {@inheritDoc}
+   * 
    * @return {@code false}
    */
   @Override

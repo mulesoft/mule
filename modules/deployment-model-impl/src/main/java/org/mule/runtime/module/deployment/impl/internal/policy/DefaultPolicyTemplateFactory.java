@@ -48,7 +48,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
    * Creates a new factory
    *
    * @param policyTemplateClassLoaderBuilderFactory creates class loader builders to create the class loaders for the created
-   *        policy templates. Non null.
+   *                                                policy templates. Non null.
    */
   public DefaultPolicyTemplateFactory(PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
                                       PluginDependenciesResolver pluginDependenciesResolver,

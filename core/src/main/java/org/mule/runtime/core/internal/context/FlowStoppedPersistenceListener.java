@@ -27,9 +27,9 @@ public interface FlowStoppedPersistenceListener {
   /**
    * Turns off persistence.
    * <p>
-   * The flow's stopped state should only be persisted if it was stopped by external users.
-   * Since external users usually call the flow's stop() method directly from their own methods, a workaround is
-   * to prevent persistence when the flow is stopped for other reasons.
+   * The flow's stopped state should only be persisted if it was stopped by external users. Since external users usually call the
+   * flow's stop() method directly from their own methods, a workaround is to prevent persistence when the flow is stopped for
+   * other reasons.
    */
   void doNotPersist();
 

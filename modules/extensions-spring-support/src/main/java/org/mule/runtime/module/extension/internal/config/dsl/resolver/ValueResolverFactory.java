@@ -114,7 +114,8 @@ public class ValueResolverFactory {
     if (stackedTypesModelProperty.isPresent()) {
       resolver = stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(value, expectedClass,
                                                                                                            content);
-      //TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be removed once implemented
+      // TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be
+      // removed once implemented
     } else if (isParameterResolver(expectedType)) {
       resolver = new ExpressionBasedParameterResolverValueResolver<>(value, expectedClass, toDataType(expectedType), content);
     } else if (isTypedValue(expectedType)) {

@@ -32,8 +32,8 @@ import javax.annotation.PreDestroy;
  * container so the EJB case is ignored in Mule.</li>
  * </ol>
  *
- * @deprecated as of 3.7.0 since these are only used by {@link Registry} which is also
- *             deprecated. Use post processors for currently supported registries instead
+ * @deprecated as of 3.7.0 since these are only used by {@link Registry} which is also deprecated. Use post processors for
+ *             currently supported registries instead
  */
 @Deprecated
 public class JSR250ValidatorProcessor implements InjectProcessor {

@@ -109,7 +109,7 @@ public interface MuleConfiguration {
 
   /**
    * @param extensionType class instance of the extension type
-   * @param <T> type of the extension
+   * @param <T>           type of the extension
    * @return extension configured of type extensionType, if there's no such extension then null.
    */
   <T> T getExtension(final Class<T> extensionType);
@@ -154,8 +154,8 @@ public interface MuleConfiguration {
   Optional<MuleVersion> getMinMuleVersion();
 
   /**
-   * @return the default Correlation ID generator for every source. Empty value will be returned if internal
-   * mule correlation id must be kept
+   * @return the default Correlation ID generator for every source. Empty value will be returned if internal mule correlation id
+   *         must be kept
    *
    * @since 4.4.0
    */

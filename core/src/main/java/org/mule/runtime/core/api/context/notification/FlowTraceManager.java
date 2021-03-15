@@ -21,7 +21,7 @@ public interface FlowTraceManager {
    * Handles the start of the passed flowName for the given event.
    * 
    * @param notificationInfo the notification information about the event for which the flow is being started
-   * @param flowName the name of the flow that is about to start
+   * @param flowName         the name of the flow that is about to start
    */
   void onFlowStart(EnrichedNotificationInfo notificationInfo, String flowName);
 

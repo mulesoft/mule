@@ -27,8 +27,8 @@ public class MediaTypeDecoratedResult extends Result {
   /**
    * Creates a new instance
    * 
-   * @param delegate    a {@link Result} whose {@link MediaType} will be decorated
-   * @param mediaType   {@link MediaType} to be used in the {@link Result}
+   * @param delegate  a {@link Result} whose {@link MediaType} will be decorated
+   * @param mediaType {@link MediaType} to be used in the {@link Result}
    */
   public MediaTypeDecoratedResult(Result delegate, MediaType mediaType) {
     this.delegate = delegate;

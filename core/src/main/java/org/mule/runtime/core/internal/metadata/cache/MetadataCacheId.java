@@ -14,9 +14,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * A unique identifier for the Metadata obtained for a given Component.
- * The MetadataCacheId provides a unique hashed value for the configuration of a component taking into consideration
- * all the relevant parts involved in the Metadata resolution mechanism.
+ * A unique identifier for the Metadata obtained for a given Component. The MetadataCacheId provides a unique hashed value for the
+ * configuration of a component taking into consideration all the relevant parts involved in the Metadata resolution mechanism.
  * <p>
  * Two elements having the same {@link MetadataCacheId} will be equal regarding all the types inferred from its configuration.
  *

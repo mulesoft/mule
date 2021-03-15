@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Adapts a {@link SourceCallbackContext} into a legacy {@link org.mule.runtime.extension.api.runtime.source.SourceCallbackContext}
+ * Adapts a {@link SourceCallbackContext} into a legacy
+ * {@link org.mule.runtime.extension.api.runtime.source.SourceCallbackContext}
  *
  * @since 4.4.0
  */

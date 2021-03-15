@@ -35,7 +35,7 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
 
   /**
    * @param expressionSplitterStrategy expression splitter strategy to use as default mechanism if there was supported mechanism
-   *        to split the payload
+   *                                   to split the payload
    */
   public EventToMessageSequenceSplittingStrategy(ExpressionSplittingStrategy expressionSplitterStrategy) {
     this.expressionSplitterStrategy = expressionSplitterStrategy;

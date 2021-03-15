@@ -20,8 +20,7 @@ import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 
 /**
- * Implementation of {@link XaQueueTransactionContext} for persistent queues using XA
- * transactions
+ * Implementation of {@link XaQueueTransactionContext} for persistent queues using XA transactions
  */
 public class PersistentXaTransactionContext implements XaQueueTransactionContext {
 

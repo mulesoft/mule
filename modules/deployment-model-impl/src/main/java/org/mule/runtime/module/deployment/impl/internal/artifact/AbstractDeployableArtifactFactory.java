@@ -34,9 +34,11 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
   /**
    * Creates a new {@link AbstractDeployableArtifactFactory}
    * 
-   * @param licenseValidator the license validator to use for plugins.
-   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
-   * @param runtimeLockFactory {@link LockFactory} for Runtime, a unique and shared lock factory to be used between different artifacts.
+   * @param licenseValidator                           the license validator to use for plugins.
+   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
+   *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   * @param runtimeLockFactory                         {@link LockFactory} for Runtime, a unique and shared lock factory to be
+   *                                                   used between different artifacts.
    */
   public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator,
                                            LockFactory runtimeLockFactory) {
@@ -55,7 +57,7 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
    * Creates an instance of {@link DeployableArtifact}
    * 
    * @param artifactDir the artifact deployment directory.
-   * @param properties deployment properties
+   * @param properties  deployment properties
    * @return the created artifact.
    * @throws IOException if there was a problem reading the content of the artifact.
    */
@@ -64,7 +66,7 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
   /**
    * Creates the artifact descriptor of the artifact.
    *
-   * @param artifactLocation the artifact location
+   * @param artifactLocation     the artifact location
    * @param deploymentProperties the artifact deployment properties
    * @return the artifact descriptor
    */

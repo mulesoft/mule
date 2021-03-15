@@ -23,9 +23,9 @@ public interface RegionPluginClassLoadersFactory {
   /**
    * Creates all the region plugin class loaders
    *
-   * @param regionClassLoader region classloader
+   * @param regionClassLoader         region classloader
    * @param artifactPluginDescriptors resolved descriptors of all the plugins to include in the region.
-   * @param regionOwnerLookupPolicy lookup policy used as the base to create plugin's lookup policy
+   * @param regionOwnerLookupPolicy   lookup policy used as the base to create plugin's lookup policy
    * @return a non null {@link List} containing a classloader for each plugin descriptor.
    */
   List<ArtifactClassLoader> createPluginClassLoaders(ArtifactClassLoader regionClassLoader,

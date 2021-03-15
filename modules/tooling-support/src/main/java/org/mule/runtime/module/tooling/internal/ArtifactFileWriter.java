@@ -48,7 +48,7 @@ public class ArtifactFileWriter {
   /**
    * Writes the jar file content to a folder with the given artifactName.
    *
-   * @param artifactName the name of the folder to where jar content will be exploded.
+   * @param artifactName            the name of the folder to where jar content will be exploded.
    * @param artifactContentLocation the jar file for the artifact.
    * @return the directory where file has been written.
    */
@@ -72,7 +72,7 @@ public class ArtifactFileWriter {
   /**
    * Writes application content from artifactContentLocation to a new artifact folder under {@link #folder} with the artifactName.
    *
-   * @param artifactName {@link String} artifact name to create the folder were artifact content will be copied.
+   * @param artifactName            {@link String} artifact name to create the folder were artifact content will be copied.
    * @param artifactContentLocation {@link File} location of the artifact to be copied.
    * @return {@link File} folder created for the artifact
    */
@@ -98,7 +98,7 @@ public class ArtifactFileWriter {
    * Unzips the content of the artifact and writes it to a folder inside the {@link #folder} with the given artifact name.
    *
    * @param artifactName {@link String} name for the artifact
-   * @param zipContent {@code byte[]} with the artifact contented zipped
+   * @param zipContent   {@code byte[]} with the artifact contented zipped
    * @return {@link File} folder where the artifact was unzipped
    */
   public File writeContent(String artifactName, byte[] zipContent) {

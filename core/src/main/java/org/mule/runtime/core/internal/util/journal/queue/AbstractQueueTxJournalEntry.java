@@ -24,6 +24,7 @@ import java.io.Serializable;
 public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T> {
 
   enum Operation {
+
     COMMIT((byte) 1), ROLLBACK((byte) 2), PREPARE((byte) 3), REMOVE((byte) 4), ADD((byte) 5), ADD_FIRST((byte) 6);
 
     private final byte byteRepresentation;

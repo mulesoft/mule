@@ -27,7 +27,7 @@ public class PetAdoptionLimitingSource extends PollingSource<String, Integer> {
   @Parameter
   private List<String> pets;
 
-  //Using this annotation in order to mix the legacy and the new api and test all code flows.
+  // Using this annotation in order to mix the legacy and the new api and test all code flows.
   @org.mule.sdk.api.annotation.param.Parameter
   private List<Integer> watermarks;
 

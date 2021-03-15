@@ -15,7 +15,7 @@ public interface NativeLibraryFinder {
   /**
    * Finds a native library for the given name
    *
-   * @param name native library to find
+   * @param name        native library to find
    * @param libraryPath library path for the given name in a parent class loading context. Can be null.
    * @return library path to use for the given name. Can be null is no library was found.
    */

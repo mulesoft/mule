@@ -224,8 +224,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   }
 
   /**
-   * @return a boolean indicating if the Mule App should start in lazy mode. This means that the Mule App components
-   * will be initialized on demand.
+   * @return a boolean indicating if the Mule App should start in lazy mode. This means that the Mule App components will be
+   *         initialized on demand.
    */
   public boolean enableLazyInit() {
     return false;

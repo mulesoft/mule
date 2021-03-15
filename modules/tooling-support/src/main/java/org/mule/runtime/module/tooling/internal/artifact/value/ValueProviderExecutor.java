@@ -148,7 +148,8 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       Optional<ValueProviderModel> valueProviderModelOptional = getValueProviderModel(parameterizedModel, providerName);
       if (valueProviderModelOptional.isPresent() && valueProviderModelOptional.get().requiresConfiguration()
           && !optionalConfigurationInstance.isPresent()) {
-        // Improves the error message when configuration is required and not present, as we do the resolve parameter with lazyInit in order
+        // Improves the error message when configuration is required and not present, as we do the resolve parameter with lazyInit
+        // in order
         // to avoid getting an error when a required parameter from model is not defined for resolving the value provider.
         throw new ValueResolvingException(format("The provider requires a configuration but the one referenced by element declaration with name: '%s' is not present",
                                                  optionalConfigRef.get()),

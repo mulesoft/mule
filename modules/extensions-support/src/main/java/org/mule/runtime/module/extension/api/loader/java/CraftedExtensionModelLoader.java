@@ -22,9 +22,9 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 /**
  * {@link ExtensionModelLoader} implementation to be used for extensions which model is {@code hand crafted}.
  * <p>
- * It requires a property of name {@link #TYPE_PROPERTY_NAME} to be specified. Such property should contain
- * the {@code fqn} of a class which implements {@link ExtensionLoadingDelegate}. Such implementation should be
- * concrete and contain a public default constructor.
+ * It requires a property of name {@link #TYPE_PROPERTY_NAME} to be specified. Such property should contain the {@code fqn} of a
+ * class which implements {@link ExtensionLoadingDelegate}. Such implementation should be concrete and contain a public default
+ * constructor.
  *
  * @see ExtensionLoadingDelegate
  * @since 4.0

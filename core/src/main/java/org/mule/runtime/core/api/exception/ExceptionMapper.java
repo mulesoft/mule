@@ -79,7 +79,7 @@ public final class ExceptionMapper {
      * Adds a mapping between an exception and an error type.
      *
      * @param exceptionType the exception type.
-     * @param errorType the error type.
+     * @param errorType     the error type.
      * @return {@code this} builder
      */
     public Builder addExceptionMapping(Class<? extends Throwable> exceptionType, ErrorType errorType) {

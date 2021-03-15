@@ -50,12 +50,12 @@ public class ExtendedTransformationService extends DefaultTransformationService 
    *
    *
    * @param message
-   * @param event the event being processed
+   * @param event        the event being processed
    * @param transformers the transformers to apply to the message payload
    *
    * @return the result of transformation
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
-   *         with the message payload
+   *                              with the message payload
    */
   public Message applyTransformers(final Message message, final CoreEvent event,
                                    final List<? extends Transformer> transformers)
@@ -69,12 +69,12 @@ public class ExtendedTransformationService extends DefaultTransformationService 
    *
    *
    * @param message
-   * @param event the event being processed
+   * @param event        the event being processed
    * @param transformers the transformers to apply to the message payload
    *
    * @return the result of transformation
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
-   *         with the message payload
+   *                              with the message payload
    */
   public Message applyTransformers(final Message message, final CoreEvent event, final Transformer... transformers)
       throws MuleException {

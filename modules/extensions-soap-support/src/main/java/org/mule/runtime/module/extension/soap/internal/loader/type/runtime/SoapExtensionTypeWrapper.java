@@ -21,8 +21,8 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 
 /**
- * {@link SoapComponentWrapper} implementation for the {@link Extension} annotated class, which is a Soap Extension either
- * because implements the {@link SoapServiceProvider} interface or is annotated with the {@link Soap} annotation.
+ * {@link SoapComponentWrapper} implementation for the {@link Extension} annotated class, which is a Soap Extension either because
+ * implements the {@link SoapServiceProvider} interface or is annotated with the {@link Soap} annotation.
  *
  * @since 4.0
  */

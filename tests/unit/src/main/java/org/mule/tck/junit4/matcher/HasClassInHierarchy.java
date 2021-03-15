@@ -16,8 +16,8 @@ import org.hamcrest.Matcher;
 /**
  * Tests whether the value has a given class name in the class hierarchy.
  * <p>
- * Similar to {@link org.hamcrest.core.IsInstanceOf} but useful when there is not access to the class that has to be matched,
- * for example, when the class is not exposed on the API.
+ * Similar to {@link org.hamcrest.core.IsInstanceOf} but useful when there is not access to the class that has to be matched, for
+ * example, when the class is not exposed on the API.
  */
 public class HasClassInHierarchy extends DiagnosingMatcher<Object> {
 

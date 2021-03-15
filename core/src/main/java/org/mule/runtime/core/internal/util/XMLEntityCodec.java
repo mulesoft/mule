@@ -440,7 +440,7 @@ public final class XMLEntityCodec {
      * Add an entity to this entity.
      * </p>
      * 
-     * @param name name of the entity
+     * @param name  name of the entity
      * @param value vale of the entity
      */
     public void addEntity(String name, int value) {
@@ -513,9 +513,9 @@ public final class XMLEntityCodec {
      * </p>
      * 
      * @param writer The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
-     * @param str The <code>String</code> to escape. Assumed to be a non-null value.
+     * @param str    The <code>String</code> to escape. Assumed to be a non-null value.
      * @throws IOException when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
-     *         methods.
+     *                     methods.
      * @see #escape(String)
      * @see Writer
      */
@@ -622,7 +622,7 @@ public final class XMLEntityCodec {
      * @param writer The <code>Writer</code> to write the results to; assumed to be non-null.
      * @param string The <code>String</code> to write the results to; assumed to be non-null.
      * @throws IOException when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
-     *         methods.
+     *                     methods.
      * @see #escape(String)
      * @see Writer
      */
@@ -700,7 +700,7 @@ public final class XMLEntityCodec {
        * Add an entry to this entity map.
        * </p>
        * 
-       * @param name the entity name
+       * @param name  the entity name
        * @param value the entity value
        */
       void add(String name, int value);
@@ -859,10 +859,10 @@ public final class XMLEntityCodec {
          * Create a new entry with the given values.
          * </p>
          * 
-         * @param hash The code used to hash the object with
-         * @param key The key used to enter this in the table
+         * @param hash  The code used to hash the object with
+         * @param key   The key used to enter this in the table
          * @param value The value for this key
-         * @param next A reference to the next entry in the table
+         * @param next  A reference to the next entry in the table
          */
         protected Entry(int hash, int key, Object value, Entry next) {
           this.hash = hash;
@@ -901,7 +901,7 @@ public final class XMLEntityCodec {
        * </p>
        * 
        * @param initialCapacity the initial capacity of the hashtable.
-       * @param loadFactor the load factor of the hashtable.
+       * @param loadFactor      the load factor of the hashtable.
        * @throws IllegalArgumentException if the initial capacity is less than zero, or if the load factor is nonpositive.
        */
       public IntHashMap(int initialCapacity, float loadFactor) {
@@ -1079,7 +1079,7 @@ public final class XMLEntityCodec {
        * The value can be retrieved by calling the <code>get</code> method with a key that is equal to the original key.
        * </p>
        * 
-       * @param key the hashtable key.
+       * @param key   the hashtable key.
        * @param value the value.
        * @return the previous value of the specified key in this hashtable, or <code>null</code> if it did not have one.
        * @throws NullPointerException if the key is <code>null</code>.

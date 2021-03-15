@@ -31,7 +31,7 @@ abstract class SupportsPropertiesMuleContextBuilder extends DefaultMuleContextBu
   /**
    * Constructs a new {@link MuleContext} builder with the given {@code artifactProperties}.
    *
-   * @param artifactType the type of artifact the target {@link MuleContext} is for.
+   * @param artifactType       the type of artifact the target {@link MuleContext} is for.
    * @param artifactProperties The properties of the artifact.
    */
   protected SupportsPropertiesMuleContextBuilder(ArtifactType artifactType, Map<String, String> artifactProperties) {

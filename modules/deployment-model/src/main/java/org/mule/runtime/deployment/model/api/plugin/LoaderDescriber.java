@@ -15,12 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Generic descriptor that will be used to describe parametrization to construct {@link ExtensionModel},
- * {@link ClassLoader} and any other descriptor that may arise in a future of {@link ArtifactPluginDescriptor}.
+ * Generic descriptor that will be used to describe parametrization to construct {@link ExtensionModel}, {@link ClassLoader} and
+ * any other descriptor that may arise in a future of {@link ArtifactPluginDescriptor}.
  * <p/>
- * Each {@link LoaderDescriber} will have an ID that will be used to discover any loader that's responsible of working
- * with the current set of attributes. It's up to each loader to validate the types, size and all that matters around
- * the attributes.
+ * Each {@link LoaderDescriber} will have an ID that will be used to discover any loader that's responsible of working with the
+ * current set of attributes. It's up to each loader to validate the types, size and all that matters around the attributes.
  *
  * @since 4.0
  */
@@ -49,10 +48,10 @@ public final class LoaderDescriber {
 
   /**
    * @return attributes that will be feed to the loader found through {@link #getId()}, where it's up to the loader's
-   * responsibilities to determine if the current structure of the values ({@link Object}) does match with the expected
-   * types.
-   * <p/>
-   * That implies each loader must evaluate on the attributes' values to be 100% sure it were formed correctly.
+   *         responsibilities to determine if the current structure of the values ({@link Object}) does match with the expected
+   *         types.
+   *         <p/>
+   *         That implies each loader must evaluate on the attributes' values to be 100% sure it were formed correctly.
    */
   public Map<String, Object> getAttributes() {
     return attributes;
@@ -70,7 +69,7 @@ public final class LoaderDescriber {
   /**
    * Stores the {@code value} under the {@key} in the {@code attributes} internal state.
    *
-   * @param key key with which the specified value is to be associated. Non blank nor null.
+   * @param key   key with which the specified value is to be associated. Non blank nor null.
    * @param value value to be associated with the specified key
    */
   private void addAttribute(String key, Object value) {

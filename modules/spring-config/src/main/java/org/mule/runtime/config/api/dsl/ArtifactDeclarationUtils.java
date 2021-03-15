@@ -41,7 +41,7 @@ public final class ArtifactDeclarationUtils {
    * Generated a new {@link ArtifactAst} based on the provided {@link ArtifactDeclaration}.
    *
    * @param artifactDeclaration the declaration to generate the {@link ArtifactAst} for.
-   * @param extensionModels the models of the extensions used in the app modeled by the provided declarer.
+   * @param extensionModels     the models of the extensions used in the app modeled by the provided declarer.
    * @return the generated AST.
    */
   public static ArtifactAst toArtifactast(ArtifactDeclaration artifactDeclaration, Set<ExtensionModel> extensionModels) {

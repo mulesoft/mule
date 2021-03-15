@@ -24,8 +24,8 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 
 /**
- * {@link AbstractDescriptionDocumenter} implementation that picks a {@link ExtensionDeclaration} on which a {@link ExtensionModel}
- * has already been described.
+ * {@link AbstractDescriptionDocumenter} implementation that picks a {@link ExtensionDeclaration} on which a
+ * {@link ExtensionModel} has already been described.
  *
  * @since 4.0
  */

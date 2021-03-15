@@ -40,13 +40,14 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
   }
 
   /**
-   * @return a collection of paths pointing to an extension built with XML. The order of the extensions matter, which means that if
-   * an extension A depends on a B, and B on a C, the result of calling this method must be C, B and A in that strict order.
-   * <p/>
-   * If the previous rule is not properly applied, when registering an extension in {@link #addBuilders(List)} will fail when looking
-   * for schemas that are not able to be generated, due to missing {@link ExtensionModel}s.
-   * <p/>
-   * Not null.
+   * @return a collection of paths pointing to an extension built with XML. The order of the extensions matter, which means that
+   *         if an extension A depends on a B, and B on a C, the result of calling this method must be C, B and A in that strict
+   *         order.
+   *         <p/>
+   *         If the previous rule is not properly applied, when registering an extension in {@link #addBuilders(List)} will fail
+   *         when looking for schemas that are not able to be generated, due to missing {@link ExtensionModel}s.
+   *         <p/>
+   *         Not null.
    */
   protected String[] getModulePaths() {
     final String modulePath = getModulePath();
@@ -64,7 +65,8 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
       }
 
       private void registerXmlExtensions(ExtensionManager extensionManager) {
-        //take all the plugins loaded by org.mule.test.runner.api.IsolatedClassLoaderExtensionsManagerConfigurationBuilder in the extension manager
+        // take all the plugins loaded by org.mule.test.runner.api.IsolatedClassLoaderExtensionsManagerConfigurationBuilder in the
+        // extension manager
         final Set<ExtensionModel> extensions = new HashSet<>(extensionManager.getExtensions());
         for (String modulePath : getModulePaths()) {
           Map<String, Object> params = new HashMap<>();
@@ -89,8 +91,8 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
    * Ideally, the implementation without validation will be ran only in runtime, while the validation one will be picked up while
    * packaging the connector.
    *
-   * @return false if we are trying to simulate a run of smart connector already packaged, false if we are testing how compiling
-   * a smart connector through maven should be.
+   * @return false if we are trying to simulate a run of smart connector already packaged, false if we are testing how compiling a
+   *         smart connector through maven should be.
    */
   protected boolean shouldValidateXml() {
     return false;
@@ -98,6 +100,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
 
   /**
    * Parameter to re-type operations' output if exists. It should map to
+   * 
    * @return the string of the parameter that represents the declaration file.
    */
   protected Optional<String> operationsOutputPath() {
@@ -106,6 +109,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
 
   /**
    * Parameter to add resources to the {@link ExtensionModel} generation.
+   * 
    * @return the collection of resources that must be exported
    */
   protected Optional<List<String>> resourcesPaths() {

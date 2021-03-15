@@ -45,8 +45,8 @@ public class MvelDataTypeResolver {
   /**
    * Resolves expression data type
    *
-   * @param value result of evaluating the expression on the given message
-   * @param event event under evaluation
+   * @param value                result of evaluating the expression on the given message
+   * @param event                event under evaluation
    * @param serializedExpression expression
    * @return the data type corresponding to the given expression if there is an expression resolver able to resolved it. A default
    *         data type for the value if the expression was not resolved.

@@ -116,7 +116,7 @@ public abstract class AbstractArtifactAgnosticService {
     }
   }
 
-  //Just to separate runtime vs configuration exceptions
+  // Just to separate runtime vs configuration exceptions
   protected static class ApplicationStartingException extends Exception {
 
     private ApplicationStartingException(Exception cause) {

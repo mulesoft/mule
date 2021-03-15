@@ -83,10 +83,10 @@ final class MetadataKeyIdObjectResolver {
    * @param key the {@link MetadataKey} associated to the {@link MetadataKeyId}
    * @return a new instance of the {@link MetadataKeyId} parameter {@code type} with the values of the passed {@link MetadataKey}
    * @throws MetadataResolvingException if:
-   *         <ul>
-   *         <li>Parameter types is not instantiable</li>
-   *         <li>{@param key} does not provide the required levels</li>
-   *         </ul>
+   *                                    <ul>
+   *                                    <li>Parameter types is not instantiable</li>
+   *                                    <li>{@param key} does not provide the required levels</li>
+   *                                    </ul>
    */
   public Object resolve(MetadataKey key) throws MetadataResolvingException {
     return doResolve(key, false);
@@ -117,7 +117,7 @@ final class MetadataKeyIdObjectResolver {
    *
    * @return a new instance of the {@link MetadataKeyId} parameter {@code type}.
    * @throws MetadataResolvingException if the Parameter type is not instantiable.
-   * @throws IllegalArgumentException if cannot found the required default values for an specified key.
+   * @throws IllegalArgumentException   if cannot found the required default values for an specified key.
    */
   public Object resolve() throws MetadataResolvingException {
 

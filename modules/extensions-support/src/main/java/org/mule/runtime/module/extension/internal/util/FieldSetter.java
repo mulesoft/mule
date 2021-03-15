@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
  * Utility class which allows setting the value of a {@link Field} on random compatible instances
  *
  * @param <Target> the generic type of the objects which contain the field
- * @param <Value> the field's generic type
+ * @param <Value>  the field's generic type
  */
 public final class FieldSetter<Target, Value> {
 
@@ -32,7 +32,7 @@ public final class FieldSetter<Target, Value> {
    * Sets the {@code value} into the {@code target} instance
    *
    * @param target the object on which the field value is to be set
-   * @param value the value to set
+   * @param value  the value to set
    */
   public void set(Target target, Value value) {
     ReflectionUtils.setField(field, target, value);

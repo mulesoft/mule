@@ -229,7 +229,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
    * Creates a {@link DeploymentListenerAdapter}.
    *
    * @param artifactDeploymentListener the artifactDeploymentListener to be adapted.
-   * @param type: the artifact type.
+   * @param type:                      the artifact type.
    * @return an DeploymentListener.
    */
   DeploymentListener createDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type) {

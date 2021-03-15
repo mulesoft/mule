@@ -14,11 +14,11 @@ import org.mule.runtime.api.exception.MuleException;
 import javax.inject.Inject;
 
 /**
- * An {@link LifecycleAwareValueResolverWrapper} which throws an {@link IllegalArgumentException} if the resolved
- * value is {@code null}.
+ * An {@link LifecycleAwareValueResolverWrapper} which throws an {@link IllegalArgumentException} if the resolved value is
+ * {@code null}.
  * <p>
- * This wrapper is intended to be used on parameters which have been assigned to an expression, but we want to prevent
- * that expression from evaluating to {@code null}
+ * This wrapper is intended to be used on parameters which have been assigned to an expression, but we want to prevent that
+ * expression from evaluating to {@code null}
  *
  * @param <T> the generic type of the resolved values
  * @since 4.0

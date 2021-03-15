@@ -46,8 +46,8 @@ import java.util.stream.Stream;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Implementation of {@link SourceCallbackExecutor} which uses a {@link GeneratedMethodComponentExecutor} to execute the
- * callback through a {@link Method}
+ * Implementation of {@link SourceCallbackExecutor} which uses a {@link GeneratedMethodComponentExecutor} to execute the callback
+ * through a {@link Method}
  *
  * @since 4.3.0
  */
