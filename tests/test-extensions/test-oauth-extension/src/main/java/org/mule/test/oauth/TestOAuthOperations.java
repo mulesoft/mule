@@ -32,6 +32,7 @@ import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.test.oauth.metadata.OAuthMetadataResolver;
 import org.mule.test.oauth.metadata.RefreshedOAuthMetadataResolver;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
@@ -104,11 +105,16 @@ public class TestOAuthOperations {
   }
 
   @MediaType(ANY)
-  public String getStreamWithFlackyConnection(@Connection TestOAuthConnection connection, InputStream parameter) {
-    String result = IOUtils.toString(parameter);
-    //    if (executedCounter++ % 2 == 0) {
-    //      throw new AccessTokenExpiredException();
-    //    }
+  public InputStream getStream(String content) {
+    return new ByteArrayInputStream(content.getBytes());
+  }
+
+  @MediaType(ANY)
+  public String getStreamContentWithFlackyConnection(@Connection TestOAuthConnection connection, InputStream content) {
+    String result = IOUtils.toString(content);
+    if (executedCounter++ % 2 == 0) {
+      throw new AccessTokenExpiredException();
+    }
 
     return result;
   }

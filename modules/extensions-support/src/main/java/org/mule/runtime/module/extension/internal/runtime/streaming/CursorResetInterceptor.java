@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public class CursorResetInterceptor implements Interceptor<OperationModel> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CursorResetInterceptor.class);
-  private static final String CURSOR_POSITIONS = "CURSOR_POSITIONS";
+  public static final String CURSOR_RESET_HANDLER_VARIABLE = "CURSOR_RESET_HANDLER";
 
   private final List<String> cursorParamNames;
 
@@ -56,26 +56,18 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
     }
 
     if (!cursorPositions.isEmpty()) {
-      ((ExecutionContextAdapter<OperationModel>) ctx).setVariable(CURSOR_POSITIONS, cursorPositions);
+      ((ExecutionContextAdapter<OperationModel>) ctx).setVariable(CURSOR_RESET_HANDLER_VARIABLE,
+                                                                  new CursorResetHandler(cursorPositions));
     }
   }
 
   @Override
   public Throwable onError(ExecutionContext<OperationModel> executionContext, Throwable exception) {
     extractConnectionException(exception).ifPresent(cne -> {
-      List<Pair<Cursor, Long>> cursorPositions =
-          ((ExecutionContextAdapter<OperationModel>) executionContext).removeVariable(CURSOR_POSITIONS);
-      if (cursorPositions != null) {
-        cursorPositions.forEach(pair -> {
-          try {
-            pair.getFirst().seek(pair.getSecond());
-          } catch (IOException e) {
-            if (LOGGER.isWarnEnabled()) {
-              LOGGER.warn("Could not reset cursor back to position " + pair.getSecond() + ". Inconsistencies might occur if "
-                  + "reconnection attempted", e);
-            }
-          }
-        });
+      CursorResetHandler cursorResetHandler =
+          ((ExecutionContextAdapter<OperationModel>) executionContext).removeVariable(CURSOR_RESET_HANDLER_VARIABLE);
+      if (cursorResetHandler != null) {
+        cursorResetHandler.resetCursors();
       }
     });
 
