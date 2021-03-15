@@ -13,8 +13,12 @@ import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.sdk.api.annotation.mapping.ParameterMapping;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.mule.test.values.extension.resolver.SimpleLegacyValueProvider;
 =======
+=======
+import org.mule.test.values.extension.resolver.PocSimpleValueProvider;
+>>>>>>> asdasd
 import org.mule.test.values.extension.resolver.SdkSimpleValueProvider;
 >>>>>>> asdads
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
@@ -30,6 +34,7 @@ import org.mule.test.values.extension.resolver.WithRequiredParameterValueProvide
 import org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider;
 import org.mule.test.values.extension.resolver.WithMuleContextValueProvider;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class ValuesOperations {
@@ -112,4 +117,8 @@ public class ValuesOperations {
       value = SdkSimpleValueProvider.class,
       mapping = {@ParameterMapping(providerParameter = "asd", componentParameter = "papa", fieldPath = "asd.qwe.asd"),
           @ParameterMapping(providerParameter = "ooo", componentParameter = "eee", fieldPath = "ee.qq.cacx")}) String papapa) {}
+
+  public void pocExample(@OfValues(
+      value = PocSimpleValueProvider.class, mapping = @ParameterMapping(providerParameter = "complexParam",
+          componentParameter = "complexParam", fieldPath = "field")) String papapa, InputStream complexParam) {}
 }
