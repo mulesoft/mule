@@ -44,6 +44,11 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
    */
   private final BaseEventContext oldContext;
 
+  /**
+   * Excutor to delegate the processing
+   */
+  private final ChainExecutor chainExecutor;
+
   private ImmutableProcessorChainExecutor delegate;
 
   private ComponentLocation location;
@@ -59,6 +64,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     this.oldContext = (BaseEventContext) this.originalEvent.getContext();
     this.delegate = new ImmutableProcessorChainExecutor(this.originalEvent, this.chain);
     this.location = getLocation();
+    this.chainExecutor = new ChainExecutor(chain, originalEvent);
   }
 
   private ComponentLocation getLocation() {
@@ -102,14 +108,13 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     CoreEvent eventWithCorrelationId = quickCopy(createCorrelationIdContext(correlationId), originalEvent);
     setSdkInternalContextValues(eventWithCorrelationId);
 
-    new ChainExecutor(chain, originalEvent, eventWithCorrelationId,
-                      result -> onSuccess.accept(resultWithPreviousCorrelationId((EventedResult) result)),
-                      (t, res) -> {
-                        if (t instanceof MessagingException) {
-                          t = new MessagingException(withPreviousCorrelationid(((MessagingException) t).getEvent()), t);
-                        }
-                        onError.accept(t, resultWithPreviousCorrelationId((EventedResult) res));
-                      }).execute();
+    chainExecutor.execute(eventWithCorrelationId,
+                          result -> onSuccess.accept(resultWithPreviousCorrelationId((EventedResult) result)), (t, res) -> {
+                            if (t instanceof MessagingException) {
+                              t = new MessagingException(withPreviousCorrelationid(((MessagingException) t).getEvent()), t);
+                            }
+                            onError.accept(t, resultWithPreviousCorrelationId((EventedResult) res));
+                          });
   }
 
   @Override

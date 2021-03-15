@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * An implementation of {@link Chain} that wraps a {@link Processor} and allows to execute it
  *
@@ -43,6 +40,11 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
   private final CoreEvent originalEvent;
 
   /**
+   * Excutor to delegate the processing
+   */
+  private final ChainExecutor chainExecutor;
+
+  /**
    * Creates a new immutable instance
    *
    * @param event the original {@link CoreEvent} for the execution of the given chain
@@ -51,6 +53,7 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
   public ImmutableProcessorChainExecutor(CoreEvent event, MessageProcessorChain chain) {
     this.originalEvent = event;
     this.chain = chain;
+    this.chainExecutor = new ChainExecutor(chain, originalEvent);
   }
 
   @Override
@@ -84,7 +87,7 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
                   "A success completion handler is required in order to execute the components chain, but it was null");
     checkArgument(onError != null,
                   "An error completion handler is required in order to execute the components chain, but it was null");
-    new ChainExecutor(chain, originalEvent, event, onSuccess, onError).execute();
+    chainExecutor.execute(event, onSuccess, onError);
   }
 
   @Override
