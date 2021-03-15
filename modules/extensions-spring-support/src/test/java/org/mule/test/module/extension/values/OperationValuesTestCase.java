@@ -144,4 +144,10 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(resolvingFailure.getFailureCode(), is("CUSTOM_ERROR"));
     assertThat(resolvingFailure.getMessage(), is(ERROR_MESSAGE));
   }
+
+  @Test
+  public void pocActing() throws Exception {
+    ValueResult result = getValueResult("pocExample", "papapa");
+    assertThat(result.getFailure().isPresent(), is(true));
+  }
 }

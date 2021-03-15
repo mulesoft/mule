@@ -90,4 +90,8 @@
     <flow name="withErrorValueProvider">
         <values:with-error-value-provider errorCode="CUSTOM_ERROR"/>
     </flow>
+
+    <flow name="pocExample">
+        <values:poc-example complexParam="#[output application/json --- { 'field' : 'hola', 'anotherField' : 'chau'}]"/>
+    </flow>
 </mule>
