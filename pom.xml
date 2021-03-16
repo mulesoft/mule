@@ -5,7 +5,7 @@
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.4.0-20210226</version>
+    <version>4.4.0-20210316</version>
 
     <!-- Organization -->
     <organization>
