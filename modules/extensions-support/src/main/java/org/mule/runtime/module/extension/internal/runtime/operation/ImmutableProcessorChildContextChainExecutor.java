@@ -63,12 +63,8 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     this.chain = chain;
     this.oldContext = (BaseEventContext) this.originalEvent.getContext();
     this.delegate = new ImmutableProcessorChainExecutor(this.originalEvent, this.chain);
-    this.location = getLocation();
+    this.location = chain.getLocation();
     this.chainExecutor = new ChainExecutor(chain, originalEvent);
-  }
-
-  private ComponentLocation getLocation() {
-    return chain.getLocation();
   }
 
   private void setSdkInternalContextValues(CoreEvent eventWithCorrelationId) {
@@ -77,9 +73,11 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     sdkInternalContext.putContext(location, eventId);
     SdkInternalContext.OperationExecutionParams params =
         sdkInternalContext.getOperationExecutionParams(location, originalEvent.getContext().getId());
-    sdkInternalContext.setOperationExecutionParams(location, eventId, params.getConfiguration(), params.getParameters(),
-                                                   eventWithCorrelationId, params.getCallback(),
-                                                   params.getExecutionContextAdapter());
+    if (params != null) {
+      sdkInternalContext.setOperationExecutionParams(location, eventId, params.getConfiguration(), params.getParameters(),
+                                                     eventWithCorrelationId, params.getCallback(),
+                                                     params.getExecutionContextAdapter());
+    }
   }
 
   private CoreEvent withPreviousCorrelationid(CoreEvent event) {
