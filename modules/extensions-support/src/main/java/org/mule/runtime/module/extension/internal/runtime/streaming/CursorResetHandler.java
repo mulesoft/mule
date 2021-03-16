@@ -10,7 +10,7 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.util.Pair;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class CursorResetHandler {
   }
 
   private List<Pair<Cursor, Long>> getCursorPositions(List<Cursor> cursors) {
-    List<Pair<Cursor, Long>> cursorPositions = new LinkedList<>();
+    List<Pair<Cursor, Long>> cursorPositions = new ArrayList<>(cursors.size());
     for (Cursor cursor : cursors) {
       cursorPositions.add(new Pair<>(cursor, cursor.getPosition()));
     }
