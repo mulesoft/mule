@@ -8,8 +8,12 @@ package org.mule.test.oauth;
 
 import static java.util.Arrays.asList;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
@@ -18,6 +22,8 @@ import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 public class TestOAuthOperations {
@@ -86,5 +92,20 @@ public class TestOAuthOperations {
       throw new AccessTokenExpiredException();
     }
     return connection;
+  }
+
+  @MediaType(ANY)
+  public InputStream getStream(String content) {
+    return new ByteArrayInputStream(content.getBytes());
+  }
+
+  @MediaType(ANY)
+  public String getStreamContentWithFlackyConnection(@Connection TestOAuthConnection connection, InputStream content) {
+    String result = IOUtils.toString(content);
+    if (executedCounter++ % 2 == 0) {
+      throw new AccessTokenExpiredException();
+    }
+
+    return result;
   }
 }

@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Created-By: Apache Maven 3.6.0
+Built-By: ndinucci
+Build-Jdk: 11.0.9
+Specification-Title: Resource HTTP Service Implementation
+Specification-Version: 4.4
+Specification-Vendor: MuleSoft, Inc.
+Implementation-Title: Resource HTTP Service Implementation
+Implementation-Version: 4.4.0-SNAPSHOT
+Implementation-Vendor-Id: org.mule.tests
+Implementation-Vendor: MuleSoft, Inc.
+Implementation-URL: https://developer.mulesoft.com/mule-tests/mule-http-
+ resource-service/
+Build-Date: 
+Build-Revision: 6f56d596
+Description: Mule Runtime and Integration Platform
+Dev-List-Email: mule-esb@mulesoft.com
+Git-branch: fix/MULE-19262
+Git-commit-id: 6f56d596d37c0f1d2a97d7a04a9bfb804b793161
+Git-commit-id-describe: 6f56d59-dirty
+Git-commit-time: 2021-03-16T10:23:36-0300
+Git-remote-origin-url: https://github.com/mulesoft/mule.git
+Git-tags: 
+License: CPAL v1.0 http://www.mulesoft.com/CPAL/
+More-Info: For more information go to https://developer.mulesoft.com/
+Product-Url: https://developer.mulesoft.com/
+Recommended-Jdks: [1.8.0_181,9),[11,12)
+Support: Get commercial support: http://www.mulesoft.com/support
+Supported-Jdks: [1.8.0,12)
+Vendor-Url: http://www.mulesoft.com
+
