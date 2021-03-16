@@ -64,6 +64,9 @@ public class PetStoreConnector {
   @Optional
   private Aquarium aquarium;
 
+  @ParameterGroup(name = "Advanced Leash Configuration", showInDsl = true)
+  public AdvancedLeashConfiguration advancedLeashConfiguration;
+
   @DefaultEncoding
   String encoding;
 
