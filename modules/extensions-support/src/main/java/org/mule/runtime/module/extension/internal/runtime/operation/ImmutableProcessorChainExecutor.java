@@ -27,7 +27,7 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcessors {
+public class ImmutableProcessorChainExecutor implements ProcessorChainExecutor {
 
   /**
    * Processor that will be executed upon calling process

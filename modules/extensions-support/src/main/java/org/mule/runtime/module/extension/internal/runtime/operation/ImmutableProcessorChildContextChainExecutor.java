@@ -27,7 +27,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 
-public class ImmutableProcessorChildContextChainExecutor implements ChildContextChain, HasMessageProcessors {
+public class ImmutableProcessorChildContextChainExecutor implements ChildContextChain, ProcessorChainExecutor {
 
   /**
    * Processor that will be executed upon calling process
@@ -49,7 +49,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
    */
   private final ChainExecutor chainExecutor;
 
-  private ImmutableProcessorChainExecutor delegate;
+  private ProcessorChainExecutor delegate;
 
   private ComponentLocation location;
 
@@ -133,5 +133,10 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
   @Override
   public List<Processor> getMessageProcessors() {
     return chain.getMessageProcessors();
+  }
+
+  @Override
+  public CoreEvent getOriginalEvent() {
+    return originalEvent;
   }
 }
