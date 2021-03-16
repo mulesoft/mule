@@ -96,7 +96,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   private final String serverId;
   private final ComponentLocation location;
 
-  private final ProcessingTime processingTime;
+  private transient ProcessingTime processingTime;
 
   private transient EventStreamingState streamingState;
 
