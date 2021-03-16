@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.MAX_REFRESH_ATTEMPTS;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
+import static org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor.CURSOR_RESET_HANDLER_VARIABLE;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -23,6 +24,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetHandler;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
@@ -80,12 +82,21 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
       public void error(Throwable e) {
         try {
           if (++attempts <= MAX_REFRESH_ATTEMPTS && refreshTokenIfNecessary(operationContext, e)) {
+            resetCursors(operationContext);
             OAuthOperationMessageProcessor.super.executeOperation(operationContext, this);
           } else {
             callback.error(e);
           }
         } catch (Exception refreshException) {
           callback.error(refreshException);
+        }
+      }
+
+      private void resetCursors(ExecutionContextAdapter<OperationModel> operationContext) {
+        CursorResetHandler cursorResetHandler =
+            ((ExecutionContextAdapter<OperationModel>) operationContext).getVariable(CURSOR_RESET_HANDLER_VARIABLE);
+        if (cursorResetHandler != null) {
+          cursorResetHandler.resetCursors();
         }
       }
     };

@@ -7,9 +7,11 @@
 package org.mule.test.oauth;
 
 import static java.util.Arrays.asList;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
@@ -30,6 +32,8 @@ import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.test.oauth.metadata.OAuthMetadataResolver;
 import org.mule.test.oauth.metadata.RefreshedOAuthMetadataResolver;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 public class TestOAuthOperations {
@@ -98,6 +102,21 @@ public class TestOAuthOperations {
       throw new AccessTokenExpiredException();
     }
     return connection;
+  }
+
+  @MediaType(ANY)
+  public InputStream getStream(String content) {
+    return new ByteArrayInputStream(content.getBytes());
+  }
+
+  @MediaType(ANY)
+  public String getStreamContentWithFlackyConnection(@Connection TestOAuthConnection connection, InputStream content) {
+    String result = IOUtils.toString(content);
+    if (executedCounter++ % 2 == 0) {
+      throw new AccessTokenExpiredException();
+    }
+
+    return result;
   }
 
   @OutputResolver(output = RefreshedOAuthMetadataResolver.class)
