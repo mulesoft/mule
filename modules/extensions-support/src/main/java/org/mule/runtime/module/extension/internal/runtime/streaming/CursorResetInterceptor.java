@@ -46,18 +46,17 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
 
   @Override
   public void before(ExecutionContext<OperationModel> ctx) throws Exception {
-    List<Pair<Cursor, Long>> cursorPositions = new ArrayList<>(cursorParamNames.size());
+    List<Cursor> cursors = new ArrayList<>(cursorParamNames.size());
     for (String cursorParamName : cursorParamNames) {
       Object value = ctx.getParameterOrDefault(cursorParamName, null);
       if (value instanceof Cursor) {
-        final Cursor cursor = (Cursor) value;
-        cursorPositions.add(new Pair<>(cursor, cursor.getPosition()));
+        cursors.add((Cursor) value);
       }
     }
 
-    if (!cursorPositions.isEmpty()) {
+    if (!cursors.isEmpty()) {
       ((ExecutionContextAdapter<OperationModel>) ctx).setVariable(CURSOR_RESET_HANDLER_VARIABLE,
-                                                                  new CursorResetHandler(cursorPositions));
+                                                                  new CursorResetHandler(cursors));
     }
   }
 
