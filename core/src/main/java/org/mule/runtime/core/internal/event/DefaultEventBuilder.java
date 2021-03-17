@@ -109,7 +109,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.notificationsEnabled = event.isNotificationsEnabled();
 
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
-    this.loggingVariables = (CaseInsensitiveHashMap<String, String>) event.getLoggingVariables();
+    this.loggingVariables = (CaseInsensitiveHashMap<String, String>) event.getLoggingVariables().orElse(null);
     this.internalParameters = (Map<String, Object>) event.getInternalParameters();
     flowProcessMediatorContext = copyOf(event.getFlowProcessMediatorContext());
     foreachInternalContext = copyOf(event.getForeachInternalContext());
@@ -618,8 +618,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     }
 
     @Override
-    public Map<String, String> getLoggingVariables() {
-      return loggingVariables;
+    public Optional<Map<String, String>> getLoggingVariables() {
+      return ofNullable(loggingVariables);
     }
 
     private void setMessage(Message message) {

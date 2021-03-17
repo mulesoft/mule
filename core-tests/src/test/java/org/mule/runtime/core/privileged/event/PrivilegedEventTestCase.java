@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.event;
 
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -25,14 +26,14 @@ public class PrivilegedEventTestCase extends AbstractMuleTestCase {
   @Test
   public void whenNoLoggingVariableIsAddedThenTheMapIsNotCreated() throws MuleException {
     PrivilegedEvent event = builder(testEvent()).build();
-    assertThat(event.getLoggingVariables(), is(nullValue()));
+    assertThat(event.getLoggingVariables().isPresent(), is(false));
   }
 
   @Test
   public void whenAVariableIsAddedThenTheMapContainsIt() throws MuleException {
     PrivilegedEvent event = builder(testEvent()).addLoggingVariable("some", "value").build();
-    assertThat(event.getLoggingVariables(), is(notNullValue()));
-    assertThat(event.getLoggingVariables().get("some"), is("value"));
+    assertThat(event.getLoggingVariables().isPresent(), is(true));
+    assertThat(event.getLoggingVariables().get().get("some"), is("value"));
   }
 
   @Test
@@ -88,6 +89,7 @@ public class PrivilegedEventTestCase extends AbstractMuleTestCase {
   public void removeLoggingVariable() throws MuleException {
     CoreEvent originalEvent = builder(testEvent()).addLoggingVariable("some", "value").build();
     PrivilegedEvent newEvent = builder(originalEvent).removeLoggingVariable("some").build();
-    assertThat(newEvent.getLoggingVariables().containsKey("some"), is(false));
+    assertThat(newEvent.getLoggingVariables().isPresent(), is(true));
+    assertThat(newEvent.getLoggingVariables().get().containsKey("some"), is(false));
   }
 }

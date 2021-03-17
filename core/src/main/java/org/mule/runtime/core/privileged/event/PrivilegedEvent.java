@@ -103,15 +103,18 @@ public interface PrivilegedEvent extends CoreEvent {
     if (event == null) {
       MDC.remove(CORRELATION_ID_MDC_KEY);
     } else {
+      event.getLoggingVariables().ifPresent(variables -> variables.forEach(MDC::put));
       MDC.put(CORRELATION_ID_MDC_KEY, event.getCorrelationId());
-      Map<String, String> loggingVariables = event.getLoggingVariables();
-      if (loggingVariables != null) {
-        loggingVariables.forEach(MDC::put);
-      }
     }
   }
 
-  Map<String, String> getLoggingVariables();
+  /**
+   * Gets the logging variables from the event. These variables are going to be added to the log4j MDC when
+   * {@link PrivilegedEvent#setCurrentEvent} is called with this event.
+   *
+   * @return A dictionary with the logging variables.
+   */
+  Optional<Map<String, String>> getLoggingVariables();
 
   /**
    * Returns the contents of the message as a byte array.
@@ -289,10 +292,28 @@ public interface PrivilegedEvent extends CoreEvent {
     @Override
     Builder clearVariables();
 
+    /**
+     * Adds a logging variable to the event. See also {@link PrivilegedEvent#getLoggingVariables()}.
+     *
+     * @param key   The variable name.
+     * @param value The variable value.
+     * @return This builder.
+     */
     Builder addLoggingVariable(String key, String value);
 
+    /**
+     * Removes a logging variable from the event. See also {@link PrivilegedEvent#getLoggingVariables()}.
+     *
+     * @param key The variable name.
+     * @return This builder.
+     */
     Builder removeLoggingVariable(String key);
 
+    /**
+     * Removes all logging variables from the event. See also {@link PrivilegedEvent#getLoggingVariables()}.
+     *
+     * @return This builder.
+     */
     Builder clearLoggingVariables();
 
     @Override
