@@ -1142,6 +1142,75 @@
           "name": "Cashier",
           "description": "",
           "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 13
+              },
+              "allowedStereotypeModels": [],
+              "name": "brand",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 14
+              },
+              "allowedStereotypeModels": [],
+              "name": "material",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 3
+          },
+          "showInDsl": true,
+          "name": "Advanced Leash Configuration",
+          "description": "",
+          "modelProperties": {}
         }
       ],
       "externalLibraryModels": [],
@@ -14814,7 +14883,9 @@
             "rothIRA",
             "pensionPlan",
             "cash",
-            "debt"
+            "debt",
+            "brand",
+            "material"
           ]
         }
       }
@@ -35366,6 +35437,67 @@
             ]
           },
           "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "advancedLeashConfiguration",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.petstore.extension.AdvancedLeashConfiguration",
+              "classInformation": {
+                "classname": "org.mule.test.petstore.extension.AdvancedLeashConfiguration",
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "typeAlias": {
+                "value": "AdvancedLeashConfiguration"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "brand"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "material"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "flattened": {},
             "expressionSupport": {
               "value": "SUPPORTED"
             }
