@@ -15,7 +15,11 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CORRELATION_ID;
+import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CorrelationIdOnSourcesStory.CORRELATION_ID_MODIFICATION;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,12 +41,16 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.size.SmallTest;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+@SmallTest
+@Feature(CORRELATION_ID)
+@Story(CORRELATION_ID_MODIFICATION)
 public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleContextTestCase {
 
   private static final String TEST_CORRELATION_ID = "messirve";
