@@ -46,6 +46,7 @@ class ChainExecutor {
       innerChainCtxMapping = sdkInternalCtx.getInnerChainSubscriberContextMapping();
     }
 
+    // TODO: MULE-19269 - Potential need to migrate this to a flux
     Mono.from(processWithChildContextDontComplete(event, chain, ofNullable(chain.getLocation())))
         .doOnSuccess(childEvent -> handleSuccess(childEvent, successHandler, errorHandler))
         .doOnError(error -> {

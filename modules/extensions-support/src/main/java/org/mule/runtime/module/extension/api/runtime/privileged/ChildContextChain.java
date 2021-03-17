@@ -20,7 +20,8 @@ import java.util.function.Consumer;
 public interface ChildContextChain extends Chain {
 
   /**
-   * Sames as {@link Chain#process(Consumer, BiConsumer)}, setting the correlation id within the execution as the the one passed.
+   * Same as {@link Chain#process(Consumer, BiConsumer)}, setting the correlation id within the execution as the the one passed.
+   * <p>
    * The correlation id will return to the previous values for the components following the chain execution.
    *
    * @param correlationId the correlation id to be used in the event within the execution of the chain

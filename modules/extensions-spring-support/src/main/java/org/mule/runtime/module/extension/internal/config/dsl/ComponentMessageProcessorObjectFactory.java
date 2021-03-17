@@ -72,6 +72,8 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
           .findFirst()
           .ifPresent(chain -> parameters.put(chain.getName(),
                                              new ProcessorChainValueResolver(nestedChain)));
+
+      // For MULE-18771 we need access to the chain's location to create a new event and sdk context
       nestedChain.setAnnotations(this.getAnnotations());
     } else {
       nestedChain = null;
