@@ -741,6 +741,8 @@ public interface AllureConstants {
 
       String CORRELATION_ID_ON_SOURCES = "Sources' correlation id generation";
 
+      String CORRELATION_ID_MODIFICATION = "Correlation id modification in child context in chains";
+
     }
   }
 

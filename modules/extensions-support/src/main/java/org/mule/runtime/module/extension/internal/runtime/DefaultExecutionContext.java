@@ -28,6 +28,7 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor;
+import org.mule.runtime.module.extension.internal.runtime.operation.ProcessorChainExecutor;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -188,8 +189,8 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     // (see MULE-19088, ReactiveInterceptorAdapter#setInternalParamsForNotParamResolver and
     // ComponentMessageProcessor#shouldUsePrecalculatedContext)
     this.getParameters().values().forEach(parameterValue -> {
-      if (parameterValue instanceof ImmutableProcessorChainExecutor) {
-        CoreEvent originalEvent = ((ImmutableProcessorChainExecutor) parameterValue).getOriginalEvent();
+      if (parameterValue instanceof ProcessorChainExecutor) {
+        CoreEvent originalEvent = ((ProcessorChainExecutor) parameterValue).getOriginalEvent();
         if (originalEvent.getContext().getId().equals(event.getContext().getId())) {
           ((InternalEvent) originalEvent).setSdkInternalContext(((InternalEvent) updated).getSdkInternalContext());
         }
