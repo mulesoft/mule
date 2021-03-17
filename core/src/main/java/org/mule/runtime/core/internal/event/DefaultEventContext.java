@@ -96,6 +96,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   private final String serverId;
   private final ComponentLocation location;
 
+  // Transient to avoid de-serialization backward compatibility problems (MULE-19020)
   private transient ProcessingTime processingTime;
 
   private transient EventStreamingState streamingState;
