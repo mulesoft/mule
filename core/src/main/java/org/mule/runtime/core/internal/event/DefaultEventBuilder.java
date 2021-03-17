@@ -226,7 +226,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     if (loggingVariables == null) {
       return this;
     }
-    loggingVariables.remove(key);
+    if (loggingVariables.remove(key) == null) {
+      return this;
+    }
     MDC.remove(key);
     modified = true;
     return this;
@@ -235,6 +237,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   @Override
   public PrivilegedEvent.Builder clearLoggingVariables() {
     if (loggingVariables == null) {
+      return this;
+    }
+    if (loggingVariables.isEmpty()) {
       return this;
     }
     loggingVariables.forEach((k, v) -> MDC.remove(k));
