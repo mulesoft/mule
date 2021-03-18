@@ -58,8 +58,8 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
     this.childExtensionManager = childExtensionManager;
 
     extensionModels = new HashSet<>();
-    extensionModels.addAll(childExtensionManager.getExtensions());
     extensionModels.addAll(parentExtensionManager.getExtensions());
+    extensionModels.addAll(childExtensionManager.getExtensions());
   }
 
   @Override
@@ -132,10 +132,12 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
     Optional<ConfigurationProvider> configurationModel =
         childExtensionManager.getConfigurationProvider(extensionModel, componentModel);
-    if (!configurationModel.isPresent() && !childExtensionManager.getExtension(extensionModel.getName()).isPresent()) {
+
+    if (!configurationModel.isPresent()) {
       configurationModel =
-          parentExtensionManager.getConfigurationProvider(extensionModel, componentModel);
+          parentExtensionManager.getConfigurationProvider(extensionModel, componentModel);;
     }
+
     return configurationModel;
   }
 
