@@ -51,6 +51,7 @@ import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
@@ -62,6 +63,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.slf4j.MDC;
+
 public class DefaultEventBuilder implements InternalEvent.Builder {
 
   private BaseEventContext context;
@@ -69,6 +72,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private boolean varsModified = false;
   private CaseInsensitiveHashMap<String, TypedValue<?>> flowVariables;
   private CaseInsensitiveHashMap<String, TypedValue<?>> originalVars;
+  private CaseInsensitiveHashMap<String, String> loggingVariables;
   private Map<String, Object> internalParameters;
   private Error error;
   private Optional<ItemSequenceInfo> itemSequenceInfo = empty();
@@ -105,6 +109,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.notificationsEnabled = event.isNotificationsEnabled();
 
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
+    this.loggingVariables = (CaseInsensitiveHashMap<String, String>) event.getLoggingVariables().orElse(null);
     this.internalParameters = (Map<String, Object>) event.getInternalParameters();
     flowProcessMediatorContext = copyOf(event.getFlowProcessMediatorContext());
     foreachInternalContext = copyOf(event.getForeachInternalContext());
@@ -203,6 +208,43 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     this.modified = flowVariables.remove(key) != null || modified;
     this.varsModified = this.varsModified || modified;
+    return this;
+  }
+
+  @Override
+  public PrivilegedEvent.Builder addLoggingVariable(String key, String value) {
+    if (loggingVariables == null) {
+      loggingVariables = new CaseInsensitiveHashMap<>();
+    }
+    loggingVariables.put(key, value);
+    modified = true;
+    return this;
+  }
+
+  @Override
+  public PrivilegedEvent.Builder removeLoggingVariable(String key) {
+    if (loggingVariables == null) {
+      return this;
+    }
+    if (loggingVariables.remove(key) == null) {
+      return this;
+    }
+    MDC.remove(key);
+    modified = true;
+    return this;
+  }
+
+  @Override
+  public PrivilegedEvent.Builder clearLoggingVariables() {
+    if (loggingVariables == null) {
+      return this;
+    }
+    if (loggingVariables.isEmpty()) {
+      return this;
+    }
+    loggingVariables.forEach((k, v) -> MDC.remove(k));
+    loggingVariables.clear();
+    modified = true;
     return this;
   }
 
@@ -310,6 +352,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       return new InternalEventImplementation(context,
                                              requireNonNull(messageFactory.apply(context)),
                                              varsModified ? flowVariables : originalVars,
+                                             loggingVariables,
                                              internalParameters,
                                              session,
                                              securityContext,
@@ -376,6 +419,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final boolean notificationsEnabled;
 
     private final CaseInsensitiveHashMap<String, TypedValue<?>> variables;
+    private final CaseInsensitiveHashMap<String, String> loggingVariables;
 
     private final String legacyCorrelationId;
     private final Error error;
@@ -398,6 +442,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.securityContext = null;
       this.notificationsEnabled = false;
       this.variables = null;
+      this.loggingVariables = null;
       this.legacyCorrelationId = null;
       this.error = null;
       this.itemSequenceInfo = null;
@@ -413,6 +458,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private InternalEventImplementation(BaseEventContext context,
                                         Message message,
                                         CaseInsensitiveHashMap<String, TypedValue<?>> variables,
+                                        CaseInsensitiveHashMap<String, String> loggingVariables,
                                         Map<String, ?> internalParameters,
                                         MuleSession session,
                                         SecurityContext securityContext,
@@ -426,6 +472,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                         String legacyCorrelationId,
                                         boolean notificationsEnabled) {
       this.context = context;
+      this.loggingVariables = loggingVariables;
       this.session = session;
       this.securityContext = securityContext;
       this.message = message;
@@ -568,6 +615,11 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public Object getReplyToDestination() {
       return null;
+    }
+
+    @Override
+    public Optional<Map<String, String>> getLoggingVariables() {
+      return ofNullable(loggingVariables);
     }
 
     private void setMessage(Message message) {
