@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.core.privileged.event;
 
-import static org.hamcrest.Matchers.empty;
+import static java.util.Optional.empty;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.builder;
 import org.mule.runtime.api.exception.MuleException;
@@ -26,14 +25,14 @@ public class PrivilegedEventTestCase extends AbstractMuleTestCase {
   @Test
   public void whenNoLoggingVariableIsAddedThenTheMapIsNotCreated() throws MuleException {
     PrivilegedEvent event = builder(testEvent()).build();
-    assertThat(event.getLoggingVariables().isPresent(), is(false));
+    assertThat(event.getLoggingVariables(), is(empty()));
   }
 
   @Test
   public void whenAVariableIsAddedThenTheMapContainsIt() throws MuleException {
     PrivilegedEvent event = builder(testEvent()).addLoggingVariable("some", "value").build();
-    assertThat(event.getLoggingVariables().isPresent(), is(true));
-    assertThat(event.getLoggingVariables().get().get("some"), is("value"));
+    assertThat(event.getLoggingVariables(), is(not(empty())));
+    event.getLoggingVariables().ifPresent(vars -> assertThat(vars.get("some"), is("value")));
   }
 
   @Test
@@ -89,7 +88,7 @@ public class PrivilegedEventTestCase extends AbstractMuleTestCase {
   public void removeLoggingVariable() throws MuleException {
     CoreEvent originalEvent = builder(testEvent()).addLoggingVariable("some", "value").build();
     PrivilegedEvent newEvent = builder(originalEvent).removeLoggingVariable("some").build();
-    assertThat(newEvent.getLoggingVariables().isPresent(), is(true));
-    assertThat(newEvent.getLoggingVariables().get().containsKey("some"), is(false));
+    assertThat(newEvent.getLoggingVariables(), is(not(empty())));
+    newEvent.getLoggingVariables().ifPresent(vars -> assertThat(vars.keySet(), not(contains("some"))));
   }
 }
