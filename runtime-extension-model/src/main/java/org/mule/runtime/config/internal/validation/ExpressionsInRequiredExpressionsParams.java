@@ -81,7 +81,7 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
 
           return false;
         })
-        .map(param -> format("A static value ('%s') was given for parameter '%s' but it requires a expression",
+        .map(param -> format("A static value ('%s') was given for parameter '%s' but it requires an expression",
                              param.getRawValue(), param.getModel().getName()))
         .findFirst();
   }
