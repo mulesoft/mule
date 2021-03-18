@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.ast.api.validation.Validation;
 
 import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCoreValidationTestCase {
 
@@ -23,6 +25,8 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
   }
 
   @Test
+  @Ignore("MULE-19234")
+  // TODO MULE-19234 Use a general WARN validation
   public void requiredExpression() {
     final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
