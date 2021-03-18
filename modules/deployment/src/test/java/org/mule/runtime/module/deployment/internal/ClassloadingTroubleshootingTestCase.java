@@ -7,24 +7,19 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
+import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.readFileToString;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
-import static org.mule.tck.util.CompilerUtils.JarCompiler;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 
-import io.qameta.allure.Feature;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
@@ -33,12 +28,21 @@ import org.mule.runtime.module.deployment.logging.MemoryAppenderResource;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
+import org.mule.tck.util.CompilerUtils.JarCompiler;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.StringJoiner;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+import io.qameta.allure.Feature;
 
 @Feature(CLASSLOADING_ISOLATION)
 public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestCase {
@@ -324,7 +328,10 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
           @Override
           public String describeFailure() {
-            return "expected content not found.";
+            final StringJoiner joiner = new StringJoiner(lineSeparator());
+            appender.getLogLines().forEach(joiner::add);
+
+            return "expected content ('" + expectedErrorLog + "') not found. Full log is:" + lineSeparator() + joiner.toString();
           }
         });
   }
@@ -332,4 +339,5 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   private boolean contains(String content) {
     return appender.getLogLines().anyMatch(event -> event.contains(content));
   }
+
 }
