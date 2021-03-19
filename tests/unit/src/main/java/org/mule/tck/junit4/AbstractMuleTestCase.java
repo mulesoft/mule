@@ -244,8 +244,8 @@ public abstract class AbstractMuleTestCase {
     setCurrentEvent(null);
   }
 
-  @After
-  public void shutdownLogging() throws MuleException {
+  @AfterClass
+  public static void shutdownLogging() throws MuleException {
     shutdown();
   }
 
