@@ -1,7 +1,0 @@
-<html>
-<head><title>Mule - ${ModuleName} Module</title>
-</head>
-<body>
-<p>${description}</p>
-</body>
-</html>
