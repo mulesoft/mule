@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
@@ -199,7 +200,19 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       Map<QName, Object> annotations = new HashMap<>(referencedFlow.getAnnotations());
       annotations.put(ROOT_CONTAINER_NAME_KEY, getRootContainerLocation().toString());
       referencedFlow.setAnnotations(annotations);
-      startIfNeeded(referencedFlow);
+
+      // Set the TCCL to the app one to apply the referenced flow lifecycle, to be consistent on how lifecycle is applied in
+      // general.
+      // TODO MULE-17598 Use the region classloader instead
+      Thread currentThread = currentThread();
+      ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+      ClassLoader contextClassLoader = muleContext.getExecutionClassLoader();
+      setContextClassLoader(currentThread, currentClassLoader, contextClassLoader);
+      try {
+        startIfNeeded(referencedFlow);
+      } finally {
+        setContextClassLoader(currentThread, contextClassLoader, currentClassLoader);
+      }
     }
 
     return (Processor) referencedFlow;
@@ -254,8 +267,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) value);
     } else if (value instanceof ManagedList) {
       ManagedList managedList = (ManagedList) value;
-      for (int i = 0; i < managedList.size(); i++) {
-        Object itemValue = managedList.get(i);
+      for (Object itemValue : managedList) {
         if (itemValue instanceof BeanDefinition) {
           updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) itemValue);
         }

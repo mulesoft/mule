@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
-
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -47,14 +48,13 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -76,6 +76,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -84,6 +85,17 @@ import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
@@ -98,19 +110,12 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 
 @SmallTest
 public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
@@ -243,6 +248,50 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("MULE-19272")
+  public void tcclProperlySetWhenStartingStaticFlowRefSubFlow() throws Exception {
+    AtomicReference<ClassLoader> startTcclRef = new AtomicReference<>();
+    ((Startable) doAnswer(inv -> {
+      startTcclRef.set(currentThread().getContextClassLoader());
+      return null;
+    }).when(targetSubFlowProcessor)).start();
+
+    ClassUtils.withContextClassLoader(mock(ClassLoader.class), () -> {
+      FlowRefFactoryBean flowRefFactoryBean;
+      try {
+        flowRefFactoryBean = createStaticFlowRefFactoryBean(targetSubFlow, targetSubFlowChainBuilder);
+        verifyProcess(flowRefFactoryBean, targetSubFlowProcessor, applicationContext);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
+    });
+
+    assertThat(startTcclRef.get(), sameInstance(mockMuleContext.getExecutionClassLoader()));
+  }
+
+  @Test
+  @Issue("MULE-19272")
+  public void tcclProperlySetWhenStartingDynamicFlowRefSubFlow() throws Exception {
+    AtomicReference<ClassLoader> startTcclRef = new AtomicReference<>();
+    ((Startable) doAnswer(inv -> {
+      startTcclRef.set(currentThread().getContextClassLoader());
+      return null;
+    }).when(targetSubFlowProcessor)).start();
+
+    ClassUtils.withContextClassLoader(mock(ClassLoader.class), () -> {
+      FlowRefFactoryBean flowRefFactoryBean;
+      try {
+        flowRefFactoryBean = createDynamicFlowRefFactoryBean(targetSubFlow, targetSubFlowChainBuilder, applicationContext);
+        verifyProcess(flowRefFactoryBean, targetSubFlowProcessor, applicationContext);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
+    });
+
+    assertThat(startTcclRef.get(), sameInstance(mockMuleContext.getExecutionClassLoader()));
+  }
+
+  @Test
   public void dynamicFlowRefSubContextAware() throws Exception {
     CoreEvent event = testEvent();
     MuleContextAware targetMuleContextAware = mock(MuleContextAware.class, INITIALIZABLE_MESSAGE_PROCESSOR);
@@ -357,19 +406,15 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   private Callable<Void> sendEventsThroughFlowRefAsynchronously(CountDownLatch countDownLatch,
                                                                 FlowRefFactoryBean flowRefFactoryBean) {
-    return new Callable<Void>() {
-
-      @Override
-      public Void call() throws Exception {
-        try {
-          countDownLatch.countDown();
-          countDownLatch.await();
-          sendEventsThroughFlowRef(flowRefFactoryBean);
-        } catch (Exception e) {
-          throw new RuntimeException("Error sending events to a flowRef", e);
-        }
-        return null;
+    return () -> {
+      try {
+        countDownLatch.countDown();
+        countDownLatch.await();
+        sendEventsThroughFlowRef(flowRefFactoryBean);
+      } catch (Exception e) {
+        throw new RuntimeException("Error sending events to a flowRef", e);
       }
+      return null;
     };
   }
 
@@ -389,7 +434,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   private static class StubbedProcessor extends AbstractComponent implements Processor {
 
-    private CoreEvent applyResult;
+    private final CoreEvent applyResult;
 
     public StubbedProcessor(CoreEvent applyResult) {
       this.applyResult = applyResult;
