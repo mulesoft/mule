@@ -9,18 +9,20 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
+import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -28,6 +30,8 @@ import java.util.function.Consumer;
 
 
 public class ImmutableProcessorChildContextChainExecutor implements ChildContextChain, ProcessorChainExecutor {
+
+  private static final Logger LOGGER = getLogger(ImmutableProcessorChildContextChainExecutor.class);
 
   /**
    * Processor that will be executed upon calling process
@@ -106,11 +110,18 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     CoreEvent eventWithCorrelationId = quickCopy(createCorrelationIdContext(correlationId), originalEvent);
     setSdkInternalContextValues(eventWithCorrelationId);
 
+    LOGGER.debug("Changing event correlationId from '{}' to '{}'", originalEvent.getCorrelationId(), correlationId);
     chainExecutor.execute(eventWithCorrelationId,
-                          result -> onSuccess.accept(resultWithPreviousCorrelationId((EventedResult) result)), (t, res) -> {
+                          result -> {
+                            LOGGER.debug("Event with correlationId '{}' going back to '{}' (successful execution)", correlationId,
+                                         originalEvent.getCorrelationId());
+                            onSuccess.accept(resultWithPreviousCorrelationId((EventedResult) result));
+                          }, (t, res) -> {
                             if (t instanceof MessagingException) {
                               t = new MessagingException(withPreviousCorrelationid(((MessagingException) t).getEvent()), t);
                             }
+                            LOGGER.debug("Event with correlationId '{}' going back to '{}' (unsuccessful execution)",
+                                         correlationId, originalEvent.getCorrelationId());
                             onError.accept(t, resultWithPreviousCorrelationId((EventedResult) res));
                           });
   }
