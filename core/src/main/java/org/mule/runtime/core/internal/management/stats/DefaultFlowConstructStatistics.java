@@ -26,7 +26,9 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   private final AtomicLong executionError = new AtomicLong(0);
   private final AtomicLong fatalError = new AtomicLong(0);
   protected final ComponentStatistics flowStatistics = new ComponentStatistics();
-  private final AtomicLong connectionErrors = new AtomicLong(0);
+
+  // Transient to avoid de-serialization backward compatibility problems (MULE-19020)
+  private transient final AtomicLong connectionErrors = new AtomicLong(0);
 
   public DefaultFlowConstructStatistics(String flowConstructType, String name) {
     this.name = name;
