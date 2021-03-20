@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.setValueIntoField;
 import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILURE;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
@@ -61,10 +63,10 @@ public class ValueProviderFactory {
   }
 
   ValueProvider createValueProvider() throws ValueResolvingException {
-    Class<? extends ValueProvider> resolverClass = factoryModelProperty.getValueProvider();
+    Class resolverClass = factoryModelProperty.getValueProvider().get();
 
     try {
-      ValueProvider resolver = instantiateClass(resolverClass);
+      ValueProvider resolver = instantiateValueProviderClass(resolverClass);
       initialiseIfNeeded(resolver, true, muleContext);
 
       injectValueProviderFields(resolver);
@@ -123,6 +125,25 @@ public class ValueProviderFactory {
     if (!missingParameters.isEmpty()) {
       throw new ValueResolvingException("Unable to retrieve values. There are missing required parameters for the resolution: "
           + missingParameters, MISSING_REQUIRED_PARAMETERS);
+    }
+  }
+
+  private ValueProvider instantiateValueProviderClass(Class resolverClass) throws ValueResolvingException {
+    try {
+      Object obj = instantiateClass(resolverClass);
+      if (obj instanceof ValueProvider) {
+        return (ValueProvider) obj;
+      } else if (obj instanceof org.mule.sdk.api.values.ValueProvider) {
+        return new SdkValueProviderAdapter((org.mule.sdk.api.values.ValueProvider) obj);
+      } else {
+        throw new ValueResolvingException(format("An error occurred trying to create a ValueProvider: %s should implement %s or %s",
+                                                 resolverClass.getSimpleName(),
+                                                 ValueProvider.class.getSimpleName(),
+                                                 org.mule.sdk.api.values.ValueProvider.class.getSimpleName()),
+                                          UNKNOWN);
+      }
+    } catch (Exception e) {
+      throw new ValueResolvingException("An error occurred trying to create a ValueProvider", UNKNOWN, e);
     }
   }
 }

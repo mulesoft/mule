@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.module.extension.internal.value.EitherValueProvider;
 import org.mule.runtime.module.extension.internal.value.ValueProviderFactory;
 
 import java.lang.reflect.Field;
@@ -35,7 +36,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
   private final Field connectionField;
   private final Field configField;
-  private final Class<? extends ValueProvider> valuesProvider;
+  private final EitherValueProvider valuesProvider;
   private final List<InjectableParameterInfo> injectableParameters;
 
   /**
@@ -45,7 +46,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
    * @param connectionField      the field inside the {@link ValueProvider} which is considered as a connection
    * @param configField          the field inside the {@link ValueProvider} which is considered as a configuration
    */
-  private ValueProviderFactoryModelProperty(Class<? extends ValueProvider> valueProvider,
+  private ValueProviderFactoryModelProperty(EitherValueProvider valueProvider,
                                             List<InjectableParameterInfo> injectableParameters,
                                             Field connectionField,
                                             Field configField) {
@@ -65,7 +66,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
    *
    * @return a new {@link ValueProviderFactoryModelPropertyBuilder}
    */
-  public static ValueProviderFactoryModelPropertyBuilder builder(Class<? extends ValueProvider> valuesProvider) {
+  public static ValueProviderFactoryModelPropertyBuilder builder(EitherValueProvider valuesProvider) {
     return new ValueProviderFactoryModelPropertyBuilder(valuesProvider);
   }
 
@@ -88,7 +89,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
   /**
    * @return the class of the {@link ValueProvider} implementation
    */
-  public Class<? extends ValueProvider> getValueProvider() {
+  public EitherValueProvider getValueProvider() {
     return valuesProvider;
   }
 
@@ -137,12 +138,12 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
    */
   public static class ValueProviderFactoryModelPropertyBuilder {
 
-    private final Class<? extends ValueProvider> dynamicOptionsResolver;
+    private final EitherValueProvider dynamicOptionsResolver;
     private final List<InjectableParameterInfo> injectableParameters;
     private Field connectionField;
     private Field configField;
 
-    ValueProviderFactoryModelPropertyBuilder(Class<? extends ValueProvider> dynamicOptionsResolver) {
+    ValueProviderFactoryModelPropertyBuilder(EitherValueProvider dynamicOptionsResolver) {
       this.dynamicOptionsResolver = dynamicOptionsResolver;
       this.injectableParameters = new ArrayList<>();
     }

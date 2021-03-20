@@ -120,15 +120,16 @@ public class ValueProviderUtils {
    * @return The id of the value provider
    * @since 4.4.0
    */
-  public static String getValueProviderId(Class<? extends ValueProvider> valueProviderClazz) {
-    ValueProvider valueProvider;
+  public static String getValueProviderId(EitherValueProvider valueProviderClazz) {
+    Object valueProvider;
     try {
-      valueProvider = instantiateClass(valueProviderClazz);
+      valueProvider = instantiateClass(valueProviderClazz.get());
     } catch (Exception e) {
       throw new IllegalStateException(format("There was an error creating an instance of %s to retrieve the Id of the provider",
-                                             valueProviderClazz.getName()),
+                                             valueProviderClazz.get().getName()),
                                       e);
     }
-    return valueProvider.getId();
+    return valueProvider instanceof ValueProvider ? ((ValueProvider) valueProvider).getId()
+        : ((org.mule.sdk.api.values.ValueProvider) valueProvider).getId();
   }
 }

@@ -31,9 +31,8 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.util.NameUtils;
-import org.mule.runtime.extension.api.values.ValueProvider;
-import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
+import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -94,7 +93,7 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
                                        ParameterizedModel model, ProblemsReporter problemsReporter,
                                        boolean supportsConnectionsAndConfigs, ReflectionCache reflectionCache,
                                        ValueProvidersIdValidator valueProvidersIdValidator) {
-    Class<? extends ValueProvider> valueProvider = modelProperty.getValueProvider();
+    Class valueProvider = modelProperty.getValueProvider().get();
     String providerName = valueProvider.getSimpleName();
     Optional<ValueProviderModel> valueProviderModel = param.getValueProviderModel();
     if (!valueProviderModel.isPresent()) {
