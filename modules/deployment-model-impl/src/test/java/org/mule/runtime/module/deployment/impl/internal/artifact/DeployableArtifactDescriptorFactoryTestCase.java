@@ -72,7 +72,6 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -80,6 +79,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import io.qameta.allure.Issue;
 
 public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends DeployableArtifactDescriptor, B extends DeployableFileBuilder>
     extends AbstractMuleTestCase {
@@ -112,6 +113,9 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
                                                                     .getClassLoader()).getLocalRepositorySuppliers()
                                                                         .environmentMavenRepositorySupplier().get()
                                                                         .getAbsolutePath());
+
+  @Rule
+  public SystemProperty activeProfile = new SystemProperty("muleRuntimeConfig.maven.activeProfiles.0", "test");
 
   @Rule
   public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
@@ -328,10 +332,15 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(pluginDescriptor.getClassLoaderModel().getDependencies(), not(hasItem(bundleDependency("library", "2.0.0"))));
   }
 
-
   @Test
   public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesLightweight() throws Exception {
     assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight");
+  }
+
+  @Test
+  @Issue("MULE-19282")
+  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesInProfileLightweight() throws Exception {
+    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-in-profile-lightweight");
   }
 
   @Test
@@ -349,6 +358,12 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-heavyweight");
   }
 
+  @Test
+  @Issue("MULE-19282")
+  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesInProfileHeavyweight() throws Exception {
+    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-in-profile-heavyweight");
+  }
+
   private void assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies(String location) throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + location);
 
@@ -358,7 +373,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(classLoaderModel.getDependencies(), hasItem(testEmptyPluginDependencyMatcher(COMPILE, true, false)));
 
     assertThat(classLoaderModel.getUrls().length, is(1));
-    assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
+    assertThat(asList(classLoaderModel.getUrls()),
+               not(hasItem(classLoaderModel.getDependencies().iterator().next().getBundleUri().toURL())));
 
     assertThat(desc.getPlugins(), hasSize(2));
 
@@ -387,6 +403,53 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("dependant")).findFirst().get();
     assertThat(dependantPluginDescriptor.getClassLoaderModel().getUrls().length, is(1));
     assertThat(dependantPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(1));
+  }
+
+  @Test
+  public void classLoaderModelWithPluginDependencyAndSharedLibrariesLightweight() throws Exception {
+    assertClassLoaderModelWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-lightweight");
+  }
+
+  @Test
+  @Issue("MULE-19282")
+  public void classLoaderModelWithPluginDependencyAndSharedLibrariesInProfileLightweight() throws Exception {
+    assertClassLoaderModelWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-in-profile-lightweight");
+  }
+
+  @Test
+  public void classLoaderModelWithPluginDependencyAndSharedLibrariesHeavyweight() throws Exception {
+    assertClassLoaderModelWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-heavyweight");
+  }
+
+  @Test
+  @Issue("MULE-19282")
+  public void classLoaderModelWithPluginDependencyAndSharedLibrariesInProfileHeavyweight() throws Exception {
+    assertClassLoaderModelWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-in-profile-heavyweight");
+  }
+
+  private void assertClassLoaderModelWithPluginDependencyAndSharedLibraries(String location) throws Exception {
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + location);
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    assertThat(classLoaderModel.getDependencies().size(), is(4));
+    assertThat(classLoaderModel.getDependencies(), hasItem(testEmptyPluginDependencyMatcher(COMPILE, true, false)));
+
+    assertThat(classLoaderModel.getUrls().length, is(3));
+
+    assertThat(classLoaderModel.getDependencies().stream()
+        .filter(dep -> "commons-collections".equals(dep.getDescriptor().getArtifactId()))
+        .findFirst().isPresent(), is(true));
+    assertThat(classLoaderModel.getDependencies().stream()
+        .filter(dep -> "commons-io".equals(dep.getDescriptor().getArtifactId()))
+        .findFirst().isPresent(), is(true));
+
+    assertThat(classLoaderModel.getExportedPackages(), hasItems("org.apache.commons.collections",
+                                                                "org.apache.commons.io"));
+    assertThat(classLoaderModel.getExportedResources(), hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
+                                                                 "META-INF/maven/commons-io/commons-io/pom.xml"));
+
+    assertThat(desc.getPlugins(), hasSize(2));
   }
 
   private static Matcher<File> exists() {

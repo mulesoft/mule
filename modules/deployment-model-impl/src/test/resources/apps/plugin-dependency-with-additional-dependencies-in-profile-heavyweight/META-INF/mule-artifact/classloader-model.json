@@ -1,0 +1,58 @@
+{
+  "additionalPluginDependencies": [
+    {
+      "groupId": "org.mule.tests",
+      "artifactId": "test-empty-plugin",
+      "additionalDependencies": [
+        {
+          "artifactCoordinates": {
+            "groupId": "commons-collections",
+            "artifactId": "commons-collections",
+            "version": "3.2.1",
+            "type": "jar"
+          },
+          "uri": "repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar"
+        },
+        {
+          "artifactCoordinates": {
+            "groupId": "commons-io",
+            "artifactId": "commons-io",
+            "version": "2.6",
+            "type": "jar"
+          },
+          "uri": "repository/commons-io/commons-io/2.6/commons-io-2.6.jar"
+        }
+      ]
+    }
+  ],
+  "version": "1.1.0",
+  "artifactCoordinates": {
+    "groupId": "test",
+    "artifactId": "plugin-dependency-with-additional-dependencies-in-profile",
+    "version": "1.0.0",
+    "type": "jar",
+    "classifier": "mule-application"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.tests",
+        "artifactId": "test-empty-plugin",
+        "version": "4.2.0-SNAPSHOT",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/tests/test-empty-plugin/4.2.0-SNAPSHOT/test-empty-plugin-4.2.0-SNAPSHOT-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.tests",
+        "artifactId": "test-dependant-plugin",
+        "version": "4.2.0-SNAPSHOT",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/tests/test-dependant-plugin/4.2.0-SNAPSHOT/test-dependant-plugin-4.2.0-SNAPSHOT-mule-plugin.jar"
+    }
+  ]
+}
