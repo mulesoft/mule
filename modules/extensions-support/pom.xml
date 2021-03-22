@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.3.1-SNAPSHOT</version>
+        <version>4.3.0-20210322</version>
     </parent>
     <artifactId>mule-module-extensions-support</artifactId>
     <name>Mule Extensions Support</name>
@@ -126,40 +126,40 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-metadata-extension</artifactId>
-            <version>4.3.1-SNAPSHOT</version>
+            <version>4.3.0-20210322</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-vegan-extension</artifactId>
-            <version>4.3.1-SNAPSHOT</version>
+            <version>4.3.0-20210322</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-heisenberg-extension</artifactId>
-            <version>4.3.1-SNAPSHOT</version>
+            <version>4.3.0-20210322</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-marvel-extension</artifactId>
-            <version>4.3.1-SNAPSHOT</version>
+            <version>4.3.0-20210322</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-subtypes-extension</artifactId>
-            <version>4.3.1-SNAPSHOT</version>
+            <version>4.3.0-20210322</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-petstore-extension</artifactId>
-            <version>4.3.1-SNAPSHOT</version>
+            <version>4.3.0-20210322</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
@@ -195,7 +195,7 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-test-oauth-extension</artifactId>
-            <version>4.3.1-SNAPSHOT</version>
+            <version>4.3.0-20210322</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
