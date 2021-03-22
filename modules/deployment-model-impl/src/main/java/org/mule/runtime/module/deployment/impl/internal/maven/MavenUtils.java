@@ -198,7 +198,7 @@ public class MavenUtils {
   }
 
   /**
-   * @param artifact a maven artifact that may be a directory following the mule deployable archive structure or a compressed
+   * @param artifact a Maven artifact that may be a directory following the mule deployable archive structure or a compressed
    *        file.
    * @return the pom model for the artifact.
    */
@@ -289,7 +289,7 @@ public class MavenUtils {
 
     // final File artifactPomFile = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + MULE_POM);
     if (artifactPomFile == null || !artifactPomFile.exists()) {
-      throw new ArtifactDescriptorCreateException(format("The maven bundle loader requires the file pom.xml (error found while reading artifact '%s')",
+      throw new ArtifactDescriptorCreateException(format("The Maven bundle loader requires the file pom.xml (error found while reading artifact '%s')",
                                                          artifactFolder.getName()));
     }
     return artifactPomFile;
@@ -316,7 +316,7 @@ public class MavenUtils {
 
     // final File mulePropertiesPom = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_POM);
     if (mulePropertiesPom == null || !mulePropertiesPom.exists()) {
-      throw new ArtifactDescriptorCreateException(format("The maven bundle loader requires the file pom.properties (error found while reading artifact '%s')",
+      throw new ArtifactDescriptorCreateException(format("The Maven bundle loader requires the file pom.properties (error found while reading artifact '%s')",
                                                          artifactFolder.getName()));
     }
     return mulePropertiesPom;
