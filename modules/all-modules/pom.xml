@@ -129,6 +129,12 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting-jruby</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jruby</groupId>
+                    <artifactId>jruby-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>

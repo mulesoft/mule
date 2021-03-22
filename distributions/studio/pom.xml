@@ -125,11 +125,7 @@
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <!--
-                                'attached' ensures there's only a single run bound to m2's lifecycle.
-                                The default 'assembly' goal would run every plugin in this pom twice.
-                            -->
-                            <goal>attached</goal>
+                            <goal>single</goal>
                         </goals>
                         <configuration>
                             <finalName>mule-studio-${project.version}</finalName>

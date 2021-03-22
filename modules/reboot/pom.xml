@@ -18,10 +18,9 @@
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>verify</phase>
                         <goals>
-                            <!-- we now require the source jar for this project in the EE build, so do it automagically -->
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>

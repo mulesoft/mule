@@ -34,11 +34,7 @@
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <!--
-                                'attached' ensures there's only a single run bound to m2's lifecycle.
-                                The default 'assembly' goal would run every plugin in this pom twice.
-                            -->
-                            <goal>attached</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -55,9 +51,9 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <skip>${skipDistributions}</skip>
-                            <tasks>
+                            <target>
                                 <mkdir dir="../../../target/site/apidocs"/>
-                            </tasks>
+                            </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
