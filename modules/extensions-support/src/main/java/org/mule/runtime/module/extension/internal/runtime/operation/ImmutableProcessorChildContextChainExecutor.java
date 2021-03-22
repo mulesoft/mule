@@ -110,18 +110,18 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     CoreEvent eventWithCorrelationId = quickCopy(createCorrelationIdContext(correlationId), originalEvent);
     setSdkInternalContextValues(eventWithCorrelationId);
 
-    LOGGER.debug("Changing event correlationId from '{}' to '{}'", originalEvent.getCorrelationId(), correlationId);
+    LOGGER.info("Changing event correlationId from '{}' to '{}' in location {}", originalEvent.getCorrelationId(), correlationId, location.getLocation());
     chainExecutor.execute(eventWithCorrelationId,
                           result -> {
-                            LOGGER.debug("Event with correlationId '{}' going back to '{}' (successful execution)", correlationId,
-                                         originalEvent.getCorrelationId());
+                            LOGGER.info("Event with correlationId '{}' going back to '{}' (successful execution) in location {}", correlationId,
+                                         originalEvent.getCorrelationId(), location.getLocation());
                             onSuccess.accept(resultWithPreviousCorrelationId((EventedResult) result));
                           }, (t, res) -> {
                             if (t instanceof MessagingException) {
                               t = new MessagingException(withPreviousCorrelationid(((MessagingException) t).getEvent()), t);
                             }
-                            LOGGER.debug("Event with correlationId '{}' going back to '{}' (unsuccessful execution)",
-                                         correlationId, originalEvent.getCorrelationId());
+                            LOGGER.info("Event with correlationId '{}' going back to '{}' (unsuccessful execution) in location {}",
+                                         correlationId, originalEvent.getCorrelationId(), location.getLocation());
                             onError.accept(t, resultWithPreviousCorrelationId((EventedResult) res));
                           });
   }
