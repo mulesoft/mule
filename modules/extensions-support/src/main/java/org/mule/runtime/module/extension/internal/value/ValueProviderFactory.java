@@ -15,12 +15,12 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILURE;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.values.ValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.sdk.api.values.ValueProvider;
+import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -133,8 +133,8 @@ public class ValueProviderFactory {
       Object obj = instantiateClass(resolverClass);
       if (obj instanceof ValueProvider) {
         return (ValueProvider) obj;
-      } else if (obj instanceof org.mule.sdk.api.values.ValueProvider) {
-        return new SdkValueProviderAdapter((org.mule.sdk.api.values.ValueProvider) obj);
+      } else if (obj instanceof org.mule.runtime.extension.api.values.ValueProvider) {
+        return new LegacyValueProviderAdapter((org.mule.runtime.extension.api.values.ValueProvider) obj);
       } else {
         throw new ValueResolvingException(format("An error occurred trying to create a ValueProvider: %s should implement %s or %s",
                                                  resolverClass.getSimpleName(),

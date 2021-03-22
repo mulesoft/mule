@@ -12,15 +12,16 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.api.value.Value;
-import org.mule.runtime.extension.api.values.ValueBuilder;
-import org.mule.runtime.extension.api.values.ValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.sdk.api.values.Value;
+import org.mule.sdk.api.values.ValueBuilder;
+import org.mule.sdk.api.values.ValueProvider;
+import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.util.List;
 import java.util.Map;
@@ -129,7 +130,8 @@ public class ValueProviderUtils {
                                              valueProviderClazz.get().getName()),
                                       e);
     }
-    return valueProvider instanceof ValueProvider ? ((ValueProvider) valueProvider).getId()
-        : ((org.mule.sdk.api.values.ValueProvider) valueProvider).getId();
+    return valueProvider instanceof org.mule.runtime.extension.api.values.ValueProvider
+        ? ((org.mule.runtime.extension.api.values.ValueProvider) valueProvider).getId()
+        : ((ValueProvider) valueProvider).getId();
   }
 }

@@ -6,21 +6,22 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
-import org.mule.runtime.api.value.Value;
+
+import org.mule.sdk.api.values.Value;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Adapter of the legacy {@link Value} to {@link org.mule.sdk.api.values.Value}
+ * Adapter of the legacy {@link org.mule.runtime.api.value.Value} to {@link org.mule.sdk.api.values.Value}
  *
  * @since 4.4.0
  */
-public class SdkValueAdapter implements Value {
+public class LegacyValueAdapter implements Value {
 
-  private org.mule.sdk.api.values.Value value;
+  private final org.mule.runtime.api.value.Value value;
 
-  public SdkValueAdapter(org.mule.sdk.api.values.Value value) {
+  public LegacyValueAdapter(org.mule.runtime.api.value.Value value) {
     this.value = value;
   }
 
@@ -37,7 +38,7 @@ public class SdkValueAdapter implements Value {
   @Override
   public Set<Value> getChilds() {
     Set<Value> values = new HashSet<>();
-    value.getChilds().forEach(v -> values.add(new SdkValueAdapter(v)));
+    value.getChilds().forEach(v -> values.add(new LegacyValueAdapter(v)));
     return values;
   }
 

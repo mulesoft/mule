@@ -6,23 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
-import org.mule.runtime.api.value.Value;
-import org.mule.runtime.extension.api.values.ValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.sdk.api.values.Value;
+import org.mule.sdk.api.values.ValueProvider;
+import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Adapter of the legacy {@link ValueProvider} to {@link org.mule.sdk.api.values.ValueProvider}
+ * Adapter of the legacy {@link org.mule.runtime.extension.api.values.ValueProvider} to {@link ValueProvider}
  *
  * @since 4.4.0
  */
-public class SdkValueProviderAdapter implements ValueProvider {
+public class LegacyValueProviderAdapter implements ValueProvider {
 
-  private final org.mule.sdk.api.values.ValueProvider valueProvider;
+  private final org.mule.runtime.extension.api.values.ValueProvider valueProvider;
 
-  public SdkValueProviderAdapter(org.mule.sdk.api.values.ValueProvider valueProvider) {
+  public LegacyValueProviderAdapter(org.mule.runtime.extension.api.values.ValueProvider valueProvider) {
     this.valueProvider = valueProvider;
   }
 
@@ -30,9 +30,9 @@ public class SdkValueProviderAdapter implements ValueProvider {
   public Set<Value> resolve() throws ValueResolvingException {
     try {
       Set<Value> values = new HashSet<>();
-      valueProvider.resolve().forEach(v -> values.add(new SdkValueAdapter(v)));
+      valueProvider.resolve().forEach(v -> values.add(new LegacyValueAdapter(v)));
       return values;
-    } catch (org.mule.sdk.api.values.ValueResolvingException e) {
+    } catch (org.mule.runtime.extension.api.values.ValueResolvingException e) {
       throw new ValueResolvingException(e.getMessage(), e.getFailureCode(), e.getCause());
     }
   }
