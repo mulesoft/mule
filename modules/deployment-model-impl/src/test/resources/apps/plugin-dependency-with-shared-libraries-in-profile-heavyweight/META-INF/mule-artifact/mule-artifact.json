@@ -1,0 +1,19 @@
+{
+  "configs": [],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "plugin-dependency-with-additional-dependencies",
+  "minMuleVersion": "4.0.0",
+  "requiredProduct": "MULE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedResources": [],
+      "exportedPackages": []
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

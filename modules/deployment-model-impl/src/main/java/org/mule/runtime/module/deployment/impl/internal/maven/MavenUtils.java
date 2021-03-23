@@ -64,7 +64,7 @@ public class MavenUtils {
 
   /**
    * Returns the {@link Model} from a given artifact folder
-   * 
+   *
    * @param artifactFile file containing the artifact content.
    * @return the {@link Model} from the {@value ArtifactPluginDescriptor#MULE_PLUGIN_POM} file if available
    * @throws ArtifactDescriptorCreateException if the artifact jar does not contain a
@@ -84,7 +84,7 @@ public class MavenUtils {
 
   /**
    * Finds the URL of the pom file within the artifact file.
-   * 
+   *
    * @param artifactFile the artifact file to search for the pom file.
    * @return the URL to the pom file.
    */
@@ -200,7 +200,7 @@ public class MavenUtils {
   }
 
   /**
-   * @param artifact a maven artifact that may be a directory following the mule deployable archive structure or a compressed
+   * @param artifact a Maven artifact that may be a directory following the mule deployable archive structure or a compressed
    *                 file.
    * @return the pom model for the artifact.
    */
@@ -213,7 +213,7 @@ public class MavenUtils {
 
   /**
    * Updates the pom file from an artifact.
-   * 
+   *
    * @param artifactFolder the artifact folder
    * @param model          the new pom model
    */
@@ -291,7 +291,7 @@ public class MavenUtils {
 
     // final File artifactPomFile = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + MULE_POM);
     if (artifactPomFile == null || !artifactPomFile.exists()) {
-      throw new ArtifactDescriptorCreateException(format("The maven bundle loader requires the file pom.xml (error found while reading artifact '%s')",
+      throw new ArtifactDescriptorCreateException(format("The Maven bundle loader requires the file pom.xml (error found while reading artifact '%s')",
                                                          artifactFolder.getName()));
     }
     return artifactPomFile;
@@ -318,7 +318,7 @@ public class MavenUtils {
 
     // final File mulePropertiesPom = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_POM);
     if (mulePropertiesPom == null || !mulePropertiesPom.exists()) {
-      throw new ArtifactDescriptorCreateException(format("The maven bundle loader requires the file pom.properties (error found while reading artifact '%s')",
+      throw new ArtifactDescriptorCreateException(format("The Maven bundle loader requires the file pom.properties (error found while reading artifact '%s')",
                                                          artifactFolder.getName()));
     }
     return mulePropertiesPom;
@@ -326,7 +326,7 @@ public class MavenUtils {
 
   /**
    * Adds a shared library to the pom model. If the plugin does not exists yet in the model then it will create it.
-   * 
+   *
    * @param model      the pom model
    * @param dependency the descriptor of the dependency
    */
