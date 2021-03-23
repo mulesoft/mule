@@ -7,11 +7,14 @@
 package org.mule.runtime.module.tooling.internal.artifact.params;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
+import org.mule.runtime.core.api.el.ExpressionManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,7 +27,6 @@ import java.util.TimeZone;
 public class ParameterExtractor implements ParameterValueVisitor {
 
   private static final ObjectMapper objectMapper;
-
   static {
     // This was added to handle complex parameters and transforming from a Map<String, Object>
     // to the actual object of type defined my the model.
@@ -36,17 +38,25 @@ public class ParameterExtractor implements ParameterValueVisitor {
 
   private Object value;
 
-  public static <T> T extractValue(ParameterValue parameterValue, Class<T> type) {
-    return objectMapper.convertValue(extractValue(parameterValue), type);
+  public static <T> T extractValue(ParameterValue parameterValue, Class<T> type, ExpressionManager expressionManager) {
+    Object value = extractValue(parameterValue, expressionManager);
+    if (isExpression(value) && value instanceof String) {
+      return (T) expressionManager.evaluate((String) value, fromType(type)).getValue();
+    }
+    return objectMapper.convertValue(extractValue(parameterValue, expressionManager), type);
   }
 
-  private static Object extractValue(ParameterValue parameterValue) {
-    final ParameterExtractor extractor = new ParameterExtractor();
+  private static Object extractValue(ParameterValue parameterValue, ExpressionManager expressionManager) {
+    final ParameterExtractor extractor = new ParameterExtractor(expressionManager);
     parameterValue.accept(extractor);
     return extractor.get();
   }
 
-  private ParameterExtractor() {}
+  private final ExpressionManager expressionManager;
+
+  private ParameterExtractor(ExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
+  }
 
   @Override
   public void visitSimpleValue(ParameterSimpleValue text) {
@@ -55,13 +65,13 @@ public class ParameterExtractor implements ParameterValueVisitor {
 
   @Override
   public void visitListValue(ParameterListValue list) {
-    this.value = list.getValues().stream().map(ParameterExtractor::extractValue).collect(toList());
+    this.value = list.getValues().stream().map(v -> extractValue(v, expressionManager)).collect(toList());
   }
 
   @Override
   public void visitObjectValue(ParameterObjectValue objectValue) {
     final Map<String, Object> parametersMap = new HashMap<>();
-    objectValue.getParameters().forEach((k, v) -> parametersMap.put(k, extractValue(v)));
+    objectValue.getParameters().forEach((k, v) -> parametersMap.put(k, extractValue(v, expressionManager)));
     this.value = parametersMap;
   }
 
