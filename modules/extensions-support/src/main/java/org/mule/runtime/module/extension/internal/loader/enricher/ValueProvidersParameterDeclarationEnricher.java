@@ -47,7 +47,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.ValueProviderFactoryModelPropertyBuilder;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
-import org.mule.runtime.module.extension.internal.value.EitherValueProvider;
 import org.mule.runtime.module.extension.internal.value.OfValueInformation;
 
 import java.lang.annotation.Annotation;
@@ -146,12 +145,11 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                Map<String, String> containerParameterNames, String name,
                                List<ParameterDeclaration> allParameters) {
 
-    EitherValueProvider eitherValueProvider = new EitherValueProvider(ofValueInformation.getValue());
-
     ValueProviderFactoryModelPropertyBuilder propertyBuilder =
-        ValueProviderFactoryModelProperty.builder(eitherValueProvider);
+        ValueProviderFactoryModelProperty.builder(ofValueInformation.getValue());
     ParameterizableTypeWrapper resolverClassWrapper =
-        new ParameterizableTypeWrapper(eitherValueProvider.get(), new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
+        new ParameterizableTypeWrapper(ofValueInformation.getValue(),
+                                       new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
     List<ExtensionParameter> resolverParameters = resolverClassWrapper.getParametersAnnotatedWith(Parameter.class);
 
     resolverParameters.forEach(param -> propertyBuilder
@@ -171,7 +169,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
         .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters),
                                        requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
                                        partOrder,
-                                       name, getValueProviderId(eitherValueProvider)));
+                                       name, getValueProviderId(ofValueInformation.getValue())));
   }
 
   /**

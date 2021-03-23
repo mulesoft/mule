@@ -119,19 +119,22 @@ public class ValueProviderUtils {
    *
    * @param valueProviderClazz a class that implements the {@link ValueProvider} interface.
    * @return The id of the value provider
+   *
    * @since 4.4.0
    */
-  public static String getValueProviderId(EitherValueProvider valueProviderClazz) {
-    Object valueProvider;
+  public static String getValueProviderId(Class valueProviderClazz) {
+    Object valueProviderObject;
     try {
-      valueProvider = instantiateClass(valueProviderClazz.get());
+      valueProviderObject = instantiateClass(valueProviderClazz);
     } catch (Exception e) {
       throw new IllegalStateException(format("There was an error creating an instance of %s to retrieve the Id of the provider",
-                                             valueProviderClazz.get().getName()),
+                                             valueProviderClazz.getName()),
                                       e);
     }
-    return valueProvider instanceof org.mule.runtime.extension.api.values.ValueProvider
-        ? ((org.mule.runtime.extension.api.values.ValueProvider) valueProvider).getId()
-        : ((ValueProvider) valueProvider).getId();
+
+    return valueProviderObject instanceof org.mule.runtime.extension.api.values.ValueProvider
+        ? ((org.mule.runtime.extension.api.values.ValueProvider) valueProviderObject).getId()
+        : ((ValueProvider) valueProviderObject).getId();
   }
+
 }

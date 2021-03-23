@@ -93,7 +93,7 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
                                        ParameterizedModel model, ProblemsReporter problemsReporter,
                                        boolean supportsConnectionsAndConfigs, ReflectionCache reflectionCache,
                                        ValueProvidersIdValidator valueProvidersIdValidator) {
-    Class valueProvider = modelProperty.getValueProvider().get();
+    Class<?> valueProvider = modelProperty.getValueProvider();
     String providerName = valueProvider.getSimpleName();
     Optional<ValueProviderModel> valueProviderModel = param.getValueProviderModel();
     if (!valueProviderModel.isPresent()) {

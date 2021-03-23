@@ -63,10 +63,10 @@ public class ValueProviderFactory {
   }
 
   ValueProvider createValueProvider() throws ValueResolvingException {
-    Class resolverClass = factoryModelProperty.getValueProvider().get();
+    Class<?> resolverClass = factoryModelProperty.getValueProvider();
 
     try {
-      ValueProvider resolver = instantiateValueProviderClass(resolverClass);
+      Object resolver = instantiateClass(resolverClass);
       initialiseIfNeeded(resolver, true, muleContext);
 
       injectValueProviderFields(resolver);
@@ -94,7 +94,7 @@ public class ValueProviderFactory {
         }
         setValueIntoField(resolver, configurationSupplier.get(), configField);
       }
-      return resolver;
+      return adaptResolver(resolver);
     } catch (ValueResolvingException e) {
       throw e;
     } catch (Exception e) {
@@ -102,7 +102,7 @@ public class ValueProviderFactory {
     }
   }
 
-  private void injectValueProviderFields(ValueProvider resolver) throws ValueResolvingException {
+  private void injectValueProviderFields(Object resolver) throws ValueResolvingException {
     List<String> missingParameters = new ArrayList<>();
     for (InjectableParameterInfo injectableParam : factoryModelProperty.getInjectableParameters()) {
       Object parameterValue = null;
@@ -128,22 +128,18 @@ public class ValueProviderFactory {
     }
   }
 
-  private ValueProvider instantiateValueProviderClass(Class resolverClass) throws ValueResolvingException {
-    try {
-      Object obj = instantiateClass(resolverClass);
-      if (obj instanceof ValueProvider) {
-        return (ValueProvider) obj;
-      } else if (obj instanceof org.mule.runtime.extension.api.values.ValueProvider) {
-        return new LegacyValueProviderAdapter((org.mule.runtime.extension.api.values.ValueProvider) obj);
-      } else {
-        throw new ValueResolvingException(format("An error occurred trying to create a ValueProvider: %s should implement %s or %s",
-                                                 resolverClass.getSimpleName(),
-                                                 ValueProvider.class.getSimpleName(),
-                                                 org.mule.sdk.api.values.ValueProvider.class.getSimpleName()),
-                                          UNKNOWN);
-      }
-    } catch (Exception e) {
-      throw new ValueResolvingException("An error occurred trying to create a ValueProvider", UNKNOWN, e);
+  private ValueProvider adaptResolver(Object resolverObject) throws ValueResolvingException {
+    if (resolverObject instanceof ValueProvider) {
+      return (ValueProvider) resolverObject;
+    } else if (resolverObject instanceof org.mule.runtime.extension.api.values.ValueProvider) {
+      return new LegacyValueProviderAdapter((org.mule.runtime.extension.api.values.ValueProvider) resolverObject);
+    } else {
+      throw new ValueResolvingException(format("An error occurred trying to create a ValueProvider: %s should implement %s or %s",
+                                               resolverObject.getClass().getName(),
+                                               ValueProvider.class.getSimpleName(),
+                                               org.mule.sdk.api.values.ValueProvider.class.getSimpleName()),
+                                        UNKNOWN);
     }
   }
+
 }

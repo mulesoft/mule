@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -35,12 +36,12 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Declaring
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.ValueProviderFactoryModelPropertyBuilder;
-import org.mule.runtime.module.extension.internal.value.EitherValueProvider;
 import org.mule.tck.size.SmallTest;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,10 +88,8 @@ public class ValueProviderModelValidatorTestCase {
     valueProviderModelValidator = new ValueProviderModelValidator();
     problemsReporter = new ProblemsReporter(extensionModel);
 
-    EitherValueProvider eitherValueProvider = new EitherValueProvider(SomeValueProvider.class);
-
-    operationParameterBuilder = ValueProviderFactoryModelProperty.builder(eitherValueProvider);
-    configrationParameterBuilder = ValueProviderFactoryModelProperty.builder(eitherValueProvider);
+    operationParameterBuilder = ValueProviderFactoryModelProperty.builder(SomeValueProvider.class);
+    configrationParameterBuilder = ValueProviderFactoryModelProperty.builder(SomeValueProvider.class);
 
     visitableMock(operationModel);
 
@@ -112,9 +111,8 @@ public class ValueProviderModelValidatorTestCase {
 
   @Test
   public void valueProviderShouldBeInstantiable() {
-    EitherValueProvider eitherValueProvider = new EitherValueProvider(NonInstantiableProvider.class);
     ValueProviderFactoryModelPropertyBuilder builder =
-        ValueProviderFactoryModelProperty.builder(eitherValueProvider);
+        ValueProviderFactoryModelProperty.builder(NonInstantiableProvider.class);
     mockParameter(operationParameter, builder, "anotherId");
 
     validate();
@@ -183,9 +181,8 @@ public class ValueProviderModelValidatorTestCase {
 
   @Test
   public void parameterWithValueProviderHasRepeatedIdInCompileTime() {
-    EitherValueProvider eitherValueProvider = new EitherValueProvider(SomeOtherValueProvider.class);
     ValueProviderFactoryModelPropertyBuilder builder =
-        ValueProviderFactoryModelProperty.builder(eitherValueProvider);
+        ValueProviderFactoryModelProperty.builder(SomeOtherValueProvider.class);
     mockParameter(operationParameter, builder);
 
     validate();
@@ -194,9 +191,8 @@ public class ValueProviderModelValidatorTestCase {
 
   @Test
   public void parameterWithValueProviderHasDifferentIdInCompileTime() {
-    EitherValueProvider eitherValueProvider = new EitherValueProvider(SomeOtherValueProvider.class);
     ValueProviderFactoryModelPropertyBuilder builder =
-        ValueProviderFactoryModelProperty.builder(eitherValueProvider);
+        ValueProviderFactoryModelProperty.builder(SomeOtherValueProvider.class);
     mockParameter(operationParameter, builder, "anotherId");
 
     validate();
