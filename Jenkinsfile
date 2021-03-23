@@ -1,6 +1,7 @@
 def UPSTREAM_PROJECTS_LIST = [ "Mule-runtime/metadata-model-api/support/1.2.2",
                                "Mule-runtime/mule-api/support/1.2.2",
                                "Mule-runtime/mule-extensions-api/support/1.2.2",
+                               "DataWeave/data-weave/support/2.2.2",
                                "Mule-runtime/mule-maven-client/support/1.4.2" ]
 
 Map pipelineParams = [ "upstreamProjects" : UPSTREAM_PROJECTS_LIST.join(','),
