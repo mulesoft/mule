@@ -64,6 +64,10 @@ public class PetStoreConnector {
   @Optional
   private Aquarium aquarium;
 
+  // ref: MULE-19264. Created to cover the case of a parameter group name with spaces.
+  @ParameterGroup(name = "Advanced Leash Configuration", showInDsl = true)
+  public AdvancedLeashConfiguration advancedLeashConfiguration;
+
   @DefaultEncoding
   String encoding;
 
