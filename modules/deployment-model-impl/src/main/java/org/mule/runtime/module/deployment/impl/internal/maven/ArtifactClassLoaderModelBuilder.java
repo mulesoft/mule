@@ -7,13 +7,17 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
@@ -45,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -130,18 +135,43 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   }
 
   protected Optional<Plugin> findArtifactPackagerPlugin(Model model) {
+    Stream<Plugin> basePlugin = Stream.empty();
     Build build = model.getBuild();
     if (build != null) {
-      List<Plugin> plugins = build.getPlugins();
-      if (plugins != null) {
-        return plugins.stream().filter(plugin -> (plugin.getArtifactId().equals(MULE_MAVEN_PLUGIN_ARTIFACT_ID)
-            && plugin.getGroupId().equals(MULE_MAVEN_PLUGIN_GROUP_ID)) ||
-            (plugin.getArtifactId().equals(MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID) &&
-                plugin.getGroupId().equals(MULE_EXTENSIONS_PLUGIN_GROUP_ID)))
-            .findFirst();
-      }
+      basePlugin = findArtifactPackagerPlugin(build.getPlugins()).map(Stream::of).orElse(Stream.empty());
     }
-    return empty();
+
+    // Sort them so the processing is consistent with how Maven calculates the plugin configuration for the effective pom.
+    final List<String> activeProfiles = getMavenConfig().getActiveProfiles().orElse(emptyList())
+        .stream()
+        .sorted((o1, o2) -> o1.compareTo(o2))
+        .collect(toList());
+
+    final Stream<Plugin> packagerConfigsForActivePluginsStream = model.getProfiles().stream()
+        .filter(profile -> activeProfiles.contains(profile.getId()))
+        .map(profile -> findArtifactPackagerPlugin(profile.getBuild().getPlugins()))
+        .filter(plugin -> !plugin.equals(empty()))
+        .map(Optional::get);
+
+    return concat(basePlugin, packagerConfigsForActivePluginsStream)
+        .reduce((p1, p2) -> {
+          p1.setConfiguration(mergeXpp3Dom((Xpp3Dom) p2.getConfiguration(), (Xpp3Dom) p1.getConfiguration()));
+          p1.getDependencies().addAll(p2.getDependencies());
+
+          return p1;
+        });
+  }
+
+  private Optional<Plugin> findArtifactPackagerPlugin(List<Plugin> plugins) {
+    if (plugins != null) {
+      return plugins.stream().filter(plugin -> (plugin.getArtifactId().equals(MULE_MAVEN_PLUGIN_ARTIFACT_ID)
+          && plugin.getGroupId().equals(MULE_MAVEN_PLUGIN_GROUP_ID)) ||
+          (plugin.getArtifactId().equals(MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID) &&
+              plugin.getGroupId().equals(MULE_EXTENSIONS_PLUGIN_GROUP_ID)))
+          .findFirst();
+    } else {
+      return empty();
+    }
   }
 
   private void exportSharedLibrariesResourcesAndPackages(Plugin packagingPlugin) {

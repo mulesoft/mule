@@ -17,7 +17,9 @@
             "checksumPolicy": "ignore"
           }
         }
-      }
+      },
+      "activeProfiles": ["development"],
+      "inactiveProfiles": ["staging"]
     },
     "cluster": {
       "objectStore": {
