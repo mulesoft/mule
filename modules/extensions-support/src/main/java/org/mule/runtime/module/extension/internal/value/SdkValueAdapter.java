@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
+import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.toCollection;
 
 import org.mule.sdk.api.values.Value;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -17,11 +19,11 @@ import java.util.Set;
  *
  * @since 4.4.0
  */
-public class LegacyValueAdapter implements Value {
+public class SdkValueAdapter implements Value {
 
   private final org.mule.runtime.api.value.Value value;
 
-  public LegacyValueAdapter(org.mule.runtime.api.value.Value value) {
+  public SdkValueAdapter(org.mule.runtime.api.value.Value value) {
     this.value = value;
   }
 
@@ -37,9 +39,10 @@ public class LegacyValueAdapter implements Value {
 
   @Override
   public Set<Value> getChilds() {
-    Set<Value> values = new HashSet<>();
-    value.getChilds().forEach(v -> values.add(new LegacyValueAdapter(v)));
-    return values;
+    Set<Value> values = value.getChilds()
+        .stream().map(SdkValueAdapter::new)
+        .collect(toCollection(LinkedHashSet::new));
+    return unmodifiableSet(values);
   }
 
   @Override

@@ -132,7 +132,7 @@ public class ValueProviderFactory {
     if (resolverObject instanceof ValueProvider) {
       return (ValueProvider) resolverObject;
     } else if (resolverObject instanceof org.mule.runtime.extension.api.values.ValueProvider) {
-      return new LegacyValueProviderAdapter((org.mule.runtime.extension.api.values.ValueProvider) resolverObject);
+      return new SdkValueProviderAdapter((org.mule.runtime.extension.api.values.ValueProvider) resolverObject);
     } else {
       throw new ValueResolvingException(format("An error occurred trying to create a ValueProvider: %s should implement %s or %s",
                                                resolverObject.getClass().getName(),

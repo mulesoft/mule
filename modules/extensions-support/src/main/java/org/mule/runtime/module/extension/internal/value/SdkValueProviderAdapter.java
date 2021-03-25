@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
+import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.toCollection;
+
 import org.mule.sdk.api.values.Value;
 import org.mule.sdk.api.values.ValueProvider;
 import org.mule.sdk.api.values.ValueResolvingException;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -18,20 +21,21 @@ import java.util.Set;
  *
  * @since 4.4.0
  */
-public class LegacyValueProviderAdapter implements ValueProvider {
+public class SdkValueProviderAdapter implements ValueProvider {
 
   private final org.mule.runtime.extension.api.values.ValueProvider valueProvider;
 
-  public LegacyValueProviderAdapter(org.mule.runtime.extension.api.values.ValueProvider valueProvider) {
+  public SdkValueProviderAdapter(org.mule.runtime.extension.api.values.ValueProvider valueProvider) {
     this.valueProvider = valueProvider;
   }
 
   @Override
   public Set<Value> resolve() throws ValueResolvingException {
     try {
-      Set<Value> values = new HashSet<>();
-      valueProvider.resolve().forEach(v -> values.add(new LegacyValueAdapter(v)));
-      return values;
+      Set<Value> values = valueProvider.resolve()
+          .stream().map(SdkValueAdapter::new)
+          .collect(toCollection(LinkedHashSet::new));
+      return unmodifiableSet(values);
     } catch (org.mule.runtime.extension.api.values.ValueResolvingException e) {
       throw new ValueResolvingException(e.getMessage(), e.getFailureCode(), e.getCause());
     }

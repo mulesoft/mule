@@ -289,10 +289,10 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
         getAnnotation(parameterDeclaration, org.mule.sdk.api.annotation.values.OfValues.class);
 
     if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
-      throw new IllegalModelDefinitionException(format("Parameter %s cannot be annotated with both %s and %s",
-                                                       parameterDeclaration.getName(),
+      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on parameter %s",
                                                        OfValues.class.getName(),
-                                                       org.mule.sdk.api.annotation.values.OfValues.class.getName()));
+                                                       org.mule.sdk.api.annotation.values.OfValues.class.getName(),
+                                                       parameterDeclaration.getName()));
     } else if (legacyAnnotation.isPresent()) {
       return of(new OfValueInformation(legacyAnnotation.get().value(), legacyAnnotation.get().open()));
     } else if (sdkAnnotation.isPresent()) {
@@ -309,10 +309,10 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
         annotatedElement.getAnnotation(org.mule.sdk.api.annotation.values.OfValues.class);
 
     if (legacyAnnotation != null && sdkAnnotation != null) {
-      throw new IllegalModelDefinitionException(format("Parameter group %s cannot be annotated with both %s and %s",
-                                                       parameterGroupDeclaration.getName(),
+      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on parameter group %s",
                                                        OfValues.class.getName(),
-                                                       org.mule.sdk.api.annotation.values.OfValues.class.getName()));
+                                                       org.mule.sdk.api.annotation.values.OfValues.class.getName(),
+                                                       parameterGroupDeclaration.getName()));
     } else if (legacyAnnotation != null) {
       return of(new OfValueInformation(legacyAnnotation.value(), legacyAnnotation.open()));
     } else if (sdkAnnotation != null) {
