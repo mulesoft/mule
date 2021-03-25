@@ -7,12 +7,13 @@
 package org.mule.runtime.core.internal.value;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toCollection;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.core.internal.util.LocationUtils.deleteLastPartFromLocation;
 import static org.mule.runtime.core.internal.util.LocationUtils.isConnection;
-import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
-import static org.mule.runtime.extension.api.values.ValueResolvingException.NOT_VALUE_PROVIDER_ENABLED;
+import static org.mule.sdk.api.values.ValueResolvingException.INVALID_LOCATION;
+import static org.mule.sdk.api.values.ValueResolvingException.NOT_VALUE_PROVIDER_ENABLED;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
@@ -21,11 +22,13 @@ import org.mule.runtime.api.value.Value;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.values.ComponentValueProvider;
-import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
-import org.mule.runtime.extension.api.values.ValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.runtime.extension.api.values.MuleValueAdapter;
+import org.mule.runtime.extension.api.values.SdkComponentValueProvider;
+import org.mule.runtime.extension.api.values.SdkConfigurationParameterValueProvider;
+import org.mule.sdk.api.values.ValueProvider;
+import org.mule.sdk.api.values.ValueResolvingException;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -49,7 +52,13 @@ public class MuleValueProviderService implements ValueProviderService {
    */
   @Override
   public ValueResult getValues(Location location, String providerName) {
-    return getValueResult(() -> this.findValueProvider(location, providerName).resolve());
+    return getValueResult(() -> {
+      ValueProvider valueProvider = this.findValueProvider(location, providerName);
+      return valueProvider.resolve()
+          .stream()
+          .map(MuleValueAdapter::new)
+          .collect(toCollection(LinkedHashSet::new));
+    });
   }
 
   /**
@@ -90,15 +99,48 @@ public class MuleValueProviderService implements ValueProviderService {
 
     Object component = findComponent(realLocation);
 
-    if (component instanceof ComponentValueProvider) {
-      return () -> ((ComponentValueProvider) component).getValues(providerName);
+    if (component instanceof SdkComponentValueProvider) {
+      return new ValueProvider() {
+
+        @Override
+        public Set<org.mule.sdk.api.values.Value> resolve() throws ValueResolvingException {
+          return ((SdkComponentValueProvider) component).getValues(providerName);
+        }
+
+        @Override
+        public String getId() {
+          return null;
+        }
+      };
     }
 
-    if (component instanceof ConfigurationParameterValueProvider) {
+    if (component instanceof SdkConfigurationParameterValueProvider) {
       if (isConnection) {
-        return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(providerName);
+        return new ValueProvider() {
+
+          @Override
+          public Set<org.mule.sdk.api.values.Value> resolve() throws ValueResolvingException {
+            return ((SdkConfigurationParameterValueProvider) component).getConnectionValues(providerName);
+          }
+
+          @Override
+          public String getId() {
+            return null;
+          }
+        };
       } else {
-        return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(providerName);
+        return new ValueProvider() {
+
+          @Override
+          public Set<org.mule.sdk.api.values.Value> resolve() throws ValueResolvingException {
+            return ((SdkConfigurationParameterValueProvider) component).getConfigValues(providerName);
+          }
+
+          @Override
+          public String getId() {
+            return null;
+          }
+        };
       }
     }
 

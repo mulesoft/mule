@@ -40,6 +40,18 @@ public class ValueProviderUtils {
 
   }
 
+  static org.mule.runtime.extension.api.values.ValueBuilder cloneAndEnrichValue(org.mule.runtime.api.value.Value value,
+                                                                                Map<Integer, String> partOrderMapping) {
+    Value sdkValue = new SdkValueAdapter(value);
+    return cloneAndEnrichMuleValue(sdkValue, partOrderMapping, 1);
+  }
+
+  public static org.mule.runtime.extension.api.values.ValueBuilder cloneAndEnrichValue(org.mule.runtime.api.value.Value value,
+                                                                                       List<ParameterModel> parameters) {
+    Value sdkValue = new SdkValueAdapter(value);
+    return cloneAndEnrichMuleValue(sdkValue, orderParts(parameters), 1);
+  }
+
   /**
    * Given a {@link Value}, this is navigated recursively cloning each {@link Value} of the tree structure creating a
    * {@link ValueBuilder} and adding the partName of each {@link Value} found.
@@ -69,6 +81,16 @@ public class ValueProviderUtils {
     final ValueBuilder keyBuilder =
         ValueBuilder.newValue(value.getId(), partOrderMapping.get(level)).withDisplayName(value.getDisplayName());
     value.getChilds().forEach(childKey -> keyBuilder.withChild(cloneAndEnrichValue(childKey, partOrderMapping, level + 1)));
+    return keyBuilder;
+  }
+
+  static org.mule.runtime.extension.api.values.ValueBuilder cloneAndEnrichMuleValue(Value value,
+                                                                                    Map<Integer, String> partOrderMapping,
+                                                                                    int level) {
+    final org.mule.runtime.extension.api.values.ValueBuilder keyBuilder =
+        org.mule.runtime.extension.api.values.ValueBuilder.newValue(value.getId(), partOrderMapping.get(level))
+            .withDisplayName(value.getDisplayName());
+    value.getChilds().forEach(childKey -> keyBuilder.withChild(cloneAndEnrichMuleValue(childKey, partOrderMapping, level + 1)));
     return keyBuilder;
   }
 

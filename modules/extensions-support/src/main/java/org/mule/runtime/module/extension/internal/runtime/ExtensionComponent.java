@@ -19,9 +19,8 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
-import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
+import static org.mule.sdk.api.values.ValueResolvingException.UNKNOWN;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -39,7 +38,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -52,7 +50,6 @@ import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.api.value.Value;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -77,8 +74,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
-import org.mule.runtime.extension.api.values.ComponentValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.runtime.extension.api.values.SdkComponentValueProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderMediator;
@@ -91,8 +87,9 @@ import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessag
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.sdk.api.data.sample.SampleDataException;
+import org.mule.sdk.api.values.Value;
+import org.mule.sdk.api.values.ValueResolvingException;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -111,7 +108,7 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractComponent
-    implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
+    implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, SdkComponentValueProvider,
     ComponentSampleDataProvider, Lifecycle {
 
   private final static Logger LOGGER = getLogger(ExtensionComponent.class);
@@ -696,11 +693,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   public ExtensionModel getExtensionModel() {
     return extensionModel;
-  }
-
-  @Override
-  public List<ValueProviderModel> getModels(String providerName) {
-    return getValueProviderModels(componentModel.getAllParameterModels());
   }
 
   @Inject

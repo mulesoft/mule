@@ -9,10 +9,10 @@ package org.mule.runtime.module.extension.internal.value;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
-import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.withRefreshToken;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.cloneAndEnrichValue;
+import static org.mule.sdk.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
+import static org.mule.sdk.api.values.ValueResolvingException.UNKNOWN;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.EnrichableModel;

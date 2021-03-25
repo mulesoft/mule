@@ -10,6 +10,7 @@ import static com.google.common.base.Throwables.propagateIfPossible;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toCollection;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
@@ -20,6 +21,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.ResolvingFailure;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
@@ -28,6 +30,7 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.values.MuleValueAdapter;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
@@ -39,7 +42,9 @@ import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSup
 import org.mule.runtime.module.tooling.internal.artifact.sampledata.SampleDataExecutor;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
+import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -78,21 +83,17 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
           LOGGER.debug("Invoking connector's value provider: {} for component: {}", providerName,
                        parameterizedModel.getName());
         }
-        return resultFrom(withContextClassLoader(extensionClassLoader, () -> valueProviderMediator.getValues(providerName,
-                                                                                                             parameterValueResolver,
-                                                                                                             connectionSupplier(context),
-                                                                                                             configSupplier(context),
-                                                                                                             context
-                                                                                                                 .getConnectionProvider()
-                                                                                                                 .orElse(null)),
-                                                 ValueResolvingException.class,
+        return resultFrom(withContextClassLoader(extensionClassLoader,
+                                                 () -> getValues(providerName, valueProviderMediator,
+                                                                 parameterValueResolver, context),
+                                                 org.mule.sdk.api.values.ValueResolvingException.class,
                                                  e -> {
                                                    throw new ExecutorExceptionWrapper(e);
                                                  }));
       } finally {
         context.dispose();
       }
-    } catch (ValueResolvingException e) {
+    } catch (org.mule.sdk.api.values.ValueResolvingException e) {
       if (LOGGER.isWarnEnabled()) {
         LOGGER.warn(format("Resolve value provider has FAILED with code: %s for component: %s", e.getFailureCode(),
                            parameterizedModel.getName()),
@@ -178,6 +179,20 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
       return ofNullable(((ComponentElementDeclaration) component).getConfigRef());
     }
     return empty();
+  }
+
+  private Set<Value> getValues(String providerName,
+                               ValueProviderMediator<?> valueProviderMediator,
+                               ParameterValueResolver parameterValueResolver,
+                               ExtensionResolvingContext context)
+      throws org.mule.sdk.api.values.ValueResolvingException {
+    return valueProviderMediator.getValues(providerName,
+                                           parameterValueResolver,
+                                           connectionSupplier(context),
+                                           configSupplier(context), context.getConnectionProvider().orElse(null))
+        .stream()
+        .map(MuleValueAdapter::new)
+        .collect(toCollection(LinkedHashSet::new));
   }
 
 }
