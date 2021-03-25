@@ -7,12 +7,14 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -47,7 +49,10 @@ public class ReconnectionUtils {
       return false;
     }
 
-    if (isPartOfActiveTransaction(context.getConfiguration().get())) {
+    // Transactions are bound to a connection, so the tx cannot continue on a newly established connection.
+    // Because of this, operations within transactions cannot be retried.
+    if (isPartOfActiveTransaction(context.getConfiguration().get())
+        || extractCauseOfType(t, TransactionException.class).isPresent()) {
       return false;
     }
 

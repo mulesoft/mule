@@ -67,23 +67,17 @@ public class TransactionBindingDelegate {
             try {
               return bindResource(txKey, connectionHandlerSupplier, currentTx);
             } catch (ConnectionException e) {
-              throw new MuleRuntimeException(e);
+              // Wrap this in a TransactionException to avoid the reconnection/retry mechanism
+              throw new MuleRuntimeException(new TransactionException(createStaticMessage("Cannot establish connection for the transaction: "
+                  + e.getMessage()), e));
             } catch (TransactionException e) {
-              throw new MuleRuntimeException(new ConnectionException(e));
+              throw new MuleRuntimeException(e);
             }
           });
 
           @Override
           public T getConnection() throws ConnectionException {
-            try {
-              return boundResource.get().getConnection();
-            } catch (MuleRuntimeException e) {
-              if (e.getCause() instanceof ConnectionException) {
-                throw (ConnectionException) e.getCause();
-              } else {
-                throw e;
-              }
-            }
+            return boundResource.get().getConnection();
           }
 
           @Override
@@ -107,8 +101,8 @@ public class TransactionBindingDelegate {
                                                                                 final Transaction currentTx)
       throws ConnectionException, TransactionException {
     ConnectionHandler<T> connectionHandler = connectionHandlerSupplier.get();
-    T connection = connectionHandler.getConnection();
 
+    T connection = connectionHandler.getConnection();
     ExtensionTransactionalResource<T> txResource = createTransactionalResource(currentTx, connectionHandler, connection);
     boolean bound = false;
     try {
