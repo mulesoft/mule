@@ -34,11 +34,6 @@ public interface FlowStoppedPersistenceListener {
   void doNotPersist();
 
   /**
-   * Checks if the flow should start or not
-   */
-  void checkIfFlowShouldStart();
-
-  /**
    * Indicates if the flow should start or not
    */
   Boolean shouldStart();

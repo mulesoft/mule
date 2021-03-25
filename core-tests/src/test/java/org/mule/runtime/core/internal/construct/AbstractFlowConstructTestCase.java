@@ -192,4 +192,53 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
     }
   }
 
+  @Test
+  public void testFlowWithInitialStateStoppedIsStoppedAndAppIsRestarted() throws Exception {
+    // STOPPEAR, restartear y startear flow, deberia poder startear  (todo con un flow con initial state stopped)
+    AbstractFlowConstruct flow = getStoppedFlowConstruct();
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+
+    assertFalse(flow.isStarted());
+    assertFalse(flow.isStopped());
+
+    flow.initialise();
+    assertFalse(flow.isStarted());
+    assertFalse(flow.isStopped());
+
+    when(muleContext.isStarting()).thenReturn(true);
+    // This should not actually start the flow
+    flow.start();
+    assertFalse(flow.isStarted());
+    assertTrue(flow.isStopped());
+
+    when(muleContext.isStarting()).thenReturn(false);
+    // Finally the flow is actually started
+    flow.start();
+    assertTrue(flow.isStarted());
+    assertFalse(flow.isStopped());
+
+    flow.stop();
+
+    //App is restarted
+    when(muleContext.isStarting()).thenReturn(true);
+    // This should not actually start the flow
+    flow.start();
+    assertFalse(flow.isStarted());
+    assertTrue(flow.isStopped());
+
+    when(muleContext.isStarting()).thenReturn(false);
+    // Finally the flow is actually started
+    flow.start();
+    assertTrue(flow.isStarted());
+    assertFalse(flow.isStopped());
+
+    // Try to start again
+    try {
+      flow.start();
+      fail("Exception expected: Cannot start an already started flow");
+    } catch (final IllegalStateException e) {
+      // expected
+    }
+  }
+
 }
