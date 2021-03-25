@@ -222,6 +222,8 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
   @Test
   @Issue("MULE-19288")
   public void doNotRetryOnTxException() {
+    when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
+
     final TransactionException txExceptionExpected = new TransactionException(new ConnectionException("expected!"));
     assertThat(shouldRetry(txExceptionExpected, operationContext), is(false));
   }
