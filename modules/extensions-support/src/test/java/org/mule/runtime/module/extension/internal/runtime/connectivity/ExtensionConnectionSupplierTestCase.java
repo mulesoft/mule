@@ -8,10 +8,15 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -19,11 +24,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -45,12 +53,15 @@ import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import io.qameta.allure.Issue;
+import io.qameta.allure.Issues;
 
 @RunWith(Parameterized.class)
 public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTestCase {
@@ -59,6 +70,9 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
   public static Collection<Boolean> params() {
     return asList(true, false);
   }
+
+  @Rule
+  public ExpectedException expected = none();
 
   @Inject
   private ExtensionConnectionSupplier adapter;
@@ -115,6 +129,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
     when(transactionConfig.getAction()).thenReturn(ACTION_ALWAYS_JOIN);
     when(transactionConfig.isTransacted()).thenReturn(true);
     when(operationContext.getTransactionConfig()).thenReturn(of(transactionConfig));
+    when(operationContext.getComponentModel()).thenReturn(mock(OperationModel.class));
   }
 
   @Override
@@ -145,6 +160,40 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
   }
 
   @Test
+  @Issues({@Issue("MULE-19288"), @Issue("MULE-17900")})
+  public void xaTransactionNotSupports() throws Exception {
+    when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
+    when(transaction.supports(any(), any())).thenReturn(false);
+
+    if (lazyConnections) {
+      expected.expect(MuleRuntimeException.class);
+      expected.expectCause(instanceOf(TransactionException.class));
+      expected.expectMessage("but the current transaction doesn't support it and could not be bound");
+    } else {
+      expected.expect(TransactionException.class);
+      expected.expectMessage("but the current transaction doesn't support it and could not be bound");
+    }
+    bindAndVerify();
+  }
+
+  @Test
+  @Issues({@Issue("MULE-19288"), @Issue("MULE-17900")})
+  public void xaTransactionBindResourceFails() throws Exception {
+    when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
+
+    final TransactionException txExceptionExpected = new TransactionException(new Exception());
+    doThrow(txExceptionExpected).when(transaction).bindResource(any(), any());
+
+    if (lazyConnections) {
+      expected.expect(MuleRuntimeException.class);
+      expected.expectCause(sameInstance(txExceptionExpected));
+    } else {
+      expected.expect(sameInstance(txExceptionExpected));
+    }
+    bindAndVerify();
+  }
+
+  @Test
   @Issue("MULE-17900")
   public void transactionResourceBindWithLazyConnections() throws Exception {
     assumeThat(lazyConnections, is(true));
@@ -168,5 +217,12 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
       connection.getConnection();
     }
     verify(transaction).bindResource(any(), any(XAExtensionTransactionalResource.class));
+  }
+
+  @Test
+  @Issue("MULE-19288")
+  public void doNotRetryOnTxException() {
+    final TransactionException txExceptionExpected = new TransactionException(new ConnectionException("expected!"));
+    assertThat(shouldRetry(txExceptionExpected, operationContext), is(false));
   }
 }
