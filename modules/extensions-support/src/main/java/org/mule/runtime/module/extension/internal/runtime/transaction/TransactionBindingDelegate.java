@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -24,12 +25,16 @@ import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+
 /**
  * Binds a connection to a given transaction and returns the {@link ConnectionHandler} that has been bound to it.
  *
  * @since 4.0
  */
 public class TransactionBindingDelegate {
+
+  private static final Logger LOGGER = getLogger(TransactionBindingDelegate.class);
 
   private final ExtensionModel extensionModel;
   private final ComponentModel componentModel;
@@ -123,7 +128,12 @@ public class TransactionBindingDelegate {
         try {
           connectionHandler.release();
         } catch (Exception e) {
-          // Nothing to do
+          final String msg = "Ignored '" + e.getClass().getName() + ": " + e.getMessage() + "' during connection release";
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.warn(msg, e);
+          } else {
+            LOGGER.warn(msg);
+          }
         }
       }
     }
