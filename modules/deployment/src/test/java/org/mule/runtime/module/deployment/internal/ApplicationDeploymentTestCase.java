@@ -131,6 +131,11 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
         .withMinMuleVersion("4.3.0") // MULE-19038
         .definedBy("dummy-app-with-props-dependencies-config.xml");
+    dummyAppDescriptorWithStoppedFlowFileBuilder = appFileBuilder("dummy-app-with-stopped-flow-config")
+        .withMinMuleVersion("4.3.0") // MULE-19127
+        .definedBy("dummy-app-with-stopped-flow-config.xml")
+        .containingClass(echoTestClassFile,
+                         "org/foo/EchoTest.class");
 
     // Application plugin artifact builders
     echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
@@ -862,6 +867,25 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertStatus(app, STARTED);
 
     assertIfFlowsHaveStarted(app, true);
+  }
+
+  @Test
+  @Issue("MULE-19127")
+  public void stopsAndStartsAppWithStoppedFlowWithInitialStateStoppedAndStartsIt() throws Exception {
+    final Application app = deployApplication(dummyAppDescriptorWithStoppedFlowFileBuilder);
+    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+      flow.start();
+      flow.stop();
+    }
+    reset(applicationDeploymentListener);
+    deploymentService.redeploy(dummyAppDescriptorWithStoppedFlowFileBuilder.getId());
+
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorWithStoppedFlowFileBuilder, STARTED);
+    for (Flow flow : app_2.getRegistry().lookupAllByType(Flow.class)) {
+      assertThat(flow.getLifecycleState().isStarted(), is(false));
+      flow.start();
+      assertThat(flow.getLifecycleState().isStarted(), is(true));
+    }
   }
 
   @Test

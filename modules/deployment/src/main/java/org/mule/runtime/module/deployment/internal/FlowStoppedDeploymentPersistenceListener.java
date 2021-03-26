@@ -80,22 +80,15 @@ public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPers
   }
 
   @Override
-  public void checkIfFlowShouldStart() {
+  public Boolean shouldStart() {
     Properties deploymentProperties = null;
     try {
       deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
     } catch (IOException e) {
-      logger.error("FlowStoppedDeploymentListener failed to process checkIfFlowShouldStart for flow "
+      logger.error("FlowStoppedDeploymentListener failed to process shouldStart for flow "
           + flowName, e);
     }
-    shouldStart.set(deploymentProperties != null
-        && parseBoolean(deploymentProperties.getProperty(propertyName, "true")));
-  }
-
-  @Override
-  public Boolean shouldStart() {
-    //Getting and resetting variable
-    Boolean start = shouldStart.getAndSet(true);
-    return start;
+    return deploymentProperties != null
+        && parseBoolean(deploymentProperties.getProperty(propertyName, "true"));
   }
 }
