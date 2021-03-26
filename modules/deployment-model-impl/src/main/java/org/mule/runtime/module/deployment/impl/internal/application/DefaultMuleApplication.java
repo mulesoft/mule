@@ -180,7 +180,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
       log(miniSplash(format("Starting %s '%s'", shortArtifactType, descriptor.getName())));
     });
     try {
-      checkIfFlowsShouldStart();
       this.artifactContext.getMuleContext().start();
       persistArtifactState(START);
 
@@ -437,14 +436,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     }
 
     return domainRepository.getCompatibleDomain(domainBundleDescriptor.get());
-  }
-
-  private void checkIfFlowsShouldStart() {
-    if (getRegistry() != null) {
-      for (Flow flow : getRegistry().lookupAllByType(Flow.class)) {
-        ((DefaultFlowBuilder.DefaultFlow) flow).checkIfFlowShouldStart();
-      }
-    }
   }
 
 }
