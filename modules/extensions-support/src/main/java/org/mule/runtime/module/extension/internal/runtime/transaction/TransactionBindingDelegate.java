@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -24,12 +25,16 @@ import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+
 /**
  * Binds a connection to a given transaction and returns the {@link ConnectionHandler} that has been bound to it.
  *
  * @since 4.0
  */
 public class TransactionBindingDelegate {
+
+  private static final Logger LOGGER = getLogger(TransactionBindingDelegate.class);
 
   private final ExtensionModel extensionModel;
   private final ComponentModel componentModel;
@@ -109,7 +114,7 @@ public class TransactionBindingDelegate {
       if (currentTx.supports(txKey, txResource)) {
         currentTx.bindResource(txKey, txResource);
         bound = true;
-        return new TransactionalConnectionHandler(txResource);
+        return new TransactionalConnectionHandler<>(txResource);
       } else {
         throw new TransactionException(createStaticMessage(format("%s '%s' of extension '%s' uses a transactional connection '%s', but the current transaction "
             + "doesn't support it and could not be bound",
@@ -120,7 +125,16 @@ public class TransactionBindingDelegate {
       }
     } finally {
       if (!bound) {
-        connectionHandler.release();
+        try {
+          connectionHandler.release();
+        } catch (Exception e) {
+          final String msg = "Ignored '" + e.getClass().getName() + ": " + e.getMessage() + "' during connection release";
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.warn(msg, e);
+          } else {
+            LOGGER.warn(msg);
+          }
+        }
       }
     }
   }
