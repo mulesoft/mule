@@ -109,7 +109,7 @@ public class TransactionBindingDelegate {
       if (currentTx.supports(txKey, txResource)) {
         currentTx.bindResource(txKey, txResource);
         bound = true;
-        return new TransactionalConnectionHandler(txResource);
+        return new TransactionalConnectionHandler<>(txResource);
       } else {
         throw new TransactionException(createStaticMessage(format("%s '%s' of extension '%s' uses a transactional connection '%s', but the current transaction "
             + "doesn't support it and could not be bound",
@@ -120,7 +120,11 @@ public class TransactionBindingDelegate {
       }
     } finally {
       if (!bound) {
-        connectionHandler.release();
+        try {
+          connectionHandler.release();
+        } catch (Exception e) {
+          // Nothing to do
+        }
       }
     }
   }

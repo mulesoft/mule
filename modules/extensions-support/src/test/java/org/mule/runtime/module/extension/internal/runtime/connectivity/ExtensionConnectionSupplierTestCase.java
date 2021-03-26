@@ -194,6 +194,24 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
   }
 
   @Test
+  @Issue("MULE-19289")
+  public void xaTransactionBindResourceFailsReleaseFails() throws Exception {
+    when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
+
+    final TransactionException txExceptionExpected = new TransactionException(new Exception());
+    doThrow(txExceptionExpected).when(transaction).bindResource(any(), any());
+    doThrow(IllegalStateException.class).when(connectionProvider).disconnect(any());
+
+    if (lazyConnections) {
+      expected.expect(MuleRuntimeException.class);
+      expected.expectCause(sameInstance(txExceptionExpected));
+    } else {
+      expected.expect(sameInstance(txExceptionExpected));
+    }
+    bindAndVerify();
+  }
+
+  @Test
   @Issue("MULE-17900")
   public void transactionResourceBindWithLazyConnections() throws Exception {
     assumeThat(lazyConnections, is(true));

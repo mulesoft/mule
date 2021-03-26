@@ -568,6 +568,11 @@ public interface AllureConstants {
       String LOCAL_TRANSACTION = "Local Transaction";
     }
 
+    interface XaStory {
+
+      String XA_TRANSACTION = "XA Transaction";
+    }
+
   }
 
   interface MuleDsl {
