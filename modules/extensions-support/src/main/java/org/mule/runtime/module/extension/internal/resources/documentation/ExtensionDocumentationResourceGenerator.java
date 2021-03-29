@@ -7,8 +7,10 @@
 package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
+
 import org.mule.metadata.api.annotation.DescriptionAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -23,12 +25,12 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
-
-import com.google.common.collect.ImmutableList;
+import org.mule.runtime.module.extension.internal.resources.AbstractGeneratedResourceFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * A {@link GeneratedResourceFactory} which generates an XML file with all the {@link ExtensionModel} elements and it's
@@ -36,10 +38,10 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ExtensionDocumentationResourceGenerator implements GeneratedResourceFactory {
+public class ExtensionDocumentationResourceGenerator extends AbstractGeneratedResourceFactory {
 
   @Override
-  public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
+  public List<GeneratedResource> generateResources(ExtensionModel extensionModel) {
     final ExtensionDescriptionsSerializer serializer = new ExtensionDescriptionsSerializer();
     ExtensionDocumenterWalker walker = new ExtensionDocumenterWalker();
     walker.walk(extensionModel);
@@ -50,7 +52,7 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
                                                            walker.getOperations(),
                                                            walker.getSources(),
                                                            getTypesDocumentation(extensionModel)));
-    return Optional.of(new GeneratedResource(serializer.getFileName(extensionModel.getName()), documenter.getBytes()));
+    return singletonList(new GeneratedResource(serializer.getFileName(extensionModel.getName()), documenter.getBytes()));
   }
 
   private class ExtensionDocumenterWalker extends ExtensionWalker {

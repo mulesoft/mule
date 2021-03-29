@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.deployment.meta.Product.MULE_EE;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -32,15 +32,15 @@ import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.resources.manifest.ClassloaderClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.DefaultClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedArtifactsCollector;
 import org.mule.runtime.module.extension.internal.resources.manifest.ProcessingEnvironmentClassPackageFinder;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 
-import javax.annotation.processing.ProcessingEnvironment;
-
+import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.processing.ProcessingEnvironment;
 
 /**
  * A {@link GeneratedResourceFactory} which generates a {@link MulePluginModel} and stores it in {@code JSON} format
@@ -48,7 +48,7 @@ import java.util.Optional;
  * @since 4.0
  */
 // TODO: MULE-12295. This was moved here just to make it work with soap extensions.
-public class MulePluginDescriptorGenerator implements GeneratedResourceFactory, ProcessingEnvironmentAware {
+public class MulePluginDescriptorGenerator extends AbstractGeneratedResourceFactory implements ProcessingEnvironmentAware {
 
   private static final String AUTO_GENERATED_MULE_ARTIFACT_DESCRIPTOR = "auto-generated-" + MULE_ARTIFACT_JSON_DESCRIPTOR;
   private ProcessingEnvironment processingEnvironment;
@@ -57,11 +57,11 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory, 
    * {@inheritDoc}
    */
   @Override
-  public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
+  public List<GeneratedResource> generateResources(ExtensionModel extensionModel) {
     final Optional<ExtensionTypeDescriptorModelProperty> typeProperty =
         extensionModel.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
     if (!typeProperty.isPresent()) {
-      return empty();
+      return emptyList();
     }
 
     DefaultClassPackageFinder defaultClassPackageFinder = new DefaultClassPackageFinder();
@@ -101,7 +101,7 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory, 
     });
 
     final String descriptorJson = new MulePluginModelJsonSerializer().serialize(builder.build());
-    return of(new GeneratedResource(AUTO_GENERATED_MULE_ARTIFACT_DESCRIPTOR, descriptorJson.getBytes()));
+    return singletonList(new GeneratedResource(AUTO_GENERATED_MULE_ARTIFACT_DESCRIPTOR, descriptorJson.getBytes()));
   }
 
   private String getLoaderId(ExtensionModel extensionModel) {
