@@ -13,12 +13,13 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.canBeUsedI
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
@@ -30,6 +31,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConne
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import javax.inject.Inject;
 import java.util.concurrent.Callable;
 
 /**
@@ -41,36 +43,37 @@ import java.util.concurrent.Callable;
  */
 public final class DefaultImplicitConfigurationProviderFactory implements ImplicitConfigurationProviderFactory {
 
+  @Inject
+  FeatureFlaggingService featureFlaggingService;
+
   /**
    * {@inheritDoc}
    */
   @Override
   public ConfigurationProvider createImplicitConfigurationProvider(ExtensionModel extensionModel,
-                                                                   ConfigurationModel implicitConfigurationModel,
+                                                                   ConfigurationModel configurationModel,
                                                                    CoreEvent event,
                                                                    ReflectionCache reflectionCache,
                                                                    ExpressionManager expressionManager,
                                                                    MuleContext muleContext) {
-    if (implicitConfigurationModel == null || !canBeUsedImplicitly(implicitConfigurationModel)) {
+    if (configurationModel == null || !canBeUsedImplicitly(configurationModel)) {
       throw new IllegalStateException("Could not find a config for extension '" + extensionModel.getName()
           + "' and none can be created automatically. Please define one");
     }
-
-    final String providerName =
-        getImplicitConfigurationProviderName(muleContext.getId(), extensionModel, implicitConfigurationModel);
     Callable<ResolverSet> resolverSetCallable =
-        () -> buildImplicitResolverSet(implicitConfigurationModel, reflectionCache, expressionManager, muleContext);
+        () -> buildImplicitResolverSet(configurationModel, reflectionCache, expressionManager, muleContext);
     ClassLoader pluginClassloader = getClassLoader(extensionModel);
     final ResolverSet resolverSet = withContextClassLoader(pluginClassloader, resolverSetCallable);
     try {
+      final String providerName = resolveImplicitConfigurationProviderName(extensionModel, configurationModel, muleContext);
       ImplicitConnectionProviderValueResolver implicitConnectionProviderValueResolver =
-          new ImplicitConnectionProviderValueResolver(implicitConfigurationModel.getName(), extensionModel,
-                                                      implicitConfigurationModel, reflectionCache, expressionManager,
+          new ImplicitConnectionProviderValueResolver(configurationModel.getName(), extensionModel,
+                                                      configurationModel, reflectionCache, expressionManager,
                                                       muleContext);
 
       ConfigurationInstance configurationInstance =
           withContextClassLoader(pluginClassloader, () -> new ConfigurationInstanceFactory(extensionModel,
-                                                                                           implicitConfigurationModel,
+                                                                                           configurationModel,
                                                                                            resolverSet,
                                                                                            expressionManager,
                                                                                            muleContext)
@@ -78,9 +81,9 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                                                                                     event,
                                                                                                                     implicitConnectionProviderValueResolver));
 
-      if (resolverSet.isDynamic() || needsDynamicConnectionProvider(extensionModel, implicitConfigurationModel,
+      if (resolverSet.isDynamic() || needsDynamicConnectionProvider(extensionModel, configurationModel,
                                                                     implicitConnectionProviderValueResolver)) {
-        return new DynamicConfigurationProvider(providerName, extensionModel, implicitConfigurationModel,
+        return new DynamicConfigurationProvider(providerName, extensionModel, configurationModel,
                                                 resolverSet,
                                                 implicitConnectionProviderValueResolver,
                                                 ImmutableExpirationPolicy.getDefault(new LocalTimeSupplier()), reflectionCache,
@@ -88,12 +91,12 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
       }
 
       return new ConfigurationProviderToolingAdapter(providerName, extensionModel,
-                                                     implicitConfigurationModel, configurationInstance, reflectionCache,
+                                                     configurationModel, configurationInstance, reflectionCache,
                                                      muleContext);
 
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
-                                                                implicitConfigurationModel.getName(),
+                                                                configurationModel.getName(),
                                                                 extensionModel.getName())),
                                      e);
     }
@@ -114,4 +117,23 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
     return !getConnectedComponents(extensionModel, configurationModel).isEmpty()
         && implicitConnectionProviderValueResolver.isDynamic();
   }
+
+  public String resolveImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel, MuleContext muleContext) {
+    // TODO: Add feature flag check and code comment
+    if (featureFlaggingService != null && muleContext.getArtifactType().equals(ArtifactType.POLICY)) {
+      return getImplicitConfigurationProviderNameForPolicyArtifact(extensionModel, configurationModel, muleContext);
+    } else {
+      return getImplicitConfigurationProviderName(extensionModel, configurationModel);
+    }
+  }
+
+  private String getImplicitConfigurationProviderNameForPolicyArtifact(ExtensionModel extensionModel, ConfigurationModel configurationModel, MuleContext muleContext) {
+    return String.format("%s-%s", muleContext.getId(), getImplicitConfigurationProviderName(extensionModel, configurationModel));
+  }
+
+  private String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
+                                                            ConfigurationModel implicitConfigurationModel) {
+    return format("%s-%s-implicit", extensionModel.getName(), implicitConfigurationModel.getName());
+  }
+
 }

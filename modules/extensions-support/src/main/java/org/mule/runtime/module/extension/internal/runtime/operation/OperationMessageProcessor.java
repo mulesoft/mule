@@ -24,6 +24,7 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -123,6 +124,15 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
    */
   @Override
   protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
+    // TODO: Also check for the feature flag
+    if (muleContext.getArtifactType().equals(ArtifactType.POLICY)
+            && !(configurationProvider.getExtensionModel() == extensionModel)) {
+      throw new IllegalOperationException(format(
+              "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                      + "The selected config is not part of the policy declaration and cannot be shared.",
+              getLocation().getRootContainerName(), componentModel.getName(),
+              configurationProvider.getName()));
+    }
     ConfigurationModel configurationModel = configurationProvider.getConfigurationModel();
     if (!configurationModel.getOperationModel(componentModel.getName()).isPresent() &&
         !configurationProvider.getExtensionModel().getOperationModel(componentModel.getName()).isPresent()) {

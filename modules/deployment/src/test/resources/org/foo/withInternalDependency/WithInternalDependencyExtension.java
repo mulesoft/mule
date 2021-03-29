@@ -13,6 +13,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.foo.withInternalDependency.internal.InternalRegistryBean;
 import org.foo.withInternalDependency.internal.WithInternalDependencyFunctions;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.lang.String;
@@ -29,9 +30,21 @@ public class WithInternalDependencyExtension {
   @Inject
   private InternalRegistryBean registryBean;
 
+  @Parameter
+  @Optional(defaultValue = "originalValue")
+  private String dummyParameter;
+
   public void checkExtensionInjection() {
     if (registryBean == null) {
       throw new NullPointerException("registryBean is null (has not been injected into the extension)");
     }
+  }
+
+  public String getDummyParameter() {
+    return dummyParameter;
+  }
+
+  public void setDummyParameter(String dummyParameter) {
+    this.dummyParameter = dummyParameter;
   }
 }

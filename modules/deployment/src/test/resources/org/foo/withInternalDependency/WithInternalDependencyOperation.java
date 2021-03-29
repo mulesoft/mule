@@ -29,4 +29,10 @@ public class WithInternalDependencyOperation {
     return "registryBean has been injected into the extension, its operations and it's EL functions";
   }
 
+  public void checkConfigResolution(@Config WithInternalDependencyExtension config) {
+    if (config.getDummyParameter().equals("originalValue")) {
+      throw new IllegalStateException("originalValue has not been modified by the extension's configuration");
+    }
+  }
+
 }
