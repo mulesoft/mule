@@ -8,7 +8,6 @@ package org.mule.test.classloading.internal.validation;
 
 import static java.util.Optional.of;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
-import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
