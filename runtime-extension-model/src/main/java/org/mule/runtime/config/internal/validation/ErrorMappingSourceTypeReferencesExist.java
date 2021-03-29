@@ -11,11 +11,14 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.List;
@@ -48,13 +51,14 @@ public class ErrorMappingSourceTypeReferencesExist extends AbstractErrorTypesVal
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     for (ErrorMapping errorMapping : getErrorMappings(component)) {
       final ComponentIdentifier errorTypeId = parserErrorType(errorMapping.getSource());
 
       final Optional<ErrorType> errorType = artifact.getErrorTypeRepository().lookupErrorType(errorTypeId);
       if (!errorType.isPresent()) {
-        return of(format("Could not find error '%s' used in %s", errorMapping.getSource(), compToLoc(component)));
+        return of(create(component, component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME), this,
+                         format("Could not find error '%s'.", errorMapping.getSource())));
       }
     }
 

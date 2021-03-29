@@ -13,6 +13,7 @@ import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public class NameIsNotRepeatedTestCase extends AbstractCoreValidationTestCase {
 
   @Test
   public void repeatedGlobalNames() {
-    final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xmlns:test=\"http://www.mulesoft.org/schema/mule/test\"\n" +
@@ -51,8 +52,8 @@ public class NameIsNotRepeatedTestCase extends AbstractCoreValidationTestCase {
         "    \n" +
         "</mule>");
 
-    assertThat(msg.get(),
-               containsString(format("Two configuration elements have been defined with the same global name. Global name [%s] must be unique",
+    assertThat(msg.get().getMessage(),
+               containsString(format("Two configuration elements have been defined with the same global name. Global name '%s' must be unique",
                                      REPEATED_GLOBAL_NAME)));
   }
 }

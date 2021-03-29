@@ -13,6 +13,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -20,6 +21,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +66,7 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     return component.getModel(ParameterizedModel.class)
         .map(pmz -> pmz.getAllParameterModels())
         .orElse(emptyList())
@@ -83,8 +85,9 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
 
           return false;
         })
-        .map(param -> format("A static value ('%s') was given for parameter '%s' but it requires an expression",
-                             param.getRawValue(), param.getModel().getName()))
+        .map(param -> create(component, param, this,
+                             format("A static value ('%s') was given for parameter '%s' but it requires an expression",
+                                    param.getRawValue(), param.getModel().getName())))
         .findFirst();
   }
 

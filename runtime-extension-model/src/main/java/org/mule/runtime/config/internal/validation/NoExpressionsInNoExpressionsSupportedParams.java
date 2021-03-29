@@ -14,6 +14,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -22,6 +23,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.declaration.type.annotation.LiteralTypeAnnotation;
 
 import java.util.List;
@@ -65,7 +67,7 @@ public class NoExpressionsInNoExpressionsSupportedParams implements Validation {
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     for (ComponentParameterAst param : component.getParameters()) {
       if (!param.getModel().isComponentId()
           && param.getValue().isRight()
@@ -76,8 +78,9 @@ public class NoExpressionsInNoExpressionsSupportedParams implements Validation {
             && !param.getModel().getType().getAnnotation(LiteralTypeAnnotation.class).isPresent()
             && stringValue.startsWith(DEFAULT_EXPRESSION_PREFIX)
             && stringValue.endsWith(DEFAULT_EXPRESSION_SUFFIX)) {
-          return of(format("An expression value was given for parameter '%s' but it doesn't support expressions",
-                           param.getModel().getName()));
+          return of(create(component, param, this,
+                           format("An expression value was given for parameter '%s' but it doesn't support expressions",
+                                  param.getModel().getName())));
         }
       }
     }

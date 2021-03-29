@@ -10,13 +10,16 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 
@@ -53,14 +56,16 @@ public class SourceErrorMappingAnyNotRepeated implements Validation {
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
-    return component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME).<List<ErrorMapping>>getValue()
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
+    final ComponentParameterAst errorMappingsParam = component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
+    return errorMappingsParam.<List<ErrorMapping>>getValue()
         .reduce(l -> empty(),
                 mappings -> {
                   if (mappings.stream()
                       .filter(this::isErrorMappingWithSourceAny)
                       .count() > 1) {
-                    return of("Only one mapping for 'ANY' or an empty source type is allowed.");
+                    return of(create(component, errorMappingsParam, this,
+                                     "Only one mapping for 'ANY' or an empty source type is allowed."));
                   } else {
                     return empty();
                   }

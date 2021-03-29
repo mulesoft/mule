@@ -8,17 +8,18 @@ package org.mule.runtime.config.internal.validation;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.topLevelElement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 
 import java.util.List;
@@ -55,7 +56,7 @@ public class SingletonsAreNotRepeated implements Validation {
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     final List<ComponentAst> repeated = artifact.topLevelComponentsStream()
         .filter(comp -> !comp.equals(component))
         .filter(equalsIdentifier(component.getIdentifier()))
@@ -65,15 +66,7 @@ public class SingletonsAreNotRepeated implements Validation {
       return empty();
     }
 
-    return of("The configuration element [" + component.getIdentifier() + "] can only appear once, but was present also in " +
-        repeated.stream()
-            .map(this::compToLoc)
-            .collect(joining(", ")));
-  }
-
-  private String compToLoc(ComponentAst component) {
-    return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
-        + component.getMetadata().getStartLine().orElse(-1) + "]";
+    return of(create(repeated, this, "The configuration element '" + component.getIdentifier() + "' can only appear once"));
   }
 
 }
