@@ -24,19 +24,22 @@ import org.mule.tck.size.SmallTest;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 @Feature(CORE_COMPONENTS)
 @Story(LOGGER)
 public class LoggerContextCacheTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   private ClassLoader currentClassLoader;
   private LoggerContextCache loggerContextCache;

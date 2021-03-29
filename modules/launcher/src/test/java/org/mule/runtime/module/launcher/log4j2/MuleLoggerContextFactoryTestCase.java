@@ -28,16 +28,19 @@ import java.net.URISyntaxException;
 
 import org.apache.logging.log4j.core.LoggerContext;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
 
   private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private RegionClassLoader classLoader;
