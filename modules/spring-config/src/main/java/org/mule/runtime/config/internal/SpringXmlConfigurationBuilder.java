@@ -103,11 +103,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   public SpringXmlConfigurationBuilder(String[] configFiles, boolean enableLazyInit, boolean disableXmlValidations)
       throws ConfigurationException {
-    super(configFiles, emptyMap());
-    this.artifactType = APP;
-    this.enableLazyInit = enableLazyInit;
-    this.disableXmlValidations = disableXmlValidations;
-    this.runtimeLockFactory = getRuntimeLockFactory();
+    this(configFiles, emptyMap(), APP, enableLazyInit, disableXmlValidations, getRuntimeLockFactory());
   }
 
   public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactDeclaration artifactDeclaration,
