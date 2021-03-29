@@ -45,7 +45,6 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
 import org.mule.runtime.extension.api.values.SdkConfigurationParameterValueProvider;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
@@ -63,7 +62,7 @@ import java.util.Set;
  * components. So far the capabilities are:
  * <ul>
  * <li>{@link MetadataKeyProvider}, to resolve {@link MetadataKey metadata keys} associated to a configuration</li>
- * <li>{@link ConfigurationParameterValueProvider}, to resolve {@link Value values} associated to a configuration and their
+ * <li>{@link SdkConfigurationParameterValueProvider}, to resolve {@link Value values} associated to a configuration and their
  * related connection</li>
  * </ul>
  *
@@ -198,7 +197,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   private interface WithConnectionProviderCallable<T> {
 
     T call(ConnectionProvider connectionProvider, ConnectionProviderModel connectionProviderModel)
-        throws org.mule.sdk.api.values.ValueResolvingException;
+        throws ValueResolvingException;
 
   }
 

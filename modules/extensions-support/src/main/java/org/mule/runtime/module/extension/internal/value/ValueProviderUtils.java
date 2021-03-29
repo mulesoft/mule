@@ -145,6 +145,14 @@ public class ValueProviderUtils {
    * @since 4.4.0
    */
   public static String getValueProviderId(Class valueProviderClazz) {
+    if (!org.mule.runtime.extension.api.values.ValueProvider.class.isAssignableFrom(valueProviderClazz) &&
+        !ValueProvider.class.isAssignableFrom(valueProviderClazz)) {
+      throw new IllegalStateException(format("Value Provider %s does not implement %s or %s",
+                                             valueProviderClazz.getName(),
+                                             org.mule.runtime.extension.api.values.ValueProvider.class.getName(),
+                                             ValueProvider.class.getName()));
+    }
+
     Object valueProviderObject;
     try {
       valueProviderObject = instantiateClass(valueProviderClazz);

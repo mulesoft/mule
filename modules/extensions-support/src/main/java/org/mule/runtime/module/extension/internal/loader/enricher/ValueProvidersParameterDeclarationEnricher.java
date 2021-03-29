@@ -126,8 +126,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                                                      allParameters));
 
     dynamicGroupOptions
-        .forEach((paramGroupDeclaration, eitherOfValue) -> getParts(paramGroupDeclaration)
-            .forEach((paramDeclaration, order) -> enrichParameter(eitherOfValue, paramDeclaration,
+        .forEach((paramGroupDeclaration, ofValueInformation) -> getParts(paramGroupDeclaration)
+            .forEach((paramDeclaration, order) -> enrichParameter(ofValueInformation, paramDeclaration,
                                                                   paramDeclaration::setValueProviderModel, order, parameterNames,
                                                                   paramGroupDeclaration.getName(), allParameters)));
   }

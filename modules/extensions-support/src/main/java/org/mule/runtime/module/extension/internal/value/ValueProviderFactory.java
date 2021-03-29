@@ -136,8 +136,8 @@ public class ValueProviderFactory {
     } else {
       throw new ValueResolvingException(format("An error occurred trying to create a ValueProvider: %s should implement %s or %s",
                                                resolverObject.getClass().getName(),
-                                               ValueProvider.class.getSimpleName(),
-                                               org.mule.sdk.api.values.ValueProvider.class.getSimpleName()),
+                                               ValueProvider.class.getName(),
+                                               org.mule.sdk.api.values.ValueProvider.class.getName()),
                                         UNKNOWN);
     }
   }
