@@ -12,7 +12,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -34,7 +34,7 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
   private static final String DEFAULT_EXPRESSION_SUFFIX = "]";
   private static final String CONFIGURATION_NAME = "configuration";
 
-  private static final ComponentIdentifier CONFIGURATION_IDENTIFIER =
+  protected static final ComponentIdentifier CONFIGURATION_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(CONFIGURATION_NAME).build();
 
   @Override
@@ -49,16 +49,18 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
 
   @Override
   public Level getLevel() {
-    return ERROR;
+    // According to the extension model, no collections or target-value for foreach, parallel-foreach, etc...
+    // must be defined by an expression, but this was not enforced. This check is needed to avoid breaking on
+    // legacy cases
+    return WARN;
   }
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(component -> component.getModel(ParameterizedModel.class).isPresent())
-        // According to the extension model, no collections or target-value for foreach, parallel-foreach, etc...
-        // must be defined by an expression, but this was not enforced. This check is needed to avoid breaking on
-        // legacy cases
-        .and(currentElemement(equalsIdentifier(CONFIGURATION_IDENTIFIER)));
+        .and(currentElemement(equalsIdentifier(CONFIGURATION_IDENTIFIER))
+            // This specific case is already handled by ExpressionsInConfigurationParams
+            .negate());
   }
 
   @Override
