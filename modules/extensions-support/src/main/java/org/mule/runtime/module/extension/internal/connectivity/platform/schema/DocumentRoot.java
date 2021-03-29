@@ -14,7 +14,7 @@ public class DocumentRoot {
     return encodes;
   }
 
-  public void setEncodes(String encodes) {
+  void setEncodes(String encodes) {
     this.encodes = encodes;
   }
 }
