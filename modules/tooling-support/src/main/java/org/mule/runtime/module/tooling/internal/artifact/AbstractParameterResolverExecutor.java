@@ -100,8 +100,7 @@ public class AbstractParameterResolverExecutor {
 
         try {
           value = extractValue(parameterElement.getValue(),
-                               artifactHelper.getParameterClass(parameterModel, parameterizedElementDeclaration),
-                               expressionManager);
+                               artifactHelper.getParameterClass(parameterModel, parameterizedElementDeclaration));
         } catch (ExpressionRuntimeException e) {
           throw new ExpressionEvaluationException(
                                                   format("Error resolving value for parameter: '%s' from declaration. There was an issue resolving the expression",

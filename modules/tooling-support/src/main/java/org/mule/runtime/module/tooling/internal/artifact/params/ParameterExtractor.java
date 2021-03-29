@@ -38,25 +38,21 @@ public class ParameterExtractor implements ParameterValueVisitor {
 
   private Object value;
 
-  public static <T> T extractValue(ParameterValue parameterValue, Class<T> type, ExpressionManager expressionManager) {
-    Object value = extractValue(parameterValue, expressionManager);
+  public static Object extractValue(ParameterValue parameterValue, Class<?> type) {
+    Object value = extractValue(parameterValue);
     if (isExpression(value) && value instanceof String) {
-      return (T) expressionManager.evaluate((String) value, fromType(type)).getValue();
+      return value;
     }
-    return objectMapper.convertValue(extractValue(parameterValue, expressionManager), type);
+    return objectMapper.convertValue(value, type);
   }
 
-  private static Object extractValue(ParameterValue parameterValue, ExpressionManager expressionManager) {
-    final ParameterExtractor extractor = new ParameterExtractor(expressionManager);
+  private static Object extractValue(ParameterValue parameterValue) {
+    final ParameterExtractor extractor = new ParameterExtractor();
     parameterValue.accept(extractor);
     return extractor.get();
   }
 
-  private final ExpressionManager expressionManager;
-
-  private ParameterExtractor(ExpressionManager expressionManager) {
-    this.expressionManager = expressionManager;
-  }
+  private ParameterExtractor() {}
 
   @Override
   public void visitSimpleValue(ParameterSimpleValue text) {
@@ -65,13 +61,13 @@ public class ParameterExtractor implements ParameterValueVisitor {
 
   @Override
   public void visitListValue(ParameterListValue list) {
-    this.value = list.getValues().stream().map(v -> extractValue(v, expressionManager)).collect(toList());
+    this.value = list.getValues().stream().map(ParameterExtractor::extractValue).collect(toList());
   }
 
   @Override
   public void visitObjectValue(ParameterObjectValue objectValue) {
     final Map<String, Object> parametersMap = new HashMap<>();
-    objectValue.getParameters().forEach((k, v) -> parametersMap.put(k, extractValue(v, expressionManager)));
+    objectValue.getParameters().forEach((k, v) -> parametersMap.put(k, extractValue(v)));
     this.value = parametersMap;
   }
 
