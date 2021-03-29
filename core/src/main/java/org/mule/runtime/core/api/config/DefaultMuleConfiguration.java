@@ -12,7 +12,12 @@ import static java.lang.System.getProperty;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_TRACE;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
@@ -27,7 +32,6 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.InternalComponent;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
@@ -66,8 +70,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
 
-  private boolean lazyInit = false;
-
   private MuleVersion minMuleVersion;
 
   /**
@@ -75,8 +77,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    * exception message if an exception occurs. Switching on DEBUG level logging with automatically set this flag to true.
    */
   public static boolean flowTrace = false;
-
-  private boolean synchronous = false;
 
   /**
    * The type of model used for the internal system model where system created services are registered
@@ -269,45 +269,41 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   protected void applySystemProperties() {
     String p;
 
-    p = getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+    p = getProperty(MULE_ENCODING_SYSTEM_PROPERTY);
     if (p != null) {
       encoding = p;
     } else {
-      System.setProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, encoding);
+      System.setProperty(MULE_ENCODING_SYSTEM_PROPERTY, encoding);
     }
-    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous");
-    if (p != null) {
-      synchronous = BooleanUtils.toBoolean(p);
-    }
-    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "systemModelType");
+    p = getProperty(SYSTEM_PROPERTY_PREFIX + "systemModelType");
     if (p != null) {
       systemModelType = p;
     }
-    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "workingDirectory");
+    p = getProperty(SYSTEM_PROPERTY_PREFIX + "workingDirectory");
     if (p != null) {
       workingDirectory = p;
     }
-    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clientMode");
+    p = getProperty(SYSTEM_PROPERTY_PREFIX + "clientMode");
     if (p != null) {
       clientMode = BooleanUtils.toBoolean(p);
     }
-    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId");
+    p = getProperty(SYSTEM_PROPERTY_PREFIX + "serverId");
     if (p != null) {
       id = p;
     }
-    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId");
+    p = getProperty(SYSTEM_PROPERTY_PREFIX + "domainId");
     if (p != null) {
       domainId = p;
     }
-    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes");
+    p = getProperty(SYSTEM_PROPERTY_PREFIX + "message.cacheBytes");
     if (p != null) {
       cacheMessageAsBytes = BooleanUtils.toBoolean(p);
     }
-    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable");
+    p = getProperty(SYSTEM_PROPERTY_PREFIX + "streaming.enable");
     if (p != null) {
       enableStreaming = BooleanUtils.toBoolean(p);
     }
-    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
+    p = getProperty(SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
     if (p != null) {
       autoWrapMessageAwareTransform = BooleanUtils.toBoolean(p);
     }
@@ -318,12 +314,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
       flowTrace = false;
     }
 
-    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");
+    p = getProperty(SYSTEM_PROPERTY_PREFIX + "validate.expressions");
     if (p != null) {
       validateExpressions = Boolean.valueOf(p);
     }
 
-    p = getProperty(MuleProperties.MULE_DISABLE_RESPONSE_TIMEOUT);
+    p = getProperty(MULE_DISABLE_RESPONSE_TIMEOUT);
     if (p != null) {
       disableTimeouts = Boolean.valueOf(p);
     }
@@ -348,14 +344,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   protected void validateEncoding() throws FatalException {
     // Check we have a valid and supported encoding
     if (!Charset.isSupported(encoding)) {
-      throw new FatalException(CoreMessages.propertyHasInvalidValue("encoding", encoding), this);
+      throw new FatalException(propertyHasInvalidValue("encoding", encoding), this);
     }
   }
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   public void setDefaultSynchronousEndpoints(boolean synchronous) {
-    if (verifyContextNotStarted()) {
-      this.synchronous = synchronous;
-    }
+    // Nothing to do
   }
 
   @Override
@@ -385,7 +383,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         File canonicalFile = FileUtils.openDirectory(workingDirectory);
         this.workingDirectory = canonicalFile.getCanonicalPath();
       } catch (IOException e) {
-        throw new IllegalArgumentException(CoreMessages.initialisationFailure("Invalid working directory").getMessage(), e);
+        throw new IllegalArgumentException(initialisationFailure("Invalid working directory").getMessage(), e);
       }
     }
   }
@@ -456,12 +454,20 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     return systemModelType;
   }
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   public void setSystemModelType(String systemModelType) {
     if (verifyContextNotStarted()) {
       this.systemModelType = systemModelType;
     }
   }
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   public void setClientMode(boolean clientMode) {
     if (verifyContextNotStarted()) {
       this.clientMode = clientMode;
@@ -489,6 +495,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     return cacheMessageAsBytes;
   }
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   public void setCacheMessageAsBytes(boolean cacheMessageAsBytes) {
     if (verifyContextNotStarted()) {
       this.cacheMessageAsBytes = cacheMessageAsBytes;
@@ -500,6 +510,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     return enableStreaming;
   }
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   public void setEnableStreaming(boolean enableStreaming) {
     if (verifyContextNotStarted()) {
       this.enableStreaming = enableStreaming;
@@ -508,16 +522,17 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   @Override
   public boolean isLazyInit() {
-    return lazyInit;
+    return false;
   }
 
-  public void setLazyInit(boolean lazyInit) {
-    this.lazyInit = lazyInit;
-  }
+  /**
+   * @deprecated Since 4.4 this is a no-op.
+   */
+  @Deprecated
+  public void setLazyInit(boolean lazyInit) {}
 
   protected boolean verifyContextNotInitialized() {
-    // LazyInit needs to be able to change the configuration
-    if (muleContext != null && !isLazyInit() && muleContext.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME)) {
+    if (muleContext != null && muleContext.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME)) {
       logger.warn("Cannot modify MuleConfiguration once the MuleContext has been initialized.  Modification will be ignored.");
       return false;
     } else {
@@ -526,8 +541,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   }
 
   protected boolean verifyContextNotStarted() {
-    // LazyInit needs to be able to change the configuration
-    if (muleContext != null && !isLazyInit() && muleContext.getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME)) {
+    if (muleContext != null && muleContext.getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME)) {
       logger.warn("Cannot modify MuleConfiguration once the MuleContext has been started.  Modification will be ignored.");
       return false;
     } else {
@@ -734,7 +748,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + responseTimeout;
     result = prime * result + new Long(shutdownTimeout).hashCode();
-    result = prime * result + (synchronous ? 1231 : 1237);
     result = prime * result + ((systemModelType == null) ? 0 : systemModelType.hashCode());
     result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
     result = prime * result + (containerMode ? 1231 : 1237);
@@ -797,9 +810,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
       return false;
     }
     if (shutdownTimeout != other.shutdownTimeout) {
-      return false;
-    }
-    if (synchronous != other.synchronous) {
       return false;
     }
     if (systemModelType == null) {

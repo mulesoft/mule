@@ -8,11 +8,6 @@ package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
-
-import java.util.List;
-
-import javax.inject.Inject;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -27,6 +22,11 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.internal.config.ExpressionCorrelationIdGenerator;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
@@ -35,7 +35,8 @@ import org.springframework.beans.factory.SmartFactoryBean;
  * only work if the MuleContext has not yet been started, otherwise the modifications will be ignored (and warnings logged).
  */
 // TODO MULE-9638 remove usage of SmartFactoryBean
-public class MuleConfigurationConfigurator extends AbstractComponentFactory implements SmartFactoryBean {
+public class MuleConfigurationConfigurator extends AbstractComponentFactory<MuleConfiguration>
+    implements SmartFactoryBean<MuleConfiguration> {
 
   @Inject
   private MuleContext muleContext;
@@ -48,7 +49,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
 
   // We instantiate DefaultMuleConfiguration to make sure we get the default values for
   // any properties not set by the user.
-  private DefaultMuleConfiguration config = new DefaultMuleConfiguration();
+  private final DefaultMuleConfiguration config = new DefaultMuleConfiguration();
 
   private boolean explicitDynamicConfigExpiration;
 
@@ -81,10 +82,6 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   @Override
   public boolean isSingleton() {
     return true;
-  }
-
-  public void setDefaultSynchronousEndpoints(boolean synchronous) {
-    config.setDefaultSynchronousEndpoints(synchronous);
   }
 
   public void setDefaultResponseTimeout(int responseTimeout) {
@@ -129,12 +126,10 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   }
 
   @Override
-  public Object doGetObject() throws Exception {
+  public MuleConfiguration doGetObject() throws Exception {
     MuleConfiguration configuration = muleContext.getConfiguration();
     if (configuration instanceof DefaultMuleConfiguration) {
       DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
-      // First of all set the lazyInit mode or not to allow modifications to the configuration
-      defaultConfig.setLazyInit(isLazyInitMode(configurationProperties));
 
       defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
       defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
