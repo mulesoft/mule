@@ -28,6 +28,8 @@ import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.validate;
+import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
@@ -50,19 +52,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.UnaryOperator;
-import java.util.stream.Stream;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -120,6 +109,20 @@ import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
@@ -372,13 +375,20 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     final ValidationResult validation = validate(appModel);
 
     final Collection<ValidationResultItem> items = validation.getItems();
-    if (!items.isEmpty()) {
 
-      final String allMessages = validation.getItems()
+    items.stream()
+        .filter(v -> v.getValidation().getLevel().equals(WARN))
+        .forEach(v -> LOGGER.warn(compToLoc(v.getComponent()) + ": " + v.getMessage()));
+
+    final List<ValidationResultItem> errors = items.stream()
+        .filter(v -> v.getValidation().getLevel().equals(ERROR))
+        .collect(toList());
+
+    if (!errors.isEmpty()) {
+      final String allMessages = errors
           .stream()
           .map(v -> compToLoc(v.getComponent()) + ": " + v.getMessage())
           .collect(joining(lineSeparator()));
-
 
       throw new MuleRuntimeException(createStaticMessage(allMessages));
     }
