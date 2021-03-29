@@ -53,7 +53,7 @@ public class ConnectivitySchema {
 
     private final ConnectivitySchema product = new ConnectivitySchema();
 
-    public Builder setGAV(String groupId, String artifactId, String version) {
+    public Builder setGav(String groupId, String artifactId, String version) {
       product.groupId = groupId;
       product.artifactId = artifactId;
       product.version = version;

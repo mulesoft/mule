@@ -14,7 +14,7 @@ public class DocumentNode {
     return root;
   }
 
-  public void setRoot(DocumentRoot root) {
+  void setRoot(DocumentRoot root) {
     this.root = root;
   }
 }

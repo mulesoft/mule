@@ -15,7 +15,7 @@ public final class ConnectivitySchemaTestUtils {
 
   public static ConnectivitySchema getNetsuiteTokenAuthenticationSchema() {
     return ConnectivitySchema.builder()
-            .setGAV("com.mulesoft.schemas", "mule-netsuite-connector-token-authentication", "1.0")
+            .setGav("com.mulesoft.schemas", "mule-netsuite-connector-token-authentication", "1.0")
             .addLabel("type", "ApiKeyAuthenticationConnection")
             .addLabel("system", "Netsuite")
             .addLabel("connectionProvider", "token-authentication")
