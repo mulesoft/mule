@@ -100,6 +100,11 @@ public interface AllureConstants {
 
   }
 
+  interface LazyInitializationFeature {
+
+    String LAZY_INITIALIZATION = "Lazy Initialization";
+  }
+
   interface DeploymentConfiguration {
 
     String DEPLOYMENT_CONFIGURATION = "Deployment Configuration";
