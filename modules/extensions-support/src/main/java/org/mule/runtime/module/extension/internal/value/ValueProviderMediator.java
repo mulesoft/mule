@@ -9,24 +9,24 @@ package org.mule.runtime.module.extension.internal.value;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.withRefreshToken;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.cloneAndEnrichValue;
-import static org.mule.sdk.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
-import static org.mule.sdk.api.values.ValueResolvingException.UNKNOWN;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.sdk.api.values.Value;
 import org.mule.sdk.api.values.ValueBuilder;
 import org.mule.sdk.api.values.ValueProvider;
-import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -68,8 +68,8 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws org.mule.sdk.api.values.ValueResolvingException if an error occurs resolving {@link Value values}
    */
-  public Set<org.mule.sdk.api.values.Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver)
-      throws org.mule.sdk.api.values.ValueResolvingException {
+  public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver)
+      throws ValueResolvingException {
     return getValues(parameterName, parameterValueResolver, nullSupplier, nullSupplier);
   }
 
@@ -108,9 +108,9 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */
-  public Set<org.mule.sdk.api.values.Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver,
-                                                      Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier,
-                                                      ConnectionProvider connectionProvider)
+  public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver,
+                              Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier,
+                              ConnectionProvider connectionProvider)
       throws ValueResolvingException {
     List<ParameterModel> parameters = getParameters(parameterName);
 
@@ -145,19 +145,23 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
                                    ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                                    Supplier<Object> configurationSupplier)
       throws ValueResolvingException {
+    try {
+      ValueProvider valueProvider =
+          factoryModelProperty
+              .createFactory(parameterValueResolver, connectionSupplier, configurationSupplier, reflectionCache.get(),
+                             muleContext.get())
+              .createValueProvider();
 
-    ValueProvider valueProvider =
-        factoryModelProperty
-            .createFactory(parameterValueResolver, connectionSupplier, configurationSupplier, reflectionCache.get(),
-                           muleContext.get())
-            .createValueProvider();
+      Set<org.mule.sdk.api.values.Value> valueSet = valueProvider.resolve();
 
-    Set<Value> valueSet = valueProvider.resolve();
-
-    return valueSet.stream()
-        .map(option -> cloneAndEnrichValue(option, parameters))
-        .map(ValueBuilder::build)
-        .collect(toCollection(LinkedHashSet::new));
+      return valueSet.stream()
+          .map(option -> cloneAndEnrichValue(option, parameters))
+          .map(ValueBuilder::build)
+          .map(MuleValueAdapter::new)
+          .collect(toCollection(LinkedHashSet::new));
+    } catch (org.mule.sdk.api.values.ValueResolvingException e) {
+      throw new ValueResolvingException(e.getMessage(), e.getFailureCode(), e.getCause());
+    }
   }
 
   /**

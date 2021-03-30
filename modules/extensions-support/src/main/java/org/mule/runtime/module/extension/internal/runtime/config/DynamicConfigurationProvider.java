@@ -31,6 +31,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -39,7 +40,8 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ExpirableConfigurationProvider;
-import org.mule.runtime.extension.api.values.SdkConfigurationParameterValueProvider;
+import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
+import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -47,8 +49,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
-import org.mule.sdk.api.values.Value;
-import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.util.List;
 import java.util.Map;
@@ -73,7 +73,7 @@ import org.slf4j.Logger;
  * @since 4.0.0
  */
 public final class DynamicConfigurationProvider extends LifecycleAwareConfigurationProvider
-    implements ExpirableConfigurationProvider, SdkConfigurationParameterValueProvider {
+    implements ExpirableConfigurationProvider, ConfigurationParameterValueProvider {
 
   private static final Logger LOGGER = getLogger(DynamicConfigurationProvider.class);
 

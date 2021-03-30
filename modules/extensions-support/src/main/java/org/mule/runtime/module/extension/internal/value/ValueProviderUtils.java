@@ -120,14 +120,16 @@ public class ValueProviderUtils {
    * @throws ValueResolvingException if an error occurs trying to resolve the values
    * @since 4.1.1
    */
-  public static Set<Value> valuesWithClassLoader(Callable<Set<Value>> valueResolver, ExtensionModel extensionModel)
-      throws ValueResolvingException {
-    Reference<ValueResolvingException> exceptionReference = new Reference<>();
-    Set<Value> values =
-        withContextClassLoader(getClassLoader(extensionModel), valueResolver, ValueResolvingException.class, (e) -> {
-          exceptionReference.set((ValueResolvingException) e);
-          return null;
-        });
+  public static Set<org.mule.runtime.api.value.Value> valuesWithClassLoader(Callable<Set<org.mule.runtime.api.value.Value>> valueResolver,
+                                                                            ExtensionModel extensionModel)
+      throws org.mule.runtime.extension.api.values.ValueResolvingException {
+    Reference<org.mule.runtime.extension.api.values.ValueResolvingException> exceptionReference = new Reference<>();
+    Set<org.mule.runtime.api.value.Value> values =
+        withContextClassLoader(getClassLoader(extensionModel), valueResolver,
+                               org.mule.runtime.extension.api.values.ValueResolvingException.class, (e) -> {
+                                 exceptionReference.set((org.mule.runtime.extension.api.values.ValueResolvingException) e);
+                                 return null;
+                               });
 
     if (exceptionReference.get() != null) {
       throw exceptionReference.get();

@@ -135,7 +135,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
   /**
    * Enriches a parameter that has an associated {@link ValueProvider}
    *
-   * @param eitherOfValue           encapsulation of a {@link ValueProvider} or a {@link org.mule.sdk.api.values.ValueProvider}
+   * @param ofValueInformation      encapsulation of a {@link ValueProvider} or a {@link org.mule.sdk.api.values.ValueProvider}
    * @param paramDeclaration        {@link ParameterDeclaration} or {@link ParameterGroupDeclaration} paramDeclaration
    * @param containerParameterNames parameters container's names
    */
