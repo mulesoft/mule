@@ -59,34 +59,33 @@ public class AbstractParameterResolverExecutor {
 
   protected ParameterValueResolver parameterValueResolver(ParameterizedElementDeclaration parameterizedElementDeclaration,
                                                           ParameterizedModel parameterizedModel)
-          throws ExpressionNotSupportedException {
+      throws ExpressionNotSupportedException {
     Map<String, Object> parametersMap = parametersMap(parameterizedElementDeclaration, parameterizedModel);
 
     try {
       final ResolverSet resolverSet =
-              ParametersResolver.fromValues(parametersMap,
-                                            muleContext,
-                                            // Required parameters should be validated by the resolver factory instead of this
-                                            // resolver
-                                            true,
-                                            reflectionCache,
-                                            expressionManager,
-                                            parameterizedModel.getName())
-                      .getParametersAsResolverSet(parameterizedModel, muleContext);
+          ParametersResolver.fromValues(parametersMap,
+                                        muleContext,
+                                        // Required parameters should be validated by the resolver factory instead of this
+                                        // resolver
+                                        true,
+                                        reflectionCache,
+                                        expressionManager,
+                                        parameterizedModel.getName())
+              .getParametersAsResolverSet(parameterizedModel, muleContext);
       return new ResolverSetBasedParameterResolver(resolverSet, parameterizedModel, reflectionCache, expressionManager);
-    }
-    catch (ConfigurationException e) {
+    } catch (ConfigurationException e) {
       throw new MuleRuntimeException(createStaticMessage("Error resolving parameters values from declaration"), e);
     }
   }
 
   protected Map<String, Object> parametersMap(ParameterizedElementDeclaration parameterizedElementDeclaration,
                                               ParameterizedModel parameterizedModel)
-          throws ExpressionNotSupportedException {
+      throws ExpressionNotSupportedException {
     Map<String, Object> parametersMap = new HashMap<>();
 
     Map<String, ParameterGroupModel> parameterGroups =
-            parameterizedModel.getParameterGroupModels().stream().collect(toMap(NamedObject::getName, identity()));
+        parameterizedModel.getParameterGroupModels().stream().collect(toMap(NamedObject::getName, identity()));
 
     for (ParameterGroupElementDeclaration parameterGroupElement : parameterizedElementDeclaration.getParameterGroups()) {
       final String parameterGroupName = parameterGroupElement.getName();
@@ -99,8 +98,8 @@ public class AbstractParameterResolverExecutor {
       for (ParameterElementDeclaration parameterElement : parameterGroupElement.getParameters()) {
         final String parameterName = parameterElement.getName();
         final ParameterModel parameterModel = parameterGroupModel.getParameter(parameterName)
-                .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find parameter with name: '%s' in parameter group: '%s'",
-                                                                                parameterName, parameterGroupName)));
+            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find parameter with name: '%s' in parameter group: '%s'",
+                                                                            parameterName, parameterGroupName)));
 
         Class<?> expectedClass = artifactHelper.getParameterClass(parameterModel, parameterizedElementDeclaration);
         Object value = extractValue(parameterElement.getValue(), expectedClass);
@@ -108,15 +107,14 @@ public class AbstractParameterResolverExecutor {
           if (NOT_SUPPORTED.equals(parameterModel.getExpressionSupport())) {
             throw new ExpressionNotSupportedException(format("Error resolving value for parameter: '%s' from declaration, it cannot be an EXPRESSION value",
                                                              parameterName));
-          }
-          else {
+          } else {
             try {
-              TypeSafeExpressionValueResolver<?> valueResolver = new TypeSafeExpressionValueResolver<>((String) value, expectedClass, fromType(expectedClass));
+              TypeSafeExpressionValueResolver<?> valueResolver =
+                  new TypeSafeExpressionValueResolver<>((String) value, expectedClass, fromType(expectedClass));
               muleContext.getInjector().inject(valueResolver);
               valueResolver.initialise();
               value = valueResolver;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
               throw new RuntimeException("Exception trying to create ExpressionValueResolver for parameter: " + parameterName, e);
             }
           }
