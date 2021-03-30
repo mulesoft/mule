@@ -14,11 +14,14 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnect
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
+import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -118,21 +121,25 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
         && implicitConnectionProviderValueResolver.isDynamic();
   }
 
-  public String resolveImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel, MuleContext muleContext) {
-    // TODO: Add feature flag check and code comment
-    if (featureFlaggingService != null && muleContext.getArtifactType().equals(ArtifactType.POLICY)) {
+  public String resolveImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel,
+                                                         MuleContext muleContext) {
+    // TODO: Add code comment
+    if (featureFlaggingService != null && featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_POLICY_ISOLATION)
+        && muleContext.getArtifactType().equals(ArtifactType.POLICY)) {
       return getImplicitConfigurationProviderNameForPolicyArtifact(extensionModel, configurationModel, muleContext);
     } else {
       return getImplicitConfigurationProviderName(extensionModel, configurationModel);
     }
   }
 
-  private String getImplicitConfigurationProviderNameForPolicyArtifact(ExtensionModel extensionModel, ConfigurationModel configurationModel, MuleContext muleContext) {
+  private String getImplicitConfigurationProviderNameForPolicyArtifact(ExtensionModel extensionModel,
+                                                                       ConfigurationModel configurationModel,
+                                                                       MuleContext muleContext) {
     return String.format("%s-%s", muleContext.getId(), getImplicitConfigurationProviderName(extensionModel, configurationModel));
   }
 
   private String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
-                                                            ConfigurationModel implicitConfigurationModel) {
+                                                      ConfigurationModel implicitConfigurationModel) {
     return format("%s-%s-implicit", extensionModel.getName(), implicitConfigurationModel.getName());
   }
 

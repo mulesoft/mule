@@ -125,15 +125,15 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   @Override
   protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
     // TODO: Also check for the feature flag
-    if (muleContext.getArtifactType().equals(ArtifactType.POLICY)
-            && !(configurationProvider.getExtensionModel() == extensionModel)) {
-      throw new IllegalOperationException(format(
-              "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
-                      + "The selected config is not part of the policy declaration and cannot be shared.",
-              getLocation().getRootContainerName(), componentModel.getName(),
-              configurationProvider.getName()));
-    }
     ConfigurationModel configurationModel = configurationProvider.getConfigurationModel();
+    if (muleContext.getArtifactType().equals(ArtifactType.POLICY)
+        && !(configurationProvider.getExtensionModel() == extensionModel)) {
+      throw new IllegalOperationException(format(
+                                                 "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                                     + "The selected config is not part of the policy declaration and cannot be shared.",
+                                                 getLocation().getRootContainerName(), componentModel.getName(),
+                                                 configurationProvider.getName()));
+    }
     if (!configurationModel.getOperationModel(componentModel.getName()).isPresent() &&
         !configurationProvider.getExtensionModel().getOperationModel(componentModel.getName()).isPresent()) {
       throw new IllegalOperationException(format(

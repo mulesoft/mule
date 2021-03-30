@@ -41,7 +41,9 @@ public interface ImplicitConfigurationProviderFactory {
                                                             ReflectionCache reflectionCache,
                                                             ExpressionManager expressionManager,
                                                             MuleContext muleContext);
+
   // TODO: Javadoc
-  String resolveImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel, MuleContext muleContext);
+  String resolveImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel,
+                                                  MuleContext muleContext);
 
 }

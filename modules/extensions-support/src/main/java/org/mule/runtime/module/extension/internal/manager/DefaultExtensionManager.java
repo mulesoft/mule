@@ -196,12 +196,14 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   // TODO: Adjust the interface javadoc (does not match this implementation that can only return an implicit configuration)
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
     Set<ConfigurationModel> configurationsForComponent = getConfigurationForComponent(extensionModel, componentModel);
-    Optional<ConfigurationModel> extensionConfigurationModel = getConfigurationModelForExtension(extensionModel, configurationsForComponent);
+    Optional<ConfigurationModel> extensionConfigurationModel =
+        getConfigurationModelForExtension(extensionModel, configurationsForComponent);
     if (!extensionConfigurationModel.isPresent() && requiresConfig(extensionModel, componentModel)) {
       throw new NoConfigRefFoundException(extensionModel, componentModel);
     }
     return extensionConfigurationModel
-        .flatMap(c -> getConfigurationProvider(implicitConfigurationProviderFactory.resolveImplicitConfigurationProviderName(extensionModel, c, muleContext)));
+        .flatMap(c -> getConfigurationProvider(implicitConfigurationProviderFactory
+            .resolveImplicitConfigurationProviderName(extensionModel, c, muleContext)));
   }
 
   /**
@@ -217,7 +219,8 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                             ConfigurationModel configurationModel,
                                                             CoreEvent muleEvent) {
 
-    String implicitConfigurationProviderName = implicitConfigurationProviderFactory.resolveImplicitConfigurationProviderName(extensionModel, configurationModel, muleContext);
+    String implicitConfigurationProviderName = implicitConfigurationProviderFactory
+        .resolveImplicitConfigurationProviderName(extensionModel, configurationModel, muleContext);
 
     return extensionRegistry.getConfigurationProvider(implicitConfigurationProviderName).orElseGet(() -> {
       synchronized (extensionModel) {
