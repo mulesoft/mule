@@ -22,6 +22,7 @@ import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -51,14 +52,19 @@ public class SingletonsAreNotRepeated implements Validation {
     return topLevelElement()
         .and(currentElemement(componentModel -> componentModel.getModel(EnrichableModel.class)
             .flatMap(enrchModel -> enrchModel.getModelProperty(SingletonModelProperty.class)
-                .map(smp -> !smp.isAppliesToFile()))
+                .map(smp -> isApplicable(smp)))
             .orElse(false)));
+  }
+
+  protected boolean isApplicable(SingletonModelProperty smp) {
+    return !smp.isAppliesToFile();
   }
 
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     final List<ComponentAst> repeated = artifact.topLevelComponentsStream()
         .filter(comp -> !comp.equals(component))
+        .filter(additionalFilter(component))
         .filter(equalsIdentifier(component.getIdentifier()))
         .collect(toList());
 
@@ -66,7 +72,15 @@ public class SingletonsAreNotRepeated implements Validation {
       return empty();
     }
 
-    return of(create(repeated, this, "The configuration element '" + component.getIdentifier() + "' can only appear once"));
+    final List<ComponentAst> allRepeated = new ArrayList<>();
+    allRepeated.add(component);
+    allRepeated.addAll(repeated);
+
+    return of(create(allRepeated, this, "The configuration element '" + component.getIdentifier() + "' can only appear once."));
+  }
+
+  protected Predicate<? super ComponentAst> additionalFilter(ComponentAst component) {
+    return comp -> true;
   }
 
 }

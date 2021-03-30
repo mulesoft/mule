@@ -41,7 +41,7 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
 
     assertThat(msg.isPresent(), is(true));
     assertThat(msg.get().getMessage(),
-               containsString("A static value was given for parameter 'collection' but it requires a expression"));
+               containsString("A static value ('1, 2, 3') was given for parameter 'collection' but it requires an expression"));
   }
 
   @Test
