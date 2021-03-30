@@ -46,7 +46,7 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
 
   @Test
   public void requiredExpressionPresent() {
-    final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xsi:schemaLocation=\"\n" +
