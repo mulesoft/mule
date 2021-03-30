@@ -13,6 +13,7 @@ import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public class ErrorHandlerRefOrOnErrorExclusivenessTestCase extends AbstractCoreV
 
   @Test
   public void errorHandlerReferenceAndDefinitionNotAllowed() {
-    final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xsi:schemaLocation=\"\n" +
@@ -51,7 +52,7 @@ public class ErrorHandlerRefOrOnErrorExclusivenessTestCase extends AbstractCoreV
         "\n" +
         "</mule>");
 
-    assertThat(msg.get(),
+    assertThat(msg.get().getMessage(),
                containsString("A reference 'error-handler' cannot have 'on-error's."));
   }
 

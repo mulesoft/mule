@@ -12,10 +12,13 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.List;
@@ -49,7 +52,7 @@ public class ErrorMappingTargetTypeReferencesExist extends AbstractErrorTypesVal
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     final Set<String> errorNamespaces = artifact.dependencies().stream()
         .map(d -> d.getXmlDslModel().getPrefix().toUpperCase())
         .collect(toSet());
@@ -59,12 +62,13 @@ public class ErrorMappingTargetTypeReferencesExist extends AbstractErrorTypesVal
       final ComponentIdentifier errorTypeId = parserErrorType(errorTypeString);
 
       if (errorNamespaces.contains(errorTypeId.getNamespace())) {
-        return validateErrorTypeId(component, artifact, errorMapping.getTarget(), errorTypeId);
+        return validateErrorTypeId(component, component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME), artifact, this,
+                                   errorMapping.getTarget(), errorTypeId);
       } else if (artifact.getParent()
           .map(p -> p.getErrorTypeRepository().getErrorNamespaces().contains(errorTypeId.getNamespace()))
           .orElse(false)) {
-        return of(format("Cannot use error type '%s': namespace already exists. Used in %s", errorMapping.getTarget(),
-                         compToLoc(component)));
+        return of(create(component, component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME), this,
+                         format("Cannot use error type '%s': namespace already exists.", errorMapping.getTarget())));
       }
     }
 

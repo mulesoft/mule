@@ -366,11 +366,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     doValidateModel(artifactAst);
   }
 
-  private String compToLoc(ComponentAst component) {
-    return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
-        + component.getMetadata().getStartLine().orElse(-1) + "]";
-  }
-
   protected final void doValidateModel(ArtifactAst appModel) {
     final ValidationResult validation = validate(appModel);
 
@@ -378,20 +373,25 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     items.stream()
         .filter(v -> v.getValidation().getLevel().equals(WARN))
-        .forEach(v -> LOGGER.warn(compToLoc(v.getComponent()) + ": " + v.getMessage()));
+        .forEach(v -> LOGGER.warn(componentsLocation(v)));
 
     final List<ValidationResultItem> errors = items.stream()
         .filter(v -> v.getValidation().getLevel().equals(ERROR))
         .collect(toList());
 
     if (!errors.isEmpty()) {
-      final String allMessages = errors
+      throw new MuleRuntimeException(createStaticMessage(validation.getItems()
           .stream()
-          .map(v -> compToLoc(v.getComponent()) + ": " + v.getMessage())
-          .collect(joining(lineSeparator()));
-
-      throw new MuleRuntimeException(createStaticMessage(allMessages));
+          .map(this::componentsLocation)
+          .collect(joining(lineSeparator()))));
     }
+  }
+
+  private String componentsLocation(ValidationResultItem v) {
+    return v.getComponents().stream()
+        .map(component -> component.getMetadata().getFileName().orElse("unknown") + ":"
+            + component.getMetadata().getStartLine().orElse(-1))
+        .collect(joining("; ", "[", "]")) + ": " + v.getMessage();
   }
 
   protected void registerErrors(final ArtifactAst artifactAst) {

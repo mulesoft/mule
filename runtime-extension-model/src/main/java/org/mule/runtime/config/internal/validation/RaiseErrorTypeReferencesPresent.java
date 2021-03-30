@@ -11,9 +11,12 @@ import static java.util.Optional.of;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,11 +50,12 @@ public class RaiseErrorTypeReferencesPresent extends AbstractErrorTypesValidatio
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
-    final String errorTypeString = component.getParameter("type").getResolvedRawValue();
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
+    final ComponentParameterAst errorTypeParam = component.getParameter("type");
+    final String errorTypeString = errorTypeParam.getResolvedRawValue();
 
     if (StringUtils.isEmpty(errorTypeString)) {
-      return of("type cannot be an empty string or null in " + compToLoc(component));
+      return of(create(component, errorTypeParam, this, "type cannot be an empty string or null "));
     } else {
       return empty();
     }

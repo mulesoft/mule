@@ -12,6 +12,7 @@ import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.Optional;
 
@@ -31,7 +32,7 @@ public class NameHasValidCharactersTestCase extends AbstractCoreValidationTestCa
 
   @Test
   public void flowNameUsingInvalidCharacter() {
-    final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xsi:schemaLocation=\"\n" +
@@ -47,7 +48,7 @@ public class NameHasValidCharactersTestCase extends AbstractCoreValidationTestCa
         "\n" +
         "</mule>");
 
-    assertThat(msg.get(),
+    assertThat(msg.get().getMessage(),
                containsString("Invalid global element name 'flow/myFlow'. Problem is: Invalid character used in location. Invalid characters are /,[,],{,},#"));
   }
 }

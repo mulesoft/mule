@@ -10,11 +10,13 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +48,7 @@ public class ParameterAndChildForSameAttributeNotDefinedTogether implements Vali
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     return component.directChildrenStream()
         .filter(child -> {
           final String paramName = toCamelCase(child.getIdentifier().getName(), "-");
@@ -60,10 +62,11 @@ public class ParameterAndChildForSameAttributeNotDefinedTogether implements Vali
           final String paramName = toCamelCase(child.getIdentifier().getName(), "-");
           final String singularParamName = pluralize(paramName);
 
-          return format("Component '%s' has a child element '%s' which is used for the same purpose of the configuration parameter '%s'. "
-              + "Only one must be used.", component.getIdentifier(),
-                        child.getIdentifier(),
-                        singularParamName);
+          return create(component, this,
+                        format("Component '%s' has a child element '%s' which is used for the same purpose of the configuration parameter '%s'. "
+                            + "Only one must be used.", component.getIdentifier(),
+                               child.getIdentifier(),
+                               singularParamName));
         });
   }
 

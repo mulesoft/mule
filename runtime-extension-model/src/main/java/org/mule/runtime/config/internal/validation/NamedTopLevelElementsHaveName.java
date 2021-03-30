@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.topLevelElement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -22,6 +23,7 @@ import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,15 +64,15 @@ public class NamedTopLevelElementsHaveName implements Validation {
   }
 
   @Override
-  public Optional<String> validate(ComponentAst topLevelComponent, ArtifactAst artifact) {
+  public Optional<ValidationResultItem> validate(ComponentAst topLevelComponent, ArtifactAst artifact) {
     if (!topLevelComponent.getModel(ConstructModel.class).isPresent()
         || topLevelComponent.getModel(ParameterizedModel.class)
             .map(pmzd -> pmzd.getAllParameterModels().stream()
                 .anyMatch(ParameterModel::isComponentId))
             .orElse(false)) {
       final ComponentIdentifier identifier = topLevelComponent.getIdentifier();
-      return of(format("Global element '%s:%s' does not provide a name attribute.",
-                       identifier.getNamespace(), identifier.getName()));
+      return of(create(topLevelComponent, this, format("Global element '%s' does not provide a name attribute.",
+                                                       identifier.toString())));
     }
 
     return empty();

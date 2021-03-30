@@ -11,11 +11,14 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.List;
 import java.util.Optional;
@@ -51,8 +54,9 @@ public class ErrorHandlerOnErrorTypeExists extends AbstractErrorTypesValidation 
   }
 
   @Override
-  public Optional<String> validate(ComponentAst onErrorModel, ArtifactAst artifact) {
-    for (String type : onErrorModel.getParameter("type").getResolvedRawValue().split(",")) {
+  public Optional<ValidationResultItem> validate(ComponentAst onErrorModel, ArtifactAst artifact) {
+    final ComponentParameterAst errorTypeParam = onErrorModel.getParameter("type");
+    for (String type : errorTypeParam.getResolvedRawValue().split(",")) {
       final ComponentIdentifier parsedErrorType = parserErrorType(type.trim());
 
       if ("*".equals(parsedErrorType.getNamespace()) || "*".equals(parsedErrorType.getName())) {
@@ -62,7 +66,7 @@ public class ErrorHandlerOnErrorTypeExists extends AbstractErrorTypesValidation 
 
       final Optional<ErrorType> errorType = artifact.getErrorTypeRepository().lookupErrorType(parsedErrorType);
       if (!errorType.isPresent()) {
-        return of(format("Could not find error '%s' used in %s", type.trim(), compToLoc(onErrorModel)));
+        return of(create(onErrorModel, errorTypeParam, this, format("Could not find error '%s'", type.trim())));
       }
     }
 

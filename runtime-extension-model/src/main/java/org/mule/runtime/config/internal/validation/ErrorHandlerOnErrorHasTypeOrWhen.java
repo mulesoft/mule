@@ -14,6 +14,7 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.curren
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsComponentId;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -21,6 +22,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.List;
 import java.util.Optional;
@@ -78,16 +80,18 @@ public class ErrorHandlerOnErrorHasTypeOrWhen implements Validation {
   }
 
   @Override
-  public Optional<String> validate(ComponentAst onErrorModel, ArtifactAst artifact) {
+  public Optional<ValidationResultItem> validate(ComponentAst onErrorModel, ArtifactAst artifact) {
     if (ON_ERROR_IDENTIFIER.equals(onErrorModel.getIdentifier())) {
-      final Optional<String> refAttr = onErrorModel.getParameter(REFERENCE_ATTRIBUTE).getValue().getValue();
+      final ComponentParameterAst errorRefParam = onErrorModel.getParameter(REFERENCE_ATTRIBUTE);
+      final Optional<String> refAttr = errorRefParam.getValue().getValue();
       final Optional<ComponentAst> referenced = refAttr
           .flatMap(sharedOnErrorName -> artifact.topLevelComponentsStream()
               .filter(equalsComponentId(sharedOnErrorName))
               .findAny());
 
       if (refAttr.isPresent() && !referenced.isPresent()) {
-        return of(format("Could not find 'on-error' reference named '%s'", refAttr.get()));
+        return of(create(onErrorModel, errorRefParam, this,
+                         format("Could not find 'on-error' reference named '%s'", refAttr.get())));
       }
 
       onErrorModel = referenced.get();
@@ -95,7 +99,8 @@ public class ErrorHandlerOnErrorHasTypeOrWhen implements Validation {
 
     if (!onErrorModel.getParameter(WHEN_CHOICE_ES_ATTRIBUTE).getValue().getValue().isPresent()
         && !onErrorModel.getParameter(TYPE_ES_ATTRIBUTE).getValue().getValue().isPresent()) {
-      return of("Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute.");
+      return of(create(onErrorModel, this,
+                       "Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
     }
 
     return empty();

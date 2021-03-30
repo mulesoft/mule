@@ -21,6 +21,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
@@ -79,7 +80,7 @@ public abstract class AbstractCoreValidationTestCase {
         .build();
   }
 
-  protected Optional<String> runValidation(final String... xmlConfigs) {
+  protected Optional<ValidationResultItem> runValidation(final String... xmlConfigs) {
     final List<Pair<String, InputStream>> configs = new ArrayList<>();
 
     for (int i = 0; i < xmlConfigs.length; i++) {

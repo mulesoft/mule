@@ -9,10 +9,12 @@ package org.mule.test.classloading.internal.validation;
 import static java.util.Optional.of;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,8 +47,8 @@ public class CLValidation implements Validation {
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
-    return of("'invalid-config' is invalid");
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
+    return of(create(component, this, "'invalid-config' is invalid"));
   }
 
 }

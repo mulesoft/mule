@@ -15,12 +15,15 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 
@@ -59,8 +62,9 @@ public class SourceErrorMappingTypeNotRepeated implements Validation {
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
-    return component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME).<List<ErrorMapping>>getValue()
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
+    final ComponentParameterAst errorMappingsParam = component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME);
+    return errorMappingsParam.<List<ErrorMapping>>getValue()
         .reduce(l -> empty(),
                 mappings -> {
                   final List<String> repeatedSources = mappings.stream()
@@ -73,8 +77,9 @@ public class SourceErrorMappingTypeNotRepeated implements Validation {
                       .collect(toList());
 
                   if (!repeatedSources.isEmpty()) {
-                    return of(format("Repeated source types are not allowed. Offending types are '%s'.",
-                                     on("', '").join(repeatedSources)));
+                    return of(create(component, errorMappingsParam, this,
+                                     format("Repeated source types are not allowed. Offending types are '%s'.",
+                                            on("', '").join(repeatedSources))));
                   } else {
                     return empty();
                   }

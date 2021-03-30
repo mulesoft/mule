@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.Optional;
 
@@ -25,7 +26,7 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
 
   @Test
   public void requiredExpression() {
-    final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xsi:schemaLocation=\"\n" +
@@ -39,12 +40,13 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
         "</mule>");
 
     assertThat(msg.isPresent(), is(true));
-    assertThat(msg.get(), containsString("A static value was given for parameter 'collection' but it requires a expression"));
+    assertThat(msg.get().getMessage(),
+               containsString("A static value ('1, 2, 3') was given for parameter 'collection' but it requires an expression"));
   }
 
   @Test
   public void requiredExpressionPresent() {
-    final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xsi:schemaLocation=\"\n" +

@@ -13,12 +13,15 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.curren
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsComponentId;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,8 +62,9 @@ public class FlowRefPointsToExistingFlow implements Validation {
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
-    return component.getParameter("name").getValue()
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
+    final ComponentParameterAst param = component.getParameter("name");
+    return param.getValue()
         .reduce(l -> empty(),
                 nameAttribute -> {
                   if (((String) nameAttribute).startsWith(DEFAULT_EXPRESSION_PREFIX)
@@ -72,8 +76,8 @@ public class FlowRefPointsToExistingFlow implements Validation {
 
                   if (artifact.topLevelComponentsStream()
                       .noneMatch(equalsComponentId((String) nameAttribute))) {
-                    return of("'flow-ref' is pointing to '" + nameAttribute
-                        + "' which does not exist");
+                    return of(create(component, param, this,
+                                     "'flow-ref' is pointing to '" + nameAttribute + "' which does not exist"));
                   } else {
                     return empty();
                   }

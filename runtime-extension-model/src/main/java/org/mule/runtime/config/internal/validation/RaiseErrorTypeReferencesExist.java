@@ -13,10 +13,13 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,8 +56,9 @@ public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation 
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
-    final String errorTypeString = component.getParameter("type").getResolvedRawValue();
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
+    final ComponentParameterAst errorTypeParam = component.getParameter("type");
+    final String errorTypeString = errorTypeParam.getResolvedRawValue();
 
     final Set<String> errorNamespaces = artifact.dependencies().stream()
         .map(d -> d.getXmlDslModel().getPrefix().toUpperCase())
@@ -63,12 +67,12 @@ public class RaiseErrorTypeReferencesExist extends AbstractErrorTypesValidation 
     final ComponentIdentifier errorTypeId = parserErrorType(errorTypeString);
 
     if (errorNamespaces.contains(errorTypeId.getNamespace())) {
-      return validateErrorTypeId(component, artifact, errorTypeString, errorTypeId);
+      return validateErrorTypeId(component, errorTypeParam, artifact, this, errorTypeString, errorTypeId);
     } else if (artifact.getParent()
         .map(p -> p.getErrorTypeRepository().getErrorNamespaces().contains(errorTypeId.getNamespace()))
         .orElse(false)) {
-      return of(format("Cannot use error type '%s': namespace already exists. Used in %s", errorTypeString,
-                       compToLoc(component)));
+      return of(create(component, errorTypeParam, this,
+                       format("Cannot use error type '%s': namespace already exists.", errorTypeString)));
     }
 
     return empty();
