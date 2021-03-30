@@ -148,6 +148,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
           .withClassLoaderModelDescriptorLoader(
                                                 new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
+
   private final PolicyFileBuilder withInternalDependencyPolicyFileBuilder =
       new PolicyFileBuilder(POLICY_WITH_INTERNAL_DEPENDENCY_NAME).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
           .setMinMuleVersion(MIN_MULE_VERSION)
@@ -832,9 +833,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Test
   public void appliesPolicyAndAppWithSameExtensionDeclaringAnInternalDependency() throws Exception {
     ArtifactPluginFileBuilder extensionWithInternalDependencyPlugin = createExtensionWithInternalDependencyPlugin();
-    ArtifactPluginFileBuilder withErrorDeclarationExtensionPlugin = createWithErrorDeclarationExtensionPlugin();
-    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder
-        .dependingOn(withErrorDeclarationExtensionPlugin)
+    policyManager.registerPolicyTemplate(withInternalDependencyPolicyFileBuilder
         .dependingOn(extensionWithInternalDependencyPlugin)
         .getArtifactFile());
     ApplicationFileBuilder applicationFileBuilder =
@@ -843,14 +842,13 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder
-        .dependingOn(extensionWithInternalDependencyPlugin)
-        .dependingOn(withErrorDeclarationExtensionPlugin).getArtifactId(),
-                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), withInternalDependencyPolicyFileBuilder
+        .dependingOn(extensionWithInternalDependencyPlugin).getArtifactId(),
+                            new PolicyParametrization(POLICY_WITH_INTERNAL_DEPENDENCY_NAME, s -> true, 1, emptyMap(),
                                                       getResourceFile("/policy-with-internal-dependency-extension.xml"),
                                                       emptyList()));
     executeApplicationFlow("main");
-    assertThat(invocationCount, equalTo(1));
+    assertThat(invocationCount, equalTo(2));
   }
 
   @Test

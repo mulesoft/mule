@@ -13,8 +13,8 @@
         <test-policy:operation>
                 <test-policy:execute-next/>
                 <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
-<!--                        <with-internal-dependency:injection-check config-ref="test"/>-->
                 <with-internal-dependency:injection-check/>
+                <with-internal-dependency:check-config-resolution config-ref="test"/>
         </test-policy:operation>
     </test-policy:proxy>
 </mule>

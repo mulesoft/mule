@@ -31,7 +31,7 @@ public class WithInternalDependencyOperation {
 
   public void checkConfigResolution(@Config WithInternalDependencyExtension config) {
     if (config.getDummyParameter().equals("originalValue")) {
-      throw new IllegalStateException("originalValue has not been modified by the extension's configuration");
+      throw new IllegalStateException("Extension explicit config did not modify the default configuration");
     }
   }
 
