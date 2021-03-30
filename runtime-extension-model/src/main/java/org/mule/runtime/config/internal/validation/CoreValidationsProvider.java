@@ -34,7 +34,9 @@ public class CoreValidationsProvider implements ValidationsProvider {
                   new ErrorMappingTargetTypeReferencesExist(),
                   new ErrorMappingSourceTypeReferencesExist(),
                   new ErrorHandlerOnErrorTypeExists(),
-                  new ExpressionsInRequiredExpressionsParams()
+                  new ExpressionsInRequiredExpressionsParams(),
+                  new ExpressionsInConfigurationParams()
+
     // TODO MULE-17711 (AST) re-enable (and possibly refactor) this validation
     // new ParameterAndChildForSameAttributeNotDefinedTogether(),
     // Commented out because this causes failures because of a lying extension model for munit, in the 'ignore' parameter
