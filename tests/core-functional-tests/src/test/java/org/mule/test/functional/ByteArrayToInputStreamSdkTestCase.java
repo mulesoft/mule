@@ -42,7 +42,7 @@ public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTes
   @Test
   @Issue("MULE-19279")
   public void byteArrayToInputStreamTransformationIsSuccessfulWithUTF16() throws Exception {
-    //Test with UTF-16 character
+    // Test with UTF-16 character
     String testMessage = "Ź";
     CoreEvent event = flowRunner("transformer").withPayload(testMessage.getBytes("UTF-16")).run();
     TypedValue<String> value = event.getMessage().getPayload();
