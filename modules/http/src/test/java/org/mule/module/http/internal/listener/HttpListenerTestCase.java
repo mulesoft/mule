@@ -14,8 +14,11 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
@@ -25,6 +28,7 @@ import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_1;
 import static org.mule.module.http.internal.listener.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.InitialisationException;
@@ -45,7 +49,9 @@ import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.lang.ref.Reference;
 import java.net.InetSocketAddress;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Rule;
@@ -86,27 +92,29 @@ public class HttpListenerTestCase extends AbstractMuleTestCase
     @Test
     public void eventCreation() throws Exception
     {
-    	final AtomicReference<RequestHandler> requestHandlerRef = new AtomicReference<>();
-    	when(mockHttpListenerConfig.addRequestHandler(any(ListenerRequestMatcher.class), any(RequestHandler.class))).then(new Answer<RequestHandlerManager>() {
-    		@Override
-    		public RequestHandlerManager answer(InvocationOnMock invocation) throws Throwable {
-    			requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
-    			return null;
-    		}
-		});
+    	  final AtomicReference<RequestHandler> requestHandlerRef = new AtomicReference<>();
+      	when(mockHttpListenerConfig.addRequestHandler(any(ListenerRequestMatcher.class), any(RequestHandler.class))).then(new Answer<RequestHandlerManager>()
+        {
+    	    	@Override
+    		    public RequestHandlerManager answer(InvocationOnMock invocation) throws Throwable
+            {
+    			      requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
+    			      return null;
+            }
+		    });
         usePath("/");
 
-    	assertThat(RequestContext.getEvent(), is(nullValue()));
+    	  assertThat(RequestContext.getEvent(), is(nullValue()));
 
-    	HttpResponseReadyCallback responseCallback = mock(HttpResponseReadyCallback.class);
+    	  HttpResponseReadyCallback responseCallback = mock(HttpResponseReadyCallback.class);
         doAnswer(new Answer<Void>()
         {
-    	    @Override
+            @Override
             public Void answer(InvocationOnMock invocation) throws Throwable
-    	    {
-    	        assertThat(RequestContext.getEvent(), not(nullValue()));
-    	        return null;
-    	    }
+            {
+                assertThat(RequestContext.getEvent(), not(nullValue()));
+                return null;
+            }
         }).when(responseCallback).responseReady(any(HttpResponse.class), any(ResponseStatusCallback.class));
 
         HttpRequest request = buildGetRootRequest(HTTP_1_1);
@@ -114,7 +122,6 @@ public class HttpListenerTestCase extends AbstractMuleTestCase
         HttpRequestContext requestContext = buildRequestContext(request);
 
         requestHandlerRef.get().handleRequest(requestContext, responseCallback);
-    	
         assertThat(RequestContext.getEvent(), is(nullValue()));
     }
     
@@ -186,6 +193,44 @@ public class HttpListenerTestCase extends AbstractMuleTestCase
         HttpResponseReadyCallback responseCallback = mock(HttpResponseReadyCallback.class);
         requestHandlerRef.get().handleRequest(requestContext, responseCallback);
         assertResponse(responseCallback, BAD_REQUEST.getStatusCode(), BAD_REQUEST.getReasonPhrase(), "HTTP request parsing failed with error: \"Missing 'host' header\"");
+    }
+
+    @Test
+    public void stopListenerStopsConfigIfConfigContextIsStopping() throws MuleException {
+        testConfigStopsWhenListenerStops(true);
+    }
+
+    @Test
+    public void stopListenerDoesNotStopConfigIfConfigContextIsNotStopping() throws MuleException {
+        testConfigStopsWhenListenerStops(false);
+    }
+
+    private void testConfigStopsWhenListenerStops(boolean shouldStop) throws MuleException {
+        MuleContext configMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+        when(configMuleContext.isStopping()).thenReturn(shouldStop);
+        when(configMuleContext.isStopped()).thenReturn(shouldStop);
+        MuleContext listenerMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+
+        DefaultHttpListenerConfig listenerConfig = spy(new DefaultHttpListenerConfig(mockHttpListenerConnectionManager));
+        listenerConfig.setHost("localhost");
+        listenerConfig.setMuleContext(configMuleContext);
+        initialiseIfNeeded(listenerConfig, configMuleContext);
+
+        MessageProcessingManager messageProcessingManager = mock(MessageProcessingManager.class);
+        when(listenerMuleContext.getRegistry().lookupObject(MessageProcessingManager.class)).thenReturn(messageProcessingManager);
+
+        DefaultHttpListener listener = new DefaultHttpListener();
+        listener.setMuleContext(listenerMuleContext);
+        listener.setConfig(listenerConfig);
+        listener.setPath("/");
+        initialiseIfNeeded(listener, listenerMuleContext);
+
+        listener.stop();
+        if (shouldStop) {
+            verify(listenerConfig).stop();
+        } else {
+            verify(listenerConfig, never()).stop();
+        }
     }
 
     protected HttpRequest buildGetRootRequest(HttpProtocol protocol)
