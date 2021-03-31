@@ -326,6 +326,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private final ComponentLocation componentLocation;
     private final String id;
     private final String correlationId;
+    private final String rootId;
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
                               FlowExceptionHandler messagingExceptionHandler, int depthLevel, final String correlationId) {
@@ -338,6 +339,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
           ? parent.getId().concat("_").concat(Integer.toString(identityHashCode(this)))
           : Integer.toString(identityHashCode(this));
       this.correlationId = correlationId != null ? correlationId : parent.getCorrelationId();
+      this.rootId = root.getRootId();
     }
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
@@ -352,7 +354,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     @Override
     public String getRootId() {
-      return this.parent.getRootId();
+      return this.rootId;
     }
 
     @Override
