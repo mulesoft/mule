@@ -101,9 +101,12 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
 
     assertThat(successCalls.get(), is(1));
     assertThat(errorCalls.get(), is(0));
-    assertThat(processor.correlationID.get(), is(TEST_CORRELATION_ID));
+    assertThat(processor.correlationID, is(TEST_CORRELATION_ID));
     assertThat(propagatedEvent.get().getCorrelationId(), is(coreEvent.getCorrelationId()));
     assertThat(propagatedEvent.get().getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
+    // Root ID is the same before, in the middle and after the execution
+    assertThat(processor.rootId, is(coreEvent.getContext().getRootId()));
+    assertThat(propagatedEvent.get().getContext().getRootId(), is(coreEvent.getContext().getRootId()));
   }
 
   @Test
@@ -123,7 +126,7 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
     assertThat(successCalls.get(), is(0));
     assertThat(errorCalls.get(), is(1));
     assertThat(errorEvent.get().getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
-    assertThat(processor.correlationID.get(), is(TEST_CORRELATION_ID));
+    assertThat(processor.correlationID, is(TEST_CORRELATION_ID));
     assertThat(errorEvent.get().getCorrelationId(), is(coreEvent.getCorrelationId()));
   }
 
@@ -138,7 +141,8 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
 
   private static class CorrelationIdProcessor implements Processor {
 
-    public Reference<String> correlationID = new Reference<>();
+    public String correlationID = null;
+    public String rootId = null;
     private boolean throwError = false;
 
     public void throwError() {
@@ -147,7 +151,9 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
-      correlationID.set(event.getCorrelationId());
+      correlationID = event.getCorrelationId();
+      rootId = event.getContext().getRootId();
+
       if (throwError) {
         throw new MessagingException(createStaticMessage("some exception"), event);
       }

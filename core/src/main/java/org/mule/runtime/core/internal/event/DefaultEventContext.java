@@ -116,6 +116,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
+  public String getRootId() {
+    return getRootContext().getId();
+  }
+
+  @Override
   public String getServerId() {
     return serverId;
   }
@@ -343,6 +348,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public String getId() {
       return id;
+    }
+
+    @Override
+    public String getRootId() {
+      return this.parent.getRootId();
     }
 
     @Override
