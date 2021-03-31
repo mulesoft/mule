@@ -7,6 +7,8 @@
 package org.mule.test.functional;
 
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.check;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
@@ -17,7 +19,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
+import org.mule.runtime.api.metadata.TypedValue;
 
 public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTestCase {
 
@@ -33,6 +37,16 @@ public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTes
   @Test
   public void byteArrayToInputStreamTransformationIsSuccessful() {
     check(POLL_TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> EventRecorder.countCapturedEvents() == EXPECTED_EVENT_COUNT);
+  }
+
+  @Test
+  @Issue("MULE-19279")
+  public void byteArrayToInputStreamTransformationIsSuccessfulWithUTF16() throws Exception {
+    // Test with UTF-16 character
+    String testMessage = "Ź";
+    CoreEvent event = flowRunner("transformer").withPayload(testMessage.getBytes("UTF-16")).run();
+    TypedValue<String> value = event.getMessage().getPayload();
+    assertThat(value.getValue(), is(testMessage));
   }
 
   public static class EventRecorder implements Processor, Startable {
