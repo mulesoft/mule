@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static java.lang.Integer.min;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -22,6 +23,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
+import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION;
+import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY;
+import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
@@ -65,15 +69,14 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     injector = spyInjector(muleContext);
     muleContext.start();
     resetConnectionProvider();
-
-    initStrategy();
-
-    connection1 = strategy.getConnectionHandler();
-    connection2 = strategy.getConnectionHandler();
   }
 
   @Test
   public void getConnection() throws Exception {
+    initStrategy();
+    connection1 = strategy.getConnectionHandler();
+    connection2 = strategy.getConnectionHandler();
+
     assertThat(connection1, is(not(sameInstance(connection2))));
     assertThat(connection1.getConnection(), is(not(sameInstance(connection2.getConnection()))));
     verify(connectionProvider, times(2)).connect();
@@ -96,11 +99,14 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
       assertThat(e.getCause(), is(sameInstance(exception)));
       verify(connectionProvider).disconnect(any(Lifecycle.class));
     }
-
   }
 
   @Test
   public void connectionsDependenciesInjected() throws Exception {
+    initStrategy();
+    connection1 = strategy.getConnectionHandler();
+    connection2 = strategy.getConnectionHandler();
+
     verify(injector).inject(connection1.getConnection());
     verify(injector).inject(connection2.getConnection());
   }
@@ -124,6 +130,10 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   @Test
   public void release() throws Exception {
+    initStrategy();
+    connection1 = strategy.getConnectionHandler();
+    connection2 = strategy.getConnectionHandler();
+
     connection1.release();
     connection2.release();
 
@@ -134,6 +144,10 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   @Test(expected = ConnectionException.class)
   public void failDueToInvalidConnection() throws ConnectionException {
+    initStrategy();
+    connection1 = strategy.getConnectionHandler();
+    connection2 = strategy.getConnectionHandler();
+
     when(connectionProvider.validate(anyVararg())).thenReturn(ConnectionValidationResult
         .failure("Invalid username or password",
                  new Exception("401: UNAUTHORIZED")));
@@ -142,8 +156,72 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   @Test(expected = ConnectionException.class)
   public void failDueToNullConnectionValidationResult() throws ConnectionException {
+    initStrategy();
+    connection1 = strategy.getConnectionHandler();
+    connection2 = strategy.getConnectionHandler();
+
     when(connectionProvider.validate(anyVararg())).thenReturn(null);
     strategy.getConnectionHandler().getConnection();
+  }
+
+  @Test
+  public void defaultInitializationPolicyIsHonored() throws ConnectionException {
+    poolingProfile =
+        new PoolingProfile(5, -1, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, DEFAULT_POOL_INITIALISATION_POLICY);
+    initStrategy();
+    verifyConnections(1);
+  }
+
+  @Test
+  public void initializationPolicyInitialiseAllWithUnlimitedMaxIdle() throws ConnectionException {
+    poolingProfile = new PoolingProfile(5, -1, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, INITIALISE_ALL);
+    initStrategy();
+    verifyConnections(5);
+  }
+
+  @Test
+  public void initializationPolicyInitialiseAllWithUnlimitedMaxActive() throws ConnectionException {
+    poolingProfile = new PoolingProfile(-1, 2, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, INITIALISE_ALL);
+    initStrategy();
+    verifyConnections(2);
+  }
+
+  @Test
+  public void initializationPolicyInitialiseAllWithUnlimitedMaxActiveAndUnlimitedMaxIdle() throws ConnectionException {
+    poolingProfile = new PoolingProfile(-1, -1, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, INITIALISE_ALL);
+    initStrategy();
+    verifyConnections(0);
+  }
+
+  @Test
+  public void initializationPolicyInitialiseAllWithMaxIdleSmallerThanMaxActive() throws ConnectionException {
+    poolingProfile = new PoolingProfile(5, 3, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, INITIALISE_ALL);
+    initStrategy();
+    verifyConnections(3);
+  }
+
+  @Test
+  public void initializationPolicyInitialiseAllWithMaxIdleGreaterThanMaxActive() throws ConnectionException {
+    poolingProfile = new PoolingProfile(5, 8, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, INITIALISE_ALL);
+    initStrategy();
+    verifyConnections(5);
+  }
+
+  @Test
+  public void initializationPolicyInitialiseNone() throws ConnectionException {
+    poolingProfile = new PoolingProfile(5, -1, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, INITIALISE_NONE);
+    initStrategy();
+    verifyConnections(0);
+  }
+
+  @Test
+  public void initializationDoesNotFailWhenEncounteringConnectionException() throws ConnectionException {
+    ConnectionProvider<Object> connectionProvider = mock(ConnectionProvider.class);
+    when(connectionProvider.connect()).thenReturn(new Object()).thenThrow(ConnectionException.class).thenReturn(new Object());
+    this.connectionProvider = spy(new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext));
+    poolingProfile = new PoolingProfile(3, -1, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, INITIALISE_ALL);
+    initStrategy();
+    verifyConnections(3);
   }
 
   private void resetConnectionProvider() throws ConnectionException {
@@ -169,6 +247,11 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
         throw new RuntimeException(e);
       }
     });
+  }
+
+  private void verifyConnections(int numToCreate) throws ConnectionException {
+    verify(this.connectionProvider, times(numToCreate)).connect();
+    verify(this.connectionProvider, times(0)).disconnect(any());
   }
 
   @FunctionalInterface
