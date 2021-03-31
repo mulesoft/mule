@@ -7,6 +7,10 @@
       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
 
+    <object name="assertPayloadIsStreamProvider" class="org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase$AssertPayloadIsStreamProvider"/>
+    <object name="assertPayloadIsNotStreamProvider" class="org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase$AssertPayloadIsNotStreamProvider"/>
+    <object name="assertVariableStreamProviderIsOpen" class="org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase$AssertVariableStreamProviderIsOpen"/>
+
     <marvel:dr-strange-config name="drStrange" />
 
     <marvel:dr-strange-config name="pollingDrStrange">
@@ -129,6 +133,29 @@
         </try>
     </flow>
 
+    <flow name="bytesCasterInSdkScopeInside" initialState="stopped">
+        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}"
+                             listenerId="bytesCasterInSdkScopeInside"/>
+                             
+        <marvel:scopeverse>
+            <flow-ref name="assertPayloadIsStreamProvider" />
+            <set-variable variableName="raw" value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+            <flow-ref name="castSpell" />
+        </marvel:scopeverse>                             
+    </flow>
+
+    <flow name="bytesCasterInSdkScopeAfter" initialState="stopped">
+        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}"
+                             listenerId="bytesCasterInSdkScopeAfter"/>
+                             
+        <marvel:scopeverse>
+            <flow-ref name="assertPayloadIsStreamProvider" />
+            <set-variable variableName="raw" value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        </marvel:scopeverse>                             
+
+        <flow-ref name="castSpell" />
+    </flow>
+
     <flow name="bytesCasterWithoutStreaming" initialState="stopped">
         <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}"
                              listenerId="bytesCasterWithoutStreaming">
@@ -189,18 +216,6 @@
 
     <sub-flow name="castSpell">
         <set-payload value="#[java!org::mule::test::module::extension::streaming::AbstractBytesStreamingExtensionTestCase::addSpell(payload)]"/>
-    </sub-flow>
-
-    <sub-flow name="assertPayloadIsStreamProvider">
-        <test:assert expression="#[mel:payload.getClass().getName().contains('CursorStreamProvider')]" />
-    </sub-flow>
-
-    <sub-flow name="assertPayloadIsNotStreamProvider">
-        <test:assert expression="#[mel:payload.getClass().getName().contains('CursorStreamProvider') == false]" />
-    </sub-flow>
-
-    <sub-flow name="assertVariableStreamProviderIsOpen">
-        <test:assert expression="#[mel:provider.closed == false]" />
     </sub-flow>
 
 </mule>

@@ -13,19 +13,12 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CORRELATION_ID;
 import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CorrelationIdOnSourcesStory.CORRELATION_ID_MODIFICATION;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -33,6 +26,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -42,11 +36,21 @@ import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-import reactor.core.publisher.Mono;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import reactor.core.publisher.Mono;
 
 @SmallTest
 @Feature(CORRELATION_ID)
@@ -61,7 +65,7 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
   @Mock(lenient = true)
   private MessageProcessorChain chain;
 
-  private CorrelationIdProcessor processor = new CorrelationIdProcessor();
+  private final CorrelationIdProcessor processor = new CorrelationIdProcessor();
 
   private CoreEvent coreEvent;
 
@@ -88,7 +92,8 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
 
   @Test
   public void testDoProcessSuccessOnce() throws InterruptedException {
-    ImmutableProcessorChildContextChainExecutor chainExecutor = new ImmutableProcessorChildContextChainExecutor(coreEvent, chain);
+    ImmutableProcessorChildContextChainExecutor chainExecutor =
+        new ImmutableProcessorChildContextChainExecutor(mock(StreamingManager.class), coreEvent, chain);
 
     AtomicInteger successCalls = new AtomicInteger(0);
     AtomicInteger errorCalls = new AtomicInteger(0);
@@ -111,7 +116,8 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
 
   @Test
   public void testDoProcessOnErrorGenericException() throws InterruptedException {
-    ImmutableProcessorChildContextChainExecutor chainExecutor = new ImmutableProcessorChildContextChainExecutor(coreEvent, chain);
+    ImmutableProcessorChildContextChainExecutor chainExecutor =
+        new ImmutableProcessorChildContextChainExecutor(mock(StreamingManager.class), coreEvent, chain);
     processor.throwError();
 
     AtomicInteger successCalls = new AtomicInteger(0);

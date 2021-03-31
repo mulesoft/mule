@@ -23,10 +23,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.util.ObjectNameHelper;
 import org.mule.runtime.extension.api.runtime.route.Chain;
-import org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor;
 import org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChildContextChainExecutor;
 
 import java.util.List;
@@ -45,15 +45,19 @@ import org.reactivestreams.Publisher;
  */
 public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
 
+  private final StreamingManager streamingManager;
+
   private final MessageProcessorChain chain;
 
   /**
    * Creates a resolver for the provided chain executor. The lifecycle of the provided {@code chain} must be managed by the owner
    * of the chain.
    *
-   * @param chain the chain to create an executor for
+   * @param streamingManager
+   * @param chain            the chain to create an executor for
    */
-  public ProcessorChainValueResolver(final MessageProcessorChain chain) {
+  public ProcessorChainValueResolver(StreamingManager streamingManager, final MessageProcessorChain chain) {
+    this.streamingManager = streamingManager;
     this.chain = chain;
   }
 
@@ -64,9 +68,9 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
    * @param ctx        the context to tie the lifecycle of the chain to be created to
    * @param processors the processors that will be part of the chain to create an executor for
    */
-  public ProcessorChainValueResolver(MuleContext ctx, List<Processor> processors) {
+  public ProcessorChainValueResolver(MuleContext ctx, StreamingManager streamingManager, List<Processor> processors) {
     // TODO MULE-18939 lifecycle of this chain must be managed by its owner, not the muleContext
-    this(new LazyInitializerChainDecorator(ctx, newChain(empty(), processors)));
+    this(streamingManager, new LazyInitializerChainDecorator(ctx, newChain(empty(), processors)));
 
     try {
       registerObject(ctx, new ObjectNameHelper(ctx).getUniqueName(""), this.chain);
@@ -84,7 +88,7 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
    */
   @Override
   public Chain resolve(ValueResolvingContext context) throws MuleException {
-    return new ImmutableProcessorChildContextChainExecutor(context.getEvent(), chain);
+    return new ImmutableProcessorChildContextChainExecutor(streamingManager, context.getEvent(), chain);
   }
 
   /**

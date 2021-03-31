@@ -7,12 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueWithCursorProvider;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.route.Chain;
@@ -28,6 +29,8 @@ import java.util.function.Consumer;
  * @since 4.0
  */
 public class ImmutableProcessorChainExecutor implements ProcessorChainExecutor {
+
+  private final StreamingManager streamingManager;
 
   /**
    * Processor that will be executed upon calling process
@@ -47,10 +50,12 @@ public class ImmutableProcessorChainExecutor implements ProcessorChainExecutor {
   /**
    * Creates a new immutable instance
    *
-   * @param event the original {@link CoreEvent} for the execution of the given chain
-   * @param chain a {@link Processor} chain to be executed
+   * @param streamingManager
+   * @param event            the original {@link CoreEvent} for the execution of the given chain
+   * @param chain            a {@link Processor} chain to be executed
    */
-  public ImmutableProcessorChainExecutor(CoreEvent event, MessageProcessorChain chain) {
+  public ImmutableProcessorChainExecutor(StreamingManager streamingManager, CoreEvent event, MessageProcessorChain chain) {
+    this.streamingManager = streamingManager;
     this.originalEvent = event;
     this.chain = chain;
     this.chainExecutor = new ChainExecutor(chain, originalEvent);
@@ -65,7 +70,7 @@ public class ImmutableProcessorChainExecutor implements ProcessorChainExecutor {
   public void process(Object payload, Object attributes, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
     CoreEvent customEvent = CoreEvent.builder(originalEvent)
         .message(Message.builder()
-            .payload(TypedValue.of(payload))
+            .payload(updateTypedValueWithCursorProvider(TypedValue.of(payload), streamingManager))
             .attributes(TypedValue.of(attributes))
             .build())
         .build();
@@ -95,6 +100,7 @@ public class ImmutableProcessorChainExecutor implements ProcessorChainExecutor {
     return chain.getMessageProcessors();
   }
 
+  @Override
   public CoreEvent getOriginalEvent() {
     return originalEvent;
   }
