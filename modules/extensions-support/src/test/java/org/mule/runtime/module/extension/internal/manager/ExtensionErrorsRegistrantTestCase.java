@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.manager;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
@@ -35,10 +36,11 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -50,6 +52,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Issue;
 
 @SmallTest
 public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
@@ -116,7 +120,6 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     when(muleContext.getErrorTypeRepository()).thenReturn(typeRepository);
     when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(typeLocator);
 
-    when(extensionModel.getOperationModels()).thenReturn(asList(operationWithError, operationWithoutErrors));
     when(extensionModel.getXmlDslModel()).thenReturn(xmlDslModel);
     when(extensionModel.getName()).thenReturn(TEST_EXTENSION_NAME);
 
@@ -133,6 +136,22 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
 
   @Test
   public void lookupErrorsForOperation() {
+    when(extensionModel.getOperationModels()).thenReturn(asList(operationWithError, operationWithoutErrors));
+
+    doTest();
+  }
+
+  @Test
+  @Issue("MULE-19293")
+  public void lookupErrorsForOperationFromConfig() {
+    final ConfigurationModel configModel = mock(ConfigurationModel.class);
+    when(configModel.getOperationModels()).thenReturn(asList(operationWithError, operationWithoutErrors));
+    when(extensionModel.getConfigurationModels()).thenReturn(singletonList(configModel));
+
+    doTest();
+  }
+
+  protected void doTest() {
     when(extensionModel.getErrorModels()).thenReturn(singleton(extensionConnectivityError));
 
     final ErrorType extConnectivityErrorType = ErrorTypeBuilder.builder()
