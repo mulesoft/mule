@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Definition {
 
+  @SerializedName("documents")
   private DocumentNode document = new DocumentNode();
 
   public DocumentNode getDocument() {

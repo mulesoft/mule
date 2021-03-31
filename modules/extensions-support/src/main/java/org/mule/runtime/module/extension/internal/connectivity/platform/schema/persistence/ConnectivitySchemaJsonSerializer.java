@@ -28,7 +28,7 @@ public class ConnectivitySchemaJsonSerializer {
     return gson.toJson(schema);
   }
 
-  public ConnectivitySchema deserealize(String json) {
+  public ConnectivitySchema deserialize(String json) {
     return gson.fromJson(json, ConnectivitySchema.class);
   }
 }

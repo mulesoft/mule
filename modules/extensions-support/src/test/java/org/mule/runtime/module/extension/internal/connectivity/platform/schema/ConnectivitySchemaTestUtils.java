@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-
 public final class ConnectivitySchemaTestUtils {
 
   private ConnectivitySchemaTestUtils() {
@@ -19,11 +17,7 @@ public final class ConnectivitySchemaTestUtils {
             .addLabel("type", "ApiKeyAuthenticationConnection")
             .addLabel("system", "Netsuite")
             .addLabel("connectionProvider", "token-authentication")
-            .addAsset(new BundleDescriptor.Builder()
-                    .setGroupId("com.mulesoft.connectors")
-                    .setArtifactId("citizen-netsuite-connector")
-                    .setVersion("1.0.0-alpha-005")
-                    .build())
+            .addAsset(new AssetDescriptor("com.mulesoft.connectors", "citizen-netsuite-connector", "1.0.0-alpha-005"))
             .uses("connectivity", "anypoint://semantics/connectivity")
             .usesExternal("core", "anypoint://semantics/core")
             .usesExternal("apiContract", "anypoint://semantics/api-contract")

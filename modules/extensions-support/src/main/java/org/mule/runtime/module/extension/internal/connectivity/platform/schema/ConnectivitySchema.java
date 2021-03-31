@@ -6,19 +6,24 @@
  */
 package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import static java.util.Collections.unmodifiableMap;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
+
+import com.google.gson.annotations.SerializedName;
 
 public class ConnectivitySchema {
 
   public static class ConnectionNode {
 
     private String classTerm;
+
+    @SerializedName("mapping")
     private Map<String, ParameterProperties> mappings = new LinkedHashMap<>();
 
     public String getClassTerm() {
@@ -26,7 +31,24 @@ public class ConnectivitySchema {
     }
 
     public Map<String, ParameterProperties> getMappings() {
-      return mappings;
+      return unmodifiableMap(mappings);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      ConnectionNode that = (ConnectionNode) o;
+      return Objects.equals(classTerm, that.classTerm) && Objects.equals(mappings, that.mappings);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(classTerm, mappings);
     }
   }
 
@@ -47,6 +69,23 @@ public class ConnectivitySchema {
     public boolean isMandatory() {
       return mandatory;
     }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      ParameterProperties that = (ParameterProperties) o;
+      return mandatory == that.mandatory && Objects.equals(propertyTerm, that.propertyTerm) && Objects.equals(range, that.range);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(propertyTerm, range, mandatory);
+    }
   }
 
   public static class Builder {
@@ -66,8 +105,8 @@ public class ConnectivitySchema {
       return this;
     }
 
-    public Builder addAsset(BundleDescriptor bundleDescriptor) {
-      product.assets.add(bundleDescriptor);
+    public Builder addAsset(AssetDescriptor assetDescriptor) {
+      product.assets.add(assetDescriptor);
       return this;
     }
 
@@ -141,11 +180,11 @@ public class ConnectivitySchema {
   private String version;
 
   private Map<String, String> labels = new LinkedHashMap<>();
-  private List<BundleDescriptor> assets = new LinkedList<>();
+  private List<AssetDescriptor> assets = new LinkedList<>();
+  private Definition definition = new Definition();
   private Map<String, String> uses = new LinkedHashMap<>();
   private Map<String, String> external = new LinkedHashMap<>();
   private Map<String, ConnectionNode> nodeMappings = new LinkedHashMap<>();
-  private Definition definition = new Definition();
 
   public ConnectivitySchema() {
     definition.getDocument().getRoot().setEncodes("Connection");
@@ -167,7 +206,7 @@ public class ConnectivitySchema {
     return labels;
   }
 
-  public List<BundleDescriptor> getAssets() {
+  public List<AssetDescriptor> getAssets() {
     return assets;
   }
 
@@ -181,5 +220,28 @@ public class ConnectivitySchema {
 
   public Map<String, ConnectionNode> getNodeMappings() {
     return nodeMappings;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) return false;
+    ConnectivitySchema that = (ConnectivitySchema) o;
+    return Objects.equals(groupId, that.groupId)
+            && Objects.equals(artifactId, that.artifactId)
+            && Objects.equals(version, that.version)
+            && Objects.equals(labels, that.labels)
+            && Objects.equals(assets, that.assets)
+            && Objects.equals(definition, that.definition)
+            && Objects.equals(uses, that.uses)
+            && Objects.equals(external, that.external)
+            && Objects.equals(nodeMappings, that.nodeMappings);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(groupId, artifactId, version, labels, assets, definition, uses, external, nodeMappings);
   }
 }
