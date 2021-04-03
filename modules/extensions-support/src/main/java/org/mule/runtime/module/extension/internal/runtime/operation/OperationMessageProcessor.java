@@ -14,6 +14,8 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -38,6 +40,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecu
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -54,6 +57,9 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   private final EntityMetadataMediator entityMetadataMediator;
 
   private final List<EnrichedErrorMapping> errorMappings;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
@@ -124,21 +130,24 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
    */
   @Override
   protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
-    // TODO: Also check for the feature flag
+    validatePolicyIsolation(configurationProvider);
     ConfigurationModel configurationModel = configurationProvider.getConfigurationModel();
-    if (muleContext.getArtifactType().equals(ArtifactType.POLICY)
-        && !(configurationProvider.getExtensionModel() == extensionModel)) {
-      throw new IllegalOperationException(format(
-                                                 "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
-                                                     + "The selected config is not part of the policy declaration and cannot be shared.",
-                                                 getLocation().getRootContainerName(), componentModel.getName(),
-                                                 configurationProvider.getName()));
-    }
     if (!configurationModel.getOperationModel(componentModel.getName()).isPresent() &&
         !configurationProvider.getExtensionModel().getOperationModel(componentModel.getName()).isPresent()) {
       throw new IllegalOperationException(format(
                                                  "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
                                                      + "The selected config does not support that operation.",
+                                                 getLocation().getRootContainerName(), componentModel.getName(),
+                                                 configurationProvider.getName()));
+    }
+  }
+
+  private void validatePolicyIsolation(ConfigurationProvider configurationProvider) {
+    if (featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_POLICY_ISOLATION) && muleContext.getArtifactType().equals(ArtifactType.POLICY)
+        && configurationProvider.getExtensionModel() != extensionModel) {
+      throw new IllegalOperationException(format(
+                                                 "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                                     + "The selected config is not part of the policy declaration and cannot be shared.",
                                                  getLocation().getRootContainerName(), componentModel.getName(),
                                                  configurationProvider.getName()));
     }

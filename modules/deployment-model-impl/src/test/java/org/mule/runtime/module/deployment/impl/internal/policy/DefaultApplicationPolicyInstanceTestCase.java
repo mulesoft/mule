@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -63,7 +62,6 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
         new DefaultApplicationPolicyInstance(application, policyTemplate,
                                              parameterization, mock(ServiceRepository.class),
                                              mock(ClassLoaderRepository.class),
-                                             emptyList(),
                                              mock(ExtensionModelLoaderRepository.class),
                                              muleContextListener);
 
