@@ -26,12 +26,18 @@ public class WithInternalDependencyOperation {
     if (registryBean == null) {
       throw new NullPointerException("registryBean is null (has not been injected into the extension operations)");
     }
-    return "registryBean has been injected into the extension, its operations and it's EL functions";
+    return "registryBean has been injected into the extension, its operations and it's functions";
   }
 
-  public void checkConfigResolution(@Config WithInternalDependencyExtension config) {
-    if (config.getDummyParameter().equals("originalValue")) {
-      throw new IllegalStateException("Extension explicit config did not modify the default configuration");
+  public void checkExplicitConfiguration(@Config WithInternalDependencyExtension config) {
+    if (config.getConfigurationParameter().equals(WithInternalDependencyExtension.CONFIG_PARAMETER_DEFAULT_VALUE)) {
+      throw new IllegalStateException("Operation explicit config should not contain the default configuration");
+    }
+  }
+
+  public void checkImplicitConfiguration(@Config WithInternalDependencyExtension config) {
+    if (!config.getConfigurationParameter().equals(WithInternalDependencyExtension.CONFIG_PARAMETER_DEFAULT_VALUE)) {
+      throw new IllegalStateException("Operation implicit config should contain the default configuration");
     }
   }
 

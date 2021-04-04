@@ -143,7 +143,8 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   }
 
   private void validatePolicyIsolation(ConfigurationProvider configurationProvider) {
-    if (featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_POLICY_ISOLATION) && muleContext.getArtifactType().equals(ArtifactType.POLICY)
+    if (featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_POLICY_ISOLATION)
+        && muleContext.getArtifactType().equals(ArtifactType.POLICY)
         && configurationProvider.getExtensionModel() != extensionModel) {
       throw new IllegalOperationException(format(
                                                  "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "

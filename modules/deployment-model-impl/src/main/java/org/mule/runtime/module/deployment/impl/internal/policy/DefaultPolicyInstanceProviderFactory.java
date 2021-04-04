@@ -28,8 +28,9 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
   /**
    * Creates a new factory
    *
-   * @param serviceRepository contains available service instances. Non null.
-   * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
+   * @param serviceRepository              contains available service instances. Non null.
+   * @param classLoaderRepository          contains the registered classloaders that can be used to load serialized classes. Non
+   *                                       null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
    */
   public DefaultPolicyInstanceProviderFactory(ServiceRepository serviceRepository,

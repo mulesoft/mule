@@ -27,12 +27,14 @@ import javax.inject.Inject;
 @Operations({WithInternalDependencyOperation.class})
 public class WithInternalDependencyExtension {
 
+  public static final String CONFIG_PARAMETER_DEFAULT_VALUE = "default value";
+
   @Inject
   private InternalRegistryBean registryBean;
 
   @Parameter
-  @Optional(defaultValue = "originalValue")
-  private String dummyParameter;
+  @Optional(defaultValue = WithInternalDependencyExtension.CONFIG_PARAMETER_DEFAULT_VALUE)
+  private String configurationParameter;
 
   public void checkExtensionInjection() {
     if (registryBean == null) {
@@ -40,11 +42,11 @@ public class WithInternalDependencyExtension {
     }
   }
 
-  public String getDummyParameter() {
-    return dummyParameter;
+  public String getConfigurationParameter() {
+    return configurationParameter;
   }
 
-  public void setDummyParameter(String dummyParameter) {
-    this.dummyParameter = dummyParameter;
+  public void setConfigurationParameter(String configurationParameter) {
+    this.configurationParameter = configurationParameter;
   }
 }

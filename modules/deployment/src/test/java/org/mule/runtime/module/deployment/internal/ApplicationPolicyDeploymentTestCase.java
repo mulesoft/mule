@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
+import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -50,6 +51,7 @@ import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POL
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_REORDER;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -128,12 +130,19 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Rule
   public SystemProperty shareErrorTypeRepoSystemProperty;
 
+  @Rule
+  public SystemProperty enablePolicyIsolationSystemProperty;
+
   private final boolean shareErrorTypeRepository;
 
-  @Parameterized.Parameters(name = "Parallel: {0} - Share ErrorType repo: {1}")
+  @Parameterized.Parameters(name = "Parallel: {0} - Share ErrorType repo: {1} - Enable policy isolation {2}")
   public static List<Object[]> parameters() {
     // Only run without parallel deployment since this configuration does not affect policy deployment at all
-    return asList(new Object[] {false, false}, new Object[] {false, true});
+    return asList(
+                  new Object[] {false, false, false},
+                  new Object[] {false, false, true},
+                  new Object[] {false, true, true},
+                  new Object[] {false, true, false});
   }
 
   // Policy artifact file builders
@@ -161,11 +170,14 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                 new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
 
-  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean shareErrorType) {
+  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean shareErrorType, boolean enablePolicyIsolation) {
     super(parallelDeployment);
     this.shareErrorTypeRepository = shareErrorType;
     this.shareErrorTypeRepoSystemProperty =
         new SystemProperty(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY, Boolean.toString(shareErrorType));
+    this.enablePolicyIsolationSystemProperty =
+        new SystemProperty((MuleRuntimeFeature.ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName().get()),
+                           Boolean.toString(enablePolicyIsolation));
   }
 
   @BeforeClass
@@ -498,7 +510,12 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Test
   @Feature(CLASSLOADING_ISOLATION)
   public void appliesApplicationPolicyUsingAppPlugin() throws Exception {
-    policyManager.registerPolicyTemplate(policyUsingAppPluginFileBuilder.getArtifactFile());
+    PolicyFileBuilder policyFileBuilder = policyUsingAppPluginFileBuilder;
+    if (parseBoolean(enablePolicyIsolationSystemProperty.getValue())) {
+      // Since the feature flag ENABLE_POLICY_ISOLATION is active, the policy must declare as dependencies all the extensions
+      policyFileBuilder = policyFileBuilder.dependingOn(helloExtensionV1Plugin);
+    }
+    policyManager.registerPolicyTemplate(policyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
                                                                                            helloExtensionV1Plugin);
@@ -842,13 +859,30 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-    policyManager.addPolicy(applicationFileBuilder.getId(), withInternalDependencyPolicyFileBuilder
-        .dependingOn(extensionWithInternalDependencyPlugin).getArtifactId(),
-                            new PolicyParametrization(POLICY_WITH_INTERNAL_DEPENDENCY_NAME, s -> true, 1, emptyMap(),
-                                                      getResourceFile("/policy-with-internal-dependency-extension.xml"),
-                                                      emptyList()));
+    try {
+      policyManager.addPolicy(applicationFileBuilder.getId(), withInternalDependencyPolicyFileBuilder
+          .dependingOn(extensionWithInternalDependencyPlugin).getArtifactId(),
+                              new PolicyParametrization(POLICY_WITH_INTERNAL_DEPENDENCY_NAME, s -> true, 1, emptyMap(),
+                                                        getResourceFile("/policy-with-internal-dependency-extension.xml"),
+                                                        emptyList()));
+    } catch (PolicyRegistrationException e) {
+      if (!parseBoolean(enablePolicyIsolationSystemProperty.getValue())) {
+        // Expected error since the feature flag ENABLE_POLICY_ISOLATION (which fixes this error) is set to false.
+        return;
+      } else {
+        // Unexpected error.
+        throw e;
+      }
+    }
+    if (!parseBoolean(enablePolicyIsolationSystemProperty.getValue())) {
+      // Unexpected behavior since the feature flag ENABLE_POLICY_ISOLATION is set to false (should fail with
+      // PolicyRegistrationException exception).
+      fail(String
+          .format("%s System property is set to false, but the policy has been successfully loaded (this is unexpected and must be reviewed)",
+                  enablePolicyIsolationSystemProperty.getName()));
+    }
     executeApplicationFlow("main");
-    assertThat(invocationCount, equalTo(2));
+    assertThat(invocationCount, equalTo(3));
   }
 
   @Test
@@ -1097,9 +1131,13 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   private void configureSimpleAppAndPolicyWithErrorDeclarationExtensionAndErrorMapping() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
     ArtifactPluginFileBuilder withErrorDeclarationExtensionPlugin = createWithErrorDeclarationExtensionPlugin();
-
-    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.dependingOn(withErrorDeclarationExtensionPlugin)
-        .getArtifactFile());
+    PolicyFileBuilder withErrorDeclarationPolicyFileBuilder =
+        policyIncludingPluginFileBuilder.dependingOn(withErrorDeclarationExtensionPlugin);
+    if (parseBoolean(enablePolicyIsolationSystemProperty.getValue())) {
+      // Since the feature flag ENABLE_POLICY_ISOLATION is active, the policy must declare as dependencies all the extensions
+      withErrorDeclarationPolicyFileBuilder = withErrorDeclarationPolicyFileBuilder.dependingOn(simpleExtensionPlugin);
+    }
+    policyManager.registerPolicyTemplate(withErrorDeclarationPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("app-with-simple-extension-config.xml",
                                                                                            simpleExtensionPlugin);

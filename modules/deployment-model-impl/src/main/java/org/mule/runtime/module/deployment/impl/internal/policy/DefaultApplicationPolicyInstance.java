@@ -73,14 +73,15 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   /**
    * Creates a new policy instance
    *
-   * @param application application artifact owning the created policy. Non null
-   * @param template policy template from which the instance will be created. Non null
-   * @param parametrization parameters used to configure the created instance. Non null
-   * @param serviceRepository repository of available services. Non null.
-   * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
+   * @param application                    application artifact owning the created policy. Non null
+   * @param template                       policy template from which the instance will be created. Non null
+   * @param parametrization                parameters used to configure the created instance. Non null
+   * @param serviceRepository              repository of available services. Non null.
+   * @param classLoaderRepository          contains the registered classloaders that can be used to load serialized classes. Non
+   *                                       null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
-   * @param muleContextListener the listener to execute for specific events that occur on the {@link MuleContext} of the policy.
-   *        May be {@code null}.
+   * @param muleContextListener            the listener to execute for specific events that occur on the {@link MuleContext} of
+   *                                       the policy. May be {@code null}.
    */
   public DefaultApplicationPolicyInstance(Application application, PolicyTemplate template,
                                           PolicyParametrization parametrization,
@@ -106,7 +107,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
             .setServiceRepository(serviceRepository)
             .setClassLoaderRepository(classLoaderRepository)
-            // No other way of doing this here. Ideally, this section would be feature flagged by MuleRuntimeFeature.ENABLE_POLICY_ISOLATION
+            // No other way of doing this here. Ideally, this section would be feature flagged by
+            // MuleRuntimeFeature.ENABLE_POLICY_ISOLATION
             // but no FeatureFlaggingService is available here (there is no MuleContext yet).
             .setArtifactPlugins(featureFlaggedArtifactPlugins())
             .setParentArtifact(application)
@@ -133,13 +135,14 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   /**
    * Applies the {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} to the policy artifact plugins list.
+   * 
    * @return The policy artifact plugins.
    */
   private List<ArtifactPlugin> featureFlaggedArtifactPlugins() {
     boolean isPolicyIsolationEnabled;
     Optional<String> policyIsolationPropertyName = MuleRuntimeFeature.ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName();
     if (policyIsolationPropertyName.isPresent() && getProperty(policyIsolationPropertyName.get()) != null) {
-      isPolicyIsolationEnabled = getBoolean(getProperty(policyIsolationPropertyName.get()));
+      isPolicyIsolationEnabled = getBoolean(policyIsolationPropertyName.get());
     } else {
       isPolicyIsolationEnabled = template.getArtifactClassLoader().getArtifactDescriptor().getMinMuleVersion().atLeast("4.4.0");
     }
@@ -153,24 +156,26 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   }
 
   /**
-   * Defers the creation of the {@link ExtensionManagerFactory} until the MuleContext is available
-   * in order to apply the {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} feature flag.
+   * Defers the creation of the {@link ExtensionManagerFactory} until the MuleContext is available in order to apply the
+   * {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} feature flag.
+   * 
    * @return {@link ExtensionManagerFactory} instance.
    */
   private ExtensionManagerFactory featureFlaggedExtensionManagerFactory() {
     return muleContext -> {
       try {
-        FeatureFlaggingService featureFlaggingService = ((MuleContextWithRegistry)muleContext).getRegistry().lookupObject(FeatureFlaggingService.class);
+        FeatureFlaggingService featureFlaggingService =
+            ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(FeatureFlaggingService.class);
         if (featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_POLICY_ISOLATION)) {
           // The policy will not share extension models and configuration providers with the application that is being applied to
           // (with the exception of HTTP, included for backwards compatibility).
           return new ArtifactExtensionManagerFactory(template.getOwnArtifactPlugins(), extensionModelLoaderRepository,
-                  new DefaultExtensionManagerFactory()).create(muleContext);
+                                                     new DefaultExtensionManagerFactory()).create(muleContext);
         } else {
           // The policy will share extension models and configuration providers with the application.
           return new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,
-                  template.getOwnArtifactPlugins(),
-                  new DefaultExtensionManagerFactory()).create(muleContext);
+                                                              template.getOwnArtifactPlugins(),
+                                                              new DefaultExtensionManagerFactory()).create(muleContext);
         }
       } catch (Exception e) {
         throw new MuleRuntimeException(e);
