@@ -135,10 +135,11 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   /**
    * Applies the {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} to the policy artifact plugins list.
-   * 
+   *
    * @return The policy artifact plugins.
    */
   private List<ArtifactPlugin> featureFlaggedArtifactPlugins() {
+    // TODO: Create MULE with necessary FeatureFlaggingService improvements and list it here
     boolean isPolicyIsolationEnabled;
     Optional<String> policyIsolationPropertyName = MuleRuntimeFeature.ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName();
     if (policyIsolationPropertyName.isPresent() && getProperty(policyIsolationPropertyName.get()) != null) {
@@ -158,7 +159,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   /**
    * Defers the creation of the {@link ExtensionManagerFactory} until the MuleContext is available in order to apply the
    * {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} feature flag.
-   * 
+   *
    * @return {@link ExtensionManagerFactory} instance.
    */
   private ExtensionManagerFactory featureFlaggedExtensionManagerFactory() {
