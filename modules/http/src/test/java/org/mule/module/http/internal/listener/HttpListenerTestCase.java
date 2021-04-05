@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -49,15 +50,12 @@ import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.lang.ref.Reference;
 import java.net.InetSocketAddress;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -71,10 +69,10 @@ public class HttpListenerTestCase extends AbstractMuleTestCase
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
-    private FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, Answers.RETURNS_DEEP_STUBS.get());
-    private DefaultHttpListenerConfig mockHttpListenerConfig = mock(DefaultHttpListenerConfig.class, Answers.RETURNS_DEEP_STUBS.get());
-    private HttpListenerConnectionManager mockHttpListenerConnectionManager = mock(HttpListenerConnectionManager.class, Answers.RETURNS_DEEP_STUBS.get());
+    private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+    private FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS.get());
+    private DefaultHttpListenerConfig mockHttpListenerConfig = mock(DefaultHttpListenerConfig.class, RETURNS_DEEP_STUBS.get());
+    private HttpListenerConnectionManager mockHttpListenerConnectionManager = mock(HttpListenerConnectionManager.class, RETURNS_DEEP_STUBS.get());
 
     @Test
     public void cannotHaveTwoUriParamsWithSameName() throws Exception
@@ -206,10 +204,10 @@ public class HttpListenerTestCase extends AbstractMuleTestCase
     }
 
     private void testConfigStopsWhenListenerStops(boolean shouldStop) throws MuleException {
-        MuleContext configMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+        MuleContext configMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
         when(configMuleContext.isStopping()).thenReturn(shouldStop);
         when(configMuleContext.isStopped()).thenReturn(shouldStop);
-        MuleContext listenerMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+        MuleContext listenerMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
 
         DefaultHttpListenerConfig listenerConfig = spy(new DefaultHttpListenerConfig(mockHttpListenerConnectionManager));
         listenerConfig.setHost("localhost");
