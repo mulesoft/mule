@@ -617,6 +617,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       resolvedProcessorRepresentation = getRepresentation();
 
       initProcessingStrategy();
+
+      ComponentLocation componentLocation = getLocation();
+      if (componentLocation != null) {
+        processorPath = componentLocation.getLocation();
+      }
+
       initialised = true;
     }
   }
@@ -804,15 +810,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
 
     if (processorPath == null) {
-      ComponentLocation componentLocation = getLocation();
-      if (componentLocation == null) {
-        return false;
-      }
-
-      processorPath = componentLocation.getLocation();
-      if (processorPath == null) {
-        return false;
-      }
+      return false;
     }
 
     MDC.put(PROCESSOR_PATH_MDC_KEY, processorPath);
