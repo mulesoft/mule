@@ -327,6 +327,14 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
         server.stop();
     }
 
+    void stopIfContextStopping() throws MuleException
+    {
+        if (muleContext.isStopping() || muleContext.isStopped())
+        {
+            stop();
+        }
+    }
+
     private String listenerUrl()
     {
         return String.format("%s://%s:%d%s", protocol.getScheme(), getHost(), getPort(), StringUtils.defaultString(basePath));
