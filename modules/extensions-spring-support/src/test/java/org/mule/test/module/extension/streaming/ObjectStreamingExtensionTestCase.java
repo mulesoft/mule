@@ -18,10 +18,11 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingSto
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -37,8 +38,6 @@ import org.junit.rules.ExpectedException;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
 
 @Feature(STREAMING)
 @Story(OBJECT_STREAMING)
@@ -69,7 +68,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
 
   @Override
   protected String getConfigFile() {
-    return "objects-streaming-extension-config.xml";
+    return "streaming/objects-streaming-extension-config.xml";
   }
 
   @Test

@@ -37,7 +37,7 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
 
   @Override
   protected String getConfigFile() {
-    return "reconnection-with-streaming-config.xml";
+    return "streaming/reconnection-with-streaming-config.xml";
   }
 
   @Test
