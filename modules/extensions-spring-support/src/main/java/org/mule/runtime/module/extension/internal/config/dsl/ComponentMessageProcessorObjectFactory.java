@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
@@ -65,7 +66,8 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
           .filter(component -> component instanceof NestedChainModel)
           .findFirst()
           .ifPresent(chain -> parameters.put(chain.getName(),
-                                             new ProcessorChainValueResolver(muleContext, nestedProcessors)));
+                                             new ProcessorChainValueResolver(registry.lookupByType(StreamingManager.class).get(),
+                                                                             muleContext, nestedProcessors)));
     }
 
     return getMessageProcessorBuilder()
