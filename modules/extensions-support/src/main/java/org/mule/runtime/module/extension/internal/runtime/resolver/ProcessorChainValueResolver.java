@@ -23,6 +23,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.util.ObjectNameHelper;
 import org.mule.runtime.extension.api.runtime.route.Chain;
@@ -45,9 +46,12 @@ import org.reactivestreams.Publisher;
  */
 public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
 
+  private final StreamingManager streamingManager;
+
   private final MessageProcessorChain chain;
 
-  public ProcessorChainValueResolver(MuleContext ctx, final MessageProcessorChain delegate) {
+  public ProcessorChainValueResolver(StreamingManager streamingManager, MuleContext ctx, final MessageProcessorChain delegate) {
+    this.streamingManager = streamingManager;
     this.chain = new LazyInitializerChainDecorator(ctx, delegate);
 
     try {
@@ -57,8 +61,8 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
     }
   }
 
-  public ProcessorChainValueResolver(MuleContext ctx, List<Processor> processors) {
-    this(ctx, newChain(empty(), processors));
+  public ProcessorChainValueResolver(StreamingManager streamingManager, MuleContext ctx, List<Processor> processors) {
+    this(streamingManager, ctx, newChain(empty(), processors));
   }
 
   /**
@@ -70,7 +74,7 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
    */
   @Override
   public Chain resolve(ValueResolvingContext context) throws MuleException {
-    return new ImmutableProcessorChainExecutor(context.getEvent(), chain);
+    return new ImmutableProcessorChainExecutor(streamingManager, context.getEvent(), chain);
   }
 
   /**

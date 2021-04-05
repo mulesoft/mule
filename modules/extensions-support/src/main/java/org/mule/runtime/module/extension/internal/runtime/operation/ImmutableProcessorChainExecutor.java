@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueWithCursorProvider;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 import static reactor.core.publisher.Mono.from;
@@ -17,6 +18,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
@@ -40,6 +42,8 @@ import reactor.util.context.Context;
  */
 public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcessors {
 
+  private final StreamingManager streamingManager;
+
   /**
    * Processor that will be executed upon calling process
    */
@@ -53,10 +57,12 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
   /**
    * Creates a new immutable instance
    *
+   * @param streamingManager
    * @param event the original {@link CoreEvent} for the execution of the given chain
    * @param chain a {@link Processor} chain to be executed
    */
-  public ImmutableProcessorChainExecutor(CoreEvent event, MessageProcessorChain chain) {
+  public ImmutableProcessorChainExecutor(StreamingManager streamingManager, CoreEvent event, MessageProcessorChain chain) {
+    this.streamingManager = streamingManager;
     this.originalEvent = event;
     this.chain = chain;
   }
@@ -70,7 +76,7 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
   public void process(Object payload, Object attributes, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
     CoreEvent customEvent = CoreEvent.builder(originalEvent)
         .message(Message.builder()
-            .payload(TypedValue.of(payload))
+            .payload(updateTypedValueWithCursorProvider(TypedValue.of(payload), streamingManager))
             .attributes(TypedValue.of(attributes))
             .build())
         .build();

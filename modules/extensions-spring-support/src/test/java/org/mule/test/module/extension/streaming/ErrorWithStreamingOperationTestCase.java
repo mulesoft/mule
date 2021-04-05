@@ -24,7 +24,7 @@ public class ErrorWithStreamingOperationTestCase extends AbstractExtensionFuncti
 
   @Override
   protected String getConfigFile() {
-    return "error-with-streaming-operation-config.xml";
+    return "streaming/error-with-streaming-operation-config.xml";
   }
 
   @Test
