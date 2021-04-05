@@ -47,6 +47,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -151,7 +152,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws MuleException {
     muleContext = mockContextWithServices();
-
+    when(muleContext.getArtifactType()).thenReturn(ArtifactType.APP);
     DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
     extensionsManager.setMuleContext(muleContext);
     extensionsManager.initialise();
