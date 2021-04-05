@@ -85,7 +85,6 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
-import org.slf4j.MDC;
 
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
@@ -341,38 +340,20 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     interceptors.addAll(additionalInterceptors);
 
     // #4 Wrap execution, before processing strategy, on flow thread.
-    interceptors.add((processor, next) -> {
-      String processorPath;
-      if (processor instanceof Component && ((Component) processor).getLocation() != null) {
-        processorPath = ((Component) processor).getLocation().getLocation();
-      } else {
-        processorPath = null;
-      }
-
-      return stream -> from(stream)
-          .doOnNext(event -> {
-            if (!canProcessMessage) {
-              throw propagate(new MessagingException(event, new LifecycleException(isStopped(name), event.getMessage())));
-            }
-            if (processorPath != null) {
-              MDC.put("processorPath", processorPath);
-            }
-            preNotification(event, (Processor) processor);
-          })
-          .transform(next)
-          .map(result -> {
-            try {
-              postNotification((Processor) processor).accept(result);
-              setCurrentEvent((PrivilegedEvent) result);
-              // If the processor returns a CursorProvider, then have the StreamingManager manage it
-              return updateEventForStreaming(streamingManager).apply(result);
-            } finally {
-              if (processorPath != null) {
-                MDC.remove("processorPath");
-              }
-            }
-          });
-    });
+    interceptors.add((processor, next) -> stream -> from(stream)
+        .doOnNext(event -> {
+          if (!canProcessMessage) {
+            throw propagate(new MessagingException(event, new LifecycleException(isStopped(name), event.getMessage())));
+          }
+          preNotification(event, (Processor) processor);
+        })
+        .transform(next)
+        .map(result -> {
+          postNotification((Processor) processor).accept(result);
+          setCurrentEvent((PrivilegedEvent) result);
+          // If the processor returns a CursorProvider, then have the StreamingManager manage it
+          return updateEventForStreaming(streamingManager).apply(result);
+        }));
 
     return interceptors;
   }

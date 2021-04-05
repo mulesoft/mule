@@ -204,6 +204,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
+  public static final String PROCESSOR_PATH_MDC_KEY = "processorPath";
 
   private final ReflectionCache reflectionCache;
   private final ResultTransformer resultTransformer;
@@ -264,6 +265,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    */
   private ReturnDelegate valueReturnDelegate;
   protected PolicyManager policyManager;
+  private String processorPath = null;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -797,27 +799,29 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private boolean setCurrentLocation() {
-    ComponentLocation componentLocation = getLocation();
-    if (componentLocation == null) {
+    if (MDC.get(PROCESSOR_PATH_MDC_KEY) != null) {
       return false;
     }
 
-    String processorPath = componentLocation.getLocation();
     if (processorPath == null) {
-      return false;
+      ComponentLocation componentLocation = getLocation();
+      if (componentLocation == null) {
+        return false;
+      }
+
+      processorPath = componentLocation.getLocation();
+      if (processorPath == null) {
+        return false;
+      }
     }
 
-    if (MDC.get("processorPath") != null) {
-      return false;
-    }
-
-    MDC.put("processorPath", processorPath);
+    MDC.put(PROCESSOR_PATH_MDC_KEY, processorPath);
     return true;
   }
 
   private void unsetCurrentLocation(boolean wasProcessorPathSet) {
     if (wasProcessorPathSet) {
-      MDC.remove("processorPath");
+      MDC.remove(PROCESSOR_PATH_MDC_KEY);
     }
   }
 
