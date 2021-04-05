@@ -129,20 +129,23 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
   }
 
   /**
-   * Resolves the {@link ConfigurationProvider} name (that can be used to look it up in the MuleContext registry) for a policy extension,
-   * taking into account the {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} feature flag.
-   * @param extensionModel The {@link ExtensionModel} that must be configured.
+   * Resolves the {@link ConfigurationProvider} name (that can be used to look it up in the MuleContext registry) for a policy
+   * extension, taking into account the {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} feature flag.
+   * 
+   * @param extensionModel     The {@link ExtensionModel} that must be configured.
    * @param configurationModel The {@link ConfigurationModel} that represents the extensionModel configuration.
-   * @param muleContext The corresponding {@link MuleContext}.
+   * @param muleContext        The corresponding {@link MuleContext}.
    * @return The {@link ConfigurationProvider} name.
    */
   private String featureFlaggedPolicyExtensionsImplicitConfigurationProviderName(ExtensionModel extensionModel,
                                                                                  ConfigurationModel configurationModel,
                                                                                  MuleContext muleContext) {
-    if(featureFlaggingService != null && featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_POLICY_ISOLATION)) {
-      // Implicit configuration providers cannot be inherited from the parent (application) MuleContext registry, so a different name is returned,
+    if (featureFlaggingService != null && featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_POLICY_ISOLATION)) {
+      // Implicit configuration providers cannot be inherited from the parent (application) MuleContext registry, so a different
+      // name is returned,
       // which will force the instantiation of a new ConfigurationProvider that will be stored in the policy MuleContext registry.
-      return String.format("%s-%s", muleContext.getId(), getImplicitConfigurationProviderName(extensionModel, configurationModel));
+      return String.format("%s-%s", muleContext.getId(),
+                           getImplicitConfigurationProviderName(extensionModel, configurationModel));
     } else {
       // Implicit configuration provider is inherited from the parent (application) MuleContext registry.
       return getImplicitConfigurationProviderName(extensionModel, configurationModel);
