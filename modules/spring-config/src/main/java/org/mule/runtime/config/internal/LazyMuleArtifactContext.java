@@ -63,6 +63,7 @@ import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.security.SecurityManager;
@@ -356,7 +357,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
               && comp.getLocation().getLocation().equals(locationOptional.get().toString()));
 
       final ArtifactAst minimalApplicationModel = buildMinimalApplicationModel(basePredicate);
-      doValidateModel(minimalApplicationModel);
+      doValidateModel(minimalApplicationModel, v -> v.getClass().getAnnotation(IgnoreOnLazyInit.class) == null);
 
       if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
           .noneMatch(comp -> comp.getLocation() != null

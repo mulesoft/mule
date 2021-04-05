@@ -9,6 +9,7 @@ package org.mule.runtime.config.api;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
+
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
@@ -34,6 +35,12 @@ public final class SpringXmlConfigurationBuilderFactory {
   public static ConfigurationBuilder createConfigurationBuilder(String configResource, boolean lazyInit)
       throws ConfigurationException {
     return new SpringXmlConfigurationBuilder(new String[] {configResource}, lazyInit, true);
+  }
+
+  public static ConfigurationBuilder createConfigurationBuilder(String configResource, boolean lazyInit,
+                                                                boolean disableXmlValidations)
+      throws ConfigurationException {
+    return new SpringXmlConfigurationBuilder(new String[] {configResource}, lazyInit, disableXmlValidations);
   }
 
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, boolean lazyInit)

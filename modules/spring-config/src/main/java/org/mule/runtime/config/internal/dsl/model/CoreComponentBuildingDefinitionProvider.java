@@ -186,7 +186,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String FLOW = "flow";
   private static final String FLOW_REF = "flow-ref";
   private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
-  private static final String SCATTER_GATHER = "scatter-gather";
   private static final String PARALLEL_FOREACH = "parallel-foreach";
   private static final String FORK_JOIN_STRATEGY = "forkJoinStrategyFactory";
   private static final String COLLECT_LIST = "collect-list";
@@ -326,7 +325,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(COLLECT_LIST)
         .withTypeDefinition(fromType(CollectListForkJoinStrategyFactory.class))
         .build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(SCATTER_GATHER)
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(SCATTER_GATHER_ELEMENT)
         .withTypeDefinition(fromType(ScatterGatherRouter.class))
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
