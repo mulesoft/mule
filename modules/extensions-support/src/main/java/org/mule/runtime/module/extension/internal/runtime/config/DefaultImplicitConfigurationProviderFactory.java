@@ -14,14 +14,12 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnect
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
-import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -123,19 +121,32 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
 
   public String resolveImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel,
                                                          MuleContext muleContext) {
-    // TODO: Add code comment
-    if (featureFlaggingService != null && featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_POLICY_ISOLATION)
-        && muleContext.getArtifactType().equals(ArtifactType.POLICY)) {
-      return getImplicitConfigurationProviderNameForPolicyArtifact(extensionModel, configurationModel, muleContext);
+    if (muleContext.getArtifactType().equals(ArtifactType.POLICY)) {
+      return featureFlaggedPolicyExtensionsImplicitConfigurationProviderName(extensionModel, configurationModel, muleContext);
     } else {
       return getImplicitConfigurationProviderName(extensionModel, configurationModel);
     }
   }
 
-  private String getImplicitConfigurationProviderNameForPolicyArtifact(ExtensionModel extensionModel,
-                                                                       ConfigurationModel configurationModel,
-                                                                       MuleContext muleContext) {
-    return String.format("%s-%s", muleContext.getId(), getImplicitConfigurationProviderName(extensionModel, configurationModel));
+  /**
+   * Resolves the {@link ConfigurationProvider} name (that can be used to look it up in the MuleContext registry) for a policy extension,
+   * taking into account the {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} feature flag.
+   * @param extensionModel The {@link ExtensionModel} that must be configured.
+   * @param configurationModel The {@link ConfigurationModel} that represents the extensionModel configuration.
+   * @param muleContext The corresponding {@link MuleContext}.
+   * @return The {@link ConfigurationProvider} name.
+   */
+  private String featureFlaggedPolicyExtensionsImplicitConfigurationProviderName(ExtensionModel extensionModel,
+                                                                                 ConfigurationModel configurationModel,
+                                                                                 MuleContext muleContext) {
+    if(featureFlaggingService != null && featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_POLICY_ISOLATION)) {
+      // Implicit configuration providers cannot be inherited from the parent (application) MuleContext registry, so a different name is returned,
+      // which will force the instantiation of a new ConfigurationProvider that will be stored in the policy MuleContext registry.
+      return String.format("%s-%s", muleContext.getId(), getImplicitConfigurationProviderName(extensionModel, configurationModel));
+    } else {
+      // Implicit configuration provider is inherited from the parent (application) MuleContext registry.
+      return getImplicitConfigurationProviderName(extensionModel, configurationModel);
+    }
   }
 
   private String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
