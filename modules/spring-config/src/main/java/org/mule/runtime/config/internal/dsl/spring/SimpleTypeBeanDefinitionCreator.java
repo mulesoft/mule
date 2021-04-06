@@ -8,23 +8,19 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.dsl.spring.ParameterGroupUtils.getSourceCallbackAwareParameter;
+import static org.mule.runtime.config.internal.dsl.spring.ParameterUtils.getParamName;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.ast.internal.DefaultComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import java.util.Map;
 import java.util.Optional;
-import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 /**
  * Bean definition creator for elements that end up representing simple types.
@@ -91,7 +87,7 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
       return null;
     }
 
-    final String paramName = getParamName(ownerComponent, componentModel);
+    final String paramName = getParamName(ownerComponent, componentModel.getIdentifier().getName());
 
     ParameterizedModel ownerComponentModel = ownerComponent.getModel(ParameterizedModel.class).get();
 
@@ -113,27 +109,6 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
     }
 
     return paramInOwner;
-  }
-
-  private String getParamName(ComponentAst ownerComponent, ComponentAst componentModel) {
-    if (ownerComponent.getGenerationInformation().getSyntax().isPresent()) {
-      return getElementNameToParamNameMap(ownerComponent.getGenerationInformation().getSyntax().get())
-          .get(componentModel.getIdentifier().getName());
-    }
-
-    // Fallback to componentModel Syntax
-    if (componentModel.getGenerationInformation().getSyntax().isPresent()) {
-      return getElementNameToParamNameMap(componentModel.getGenerationInformation().getSyntax().get())
-          .get(componentModel.getIdentifier().getName());
-    }
-
-    return null;
-  }
-
-  private HashMap<String, String> getElementNameToParamNameMap(DslElementSyntax dslElementSyntax) {
-    // Map whose key is the DSL representation (element name) and whose value is the model parameter name (the previous key)
-    return dslElementSyntax.getContainedElementsByName().entrySet().stream()
-        .collect(Collectors.toMap(entry -> entry.getValue().getElementName(), Map.Entry::getKey, (a, b) -> b, HashMap::new));
   }
 
 }
