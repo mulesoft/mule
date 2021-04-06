@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableMap;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
 
 import java.util.LinkedHashMap;
@@ -258,6 +255,7 @@ public class ConnectivitySchema {
 
     /**
      * Specifies whether the parameter is mandatory or not
+     *
      * @param mandatory the mandatory boolean value
      * @return {@code this} configurer
      */
@@ -311,14 +309,14 @@ public class ConnectivitySchema {
    * @return The schema's labels
    */
   public Map<String, String> getLabels() {
-    return unmodifiableMap(labels);
+    return labels;
   }
 
   /**
    * @return The schema's assets
    */
   public List<ExchangeAssetDescriptor> getAssets() {
-    return unmodifiableList(assets);
+    return assets;
   }
 
   /**

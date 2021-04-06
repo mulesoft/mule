@@ -6,11 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
+/**
+ * Testing utilities for functionality related to {@link ConnectivitySchema}
+ *
+ * @since 4.4.0
+ */
 public final class ConnectivitySchemaTestUtils {
 
   private ConnectivitySchemaTestUtils() {
   }
 
+  /**
+   * Creates a {@link ConnectivitySchema} which resembles the ApiKeyAuthentication schema of the Netsuite SOAP API
+   *
+   * @return a test {@link ConnectivitySchema}
+   */
   public static ConnectivitySchema getNetsuiteTokenAuthenticationSchema() {
     return ConnectivitySchema.builder()
             .setGav("com.mulesoft.schemas", "mule-netsuite-connector-token-authentication", "1.0")
