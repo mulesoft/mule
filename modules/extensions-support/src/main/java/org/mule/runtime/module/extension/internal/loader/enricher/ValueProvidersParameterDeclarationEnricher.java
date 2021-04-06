@@ -78,22 +78,22 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
 
         @Override
         public void onSource(SourceDeclaration declaration) {
-          enrichContainerModel(declaration);
+          enrichContainerModel(declaration, declaration.getName(), "source");
         }
 
         @Override
         public void onOperation(OperationDeclaration declaration) {
-          enrichContainerModel(declaration);
+          enrichContainerModel(declaration, declaration.getName(), "operation");
         }
 
         @Override
         protected void onConfiguration(ConfigurationDeclaration declaration) {
-          enrichContainerModel(declaration);
+          enrichContainerModel(declaration, declaration.getName(), "configuration");
         }
 
         @Override
         protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
-          enrichContainerModel(declaration);
+          enrichContainerModel(declaration, declaration.getName(), "connection provider");
         }
       }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
     }
@@ -108,15 +108,17 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
    *
    * @param containerDeclaration declaration to introspect their parameters
    */
-  private void enrichContainerModel(ParameterizedDeclaration<?> containerDeclaration) {
+  private void enrichContainerModel(ParameterizedDeclaration<?> containerDeclaration, String componentName,
+                                    String componentType) {
     List<ParameterDeclaration> allParameters = containerDeclaration.getAllParameters();
 
     Map<String, String> parameterNames = getContainerParameterNames(allParameters);
 
     Map<ParameterGroupDeclaration, OfValueInformation> dynamicGroupOptions =
-        introspectParameterGroups(containerDeclaration.getParameterGroups());
+        introspectParameterGroups(containerDeclaration.getParameterGroups(), componentName, componentType);
 
-    Map<ParameterDeclaration, OfValueInformation> dynamicOptions = introspectParameters(allParameters);
+    Map<ParameterDeclaration, OfValueInformation> dynamicOptions =
+        introspectParameters(allParameters, componentName, componentType);
 
     dynamicOptions.forEach((paramDeclaration, ofValueInformation) -> enrichParameter(ofValueInformation,
                                                                                      paramDeclaration,
@@ -217,11 +219,12 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
    * @param parameters parameters to introspect
    * @return a Map containing all the {@link ParameterDeclaration} with their correspondent {@link ValueProvider}
    */
-  private Map<ParameterDeclaration, OfValueInformation> introspectParameters(List<ParameterDeclaration> parameters) {
+  private Map<ParameterDeclaration, OfValueInformation> introspectParameters(List<ParameterDeclaration> parameters,
+                                                                             String componentName, String componentType) {
 
     Map<ParameterDeclaration, OfValueInformation> optionResolverEnabledParameters = new HashMap<>();
 
-    parameters.forEach(param -> getOfValueInformation(param)
+    parameters.forEach(param -> getOfValueInformation(param, componentName, componentType)
         .ifPresent(optionAnnotation -> optionResolverEnabledParameters.put(param, optionAnnotation)));
 
     return optionResolverEnabledParameters;
@@ -234,7 +237,9 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
    * @param parameterGroups parameter groups to introspect
    * @return a Map containing all the {@link ParameterGroupDeclaration} with their correspondent {@link ValueProvider}
    */
-  private Map<ParameterGroupDeclaration, OfValueInformation> introspectParameterGroups(List<ParameterGroupDeclaration> parameterGroups) {
+  private Map<ParameterGroupDeclaration, OfValueInformation> introspectParameterGroups(List<ParameterGroupDeclaration> parameterGroups,
+                                                                                       String componentName,
+                                                                                       String componentType) {
     Map<ParameterGroupDeclaration, OfValueInformation> optionResolverEnabledParameters = new HashMap<>();
 
     parameterGroups
@@ -242,7 +247,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
             .ifPresent(modelProperty -> {
               AnnotatedElement container = modelProperty.getDescriptor().getContainer();
               if (container != null) {
-                getOfValueInformation(paramGroup, container).ifPresent(v -> optionResolverEnabledParameters.put(paramGroup, v));
+                getOfValueInformation(paramGroup, container, componentName, componentType)
+                    .ifPresent(v -> optionResolverEnabledParameters.put(paramGroup, v));
               }
             }));
 
@@ -283,16 +289,19 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     return parameterNames;
   }
 
-  private Optional<OfValueInformation> getOfValueInformation(ParameterDeclaration parameterDeclaration) {
+  private Optional<OfValueInformation> getOfValueInformation(ParameterDeclaration parameterDeclaration, String componentName,
+                                                             String componentType) {
     Optional<OfValues> legacyAnnotation = getAnnotation(parameterDeclaration, OfValues.class);
     Optional<org.mule.sdk.api.annotation.values.OfValues> sdkAnnotation =
         getAnnotation(parameterDeclaration, org.mule.sdk.api.annotation.values.OfValues.class);
 
     if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
-      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on parameter %s",
+      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on parameter %s of %s %s",
                                                        OfValues.class.getName(),
                                                        org.mule.sdk.api.annotation.values.OfValues.class.getName(),
-                                                       parameterDeclaration.getName()));
+                                                       parameterDeclaration.getName(),
+                                                       componentType,
+                                                       componentName));
     } else if (legacyAnnotation.isPresent()) {
       return of(new OfValueInformation(legacyAnnotation.get().value(), legacyAnnotation.get().open()));
     } else if (sdkAnnotation.isPresent()) {
@@ -303,16 +312,20 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
   }
 
   private Optional<OfValueInformation> getOfValueInformation(ParameterGroupDeclaration parameterGroupDeclaration,
-                                                             AnnotatedElement annotatedElement) {
+                                                             AnnotatedElement annotatedElement,
+                                                             String componentName,
+                                                             String componentType) {
     OfValues legacyAnnotation = annotatedElement.getAnnotation(OfValues.class);
     org.mule.sdk.api.annotation.values.OfValues sdkAnnotation =
         annotatedElement.getAnnotation(org.mule.sdk.api.annotation.values.OfValues.class);
 
     if (legacyAnnotation != null && sdkAnnotation != null) {
-      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on parameter group %s",
+      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on parameter group %s of %s %s",
                                                        OfValues.class.getName(),
                                                        org.mule.sdk.api.annotation.values.OfValues.class.getName(),
-                                                       parameterGroupDeclaration.getName()));
+                                                       parameterGroupDeclaration.getName(),
+                                                       componentType,
+                                                       componentName));
     } else if (legacyAnnotation != null) {
       return of(new OfValueInformation(legacyAnnotation.value(), legacyAnnotation.open()));
     } else if (sdkAnnotation != null) {

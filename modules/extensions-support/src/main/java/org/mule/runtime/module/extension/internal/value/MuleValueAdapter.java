@@ -14,6 +14,11 @@ import org.mule.runtime.api.value.Value;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * Adapter of {@link org.mule.sdk.api.values.Value} to {@link org.mule.runtime.api.value.Value}
+ *
+ * @since 4.4.0
+ */
 public class MuleValueAdapter implements Value {
 
   private final org.mule.sdk.api.values.Value value;

@@ -15,7 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Adapter of the legacy {@link org.mule.runtime.api.value.Value} to {@link org.mule.sdk.api.values.Value}
+ * Adapter of {@link org.mule.runtime.api.value.Value} to {@link org.mule.sdk.api.values.Value}
  *
  * @since 4.4.0
  */

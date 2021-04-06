@@ -40,12 +40,14 @@ public class ValueProviderUtils {
 
   }
 
+  // TODO: MULE-19298 - Create interface to provide values to tooling client and remove the following method
   static org.mule.runtime.extension.api.values.ValueBuilder cloneAndEnrichValue(org.mule.runtime.api.value.Value value,
                                                                                 Map<Integer, String> partOrderMapping) {
     Value sdkValue = new SdkValueAdapter(value);
     return cloneAndEnrichMuleValue(sdkValue, partOrderMapping, 1);
   }
 
+  // TODO: MULE-19298 - Create interface to provide values to tooling client and remove the following method
   public static org.mule.runtime.extension.api.values.ValueBuilder cloneAndEnrichValue(org.mule.runtime.api.value.Value value,
                                                                                        List<ParameterModel> parameters) {
     Value sdkValue = new SdkValueAdapter(value);

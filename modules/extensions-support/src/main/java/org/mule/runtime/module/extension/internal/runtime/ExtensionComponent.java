@@ -424,6 +424,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public Set<Value> getValues(String parameterName) throws org.mule.runtime.extension.api.values.ValueResolvingException {
+    // TODO: MULE-19298 - throws org.mule.sdk.api.values.ValueResolvingException
     try {
       return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getValueProviderMediator().getValues(
                                                                                                                                parameterName,
@@ -439,7 +440,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                                                                                    .orElse(null))));
     } catch (MuleRuntimeException e) {
       Throwable rootException = getRootException(e);
-      if (rootException instanceof ValueResolvingException) {
+      if (rootException instanceof org.mule.runtime.extension.api.values.ValueResolvingException) {
         throw (org.mule.runtime.extension.api.values.ValueResolvingException) rootException;
       } else {
         throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
