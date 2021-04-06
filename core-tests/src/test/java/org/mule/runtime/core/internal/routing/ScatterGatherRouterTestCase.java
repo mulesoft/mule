@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -204,14 +203,6 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   public void defaultForkJoinStrategyFactory() {
     assertThat(router.getDefaultForkJoinStrategyFactory(), instanceOf(CollectMapForkJoinStrategyFactory.class));
     assertThat(router.getDefaultForkJoinStrategyFactory().getResultDataType(), equalTo(MULE_MESSAGE_MAP));
-  }
-
-  @Test
-  @Description("The router must be configured with at least two routes.")
-  public void minimumTwoRoutes() throws MuleException {
-    muleContext.getInjector().inject(router);
-    expectedException.expect(instanceOf(IllegalArgumentException.class));
-    router.setRoutes(singletonList(mock(MessageProcessorChain.class)));
   }
 
   @Test
