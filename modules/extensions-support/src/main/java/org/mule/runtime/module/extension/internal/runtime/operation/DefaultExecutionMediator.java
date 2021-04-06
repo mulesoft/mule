@@ -22,6 +22,7 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
@@ -110,7 +111,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
 
     try {
-      getExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context).execute(() -> {
+      withExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context, () -> {
         executeWithInterceptors(executor, context, stats, callback);
         return null;
       });
@@ -224,20 +225,56 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     return e;
   }
 
-  Throwable applyBeforeInterceptors(ExecutionContextAdapter executionContext) {
-    return interceptorChain.before(executionContext, null);
+  Throwable applyBeforeInterceptors(ExecutionContextAdapter context) {
+    try {
+      return withExecutionTemplate(context, () -> {
+        RetryPolicyTemplate retryPolicy = (RetryPolicyTemplate) context.getRetryPolicyTemplate().orElse(null);
+        if (retryPolicy != null && retryPolicy.isEnabled()) {
+          CompletableFuture<Throwable> result = new CompletableFuture<>();
+
+          executeWithRetry(context, retryPolicy, callback -> {
+            final Throwable t = interceptorChain.before(context, callback);
+            if (t == null) {
+              result.complete(null);
+            }
+          },
+                           new ExecutorCallback() {
+
+                             @Override
+                             public void complete(Object value) {
+                               result.complete((Throwable) value);
+                             }
+
+                             @Override
+                             public void error(Throwable e) {
+                               result.completeExceptionally(e);
+                             }
+
+                           });
+
+          return result.get();
+        } else {
+          return interceptorChain.before(context, null);
+        }
+      });
+    } catch (Exception e) {
+      return e;
+    }
   }
 
   void applyAfterInterceptors(ExecutionContext executionContext) {
     interceptorChain.abort(executionContext);
   }
 
-  private <T> ExecutionTemplate<T> getExecutionTemplate(ExecutionContextAdapter<ComponentModel> context) {
+  private <T> T withExecutionTemplate(ExecutionContextAdapter<ComponentModel> context, ExecutionCallback<T> callback)
+      throws Exception {
     if (context.getTransactionConfig().isPresent()) {
       return ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(),
-                                                                          context.getTransactionConfig().get()));
+                                                                          context.getTransactionConfig().get()))
+                                                                              .execute(callback);
     } else {
-      return (ExecutionTemplate<T>) defaultExecutionTemplate;
+      return ((ExecutionTemplate<T>) defaultExecutionTemplate)
+          .execute(callback);
     }
   }
 
