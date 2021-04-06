@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
+import java.util.Objects;
+
 public class DocumentRoot {
 
   private String encodes;
@@ -16,5 +18,22 @@ public class DocumentRoot {
 
   void setEncodes(String encodes) {
     this.encodes = encodes;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    DocumentRoot that = (DocumentRoot) o;
+    return Objects.equals(encodes, that.encodes);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(encodes);
   }
 }

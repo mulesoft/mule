@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
+import java.util.Objects;
+
 public class DocumentNode {
 
   private DocumentRoot root = new DocumentRoot();
@@ -14,7 +16,20 @@ public class DocumentNode {
     return root;
   }
 
-  void setRoot(DocumentRoot root) {
-    this.root = root;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    DocumentNode that = (DocumentNode) o;
+    return Objects.equals(root, that.root);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(root);
   }
 }
