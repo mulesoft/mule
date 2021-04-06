@@ -439,6 +439,10 @@ public interface AllureConstants {
 
     String SCHEDULER = "Scheduler";
 
+    interface SchedulerStories {
+
+      String SCHEDULED_FLOW_EXECUTION = "Scheduled flow execution";
+    }
   }
 
   interface StreamingFeature {
@@ -760,6 +764,11 @@ public interface AllureConstants {
       String CORRELATION_ID_MODIFICATION = "Correlation id modification in child context in chains";
 
     }
+  }
+
+  interface NotificationsFeature {
+
+    String NOTIFICATIONS = "Notifications";
   }
 
 }

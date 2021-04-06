@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_ELEMENT;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
@@ -187,7 +188,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String FLOW = "flow";
   private static final String FLOW_REF = "flow-ref";
   private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
-  private static final String PARALLEL_FOREACH = "parallel-foreach";
   private static final String FORK_JOIN_STRATEGY = "forkJoinStrategyFactory";
   private static final String COLLECT_LIST = "collect-list";
   private static final String ASYNC = "async";
@@ -337,7 +337,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(ROUTES, fromChildCollectionConfiguration(MessageProcessorChain.class).build())
         .withSetterParameterDefinition(FORK_JOIN_STRATEGY, fromChildConfiguration(ForkJoinStrategyFactory.class).build())
         .asScope().build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(PARALLEL_FOREACH)
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(PARALLEL_FOREACH_ELEMENT)
         .withTypeDefinition(fromType(ParallelForEach.class))
         .withSetterParameterDefinition("collectionExpression", fromSimpleParameter("collection").build())
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())

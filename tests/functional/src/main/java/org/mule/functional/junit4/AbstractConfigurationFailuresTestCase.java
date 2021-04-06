@@ -12,6 +12,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
@@ -123,7 +124,7 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
     DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
     Map<String, Object> ctx = new HashMap<>();
     ctx.put(TYPE_PROPERTY_NAME, extension.getName());
-    ctx.put(VERSION, "4.4.0-SNAPSHOT");
+    ctx.put(VERSION, getProductVersion());
     return loader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
   }
 
