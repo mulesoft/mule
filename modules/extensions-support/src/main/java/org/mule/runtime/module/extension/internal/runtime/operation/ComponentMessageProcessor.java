@@ -37,6 +37,7 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.createRoundRobinFluxSupplier;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.createDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -104,6 +105,7 @@ import org.mule.runtime.core.internal.processor.strategy.OperationInnerProcessor
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -167,6 +169,7 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import org.slf4j.MDC;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -201,6 +204,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
+  public static final String PROCESSOR_PATH_MDC_KEY = "processorPath";
 
   private final ReflectionCache reflectionCache;
   private final ResultTransformer resultTransformer;
@@ -261,6 +265,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    */
   private ReturnDelegate valueReturnDelegate;
   protected PolicyManager policyManager;
+  private String processorPath = null;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -612,6 +617,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       resolvedProcessorRepresentation = getRepresentation();
 
       initProcessingStrategy();
+
+      ComponentLocation componentLocation = getLocation();
+      if (componentLocation != null) {
+        processorPath = componentLocation.getLocation();
+      }
+
       initialised = true;
     }
   }
@@ -783,8 +794,33 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     ExecutionContextAdapter<T> operationContext = oep.getExecutionContextAdapter();
 
-    executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext,
-                                              isTargetWithPolicies(event) ? valueReturnDelegate : returnDelegate));
+    setCurrentEvent((PrivilegedEvent) event);
+    boolean wasProcessorPathSet = setCurrentLocation();
+    try {
+      executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext,
+                                                isTargetWithPolicies(event) ? valueReturnDelegate : returnDelegate));
+    } finally {
+      unsetCurrentLocation(wasProcessorPathSet);
+    }
+  }
+
+  private boolean setCurrentLocation() {
+    if (MDC.get(PROCESSOR_PATH_MDC_KEY) != null) {
+      return false;
+    }
+
+    if (processorPath == null) {
+      return false;
+    }
+
+    MDC.put(PROCESSOR_PATH_MDC_KEY, processorPath);
+    return true;
+  }
+
+  private void unsetCurrentLocation(boolean wasProcessorPathSet) {
+    if (wasProcessorPathSet) {
+      MDC.remove(PROCESSOR_PATH_MDC_KEY);
+    }
   }
 
   private void initRetryPolicyResolver() {
