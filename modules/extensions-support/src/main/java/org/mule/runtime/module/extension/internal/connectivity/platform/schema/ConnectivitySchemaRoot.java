@@ -26,6 +26,7 @@ public class ConnectivitySchemaRoot {
 
   /**
    * Sets the entity type encoded in the document
+   * 
    * @param encodes the entity type
    */
   void setEncodes(String encodes) {

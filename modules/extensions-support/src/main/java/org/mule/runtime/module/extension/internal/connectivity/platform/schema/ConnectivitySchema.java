@@ -35,8 +35,8 @@ public class ConnectivitySchema {
     public Builder() {
       product.definition.getNodeMappings().put("Connection", connectionNode);
       uses("connectivity", "anypoint://semantics/connectivity")
-              .usesExternal("core", "anypoint://semantics/core")
-              .usesExternal("apiContract", "anypoint://semantics/api-contract");
+          .usesExternal("core", "anypoint://semantics/core")
+          .usesExternal("apiContract", "anypoint://semantics/api-contract");
     }
 
     /**
@@ -152,7 +152,8 @@ public class ConnectivitySchema {
      * Adds a parameter into the range through the use of a {@link ConnectionParameterConfigurer}
      *
      * @param name               the parameter name
-     * @param configurerConsumer a {@link Consumer} for a {@link ConnectionParameterConfigurer} on which the parameter is described
+     * @param configurerConsumer a {@link Consumer} for a {@link ConnectionParameterConfigurer} on which the parameter is
+     *                           described
      * @return {@code this} builder
      */
     public Builder addParameter(String name, Consumer<ConnectionParameterConfigurer> configurerConsumer) {
@@ -210,7 +211,8 @@ public class ConnectivitySchema {
      * Adds a parameter into the range through the use of a {@link ConnectionParameterConfigurer}
      *
      * @param name               the parameter name
-     * @param configurerConsumer a {@link Consumer} for a {@link ConnectionParameterConfigurer} on which the parameter is described
+     * @param configurerConsumer a {@link Consumer} for a {@link ConnectionParameterConfigurer} on which the parameter is
+     *                           described
      * @return {@code this} configurer
      */
     public CustomRangeConfigurer addParameter(String name, Consumer<ConnectionParameterConfigurer> configurerConsumer) {
@@ -232,7 +234,7 @@ public class ConnectivitySchema {
     private ConnectivitySchemaParameter product = new ConnectivitySchemaParameter();
 
     /**
-     * Specifies the parameter's  property term. Ideally, this term is defined in the Connectivity AML Vocabulary.
+     * Specifies the parameter's property term. Ideally, this term is defined in the Connectivity AML Vocabulary.
      *
      * @param propertyTerm the property term.
      * @return {@code this} configurer
@@ -331,14 +333,15 @@ public class ConnectivitySchema {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass())
+      return false;
     ConnectivitySchema that = (ConnectivitySchema) o;
     return Objects.equals(groupId, that.groupId)
-            && Objects.equals(artifactId, that.artifactId)
-            && Objects.equals(version, that.version)
-            && Objects.equals(labels, that.labels)
-            && Objects.equals(assets, that.assets)
-            && Objects.equals(definition, that.definition);
+        && Objects.equals(artifactId, that.artifactId)
+        && Objects.equals(version, that.version)
+        && Objects.equals(labels, that.labels)
+        && Objects.equals(assets, that.assets)
+        && Objects.equals(definition, that.definition);
   }
 
   @Override

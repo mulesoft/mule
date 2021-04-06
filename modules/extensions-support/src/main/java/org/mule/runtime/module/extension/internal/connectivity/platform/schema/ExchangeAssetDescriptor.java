@@ -62,7 +62,8 @@ public class ExchangeAssetDescriptor {
       return false;
     }
     ExchangeAssetDescriptor that = (ExchangeAssetDescriptor) o;
-    return Objects.equals(groupId, that.groupId) && Objects.equals(assetId, that.assetId) && Objects.equals(version, that.version);
+    return Objects.equals(groupId, that.groupId) && Objects.equals(assetId, that.assetId)
+        && Objects.equals(version, that.version);
   }
 
   @Override

@@ -41,7 +41,7 @@ public class ConnectivitySchemaJsonSerializerTestCase extends AbstractMuleTestCa
   private ConnectivitySchemaJsonSerializer serializer = new ConnectivitySchemaJsonSerializer(true);
 
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
-          getBoolean(SYSTEM_PROPERTY_PREFIX + "connectivitySchema.updateExpectedFilesOnError");
+      getBoolean(SYSTEM_PROPERTY_PREFIX + "connectivitySchema.updateExpectedFilesOnError");
 
   @Parameterized.Parameter
   public ConnectivitySchema schemaObject;
@@ -53,7 +53,8 @@ public class ConnectivitySchemaJsonSerializerTestCase extends AbstractMuleTestCa
 
   @Parameterized.Parameters(name = "{1}")
   public static Collection<Object[]> data() {
-    List<ConnectivitySchemaJsonSerializerTestUnit> schemas = asList(newTestUnit(getNetsuiteTokenAuthenticationSchema(), "connectivity-test-schema-netsuite.json"));
+    List<ConnectivitySchemaJsonSerializerTestUnit> schemas =
+        asList(newTestUnit(getNetsuiteTokenAuthenticationSchema(), "connectivity-test-schema-netsuite.json"));
 
     return schemas.stream().map(t -> t.toTestParams()).collect(toList());
   }
@@ -99,7 +100,7 @@ public class ConnectivitySchemaJsonSerializerTestCase extends AbstractMuleTestCa
 
   private void updateExpectedJson(String json) throws URISyntaxException, IOException {
     File root = new File(getResourceAsUrl("connectivity/schema/" + expectedSource, getClass()).toURI()).getParentFile()
-            .getParentFile().getParentFile().getParentFile();
+        .getParentFile().getParentFile().getParentFile();
     File testDir = new File(root, "src/test/resources/connectivity/schema");
     File target = new File(testDir, expectedSource);
     stringToFile(target.getAbsolutePath(), json);
@@ -130,7 +131,7 @@ public class ConnectivitySchemaJsonSerializerTestCase extends AbstractMuleTestCa
     }
 
     public Object[] toTestParams() {
-      return new Object[]{schema, getFileName()};
+      return new Object[] {schema, getFileName()};
     }
   }
 }

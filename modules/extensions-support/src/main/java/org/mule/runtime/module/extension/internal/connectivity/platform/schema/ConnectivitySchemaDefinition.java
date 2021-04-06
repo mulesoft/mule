@@ -47,9 +47,9 @@ public class ConnectivitySchemaDefinition {
     }
     ConnectivitySchemaDefinition that = (ConnectivitySchemaDefinition) o;
     return Objects.equals(document, that.document)
-            && Objects.equals(uses, that.uses)
-            && Objects.equals(external, that.external)
-            && Objects.equals(nodeMappings, that.nodeMappings);
+        && Objects.equals(uses, that.uses)
+        && Objects.equals(external, that.external)
+        && Objects.equals(nodeMappings, that.nodeMappings);
   }
 
   @Override
