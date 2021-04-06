@@ -12,6 +12,7 @@ import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 
 import java.util.HashMap;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -39,88 +40,100 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateBeanDefinitionRequest createBeanDefinitionRequest) {
     Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
-    if (isSimpleType(type)) {
-      ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
-      createBeanDefinitionRequest.getSpringComponentModel().setType(type);
 
-      final ComponentParameterAst paramInOwner = getParamInOwnerComponent(createBeanDefinitionRequest, componentModel);
-      final ComponentParameterAst valueParame = componentModel.getParameter("value");
-
-      String value = null;
-
-      if (paramInOwner != null) {
-        value = paramInOwner.getResolvedRawValue();
-      } else if (valueParame != null) {
-        value = valueParame.getResolvedRawValue();
-      }
-
-      if (value == null) {
-        throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
-                                                           componentModel.getMetadata().getFileName()
-                                                               .orElse("unknown"),
-                                                           componentModel.getMetadata().getStartLine().orElse(-1)));
-      }
-      Optional<TypeConverter> typeConverterOptional =
-          createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeConverter();
-      createBeanDefinitionRequest.getSpringComponentModel()
-          .setBeanDefinition(getConvertibleBeanDefinition(type, value, typeConverterOptional));
-      return true;
+    if (!isSimpleType(type)) {
+      return false;
     }
-    return false;
+
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+    createBeanDefinitionRequest.getSpringComponentModel().setType(type);
+
+    String value = getResolvedRawValue(createBeanDefinitionRequest, componentModel);
+
+    if (value == null) {
+      throw new MuleRuntimeException(
+                                     createStaticMessage(
+                                                         "Parameter at %s:%s must provide a non-empty value",
+                                                         componentModel.getMetadata().getFileName().orElse("unknown"),
+                                                         componentModel.getMetadata().getStartLine().orElse(-1)));
+    }
+
+    Optional<TypeConverter> typeConverterOptional =
+        createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeConverter();
+    createBeanDefinitionRequest.getSpringComponentModel()
+        .setBeanDefinition(getConvertibleBeanDefinition(type, value, typeConverterOptional));
+
+    return true;
+  }
+
+  private String getResolvedRawValue(CreateBeanDefinitionRequest createBeanDefinitionRequest, ComponentAst componentModel) {
+    final ComponentParameterAst paramInOwner = getParamInOwnerComponent(createBeanDefinitionRequest, componentModel);
+
+    if (paramInOwner != null) {
+      return paramInOwner.getResolvedRawValue();
+    }
+
+    final ComponentParameterAst valueParam = componentModel.getParameter("value");
+
+    if (valueParam == null) {
+      return null;
+    }
+
+    return valueParam.getResolvedRawValue();
+
   }
 
   private ComponentParameterAst getParamInOwnerComponent(CreateBeanDefinitionRequest createBeanDefinitionRequest,
                                                          ComponentAst componentModel) {
     ComponentAst ownerComponent = resolveOwnerComponent(createBeanDefinitionRequest);
 
-    if (ownerComponent != null) {
-
-      String name = componentModel.getIdentifier().getName();
-      final String paramName = getParamName((DefaultComponentAst) ownerComponent, name);
-
-      ParameterizedModel ownerComponentModel = ownerComponent.getModel(ParameterizedModel.class).get();
-      if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
-        // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
-        // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
-        // previous implementations.
-        int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
-        final ComponentAst possibleGroup = createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
-
-        return getSourceCallbackAwareParameter(ownerComponent, paramName, possibleGroup, (SourceModel) ownerComponentModel);
-      } else {
-        ComponentParameterAst paramInOwner =
-            ownerComponent.getParameter(paramName);
-
-        if (paramInOwner == null) {
-          // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.
-          paramInOwner = ownerComponent.getParameter(componentModel.getIdentifier().getName());
-        }
-
-        return paramInOwner;
-      }
-    } else {
+    if (ownerComponent == null) {
       return null;
     }
+
+    final String paramName = getParamName(ownerComponent, componentModel);
+
+    ParameterizedModel ownerComponentModel = ownerComponent.getModel(ParameterizedModel.class).get();
+
+    if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
+      // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
+      // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
+      // previous implementations.
+      int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
+      final ComponentAst possibleGroup = createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
+
+      return getSourceCallbackAwareParameter(ownerComponent, paramName, possibleGroup, (SourceModel) ownerComponentModel);
+    }
+
+    ComponentParameterAst paramInOwner = ownerComponent.getParameter(paramName);
+
+    if (paramInOwner == null) {
+      // XML SDK 1 allows for hyphenated names in parameters, so need to account for those.
+      return ownerComponent.getParameter(componentModel.getIdentifier().getName());
+    }
+
+    return paramInOwner;
   }
 
-  private String getParamName(DefaultComponentAst ownerComponent, String name) {
-    Optional<DslElementSyntax> optionalDslElementSyntax = ownerComponent.getGenerationInformation().getSyntax();
-
-    if (!optionalDslElementSyntax.isPresent()) {
-      return null;
+  private String getParamName(ComponentAst ownerComponent, ComponentAst componentModel) {
+    if (ownerComponent.getGenerationInformation().getSyntax().isPresent()) {
+      return getElementNameToParamNameMap(ownerComponent.getGenerationInformation().getSyntax().get())
+          .get(componentModel.getIdentifier().getName());
     }
 
-    return getElementNameToParamNameMap(optionalDslElementSyntax.get()).get(name);
+    // Fallback to componentModel Syntax
+    if (componentModel.getGenerationInformation().getSyntax().isPresent()) {
+      return getElementNameToParamNameMap(componentModel.getGenerationInformation().getSyntax().get())
+          .get(componentModel.getIdentifier().getName());
+    }
+
+    return null;
   }
 
   private HashMap<String, String> getElementNameToParamNameMap(DslElementSyntax dslElementSyntax) {
-    Set<Map.Entry<String, DslElementSyntax>> entries = dslElementSyntax.getContainedElementsByName().entrySet();
-
-    HashMap<String, String> elementNameToParamNameMap = new HashMap<>();
-    for (Map.Entry<String, DslElementSyntax> entry : entries) {
-      elementNameToParamNameMap.put(entry.getValue().getElementName(), entry.getKey());
-    }
-    return elementNameToParamNameMap;
+    // Map whose key is the DSL representation (element name) and whose value is the model parameter name (the previous key)
+    return dslElementSyntax.getContainedElementsByName().entrySet().stream()
+        .collect(Collectors.toMap(entry -> entry.getValue().getElementName(), Map.Entry::getKey, (a, b) -> b, HashMap::new));
   }
 
 }
