@@ -8,26 +8,47 @@ package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
 import java.util.Objects;
 
-public class AssetDescriptor {
+/**
+ * Describes an Asset in Exchange
+ *
+ * @since 4.4.0
+ */
+public class ExchangeAssetDescriptor {
 
   private String groupId;
   private String assetId;
   private String version;
 
-  public AssetDescriptor(String groupId, String assetId, String version) {
+  /**
+   * Creates a new instance
+   *
+   * @param groupId the asset's groupId
+   * @param assetId the asset's assetId
+   * @param version the asset's version
+   */
+  public ExchangeAssetDescriptor(String groupId, String assetId, String version) {
     this.groupId = groupId;
     this.assetId = assetId;
     this.version = version;
   }
 
+  /**
+   * @return the asset's groupId
+   */
   public String getGroupId() {
     return groupId;
   }
 
+  /**
+   * @return the asset id
+   */
   public String getAssetId() {
     return assetId;
   }
 
+  /**
+   * @return the asset version
+   */
   public String getVersion() {
     return version;
   }
@@ -40,7 +61,7 @@ public class AssetDescriptor {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AssetDescriptor that = (AssetDescriptor) o;
+    ExchangeAssetDescriptor that = (ExchangeAssetDescriptor) o;
     return Objects.equals(groupId, that.groupId) && Objects.equals(assetId, that.assetId) && Objects.equals(version, that.version);
   }
 

@@ -12,16 +12,16 @@ import java.util.Objects;
 
 import com.google.gson.annotations.SerializedName;
 
-public class DocumentDefinition {
+public class ConnectivitySchemaDefinition {
 
   @SerializedName("documents")
-  private DocumentNode document = new DocumentNode();
+  private ConnectivitySchemaBody document = new ConnectivitySchemaBody();
 
   private Map<String, String> uses = new LinkedHashMap<>();
   private Map<String, String> external = new LinkedHashMap<>();
-  private Map<String, ConnectionNode> nodeMappings = new LinkedHashMap<>();
+  private Map<String, ConnectivitySchemaNode> nodeMappings = new LinkedHashMap<>();
 
-  public DocumentNode getDocument() {
+  public ConnectivitySchemaBody getDocument() {
     return document;
   }
 
@@ -33,7 +33,7 @@ public class DocumentDefinition {
     return external;
   }
 
-  public Map<String, ConnectionNode> getNodeMappings() {
+  public Map<String, ConnectivitySchemaNode> getNodeMappings() {
     return nodeMappings;
   }
 
@@ -45,7 +45,7 @@ public class DocumentDefinition {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    DocumentDefinition that = (DocumentDefinition) o;
+    ConnectivitySchemaDefinition that = (ConnectivitySchemaDefinition) o;
     return Objects.equals(document, that.document)
             && Objects.equals(uses, that.uses)
             && Objects.equals(external, that.external)

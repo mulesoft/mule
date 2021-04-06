@@ -12,7 +12,12 @@ import java.util.Objects;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ConnectionNode {
+/**
+ * Models a node within a {@link ConnectivitySchema}
+ *
+ * @since 4.4.0
+ */
+public class ConnectivitySchemaNode {
 
   private String classTerm;
 
@@ -39,7 +44,7 @@ public class ConnectionNode {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ConnectionNode that = (ConnectionNode) o;
+    ConnectivitySchemaNode that = (ConnectivitySchemaNode) o;
     return Objects.equals(classTerm, that.classTerm) && Objects.equals(mappings, that.mappings);
   }
 

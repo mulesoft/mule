@@ -8,14 +8,26 @@ package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
 import java.util.Objects;
 
-public class DocumentRoot {
+/**
+ * Models the root element of the schema document
+ *
+ * @since 4.4.0
+ */
+public class ConnectivitySchemaRoot {
 
   private String encodes;
 
+  /**
+   * @return the entity type encoded in the document
+   */
   public String getEncodes() {
     return encodes;
   }
 
+  /**
+   * Sets the entity type encoded in the document
+   * @param encodes the entity type
+   */
   void setEncodes(String encodes) {
     this.encodes = encodes;
   }
@@ -28,7 +40,7 @@ public class DocumentRoot {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    DocumentRoot that = (DocumentRoot) o;
+    ConnectivitySchemaRoot that = (ConnectivitySchemaRoot) o;
     return Objects.equals(encodes, that.encodes);
   }
 

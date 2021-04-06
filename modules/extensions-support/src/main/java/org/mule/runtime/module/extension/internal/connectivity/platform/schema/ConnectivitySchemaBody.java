@@ -8,11 +8,16 @@ package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
 import java.util.Objects;
 
-public class DocumentNode {
+/**
+ * Models the body of a {@link ConnectivitySchema}
+ *
+ * @since 4.4.0
+ */
+public class ConnectivitySchemaBody {
 
-  private DocumentRoot root = new DocumentRoot();
+  private ConnectivitySchemaRoot root = new ConnectivitySchemaRoot();
 
-  public DocumentRoot getRoot() {
+  public ConnectivitySchemaRoot getRoot() {
     return root;
   }
 
@@ -24,7 +29,7 @@ public class DocumentNode {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    DocumentNode that = (DocumentNode) o;
+    ConnectivitySchemaBody that = (ConnectivitySchemaBody) o;
     return Objects.equals(root, that.root);
   }
 

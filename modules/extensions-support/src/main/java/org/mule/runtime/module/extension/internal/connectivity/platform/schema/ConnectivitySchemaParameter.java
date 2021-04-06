@@ -8,6 +8,11 @@ package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
 import java.util.Objects;
 
+/**
+ * Models a parameter within a {@link ConnectivitySchema}
+ *
+ * @since 4.4.0
+ */
 public class ConnectivitySchemaParameter {
 
   private String propertyTerm;
