@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.connectivity.platform.schema;
 
-import static java.util.Collections.unmodifiableMap;
-
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,78 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import com.google.gson.annotations.SerializedName;
-
 public class ConnectivitySchema {
-
-  public static class ConnectionNode {
-
-    private String classTerm;
-
-    @SerializedName("mapping")
-    private Map<String, ParameterProperties> mappings = new LinkedHashMap<>();
-
-    public String getClassTerm() {
-      return classTerm;
-    }
-
-    public Map<String, ParameterProperties> getMappings() {
-      return unmodifiableMap(mappings);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      ConnectionNode that = (ConnectionNode) o;
-      return Objects.equals(classTerm, that.classTerm) && Objects.equals(mappings, that.mappings);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(classTerm, mappings);
-    }
-  }
-
-  public static class ParameterProperties {
-
-    private String propertyTerm;
-    private String range;
-    private boolean mandatory;
-
-    public String getPropertyTerm() {
-      return propertyTerm;
-    }
-
-    public String getRange() {
-      return range;
-    }
-
-    public boolean isMandatory() {
-      return mandatory;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      ParameterProperties that = (ParameterProperties) o;
-      return mandatory == that.mandatory && Objects.equals(propertyTerm, that.propertyTerm) && Objects.equals(range, that.range);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(propertyTerm, range, mandatory);
-    }
-  }
 
   public static class Builder {
 
@@ -111,19 +38,19 @@ public class ConnectivitySchema {
     }
 
     public Builder uses(String ns, String url) {
-      product.uses.put(ns, url);
+      product.definition.getUses().put(ns, url);
       return this;
     }
 
     public Builder usesExternal(String ns, String url) {
-      product.external.put(ns, url);
+      product.definition.getExternal().put(ns, url);
       return this;
     }
 
     public Builder addNode(String name, Consumer<ConnectionNodeConfigurer> configurerConsumer) {
       ConnectionNodeConfigurer configurer = new ConnectionNodeConfigurer();
       configurerConsumer.accept(configurer);
-      product.nodeMappings.put(name, configurer.product);
+      product.definition.getNodeMappings().put(name, configurer.product);
 
       return this;
     }
@@ -138,35 +65,34 @@ public class ConnectivitySchema {
     private ConnectionNode product = new ConnectionNode();
 
     public ConnectionNodeConfigurer setClassTerm(String classTerm) {
-      product.classTerm = classTerm;
+      product.setClassTerm(classTerm);
       return this;
     }
 
     public ConnectionNodeConfigurer addParameter(String name, Consumer<ConnectionParameterConfigurer> configurerConsumer) {
       ConnectionParameterConfigurer configurer = new ConnectionParameterConfigurer();
       configurerConsumer.accept(configurer);
-      product.mappings.put(name, configurer.product);
+      product.getMappings().put(name, configurer.product);
 
       return this;
     }
-
   }
 
   public static class ConnectionParameterConfigurer {
-    private ParameterProperties product = new ParameterProperties();
+    private ConnectivitySchemaParameter product = new ConnectivitySchemaParameter();
 
     public ConnectionParameterConfigurer setPropertyTerm(String propertyTerm) {
-      product.propertyTerm = propertyTerm;
+      product.setPropertyTerm(propertyTerm);
       return this;
     }
 
     public ConnectionParameterConfigurer setRange(String range) {
-      product.range = range;
+      product.setRange(range);
       return this;
     }
 
     public ConnectionParameterConfigurer mandatory(boolean mandatory) {
-      product.mandatory = mandatory;
+      product.setMandatory(mandatory);
       return this;
     }
   }
@@ -181,10 +107,7 @@ public class ConnectivitySchema {
 
   private Map<String, String> labels = new LinkedHashMap<>();
   private List<AssetDescriptor> assets = new LinkedList<>();
-  private Definition definition = new Definition();
-  private Map<String, String> uses = new LinkedHashMap<>();
-  private Map<String, String> external = new LinkedHashMap<>();
-  private Map<String, ConnectionNode> nodeMappings = new LinkedHashMap<>();
+  private DocumentDefinition definition = new DocumentDefinition();
 
   public ConnectivitySchema() {
     definition.getDocument().getRoot().setEncodes("Connection");
@@ -210,18 +133,6 @@ public class ConnectivitySchema {
     return assets;
   }
 
-  public Map<String, String> getUses() {
-    return uses;
-  }
-
-  public Map<String, String> getExternal() {
-    return external;
-  }
-
-  public Map<String, ConnectionNode> getNodeMappings() {
-    return nodeMappings;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -234,14 +145,11 @@ public class ConnectivitySchema {
             && Objects.equals(version, that.version)
             && Objects.equals(labels, that.labels)
             && Objects.equals(assets, that.assets)
-            && Objects.equals(definition, that.definition)
-            && Objects.equals(uses, that.uses)
-            && Objects.equals(external, that.external)
-            && Objects.equals(nodeMappings, that.nodeMappings);
+            && Objects.equals(definition, that.definition);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, artifactId, version, labels, assets, definition, uses, external, nodeMappings);
+    return Objects.hash(groupId, artifactId, version, labels, assets, definition);
   }
 }
