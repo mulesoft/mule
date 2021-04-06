@@ -21,6 +21,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
@@ -45,6 +46,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
   private final Supplier<MuleContext> muleContext;
   private final Supplier<ReflectionCache> reflectionCache;
   private final Supplier<Object> nullSupplier = () -> null;
+  private final ExpressionManager expressionManager;
 
   /**
    * Creates a new instance of the mediator
@@ -53,9 +55,20 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    * @param muleContext    context to be able to initialize {@link ValueProvider} if necessary
    */
   public ValueProviderMediator(T containerModel, Supplier<MuleContext> muleContext, Supplier<ReflectionCache> reflectionCache) {
+    this(containerModel, muleContext, reflectionCache, null);
+  }
+
+  /**
+   * ADD JDOC
+   *
+   * MAKE THINGS INVOKE THIS ONE
+   */
+  public ValueProviderMediator(T containerModel, Supplier<MuleContext> muleContext, Supplier<ReflectionCache> reflectionCache,
+                               ExpressionManager expressionManager) {
     this.containerModel = containerModel;
     this.muleContext = muleContext;
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
   }
 
   /**
@@ -149,7 +162,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
       ValueProvider valueProvider =
           factoryModelProperty
               .createFactory(parameterValueResolver, connectionSupplier, configurationSupplier, reflectionCache.get(),
-                             muleContext.get())
+                             muleContext.get(), expressionManager, containerModel)
               .createValueProvider();
 
       Set<org.mule.sdk.api.values.Value> valueSet = valueProvider.resolve();

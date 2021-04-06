@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
+import org.mule.sdk.api.annotation.binding.Binding;
 import org.mule.sdk.api.annotation.values.OfValues;
 
 /**
@@ -18,10 +19,12 @@ public class OfValueInformation {
 
   private final Class<?> value;
   private final boolean isOpen;
+  private final Binding[] bindings;
 
-  public OfValueInformation(Class<?> clazz, boolean isOpen) {
+  public OfValueInformation(Class<?> clazz, boolean isOpen, Binding[] bindings) {
     this.value = clazz;
     this.isOpen = isOpen;
+    this.bindings = bindings;
   }
 
   public Class<?> getValue() {
@@ -30,5 +33,9 @@ public class OfValueInformation {
 
   public boolean isOpen() {
     return isOpen;
+  }
+
+  public Binding[] getBindings() {
+    return bindings;
   }
 }

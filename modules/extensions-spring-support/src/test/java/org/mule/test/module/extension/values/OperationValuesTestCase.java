@@ -146,8 +146,76 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
-  public void pocActing() throws Exception {
-    ValueResult result = getValueResult("pocExample", "papapa");
-    assertThat(result.getFailure().isPresent(), is(true));
+  public void withBoundActingParameter() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    // Add assertion
   }
+
+  @Test
+  public void withBoundActingParameterField() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterField", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    // Add assertion
+  }
+  //
+  //  public void withTwoActingParameters(@OfValues(
+  //      value = WithTwoActingParametersValueProvider.class,
+  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field")}) String parameterWithValues,
+  //                                      String scalarActingParameter,
+  //                                      InputStream actingParameter) {}
+  //
+  //  public void withTwoBoundActingParameters(@OfValues(
+  //      value = WithTwoActingParametersValueProvider.class,
+  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field"),
+  //          @Binding(actingParameter = "scalarActingParameter", path = "anotherParameter")}) String parameterWithValues,
+  //                                           String anotherParameter,
+  //                                           InputStream actingParameter) {}
+  //
+  //
+  //  public void withBoundActingParameterToXmlTagContent(@OfValues(
+  //      value = WithRequiredParameterValueProvider.class,
+  //      bindings = {
+  //          @Binding(actingParameter = "requiredValue", path = "actingParameter.nested.xmlTag")}) String parameterWithValues,
+  //                                                      InputStream actingParameter) {}
+  //
+  //  public void withBoundActingParameterToXmlTagAtttribute(@OfValues(
+  //      value = WithRequiredParameterValueProvider.class,
+  //      bindings = {@Binding(actingParameter = "requiredValue",
+  //          path = "actingParameter.nested.xmlTag.@attribute")}) String parameterWithValues,
+  //                                                         InputStream actingParameter) {}
+  //
+  //  public void withFourBoundActingParametes(@OfValues(
+  //      value = WithFourActingParametersValueProvider.class,
+  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field1"),
+  //          @Binding(actingParameter = "anotherValue", path = "actingParameter.nested.field2"),
+  //          @Binding(actingParameter = "someValue", path = "actingParameter.nested.field.3"),
+  //          @Binding(actingParameter = "optionalValue", path = "actingParameter.anotherNested.field4")}) String parameterWithValues,
+  //                                           InputStream actingParameter) {}
+  //
+  //  public void withBoundActingParameterArray(@OfValues(
+  //      value = WithArrayParameterValueProvider.class,
+  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.jsonArray")}) String parameterWithValues,
+  //                                            InputStream actingParameter) {}
+  //
+  //  public void withPojoBoundActingParameter(@OfValues(
+  //      value = WithPojoParameterValueProvider.class,
+  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.pojoField")}) String parameterWithValues,
+  //                                           InputStream actingParameter) {}
+  //
+  //  public void withMapBoundActingParameter(@OfValues(
+  //      value = WithMapParameterValueProvider.class,
+  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.mapField")}) String parameterWithValues,
+  //                                          InputStream actingParameter) {}
+  //
+  //  // Test both defining pojo as an expression and in the dsl.
+  //  public void withPojoFieldBoundActingParameterField(@OfValues(
+  //      value = WithRequiredParameterValueProvider.class,
+  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.pojoId")}) String parameterWithValues,
+  //                                                     MyPojo actingParameter) {}
+  //
+  //  public void withBoundActingParameterEnum(@OfValues(
+  //      value = WithEnumParameterValueProvider.class,
+  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.enumField")}) String parameterWithValues,
+  //                                           InputStream actingParameter) {}
 }

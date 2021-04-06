@@ -91,7 +91,11 @@
         <values:with-error-value-provider errorCode="CUSTOM_ERROR"/>
     </flow>
 
-    <flow name="pocExample">
-        <values:poc-example complexParam="#[output application/json --- { 'field' : 'hola', 'anotherField' : 'chau'}]"/>
+    <flow name="withBoundActingParameter">
+        <values:with-bound-acting-parameter actingParameter="Acting parameter value"/>
+    </flow>
+
+    <flow name="withBoundActingParameterField">
+        <values:with-bound-acting-parameter-field actingParameter='#[output application/json --- { "field" : "Acting parameter value" }]'/>
     </flow>
 </mule>

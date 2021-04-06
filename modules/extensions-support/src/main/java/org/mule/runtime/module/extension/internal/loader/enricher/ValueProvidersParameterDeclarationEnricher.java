@@ -48,7 +48,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.ValueProv
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.ValueProviderFactoryModelPropertyBuilder;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
 import org.mule.runtime.module.extension.internal.value.OfValueInformation;
-
+import org.mule.sdk.api.annotation.binding.Binding;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -146,6 +146,10 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                Consumer<ValueProviderModel> valueProviderModelConsumer, Integer partOrder,
                                Map<String, String> containerParameterNames, String name,
                                List<ParameterDeclaration> allParameters) {
+    Map<String, String> bindingMap = new HashMap<>();
+    for (Binding binding : ofValueInformation.getBindings()) {
+      bindingMap.put(binding.actingParameter(), binding.path());
+    }
 
     ValueProviderFactoryModelPropertyBuilder propertyBuilder =
         ValueProviderFactoryModelProperty.builder(ofValueInformation.getValue());
@@ -155,7 +159,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     List<ExtensionParameter> resolverParameters = resolverClassWrapper.getParametersAnnotatedWith(Parameter.class);
 
     resolverParameters.forEach(param -> propertyBuilder
-        .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired()));
+        .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired(),
+                                 bindingMap.getOrDefault(param.getName(), param.getName())));
 
     Reference<Boolean> requiresConfiguration = new Reference<>(false);
     Reference<Boolean> requiresConnection = new Reference<>(false);
@@ -168,7 +173,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     paramDeclaration.addModelProperty(propertyBuilder.build());
 
     valueProviderModelConsumer
-        .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters),
+        .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters, bindingMap),
                                        requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
                                        partOrder,
                                        name, getValueProviderId(ofValueInformation.getValue())));
@@ -263,12 +268,15 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
 
   private List<ActingParameterModel> getActingParametersModel(List<ExtensionParameter> parameterDeclarations,
                                                               Map<String, String> parameterNames,
-                                                              List<ParameterDeclaration> allParameters) {
+                                                              List<ParameterDeclaration> allParameters,
+                                                              Map<String, String> bindings) {
+
     Map<String, Boolean> paramsInfo = parameterDeclarations.stream()
         .collect(toMap(param -> parameterNames.getOrDefault(param.getName(), param.getName()), ExtensionParameter::isRequired));
     return allParameters.stream()
         .filter(param -> paramsInfo.containsKey(param.getName()))
-        .map(param -> new ImmutableActingParameterModel(param.getName(), paramsInfo.get(param.getName())))
+        .map(param -> new ImmutableActingParameterModel(param.getName(), paramsInfo.get(param.getName()),
+                                                        bindings.getOrDefault(param.getName(), param.getName())))
         .collect(toList());
   }
 
@@ -303,9 +311,9 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                        componentType,
                                                        componentName));
     } else if (legacyAnnotation.isPresent()) {
-      return of(new OfValueInformation(legacyAnnotation.get().value(), legacyAnnotation.get().open()));
+      return of(new OfValueInformation(legacyAnnotation.get().value(), legacyAnnotation.get().open(), legacyAnnotation.get().bindings()));
     } else if (sdkAnnotation.isPresent()) {
-      return of(new OfValueInformation(sdkAnnotation.get().value(), sdkAnnotation.get().open()));
+      return of(new OfValueInformation(sdkAnnotation.get().value(), sdkAnnotation.get().open(), new Binding[0]));
     } else {
       return empty();
     }
@@ -327,9 +335,9 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                        componentType,
                                                        componentName));
     } else if (legacyAnnotation != null) {
-      return of(new OfValueInformation(legacyAnnotation.value(), legacyAnnotation.open()));
+      return of(new OfValueInformation(legacyAnnotation.value(), legacyAnnotation.open(), legacyAnnotation.bindings()));
     } else if (sdkAnnotation != null) {
-      return of(new OfValueInformation(sdkAnnotation.value(), sdkAnnotation.open()));
+      return of(new OfValueInformation(sdkAnnotation.value(), sdkAnnotation.open(), new Binding[0]));
     } else {
       return empty();
     }
