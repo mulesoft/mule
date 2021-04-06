@@ -21,11 +21,10 @@ import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
-import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 
 @Features({@Feature(ERROR_HANDLING), @Feature(MULE_DSL)})
-@Stories({@Story("Validations"), @Story(DSL_VALIDATION_STORY)})
+@Story(DSL_VALIDATION_STORY)
 public class SourceErrorMappingAnyNotRepeatedTestCase extends AbstractCoreValidationTestCase {
 
   @Override

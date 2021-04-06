@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.POLLING_SOURCE_LIMIT_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
@@ -138,11 +137,7 @@ public final class SourceConfigurer {
 
       if (sdkSource instanceof PollingSource) {
         ValueResolver<?> valueResolver = resolverSet.getResolvers().get(SCHEDULING_STRATEGY_PARAMETER_NAME);
-        if (valueResolver == null) {
-          if (!isLazyInitMode(properties)) {
-            throw new IllegalStateException("The scheduling strategy has not been configured");
-          }
-        } else {
+        if (valueResolver != null) {
           context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
           SchedulingStrategy scheduler = (SchedulingStrategy) valueResolver.resolve(context);
           sdkSource = new PollingSourceWrapper<>((PollingSource) sdkSource, scheduler,

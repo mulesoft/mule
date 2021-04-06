@@ -69,6 +69,7 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.util.BaseArtifactAst;
+import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResult;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
@@ -120,6 +121,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
@@ -363,11 +365,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   protected void validateArtifact(final ArtifactAst artifactAst) {
-    doValidateModel(artifactAst);
+    doValidateModel(artifactAst, v -> true);
   }
 
-  protected final void doValidateModel(ArtifactAst appModel) {
-    final ValidationResult validation = validate(appModel);
+  protected final void doValidateModel(ArtifactAst appModel, Predicate<Validation> validationsFilter) {
+    final ValidationResult validation = validate(appModel, validationsFilter);
 
     final Collection<ValidationResultItem> items = validation.getItems();
 
