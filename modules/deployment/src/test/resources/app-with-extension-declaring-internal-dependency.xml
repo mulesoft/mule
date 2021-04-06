@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:policy-dependency-injection="http://www.mulesoft.org/schema/mule/policy-dependency-injection"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/policy-dependency-injection http://www.mulesoft.org/schema/mule/policy-dependency-injection/current/mule-policy-dependency-injection.xsd">
+
+<!--    <policy-dependency-injection:config name="test" configurationParameter="non default value"/>-->
+
+    <flow name="main">
+        <scheduler>
+            <scheduling-strategy>
+                <fixed-frequency frequency="10000"/>
+            </scheduling-strategy>
+        </scheduler>
+        <set-payload value=""/>
+        <policy-dependency-injection:injection-check/>
+<!--        <policy-dependency-injection:check-explicit-configuration config-ref="test"/>-->
+<!--        <policy-dependency-injection:check-implicit-configuration />-->
+    </flow>
+</mule>

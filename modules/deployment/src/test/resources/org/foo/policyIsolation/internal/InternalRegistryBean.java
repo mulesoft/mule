@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.foo.withInternalDependency.internal;
+package org.foo.policyIsolation.internal;
 
 public class InternalRegistryBean {
 

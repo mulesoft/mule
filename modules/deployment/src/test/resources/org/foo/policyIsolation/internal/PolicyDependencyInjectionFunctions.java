@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.foo.withInternalDependency.internal;
+package org.foo.policyIsolation.internal;
 
 import javax.inject.Inject;
 
-public class WithInternalDependencyFunctions {
+public class PolicyDependencyInjectionFunctions {
 
     @Inject
     private InternalRegistryBean registryBean;

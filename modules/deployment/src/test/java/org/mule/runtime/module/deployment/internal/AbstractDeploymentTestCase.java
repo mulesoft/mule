@@ -267,7 +267,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File goodbyeExtensionV1JarFile;
 
   private static File helloExtensionV2JarFile;
-  protected static File extensionWithInternalDependencyJarFile;
+  protected static File policyDependencyInjectionExtensionJarFile;
+  protected static File policyConfigurationExtensionJarFile;
 
   protected static File loadsAppResourceCallbackClassFile;
   protected static File loadsAppResourceCallbackJarFile;
@@ -367,13 +368,18 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                                 getResourceFile("/org/foo/hello/HelloOperation.java"))
         .compile("mule-module-hello-2.0.0.jar", "2.0.0");
 
-    extensionWithInternalDependencyJarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/withInternalDependency/WithInternalDependencyExtension.java"),
-                   getResourceFile("/org/foo/withInternalDependency/WithInternalDependencyOperation.java"),
-                   getResourceFile("/org/foo/withInternalDependency/internal/InternalRegistryBean.java"),
-                   getResourceFile("/org/foo/withInternalDependency/internal/WithInternalDependencyFunctions.java"))
-        .including(getResourceFile("/org/foo/withInternalDependency/registry-bootstrap.properties"),
+    policyDependencyInjectionExtensionJarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/policyIsolation/PolicyDependencyInjectionExtension.java"),
+                   getResourceFile("/org/foo/policyIsolation/PolicyDependencyInjectionOperations.java"),
+                   getResourceFile("/org/foo/policyIsolation/internal/InternalRegistryBean.java"),
+                   getResourceFile("/org/foo/policyIsolation/internal/PolicyDependencyInjectionFunctions.java"))
+        .including(getResourceFile("/org/foo/policyIsolation/registry-bootstrap.properties"),
                    "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
+        .compile("mule-module-with-internal-dependency-4.0-SNAPSHOT.jar", "1.0.0");
+
+    policyConfigurationExtensionJarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/policyIsolation/PolicyConfigurationExtension.java"),
+                   getResourceFile("/org/foo/policyIsolation/PolicyConfigurationOperations.java"))
         .compile("mule-module-with-internal-dependency-4.0-SNAPSHOT.jar", "1.0.0");
 
     loadsAppResourceCallbackClassFile =
