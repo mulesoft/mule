@@ -55,7 +55,6 @@ import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.event.EventContext;
@@ -87,6 +86,7 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -98,6 +98,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
+
+import com.google.common.reflect.TypeToken;
 
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -113,8 +115,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-
-import com.google.common.reflect.TypeToken;
+import org.slf4j.MDC;
 
 
 @SmallTest
@@ -490,6 +491,17 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   @Test
+  public void operationExecutionHasCorrelationIdAndProcessorPathInMDC() throws MuleException {
+    String expectedCorrelationId = event.getCorrelationId();
+    String expectedProcessorPath = messageProcessor.getLocation().getLocation();
+
+    messageProcessor.process(event);
+    Map<String, String> mdc = ((TestOperationMessageProcessor) messageProcessor).getLastOperationExecutionMDC();
+    assertThat(mdc.get("correlationId"), is(expectedCorrelationId));
+    assertThat(mdc.get("processorPath"), is(expectedProcessorPath));
+  }
+
+  @Test
   public void cursorStreamProvidersAreManaged() throws Exception {
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     final InputStream inputStream = mock(InputStream.class);
@@ -547,6 +559,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   private static class TestOperationMessageProcessor extends OperationMessageProcessor {
 
 
+    private Map<String, String> lastOperationExecutionMDC;
+
     public TestOperationMessageProcessor(ExtensionModel extensionModel, OperationModel operationModel,
                                          ConfigurationProvider configurationProvider, String target, String targetValue,
                                          ResolverSet resolverSet, CursorProviderFactory cursorProviderFactory,
@@ -560,6 +574,17 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     @Override
     protected boolean honourOperationRetryPolicyOverride() {
       return true;
+    }
+
+    @Override
+    protected void executeOperation(ExecutionContextAdapter<OperationModel> operationContext,
+                                    CompletableComponentExecutor.ExecutorCallback callback) {
+      lastOperationExecutionMDC = MDC.getCopyOfContextMap();
+      super.executeOperation(operationContext, callback);
+    }
+
+    public Map<String, String> getLastOperationExecutionMDC() {
+      return lastOperationExecutionMDC;
     }
   }
 }
