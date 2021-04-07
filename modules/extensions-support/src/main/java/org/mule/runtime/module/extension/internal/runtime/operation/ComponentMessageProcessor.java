@@ -1085,14 +1085,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       return false;
     }
 
-    if (usesDynamicConfiguration()) {
-      return true;
-    } else {
-      Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
-      if (staticConfig.isPresent()) {
-        RetryPolicyTemplate resolvedRetryPolicyTemplate = getRetryPolicyTemplate(staticConfig);
-        return resolvedRetryPolicyTemplate.isEnabled() && resolvedRetryPolicyTemplate.isAsync();
-      }
+    Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
+    if (staticConfig.isPresent()) {
+      RetryPolicyTemplate resolvedRetryPolicyTemplate = getRetryPolicyTemplate(staticConfig);
+      return resolvedRetryPolicyTemplate.isEnabled() && resolvedRetryPolicyTemplate.isAsync();
     }
 
     return true;
