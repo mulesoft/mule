@@ -64,6 +64,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   private transient final FlowExceptionHandler exceptionHandler;
   private transient final CompletableFuture<Void> externalCompletion;
   private transient List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
+  private transient List<BiConsumer<CoreEvent, Throwable>> onBeforeResponseConsumerList = new ArrayList<>();
   private transient List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>(2);
   private transient List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
 
@@ -99,6 +100,10 @@ abstract class AbstractEventContext implements BaseEventContext {
   protected void initCompletionLists() {
     if (onCompletionConsumerList == null) {
       onResponseConsumerList = new ArrayList<>();
+    }
+
+    if (onCompletionConsumerList == null) {
+      onBeforeResponseConsumerList = new ArrayList<>();
     }
 
     if (onCompletionConsumerList == null) {
@@ -195,6 +200,12 @@ abstract class AbstractEventContext implements BaseEventContext {
     responsePublisher.ifComputed(rp -> rp.result = result);
 
     state = STATE_RESPONSE;
+
+    for (BiConsumer<CoreEvent, Throwable> onBeforeResponseConsumer : onBeforeResponseConsumerList) {
+      signalConsumerSilently(onBeforeResponseConsumer);
+    }
+    onBeforeResponseConsumerList.clear();
+
     for (BiConsumer<CoreEvent, Throwable> onResponseConsumer : onResponseConsumerList) {
       signalConsumerSilently(onResponseConsumer);
     }
@@ -326,6 +337,15 @@ abstract class AbstractEventContext implements BaseEventContext {
       signalConsumerSilently(consumer);
     } else {
       onResponseConsumerList.add(requireNonNull(consumer));
+    }
+  }
+
+  @Override
+  public synchronized void onBeforeResponse(BiConsumer<CoreEvent, Throwable> consumer) {
+    if (state >= STATE_RESPONSE) {
+      signalConsumerSilently(consumer);
+    } else {
+      onBeforeResponseConsumerList.add(requireNonNull(consumer));
     }
   }
 
