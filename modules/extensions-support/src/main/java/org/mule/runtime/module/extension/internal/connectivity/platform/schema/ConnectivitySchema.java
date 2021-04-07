@@ -47,7 +47,7 @@ public class ConnectivitySchema {
      * @param version    a valid Maven {@code version}
      * @return {@code this} builder
      */
-    public Builder setGav(String groupId, String artifactId, String version) {
+    public Builder gav(String groupId, String artifactId, String version) {
       product.groupId = groupId;
       product.artifactId = artifactId;
       product.version = version;
@@ -63,7 +63,7 @@ public class ConnectivitySchema {
      * @param authenticationType the authentication type id
      * @return {@code this} builder
      */
-    public Builder setAuthenticationType(String authenticationType) {
+    public Builder authenticationType(String authenticationType) {
       product.labels.put("type", authenticationType);
       return this;
     }
@@ -74,7 +74,7 @@ public class ConnectivitySchema {
      * @param system the system name
      * @return {@code this} builder
      */
-    public Builder setSystem(String system) {
+    public Builder system(String system) {
       product.labels.put("system", system);
       return this;
     }
@@ -85,7 +85,7 @@ public class ConnectivitySchema {
      * @param connectionProviderName a ConnectionProvider name
      * @return {@code this} builder
      */
-    public Builder setConnectionProviderName(String connectionProviderName) {
+    public Builder connectionProviderName(String connectionProviderName) {
       product.labels.put("connectionProvider", connectionProviderName);
       return this;
     }
@@ -97,7 +97,7 @@ public class ConnectivitySchema {
      * @param value the label value
      * @return {@code this} builder
      */
-    public Builder addLabel(String key, String value) {
+    public Builder withLabel(String key, String value) {
       product.labels.put(key, value);
       return this;
     }
@@ -143,7 +143,7 @@ public class ConnectivitySchema {
      * @param classTerm the connectivity class term
      * @return {@code this} builder
      */
-    public Builder setConnectionClassTerm(String classTerm) {
+    public Builder connectionClassTerm(String classTerm) {
       connectionNode.setClassTerm(classTerm);
       return this;
     }
@@ -156,7 +156,7 @@ public class ConnectivitySchema {
      *                           described
      * @return {@code this} builder
      */
-    public Builder addParameter(String name, Consumer<ConnectionParameterConfigurer> configurerConsumer) {
+    public Builder withParameter(String name, Consumer<ConnectionParameterConfigurer> configurerConsumer) {
       ConnectionParameterConfigurer configurer = new ConnectionParameterConfigurer();
       configurerConsumer.accept(configurer);
       connectionNode.getMappings().put(name, configurer.product);
