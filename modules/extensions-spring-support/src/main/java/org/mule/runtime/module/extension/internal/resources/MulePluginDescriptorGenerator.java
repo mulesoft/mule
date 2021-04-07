@@ -32,15 +32,14 @@ import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.resources.manifest.ClassloaderClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.DefaultClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedArtifactsCollector;
 import org.mule.runtime.module.extension.internal.resources.manifest.ProcessingEnvironmentClassPackageFinder;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 
-import javax.annotation.processing.ProcessingEnvironment;
-
 import java.util.Optional;
+
+import javax.annotation.processing.ProcessingEnvironment;
 
 /**
  * A {@link GeneratedResourceFactory} which generates a {@link MulePluginModel} and stores it in {@code JSON} format
