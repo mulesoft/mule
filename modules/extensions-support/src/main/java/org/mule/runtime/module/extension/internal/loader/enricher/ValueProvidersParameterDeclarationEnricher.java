@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -34,6 +35,7 @@ import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.values.ValuePart;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.model.parameter.ImmutableActingParameterModel;
@@ -45,6 +47,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.ValueProviderFactoryModelPropertyBuilder;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
+import org.mule.runtime.module.extension.internal.value.OfValueInformation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -57,8 +60,9 @@ import java.util.function.Consumer;
 
 /**
  * {@link DeclarationEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for Source, Operation,
- * Configuration and Connection Provider Parameters and ParameterGroups annotated with {@link OfValues}. If a parameter or
- * parameter group is annotated, this one will have a related {@link ValueProvider}
+ * Configuration and Connection Provider Parameters and ParameterGroups annotated with {@link OfValues} or
+ * {@link org.mule.sdk.api.annotation.values.OfValues}. If a parameter or parameter group is annotated, this one will have a
+ * related {@link org.mule.sdk.api.values.Value}
  *
  * @since 4.0
  */
@@ -74,54 +78,58 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
 
         @Override
         public void onSource(SourceDeclaration declaration) {
-          enrichContainerModel(declaration);
+          enrichContainerModel(declaration, declaration.getName(), "source");
         }
 
         @Override
         public void onOperation(OperationDeclaration declaration) {
-          enrichContainerModel(declaration);
+          enrichContainerModel(declaration, declaration.getName(), "operation");
         }
 
         @Override
         protected void onConfiguration(ConfigurationDeclaration declaration) {
-          enrichContainerModel(declaration);
+          enrichContainerModel(declaration, declaration.getName(), "configuration");
         }
 
         @Override
         protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
-          enrichContainerModel(declaration);
+          enrichContainerModel(declaration, declaration.getName(), "connection provider");
         }
       }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
     }
   }
 
   /**
-   * The method will look for parameters of the given {@link ParameterizedDeclaration declaration} and is a parameter or parameter
-   * group annotated with {@link OfValues} if found, a {@link ValueProviderModel} will be added to this element to communicate
-   * that values can be provided.
+   * This method will look for parameters of the given {@link ParameterizedDeclaration declaration} and, if a parameter or
+   * parameter group annotated with {@link OfValues} or {@link org.mule.sdk.api.annotation.values.OfValues} is found, a
+   * {@link ValueProviderModel} will be added to this element to communicate that values can be provided.
    * <p>
    * Also the {@link ParameterDeclaration parameters} of the {@link ParameterizedDeclaration declaration} will be enriched.
    *
    * @param containerDeclaration declaration to introspect their parameters
    */
-  private void enrichContainerModel(ParameterizedDeclaration<?> containerDeclaration) {
+  private void enrichContainerModel(ParameterizedDeclaration<?> containerDeclaration, String componentName,
+                                    String componentType) {
     List<ParameterDeclaration> allParameters = containerDeclaration.getAllParameters();
 
     Map<String, String> parameterNames = getContainerParameterNames(allParameters);
-    Map<ParameterGroupDeclaration, OfValues> dynamicGroupOptions =
-        introspectParameterGroups(containerDeclaration.getParameterGroups());
-    Map<ParameterDeclaration, OfValues> dynamicOptions = introspectParameters(allParameters);
 
-    dynamicOptions.forEach((paramDeclaration, resolverClass) -> enrichParameter(resolverClass,
-                                                                                paramDeclaration,
-                                                                                paramDeclaration::setValueProviderModel,
-                                                                                1,
-                                                                                parameterNames, paramDeclaration.getName(),
-                                                                                allParameters));
+    Map<ParameterGroupDeclaration, OfValueInformation> dynamicGroupOptions =
+        introspectParameterGroups(containerDeclaration.getParameterGroups(), componentName, componentType);
+
+    Map<ParameterDeclaration, OfValueInformation> dynamicOptions =
+        introspectParameters(allParameters, componentName, componentType);
+
+    dynamicOptions.forEach((paramDeclaration, ofValueInformation) -> enrichParameter(ofValueInformation,
+                                                                                     paramDeclaration,
+                                                                                     paramDeclaration::setValueProviderModel,
+                                                                                     1,
+                                                                                     parameterNames, paramDeclaration.getName(),
+                                                                                     allParameters));
 
     dynamicGroupOptions
-        .forEach((paramGroupDeclaration, resolverClass) -> getParts(paramGroupDeclaration)
-            .forEach((paramDeclaration, order) -> enrichParameter(resolverClass, paramDeclaration,
+        .forEach((paramGroupDeclaration, ofValueInformation) -> getParts(paramGroupDeclaration)
+            .forEach((paramDeclaration, order) -> enrichParameter(ofValueInformation, paramDeclaration,
                                                                   paramDeclaration::setValueProviderModel, order, parameterNames,
                                                                   paramGroupDeclaration.getName(), allParameters)));
   }
@@ -129,20 +137,21 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
   /**
    * Enriches a parameter that has an associated {@link ValueProvider}
    *
-   * @param resolverClass           the class of the {@link ValueProvider}
+   * @param ofValueInformation      encapsulation of a {@link ValueProvider} or a {@link org.mule.sdk.api.values.ValueProvider}
    * @param paramDeclaration        {@link ParameterDeclaration} or {@link ParameterGroupDeclaration} paramDeclaration
    * @param containerParameterNames parameters container's names
    */
-  private void enrichParameter(OfValues resolverClass,
+  private void enrichParameter(OfValueInformation ofValueInformation,
                                BaseDeclaration paramDeclaration,
                                Consumer<ValueProviderModel> valueProviderModelConsumer, Integer partOrder,
                                Map<String, String> containerParameterNames, String name,
                                List<ParameterDeclaration> allParameters) {
 
     ValueProviderFactoryModelPropertyBuilder propertyBuilder =
-        ValueProviderFactoryModelProperty.builder(resolverClass.value());
+        ValueProviderFactoryModelProperty.builder(ofValueInformation.getValue());
     ParameterizableTypeWrapper resolverClassWrapper =
-        new ParameterizableTypeWrapper(resolverClass.value(), new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
+        new ParameterizableTypeWrapper(ofValueInformation.getValue(),
+                                       new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
     List<ExtensionParameter> resolverParameters = resolverClassWrapper.getParametersAnnotatedWith(Parameter.class);
 
     resolverParameters.forEach(param -> propertyBuilder
@@ -160,8 +169,9 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
 
     valueProviderModelConsumer
         .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters),
-                                       requiresConfiguration.get(), requiresConnection.get(), resolverClass.open(), partOrder,
-                                       name, getValueProviderId(resolverClass.value())));
+                                       requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
+                                       partOrder,
+                                       name, getValueProviderId(ofValueInformation.getValue())));
   }
 
   /**
@@ -204,16 +214,17 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
 
   /**
    * Given a list of {@link ParameterDeclaration}, introspect it and finds all the considered parameters with an associated
-   * {@link ValueProvider}
+   * {@link ValueProvider} or {@link org.mule.sdk.api.values.ValueProvider}
    *
    * @param parameters parameters to introspect
    * @return a Map containing all the {@link ParameterDeclaration} with their correspondent {@link ValueProvider}
    */
-  private Map<ParameterDeclaration, OfValues> introspectParameters(List<ParameterDeclaration> parameters) {
+  private Map<ParameterDeclaration, OfValueInformation> introspectParameters(List<ParameterDeclaration> parameters,
+                                                                             String componentName, String componentType) {
 
-    Map<ParameterDeclaration, OfValues> optionResolverEnabledParameters = new HashMap<>();
+    Map<ParameterDeclaration, OfValueInformation> optionResolverEnabledParameters = new HashMap<>();
 
-    parameters.forEach(param -> getAnnotation(param, OfValues.class)
+    parameters.forEach(param -> getOfValueInformation(param, componentName, componentType)
         .ifPresent(optionAnnotation -> optionResolverEnabledParameters.put(param, optionAnnotation)));
 
     return optionResolverEnabledParameters;
@@ -221,24 +232,23 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
 
   /**
    * Given a list of {@link ParameterGroupDeclaration}, introspect it and finds all the considered parameters with an associated
-   * {@link ValueProvider}
+   * {@link ValueProvider} or {@link org.mule.sdk.api.values.ValueProvider}
    *
    * @param parameterGroups parameter groups to introspect
    * @return a Map containing all the {@link ParameterGroupDeclaration} with their correspondent {@link ValueProvider}
    */
-  private Map<ParameterGroupDeclaration, OfValues> introspectParameterGroups(List<ParameterGroupDeclaration> parameterGroups) {
-    Map<ParameterGroupDeclaration, OfValues> optionResolverEnabledParameters = new HashMap<>();
+  private Map<ParameterGroupDeclaration, OfValueInformation> introspectParameterGroups(List<ParameterGroupDeclaration> parameterGroups,
+                                                                                       String componentName,
+                                                                                       String componentType) {
+    Map<ParameterGroupDeclaration, OfValueInformation> optionResolverEnabledParameters = new HashMap<>();
 
     parameterGroups
         .forEach(paramGroup -> paramGroup.getModelProperty(ParameterGroupModelProperty.class)
             .ifPresent(modelProperty -> {
-
               AnnotatedElement container = modelProperty.getDescriptor().getContainer();
               if (container != null) {
-                OfValues annotation = container.getAnnotation(OfValues.class);
-                if (annotation != null) {
-                  optionResolverEnabledParameters.put(paramGroup, annotation);
-                }
+                getOfValueInformation(paramGroup, container, componentName, componentType)
+                    .ifPresent(v -> optionResolverEnabledParameters.put(paramGroup, v));
               }
             }));
 
@@ -278,4 +288,51 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     }
     return parameterNames;
   }
+
+  private Optional<OfValueInformation> getOfValueInformation(ParameterDeclaration parameterDeclaration, String componentName,
+                                                             String componentType) {
+    Optional<OfValues> legacyAnnotation = getAnnotation(parameterDeclaration, OfValues.class);
+    Optional<org.mule.sdk.api.annotation.values.OfValues> sdkAnnotation =
+        getAnnotation(parameterDeclaration, org.mule.sdk.api.annotation.values.OfValues.class);
+
+    if (legacyAnnotation.isPresent() && sdkAnnotation.isPresent()) {
+      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on parameter %s of %s %s",
+                                                       OfValues.class.getName(),
+                                                       org.mule.sdk.api.annotation.values.OfValues.class.getName(),
+                                                       parameterDeclaration.getName(),
+                                                       componentType,
+                                                       componentName));
+    } else if (legacyAnnotation.isPresent()) {
+      return of(new OfValueInformation(legacyAnnotation.get().value(), legacyAnnotation.get().open()));
+    } else if (sdkAnnotation.isPresent()) {
+      return of(new OfValueInformation(sdkAnnotation.get().value(), sdkAnnotation.get().open()));
+    } else {
+      return empty();
+    }
+  }
+
+  private Optional<OfValueInformation> getOfValueInformation(ParameterGroupDeclaration parameterGroupDeclaration,
+                                                             AnnotatedElement annotatedElement,
+                                                             String componentName,
+                                                             String componentType) {
+    OfValues legacyAnnotation = annotatedElement.getAnnotation(OfValues.class);
+    org.mule.sdk.api.annotation.values.OfValues sdkAnnotation =
+        annotatedElement.getAnnotation(org.mule.sdk.api.annotation.values.OfValues.class);
+
+    if (legacyAnnotation != null && sdkAnnotation != null) {
+      throw new IllegalModelDefinitionException(format("Annotations %s and %s are both present at the same time on parameter group %s of %s %s",
+                                                       OfValues.class.getName(),
+                                                       org.mule.sdk.api.annotation.values.OfValues.class.getName(),
+                                                       parameterGroupDeclaration.getName(),
+                                                       componentType,
+                                                       componentName));
+    } else if (legacyAnnotation != null) {
+      return of(new OfValueInformation(legacyAnnotation.value(), legacyAnnotation.open()));
+    } else if (sdkAnnotation != null) {
+      return of(new OfValueInformation(sdkAnnotation.value(), sdkAnnotation.open()));
+    } else {
+      return empty();
+    }
+  }
+
 }

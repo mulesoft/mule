@@ -35,7 +35,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
   private final Field connectionField;
   private final Field configField;
-  private final Class<? extends ValueProvider> valuesProvider;
+  private final Class<?> valuesProvider;
   private final List<InjectableParameterInfo> injectableParameters;
 
   /**
@@ -45,7 +45,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
    * @param connectionField      the field inside the {@link ValueProvider} which is considered as a connection
    * @param configField          the field inside the {@link ValueProvider} which is considered as a configuration
    */
-  private ValueProviderFactoryModelProperty(Class<? extends ValueProvider> valueProvider,
+  private ValueProviderFactoryModelProperty(Class<?> valueProvider,
                                             List<InjectableParameterInfo> injectableParameters,
                                             Field connectionField,
                                             Field configField) {
@@ -65,7 +65,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
    *
    * @return a new {@link ValueProviderFactoryModelPropertyBuilder}
    */
-  public static ValueProviderFactoryModelPropertyBuilder builder(Class<? extends ValueProvider> valuesProvider) {
+  public static ValueProviderFactoryModelPropertyBuilder builder(Class valuesProvider) {
     return new ValueProviderFactoryModelPropertyBuilder(valuesProvider);
   }
 
@@ -88,7 +88,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
   /**
    * @return the class of the {@link ValueProvider} implementation
    */
-  public Class<? extends ValueProvider> getValueProvider() {
+  public Class<?> getValueProvider() {
     return valuesProvider;
   }
 
@@ -137,12 +137,12 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
    */
   public static class ValueProviderFactoryModelPropertyBuilder {
 
-    private final Class<? extends ValueProvider> dynamicOptionsResolver;
+    private final Class<?> dynamicOptionsResolver;
     private final List<InjectableParameterInfo> injectableParameters;
     private Field connectionField;
     private Field configField;
 
-    ValueProviderFactoryModelPropertyBuilder(Class<? extends ValueProvider> dynamicOptionsResolver) {
+    ValueProviderFactoryModelPropertyBuilder(Class<?> dynamicOptionsResolver) {
       this.dynamicOptionsResolver = dynamicOptionsResolver;
       this.injectableParameters = new ArrayList<>();
     }

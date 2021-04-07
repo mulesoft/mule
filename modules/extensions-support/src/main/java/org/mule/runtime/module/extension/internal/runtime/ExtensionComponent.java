@@ -78,7 +78,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderMediator;
@@ -91,6 +90,7 @@ import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessag
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.sdk.api.data.sample.SampleDataException;
+import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.util.List;
 import java.util.Optional;
@@ -423,29 +423,34 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * {@inheritDoc}
    */
   @Override
-  public Set<Value> getValues(String parameterName) throws ValueResolvingException {
+  public Set<Value> getValues(String parameterName) throws org.mule.runtime.extension.api.values.ValueResolvingException {
+    // TODO: MULE-19298 - throws org.mule.sdk.api.values.ValueResolvingException
     try {
-      return runWithResolvingContext(context -> withContextClassLoader(classLoader,
-                                                                       () -> getValueProviderMediator()
-                                                                           .getValues(parameterName,
-                                                                                      getParameterValueResolver(),
-                                                                                      (CheckedSupplier<Object>) () -> context
-                                                                                          .getConnection().orElse(null),
-                                                                                      (CheckedSupplier<Object>) () -> context
-                                                                                          .getConfig().orElse(null),
-                                                                                      context.getConnectionProvider()
-                                                                                          .orElse(null))));
+      return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getValueProviderMediator().getValues(
+                                                                                                                               parameterName,
+                                                                                                                               getParameterValueResolver(),
+                                                                                                                               (CheckedSupplier<Object>) () -> context
+                                                                                                                                   .getConnection()
+                                                                                                                                   .orElse(null),
+                                                                                                                               (CheckedSupplier<Object>) () -> context
+                                                                                                                                   .getConfig()
+                                                                                                                                   .orElse(null),
+                                                                                                                               context
+                                                                                                                                   .getConnectionProvider()
+                                                                                                                                   .orElse(null))));
     } catch (MuleRuntimeException e) {
       Throwable rootException = getRootException(e);
-      if (rootException instanceof ValueResolvingException) {
-        throw (ValueResolvingException) rootException;
+      if (rootException instanceof org.mule.runtime.extension.api.values.ValueResolvingException) {
+        throw (org.mule.runtime.extension.api.values.ValueResolvingException) rootException;
       } else {
-        throw new ValueResolvingException("An unknown error occurred trying to resolve values. " + e.getCause().getMessage(),
-                                          UNKNOWN, e);
+        throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
+            + e.getCause().getMessage(),
+                                                                                UNKNOWN, e);
       }
     } catch (Exception e) {
-      throw new ValueResolvingException("An unknown error occurred trying to resolve values. " + e.getCause().getMessage(),
-                                        UNKNOWN, e);
+      throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
+          + e.getCause().getMessage(),
+                                                                              UNKNOWN, e);
     }
   }
 

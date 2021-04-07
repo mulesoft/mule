@@ -293,12 +293,10 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   public Set<Value> getConnectionValues(String parameterName) throws ValueResolvingException {
     return valuesWithClassLoader(() -> {
       ConnectionProviderModel connectionProviderModel = getConnectionProviderModel()
-          .orElseThrow(() -> new ValueResolvingException(
-                                                         "Internal Error. Unable to resolve values because the service is unable to get the connection model",
+          .orElseThrow(() -> new ValueResolvingException("Internal Error. Unable to resolve values because the service is unable to get the connection model",
                                                          UNKNOWN));
       ResolverSet resolverSet = ((Optional<ResolverSet>) connectionProviderResolver.getResolverSet())
-          .orElseThrow(() -> new ValueResolvingException(
-                                                         "Internal Error. Unable to resolve values because of the service is unable to retrieve connection parameters",
+          .orElseThrow(() -> new ValueResolvingException("Internal Error. Unable to resolve values because of the service is unable to retrieve connection parameters",
                                                          UNKNOWN));
 
       return new ValueProviderMediator<>(connectionProviderModel,

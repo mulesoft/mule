@@ -6,19 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.setValueIntoField;
 import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILURE;
+
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.values.ValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.sdk.api.values.ValueProvider;
+import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -61,10 +63,10 @@ public class ValueProviderFactory {
   }
 
   ValueProvider createValueProvider() throws ValueResolvingException {
-    Class<? extends ValueProvider> resolverClass = factoryModelProperty.getValueProvider();
+    Class<?> resolverClass = factoryModelProperty.getValueProvider();
 
     try {
-      ValueProvider resolver = instantiateClass(resolverClass);
+      Object resolver = instantiateClass(resolverClass);
       initialiseIfNeeded(resolver, true, muleContext);
 
       injectValueProviderFields(resolver);
@@ -92,7 +94,7 @@ public class ValueProviderFactory {
         }
         setValueIntoField(resolver, configurationSupplier.get(), configField);
       }
-      return resolver;
+      return adaptResolver(resolver);
     } catch (ValueResolvingException e) {
       throw e;
     } catch (Exception e) {
@@ -100,7 +102,7 @@ public class ValueProviderFactory {
     }
   }
 
-  private void injectValueProviderFields(ValueProvider resolver) throws ValueResolvingException {
+  private void injectValueProviderFields(Object resolver) throws ValueResolvingException {
     List<String> missingParameters = new ArrayList<>();
     for (InjectableParameterInfo injectableParam : factoryModelProperty.getInjectableParameters()) {
       Object parameterValue = null;
@@ -125,4 +127,19 @@ public class ValueProviderFactory {
           + missingParameters, MISSING_REQUIRED_PARAMETERS);
     }
   }
+
+  private ValueProvider adaptResolver(Object resolverObject) throws ValueResolvingException {
+    if (resolverObject instanceof ValueProvider) {
+      return (ValueProvider) resolverObject;
+    } else if (resolverObject instanceof org.mule.runtime.extension.api.values.ValueProvider) {
+      return new SdkValueProviderAdapter((org.mule.runtime.extension.api.values.ValueProvider) resolverObject);
+    } else {
+      throw new ValueResolvingException(format("An error occurred trying to create a ValueProvider: %s should implement %s or %s",
+                                               resolverObject.getClass().getName(),
+                                               ValueProvider.class.getName(),
+                                               org.mule.sdk.api.values.ValueProvider.class.getName()),
+                                        UNKNOWN);
+    }
+  }
+
 }

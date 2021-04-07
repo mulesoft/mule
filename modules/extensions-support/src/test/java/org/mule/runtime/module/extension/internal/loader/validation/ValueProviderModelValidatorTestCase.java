@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -40,6 +41,7 @@ import org.mule.tck.size.SmallTest;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
