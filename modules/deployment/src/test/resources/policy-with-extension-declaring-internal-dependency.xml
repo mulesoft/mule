@@ -7,15 +7,11 @@
       http://www.mulesoft.org/schema/mule/test-policy http://www.mulesoft.org/schema/mule/test-policy/current/mule-test-policy.xsd
       http://www.mulesoft.org/schema/mule/policy-dependency-injection http://www.mulesoft.org/schema/mule/policy-dependency-injection/current/mule-policy-dependency-injection.xsd">
 
-<!--    <policy-dependency-injection:config name="test" configurationParameter="non default value"/>-->
-
     <test-policy:proxy name="policy-dependency-injection-extension">
         <test-policy:operation>
                 <test-policy:execute-next/>
                 <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
                 <policy-dependency-injection:injection-check/>
-<!--                <policy-dependency-injection:check-explicit-configuration config-ref="test"/>-->
-<!--                <policy-dependency-injection:check-implicit-configuration/>-->
         </test-policy:operation>
     </test-policy:proxy>
 </mule>

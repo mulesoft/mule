@@ -158,8 +158,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   }
 
   /**
-   * Defers the creation of the {@link ExtensionManagerFactory} until the MuleContext is available in order to apply the
-   * {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} feature flag.
+   * {@link ExtensionManagerFactory} that defers the decision of the {@link ExtensionManager} implementation until the MuleContext
+   * is available, in order to apply the {@link MuleRuntimeFeature.ENABLE_POLICY_ISOLATION} feature flag.
    *
    * @return {@link ExtensionManagerFactory} instance.
    */
@@ -231,7 +231,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   @Override
   public void initialise() throws InitialisationException {
-
     if (policyInstance == null && policyContext == null) {
       initPolicyContext();
     }
