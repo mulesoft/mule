@@ -95,9 +95,10 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
         componentBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
     Optional<ValueProviderCacheId> declarationBasedId =
         elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(), parameterName);
+    Optional<ValueProviderCacheId> astId =
+        componentAstBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
 
-    // TODO: ADD THIS CHECK MULE-18636
-    // checkIdsAreEqual(astId, dslElementId);
+    checkIdsAreEqual(astId, dslElementId);
     checkIdsAreEqual(dslElementId, componentBasedId);
     checkIdsAreEqual(componentBasedId, declarationBasedId);
 

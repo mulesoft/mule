@@ -12,7 +12,7 @@ import static java.util.Optional.of;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeHashFor;
+import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeIdFor;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.getSourceElementName;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.resolveConfigName;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
@@ -23,6 +23,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
@@ -87,7 +88,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     return containerComponent.getModel(ParameterizedModel.class)
         .map(parameterizedModel -> containerComponent.getParameters()
             .stream()
-            .map(p -> new ParameterModelInformation(p))
+            .map(ParameterModelInformation::new)
             .collect(toMap(i -> i.getParameterModel().getName(), identity())));
   }
 
@@ -202,8 +203,9 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
   private List<ValueProviderCacheId> resolveActingParameterIds(ComponentAst containerComponent,
                                                                ValueProviderModel valueProviderModel,
                                                                Map<String, ParameterModelInformation> parameterModelsInformation) {
-    return valueProviderModel.getActingParameters()
+    return valueProviderModel.getParameters()
         .stream()
+        .map(ActingParameterModel::getName)
         .filter(parameterModelsInformation::containsKey)
         .map(ap -> resolveParameterId(containerComponent, parameterModelsInformation.get(ap).getParameterAst()))
         .collect(toList());
@@ -211,9 +213,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
 
   private ValueProviderCacheId resolveParameterId(ComponentAst containerComponent,
                                                   ComponentParameterAst componentParameterAst) {
-    return aValueProviderCacheId(fromElementWithName("param:"
-        + sourceElementNameFromSimpleValue(containerComponent, componentParameterAst))
-            .withHashValue(computeHashFor(componentParameterAst)));
+    return computeIdFor(containerComponent, componentParameterAst);
   }
 
   private class ParameterModelInformation {
@@ -233,5 +233,6 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     }
 
   }
+
 
 }

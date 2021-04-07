@@ -9,6 +9,10 @@ package org.mule.runtime.config.api.dsl.model.metadata;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
+import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -16,6 +20,7 @@ import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 
 import java.util.Collection;
@@ -61,21 +66,92 @@ public class ComponentBasedIdHelper {
     return elementModel.getRawParameterValue(CONFIG_ATTRIBUTE_NAME);
   }
 
+  /**
+   * @deprecated Use {@link ComponentBasedIdHelper#computeIdFor(ComponentAst, ComponentParameterAst)} and get the value.
+   */
+  @Deprecated
   public static int computeHashFor(ComponentParameterAst componentParameterAst) {
-    return ParameterVisitorFunctions.computeHashFor(componentParameterAst);
+    return DeprecatedParameterVisitorFunctions.computeHashFor(componentParameterAst);
+  }
+
+  static ValueProviderCacheId computeIdFor(ComponentAst containerComponent,
+                                           ComponentParameterAst componentParameterAst) {
+    return ParameterVisitorFunctions.computeIdFor(containerComponent, componentParameterAst);
   }
 
   private static class ParameterVisitorFunctions {
 
+    private static ValueProviderCacheId computeIdFor(ComponentAst containerComponent, ComponentParameterAst parameter) {
+      return aValueProviderCacheId(new ParameterVisitorFunctions(containerComponent, parameter).idBuilder);
+    }
+
+    private static ValueProviderCacheId computeIdFor(ComponentAst componentAst) {
+      return aValueProviderCacheId(new ParameterVisitorFunctions(componentAst).idBuilder);
+    }
+
+    private ValueProviderCacheId.ValueProviderCacheIdBuilder idBuilder;
+    private final Function<String, Void> leftFunction = this::hashForLeft;
+    private final Function<Object, Void> rightFunction = this::hashForRight;
+
+    private ParameterVisitorFunctions(ComponentAst containerComponent, ComponentParameterAst parameterAst) {
+      String name = parameterAst
+          .getGenerationInformation()
+          .getSyntax()
+          .map(s -> {
+            if (isEmpty(s.getElementName())) {
+              return s.getAttributeName();
+            }
+            return s.getPrefix() + ":" + s.getElementName();
+          })
+          .orElse(sourceElementNameFromSimpleValue(containerComponent, parameterAst));
+      this.idBuilder = fromElementWithName(name).withHashValueFrom(name);
+      parameterAst.getValue().reduce(leftFunction, rightFunction);
+    }
+
+    private ParameterVisitorFunctions(ComponentAst component) {
+      String name = component.getIdentifier().toString();
+      this.idBuilder = fromElementWithName(name).withHashValueFrom(name);
+      this.idBuilder.containing(component.getParameters().stream().map(p -> computeIdFor(component, p)).collect(toList()));
+    }
+
+    private Void hashForLeft(String s) {
+      this.idBuilder.withHashValueFrom(s);
+      return null;
+    }
+
+    private Void hashForRight(Object o) {
+      if (o instanceof Collection) {
+        final Collection<ComponentAst> collection = (Collection<ComponentAst>) o;
+        this.idBuilder.containing(
+                                  collection.stream()
+                                      .map(ParameterVisitorFunctions::computeIdFor)
+                                      .collect(toList()));
+      } else if (o instanceof ComponentAst) {
+        final ComponentAst c = (ComponentAst) o;
+        this.idBuilder.containing(c.getParameters()
+            .stream()
+            .sorted(comparing(p -> p.getModel().getName()))
+            .map(p -> computeIdFor(c, p))
+            .collect(toList()));
+      } else {
+        this.idBuilder.withHashValueFrom(o.toString());
+      }
+      return null;
+    }
+  }
+
+  @Deprecated
+  private static class DeprecatedParameterVisitorFunctions {
+
     private static int computeHashFor(ComponentParameterAst parameter) {
-      return hash(new ParameterVisitorFunctions(parameter).hashBuilder.toString());
+      return hash(new DeprecatedParameterVisitorFunctions(parameter).hashBuilder.toString());
     }
 
     private StringBuilder hashBuilder = new StringBuilder();
     private final Function<String, Void> leftFunction = this::hashForLeft;
     private final Function<Object, Void> rightFunction = this::hashForRight;
 
-    private ParameterVisitorFunctions(ComponentParameterAst startingParameter) {
+    private DeprecatedParameterVisitorFunctions(ComponentParameterAst startingParameter) {
       startingParameter.getValue().reduce(leftFunction, rightFunction);
     }
 

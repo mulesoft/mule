@@ -52,6 +52,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
@@ -80,6 +81,7 @@ import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
 import org.mule.runtime.extension.api.model.config.ImmutableConfigurationModel;
 import org.mule.runtime.extension.api.model.connection.ImmutableConnectionProviderModel;
 import org.mule.runtime.extension.api.model.operation.ImmutableOperationModel;
+import org.mule.runtime.extension.api.model.parameter.ImmutableActingParameterModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterGroupModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
@@ -217,13 +219,23 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(valueProviderModel.getProviderName()).thenReturn(VALUE_PROVIDER_NAME);
     when(valueProviderModel.getProviderId()).thenReturn(VALUE_PROVIDER_ID);
     when(valueProviderModel.getActingParameters()).thenReturn(asList(ACTING_PARAMETER_NAME, PARAMETER_IN_GROUP_NAME));
+
+    ActingParameterModel actingParameterActingModel = new ImmutableActingParameterModel(ACTING_PARAMETER_NAME, true);
+    ActingParameterModel parameterInGroupActingModel = new ImmutableActingParameterModel(PARAMETER_IN_GROUP_NAME, true);
+
+    when(valueProviderModel.getParameters()).thenReturn(asList(actingParameterActingModel, parameterInGroupActingModel));
     when(valueProviderModel.requiresConfiguration()).thenReturn(false);
     when(valueProviderModel.requiresConnection()).thenReturn(false);
 
     when(complexValueProviderModel.getPartOrder()).thenReturn(0);
     when(complexValueProviderModel.getProviderName()).thenReturn(COMPLEX_VALUE_PROVIDER_NAME);
     when(complexValueProviderModel.getProviderId()).thenReturn(COMPLEX_VALUE_PROVIDER_ID);
-    when(complexValueProviderModel.getActingParameters()).thenReturn(asList(COMPLEX_ACTING_PARAMETER_NAME));
+
+    ActingParameterModel complexActingParameterActingModel =
+        new ImmutableActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME, true);
+    when(complexValueProviderModel.getParameters()).thenReturn(singletonList(complexActingParameterActingModel));
+
+    when(complexValueProviderModel.getActingParameters()).thenReturn(singletonList(COMPLEX_ACTING_PARAMETER_NAME));
     when(complexValueProviderModel.requiresConfiguration()).thenReturn(false);
     when(complexValueProviderModel.requiresConnection()).thenReturn(false);
 
