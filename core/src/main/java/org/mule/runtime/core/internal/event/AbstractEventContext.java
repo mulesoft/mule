@@ -63,8 +63,8 @@ abstract class AbstractEventContext implements BaseEventContext {
   private transient final List<BaseEventContext> childContexts = new ArrayList<>();
   private transient final FlowExceptionHandler exceptionHandler;
   private transient final CompletableFuture<Void> externalCompletion;
-  private transient List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
   private transient List<BiConsumer<CoreEvent, Throwable>> onBeforeResponseConsumerList = new ArrayList<>();
+  private transient List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
   private transient List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>(2);
   private transient List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
 
@@ -99,11 +99,11 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   protected void initCompletionLists() {
     if (onCompletionConsumerList == null) {
-      onResponseConsumerList = new ArrayList<>();
+      onBeforeResponseConsumerList = new ArrayList<>();
     }
 
     if (onCompletionConsumerList == null) {
-      onBeforeResponseConsumerList = new ArrayList<>();
+      onResponseConsumerList = new ArrayList<>();
     }
 
     if (onCompletionConsumerList == null) {
@@ -332,20 +332,20 @@ abstract class AbstractEventContext implements BaseEventContext {
   }
 
   @Override
-  public synchronized void onResponse(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state >= STATE_RESPONSE) {
-      signalConsumerSilently(consumer);
-    } else {
-      onResponseConsumerList.add(requireNonNull(consumer));
-    }
-  }
-
-  @Override
   public synchronized void onBeforeResponse(BiConsumer<CoreEvent, Throwable> consumer) {
     if (state >= STATE_RESPONSE) {
       signalConsumerSilently(consumer);
     } else {
       onBeforeResponseConsumerList.add(requireNonNull(consumer));
+    }
+  }
+
+  @Override
+  public synchronized void onResponse(BiConsumer<CoreEvent, Throwable> consumer) {
+    if (state >= STATE_RESPONSE) {
+      signalConsumerSilently(consumer);
+    } else {
+      onResponseConsumerList.add(requireNonNull(consumer));
     }
   }
 
