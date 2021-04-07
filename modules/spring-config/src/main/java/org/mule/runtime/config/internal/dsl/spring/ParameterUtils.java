@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
+import static java.util.stream.Collectors.toMap;
+
 public class ParameterUtils {
 
   static String getParamName(ComponentAst componentAst, String name) {
@@ -24,9 +26,24 @@ public class ParameterUtils {
 
   }
 
-  static HashMap<String, String> getElementNameToParamNameMap(DslElementSyntax dslElementSyntax) {
-    // Map whose key is the DSL representation (element name) and whose value is the model parameter name (the previous key)
-    return dslElementSyntax.getContainedElementsByName().entrySet().stream()
-        .collect(Collectors.toMap(entry -> entry.getValue().getElementName(), Map.Entry::getKey, (a, b) -> b, HashMap::new));
+  static Map<String, String> getElementNameToParamNameMap(DslElementSyntax dslElementSyntax) {
+
+    Map<String, DslElementSyntax> containedElementsByName = dslElementSyntax.getContainedElementsByName();
+
+    // Add direct children to the dictionary
+    Map<String, String> result = containedElementsByName.keySet().stream()
+        .collect(
+                 toMap(
+                       key -> containedElementsByName.get(key).getElementName(),
+                       key -> key,
+                       (a, b) -> b)
+        );
+
+    // Add its childrens to the dictionary
+    containedElementsByName.values().stream().map(DslElementSyntax::getContainedElementsByName)
+        .forEach(elementsByName -> elementsByName.keySet()
+            .forEach(key -> result.put(elementsByName.get(key).getElementName(), key)));
+
+    return result;
   }
 }
