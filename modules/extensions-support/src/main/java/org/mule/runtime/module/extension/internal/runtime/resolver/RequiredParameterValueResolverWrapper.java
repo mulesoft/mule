@@ -66,7 +66,7 @@ public class RequiredParameterValueResolverWrapper<T> extends LifecycleAwareValu
   public T resolve(ValueResolvingContext context) throws MuleException {
     T value = super.resolve(context);
     if (value == null && !isLazyInitMode(properties)) {
-      throw new IllegalArgumentException(errorMessage);
+      // throw new IllegalArgumentException(errorMessage);
     }
 
     return value;

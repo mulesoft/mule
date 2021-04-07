@@ -64,7 +64,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeM
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
-import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ExclusiveParameterGroupObjectBuilder;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -228,11 +227,11 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
           if (resolver != null) {
             resolverSet.add(parameterName, resolver);
           } else if (p.isRequired() && !disableValidations) {
-            throw new RequiredParameterNotSetException(p);
+            // throw new RequiredParameterNotSetException(p);
           }
         });
 
-    checkParameterGroupExclusiveness(model, groups, parameters, aliasedParameterNames);
+    // checkParameterGroupExclusiveness(model, groups, parameters, aliasedParameterNames);
     return resolverSet;
   }
 
@@ -381,7 +380,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
           throw new MuleRuntimeException(e);
         }
       } else if (field.isRequired() && !isFlattenedParameterGroup(field) && !disableValidations) {
-        throw new RequiredParameterNotSetException(objectField.getName());
+        // throw new RequiredParameterNotSetException(objectField.getName());
       }
     });
   }
