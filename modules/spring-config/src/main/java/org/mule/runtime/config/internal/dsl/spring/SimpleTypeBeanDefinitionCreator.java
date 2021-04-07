@@ -101,6 +101,10 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
       return getSourceCallbackAwareParameter(ownerComponent, paramName, possibleGroup, (SourceModel) ownerComponentModel);
     }
 
+    if(paramName == null){
+      return ownerComponent.getParameter(componentModel.getIdentifier().getName());
+    }
+
     ComponentParameterAst paramInOwner = ownerComponent.getParameter(paramName);
 
     if (paramInOwner == null) {
