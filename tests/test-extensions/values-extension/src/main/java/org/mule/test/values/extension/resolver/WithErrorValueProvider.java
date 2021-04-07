@@ -6,10 +6,11 @@
  */
 package org.mule.test.values.extension.resolver;
 
-import org.mule.runtime.api.value.Value;
+
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.sdk.api.values.Value;
+import org.mule.sdk.api.values.ValueProvider;
 
 import java.util.Set;
 
@@ -23,5 +24,10 @@ public class WithErrorValueProvider implements ValueProvider {
   @Override
   public Set<Value> resolve() throws ValueResolvingException {
     throw new ValueResolvingException(ERROR_MESSAGE, errorCode);
+  }
+
+  @Override
+  public String getId() {
+    return "WithErrorValueProvider-id";
   }
 }
