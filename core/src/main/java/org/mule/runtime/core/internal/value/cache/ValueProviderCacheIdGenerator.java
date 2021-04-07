@@ -20,13 +20,27 @@ public interface ValueProviderCacheIdGenerator<T> {
   /**
    * Calculates a {@link ValueProviderCacheId} required to identify all the values returned by a
    * {@link org.mule.runtime.extension.api.values.ValueProvider} associated with the parameter in the given component.
-   * 
+   *
    * @param containerComponent the component that holds the parameter
    * @param parameterName      the name of the parameter which values are provided by a
    *                           {@link org.mule.runtime.extension.api.values.ValueProvider}
    * @return a {@see Optional<ValueProviderCacheId>} with the resolved id in case it's possible, {@link Optional#empty()}
-   *         otherwise.
+   * otherwise.
    */
   Optional<ValueProviderCacheId> getIdForResolvedValues(T containerComponent, String parameterName);
+
+  /**
+   * Calculates a {@link ValueProviderCacheId} required to identify all the values returned by a
+   * {@link org.mule.runtime.extension.api.values.ValueProvider} associated with the field contained by the parameter
+   * in the given container.
+   *
+   * @param containerComponent the component that holds the parameter
+   * @param parameterName      the name of the parameter containing the field for which {@link org.mule.runtime.api.value.Value}s are provided.
+   * @param targetPath         the path to locate the field with a {@link org.mule.sdk.api.values.ValueProvider} within the parameter in the container component.
+   *
+   * @return a {@see Optional<ValueProviderCacheId>} with the resolved id in case it's possible, {@link Optional#empty()}
+   * otherwise.
+   */
+  Optional<ValueProviderCacheId> getIdForResolvedValues(T containerComponent, String parameterName, String targetPath);
 
 }

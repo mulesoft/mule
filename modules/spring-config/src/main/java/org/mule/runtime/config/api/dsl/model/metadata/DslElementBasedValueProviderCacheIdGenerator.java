@@ -67,6 +67,22 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
             .flatMap(infoMap -> resolveId(containerComponent, valueProviderModel, infoMap)));
   }
 
+  /**
+   * {@inheritDoc}
+   * <p/>
+   * The returned {@link ValueProviderCacheId} will contain all acting parameters required by the
+   * {@link org.mule.runtime.extension.api.values.ValueProvider} as parts. In case the {@link DslElementModel} corresponds to a
+   * Source or Operation, if the {@link org.mule.runtime.extension.api.values.ValueProvider} requires a connection or a
+   * configuration, their id will be added as part. The resolution of a config or connection id as part is different from the one
+   * done when their are the one's holding the resolving parameter. In the case they are parts needed by another
+   * {@link org.mule.runtime.extension.api.values.ValueProvider}, acting parameters will not exist. Therefore, only parameters
+   * required for metadata are used as input to calculate the {@link ValueProviderCacheId}.
+   */
+  @Override
+  public Optional<ValueProviderCacheId> getIdForResolvedValues(DslElementModel<?> containerComponent, String parameterName, String targetPath) {
+    return empty();
+  }
+
   private Optional<ParameterModel> ifContainsParameter(DslElementModel<?> containerComponent, String parameterName) {
     if (containerComponent.getModel() instanceof ParameterizedModel) {
       return ((ParameterizedModel) containerComponent.getModel())
