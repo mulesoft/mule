@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
+import org.mule.test.values.extension.resolver.SimpleLegacyValueProvider;
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
 import org.mule.test.values.extension.resolver.WithComplexActingParameter;
 import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
@@ -28,14 +29,14 @@ import java.util.List;
 
 public class ValuesOperations {
 
-  public void singleValuesEnabledParameter(@OfValues(SimpleValueProvider.class) String channels) {
+  public void singleValuesEnabledParameter(@org.mule.sdk.api.annotation.values.OfValues(SimpleValueProvider.class) String channels) {
 
   }
 
-  public void singleValuesEnabledParameterWithConnection(@OfValues(WithConnectionValueProvider.class) String channels,
+  public void singleValuesEnabledParameterWithConnection(@org.mule.sdk.api.annotation.values.OfValues(WithConnectionValueProvider.class) String channels,
                                                          @Connection ValuesConnection connection) {}
 
-  public void singleValuesEnabledParameterWithConfiguration(@OfValues(WithConfigValueProvider.class) String channels,
+  public void singleValuesEnabledParameterWithConfiguration(@org.mule.sdk.api.annotation.values.OfValues(WithConfigValueProvider.class) String channels,
                                                             @Connection ValuesConnection connection) {}
 
   public void singleValuesEnabledParameterWithRequiredParameters(@OfValues(WithRequiredParametersValueProvider.class) String channels,
@@ -47,7 +48,7 @@ public class ValuesOperations {
   public void singleValuesEnabledParameterInsideParameterGroup(@ParameterGroup(
       name = "ValuesGroup") GroupWithValuesParameter optionsParameter) {}
 
-  public void singleValuesEnabledParameterRequiresValuesOfParameterGroup(@OfValues(WithRequiredParameterFromGroupValueProvider.class) String values,
+  public void singleValuesEnabledParameterRequiresValuesOfParameterGroup(@org.mule.sdk.api.annotation.values.OfValues(WithRequiredParameterFromGroupValueProvider.class) String values,
                                                                          @ParameterGroup(
                                                                              name = "ValuesGroup") GroupWithValuesParameter optionsParameter) {}
 
@@ -63,13 +64,14 @@ public class ValuesOperations {
 
   }
 
-  public void valuesInsideShowInDslGroup(@OfValues(WithRequiredParameterFromGroupValueProvider.class) String values,
+  public void valuesInsideShowInDslGroup(@org.mule.sdk.api.annotation.values.OfValues(WithRequiredParameterFromGroupValueProvider.class) String values,
                                          @ParameterGroup(name = "ValuesGroup",
                                              showInDsl = true) GroupWithValuesParameter optionsParameter) {
 
   }
 
-  public void withErrorValueProvider(@OfValues(WithErrorValueProvider.class) String values, String errorCode) {
+  public void withErrorValueProvider(@org.mule.sdk.api.annotation.values.OfValues(WithErrorValueProvider.class) String values,
+                                     String errorCode) {
 
   }
 

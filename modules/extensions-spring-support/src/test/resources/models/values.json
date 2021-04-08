@@ -77,7 +77,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "channel",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValueProvider",
+                "providerId": "WithRequiredParametersFromConfigValueProvider-Id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -657,7 +657,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "valueParam",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupLegacyValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -1261,7 +1261,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "valueParam",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -2152,7 +2152,7 @@
                     "parameters": [],
                     "partOrder": 1,
                     "providerName": "channels",
-                    "providerId": "org.mule.test.values.extension.resolver.WithConfigValueProvider",
+                    "providerId": "WithConfigValueProvider-id",
                     "requiresConfiguration": true,
                     "requiresConnection": false,
                     "isOpen": true
@@ -3063,7 +3063,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "channel",
-                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValueProvider",
+                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigLegacyValueProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -3419,7 +3419,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "valueParam",
-                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                    "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -3799,7 +3799,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "valueParam",
-                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                    "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupLegacyValueProvider",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -4465,7 +4465,7 @@
                     ],
                     "partOrder": 1,
                     "providerName": "values",
-                    "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
+                    "providerId": "WithErrorValueProvider-id",
                     "requiresConfiguration": false,
                     "requiresConnection": false,
                     "isOpen": true
@@ -5118,7 +5118,7 @@
                     "parameters": [],
                     "partOrder": 1,
                     "providerName": "channel",
-                    "providerId": "org.mule.test.values.extension.resolver.WithConfigValueProvider",
+                    "providerId": "WithConfigValueProvider-id",
                     "requiresConfiguration": true,
                     "requiresConnection": false,
                     "isOpen": true
@@ -5949,7 +5949,7 @@
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "channel",
-                "providerId": "Simple value provider",
+                "providerId": "org.mule.test.values.extension.resolver.SimpleLegacyValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -6473,7 +6473,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
+                "providerId": "WithErrorValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -7799,7 +7799,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -8751,7 +8751,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                "providerId": "WithRequiredParameterFromGroupValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -9314,7 +9314,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.WithErrorValueProvider",
+                "providerId": "WithErrorValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -12002,7 +12002,7 @@
                 "parameters": [],
                 "partOrder": 1,
                 "providerName": "hasBeenStarted",
-                "providerId": "org.mule.test.values.extension.resolver.TrueFalseValueProvider",
+                "providerId": "TrueFalseValueProvider-id",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
@@ -12692,7 +12692,7 @@
                 ],
                 "partOrder": 1,
                 "providerName": "values",
-                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider",
+                "providerId": "org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupLegacyValueProvider",
                 "requiresConfiguration": false,
                 "requiresConnection": false,
                 "isOpen": true
