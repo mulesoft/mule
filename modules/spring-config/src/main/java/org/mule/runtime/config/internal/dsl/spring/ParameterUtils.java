@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayDeque;
+import java.util.List;
+import java.util.Queue;
 import java.util.stream.Collectors;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -16,33 +17,63 @@ import static java.util.stream.Collectors.toMap;
 
 public class ParameterUtils {
 
-  static String getParamName(ComponentAst componentAst, String name) {
+  public String getParamName(ComponentAst componentAst, String name) {
 
     if (!componentAst.getGenerationInformation().getSyntax().isPresent()) {
       return null;
     }
 
-    return getElementNameToParamNameMap(componentAst.getGenerationInformation().getSyntax().get()).get(name);
+    DslElementSyntax dslElementSyntax = componentAst.getGenerationInformation().getSyntax().get();
 
+    return breathSearchParameterNameByElementName(name, dslElementSyntax);
   }
 
-  static Map<String, String> getElementNameToParamNameMap(DslElementSyntax dslElementSyntax) {
+  private String breathSearchParameterNameByElementName(String name, DslElementSyntax dslElementSyntax) {
+    Queue<NamePair> queue = new ArrayDeque<>(makeElementsToNamePairList(dslElementSyntax));
 
-    Map<String, DslElementSyntax> containedElementsByName = dslElementSyntax.getContainedElementsByName();
+    while (!queue.isEmpty()) {
+      NamePair currentNode = queue.remove();
 
-    // Add direct children to the dictionary
-    Map<String, String> result = containedElementsByName.keySet().stream()
-        .collect(
-                 toMap(
-                       key -> containedElementsByName.get(key).getElementName(),
-                       key -> key,
-                       (a, b) -> b));
+      if (currentNode.getDslElementSyntax().getElementName().equals(name)) {
+        return currentNode.getParamName();
+      }
 
-    // Add its childrens to the dictionary
-    containedElementsByName.values().stream().map(DslElementSyntax::getContainedElementsByName)
-        .forEach(elementsByName -> elementsByName.keySet()
-            .forEach(key -> result.put(elementsByName.get(key).getElementName(), key)));
+      queue.addAll(makeElementsToNamePairList(currentNode.getDslElementSyntax()));
+    }
 
-    return result;
+    return null;
   }
+
+  private List<NamePair> makeElementsToNamePairList(DslElementSyntax dslElementSyntax) {
+    return dslElementSyntax.getContainedElementsByName().entrySet().stream()
+        .map(entry -> new NamePair(entry.getKey(), entry.getValue())).collect(Collectors.toList());
+  }
+
+  class NamePair {
+
+    private String paramName;
+    private DslElementSyntax dslElementSyntax;
+
+    public NamePair(String paramName, DslElementSyntax dslElementSyntax) {
+      this.paramName = paramName;
+      this.dslElementSyntax = dslElementSyntax;
+    }
+
+    public String getParamName() {
+      return paramName;
+    }
+
+    public void setParamName(String paramName) {
+      this.paramName = paramName;
+    }
+
+    public DslElementSyntax getDslElementSyntax() {
+      return dslElementSyntax;
+    }
+
+    public void setDslElementSyntax(DslElementSyntax dslElementSyntax) {
+      this.dslElementSyntax = dslElementSyntax;
+    }
+  }
+
 }

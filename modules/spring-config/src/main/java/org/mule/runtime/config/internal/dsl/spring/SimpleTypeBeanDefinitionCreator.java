@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.dsl.spring.ParameterGroupUtils.getSourceCallbackAwareParameter;
-import static org.mule.runtime.config.internal.dsl.spring.ParameterUtils.getParamName;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -31,6 +30,13 @@ import java.util.Optional;
  * @since 4.0
  */
 class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
+
+  private ParameterUtils parameterUtils;
+
+  public SimpleTypeBeanDefinitionCreator(){
+    super();
+    parameterUtils = new ParameterUtils();
+  }
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
@@ -87,7 +93,7 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
       return null;
     }
 
-    final String paramName = getParamName(ownerComponent, componentModel.getIdentifier().getName());
+    final String paramName = parameterUtils.getParamName(ownerComponent, componentModel.getIdentifier().getName());
 
     ParameterizedModel ownerComponentModel = ownerComponent.getModel(ParameterizedModel.class).get();
 
