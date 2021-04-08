@@ -149,6 +149,18 @@ public interface BaseEventContext extends EventContext {
 
   /**
    * Register a {@link BiConsumer} callback that will be executed when a response event or error is available for this
+   * {@link EventContext} before response consumers. There are currently no guarantees given regarding the order of callback
+   * execution.
+   * <p/>
+   * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
+   *
+   * @param consumer callback to execute on event context response.
+   * @throws NullPointerException if consumer is {@code null}
+   */
+  void onBeforeResponse(BiConsumer<CoreEvent, Throwable> consumer);
+
+  /**
+   * Register a {@link BiConsumer} callback that will be executed when a response event or error is available for this
    * {@link EventContext}. There are currently no guarantees given regarding the order of callback execution.
    * <p/>
    * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
