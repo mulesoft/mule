@@ -102,7 +102,7 @@ abstract class AbstractEventContext implements BaseEventContext {
       onBeforeResponseConsumerList = new ArrayList<>();
     }
 
-    if (onCompletionConsumerList == null) {
+    if (onResponseConsumerList == null) {
       onResponseConsumerList = new ArrayList<>();
     }
 
