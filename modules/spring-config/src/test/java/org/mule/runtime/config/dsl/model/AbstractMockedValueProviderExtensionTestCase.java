@@ -44,6 +44,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
@@ -52,6 +53,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.FieldValueProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -126,6 +128,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected static final String PROVIDED_FROM_COMPLEX_PARAMETER_NAME = "fromComplexActingParameter";
   protected static final String COMPLEX_ACTING_PARAMETER_NAME = "complexActingParameter";
   protected static final String PROVIDED_PARAMETER_DEFAULT_VALUE = "providedParameter";
+  protected static final String PROVIDED_FIELD_PATH = "some.target.path";
   protected static final String EXTENSION_NAME = "extension";
   protected static final String OPERATION_NAME = "mockOperation";
   protected static final String OTHER_OPERATION_NAME = "mockOtherOperation";
@@ -137,6 +140,8 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected static final String VALUE_PROVIDER_ID = "valueProviderId";
   protected static final String COMPLEX_VALUE_PROVIDER_NAME = "complexValueProvider";
   protected static final String COMPLEX_VALUE_PROVIDER_ID = "complexValueProviderId";
+  protected static final String FIELD_VALUE_PROVIDER_NAME = "fieldValueProvider";
+  protected static final String FIELD_VALUE_PROVIDER_ID = "fieldValueProviderId";
 
   protected static final String MY_FLOW = "myFlow";
   protected static final String MY_CONFIG = "myConfig";
@@ -200,6 +205,9 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   @Mock(lenient = true)
   protected ValueProviderModel complexValueProviderModel;
 
+  @Mock(lenient = true)
+  protected FieldValueProviderModel fieldValueProviderModel;
+
   protected ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   private Set<ExtensionModel> extensions;
@@ -241,12 +249,21 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(complexValueProviderModel.requiresConfiguration()).thenReturn(false);
     when(complexValueProviderModel.requiresConnection()).thenReturn(false);
 
+    when(fieldValueProviderModel.getPartOrder()).thenReturn(0);
+    when(fieldValueProviderModel.getProviderName()).thenReturn(FIELD_VALUE_PROVIDER_NAME);
+    when(fieldValueProviderModel.getProviderId()).thenReturn(FIELD_VALUE_PROVIDER_ID);
+    when(fieldValueProviderModel.getActingParameters()).thenReturn(emptyList());
+    when(fieldValueProviderModel.getParameters()).thenReturn(emptyList());
+    when(fieldValueProviderModel.requiresConfiguration()).thenReturn(false);
+    when(fieldValueProviderModel.requiresConnection()).thenReturn(false);
+    when(fieldValueProviderModel.getFieldPath()).thenReturn(PROVIDED_FIELD_PATH);
+
     parameterInGroup = createParameterModel(PARAMETER_IN_GROUP_NAME, false, stringType, null,
                                             NOT_SUPPORTED, BEHAVIOUR, null, emptyList());
     actingParameter = createParameterModel(ACTING_PARAMETER_NAME, false, stringType,
                                            ACTING_PARAMETER_DEFAULT_VALUE, NOT_SUPPORTED, BEHAVIOUR, null, emptyList());
     providedParameter = createParameterModel(PROVIDED_PARAMETER_NAME, false, stringType, null, NOT_SUPPORTED,
-                                             BEHAVIOUR, valueProviderModel, emptyList());
+                                             BEHAVIOUR, null, emptyList(), singletonList(fieldValueProviderModel));
 
     otherProvidedParameter =
         createParameterModel(OTHER_PROVIDED_PARAMETER_NAME, false, stringType, null,
@@ -343,11 +360,18 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
                                                        Object defaultValue, ExpressionSupport expressionSupport,
                                                        ParameterRole parameterRole, ValueProviderModel valueProviderModel,
                                                        List<StereotypeModel> allowedStereotypes) {
+    return createParameterModel(paramName, isComponentId, type, defaultValue, expressionSupport, parameterRole, valueProviderModel, allowedStereotypes, emptyList());
+  }
+
+  private ImmutableParameterModel createParameterModel(String paramName, boolean isComponentId, MetadataType type,
+                                                       Object defaultValue, ExpressionSupport expressionSupport,
+                                                       ParameterRole parameterRole, ValueProviderModel valueProviderModel,
+                                                       List<StereotypeModel> allowedStereotypes, List<FieldValueProviderModel> fieldModels) {
     return new ImmutableParameterModel(paramName, "", type, false, false,
                                        false, isComponentId, expressionSupport, defaultValue,
                                        parameterRole, ParameterDslConfiguration.getDefaultInstance(), null, null,
                                        valueProviderModel,
-                                       allowedStereotypes, emptySet());
+                                       allowedStereotypes, emptySet(), null, fieldModels);
   }
 
   private ImmutableOperationModel createOperationModel(String operationName, List<ParameterGroupModel> paramGroups) {

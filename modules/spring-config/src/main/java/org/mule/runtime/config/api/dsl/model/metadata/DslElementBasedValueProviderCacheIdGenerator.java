@@ -79,8 +79,18 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
    * required for metadata are used as input to calculate the {@link ValueProviderCacheId}.
    */
   @Override
-  public Optional<ValueProviderCacheId> getIdForResolvedValues(DslElementModel<?> containerComponent, String parameterName, String targetPath) {
-    return empty();
+  public Optional<ValueProviderCacheId> getIdForResolvedValues(DslElementModel<?> containerComponent,
+                                                               String parameterName,
+                                                               String targetPath) {
+    return ifContainsParameter(containerComponent, parameterName)
+        .flatMap(ParameterModel::getValueProviderModels)
+        .flatMap(models -> resolveParametersInformation(containerComponent)
+            .flatMap(infoMap -> models.reduce(
+                                              vp -> resolveId(containerComponent, vp, infoMap),
+                                              fp -> fp.stream()
+                                                  .filter(m -> m.getFieldPath().equals(targetPath))
+                                                  .findAny()
+                                                  .flatMap(f -> resolveId(containerComponent, f, infoMap)))));
   }
 
   private Optional<ParameterModel> ifContainsParameter(DslElementModel<?> containerComponent, String parameterName) {

@@ -38,9 +38,11 @@ public class DeclarationBasedValueProviderCacheIdGenerator implements ValueProvi
   }
 
   @Override
-  public Optional<ValueProviderCacheId> getIdForResolvedValues(ElementDeclaration containerComponent, String parameterName, String targetPath) {
+  public Optional<ValueProviderCacheId> getIdForResolvedValues(ElementDeclaration containerComponent, String parameterName,
+                                                               String targetPath) {
     checkArgument(containerComponent != null, "Cannot generate a Cache Key for a 'null' component");
-    return elementModelFactory.create(containerComponent).flatMap(dsl -> delegate.getIdForResolvedValues(dsl, parameterName, targetPath));
+    return elementModelFactory.create(containerComponent)
+        .flatMap(dsl -> delegate.getIdForResolvedValues(dsl, parameterName, targetPath));
   }
 
   // Consider refactoring this in the future to make things simpler. MULE-18743

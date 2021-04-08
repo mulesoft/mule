@@ -8,11 +8,14 @@ package org.mule.runtime.config.dsl.model;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
 import static junit.framework.TestCase.fail;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
 
 import org.mule.runtime.api.component.location.Location;
@@ -60,29 +63,37 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
                                                       String location,
                                                       String parameterName)
       throws Exception {
+    return this.computeIdFor(appDeclaration, location, parameterName, null);
+  }
+
+  private Optional<ValueProviderCacheId> computeIdFor(ArtifactDeclaration appDeclaration,
+                                                      String location,
+                                                      String parameterName,
+                                                      String targetPath)
+          throws Exception {
     ArtifactAst app = loadApplicationModel(appDeclaration);
     Locator locator = new Locator(app);
     ComponentLocator<DslElementModel<?>> dslLocator =
-        l -> getDeclaration(appDeclaration, l.toString()).map(d -> dslElementModelFactory.create(d).orElse(null));
+            l -> getDeclaration(appDeclaration, l.toString()).map(d -> dslElementModelFactory.create(d).orElse(null));
 
     ComponentLocator<ElementDeclaration> declarationLocator =
-        l -> appDeclaration.findElement(builderFromStringRepresentation(l.toString()).build());
+            l -> appDeclaration.findElement(builderFromStringRepresentation(l.toString()).build());
 
     ValueProviderCacheIdGenerator<ComponentAst> componentAstBasedValueProviderCacheIdGenerator =
-        new ComponentAstBasedValueProviderCacheIdGenerator(locator);
+            new ComponentAstBasedValueProviderCacheIdGenerator(locator);
     ValueProviderCacheIdGenerator<ComponentAst> componentBasedValueProviderCacheIdGenerator =
-        new ComponentBasedValueProviderCacheIdGenerator(dslContext, locator);
+            new ComponentBasedValueProviderCacheIdGenerator(dslContext, locator);
     ValueProviderCacheIdGenerator<DslElementModel<?>> dslElementModelValueProviderCacheIdGenerator =
-        new DslElementBasedValueProviderCacheIdGenerator(dslLocator);
+            new DslElementBasedValueProviderCacheIdGenerator(dslLocator);
     ValueProviderCacheIdGenerator<ElementDeclaration> elementDeclarationValueProviderCacheIdGenerator =
-        new DeclarationBasedValueProviderCacheIdGenerator(dslContext, declarationLocator);
+            new DeclarationBasedValueProviderCacheIdGenerator(dslContext, declarationLocator);
 
     ComponentAst component = getComponentAst(app, location);
     DslElementModel<?> dslElementModel = dslLocator.get(Location.builderFromStringRepresentation(location).build())
-        .orElseThrow(() -> new AssertionError("Could not create dslElementModel"));
+            .orElseThrow(() -> new AssertionError("Could not create dslElementModel"));
 
     Optional<ParameterizedElementDeclaration> elementDeclaration =
-        appDeclaration.findElement(builderFromStringRepresentation(location).build());
+            appDeclaration.findElement(builderFromStringRepresentation(location).build());
     Optional<ParameterizedModel> elementModel = component.getModel(ParameterizedModel.class);
 
     if (!elementDeclaration.isPresent() || !elementModel.isPresent()) {
@@ -97,6 +108,18 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
         elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(), parameterName);
     Optional<ValueProviderCacheId> astId =
         componentAstBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
+    Optional<ValueProviderCacheId> dslElementId;
+    Optional<ValueProviderCacheId> componentBasedId;
+    Optional<ValueProviderCacheId> declarationBasedId;
+    if(targetPath == null) {
+      dslElementId = dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName);
+      componentBasedId = componentBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
+      declarationBasedId = elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(), parameterName);
+    }else {
+      dslElementId = dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName, targetPath);
+      componentBasedId = componentBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName, targetPath);
+      declarationBasedId = elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(), parameterName, targetPath);
+    }
 
     checkIdsAreEqual(astId, dslElementId);
     checkIdsAreEqual(dslElementId, componentBasedId);
@@ -635,6 +658,15 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
         }
       }
     }
+  }
+
+  @Test
+  public void testCacheIdInField() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> cacheId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME, PROVIDED_FIELD_PATH);
+    assertThat(cacheId.isPresent(), is(true));
+    cacheId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME, "other.field");
+    assertThat(cacheId.isPresent(), is(false));
   }
 
 }
