@@ -95,7 +95,7 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
 
       // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
       // an async, for instance)
-      ((BaseEventContext) event.getContext()).onResponse(inFlightDecrementCallback);
+      ((BaseEventContext) event.getContext()).onBeforeResponse(inFlightDecrementCallback);
     }
 
     return null;
