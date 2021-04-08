@@ -158,40 +158,51 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(result.getFailure().isPresent(), is(false));
     // Add assertion
   }
-  //
-  //  public void withTwoActingParameters(@OfValues(
-  //      value = WithTwoActingParametersValueProvider.class,
-  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field")}) String parameterWithValues,
-  //                                      String scalarActingParameter,
-  //                                      InputStream actingParameter) {}
-  //
-  //  public void withTwoBoundActingParameters(@OfValues(
-  //      value = WithTwoActingParametersValueProvider.class,
-  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field"),
-  //          @Binding(actingParameter = "scalarActingParameter", path = "anotherParameter")}) String parameterWithValues,
-  //                                           String anotherParameter,
-  //                                           InputStream actingParameter) {}
-  //
-  //
-  //  public void withBoundActingParameterToXmlTagContent(@OfValues(
-  //      value = WithRequiredParameterValueProvider.class,
-  //      bindings = {
-  //          @Binding(actingParameter = "requiredValue", path = "actingParameter.nested.xmlTag")}) String parameterWithValues,
-  //                                                      InputStream actingParameter) {}
-  //
-  //  public void withBoundActingParameterToXmlTagAtttribute(@OfValues(
-  //      value = WithRequiredParameterValueProvider.class,
-  //      bindings = {@Binding(actingParameter = "requiredValue",
-  //          path = "actingParameter.nested.xmlTag.@attribute")}) String parameterWithValues,
-  //                                                         InputStream actingParameter) {}
-  //
-  //  public void withFourBoundActingParametes(@OfValues(
-  //      value = WithFourActingParametersValueProvider.class,
-  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field1"),
-  //          @Binding(actingParameter = "anotherValue", path = "actingParameter.nested.field2"),
-  //          @Binding(actingParameter = "someValue", path = "actingParameter.nested.field.3"),
-  //          @Binding(actingParameter = "optionalValue", path = "actingParameter.anotherNested.field4")}) String parameterWithValues,
-  //                                           InputStream actingParameter) {}
+
+  @Test
+  public void withTwoActingParameters() throws Exception {
+    ValueResult result = getValueResult("withTwoActingParameters", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    // Add assertion
+  }
+
+  @Test
+  public void withTwoBoundActingParameters() throws Exception {
+    ValueResult result = getValueResult("withTwoBoundActingParameters", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    // Add assertion
+  }
+
+  @Test
+  public void withBoundActingParameterToXmlTagContent() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterToXmlTagContent", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    // Add assertion
+  }
+
+  @Test
+  public void withBoundActingParameterToXmlTagAttribute() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterToXmlTagAttribute", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    // Add assertion
+  }
+
+  @Test
+  public void withFourBoundActingParameters() throws Exception {
+    ValueResult result = getValueResult("withFourBoundActingParameters", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    // Add assertion
+  }
+
+  @Test
+  public void withBoundActingParameterArray() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterArray", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    // Add assertion
+  }
+
+
+
   //
   //  public void withBoundActingParameterArray(@OfValues(
   //      value = WithArrayParameterValueProvider.class,
@@ -218,4 +229,7 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   //      value = WithEnumParameterValueProvider.class,
   //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.enumField")}) String parameterWithValues,
   //                                           InputStream actingParameter) {}
+
+  // ADD optional cases
+
 }

@@ -42,6 +42,7 @@ import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
@@ -59,6 +60,8 @@ import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 /**
  * Adds the capability to expose tooling focused capabilities associated with the {@link StaticConfigurationProvider}'s
  * components. So far the capabilities are:
@@ -72,6 +75,9 @@ import java.util.Set;
  */
 public final class ConfigurationProviderToolingAdapter extends StaticConfigurationProvider
     implements MetadataKeyProvider, ConfigurationParameterValueProvider {
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   private final MuleMetadataService metadataService;
   protected final ConnectionManager connectionManager;
@@ -163,7 +169,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   public Set<Value> getConfigValues(String parameterName) throws ValueResolvingException {
     return valuesWithClassLoader(() -> {
       ConfigurationModel configurationModel = getConfigurationModel();
-      return new ValueProviderMediator<>(configurationModel, () -> muleContext, () -> reflectionCache)
+      return new ValueProviderMediator<>(configurationModel, () -> muleContext, () -> reflectionCache, expressionManager)
           .getValues(parameterName, getParameterValueResolver(configuration.getValue(), configurationModel));
     }, getExtensionModel());
   }
@@ -183,7 +189,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   public Set<Value> getConnectionValues(String parameterName) throws ValueResolvingException {
     return valuesWithClassLoader(() -> withConnectionProviderInfo((connection, model) -> {
       ValueProviderMediator<ConnectionProviderModel> valueProviderMediator =
-          new ValueProviderMediator<>(model, () -> muleContext, () -> reflectionCache);
+          new ValueProviderMediator<>(model, () -> muleContext, () -> reflectionCache, expressionManager);
       return valueProviderMediator.getValues(parameterName, getParameterValueResolver(connection, model));
     }), getExtensionModel());
   }

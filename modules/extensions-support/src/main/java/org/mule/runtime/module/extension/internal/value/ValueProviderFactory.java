@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -39,7 +40,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,30 +106,90 @@ public class ValueProviderFactory {
       initialiseIfNeeded(resolver, true, muleContext);
 
       Map<String, Object> resolvedActingParameters = new HashMap<>();
-      for (InjectableParameterInfo injectableParameterInfo : factoryModelProperty.getInjectableParameters()) {
-        BindingContext.Builder bindingContextBuilder = BindingContext.builder();
-        for (Map.Entry<String, ValueResolver<? extends Object>> entry : parameterValueResolver.getParameters().entrySet()) {
-          Object value = parameterValueResolver.getParameterValue(entry.getKey());
-          String mediaType = parameterizedModel.getAllParameterModels().stream()
-              .filter(parameterModel -> parameterModel.getName().equals(entry.getKey())).findFirst().get().getType()
-              .getMetadataFormat().getValidMimeTypes().iterator().next();
-          DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
-          bindingContextBuilder
-              .addBinding(entry.getKey(), new TypedValue(value, valueDataType));
+      // Problem here is, streams are consumed
+
+      // for (InjectableParameterInfo injectableParameterInfo : factoryModelProperty.getInjectableParameters()) {
+      // BindingContext.Builder bindingContextBuilder = BindingContext.builder();
+      // for (Map.Entry<String, ValueResolver<? extends Object>> entry : parameterValueResolver.getParameters().entrySet()) {
+      // Object value = parameterValueResolver.getParameterValue(entry.getKey());
+      // String mediaType = parameterizedModel.getAllParameterModels().stream()
+      // .filter(parameterModel -> parameterModel.getName().equals(entry.getKey())).findFirst().get().getType()
+      // .getMetadataFormat().getValidMimeTypes().iterator().next();
+      // DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
+      // bindingContextBuilder
+      // .addBinding(entry.getKey(), new TypedValue(value, valueDataType));
+      // }
+      // BindingContext bindingContext = bindingContextBuilder.build();
+      // resolvedActingParameters.put(injectableParameterInfo.getParameterName(),
+      // expressionManager
+      // .evaluate("#[" + injectableParameterInfo.getPath() + "]",
+      // DataType.fromType(getField(resolverClass,
+      // injectableParameterInfo.getParameterName(),
+      // new ReflectionCache()).get().getType()),
+      // bindingContext)
+      // .getValue());
+      //
+      //
+      // }
+
+      // PROBLEMS WITH ALIASED PARAMETERS
+      // PROBLEM WITH OPTIONAL PARAMETERS TO THE VP
+      // PROBLEM WITH PARAMETER TYPE MEDIA TYPE ARRAY
+      BindingContext.Builder bindingContextBuilder = BindingContext.builder();
+
+
+      // PROBLEM WITH getParameter method
+
+      //      for (Map.Entry<String, ValueResolver<? extends Object>> entry : parameterValueResolver.getParameters().entrySet()) {
+      //        Object value = parameterValueResolver.getParameterValue(entry.getKey());
+      //        Optional<String> mediaType = parameterizedModel.getAllParameterModels().stream()
+      //            .filter(parameterModel -> getUnaliasedName(parameterModel).equals(entry.getKey())).findFirst()
+      //            .map(parameterModel -> parameterModel.getType()
+      //                .getMetadataFormat().getValidMimeTypes().iterator().next());
+      //        if (mediaType.isPresent()) {
+      //          DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType.get()).build();
+      //          bindingContextBuilder
+      //              .addBinding(entry.getKey(), new TypedValue(value, valueDataType));
+      //        }
+      //      }
+
+      for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
+        String unaliasedName = getUnaliasedName(parameterModel);
+        Object value = null;
+        try {
+          value = parameterValueResolver.getParameterValue(unaliasedName);
+        } catch (org.mule.runtime.module.extension.internal.runtime.ValueResolvingException e) {
+          value = null;
         }
-        BindingContext bindingContext = bindingContextBuilder.build();
-        resolvedActingParameters.put(injectableParameterInfo.getParameterName(),
-                                     expressionManager
-                                         .evaluate("#[" + injectableParameterInfo.getPath() + "]",
-                                                   DataType.fromType(getField(resolverClass,
-                                                                              injectableParameterInfo.getParameterName(),
-                                                                              new ReflectionCache()).get().getType()),
-                                                   bindingContext)
-                                         .getValue());
-
-
+        if (value != null) {
+          String mediaType = parameterModel.getType().getMetadataFormat().getValidMimeTypes().iterator().next();
+          DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType).build();
+          bindingContextBuilder.addBinding(unaliasedName, new TypedValue(value, valueDataType));
+        }
       }
 
+      BindingContext bindingContext = bindingContextBuilder.build();
+
+      StringBuilder expression = new StringBuilder();
+      expression.append("#[{");
+      expression.append(
+                        factoryModelProperty
+                            .getInjectableParameters().stream()
+                            .filter(injectableParameterInfo -> bindingContext.identifiers()
+                                .contains(injectableParameterInfo.getPath()
+                                    .substring(0, injectableParameterInfo.getPath().indexOf(".") > 0
+                                        ? injectableParameterInfo.getPath().indexOf(".")
+                                        : injectableParameterInfo.getPath().length())))
+                            .map(injectableParameterInfo -> "\""
+                                + injectableParameterInfo.getParameterName() + "\"  : " + injectableParameterInfo.getPath())
+                            .collect(Collectors.joining(", ")));
+      expression.append("}]");
+
+      if (!expression.toString().equals("#[{}]")) {
+        resolvedActingParameters =
+            (Map<String, Object>) expressionManager.evaluate(expression.toString(), DataType.fromType(Map.class), bindingContext)
+                .getValue();
+      }
 
       injectValueProviderFields(resolver, resolvedActingParameters);
 
@@ -161,11 +224,18 @@ public class ValueProviderFactory {
     }
   }
 
-  private void injectValueProviderFields(Object resolver, Map<String, Object> resolvedParameters)
-      throws ValueResolvingException {
+  private String getUnaliasedName(ParameterModel parameterModel) {
+    return parameterModel.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+        .map(extensionParameterDescriptorModelProperty -> extensionParameterDescriptorModelProperty.getExtensionParameter()
+            .getName())
+        .orElse(parameterModel.getName());
+  }
+
+  private void injectValueProviderFields(Object resolver, Map<String, Object> resolvedParameters) throws ValueResolvingException {
     List<String> missingParameters = new ArrayList<>();
     for (InjectableParameterInfo injectableParam : factoryModelProperty.getInjectableParameters()) {
       Object parameterValue = null;
+      //Maybe need transformation ? example list -> array
       String parameterName = injectableParam.getParameterName();
       parameterValue = resolvedParameters.get(parameterName);
 

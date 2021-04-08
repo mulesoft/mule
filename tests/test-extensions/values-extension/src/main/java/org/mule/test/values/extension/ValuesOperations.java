@@ -14,6 +14,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.sdk.api.annotation.binding.Binding;
 import org.mule.test.values.extension.metadata.JsonTypeResolver;
+import org.mule.test.values.extension.metadata.XmlTypeResolver;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
 import org.mule.test.values.extension.resolver.SimpleLegacyValueProvider;
 import org.mule.test.values.extension.resolver.PocSimpleValueProvider;
@@ -130,40 +131,40 @@ public class ValuesOperations {
       value = WithTwoActingParametersValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field")}) String parameterWithValues,
                                       String scalarActingParameter,
-                                      InputStream actingParameter) {}
+                                      @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
   public void withTwoBoundActingParameters(@OfValues(
       value = WithTwoActingParametersValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field"),
           @Binding(actingParameter = "scalarActingParameter", path = "anotherParameter")}) String parameterWithValues,
                                            String anotherParameter,
-                                           InputStream actingParameter) {}
+                                           @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
 
   public void withBoundActingParameterToXmlTagContent(@OfValues(
       value = WithRequiredParameterValueProvider.class,
       bindings = {
           @Binding(actingParameter = "requiredValue", path = "actingParameter.nested.xmlTag")}) String parameterWithValues,
-                                                      InputStream actingParameter) {}
+                                                      @TypeResolver(XmlTypeResolver.class) InputStream actingParameter) {}
 
-  public void withBoundActingParameterToXmlTagAtttribute(@OfValues(
+  public void withBoundActingParameterToXmlTagAttribute(@OfValues(
       value = WithRequiredParameterValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue",
           path = "actingParameter.nested.xmlTag.@attribute")}) String parameterWithValues,
-                                                         InputStream actingParameter) {}
+                                                        @TypeResolver(XmlTypeResolver.class) InputStream actingParameter) {}
 
-  public void withFourBoundActingParametes(@OfValues(
+  public void withFourBoundActingParameters(@OfValues(
       value = WithFourActingParametersValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field1"),
           @Binding(actingParameter = "anotherValue", path = "actingParameter.nested.field2"),
-          @Binding(actingParameter = "someValue", path = "actingParameter.nested.field.3"),
+          @Binding(actingParameter = "someValue", path = "actingParameter.nested.field3"),
           @Binding(actingParameter = "optionalValue", path = "actingParameter.anotherNested.field4")}) String parameterWithValues,
-                                           InputStream actingParameter) {}
+                                            @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
   public void withBoundActingParameterArray(@OfValues(
       value = WithArrayParameterValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.jsonArray")}) String parameterWithValues,
-                                            InputStream actingParameter) {}
+                                            @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
   public void withPojoBoundActingParameter(@OfValues(
       value = WithPojoParameterValueProvider.class,
