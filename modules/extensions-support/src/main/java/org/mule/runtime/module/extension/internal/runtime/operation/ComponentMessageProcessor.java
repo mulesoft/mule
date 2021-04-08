@@ -168,8 +168,8 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import org.slf4j.MDC;
+
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -1336,8 +1336,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
 
     ffRegistry.registerFeature(HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE,
-                               ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
-                                   && ctx.getConfiguration().getMinMuleVersion().get().atLeast("4.4.0"));
+                               ctx -> ctx.getConfiguration().getMinMuleVersion().map(v -> v.atLeast("4.4.0")).orElse(false));
 
   }
 

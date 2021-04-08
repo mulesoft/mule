@@ -799,8 +799,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
 
     ffRegistry.registerFeature(HANDLE_SPLITTER_EXCEPTION,
-                               ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
-                                   && ctx.getConfiguration().getMinMuleVersion().get().atLeast("4.4.0"));
+                               ctx -> ctx.getConfiguration().getMinMuleVersion().map(v -> v.atLeast("4.4.0")).orElse(false));
   }
 
   private static void configureBatchFixedAggregatorTransactionRecordBuffer() {
