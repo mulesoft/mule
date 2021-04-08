@@ -36,8 +36,7 @@ public class ParameterUtils {
                  toMap(
                        key -> containedElementsByName.get(key).getElementName(),
                        key -> key,
-                       (a, b) -> b)
-        );
+                       (a, b) -> b));
 
     // Add its childrens to the dictionary
     containedElementsByName.values().stream().map(DslElementSyntax::getContainedElementsByName)
