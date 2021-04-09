@@ -112,9 +112,9 @@ public class BeanDefinitionFactory {
   public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
+    this.parameterUtils = new ParameterUtils();
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
-    this.parameterUtils = new ParameterUtils();
 
     registerConfigurationPropertyProviders();
   }
