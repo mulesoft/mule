@@ -45,6 +45,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.management.stats.AllStatistics.configureComputeConnectionErrorsInStats;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
+import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.configureHonourRetryPolicyTemplateOverrideFeature;
@@ -155,6 +156,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     configureHonourRetryPolicyTemplateOverrideFeature();
     configureBatchFixedAggregatorTransactionRecordBuffer();
     configureComputeConnectionErrorsInStats();
+    configureToStringTransformerTransformIteratorElements();
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactContext.class);
