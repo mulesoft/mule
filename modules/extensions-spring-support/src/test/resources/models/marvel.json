@@ -87,6 +87,7 @@
                   }
                 }
               ],
+              "semanticTerms": [],
               "name": "ironManConfig",
               "description": "",
               "modelProperties": {}
@@ -119,6 +120,7 @@
                   "namespace": "OS"
                 }
               ],
+              "semanticTerms": [],
               "name": "spellStore",
               "description": "",
               "modelProperties": {}
@@ -146,6 +148,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -263,6 +266,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -321,6 +325,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "CRASH_CAR",
             "namespace": "MARVEL",
@@ -384,6 +389,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -497,6 +503,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -583,6 +590,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_RELICS",
             "namespace": "MARVEL",
@@ -646,6 +654,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -798,6 +807,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -852,6 +862,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -884,6 +895,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1000,6 +1012,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1189,6 +1202,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1275,6 +1289,7 @@
             "MARVEL:CONNECTIVITY",
             "MARVEL:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "OBJECT_TO_STREAM",
             "namespace": "MARVEL",
@@ -1332,6 +1347,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "data",
                   "description": "",
                   "modelProperties": {}
@@ -1384,6 +1400,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1561,6 +1578,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -1615,6 +1633,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1647,6 +1666,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1763,6 +1783,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1952,6 +1973,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2023,6 +2045,7 @@
             "MARVEL:CONNECTIVITY",
             "MARVEL:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "READ_STREAM",
             "namespace": "MARVEL",
@@ -2078,6 +2101,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "stream",
                   "description": "",
                   "modelProperties": {}
@@ -2130,6 +2154,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2173,6 +2198,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2205,6 +2231,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2321,6 +2348,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -2510,6 +2538,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2593,6 +2622,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SAY_MAGIC_WORDS",
             "namespace": "MARVEL",
@@ -2653,6 +2683,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "values",
                   "description": "",
                   "modelProperties": {}
@@ -2695,6 +2726,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "fetchSize",
                   "description": "",
                   "modelProperties": {}
@@ -2723,6 +2755,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
@@ -2779,6 +2812,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2931,6 +2965,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -2985,6 +3020,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3017,6 +3053,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3133,6 +3170,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -3322,6 +3360,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3392,6 +3431,7 @@
             "MARVEL:CONNECTIVITY",
             "MARVEL:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SEEK_STREAM",
             "namespace": "MARVEL",
@@ -3447,6 +3487,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "stream",
                   "description": "",
                   "modelProperties": {}
@@ -3489,6 +3530,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "position",
                   "description": "",
                   "modelProperties": {}
@@ -3541,6 +3583,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -3584,6 +3627,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3616,6 +3660,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3732,6 +3777,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -3921,6 +3967,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4007,6 +4054,7 @@
             "MARVEL:CONNECTIVITY",
             "MARVEL:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "TO_STREAM",
             "namespace": "MARVEL",
@@ -4046,6 +4094,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "data",
                   "description": "",
                   "modelProperties": {}
@@ -4098,6 +4147,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -4275,6 +4325,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -4329,6 +4380,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -4361,6 +4413,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -4477,6 +4530,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -4666,6 +4720,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4727,6 +4782,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "REFERABLE_OPERATION",
             "namespace": "MARVEL",
@@ -4766,6 +4822,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "flowRef",
                   "description": "",
                   "modelProperties": {}
@@ -4793,6 +4850,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "name",
                   "description": "",
                   "modelProperties": {}
@@ -4845,6 +4903,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -4958,6 +5017,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -5001,6 +5061,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "MYSTIC",
             "namespace": "MARVEL",
@@ -5052,6 +5113,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "multipleConfig",
                   "description": "",
                   "modelProperties": {}
@@ -5261,6 +5323,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -5304,6 +5367,7 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "POOLING-MYSTIC",
             "namespace": "MARVEL",
@@ -5355,6 +5419,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "multipleConfig",
                   "description": "",
                   "modelProperties": {}
@@ -5564,6 +5629,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -5777,6 +5843,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
@@ -5867,6 +5934,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "BYTES-CASTER",
             "namespace": "MARVEL",
@@ -5920,6 +5988,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "castFrequencyInMillis",
                   "description": "",
                   "modelProperties": {}
@@ -5947,6 +6016,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "spell",
                   "description": "",
                   "modelProperties": {}
@@ -5990,6 +6060,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "spellSize",
                   "description": "",
                   "modelProperties": {}
@@ -6026,6 +6097,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "nextOperationReference",
                   "description": "",
                   "modelProperties": {}
@@ -6053,6 +6125,7 @@
                     "order": 5
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "listenerId",
                   "description": "",
                   "modelProperties": {}
@@ -6105,6 +6178,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -6134,6 +6208,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -6311,6 +6386,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -6461,6 +6537,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -6543,6 +6620,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "ironManConfigFile",
               "displayModel": {
                 "pathModel": {
@@ -6579,6 +6657,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aiType",
               "displayModel": {
                 "classValueModel": {
@@ -6613,6 +6692,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -6730,6 +6810,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -6788,6 +6869,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "COMPUTE_FLIGHT_PLAN",
             "namespace": "MARVEL",
@@ -6851,6 +6933,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -6964,6 +7047,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -7037,6 +7121,7 @@
             "MARVEL:CONNECTIVITY",
             "MARVEL:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "FIRE_MISSILE",
             "namespace": "MARVEL",
@@ -7075,6 +7160,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "at",
                   "description": "",
                   "modelProperties": {}
@@ -7127,6 +7213,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -7170,6 +7257,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -7202,6 +7290,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -7318,6 +7407,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -7507,6 +7597,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -7577,6 +7668,7 @@
             "MARVEL:CONNECTIVITY",
             "MARVEL:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "FIRE_MISSILE_EPIC_SHOT",
             "namespace": "MARVEL",
@@ -7615,6 +7707,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "at",
                   "description": "",
                   "modelProperties": {}
@@ -7667,6 +7760,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -7710,6 +7804,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -7742,6 +7837,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -7858,6 +7954,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -8047,6 +8144,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -8117,6 +8215,7 @@
             "MARVEL:CONNECTIVITY",
             "MARVEL:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "FIRE_MISSILE_MISHAP",
             "namespace": "MARVEL",
@@ -8155,6 +8254,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "at",
                   "description": "",
                   "modelProperties": {}
@@ -8207,6 +8307,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -8250,6 +8351,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -8282,6 +8384,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -8398,6 +8501,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -8587,6 +8691,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -8627,6 +8732,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "MISSILE",
             "namespace": "MARVEL",
@@ -8661,6 +8767,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "missileConfigurationDirectory",
                   "displayModel": {
                     "pathModel": {
@@ -8878,6 +8985,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -8921,6 +9029,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "ODD-MISSILE",
             "namespace": "MARVEL",
@@ -8955,6 +9064,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "missileConfigurationDirectory",
                   "displayModel": {
                     "pathModel": {
@@ -9172,6 +9282,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -9260,6 +9371,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -9395,6 +9507,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "ADAMANTIUM_INJECTORS",
         "namespace": "MARVEL",
@@ -9448,6 +9561,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "injectorsToCreate",
               "description": "",
               "modelProperties": {}
@@ -9490,6 +9604,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "injectorLoad",
               "description": "",
               "modelProperties": {}
@@ -9518,6 +9633,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
@@ -9550,6 +9666,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {
@@ -9597,6 +9714,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -9629,6 +9747,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -9745,6 +9864,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -9815,6 +9935,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "FIND_INSTRUCTIONS",
         "namespace": "MARVEL",
@@ -9853,6 +9974,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "instructionsFile",
               "displayModel": {
                 "pathModel": {
@@ -9890,6 +10012,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "readerClass",
               "displayModel": {
                 "classValueModel": {
@@ -9940,6 +10063,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -9972,6 +10096,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -10088,6 +10213,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -10152,6 +10278,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GAMBIT_CHARGE_ITEMS",
         "namespace": "MARVEL",
@@ -10208,6 +10335,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "items",
               "description": "",
               "modelProperties": {}
@@ -10321,6 +10449,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -10385,6 +10514,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GAMBIT_RELUCTANT_CHARGE",
         "namespace": "MARVEL",
@@ -10439,6 +10569,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "input",
               "description": "",
               "modelProperties": {}
@@ -10552,6 +10683,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -10616,6 +10748,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GAMBIT_RELUCTANT_CHARGE_ITEMS",
         "namespace": "MARVEL",
@@ -10671,6 +10804,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "items",
               "description": "",
               "modelProperties": {}
@@ -10784,6 +10918,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -10869,6 +11004,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "READ_OBJECT_STREAM",
         "namespace": "MARVEL",
@@ -10927,6 +11063,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "iteratorValues",
               "description": "",
               "modelProperties": {}
@@ -10955,6 +11092,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
@@ -11002,6 +11140,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11034,6 +11173,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -11150,6 +11290,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -11271,6 +11412,7 @@
         }
       ],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SCOPEVERSE",
         "namespace": "MARVEL",
@@ -11329,6 +11471,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -11376,6 +11519,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "attributes",
               "description": "",
               "modelProperties": {}
@@ -11419,6 +11563,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11451,6 +11596,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -11567,6 +11713,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -11650,6 +11797,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WOLVERINE_BLACKLIST",
         "namespace": "MARVEL",
@@ -11689,6 +11837,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
@@ -11736,6 +11885,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11768,6 +11918,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -11884,6 +12035,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -11948,6 +12100,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WOLVERINE_CHILL_OUT",
         "namespace": "MARVEL",
@@ -12008,6 +12161,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "bears",
               "description": "",
               "modelProperties": {}
@@ -12054,6 +12208,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "river",
               "description": "",
               "modelProperties": {}
@@ -12102,6 +12257,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "friends",
               "description": "",
               "modelProperties": {}
@@ -12215,6 +12371,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -12279,6 +12436,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WOLVERINE_CHILL_OUT_QUICK",
         "namespace": "MARVEL",
@@ -12339,6 +12497,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "bears",
               "description": "",
               "modelProperties": {}
@@ -12385,6 +12544,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "river",
               "description": "",
               "modelProperties": {}
@@ -12433,6 +12593,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "friends",
               "description": "",
               "modelProperties": {}
@@ -12546,6 +12707,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -12610,6 +12772,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WOLVERINE_SHRED",
         "namespace": "MARVEL",
@@ -12687,6 +12850,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "enemies",
               "description": "",
               "modelProperties": {}
@@ -12800,6 +12964,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -12883,6 +13048,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WOUNDS_PASSTHROUGH",
         "namespace": "MARVEL",
@@ -12941,6 +13107,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "wounds",
               "description": "",
               "modelProperties": {}
@@ -12984,6 +13151,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -13016,6 +13184,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -13132,6 +13301,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -13269,6 +13439,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "CEREBRO_DETECT_NEW_MUTANTS",
         "namespace": "MARVEL",
@@ -13308,6 +13479,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
@@ -13341,6 +13513,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -13480,6 +13653,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -13564,6 +13738,7 @@
                   "order": 4
                 },
                 "allowedStereotypeModels": [],
+                "semanticTerms": [],
                 "name": "body",
                 "displayModel": {
                   "summary": "The body of the Message"
@@ -13629,6 +13804,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "MAGNETO_BROTHERHOOD",
         "namespace": "MARVEL",
@@ -13668,6 +13844,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
@@ -13700,6 +13877,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {
@@ -13733,6 +13911,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -13872,6 +14051,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -13956,6 +14136,7 @@
                   "order": 3
                 },
                 "allowedStereotypeModels": [],
+                "semanticTerms": [],
                 "name": "body",
                 "displayModel": {
                   "summary": "The body of the Message"
@@ -14026,6 +14207,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "MAGNETO_MUTANT_SUMMON",
         "namespace": "MARVEL",
@@ -14066,6 +14248,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -14243,6 +14426,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -14393,6 +14577,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {

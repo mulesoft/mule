@@ -78,6 +78,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -195,6 +196,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -256,6 +258,7 @@
             "TX:RETRY_EXHAUSTED",
             "TX:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION_EXCEPTION",
             "namespace": "TX",
@@ -319,6 +322,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -371,6 +375,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -484,6 +489,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -673,6 +679,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -773,6 +780,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "FAILING_PAGED_TRANSACTIONAL_OPERATION",
             "namespace": "TX",
@@ -828,6 +836,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failOn",
                   "description": "",
                   "modelProperties": {}
@@ -880,6 +889,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -932,6 +942,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -1084,6 +1095,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -1138,6 +1150,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1170,6 +1183,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1286,6 +1300,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1475,6 +1490,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1539,6 +1555,7 @@
             "TX:RETRY_EXHAUSTED",
             "TX:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TX",
@@ -1602,6 +1619,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1654,6 +1672,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -1697,6 +1716,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1729,6 +1749,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1845,6 +1866,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -2034,6 +2056,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2131,6 +2154,7 @@
             "TX:RETRY_EXHAUSTED",
             "TX:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "INJECT_TRANSACTIONAL_ACTION",
             "namespace": "TX",
@@ -2194,6 +2218,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -2246,6 +2271,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2289,6 +2315,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2321,6 +2348,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2437,6 +2465,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -2626,6 +2655,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2726,6 +2756,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_TRANSACTIONAL_OPERATION",
             "namespace": "TX",
@@ -2789,6 +2820,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2841,6 +2873,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -2993,6 +3026,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -3047,6 +3081,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3079,6 +3114,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3195,6 +3231,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -3384,6 +3421,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3484,6 +3522,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "STICKY_FAILING_PAGED_TRANSACTIONAL_OPERATION",
             "namespace": "TX",
@@ -3539,6 +3578,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failOn",
                   "description": "",
                   "modelProperties": {}
@@ -3591,6 +3631,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -3643,6 +3684,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -3795,6 +3837,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -3849,6 +3892,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3881,6 +3925,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3997,6 +4042,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -4186,6 +4232,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4250,6 +4297,7 @@
             "TX:RETRY_EXHAUSTED",
             "TX:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "VERIFY_NO_TRANSACTION",
             "namespace": "TX",
@@ -4313,6 +4361,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -4365,6 +4414,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -4478,6 +4528,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -4667,6 +4718,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4731,6 +4783,7 @@
             "TX:RETRY_EXHAUSTED",
             "TX:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "VERIFY_SAME_CONNECTION",
             "namespace": "TX",
@@ -4775,6 +4828,7 @@
                       "namespace": "TX"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "transactionalConnection",
                   "description": "",
                   "modelProperties": {}
@@ -4827,6 +4881,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -4879,6 +4934,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -4992,6 +5048,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -5181,6 +5238,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5245,6 +5303,7 @@
             "TX:RETRY_EXHAUSTED",
             "TX:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "VERIFY_TRANSACTION_BEGUN",
             "namespace": "TX",
@@ -5308,6 +5367,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -5360,6 +5420,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -5473,6 +5534,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -5662,6 +5724,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5726,6 +5789,7 @@
             "TX:RETRY_EXHAUSTED",
             "TX:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "VERIFY_TRANSACTION_COMMITED",
             "namespace": "TX",
@@ -5789,6 +5853,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -5841,6 +5906,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -5954,6 +6020,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -6143,6 +6210,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -6207,6 +6275,7 @@
             "TX:RETRY_EXHAUSTED",
             "TX:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "VERIFY_TRANSACTION_ROLLEDBACK",
             "namespace": "TX",
@@ -6270,6 +6339,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -6322,6 +6392,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -6435,6 +6506,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -6624,6 +6696,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -6664,6 +6737,7 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "TX",
@@ -6702,6 +6776,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "useXa",
                   "description": "",
                   "modelProperties": {}
@@ -6911,6 +6986,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -7124,6 +7200,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
@@ -7167,6 +7244,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "NON-POOLING",
             "namespace": "TX",
@@ -7205,6 +7283,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "useXa",
                   "description": "",
                   "modelProperties": {}
@@ -7414,6 +7493,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -7518,6 +7598,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "TRANSACTIONAL_SOURCE",
             "namespace": "TX",
@@ -7581,6 +7662,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -7632,6 +7714,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of beginning action that sources can take regarding transactions.",
                   "modelProperties": {}
@@ -7661,6 +7744,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -7712,6 +7796,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionType",
                   "description": "The type of transaction to create. Availability will depend on the runtime version.",
                   "modelProperties": {
@@ -7855,6 +7940,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -8041,6 +8127,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -8152,6 +8239,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "TRANSACTIONAL_SOURCE_WITH_TX_PARAMETERS",
             "namespace": "TX",
@@ -8215,6 +8303,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -8266,6 +8355,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionType",
                   "description": "The type of transaction to create. Availability will depend on the runtime version.",
                   "modelProperties": {}
@@ -8295,6 +8385,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -8346,6 +8437,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transactionalAction",
                   "description": "The type of beginning action that sources can take regarding transactions.",
                   "modelProperties": {
@@ -8489,6 +8581,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -8675,6 +8768,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -8749,6 +8843,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "FAIL",
         "namespace": "TX",
@@ -8858,6 +8953,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -8903,6 +8999,7 @@
       "connectionManagementType": "POOLING",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "semanticTerms": [],
       "stereotype": {
         "type": "CONNECTION",
         "namespace": "TX",
@@ -8941,6 +9038,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "useXa",
               "description": "",
               "modelProperties": {}
@@ -9150,6 +9248,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -9363,6 +9462,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "poolingProfile",
               "description": "Characteristics of the connection pool",
               "modelProperties": {
@@ -9406,6 +9506,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "semanticTerms": [],
       "stereotype": {
         "type": "NON-POOLING",
         "namespace": "TX",
@@ -9444,6 +9545,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "useXa",
               "description": "",
               "modelProperties": {}
@@ -9653,6 +9755,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {

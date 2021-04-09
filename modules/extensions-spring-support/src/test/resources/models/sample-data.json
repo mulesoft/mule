@@ -78,6 +78,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "prefix",
               "description": "",
               "modelProperties": {}
@@ -105,6 +106,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -222,6 +224,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -304,6 +307,7 @@
             "SAMPLE-DATA:RETRY_EXHAUSTED",
             "SAMPLE-DATA:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ALIASED_GROUP",
             "namespace": "SAMPLE-DATA",
@@ -367,6 +371,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -409,6 +414,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "aliasedPayload",
                   "description": "",
                   "modelProperties": {}
@@ -436,6 +442,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "aliasedAttributes",
                   "description": "",
                   "modelProperties": {}
@@ -479,6 +486,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -511,6 +519,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -627,6 +636,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -816,6 +826,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -901,6 +912,7 @@
             "SAMPLE-DATA:RETRY_EXHAUSTED",
             "SAMPLE-DATA:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "NON_BLOCKING",
             "namespace": "SAMPLE-DATA",
@@ -939,6 +951,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "payload",
                   "description": "",
                   "modelProperties": {}
@@ -966,6 +979,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "attributes",
                   "description": "",
                   "modelProperties": {}
@@ -1018,6 +1032,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1061,6 +1076,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1093,6 +1109,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1209,6 +1226,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1398,6 +1416,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1483,6 +1502,7 @@
             "SAMPLE-DATA:RETRY_EXHAUSTED",
             "SAMPLE-DATA:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "PARAMETER_GROUP",
             "namespace": "SAMPLE-DATA",
@@ -1546,6 +1566,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1588,6 +1609,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "groupParameter",
                   "description": "",
                   "modelProperties": {}
@@ -1615,6 +1637,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "optionalParameter",
                   "description": "",
                   "modelProperties": {}
@@ -1658,6 +1681,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1690,6 +1714,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1806,6 +1831,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1995,6 +2021,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2080,6 +2107,7 @@
             "SAMPLE-DATA:RETRY_EXHAUSTED",
             "SAMPLE-DATA:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SHOW_IN_DSL_PARAMETER_GROUP",
             "namespace": "SAMPLE-DATA",
@@ -2143,6 +2171,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2185,6 +2214,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "groupParameter",
                   "description": "",
                   "modelProperties": {}
@@ -2212,6 +2242,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "optionalParameter",
                   "description": "",
                   "modelProperties": {}
@@ -2255,6 +2286,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2287,6 +2319,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2403,6 +2436,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -2592,6 +2626,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2677,6 +2712,7 @@
             "SAMPLE-DATA:RETRY_EXHAUSTED",
             "SAMPLE-DATA:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "USE_CONFIG",
             "namespace": "SAMPLE-DATA",
@@ -2715,6 +2751,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "payload",
                   "description": "",
                   "modelProperties": {}
@@ -2742,6 +2779,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "attributes",
                   "description": "",
                   "modelProperties": {}
@@ -2794,6 +2832,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2837,6 +2876,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2869,6 +2909,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2985,6 +3026,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -3174,6 +3216,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3259,6 +3302,7 @@
             "SAMPLE-DATA:RETRY_EXHAUSTED",
             "SAMPLE-DATA:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "USE_CONNECTION",
             "namespace": "SAMPLE-DATA",
@@ -3297,6 +3341,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "payload",
                   "description": "",
                   "modelProperties": {}
@@ -3324,6 +3369,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "attributes",
                   "description": "",
                   "modelProperties": {}
@@ -3376,6 +3422,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -3419,6 +3466,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3451,6 +3499,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3567,6 +3616,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -3756,6 +3806,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3796,6 +3847,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "SAMPLE-DATA",
@@ -3997,6 +4049,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -4080,6 +4133,7 @@
           },
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONFIG-LISTENER",
             "namespace": "SAMPLE-DATA",
@@ -4118,6 +4172,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "payload",
                   "description": "",
                   "modelProperties": {}
@@ -4145,6 +4200,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "attributes",
                   "description": "",
                   "modelProperties": {}
@@ -4197,6 +4253,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -4226,6 +4283,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -4365,6 +4423,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -4551,6 +4610,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4633,6 +4693,7 @@
           },
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTED-LISTENER",
             "namespace": "SAMPLE-DATA",
@@ -4671,6 +4732,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "payload",
                   "description": "",
                   "modelProperties": {}
@@ -4698,6 +4760,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "attributes",
                   "description": "",
                   "modelProperties": {}
@@ -4750,6 +4813,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -4779,6 +4843,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -4918,6 +4983,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -5104,6 +5170,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5196,6 +5263,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "COMPLEX_ACTING_PARAMETER",
         "namespace": "SAMPLE-DATA",
@@ -5234,6 +5302,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "complex",
               "description": "",
               "modelProperties": {}
@@ -5277,6 +5346,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -5309,6 +5379,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -5425,6 +5496,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -5521,6 +5593,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "COMPLEX_GENERICS",
         "namespace": "SAMPLE-DATA",
@@ -5559,6 +5632,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "complex",
               "description": "",
               "modelProperties": {}
@@ -5602,6 +5676,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -5634,6 +5709,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -5750,6 +5826,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -5835,6 +5912,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "CONNECTION_LESS",
         "namespace": "SAMPLE-DATA",
@@ -5873,6 +5951,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -5900,6 +5979,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "attributes",
               "description": "",
               "modelProperties": {}
@@ -5943,6 +6023,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -5975,6 +6056,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -6091,6 +6173,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -6208,6 +6291,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "MORE_COMPLEX_GENERICS",
         "namespace": "SAMPLE-DATA",
@@ -6246,6 +6330,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "complex",
               "description": "",
               "modelProperties": {}
@@ -6289,6 +6374,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6321,6 +6407,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -6437,6 +6524,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -6522,6 +6610,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "MULE_CONTEXT_AWARE_SAMPLE_DATA",
         "namespace": "SAMPLE-DATA",
@@ -6560,6 +6649,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -6587,6 +6677,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "attributes",
               "description": "",
               "modelProperties": {}
@@ -6630,6 +6721,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6662,6 +6754,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -6778,6 +6871,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -6863,6 +6957,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "OPTIONAL_PARAMETERS",
         "namespace": "SAMPLE-DATA",
@@ -6902,6 +6997,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -6929,6 +7025,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "attributes",
               "description": "",
               "modelProperties": {}
@@ -6972,6 +7069,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7004,6 +7102,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -7120,6 +7219,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -7196,6 +7296,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "PARAMETER_LESS",
         "namespace": "SAMPLE-DATA",
@@ -7235,6 +7336,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7267,6 +7369,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -7383,6 +7486,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -7428,6 +7532,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "semanticTerms": [],
       "stereotype": {
         "type": "CONNECTION",
         "namespace": "SAMPLE-DATA",
@@ -7629,6 +7734,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -7712,6 +7818,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "ALIASED-GROUP-LISTENER",
         "namespace": "SAMPLE-DATA",
@@ -7752,6 +7859,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -7891,6 +7999,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -7944,6 +8053,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aliasedPayload",
               "description": "",
               "modelProperties": {}
@@ -7971,6 +8081,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aliasedAttributes",
               "description": "",
               "modelProperties": {}
@@ -8038,6 +8149,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "COMPLEX-ACTING-PARAMETER-LISTENER",
         "namespace": "SAMPLE-DATA",
@@ -8076,6 +8188,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "complex",
               "description": "",
               "modelProperties": {}
@@ -8105,6 +8218,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -8244,6 +8358,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -8326,6 +8441,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "LISTENER",
         "namespace": "SAMPLE-DATA",
@@ -8364,6 +8480,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -8391,6 +8508,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "attributes",
               "description": "",
               "modelProperties": {}
@@ -8420,6 +8538,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -8559,6 +8678,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -8641,6 +8761,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "MULE-CONTEXT-AWARE-LISTENER",
         "namespace": "SAMPLE-DATA",
@@ -8679,6 +8800,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -8706,6 +8828,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "attributes",
               "description": "",
               "modelProperties": {}
@@ -8735,6 +8858,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -8874,6 +8998,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -8956,6 +9081,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "PARAMETER-GROUP-LISTENER",
         "namespace": "SAMPLE-DATA",
@@ -8996,6 +9122,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -9135,6 +9262,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -9188,6 +9316,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "groupParameter",
               "description": "",
               "modelProperties": {}
@@ -9215,6 +9344,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "optionalParameter",
               "description": "",
               "modelProperties": {}
@@ -9286,6 +9416,7 @@
       },
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SHOW-IN-DSL-PARAMETER-GROUP-LISTENER",
         "namespace": "SAMPLE-DATA",
@@ -9326,6 +9457,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -9465,6 +9597,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -9518,6 +9651,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "groupParameter",
               "description": "",
               "modelProperties": {}
@@ -9545,6 +9679,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "optionalParameter",
               "description": "",
               "modelProperties": {}

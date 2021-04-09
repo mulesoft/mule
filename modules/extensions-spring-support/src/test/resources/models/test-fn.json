@@ -131,6 +131,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -216,6 +217,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "EVALUATE",
         "namespace": "FN",
@@ -273,6 +275,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -301,6 +304,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
@@ -333,6 +337,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {
@@ -380,6 +385,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -412,6 +418,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -528,6 +535,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -612,6 +620,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "echo",
               "description": "",
               "modelProperties": {}
@@ -668,6 +677,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "bool",
               "description": "",
               "modelProperties": {}
@@ -709,6 +719,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "number",
               "description": "",
               "modelProperties": {}
@@ -749,6 +760,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "doubles",
               "description": "",
               "modelProperties": {}
@@ -789,6 +801,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "floats",
               "description": "",
               "modelProperties": {}
@@ -830,6 +843,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "longs",
               "description": "",
               "modelProperties": {}
@@ -870,6 +884,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "shorts",
               "description": "",
               "modelProperties": {}
@@ -959,6 +974,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -986,6 +1002,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "prefix",
               "description": "",
               "modelProperties": {}
@@ -1139,6 +1156,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "listToSplit",
               "description": "",
               "modelProperties": {}
@@ -1180,6 +1198,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "groupSize",
               "description": "",
               "modelProperties": {}
@@ -1299,6 +1318,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pojo",
               "description": "",
               "modelProperties": {}
@@ -1383,6 +1403,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "stream",
               "description": "",
               "modelProperties": {}
@@ -1494,6 +1515,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "notObject",
               "description": "",
               "modelProperties": {}
@@ -1520,6 +1542,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "string",
               "description": "",
               "modelProperties": {}
@@ -1562,6 +1585,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "stream",
               "description": "",
               "modelProperties": {}
@@ -1588,6 +1612,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "door",
               "description": "",
               "modelProperties": {}
@@ -1663,6 +1688,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expression",
               "description": "",
               "modelProperties": {}
@@ -1706,6 +1732,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "item",
               "description": "",
               "modelProperties": {}
@@ -1732,6 +1759,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "returnType",
               "description": "",
               "modelProperties": {}

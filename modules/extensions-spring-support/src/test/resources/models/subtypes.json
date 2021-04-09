@@ -456,6 +456,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "abstractShape",
               "description": "",
               "modelProperties": {}
@@ -488,6 +489,7 @@
                   "namespace": "SUBTYPES"
                 }
               ],
+              "semanticTerms": [],
               "name": "doorInterface",
               "description": "",
               "modelProperties": {}
@@ -524,6 +526,7 @@
                   }
                 }
               ],
+              "semanticTerms": [],
               "name": "explicitSquare",
               "description": "",
               "modelProperties": {}
@@ -551,6 +554,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "finalPojo",
               "description": "",
               "modelProperties": {}
@@ -587,6 +591,7 @@
                   }
                 }
               ],
+              "semanticTerms": [],
               "name": "ricin",
               "description": "",
               "modelProperties": {}
@@ -619,6 +624,7 @@
                   "namespace": "HEISENBERG"
                 }
               ],
+              "semanticTerms": [],
               "name": "extensibleWeapon",
               "description": "",
               "modelProperties": {}
@@ -646,6 +652,7 @@
                 "order": 7
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "triangle",
               "description": "",
               "modelProperties": {}
@@ -673,6 +680,7 @@
                 "order": 8
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pojoWithExtension",
               "description": "",
               "modelProperties": {}
@@ -721,6 +729,7 @@
                 "order": 9
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "onePojos",
               "description": "",
               "modelProperties": {}
@@ -769,6 +778,7 @@
                 "order": 10
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "twoPojos",
               "description": "",
               "modelProperties": {}
@@ -822,6 +832,7 @@
                   "namespace": "HEISENBERG"
                 }
               ],
+              "semanticTerms": [],
               "name": "weapons",
               "description": "",
               "modelProperties": {}
@@ -875,6 +886,7 @@
                   "namespace": "HEISENBERG"
                 }
               ],
+              "semanticTerms": [],
               "name": "weaponMap",
               "description": "",
               "modelProperties": {}
@@ -902,6 +914,7 @@
                 "order": 14
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -1019,6 +1032,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -1077,6 +1091,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONFIG_RETRIEVER",
             "namespace": "SUBTYPES",
@@ -1140,6 +1155,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1183,6 +1199,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1215,6 +1232,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1331,6 +1349,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1408,6 +1427,7 @@
             "SUBTYPES:CONNECTIVITY",
             "SUBTYPES:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION_RETRIEVER",
             "namespace": "SUBTYPES",
@@ -1471,6 +1491,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1514,6 +1535,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1546,6 +1568,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1662,6 +1685,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1851,6 +1875,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1901,6 +1926,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "SUBTYPES",
@@ -1935,6 +1961,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "abstractShape",
                   "description": "",
                   "modelProperties": {}
@@ -1967,6 +1994,7 @@
                       "namespace": "SUBTYPES"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "doorInterface",
                   "description": "",
                   "modelProperties": {}
@@ -2020,6 +2048,7 @@
                       "namespace": "SUBTYPES"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "doors",
                   "description": "",
                   "modelProperties": {}
@@ -2229,6 +2258,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -2323,6 +2353,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "DOOR_RETRIEVER",
         "namespace": "SUBTYPES",
@@ -2366,6 +2397,7 @@
                   "namespace": "SUBTYPES"
                 }
               ],
+              "semanticTerms": [],
               "name": "door",
               "description": "",
               "modelProperties": {}
@@ -2409,6 +2441,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2441,6 +2474,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2557,6 +2591,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -2631,6 +2666,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "NO_GLOBAL_POJO",
         "namespace": "SUBTYPES",
@@ -2669,6 +2705,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "noGlobalPojo",
               "description": "",
               "modelProperties": {}
@@ -2712,6 +2749,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2744,6 +2782,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2860,6 +2899,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -2976,6 +3016,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "PROCESS_DOOR",
         "namespace": "SUBTYPES",
@@ -3019,6 +3060,7 @@
                   "namespace": "SUBTYPES"
                 }
               ],
+              "semanticTerms": [],
               "name": "door",
               "description": "",
               "modelProperties": {}
@@ -3072,6 +3114,7 @@
                   "namespace": "SUBTYPES"
                 }
               ],
+              "semanticTerms": [],
               "name": "doorRegistry",
               "description": "",
               "modelProperties": {}
@@ -3115,6 +3158,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -3147,6 +3191,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -3263,6 +3308,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -3337,6 +3383,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SHAPE_RETRIEVER",
         "namespace": "SUBTYPES",
@@ -3375,6 +3422,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "shape",
               "description": "",
               "modelProperties": {}
@@ -3418,6 +3466,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -3450,6 +3499,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -3566,6 +3616,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -3680,6 +3731,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SUBTYPED_AND_CONCRETE_PARAMETERS",
         "namespace": "SUBTYPES",
@@ -3718,6 +3770,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "baseShape",
               "description": "",
               "modelProperties": {}
@@ -3750,6 +3803,7 @@
                   "namespace": "SUBTYPES"
                 }
               ],
+              "semanticTerms": [],
               "name": "door",
               "description": "",
               "modelProperties": {}
@@ -3777,6 +3831,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "finalPojo",
               "description": "",
               "modelProperties": {}
@@ -3804,6 +3859,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "cookBook",
               "description": "",
               "modelProperties": {}
@@ -3831,6 +3887,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "squareShape",
               "description": "",
               "modelProperties": {}
@@ -3858,6 +3915,7 @@
                 "order": 6
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "triangle",
               "description": "",
               "modelProperties": {}
@@ -3885,6 +3943,7 @@
                 "order": 7
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "noRef",
               "description": "",
               "modelProperties": {}
@@ -3928,6 +3987,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -3960,6 +4020,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -4076,6 +4137,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -4131,6 +4193,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "semanticTerms": [],
       "stereotype": {
         "type": "CONNECTION",
         "namespace": "SUBTYPES",
@@ -4165,6 +4228,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "abstractShape",
               "description": "",
               "modelProperties": {}
@@ -4197,6 +4261,7 @@
                   "namespace": "SUBTYPES"
                 }
               ],
+              "semanticTerms": [],
               "name": "doorInterface",
               "description": "",
               "modelProperties": {}
@@ -4250,6 +4315,7 @@
                   "namespace": "SUBTYPES"
                 }
               ],
+              "semanticTerms": [],
               "name": "doors",
               "description": "",
               "modelProperties": {}
@@ -4459,6 +4525,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -4535,6 +4602,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SUBTYPES_SOURCE",
         "namespace": "SUBTYPES",
@@ -4578,6 +4646,7 @@
                   "namespace": "SUBTYPES"
                 }
               ],
+              "semanticTerms": [],
               "name": "doorParam",
               "description": "",
               "modelProperties": {}
@@ -4607,6 +4676,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -4746,6 +4816,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {

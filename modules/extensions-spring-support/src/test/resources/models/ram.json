@@ -95,6 +95,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -212,6 +213,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -464,6 +466,7 @@
             "RAM:BAD_RESPONSE",
             "MULE:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "INVOKE",
             "namespace": "RAM",
@@ -527,6 +530,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -569,6 +573,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "service",
                   "description": "",
                   "modelProperties": {
@@ -601,6 +606,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "operation",
                   "description": "",
                   "modelProperties": {
@@ -665,6 +671,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "body",
                   "displayModel": {
                     "summary": "The XML body to include in the SOAP message, with all the required parameters."
@@ -711,6 +718,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "headers",
                   "displayModel": {
                     "displayName": "Headers",
@@ -764,6 +772,7 @@
                     "order": 5
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "attachments",
                   "displayModel": {
                     "summary": "The attachments to include in the SOAP request."
@@ -829,6 +838,7 @@
                     "tabName": "Transport"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transportHeaders",
                   "displayModel": {
                     "displayName": "Headers",
@@ -876,6 +886,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -908,6 +919,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1024,6 +1036,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1213,6 +1226,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1335,6 +1349,7 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "RICK-AND-MORTY-CONNECTION",
             "namespace": "RAM",
@@ -1369,6 +1384,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "wsdlUrl",
                   "description": "",
                   "modelProperties": {}
@@ -1396,6 +1412,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "service",
                   "description": "",
                   "modelProperties": {}
@@ -1423,6 +1440,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "port",
                   "description": "",
                   "modelProperties": {}
@@ -1487,6 +1505,7 @@
                     "tabName": "Transport"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transport",
                   "displayModel": {
                     "displayName": "Transport Configuration"
@@ -1699,6 +1718,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -1912,6 +1932,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {

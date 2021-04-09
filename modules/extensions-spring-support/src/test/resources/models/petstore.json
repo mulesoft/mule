@@ -122,6 +122,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pets",
               "description": "",
               "modelProperties": {}
@@ -149,6 +150,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "cage",
               "description": "",
               "modelProperties": {}
@@ -197,6 +199,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "cages",
               "description": "",
               "modelProperties": {}
@@ -224,6 +227,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aquarium",
               "description": "",
               "modelProperties": {}
@@ -251,6 +255,7 @@
                 "order": 7
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -793,6 +798,7 @@
                   "namespace": "TLS"
                 }
               ],
+              "semanticTerms": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -921,6 +927,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -974,6 +981,7 @@
                 "order": 8
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "cashierName",
               "description": "",
               "modelProperties": {}
@@ -1001,6 +1009,7 @@
                 "order": 9
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "rothIRA",
               "description": "",
               "modelProperties": {}
@@ -1028,6 +1037,7 @@
                 "order": 10
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pensionPlan",
               "description": "",
               "modelProperties": {}
@@ -1072,6 +1082,7 @@
                 "order": 11
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "cash",
               "description": "",
               "modelProperties": {}
@@ -1116,6 +1127,7 @@
                 "order": 12
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "debt",
               "description": "",
               "modelProperties": {}
@@ -1168,6 +1180,7 @@
                 "order": 13
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "brand",
               "description": "",
               "modelProperties": {}
@@ -1195,6 +1208,7 @@
                 "order": 14
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "material",
               "description": "",
               "modelProperties": {}
@@ -1262,6 +1276,7 @@
             "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "FAIL_CONNECTION",
             "namespace": "PETSTORE",
@@ -1325,6 +1340,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1368,6 +1384,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1400,6 +1417,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1516,6 +1534,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1705,6 +1724,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1786,6 +1806,7 @@
             "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "FAIL_OPERATION_WITH_EXCEPTION",
             "namespace": "PETSTORE",
@@ -1849,6 +1870,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1892,6 +1914,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1924,6 +1947,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2040,6 +2064,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -2229,6 +2254,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2310,6 +2336,7 @@
             "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "FAIL_OPERATION_WITH_THROWABLE",
             "namespace": "PETSTORE",
@@ -2373,6 +2400,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2416,6 +2444,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2448,6 +2477,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2564,6 +2594,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -2753,6 +2784,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2824,6 +2856,7 @@
             "PETSTORE:PET_ERROR",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "FAILS_TO_READ_STREAM",
             "namespace": "PETSTORE",
@@ -2862,6 +2895,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -2914,6 +2948,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2957,6 +2992,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2989,6 +3025,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3105,6 +3142,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -3294,6 +3332,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3355,6 +3394,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_CAGE",
             "namespace": "PETSTORE",
@@ -3418,6 +3458,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -3461,6 +3502,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3493,6 +3535,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3609,6 +3652,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -3676,6 +3720,7 @@
             "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_CLIENT",
             "namespace": "PETSTORE",
@@ -3739,6 +3784,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -3782,6 +3828,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3814,6 +3861,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3930,6 +3978,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -4119,6 +4168,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4183,6 +4233,7 @@
             "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_CLIENT_ON_LATCH",
             "namespace": "PETSTORE",
@@ -4239,6 +4290,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "countDownLatch",
                   "description": "",
                   "modelProperties": {}
@@ -4284,6 +4336,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "latch",
                   "description": "",
                   "modelProperties": {}
@@ -4336,6 +4389,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -4379,6 +4433,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -4411,6 +4466,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -4527,6 +4583,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -4716,6 +4773,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4777,6 +4835,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_CONFIG",
             "namespace": "PETSTORE",
@@ -4840,6 +4899,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -4883,6 +4943,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -4915,6 +4976,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -5031,6 +5093,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -5115,6 +5178,7 @@
             "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_CONNECTION_AGE",
             "namespace": "PETSTORE",
@@ -5178,6 +5242,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -5221,6 +5286,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -5253,6 +5319,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -5369,6 +5436,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -5558,6 +5626,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5643,6 +5712,7 @@
             "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_PETS",
             "namespace": "PETSTORE",
@@ -5681,6 +5751,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "ownerName",
                   "description": "",
                   "modelProperties": {}
@@ -5724,6 +5795,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "ownerSignature",
                   "description": "",
                   "modelProperties": {}
@@ -5752,6 +5824,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
@@ -5808,6 +5881,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -5851,6 +5925,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -5883,6 +5958,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -5999,6 +6075,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -6188,6 +6265,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -6273,6 +6351,7 @@
             "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_PETS_WITH_INTERMITENT_CONNECTION_PROBLEM_AND_CLOSING_STREAM",
             "namespace": "PETSTORE",
@@ -6311,6 +6390,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "ownerName",
                   "description": "",
                   "modelProperties": {}
@@ -6354,6 +6434,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "ownerSignature",
                   "description": "",
                   "modelProperties": {}
@@ -6382,6 +6463,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
@@ -6438,6 +6520,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -6481,6 +6564,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -6513,6 +6597,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -6629,6 +6714,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -6818,6 +6904,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -6904,6 +6991,7 @@
             "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_STREAMED_SIGNATURE_WITH_ERROR",
             "namespace": "PETSTORE",
@@ -6942,6 +7030,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "signature",
                   "description": "",
                   "modelProperties": {}
@@ -6994,6 +7083,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -7171,6 +7261,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -7225,6 +7316,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -7257,6 +7349,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -7373,6 +7466,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -7562,6 +7656,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -7602,6 +7697,7 @@
           "connectionManagementType": "CACHED",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "SIMPLE_CONNECTION",
             "namespace": "PETSTORE",
@@ -7644,6 +7740,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -7671,6 +7768,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -7717,6 +7815,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -7784,6 +7883,7 @@
                     "order": 5
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -7852,6 +7952,7 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -8394,6 +8495,7 @@
                       "namespace": "TLS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -8614,6 +8716,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -8661,6 +8764,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "INVALID",
             "namespace": "PETSTORE",
@@ -8695,6 +8799,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -8722,6 +8827,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -8768,6 +8874,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -8835,6 +8942,7 @@
                     "order": 5
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -8903,6 +9011,7 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -9445,6 +9554,7 @@
                       "namespace": "TLS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -9665,6 +9775,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -9712,6 +9823,7 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CUSTOM_CONNECTION",
             "namespace": "PETSTORE",
@@ -9750,6 +9862,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -9777,6 +9890,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -9823,6 +9937,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -9890,6 +10005,7 @@
                     "order": 5
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -9958,6 +10074,7 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -10500,6 +10617,7 @@
                       "namespace": "TLS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -10720,6 +10838,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -10933,6 +11052,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
@@ -10980,6 +11100,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "TRANSACTIONAL",
             "namespace": "PETSTORE",
@@ -11014,6 +11135,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -11041,6 +11163,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -11087,6 +11210,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -11154,6 +11278,7 @@
                     "order": 5
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -11222,6 +11347,7 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -11764,6 +11890,7 @@
                       "namespace": "TLS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -11984,6 +12111,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -12031,6 +12159,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "VALID",
             "namespace": "PETSTORE",
@@ -12065,6 +12194,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -12092,6 +12222,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -12138,6 +12269,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -12205,6 +12337,7 @@
                     "order": 5
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -12273,6 +12406,7 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -12815,6 +12949,7 @@
                       "namespace": "TLS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -13035,6 +13170,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -13131,6 +13267,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTED_PET_ADOPTION_SOURCE",
             "namespace": "PETSTORE",
@@ -13173,6 +13310,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "watermark",
                   "description": "",
                   "modelProperties": {}
@@ -13204,6 +13342,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "idempotent",
                   "description": "",
                   "modelProperties": {}
@@ -13256,6 +13395,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -13285,6 +13425,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -13312,6 +13453,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "schedulingStrategy",
                   "description": "Configures the scheduler that triggers the polling",
                   "modelProperties": {
@@ -13462,6 +13604,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -13648,6 +13791,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -13725,6 +13869,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "PET-FAILING-SOURCE",
             "namespace": "PETSTORE",
@@ -13781,6 +13926,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failAtPoll",
                   "description": "",
                   "modelProperties": {}
@@ -13826,6 +13972,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "adoptionLimit",
                   "description": "",
                   "modelProperties": {}
@@ -13878,6 +14025,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -13907,6 +14055,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -13934,6 +14083,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "schedulingStrategy",
                   "description": "Configures the scheduler that triggers the polling",
                   "modelProperties": {
@@ -14084,6 +14234,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -14270,6 +14421,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -14355,6 +14507,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SOURCE",
             "namespace": "PETSTORE",
@@ -14397,6 +14550,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failOnStart",
                   "description": "",
                   "modelProperties": {}
@@ -14428,6 +14582,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failOnException",
                   "description": "",
                   "modelProperties": {}
@@ -14480,6 +14635,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -14509,6 +14665,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -14648,6 +14805,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -14834,6 +14992,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -14925,6 +15084,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "DESCRIBE_SERIALIZED_ANIMAL",
         "namespace": "PETSTORE",
@@ -14981,6 +15141,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "animal",
               "description": "",
               "modelProperties": {}
@@ -15024,6 +15185,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -15056,6 +15218,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -15172,6 +15335,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -15242,6 +15406,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "ECHO_WITH_SIGNATURE",
         "namespace": "PETSTORE",
@@ -15280,6 +15445,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "message",
               "description": "",
               "modelProperties": {}
@@ -15323,6 +15489,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -15355,6 +15522,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -15471,6 +15639,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -15541,6 +15710,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "FAIL",
         "namespace": "PETSTORE",
@@ -15600,6 +15770,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "petNames",
               "description": "",
               "modelProperties": {}
@@ -15643,6 +15814,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -15675,6 +15847,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -15791,6 +15964,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -15861,6 +16035,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "FEATURE_FLAGGED_ECHO",
         "namespace": "PETSTORE",
@@ -15899,6 +16074,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "message",
               "description": "",
               "modelProperties": {}
@@ -15942,6 +16118,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -15974,6 +16151,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -16090,6 +16268,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -16154,6 +16333,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET_AQUARIUM",
         "namespace": "PETSTORE",
@@ -16192,6 +16372,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "aquarium",
               "description": "",
               "modelProperties": {}
@@ -16235,6 +16416,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -16267,6 +16449,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -16383,6 +16566,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -16447,6 +16631,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET_BREEDER",
         "namespace": "PETSTORE",
@@ -16485,6 +16670,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "mammals",
               "description": "",
               "modelProperties": {}
@@ -16512,6 +16698,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "birds",
               "description": "",
               "modelProperties": {}
@@ -16563,6 +16750,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -16595,6 +16783,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -16711,6 +16900,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -16775,6 +16965,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET_CASHIER",
         "namespace": "PETSTORE",
@@ -16813,6 +17004,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "cashierName",
               "description": "",
               "modelProperties": {}
@@ -16840,6 +17032,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "rothIRA",
               "description": "",
               "modelProperties": {}
@@ -16867,6 +17060,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pensionPlan",
               "description": "",
               "modelProperties": {}
@@ -16911,6 +17105,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "cash",
               "description": "",
               "modelProperties": {}
@@ -16955,6 +17150,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "debt",
               "description": "",
               "modelProperties": {}
@@ -17008,6 +17204,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -17040,6 +17237,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -17156,6 +17354,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -17226,6 +17425,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET_DEFAULT_ENCODING",
         "namespace": "PETSTORE",
@@ -17268,6 +17468,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "usePhoneNumber",
               "description": "",
               "modelProperties": {}
@@ -17300,6 +17501,7 @@
                   "namespace": "PETSTORE"
                 }
               ],
+              "semanticTerms": [],
               "name": "phoneNumber",
               "description": "",
               "modelProperties": {}
@@ -17343,6 +17545,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -17375,6 +17578,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -17491,6 +17695,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -17561,6 +17766,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET_FISH_FROM_RIVER_STREAM",
         "namespace": "PETSTORE",
@@ -17616,6 +17822,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "river",
               "description": "",
               "modelProperties": {}
@@ -17659,6 +17866,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pollutedStream",
               "description": "",
               "modelProperties": {}
@@ -17702,6 +17910,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -17734,6 +17943,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -17850,6 +18060,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -17958,6 +18169,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET_FORBIDDEN_PETS",
         "namespace": "PETSTORE",
@@ -18040,6 +18252,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "forbiddenPets",
               "description": "",
               "modelProperties": {}
@@ -18083,6 +18296,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -18115,6 +18329,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -18231,6 +18446,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -18392,6 +18608,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET_MULE_VERSION",
         "namespace": "PETSTORE",
@@ -18431,6 +18648,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -18463,6 +18681,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -18579,6 +18798,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -18664,6 +18884,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET_PET_CORRELATION",
         "namespace": "PETSTORE",
@@ -18703,6 +18924,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -18735,6 +18957,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -18851,6 +19074,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -18925,6 +19149,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET_PET_STORE_DEAL",
         "namespace": "PETSTORE",
@@ -18963,6 +19188,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "petStoreDeal",
               "description": "",
               "modelProperties": {}
@@ -19006,6 +19232,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -19038,6 +19265,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -19154,6 +19382,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -19240,6 +19469,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET_STREAMED_SIGNATURE",
         "namespace": "PETSTORE",
@@ -19278,6 +19508,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "signature",
               "description": "",
               "modelProperties": {}
@@ -19455,6 +19686,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -19509,6 +19741,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -19541,6 +19774,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -19657,6 +19891,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -19724,6 +19959,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "IS_SPLITTER_EXCEPTION_HANDLED",
         "namespace": "PETSTORE",
@@ -19763,6 +19999,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -19795,6 +20032,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -19911,6 +20149,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -19975,6 +20214,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "MAKE_PHONE_CALL",
         "namespace": "PETSTORE",
@@ -20018,6 +20258,7 @@
                   "namespace": "PETSTORE"
                 }
               ],
+              "semanticTerms": [],
               "name": "phoneNumber",
               "description": "",
               "modelProperties": {}
@@ -20131,6 +20372,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -20195,6 +20437,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "RESET_CONNECTION_THREADS",
         "namespace": "PETSTORE",
@@ -20304,6 +20547,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -20392,6 +20636,7 @@
         }
       ],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SCOPE_WITH_MULE_STEREOTYPE",
         "namespace": "PETSTORE",
@@ -20431,6 +20676,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -20463,6 +20709,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -20579,6 +20826,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -20643,6 +20891,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SET_SECURE_CAGE",
         "namespace": "PETSTORE",
@@ -20702,6 +20951,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "providers",
               "description": "",
               "modelProperties": {}
@@ -20729,6 +20979,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "user",
               "description": "",
               "modelProperties": {}
@@ -20756,6 +21007,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pass",
               "description": "",
               "modelProperties": {}
@@ -20869,6 +21121,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -20957,6 +21210,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SPELL_BUILT_IN",
         "namespace": "PETSTORE",
@@ -21013,6 +21267,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "character",
               "description": "",
               "modelProperties": {}
@@ -21056,6 +21311,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -21088,6 +21344,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -21204,6 +21461,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -21293,6 +21551,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SPELL_CLASS",
         "namespace": "PETSTORE",
@@ -21350,6 +21609,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "clazz",
               "description": "",
               "modelProperties": {}
@@ -21393,6 +21653,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -21425,6 +21686,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -21541,6 +21803,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -21632,6 +21895,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SPELL_OBJECT",
         "namespace": "PETSTORE",
@@ -21691,6 +21955,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "character",
               "description": "",
               "modelProperties": {}
@@ -21734,6 +21999,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -21766,6 +22032,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -21882,6 +22149,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
@@ -21927,6 +22195,7 @@
       "connectionManagementType": "CACHED",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "semanticTerms": [],
       "stereotype": {
         "type": "SIMPLE_CONNECTION",
         "namespace": "PETSTORE",
@@ -21969,6 +22238,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -21996,6 +22266,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -22042,6 +22313,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -22109,6 +22381,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -22177,6 +22450,7 @@
                 "order": 6
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -22719,6 +22993,7 @@
                   "namespace": "TLS"
                 }
               ],
+              "semanticTerms": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -22939,6 +23214,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -22986,6 +23262,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "semanticTerms": [],
       "stereotype": {
         "type": "INVALID",
         "namespace": "PETSTORE",
@@ -23020,6 +23297,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -23047,6 +23325,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -23093,6 +23372,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -23160,6 +23440,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -23228,6 +23509,7 @@
                 "order": 6
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -23770,6 +24052,7 @@
                   "namespace": "TLS"
                 }
               ],
+              "semanticTerms": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -23990,6 +24273,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -24037,6 +24321,7 @@
       "connectionManagementType": "POOLING",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "semanticTerms": [],
       "stereotype": {
         "type": "CUSTOM_CONNECTION",
         "namespace": "PETSTORE",
@@ -24075,6 +24360,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -24102,6 +24388,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -24148,6 +24435,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -24215,6 +24503,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -24283,6 +24572,7 @@
                 "order": 6
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -24825,6 +25115,7 @@
                   "namespace": "TLS"
                 }
               ],
+              "semanticTerms": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -25045,6 +25336,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -25258,6 +25550,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "poolingProfile",
               "description": "Characteristics of the connection pool",
               "modelProperties": {
@@ -25305,6 +25598,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "semanticTerms": [],
       "stereotype": {
         "type": "TRANSACTIONAL",
         "namespace": "PETSTORE",
@@ -25339,6 +25633,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -25366,6 +25661,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -25412,6 +25708,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -25479,6 +25776,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -25547,6 +25845,7 @@
                 "order": 6
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -26089,6 +26388,7 @@
                   "namespace": "TLS"
                 }
               ],
+              "semanticTerms": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -26309,6 +26609,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -26356,6 +26657,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "semanticTerms": [],
       "stereotype": {
         "type": "VALID",
         "namespace": "PETSTORE",
@@ -26390,6 +26692,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -26417,6 +26720,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -26463,6 +26767,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -26530,6 +26835,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -26598,6 +26904,7 @@
                 "order": 6
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -27140,6 +27447,7 @@
                   "namespace": "TLS"
                 }
               ],
+              "semanticTerms": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -27360,6 +27668,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -27456,6 +27765,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "NUMBER_PET_ADOPTION_SOURCE",
         "namespace": "PETSTORE",
@@ -27498,6 +27808,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "watermark",
               "description": "",
               "modelProperties": {}
@@ -27529,6 +27840,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "idempotent",
               "description": "",
               "modelProperties": {}
@@ -27558,6 +27870,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -27585,6 +27898,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "schedulingStrategy",
               "description": "Configures the scheduler that triggers the polling",
               "modelProperties": {
@@ -27735,6 +28049,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -27830,6 +28145,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "PARTIAL_PET_ADOPTION_SOURCE",
         "namespace": "PETSTORE",
@@ -27872,6 +28188,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "watermark",
               "description": "",
               "modelProperties": {}
@@ -27903,6 +28220,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "idempotent",
               "description": "",
               "modelProperties": {}
@@ -27932,6 +28250,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -27959,6 +28278,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "schedulingStrategy",
               "description": "Configures the scheduler that triggers the polling",
               "modelProperties": {
@@ -28109,6 +28429,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -28203,6 +28524,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "PET_ADOPTION_LIMITING_SOURCE",
         "namespace": "PETSTORE",
@@ -28262,6 +28584,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pets",
               "description": "",
               "modelProperties": {}
@@ -28327,6 +28650,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "watermarks",
               "description": "",
               "modelProperties": {}
@@ -28356,6 +28680,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -28383,6 +28708,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "schedulingStrategy",
               "description": "Configures the scheduler that triggers the polling",
               "modelProperties": {
@@ -28533,6 +28859,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -28628,6 +28955,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "PET_ADOPTION_SOURCE",
         "namespace": "PETSTORE",
@@ -28670,6 +28998,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "watermark",
               "description": "",
               "modelProperties": {}
@@ -28701,6 +29030,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "idempotent",
               "description": "",
               "modelProperties": {}
@@ -28730,6 +29060,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -28757,6 +29088,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "schedulingStrategy",
               "description": "Configures the scheduler that triggers the polling",
               "modelProperties": {
@@ -28907,6 +29239,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -28997,6 +29330,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SENTIENT_SOURCE",
         "namespace": "PETSTORE",
@@ -29037,6 +29371,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -29176,6 +29511,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -29288,6 +29624,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "WATERMARKING_PET_ADOPTION_SOURCE",
         "namespace": "PETSTORE",
@@ -29344,6 +29681,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "awaitOnItem",
               "description": "",
               "modelProperties": {}
@@ -29392,6 +29730,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pets",
               "description": "",
               "modelProperties": {}
@@ -29457,6 +29796,7 @@
                 "order": 3
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "watermarks",
               "description": "",
               "modelProperties": {}
@@ -29501,6 +29841,7 @@
                 "order": 4
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "itemsPerPoll",
               "description": "",
               "modelProperties": {}
@@ -29530,6 +29871,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -29557,6 +29899,7 @@
                 "order": 5
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "schedulingStrategy",
               "description": "Configures the scheduler that triggers the polling",
               "modelProperties": {
@@ -29707,6 +30050,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -29784,6 +30128,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "PET-FILTER-SOURCE",
         "namespace": "PETSTORE",
@@ -29822,6 +30167,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "filter",
               "description": "",
               "modelProperties": {}
@@ -29851,6 +30197,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -29878,6 +30225,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "schedulingStrategy",
               "description": "Configures the scheduler that triggers the polling",
               "modelProperties": {
@@ -30028,6 +30376,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -30113,6 +30462,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "PET-SOURCE",
         "namespace": "PETSTORE",
@@ -30153,6 +30503,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -30292,6 +30643,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -30345,6 +30697,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "mammals",
               "description": "",
               "modelProperties": {}
@@ -30372,6 +30725,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "birds",
               "description": "",
               "modelProperties": {}
@@ -30525,6 +30879,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "PET-SOURCE-LIST",
         "namespace": "PETSTORE",
@@ -30564,6 +30919,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
@@ -30597,6 +30953,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -30736,6 +31093,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -30789,6 +31147,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "mammals",
               "description": "",
               "modelProperties": {}
@@ -30816,6 +31175,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "birds",
               "description": "",
               "modelProperties": {}
@@ -30914,6 +31274,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "PET-SOURCE-STREAM",
         "namespace": "PETSTORE",
@@ -30953,6 +31314,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -30981,6 +31343,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {}
@@ -31010,6 +31373,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
               "modelProperties": {}
@@ -31187,6 +31551,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -31337,6 +31702,7 @@
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -31390,6 +31756,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "mammals",
               "description": "",
               "modelProperties": {}
@@ -31417,6 +31784,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "birds",
               "description": "",
               "modelProperties": {}

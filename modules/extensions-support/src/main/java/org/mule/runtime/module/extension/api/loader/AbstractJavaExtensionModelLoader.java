@@ -57,6 +57,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.RuntimeVersion
 import org.mule.runtime.module.extension.internal.loader.enricher.SampleDataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.semantic.SemanticTermsEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
@@ -150,7 +151,8 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
                                                                                                new BackPressureDeclarationEnricher(),
                                                                                                new ObjectStoreParameterDeclarationEnricher(),
-                                                                                               new PollingSourceDeclarationEnricher()));
+                                                                                               new PollingSourceDeclarationEnricher(),
+                                                                                               new SemanticTermsEnricher()));
 
   private final String id;
   private final ModelLoaderDelegateFactory factory;
