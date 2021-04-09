@@ -6,21 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-
-import java.util.List;
-import java.util.Optional;
 
 public abstract class AbstractGeneratedResourceFactory implements GeneratedResourceFactory {
 
-  @Override
-  public final Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
-    List<GeneratedResource> resources = generateResources(extensionModel);
-    return resources.isEmpty() ? empty() : of(resources.get(0));
-  }
+  // @Override
+  // public final Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
+  // List<GeneratedResource> resources = generateResources(extensionModel);
+  // return resources.isEmpty() ? empty() : of(resources.get(0));
+  // }
 }

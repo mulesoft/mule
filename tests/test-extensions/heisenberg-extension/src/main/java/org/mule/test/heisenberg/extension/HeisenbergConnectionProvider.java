@@ -12,6 +12,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_FILE_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_NAME;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -20,6 +21,8 @@ import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.sdk.api.annotation.semantics.connectivity.ApiKeyAuth;
+import org.mule.sdk.api.annotation.semantics.security.ApiKey;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 
 import java.util.HashSet;
@@ -37,6 +40,7 @@ import org.slf4j.LoggerFactory;
 @Deprecated(
     message = "Usages of this connection provider must be change to the secure option, this will lower the chances of getting caught by the DEA",
     since = "1.3.0", toRemoveIn = "2.0.0")
+@ApiKeyAuth
 public class HeisenbergConnectionProvider implements ConnectionProvider<HeisenbergConnection> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeisenbergConnectionProvider.class);
@@ -49,6 +53,7 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
 
   @Parameter
   @Optional(defaultValue = SAUL_OFFICE_NUMBER)
+  @ApiKey
   private String saulPhoneNumber;
 
   @ParameterGroup(name = "look", showInDsl = true)
