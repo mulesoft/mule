@@ -14,6 +14,7 @@ import static java.util.Optional.of;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -224,7 +225,7 @@ public class MuleContextUtils {
     when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(typeLocator);
 
     final MuleConfiguration configuration = muleContext.getConfiguration();
-    when(configuration.getMinMuleVersion()).thenReturn(of(new MuleVersion(getProductVersion())));
+    lenient().when(configuration.getMinMuleVersion()).thenReturn(of(new MuleVersion(getProductVersion())));
 
     final MuleRegistry registry = muleContext.getRegistry();
 
