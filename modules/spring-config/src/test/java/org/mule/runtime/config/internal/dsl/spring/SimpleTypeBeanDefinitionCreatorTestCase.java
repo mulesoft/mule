@@ -34,7 +34,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase {
   private CreateBeanDefinitionRequest createBeanDefinitionRequest;
 
   @Before
-  public void setUp(){
+  public void setUp() {
     parameterUtils = mock(ParameterUtils.class);
     simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator(parameterUtils);
     createBeanDefinitionRequest = mock(CreateBeanDefinitionRequest.class);
@@ -43,7 +43,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase {
   }
 
   @Test
-  public void testHandleRequestReturnsFalse_WhenCreateBeanDefinitionRequestTypeIsNotSimpleType(){
+  public void testHandleRequestReturnsFalse_WhenCreateBeanDefinitionRequestTypeIsNotSimpleType() {
     // Given
     mockStringObjectTypeVisitor(createBeanDefinitionRequest, SimpleTypeBeanDefinitionCreatorTestCase.class);
 
@@ -55,7 +55,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase {
   }
 
   @Test
-  public void testHandleRequestReturnsTrue_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamFoundInOwnerComponent(){
+  public void testHandleRequestReturnsTrue_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamFoundInOwnerComponent() {
     // Given
     mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
 
@@ -73,7 +73,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase {
   }
 
   @Test
-  public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamFoundInOwnerComponentAndNoTypeConverter(){
+  public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamFoundInOwnerComponentAndNoTypeConverter() {
     // Given
     mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
 
@@ -98,7 +98,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase {
   }
 
   @Test
-  public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamFoundInOwnerComponentAndTypeConverter(){
+  public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamFoundInOwnerComponentAndTypeConverter() {
     // Given
     mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
 
@@ -123,7 +123,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase {
   }
 
   @Test
-  public void testHandleRequestReturnsTrue_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamNotFoundInOwnerComponentButFoundInComponentModel(){
+  public void testHandleRequestReturnsTrue_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamNotFoundInOwnerComponentButFoundInComponentModel() {
     // Given
     mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
 
@@ -146,7 +146,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase {
   }
 
   @Test
-  public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamNotFoundInOwnerComponentButFoundInComponentModelAndNoTypeConverter(){
+  public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamNotFoundInOwnerComponentButFoundInComponentModelAndNoTypeConverter() {
     // Given
     mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
 
@@ -176,7 +176,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase {
   }
 
   @Test
-  public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamNotFoundInOwnerComponentButFoundInComponentModelAndTypeConverter(){
+  public void testHandleRequestCallsSetBeanDefinitionWithResultGetConvertibleBeanDefinition_WhenCreateBeanDefinitionRequestTypeIsSimpleTypeAndParamNotFoundInOwnerComponentButFoundInComponentModelAndTypeConverter() {
     // Given
     mockStringObjectTypeVisitor(createBeanDefinitionRequest, String.class);
 
@@ -205,7 +205,8 @@ public class SimpleTypeBeanDefinitionCreatorTestCase {
     assertThat(value.getConstructorArgumentValues().getArgumentValue(0, String.class).getValue(), is(TEST_STRING_RAW_VALUE));
   }
 
-  private void mockComponentBuildingDefinition(CreateBeanDefinitionRequest createBeanDefinitionRequest, Optional<TypeConverter> typeConverterOptional) {
+  private void mockComponentBuildingDefinition(CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                                               Optional<TypeConverter> typeConverterOptional) {
     ComponentBuildingDefinition componentBuildingDefinition = mock(ComponentBuildingDefinition.class);
     when(componentBuildingDefinition.getTypeConverter()).thenReturn(typeConverterOptional);
     when(createBeanDefinitionRequest.getComponentBuildingDefinition()).thenReturn(componentBuildingDefinition);
@@ -218,6 +219,7 @@ public class SimpleTypeBeanDefinitionCreatorTestCase {
   }
 
   private static class MyComponentParameterAst implements ComponentParameterAst {
+
     @Override
     public ParameterModel getModel() {
       return null;

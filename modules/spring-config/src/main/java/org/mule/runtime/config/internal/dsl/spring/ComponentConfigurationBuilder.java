@@ -345,7 +345,7 @@ class ComponentConfigurationBuilder<T> {
                       : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
 
               return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName, possibleGroup,
-                                                     (SourceModel) ownerComponentModel);
+                                                                         (SourceModel) ownerComponentModel);
             } else {
               ComponentParameterAst p = ownerComponent.getParameter(parameterName);
 

@@ -30,7 +30,7 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private ParameterUtils parameterUtils;
 
-  public SimpleTypeBeanDefinitionCreator(ParameterUtils parameterUtils){
+  public SimpleTypeBeanDefinitionCreator(ParameterUtils parameterUtils) {
     super();
     this.parameterUtils = parameterUtils;
   }
@@ -48,7 +48,7 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
     ComponentParameterAst paramInOwnerComponent = parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest);
 
-    if(paramInOwnerComponent != null){
+    if (paramInOwnerComponent != null) {
       this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, paramInOwnerComponent.getResolvedRawValue());
       return true;
     }
@@ -57,7 +57,9 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
     final ComponentParameterAst valueParam = componentModel.getParameter("value");
 
     if (valueParam == null || valueParam.getResolvedRawValue() == null) {
-      throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value", componentModel.getMetadata().getFileName().orElse("unknown"), componentModel.getMetadata().getStartLine().orElse(-1)));
+      throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
+                                                         componentModel.getMetadata().getFileName().orElse("unknown"),
+                                                         componentModel.getMetadata().getStartLine().orElse(-1)));
     }
 
     this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, valueParam.getResolvedRawValue());
@@ -65,7 +67,8 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
     return true;
   }
 
-  private void setConvertibleBeanDefinition(CreateBeanDefinitionRequest createBeanDefinitionRequest, Class<?> type, String value) {
+  private void setConvertibleBeanDefinition(CreateBeanDefinitionRequest createBeanDefinitionRequest, Class<?> type,
+                                            String value) {
     Optional<TypeConverter> typeConverterOptional =
         createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeConverter();
 

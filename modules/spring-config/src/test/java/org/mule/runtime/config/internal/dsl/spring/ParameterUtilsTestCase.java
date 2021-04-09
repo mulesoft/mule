@@ -65,7 +65,10 @@ public class ParameterUtilsTestCase {
     TypedComponentIdentifier.ComponentType componentType = null;
     ComponentMetadataAst metadata = null;
 
-    componentAst = new DefaultComponentAst(builtChildren, parameterAsts, extraParams, propertiesResolver, componentId, extensionModel, componentModel, nestableElementModel, configurationModel, connectionProviderModel, parameterizedModel, generationInformation, metadata, location, identifier, componentType);
+    componentAst =
+        new DefaultComponentAst(builtChildren, parameterAsts, extraParams, propertiesResolver, componentId, extensionModel,
+                                componentModel, nestableElementModel, configurationModel, connectionProviderModel,
+                                parameterizedModel, generationInformation, metadata, location, identifier, componentType);
   }
 
   @Test

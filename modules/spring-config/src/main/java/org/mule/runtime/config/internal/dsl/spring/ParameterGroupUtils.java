@@ -37,16 +37,15 @@ public final class ParameterGroupUtils {
    * @return the resolved parameter
    */
   public ComponentParameterAst getSourceCallbackAwareParameter(ComponentAst ownerComponent, String parameterName,
-                                                                      ComponentAst possibleGroup,
-                                                                      SourceModel ownerComponentModel) {
+                                                               ComponentAst possibleGroup,
+                                                               SourceModel ownerComponentModel) {
 
     Optional<ParameterGroupModel> groupModelOptional = getSourceParamGroups(ownerComponentModel).stream()
-        .filter(parameterGroupModel ->
-                parameterGroupModel.getParameter(parameterName).isPresent() &&
-                parameterGroupModel.isShowInDsl() &&
-                getChildElementName(ownerComponent, parameterGroupModel)
-                    .map(en -> possibleGroup.getIdentifier().getName().equals(en))
-                    .orElse(false))
+        .filter(parameterGroupModel -> parameterGroupModel.getParameter(parameterName).isPresent() &&
+            parameterGroupModel.isShowInDsl() &&
+            getChildElementName(ownerComponent, parameterGroupModel)
+                .map(en -> possibleGroup.getIdentifier().getName().equals(en))
+                .orElse(false))
         .findFirst();
 
     if (!groupModelOptional.isPresent()) {
@@ -63,7 +62,9 @@ public final class ParameterGroupUtils {
 
   }
 
-  public ComponentParameterAst getComponentParameterAstFromSourceModel(CreateBeanDefinitionRequest createBeanDefinitionRequest, ComponentAst ownerComponent, String paramName, SourceModel ownerComponentModel) {
+  public ComponentParameterAst getComponentParameterAstFromSourceModel(CreateBeanDefinitionRequest createBeanDefinitionRequest,
+                                                                       ComponentAst ownerComponent, String paramName,
+                                                                       SourceModel ownerComponentModel) {
     // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
     // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
     // previous implementations.

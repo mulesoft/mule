@@ -20,7 +20,7 @@ public class ParameterUtils {
 
   private ParameterGroupUtils parameterGroupUtils;
 
-  public ParameterUtils(){
+  public ParameterUtils() {
     parameterGroupUtils = new ParameterGroupUtils();
   }
 
@@ -37,7 +37,8 @@ public class ParameterUtils {
     ParameterizedModel ownerComponentModel = ownerComponent.getModel(ParameterizedModel.class).get();
 
     if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
-      return parameterGroupUtils.getComponentParameterAstFromSourceModel(createBeanDefinitionRequest, ownerComponent, paramName, (SourceModel) ownerComponentModel);
+      return parameterGroupUtils.getComponentParameterAstFromSourceModel(createBeanDefinitionRequest, ownerComponent, paramName,
+                                                                         (SourceModel) ownerComponentModel);
     }
 
     if (paramName == null) {
@@ -55,14 +56,9 @@ public class ParameterUtils {
   }
 
   protected String getParamName(ComponentAst componentAst, String name) {
-
-    if (!componentAst.getGenerationInformation().getSyntax().isPresent()) {
-      return null;
-    }
-
-    DslElementSyntax dslElementSyntax = componentAst.getGenerationInformation().getSyntax().get();
-
-    return searchParameterNameByElementNameBreadthFirst(name, dslElementSyntax);
+    return componentAst.getGenerationInformation().getSyntax()
+        .map(dslElementSyntax -> searchParameterNameByElementNameBreadthFirst(name, dslElementSyntax))
+        .orElse(null);
   }
 
   private String searchParameterNameByElementNameBreadthFirst(String name, DslElementSyntax dslElementSyntax) {
