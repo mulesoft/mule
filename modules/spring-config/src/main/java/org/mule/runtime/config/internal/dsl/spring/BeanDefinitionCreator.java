@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
@@ -65,20 +64,9 @@ abstract class BeanDefinitionCreator {
     if (converter.isPresent()) {
       return genericBeanDefinition(ConstantFactoryBean.class).addConstructorArgValue(converter.get().convert(value))
           .getBeanDefinition();
-    } else {
-      return genericBeanDefinition(type).addConstructorArgValue(value).getBeanDefinition();
-    }
-  }
-
-  protected ComponentAst resolveOwnerComponent(CreateBeanDefinitionRequest request) {
-    for (int i = request.getComponentModelHierarchy().size() - 1; i >= 0; --i) {
-      final ComponentAst possibleOwner = request.getComponentModelHierarchy().get(i);
-
-      if (possibleOwner.getModel(ParameterizedModel.class).isPresent()) {
-        return possibleOwner;
-      }
     }
 
-    return null;
+    return genericBeanDefinition(type).addConstructorArgValue(value).getBeanDefinition();
   }
+
 }

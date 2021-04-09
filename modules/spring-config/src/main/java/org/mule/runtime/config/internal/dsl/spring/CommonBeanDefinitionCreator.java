@@ -183,7 +183,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     if (componentModel.getModel(ParameterizedModel.class).isPresent()) {
       ownerComponent = componentModel;
     } else {
-      ownerComponent = resolveOwnerComponent(request);
+      ownerComponent = request.resolveOwnerComponent();
       if (ownerComponent == null) {
         ownerComponent = componentModel;
       }

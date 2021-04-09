@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -74,5 +75,17 @@ public class CreateBeanDefinitionRequest {
 
   public ObjectTypeVisitor retrieveTypeVisitor() {
     return typeVisitorRetriever.get();
+  }
+
+  protected ComponentAst resolveOwnerComponent() {
+    for (int i = getComponentModelHierarchy().size() - 1; i >= 0; --i) {
+      final ComponentAst possibleOwner = getComponentModelHierarchy().get(i);
+
+      if (possibleOwner.getModel(ParameterizedModel.class).isPresent()) {
+        return possibleOwner;
+      }
+    }
+
+    return null;
   }
 }

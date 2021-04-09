@@ -10,14 +10,51 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
 import java.util.stream.Collectors;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-
-import static java.util.stream.Collectors.toMap;
 
 public class ParameterUtils {
 
-  public String getParamName(ComponentAst componentAst, String name) {
+  private ParameterGroupUtils parameterGroupUtils;
+
+  public ParameterUtils(){
+    parameterGroupUtils = new ParameterGroupUtils();
+  }
+
+  public ComponentParameterAst getParamInOwnerComponent(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentAst ownerComponent = createBeanDefinitionRequest.resolveOwnerComponent();
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+
+    if (ownerComponent == null) {
+      return null;
+    }
+
+    final String paramName = getParamName(ownerComponent, componentModel.getIdentifier().getName());
+
+    ParameterizedModel ownerComponentModel = ownerComponent.getModel(ParameterizedModel.class).get();
+
+    if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
+      return parameterGroupUtils.getComponentParameterAstFromSourceModel(createBeanDefinitionRequest, ownerComponent, paramName, (SourceModel) ownerComponentModel);
+    }
+
+    if (paramName == null) {
+      return ownerComponent.getParameter(componentModel.getIdentifier().getName());
+    }
+
+    ComponentParameterAst paramInOwner = ownerComponent.getParameter(paramName);
+
+    if (paramInOwner == null) {
+      // XML SDK 1 allows for hyphenated names in parameters, so need to account for those.
+      return ownerComponent.getParameter(componentModel.getIdentifier().getName());
+    }
+
+    return paramInOwner;
+  }
+
+  protected String getParamName(ComponentAst componentAst, String name) {
 
     if (!componentAst.getGenerationInformation().getSyntax().isPresent()) {
       return null;
@@ -25,14 +62,14 @@ public class ParameterUtils {
 
     DslElementSyntax dslElementSyntax = componentAst.getGenerationInformation().getSyntax().get();
 
-    return breathSearchParameterNameByElementName(name, dslElementSyntax);
+    return searchParameterNameByElementNameBreadthFirst(name, dslElementSyntax);
   }
 
-  private String breathSearchParameterNameByElementName(String name, DslElementSyntax dslElementSyntax) {
-    Queue<NamePair> queue = new ArrayDeque<>(makeElementsToNamePairList(dslElementSyntax));
+  private String searchParameterNameByElementNameBreadthFirst(String name, DslElementSyntax dslElementSyntax) {
+    Queue<NameToSyntaxPair> queue = new ArrayDeque<>(makeElementsToNamePairList(dslElementSyntax));
 
     while (!queue.isEmpty()) {
-      NamePair currentNode = queue.remove();
+      NameToSyntaxPair currentNode = queue.remove();
 
       if (currentNode.getDslElementSyntax().getElementName().equals(name)) {
         return currentNode.getParamName();
@@ -44,17 +81,17 @@ public class ParameterUtils {
     return null;
   }
 
-  private List<NamePair> makeElementsToNamePairList(DslElementSyntax dslElementSyntax) {
+  private List<NameToSyntaxPair> makeElementsToNamePairList(DslElementSyntax dslElementSyntax) {
     return dslElementSyntax.getContainedElementsByName().entrySet().stream()
-        .map(entry -> new NamePair(entry.getKey(), entry.getValue())).collect(Collectors.toList());
+        .map(entry -> new NameToSyntaxPair(entry.getKey(), entry.getValue())).collect(Collectors.toList());
   }
 
-  class NamePair {
+  class NameToSyntaxPair {
 
     private String paramName;
     private DslElementSyntax dslElementSyntax;
 
-    public NamePair(String paramName, DslElementSyntax dslElementSyntax) {
+    public NameToSyntaxPair(String paramName, DslElementSyntax dslElementSyntax) {
       this.paramName = paramName;
       this.dslElementSyntax = dslElementSyntax;
     }

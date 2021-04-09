@@ -15,7 +15,6 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
 import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
-import static org.mule.runtime.config.internal.dsl.spring.ParameterGroupUtils.getSourceCallbackAwareParameter;
 import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
@@ -66,6 +65,7 @@ class ComponentConfigurationBuilder<T> {
   private final ComponentAst componentModel;
   private final CreateBeanDefinitionRequest createBeanDefinitionRequest;
   private final ComponentBuildingDefinition<T> componentBuildingDefinition;
+  private ParameterGroupUtils parameterGroupUtils = new ParameterGroupUtils();
 
   public ComponentConfigurationBuilder(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                        ComponentAst ownerComponent, ComponentAst componentModel,
@@ -344,7 +344,7 @@ class ComponentConfigurationBuilder<T> {
                       ? componentModel
                       : createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
 
-              return getSourceCallbackAwareParameter(ownerComponent, parameterName, possibleGroup,
+              return parameterGroupUtils.getSourceCallbackAwareParameter(ownerComponent, parameterName, possibleGroup,
                                                      (SourceModel) ownerComponentModel);
             } else {
               ComponentParameterAst p = ownerComponent.getParameter(parameterName);

@@ -7,12 +7,9 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.config.internal.dsl.spring.ParameterGroupUtils.getSourceCallbackAwareParameter;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -33,9 +30,9 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private ParameterUtils parameterUtils;
 
-  public SimpleTypeBeanDefinitionCreator(){
+  public SimpleTypeBeanDefinitionCreator(ParameterUtils parameterUtils){
     super();
-    parameterUtils = new ParameterUtils();
+    this.parameterUtils = parameterUtils;
   }
 
   @Override
@@ -47,78 +44,34 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
       return false;
     }
 
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     createBeanDefinitionRequest.getSpringComponentModel().setType(type);
 
-    String value = getResolvedRawValue(createBeanDefinitionRequest, componentModel);
+    ComponentParameterAst paramInOwnerComponent = parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest);
 
-    if (value == null) {
-      throw new MuleRuntimeException(
-                                     createStaticMessage(
-                                                         "Parameter at %s:%s must provide a non-empty value",
-                                                         componentModel.getMetadata().getFileName().orElse("unknown"),
-                                                         componentModel.getMetadata().getStartLine().orElse(-1)));
+    if(paramInOwnerComponent != null){
+      this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, paramInOwnerComponent.getResolvedRawValue());
+      return true;
     }
 
-    Optional<TypeConverter> typeConverterOptional =
-        createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeConverter();
-    createBeanDefinitionRequest.getSpringComponentModel()
-        .setBeanDefinition(getConvertibleBeanDefinition(type, value, typeConverterOptional));
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+    final ComponentParameterAst valueParam = componentModel.getParameter("value");
+
+    if (valueParam == null || valueParam.getResolvedRawValue() == null) {
+      throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value", componentModel.getMetadata().getFileName().orElse("unknown"), componentModel.getMetadata().getStartLine().orElse(-1)));
+    }
+
+    this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, valueParam.getResolvedRawValue());
 
     return true;
   }
 
-  private String getResolvedRawValue(CreateBeanDefinitionRequest createBeanDefinitionRequest, ComponentAst componentModel) {
-    final ComponentParameterAst paramInOwner = getParamInOwnerComponent(createBeanDefinitionRequest, componentModel);
+  private void setConvertibleBeanDefinition(CreateBeanDefinitionRequest createBeanDefinitionRequest, Class<?> type, String value) {
+    Optional<TypeConverter> typeConverterOptional =
+        createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeConverter();
 
-    if (paramInOwner != null) {
-      return paramInOwner.getResolvedRawValue();
-    }
+    SpringComponentModel springComponentModel = createBeanDefinitionRequest.getSpringComponentModel();
 
-    final ComponentParameterAst valueParam = componentModel.getParameter("value");
-
-    if (valueParam == null) {
-      return null;
-    }
-
-    return valueParam.getResolvedRawValue();
-
-  }
-
-  private ComponentParameterAst getParamInOwnerComponent(CreateBeanDefinitionRequest createBeanDefinitionRequest,
-                                                         ComponentAst componentModel) {
-    ComponentAst ownerComponent = resolveOwnerComponent(createBeanDefinitionRequest);
-
-    if (ownerComponent == null) {
-      return null;
-    }
-
-    final String paramName = parameterUtils.getParamName(ownerComponent, componentModel.getIdentifier().getName());
-
-    ParameterizedModel ownerComponentModel = ownerComponent.getModel(ParameterizedModel.class).get();
-
-    if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
-      // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
-      // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
-      // previous implementations.
-      int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
-      final ComponentAst possibleGroup = createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
-
-      return getSourceCallbackAwareParameter(ownerComponent, paramName, possibleGroup, (SourceModel) ownerComponentModel);
-    }
-
-    if (paramName == null) {
-      return ownerComponent.getParameter(componentModel.getIdentifier().getName());
-    }
-
-    ComponentParameterAst paramInOwner = ownerComponent.getParameter(paramName);
-
-    if (paramInOwner == null) {
-      // XML SDK 1 allows for hyphenated names in parameters, so need to account for those.
-      return ownerComponent.getParameter(componentModel.getIdentifier().getName());
-    }
-
-    return paramInOwner;
+    springComponentModel.setBeanDefinition(getConvertibleBeanDefinition(type, value, typeConverterOptional));
   }
 
 }
