@@ -40,7 +40,7 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
 
   private FeatureFlaggingService featureFlags;
 
-  /** Give core transformers a slighty higher priority */
+  /** Give core transformers a slightly higher priority */
   private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
   public ObjectToString() {
@@ -158,7 +158,7 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
   /**
    * Configures {@link FeatureFlaggingService} for MULE-19323.
    *
-   * @since 4.4, 4.3.1
+   * @since 4.4
    */
   public static void configureToStringTransformerTransformIteratorElements() {
 
