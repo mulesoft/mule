@@ -21,6 +21,7 @@ import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.module.xml.transformer.XmlToDomDocument;
+import org.mule.serialization.internal.NodeWrapper;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
@@ -423,7 +424,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
         {
             return toXmlSource((XMLStreamReader) src);
         }
-        else if (src instanceof org.w3c.dom.Document || src instanceof org.w3c.dom.Element)
+        else if (src instanceof org.w3c.dom.Document || src instanceof org.w3c.dom.Element || src instanceof NodeWrapper)
         {
             return new DOMSource((org.w3c.dom.Node) src);
         }
