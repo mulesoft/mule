@@ -10,6 +10,7 @@ package org.mule.transport.jms;
 import static org.mule.api.config.MuleProperties.MULE_JMS_REDELIVERY_DELAY;
 import static org.mule.api.config.MuleProperties.MULE_JMS_MAX_REDELIVERY_DELAY;
 import static org.mule.api.config.MuleProperties.MULE_JMS_INITIAL_REDELIVERY_DELAY;
+import static org.mule.api.config.MuleProperties.MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP;
 
 import org.mule.api.Closeable;
 import org.mule.api.DefaultMuleException;
@@ -775,16 +776,17 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     protected void doStart() throws MuleException
     {
         //TODO: This should never be null or an exception should be thrown
-        if (connection != null)
+
+        try
         {
-            try
-            {
-                connection.start();
+            if(connection==null){
+                connection = createConnection();
             }
-            catch (JMSException e)
-            {
-                throw new StartException(CoreMessages.failedToStart("Jms Connection"), e, this);
-            }
+            connection.start();
+        }
+        catch (JMSException e)
+        {
+            throw new StartException(CoreMessages.failedToStart("Jms Connection"), e, this);
         }
 
         if (jndiNameResolver != null)
@@ -826,6 +828,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 stopping = true;
                 connection.stop();
+                if(Boolean.valueOf( System.getProperty(MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP, "false")))
+                {
+                    closeConnection(connection, connectionFactory);
+                    connection = null;
+                }
             }
             catch (Exception e)
             {
