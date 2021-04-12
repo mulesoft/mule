@@ -10,11 +10,15 @@ import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary
 import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION_PARAMETER;
 import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.PROXY_CONFIGURATION_PARAMETER;
 import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.PROXY_CONFIGURATION_TYPE;
+import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.SCALAR_SECRET;
+import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.SECRET;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSemanticTerms;
 import static org.mule.runtime.extension.internal.semantic.SemanticTermsHelper.getTermsFromAnnotations;
 
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
@@ -65,8 +69,19 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
       protected void onParameter(ParameterGroupDeclaration parameterGroup, ParameterDeclaration parameter) {
         extractDeclaredParameter(parameter).ifPresent(e -> addSemanticTerms(parameter, e));
         Set<String> typeTerms = getSemanticTerms(parameter.getType());
+
         addTermIfPresent(typeTerms, parameter, PROXY_CONFIGURATION_TYPE, PROXY_CONFIGURATION_PARAMETER);
         addTermIfPresent(typeTerms, parameter, NTLM_PROXY_CONFIGURATION, NTLM_PROXY_CONFIGURATION_PARAMETER);
+        if (typeTerms.contains(SECRET)) {
+          parameter.getType().accept(new BasicTypeMetadataVisitor() {
+
+            @Override
+            protected void visitBasicType(MetadataType metadataType) {
+              typeTerms.remove(SECRET);
+              typeTerms.add(SCALAR_SECRET);
+            }
+          });
+        }
       }
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
   }

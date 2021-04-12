@@ -144,6 +144,7 @@
           <xs:attribute type="mule:expressionString" use="required" name="sessionId"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="required" name="accountId"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="certificate"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="secretNumber"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>

@@ -2363,6 +2363,36 @@
                   "name": "certificate",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.secret"
+                  ],
+                  "name": "secretNumber",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -2565,7 +2595,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16,
+                    "order": 17,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2618,7 +2648,8 @@
                 "secretToken",
                 "sessionId",
                 "accountId",
-                "certificate"
+                "certificate",
+                "secretNumber"
               ]
             }
           }
@@ -4879,7 +4910,9 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [],
+              "semanticTerms": [
+                "connectivity.password"
+              ],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -7279,6 +7312,36 @@
               "name": "certificate",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 16
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [
+                "connectivity.secret"
+              ],
+              "name": "secretNumber",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -7481,7 +7544,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 16,
+                "order": 17,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -7534,7 +7597,8 @@
             "secretToken",
             "sessionId",
             "accountId",
-            "certificate"
+            "certificate",
+            "secretNumber"
           ]
         }
       }

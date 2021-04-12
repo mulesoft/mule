@@ -52,4 +52,8 @@ public class CustomAuthSemanticConnectionProvider extends SemanticTermsConnectio
   @Secret
   private byte[] certificate;
 
+  @Parameter
+  @Secret
+  private String secretNumber;
+
 }
