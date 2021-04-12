@@ -173,7 +173,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     paramDeclaration.addModelProperty(propertyBuilder.build());
 
     valueProviderModelConsumer
-        .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters, bindingMap),
+        .accept(new ValueProviderModel(getActingParametersModel(resolverParameters, containerParameterNames, allParameters,
+                                                                bindingMap),
                                        requiresConfiguration.get(), requiresConnection.get(), ofValueInformation.isOpen(),
                                        partOrder,
                                        name, getValueProviderId(ofValueInformation.getValue())));
@@ -311,9 +312,10 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                        componentType,
                                                        componentName));
     } else if (legacyAnnotation.isPresent()) {
-      return of(new OfValueInformation(legacyAnnotation.get().value(), legacyAnnotation.get().open(), legacyAnnotation.get().bindings()));
+      return of(new OfValueInformation(legacyAnnotation.get().value(), legacyAnnotation.get().open(),
+                                       new Binding[0]));
     } else if (sdkAnnotation.isPresent()) {
-      return of(new OfValueInformation(sdkAnnotation.get().value(), sdkAnnotation.get().open(), new Binding[0]));
+      return of(new OfValueInformation(sdkAnnotation.get().value(), sdkAnnotation.get().open(), sdkAnnotation.get().bindings()));
     } else {
       return empty();
     }
@@ -335,9 +337,9 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                        componentType,
                                                        componentName));
     } else if (legacyAnnotation != null) {
-      return of(new OfValueInformation(legacyAnnotation.value(), legacyAnnotation.open(), legacyAnnotation.bindings()));
+      return of(new OfValueInformation(legacyAnnotation.value(), legacyAnnotation.open(), new Binding[0]));
     } else if (sdkAnnotation != null) {
-      return of(new OfValueInformation(sdkAnnotation.value(), sdkAnnotation.open(), new Binding[0]));
+      return of(new OfValueInformation(sdkAnnotation.value(), sdkAnnotation.open(), sdkAnnotation.bindings()));
     } else {
       return empty();
     }

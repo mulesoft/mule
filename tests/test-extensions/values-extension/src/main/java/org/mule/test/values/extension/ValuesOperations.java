@@ -6,7 +6,6 @@
  */
 package org.mule.test.values.extension;
 
-import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -16,11 +15,8 @@ import org.mule.sdk.api.annotation.binding.Binding;
 import org.mule.test.values.extension.metadata.JsonTypeResolver;
 import org.mule.test.values.extension.metadata.XmlTypeResolver;
 import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
-import org.mule.test.values.extension.resolver.SimpleLegacyValueProvider;
-import org.mule.test.values.extension.resolver.PocSimpleValueProvider;
-import org.mule.test.values.extension.resolver.SdkSimpleValueProvider;
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
-import org.mule.test.values.extension.resolver.WithArrayParameterValueProvider;
+import org.mule.test.values.extension.resolver.WithListParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithComplexActingParameter;
 import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
 import org.mule.test.values.extension.resolver.WithConfigValueProvider;
@@ -33,6 +29,7 @@ import org.mule.test.values.extension.resolver.WithOptionalParametersWithDefault
 import org.mule.test.values.extension.resolver.WithPojoParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredAndOptionalParametersValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParameterSdkValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParameterValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider;
 import org.mule.test.values.extension.resolver.WithMuleContextValueProvider;
@@ -117,23 +114,23 @@ public class ValuesOperations {
   public void withVPOptionalParameterWithDefaultValue(@OfValues(WithOptionalParametersWithDefaultValueProvider.class) String providedParameters,
                                                       @Optional(defaultValue = "OPERATION_DEFAULT_VALUE") String optionalValue) {}
 
-  public void withBoundActingParameter(@OfValues(
-      value = WithRequiredParameterValueProvider.class,
+  public void withBoundActingParameter(@org.mule.sdk.api.annotation.values.OfValues(
+      value = WithRequiredParameterSdkValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter")}) String parameterWithValues,
                                        String actingParameter) {}
 
-  public void withBoundActingParameterField(@OfValues(
-      value = WithRequiredParameterValueProvider.class,
+  public void withBoundActingParameterField(@org.mule.sdk.api.annotation.values.OfValues(
+      value = WithRequiredParameterSdkValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field")}) String parameterWithValues,
                                             @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
-  public void withTwoActingParameters(@OfValues(
+  public void withTwoActingParameters(@org.mule.sdk.api.annotation.values.OfValues(
       value = WithTwoActingParametersValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field")}) String parameterWithValues,
                                       String scalarActingParameter,
                                       @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
-  public void withTwoBoundActingParameters(@OfValues(
+  public void withTwoBoundActingParameters(@org.mule.sdk.api.annotation.values.OfValues(
       value = WithTwoActingParametersValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field"),
           @Binding(actingParameter = "scalarActingParameter", path = "anotherParameter")}) String parameterWithValues,
@@ -141,19 +138,19 @@ public class ValuesOperations {
                                            @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
 
-  public void withBoundActingParameterToXmlTagContent(@OfValues(
-      value = WithRequiredParameterValueProvider.class,
+  public void withBoundActingParameterToXmlTagContent(@org.mule.sdk.api.annotation.values.OfValues(
+      value = WithRequiredParameterSdkValueProvider.class,
       bindings = {
           @Binding(actingParameter = "requiredValue", path = "actingParameter.nested.xmlTag")}) String parameterWithValues,
                                                       @TypeResolver(XmlTypeResolver.class) InputStream actingParameter) {}
 
-  public void withBoundActingParameterToXmlTagAttribute(@OfValues(
-      value = WithRequiredParameterValueProvider.class,
+  public void withBoundActingParameterToXmlTagAttribute(@org.mule.sdk.api.annotation.values.OfValues(
+      value = WithRequiredParameterSdkValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue",
           path = "actingParameter.nested.xmlTag.@attribute")}) String parameterWithValues,
                                                         @TypeResolver(XmlTypeResolver.class) InputStream actingParameter) {}
 
-  public void withFourBoundActingParameters(@OfValues(
+  public void withFourBoundActingParameters(@org.mule.sdk.api.annotation.values.OfValues(
       value = WithFourActingParametersValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.field1"),
           @Binding(actingParameter = "anotherValue", path = "actingParameter.nested.field2"),
@@ -161,28 +158,28 @@ public class ValuesOperations {
           @Binding(actingParameter = "optionalValue", path = "actingParameter.anotherNested.field4")}) String parameterWithValues,
                                             @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
-  public void withBoundActingParameterArray(@OfValues(
-      value = WithArrayParameterValueProvider.class,
+  public void withBoundActingParameterArray(@org.mule.sdk.api.annotation.values.OfValues(
+      value = WithListParameterValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.jsonArray")}) String parameterWithValues,
                                             @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
-  public void withPojoBoundActingParameter(@OfValues(
+  public void withPojoBoundActingParameter(@org.mule.sdk.api.annotation.values.OfValues(
       value = WithPojoParameterValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.pojoField")}) String parameterWithValues,
-                                           InputStream actingParameter) {}
+                                           @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
-  public void withMapBoundActingParameter(@OfValues(
+  public void withMapBoundActingParameter(@org.mule.sdk.api.annotation.values.OfValues(
       value = WithMapParameterValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.mapField")}) String parameterWithValues,
-                                          InputStream actingParameter) {}
+                                          @TypeResolver(JsonTypeResolver.class) InputStream actingParameter) {}
 
   // Test both defining pojo as an expression and in the dsl.
-  public void withPojoFieldBoundActingParameterField(@OfValues(
-      value = WithRequiredParameterValueProvider.class,
+  public void withPojoFieldBoundActingParameterField(@org.mule.sdk.api.annotation.values.OfValues(
+      value = WithRequiredParameterSdkValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.pojoId")}) String parameterWithValues,
                                                      MyPojo actingParameter) {}
 
-  public void withBoundActingParameterEnum(@OfValues(
+  public void withBoundActingParameterEnum(@org.mule.sdk.api.annotation.values.OfValues(
       value = WithEnumParameterValueProvider.class,
       bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.enumField")}) String parameterWithValues,
                                            InputStream actingParameter) {}

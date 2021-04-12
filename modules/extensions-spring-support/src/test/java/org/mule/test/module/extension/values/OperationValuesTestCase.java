@@ -149,87 +149,125 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   public void withBoundActingParameter() throws Exception {
     ValueResult result = getValueResult("withBoundActingParameter", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
-    // Add assertion
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
   }
 
   @Test
   public void withBoundActingParameterField() throws Exception {
     ValueResult result = getValueResult("withBoundActingParameterField", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
-    // Add assertion
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
   }
 
   @Test
   public void withTwoActingParameters() throws Exception {
     ValueResult result = getValueResult("withTwoActingParameters", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
-    // Add assertion
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(2));
+    assertThat(values, hasValues("Acting parameter value", "Scalar value"));
   }
 
   @Test
   public void withTwoBoundActingParameters() throws Exception {
     ValueResult result = getValueResult("withTwoBoundActingParameters", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
-    // Add assertion
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(2));
+    assertThat(values, hasValues("Acting parameter value", "Scalar value"));
   }
 
   @Test
   public void withBoundActingParameterToXmlTagContent() throws Exception {
     ValueResult result = getValueResult("withBoundActingParameterToXmlTagContent", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
-    // Add assertion
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("This is the tag content"));
   }
 
   @Test
   public void withBoundActingParameterToXmlTagAttribute() throws Exception {
     ValueResult result = getValueResult("withBoundActingParameterToXmlTagAttribute", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
-    // Add assertion
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("This is the attribute value"));
   }
 
   @Test
   public void withFourBoundActingParameters() throws Exception {
     ValueResult result = getValueResult("withFourBoundActingParameters", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
-    // Add assertion
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(4));
+    assertThat(values, hasValues("Field1 Value", "Field2 Value", "Field3 Value", "Field4 Value"));
   }
 
   @Test
   public void withBoundActingParameterArray() throws Exception {
     ValueResult result = getValueResult("withBoundActingParameterArray", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(3));
+    assertThat(values, hasValues("One Value", "Another value", "Yet another value"));
+  }
+
+  // MAKE THIS ONE WORK
+  @Test
+  public void withPojoBoundActingParameter() throws Exception {
+    ValueResult result = getValueResult("withPojoBoundActingParameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
     // Add assertion
   }
 
+  @Test
+  public void withMapBoundActingParameter() throws Exception {
+    ValueResult result = getValueResult("withMapBoundActingParameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(4));
+    assertThat(values, hasValues("pojoId : This is the pojo ID", "pojoName : This is the pojo name", "pojoNumber : 23",
+                                 "pojoBoolean : true"));
+  }
 
+  @Test
+  public void withPojoFieldBoundActingParameterFieldExpression() throws Exception {
+    ValueResult result = getValueResult("withPojoFieldBoundActingParameterFieldExpression", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("This is the pojo ID"));
+  }
+
+  @Test
+  public void withPojoFieldBoundActingParameterFieldDsl() throws Exception {
+    ValueResult result = getValueResult("withPojoFieldBoundActingParameterFieldDsl", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("This is the pojo ID"));
+  }
+
+  @Test
+  public void withPojoFieldBoundIncompleteActingParameterFieldDsl() throws Exception {
+    ValueResult result = getValueResult("withPojoFieldBoundIncompleteActingParameterFieldDsl", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("This is the pojo ID"));
+  }
 
   //
-  //  public void withBoundActingParameterArray(@OfValues(
-  //      value = WithArrayParameterValueProvider.class,
-  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.jsonArray")}) String parameterWithValues,
-  //                                            InputStream actingParameter) {}
-  //
-  //  public void withPojoBoundActingParameter(@OfValues(
-  //      value = WithPojoParameterValueProvider.class,
-  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.pojoField")}) String parameterWithValues,
-  //                                           InputStream actingParameter) {}
-  //
-  //  public void withMapBoundActingParameter(@OfValues(
-  //      value = WithMapParameterValueProvider.class,
-  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.mapField")}) String parameterWithValues,
-  //                                          InputStream actingParameter) {}
-  //
-  //  // Test both defining pojo as an expression and in the dsl.
-  //  public void withPojoFieldBoundActingParameterField(@OfValues(
-  //      value = WithRequiredParameterValueProvider.class,
-  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.pojoId")}) String parameterWithValues,
-  //                                                     MyPojo actingParameter) {}
-  //
-  //  public void withBoundActingParameterEnum(@OfValues(
-  //      value = WithEnumParameterValueProvider.class,
-  //      bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.enumField")}) String parameterWithValues,
-  //                                           InputStream actingParameter) {}
+  // public void withBoundActingParameterEnum(@OfValues(
+  // value = WithEnumParameterValueProvider.class,
+  // bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.enumField")}) String parameterWithValues,
+  // InputStream actingParameter) {}
 
-  // ADD optional cases
+  // ADD optional parameter cases cases
 
 }

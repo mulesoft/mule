@@ -6,27 +6,27 @@
  */
 package org.mule.test.values.extension.resolver;
 
-import java.io.InputStream;
+
+import static org.mule.sdk.api.values.ValueBuilder.getValuesFor;
+
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.sdk.api.values.Value;
+import org.mule.sdk.api.values.ValueProvider;
+
 import java.util.Set;
 
-import org.mule.runtime.api.value.Value;
-import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.values.ValueBuilder;
-import org.mule.runtime.extension.api.values.ValueProvider;
-
-public class PocSimpleValueProvider implements ValueProvider {
+public class WithRequiredParameterSdkValueProvider implements ValueProvider {
 
   @Parameter
-  private InputStream complexParam;
+  String requiredValue;
 
   @Override
   public Set<Value> resolve() {
-    return ValueBuilder.getValuesFor(IOUtils.toString(complexParam));
+    return getValuesFor(requiredValue);
   }
 
   @Override
   public String getId() {
-    return "Poc Simple value provider";
+    return getClass().getName();
   }
 }

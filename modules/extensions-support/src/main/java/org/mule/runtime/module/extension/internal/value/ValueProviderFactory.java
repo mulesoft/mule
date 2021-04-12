@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.value;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
@@ -17,6 +18,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILURE;
 
 
+import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.el.BindingContext;
@@ -26,6 +29,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.metadata.DefaultDataTypeBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
@@ -94,6 +98,7 @@ public class ValueProviderFactory {
     this.configField = configField;
     this.reflectionCache = reflectionCache;
     this.muleContext = muleContext;
+    // The expression manager can be taken from the mule context CHANGE THIS
     this.expressionManager = expressionManager;
     this.parameterizedModel = parameterizedModel;
   }
@@ -140,18 +145,18 @@ public class ValueProviderFactory {
 
       // PROBLEM WITH getParameter method
 
-      //      for (Map.Entry<String, ValueResolver<? extends Object>> entry : parameterValueResolver.getParameters().entrySet()) {
-      //        Object value = parameterValueResolver.getParameterValue(entry.getKey());
-      //        Optional<String> mediaType = parameterizedModel.getAllParameterModels().stream()
-      //            .filter(parameterModel -> getUnaliasedName(parameterModel).equals(entry.getKey())).findFirst()
-      //            .map(parameterModel -> parameterModel.getType()
-      //                .getMetadataFormat().getValidMimeTypes().iterator().next());
-      //        if (mediaType.isPresent()) {
-      //          DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType.get()).build();
-      //          bindingContextBuilder
-      //              .addBinding(entry.getKey(), new TypedValue(value, valueDataType));
-      //        }
-      //      }
+      // for (Map.Entry<String, ValueResolver<? extends Object>> entry : parameterValueResolver.getParameters().entrySet()) {
+      // Object value = parameterValueResolver.getParameterValue(entry.getKey());
+      // Optional<String> mediaType = parameterizedModel.getAllParameterModels().stream()
+      // .filter(parameterModel -> getUnaliasedName(parameterModel).equals(entry.getKey())).findFirst()
+      // .map(parameterModel -> parameterModel.getType()
+      // .getMetadataFormat().getValidMimeTypes().iterator().next());
+      // if (mediaType.isPresent()) {
+      // DataType valueDataType = DataType.builder().type(value.getClass()).mediaType(mediaType.get()).build();
+      // bindingContextBuilder
+      // .addBinding(entry.getKey(), new TypedValue(value, valueDataType));
+      // }
+      // }
 
       for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
         String unaliasedName = getUnaliasedName(parameterModel);
@@ -187,7 +192,11 @@ public class ValueProviderFactory {
 
       if (!expression.toString().equals("#[{}]")) {
         resolvedActingParameters =
-            (Map<String, Object>) expressionManager.evaluate(expression.toString(), DataType.fromType(Map.class), bindingContext)
+            (Map<String, Object>) expressionManager
+                .evaluate(expression.toString(),
+                          DataType.builder().mapType(Map.class)
+                              .valueMediaType(ANY).build(),
+                          bindingContext)
                 .getValue();
       }
 
@@ -232,10 +241,11 @@ public class ValueProviderFactory {
   }
 
   private void injectValueProviderFields(Object resolver, Map<String, Object> resolvedParameters) throws ValueResolvingException {
+    TransformationService transformationService = muleContext.getTransformationService();
     List<String> missingParameters = new ArrayList<>();
     for (InjectableParameterInfo injectableParam : factoryModelProperty.getInjectableParameters()) {
       Object parameterValue = null;
-      //Maybe need transformation ? example list -> array
+      // Maybe need transformation ? example list -> array
       String parameterName = injectableParam.getParameterName();
       parameterValue = resolvedParameters.get(parameterName);
 

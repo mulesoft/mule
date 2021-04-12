@@ -6,13 +6,13 @@
  */
 package org.mule.test.values.extension.resolver;
 
-import static org.mule.runtime.extension.api.values.ValueBuilder.getValuesFor;
+import static org.mule.sdk.api.values.ValueBuilder.getValuesFor;
 
-import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.values.ValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.sdk.api.values.Value;
+import org.mule.sdk.api.values.ValueProvider;
+import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.util.Set;
 
@@ -34,6 +34,11 @@ public class WithFourActingParametersValueProvider implements ValueProvider {
   @Override
   public Set<Value> resolve() throws ValueResolvingException {
     return getValuesFor(requiredValue, anotherValue, someValue, optionalValue);
+  }
+
+  @Override
+  public String getId() {
+    return getClass().getName();
   }
 
 }
