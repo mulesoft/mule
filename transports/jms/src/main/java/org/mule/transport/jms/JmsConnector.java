@@ -7,6 +7,7 @@
 package org.mule.transport.jms;
 
 
+import static java.lang.Boolean.getBoolean;
 import static org.mule.api.config.MuleProperties.MULE_JMS_REDELIVERY_DELAY;
 import static org.mule.api.config.MuleProperties.MULE_JMS_MAX_REDELIVERY_DELAY;
 import static org.mule.api.config.MuleProperties.MULE_JMS_INITIAL_REDELIVERY_DELAY;
@@ -828,7 +829,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 stopping = true;
                 connection.stop();
-                if(Boolean.valueOf( System.getProperty(MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP, "false")))
+                if(getBoolean(System.getProperty(MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP, "false")))
                 {
                     closeConnection(connection, connectionFactory);
                     connection = null;
