@@ -39,21 +39,6 @@ import com.google.common.collect.ImmutableList;
  */
 public class ExtensionDocumentationResourceGenerator implements GeneratedResourceFactory {
 
-  // @Override
-  // public List<GeneratedResource> generateResources(ExtensionModel extensionModel) {
-  // final ExtensionDescriptionsSerializer serializer = new ExtensionDescriptionsSerializer();
-  // ExtensionDocumenterWalker walker = new ExtensionDocumenterWalker();
-  // walker.walk(extensionModel);
-  //
-  // String documenter = serializer.serialize(getDocumenter(extensionModel,
-  // walker.getConfigs(),
-  // walker.getConnections(),
-  // walker.getOperations(),
-  // walker.getSources(),
-  // getTypesDocumentation(extensionModel)));
-  // return singletonList(new GeneratedResource(serializer.getFileName(extensionModel.getName()), documenter.getBytes()));
-  // }
-
   @Override
   public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
     final ExtensionDescriptionsSerializer serializer = new ExtensionDescriptionsSerializer();

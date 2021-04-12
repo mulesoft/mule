@@ -12,7 +12,6 @@ import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary
 import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.PROXY_CONFIGURATION_TYPE;
 import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.SCALAR_SECRET;
 import static org.mule.runtime.extension.api.connectivity.ConnectivityVocabulary.SECRET;
-import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSemanticTerms;
 import static org.mule.runtime.extension.internal.semantic.SemanticTermsHelper.getTermsFromAnnotations;
 
@@ -27,7 +26,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSemanticTermsDeclaration;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.enricher.AbstractAnnotatedDeclarationEnricher;
@@ -35,14 +33,14 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Metho
 
 import java.util.Set;
 
+/**
+ * An enricher which adds semantic terms based on annotations
+ *
+ * @since 4.4.0ExtensionDocumentationResourceGenerator.java
+ */
 public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher {
 
   private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-
-  @Override
-  public DeclarationEnricherPhase getExecutionPhase() {
-    return STRUCTURE;
-  }
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
@@ -56,8 +54,8 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
       @Override
       protected void onOperation(OperationDeclaration declaration) {
         extractImplementingMethod(declaration)
-            .map(method -> new MethodWrapper(method, typeLoader))
-            .ifPresent(method -> addSemanticTerms(declaration, method));
+                .map(method -> new MethodWrapper(method, typeLoader))
+                .ifPresent(method -> addSemanticTerms(declaration, method));
       }
 
       @Override

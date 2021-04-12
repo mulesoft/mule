@@ -38,7 +38,7 @@ public abstract class AbstractAnnotatedDeclarationEnricher implements Declaratio
    * @param annotationType the type of the annotation you want
    * @param <A>            the annotation's generic type
    * @return an {@link Annotation} or {@code null} if the annotation is not present or the {@code declaration} doesn't have a
-   *         backing annotated type
+   * backing annotated type
    */
   protected <A extends Annotation> A extractAnnotation(BaseDeclaration<? extends BaseDeclaration> declaration,
                                                        Class<A> annotationType) {
@@ -56,14 +56,14 @@ public abstract class AbstractAnnotatedDeclarationEnricher implements Declaratio
    * @return a {@link Class} or {@code null} if the model doesn't have a {@link ImplementingTypeModelProperty}
    */
   protected Optional<ImplementingTypeModelProperty> extractImplementingTypeProperty(
-                                                                                    BaseDeclaration<? extends BaseDeclaration> declaration) {
+          BaseDeclaration<? extends BaseDeclaration> declaration) {
     return declaration.getModelProperty(ImplementingTypeModelProperty.class);
   }
 
   /**
    * @param declaration a {@link BaseDeclaration}
    * @return The type from which the {@code declaration} was derived or {@link Optional#empty()} if it couldn't be determined or
-   *         the declaration is synthetic
+   * the declaration is synthetic
    */
   protected Optional<Class> extractImplementingType(BaseDeclaration<? extends BaseDeclaration> declaration) {
     return extractImplementingTypeProperty(declaration).map(ImplementingTypeModelProperty::getType);
@@ -72,20 +72,35 @@ public abstract class AbstractAnnotatedDeclarationEnricher implements Declaratio
   /**
    * @param declaration a {@link BaseDeclaration}
    * @return The type from which the {@code declaration} was derived or {@link Optional#empty()} if it couldn't be determined or
-   *         the declaration is synthetic
+   * the declaration is synthetic
    */
   protected Optional<Type> extractType(BaseDeclaration<? extends BaseDeclaration> declaration) {
     return declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
-        .map(ExtensionTypeDescriptorModelProperty::getType);
+            .map(ExtensionTypeDescriptorModelProperty::getType);
   }
 
+  /**
+   * If the operation was derived from a Java method, this method extracts and returns it.
+   *
+   * @param declaration the operation's declaration
+   * @return an {@link Optional} {@link Method}
+   * @since 4.4.0
+   */
   protected Optional<Method> extractImplementingMethod(OperationDeclaration declaration) {
     return declaration.getModelProperty(ImplementingMethodModelProperty.class)
-        .map(ImplementingMethodModelProperty::getMethod);
+            .map(ImplementingMethodModelProperty::getMethod);
   }
 
+  /**
+   * If the parameter was derived from a Java field or method argument, this method returns an {@link ExtensionParameter}
+   * which provides an abstraction over that field or argument
+   *
+   * @param declaration the parameter's declaration
+   * @return an {@link ExtensionParameter}
+   * @since 4.4.0
+   */
   protected Optional<ExtensionParameter> extractDeclaredParameter(ParameterDeclaration declaration) {
     return declaration.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
-        .map(ExtensionParameterDescriptorModelProperty::getExtensionParameter);
+            .map(ExtensionParameterDescriptorModelProperty::getExtensionParameter);
   }
 }
