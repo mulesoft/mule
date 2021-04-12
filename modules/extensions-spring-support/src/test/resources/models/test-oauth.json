@@ -6929,7 +6929,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [],
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -7337,7 +7339,9 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -7365,7 +7369,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -7394,7 +7400,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -7423,7 +7431,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -7480,7 +7490,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -7629,7 +7641,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -7657,7 +7671,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -7685,7 +7701,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -7801,7 +7819,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [],
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "SCOPELESS",
             "namespace": "TEST-OAUTH",
@@ -8209,7 +8229,9 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -8237,7 +8259,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -8266,7 +8290,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -8295,7 +8321,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -8351,7 +8379,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -8500,7 +8530,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -8528,7 +8560,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -8556,7 +8590,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -8671,7 +8707,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [],
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "VALIDATED-CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -9079,7 +9117,9 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -9107,7 +9147,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -9136,7 +9178,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -9165,7 +9209,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -9222,7 +9268,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -9371,7 +9419,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -9399,7 +9449,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -9427,7 +9479,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -9543,7 +9597,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [],
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "WITH-PARAMS-CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -10063,7 +10119,9 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -10091,7 +10149,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -10120,7 +10180,9 @@
                     "order": 12
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -10149,7 +10211,9 @@
                     "order": 13
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -10206,7 +10270,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -10355,7 +10421,9 @@
                     "order": 19
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -10383,7 +10451,9 @@
                     "order": 20
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -10411,7 +10481,9 @@
                     "order": 21
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -18079,7 +18151,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [],
+          "semanticTerms": [
+            "connectivity.OAuthClientCredentialsConnection"
+          ],
           "stereotype": {
             "type": "CLIENT-CREDENTIALS",
             "namespace": "TEST-OAUTH",
@@ -18564,7 +18638,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "clientId",
                   "description": "The OAuth client id as registered with the service provider",
                   "modelProperties": {}
@@ -18592,7 +18668,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "clientSecret",
                   "description": "The OAuth client secret as registered with the service provider",
                   "modelProperties": {}
@@ -18621,7 +18699,9 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "tokenUrl",
                   "description": "The service provider\u0027s token endpoint URL",
                   "modelProperties": {}
@@ -25289,7 +25369,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [],
+          "semanticTerms": [
+            "connectivity.OAuthClientCredentialsConnection"
+          ],
           "stereotype": {
             "type": "CLIENT-CREDENTIALS",
             "namespace": "TEST-OAUTH",
@@ -25774,7 +25856,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "clientId",
                   "description": "The OAuth client id as registered with the service provider",
                   "modelProperties": {}
@@ -25802,7 +25886,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "clientSecret",
                   "description": "The OAuth client secret as registered with the service provider",
                   "modelProperties": {}
@@ -25831,7 +25917,9 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "tokenUrl",
                   "description": "The service provider\u0027s token endpoint URL",
                   "modelProperties": {}
@@ -25969,7 +26057,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [],
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -26377,7 +26467,9 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -26405,7 +26497,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -26434,7 +26528,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -26463,7 +26559,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -26520,7 +26618,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -26669,7 +26769,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -26697,7 +26799,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -26725,7 +26829,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -33371,7 +33477,9 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [],
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "POOLED",
             "namespace": "TEST-OAUTH",
@@ -33993,7 +34101,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -34021,7 +34131,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -34050,7 +34162,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -34079,7 +34193,9 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -34135,7 +34251,9 @@
                     "order": 12
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -34284,7 +34402,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -34312,7 +34432,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -34340,7 +34462,9 @@
                     "order": 18
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -40985,7 +41109,9 @@
           "connectionManagementType": "CACHED",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [],
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "REFRESH-VALIDATION",
             "namespace": "TEST-OAUTH",
@@ -41393,7 +41519,9 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -41421,7 +41549,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -41450,7 +41580,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -41479,7 +41611,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -41535,7 +41669,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -41684,7 +41820,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -41712,7 +41850,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -41740,7 +41880,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}

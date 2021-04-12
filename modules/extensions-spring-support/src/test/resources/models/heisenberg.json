@@ -16565,9 +16565,7 @@
             }
           ],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [
-            "connectivity.ApiKeyAuthenticationConnection"
-          ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "HEISENBERG",
@@ -16608,9 +16606,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [
-                    "connectivity.apiKey"
-                  ],
+                  "semanticTerms": [],
                   "name": "saulPhoneNumber",
                   "description": "",
                   "modelProperties": {}
@@ -16973,9 +16969,7 @@
             }
           ],
           "supportsConnectivityTesting": true,
-          "semanticTerms": [
-            "connectivity.ApiKeyAuthenticationConnection"
-          ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SECURE",
             "namespace": "HEISENBERG",
@@ -17011,9 +17005,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [
-                    "connectivity.apiKey"
-                  ],
+                  "semanticTerms": [],
                   "name": "saulPhoneNumber",
                   "description": "",
                   "modelProperties": {}
@@ -48232,9 +48224,7 @@
         }
       ],
       "supportsConnectivityTesting": true,
-      "semanticTerms": [
-        "connectivity.ApiKeyAuthenticationConnection"
-      ],
+      "semanticTerms": [],
       "stereotype": {
         "type": "CONNECTION",
         "namespace": "HEISENBERG",
@@ -48275,9 +48265,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [
-                "connectivity.apiKey"
-              ],
+              "semanticTerms": [],
               "name": "saulPhoneNumber",
               "description": "",
               "modelProperties": {}
@@ -48640,9 +48628,7 @@
         }
       ],
       "supportsConnectivityTesting": true,
-      "semanticTerms": [
-        "connectivity.ApiKeyAuthenticationConnection"
-      ],
+      "semanticTerms": [],
       "stereotype": {
         "type": "SECURE",
         "namespace": "HEISENBERG",
@@ -48678,9 +48664,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "semanticTerms": [
-                "connectivity.apiKey"
-              ],
+              "semanticTerms": [],
               "name": "saulPhoneNumber",
               "description": "",
               "modelProperties": {}

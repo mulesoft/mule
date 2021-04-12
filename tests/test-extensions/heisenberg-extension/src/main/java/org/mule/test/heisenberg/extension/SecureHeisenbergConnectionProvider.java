@@ -16,7 +16,6 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.sdk.api.annotation.semantics.connectivity.ApiKeyAuth;
 
 @Alias("secure")
 @ExternalLib(name = HEISENBERG_LIB_NAME,
@@ -24,7 +23,6 @@ import org.mule.sdk.api.annotation.semantics.connectivity.ApiKeyAuth;
     nameRegexpMatcher = HEISENBERG_LIB_FILE_NAME,
     requiredClassName = HEISENBERG_LIB_CLASS_NAME,
     type = NATIVE)
-@ApiKeyAuth
 public class SecureHeisenbergConnectionProvider extends HeisenbergConnectionProvider {
 
   @Parameter

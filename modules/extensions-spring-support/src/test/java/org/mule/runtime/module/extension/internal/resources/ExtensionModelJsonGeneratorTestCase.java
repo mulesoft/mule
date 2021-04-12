@@ -48,6 +48,7 @@ import org.mule.test.nonimplicit.config.extension.extension.api.NonImplicitConfi
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.ram.RickAndMortyExtension;
+import org.mule.test.semantic.extension.SemanticTermsExtension;
 import org.mule.test.substitutiongroup.extension.SubstitutionGroupExtension;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.transactional.TransactionalExtension;
@@ -112,6 +113,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
                         newTestUnit(javaLoader, SampleDataExtension.class, "sample-data.json"),
                         newTestUnit(javaLoader, ImplicitConfigExtension.class, "implicit-config.json"),
                         newTestUnit(javaLoader, NonImplicitConfigExtension.class, "non-implicit-config.json"),
+                        newTestUnit(javaLoader, SemanticTermsExtension.class, "semantic-terms-extension.json"),
                         newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.json"));
 
     return createExtensionModels(extensions);

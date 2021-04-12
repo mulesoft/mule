@@ -309,6 +309,13 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
+            <artifactId>mule-semantic-terms-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
             <artifactId>test-weave-function-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
