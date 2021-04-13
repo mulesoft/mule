@@ -279,7 +279,8 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
             spy.doConnect();
             spy.doStop();
             assertNull(connector.getConnectionFactory());
-        }finally
+        }
+        finally
         {
             System.setProperty(MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP, "false");
         }
