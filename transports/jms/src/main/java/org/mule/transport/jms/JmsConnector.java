@@ -829,7 +829,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 stopping = true;
                 connection.stop();
-                if(getBoolean(System.getProperty(MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP, "false")))
+                if(getBoolean(MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP))
                 {
                     closeConnection(connection, connectionFactory);
                     connection = null;
