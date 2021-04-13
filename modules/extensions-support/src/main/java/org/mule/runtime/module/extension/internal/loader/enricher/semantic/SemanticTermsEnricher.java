@@ -31,6 +31,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.enricher.AbstractAnnotatedDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -66,7 +67,7 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
       @Override
       protected void onParameter(ParameterGroupDeclaration parameterGroup, ParameterDeclaration parameter) {
         extractDeclaredParameter(parameter).ifPresent(e -> addSemanticTerms(parameter, e));
-        Set<String> typeTerms = getSemanticTerms(parameter.getType());
+        Set<String> typeTerms = new LinkedHashSet<>(getSemanticTerms(parameter.getType()));
 
         addTermIfPresent(typeTerms, parameter, PROXY_CONFIGURATION_TYPE, PROXY_CONFIGURATION_PARAMETER);
         addTermIfPresent(typeTerms, parameter, NTLM_PROXY_CONFIGURATION, NTLM_PROXY_CONFIGURATION_PARAMETER);

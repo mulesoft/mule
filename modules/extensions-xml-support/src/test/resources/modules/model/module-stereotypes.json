@@ -62,6 +62,7 @@
                   }
                 }
               ],
+              "semanticTerms": [],
               "name": "stereotypableIronManConfig",
               "displayModel": {},
               "description": "",
@@ -107,6 +108,7 @@
                   }
                 }
               ],
+              "semanticTerms": [],
               "name": "stereotypableMultipleConfig",
               "displayModel": {},
               "description": "",
@@ -144,6 +146,7 @@
                   }
                 }
               ],
+              "semanticTerms": [],
               "name": "stereotypableWeirdConfig",
               "displayModel": {},
               "description": "",
@@ -166,6 +169,7 @@
                 "allowTopLevelDefinition": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -282,6 +286,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -334,6 +339,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "CALL-FLOW",
             "namespace": "MODULE-STEREOTYPES",
@@ -381,6 +387,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "reference",
                   "displayModel": {},
                   "description": "",
@@ -428,6 +435,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -464,6 +472,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -495,6 +504,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -604,6 +614,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -663,6 +674,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "DO-SOMETHING",
             "namespace": "MODULE-STEREOTYPES",
@@ -701,6 +713,7 @@
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "aData",
                   "displayModel": {},
                   "description": "",
@@ -748,6 +761,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -784,6 +798,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -815,6 +830,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -924,6 +940,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -962,6 +979,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "MODULE-STEREOTYPES",
@@ -1005,6 +1023,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "stereotypableIronManConfigInConnection",
                   "displayModel": {},
                   "description": "",
