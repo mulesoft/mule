@@ -23,7 +23,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.api.config.MuleProperties.MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP;
+import static org.mule.api.config.MuleProperties.MULE_JMS_CLOSE_CONNECTION_ON_STOP;
 
 import java.lang.reflect.UndeclaredThrowableException;
 
@@ -268,33 +268,36 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void closeConnectionFactoryOnStop() throws Exception
+    public void closeConnectionOnStop() throws Exception
     {
         try
         {
-            System.setProperty(MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP, "true");
+            System.setProperty(MULE_JMS_CLOSE_CONNECTION_ON_STOP, "true");
             Connection connection = mock(Connection.class);
             JmsConnector connector = new JmsConnector(muleContext);
-            JmsConnector spy = spy(connector);
-            spy.doConnect();
-            spy.doStop();
-            assertNull(connector.getConnectionFactory());
+            ConnectionFactory connectionFactory = mock(CachingConnectionFactory.class);
+            connector.setConnectionFactory(connectionFactory);
+            connector.setConnection(connection);
+            connector.doStop();
+            assertNull(connector.getConnection());
         }
         finally
         {
-            System.setProperty(MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP, "false");
+            System.setProperty(MULE_JMS_CLOSE_CONNECTION_ON_STOP, "false");
         }
     }
 
     @Test
-    public void doNotCloseConnectionFactoryOnStop() throws Exception
+    public void doNotCloseConnectionOnStop() throws Exception
     {
             Connection connection = mock(Connection.class);
             JmsConnector connector = new JmsConnector(muleContext);
             JmsConnector spy = spy(connector);
-            spy.doConnect();
+            ConnectionFactory connectionFactory = mock(CachingConnectionFactory.class);
+            connector.setConnectionFactory(connectionFactory);
+            connector.setConnection(connection);
             spy.doStop();
-            assertNotNull(connector.getConnectionFactory());
+            assertNotNull(connector.getConnection());
     }
 
 
