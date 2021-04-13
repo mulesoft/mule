@@ -101,6 +101,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -218,6 +219,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -285,6 +287,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ANOTHER_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -323,6 +326,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "metadataKey",
                   "description": "",
                   "modelProperties": {
@@ -373,6 +377,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "inputParameter",
                   "description": "",
                   "modelProperties": {}
@@ -457,6 +462,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -500,6 +506,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -532,6 +539,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -648,6 +656,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -837,6 +846,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -933,6 +943,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "CAPTURE_CALLBACK_PAYLOADS",
             "namespace": "TEST-OAUTH",
@@ -992,6 +1003,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "request",
                   "description": "",
                   "modelProperties": {}
@@ -1040,6 +1052,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "state",
                   "description": "",
                   "modelProperties": {}
@@ -1092,6 +1105,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1205,6 +1219,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1278,6 +1293,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ENTITIES_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -1316,6 +1332,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "key",
                   "description": "",
                   "modelProperties": {
@@ -1405,6 +1422,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -1448,6 +1466,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1480,6 +1499,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1596,6 +1616,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -1785,6 +1806,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1866,6 +1888,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -1961,6 +1984,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2004,6 +2028,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2036,6 +2061,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2152,6 +2178,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -2341,6 +2368,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2405,6 +2433,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -2500,6 +2529,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -2543,6 +2573,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2575,6 +2606,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2691,6 +2723,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -2880,6 +2913,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2950,6 +2984,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_STREAM_CONTENT_WITH_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -3004,6 +3039,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -3088,6 +3124,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -3131,6 +3168,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3163,6 +3201,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3279,6 +3318,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -3468,6 +3508,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3538,6 +3579,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -3576,6 +3618,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "metadataKey",
                   "description": "",
                   "modelProperties": {
@@ -3626,6 +3669,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "inputParameter",
                   "description": "",
                   "modelProperties": {}
@@ -3710,6 +3754,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -3753,6 +3798,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3785,6 +3831,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3901,6 +3948,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -4090,6 +4138,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4203,6 +4252,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -4259,6 +4309,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failAt",
                   "description": "",
                   "modelProperties": {}
@@ -4287,6 +4338,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
@@ -4375,6 +4427,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -4527,6 +4580,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -4581,6 +4635,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -4613,6 +4668,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -4729,6 +4785,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -4918,6 +4975,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4994,6 +5052,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SAMPLE_DATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -5089,6 +5148,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -5132,6 +5192,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -5164,6 +5225,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -5280,6 +5342,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -5469,6 +5532,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5533,6 +5597,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "TOKEN_EXPIRED",
             "namespace": "TEST-OAUTH",
@@ -5628,6 +5693,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -5741,6 +5807,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -5930,6 +5997,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5991,6 +6059,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "UNAUTHORIZE",
             "namespace": "TEST-OAUTH",
@@ -6029,6 +6098,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "resourceOwnerId",
                   "description": "The id of the resource owner which access should be invalidated",
                   "modelProperties": {}
@@ -6113,6 +6183,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -6226,6 +6297,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -6299,6 +6371,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "VALUES_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -6346,6 +6419,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "parameter",
                   "description": "",
                   "modelProperties": {}
@@ -6430,6 +6504,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -6473,6 +6548,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -6505,6 +6581,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -6621,6 +6698,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -6810,6 +6888,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -6850,6 +6929,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -6901,6 +6983,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -6928,6 +7011,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -6959,6 +7043,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -6990,6 +7075,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -7199,6 +7285,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -7252,6 +7339,9 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -7279,6 +7369,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -7307,6 +7400,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -7335,6 +7431,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -7363,6 +7462,7 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -7390,6 +7490,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -7422,6 +7525,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -7454,6 +7558,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -7508,6 +7613,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "listenerConfig",
                   "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
@@ -7535,6 +7641,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -7562,6 +7671,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -7589,6 +7701,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -7639,6 +7754,7 @@
                       "namespace": "OS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "objectStore",
                   "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
@@ -7703,6 +7819,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "SCOPELESS",
             "namespace": "TEST-OAUTH",
@@ -7754,6 +7873,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -7781,6 +7901,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -7812,6 +7933,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -7843,6 +7965,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -8052,6 +8175,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -8105,6 +8229,9 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -8132,6 +8259,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -8160,6 +8290,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -8188,6 +8321,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -8215,6 +8351,7 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -8242,6 +8379,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -8274,6 +8414,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -8306,6 +8447,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -8360,6 +8502,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "listenerConfig",
                   "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
@@ -8387,6 +8530,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -8414,6 +8560,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -8441,6 +8590,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -8491,6 +8643,7 @@
                       "namespace": "OS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "objectStore",
                   "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
@@ -8554,6 +8707,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "VALIDATED-CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -8605,6 +8761,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -8632,6 +8789,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -8663,6 +8821,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -8694,6 +8853,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -8903,6 +9063,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -8956,6 +9117,9 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -8983,6 +9147,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -9011,6 +9178,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -9039,6 +9209,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -9067,6 +9240,7 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -9094,6 +9268,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -9126,6 +9303,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -9158,6 +9336,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -9212,6 +9391,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "listenerConfig",
                   "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
@@ -9239,6 +9419,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -9266,6 +9449,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -9293,6 +9479,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -9343,6 +9532,7 @@
                       "namespace": "OS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "objectStore",
                   "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
@@ -9407,6 +9597,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "WITH-PARAMS-CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -9458,6 +9651,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -9485,6 +9679,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -9516,6 +9711,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -9547,6 +9743,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -9574,6 +9771,7 @@
                     "order": 5
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "withAlias",
                   "description": "",
                   "modelProperties": {}
@@ -9601,6 +9799,7 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "defaultPlacement",
                   "description": "",
                   "modelProperties": {}
@@ -9628,6 +9827,7 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "queryParam",
                   "description": "",
                   "modelProperties": {}
@@ -9655,6 +9855,7 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "header",
                   "description": "",
                   "modelProperties": {}
@@ -9864,6 +10065,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -9917,6 +10119,9 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -9944,6 +10149,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -9972,6 +10180,9 @@
                     "order": 12
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -10000,6 +10211,9 @@
                     "order": 13
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -10028,6 +10242,7 @@
                     "order": 14
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -10055,6 +10270,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -10087,6 +10305,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -10119,6 +10338,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -10173,6 +10393,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "listenerConfig",
                   "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
@@ -10200,6 +10421,9 @@
                     "order": 19
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -10227,6 +10451,9 @@
                     "order": 20
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -10254,6 +10481,9 @@
                     "order": 21
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -10304,6 +10534,7 @@
                       "namespace": "OS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "objectStore",
                   "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
@@ -10403,6 +10634,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "LISTENER",
             "namespace": "TEST-OAUTH",
@@ -10466,6 +10698,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -10495,6 +10728,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -10634,6 +10868,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -10820,6 +11055,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -10887,6 +11123,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "POLLER",
             "namespace": "TEST-OAUTH",
@@ -10950,6 +11187,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -10979,6 +11217,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "primaryNodeOnly",
                   "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
                   "modelProperties": {}
@@ -11006,6 +11245,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "schedulingStrategy",
                   "description": "Configures the scheduler that triggers the polling",
                   "modelProperties": {
@@ -11156,6 +11396,7 @@
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -11342,6 +11583,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -11422,6 +11664,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -11539,6 +11782,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -11606,6 +11850,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ANOTHER_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -11644,6 +11889,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "metadataKey",
                   "description": "",
                   "modelProperties": {
@@ -11694,6 +11940,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "inputParameter",
                   "description": "",
                   "modelProperties": {}
@@ -11778,6 +12025,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -11821,6 +12069,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -11853,6 +12102,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -11969,6 +12219,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -12158,6 +12409,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -12263,6 +12515,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ENTITIES_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -12301,6 +12554,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "key",
                   "description": "",
                   "modelProperties": {
@@ -12390,6 +12644,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -12433,6 +12688,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -12465,6 +12721,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -12581,6 +12838,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -12770,6 +13028,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -12851,6 +13110,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -12946,6 +13206,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -12989,6 +13250,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -13021,6 +13283,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -13137,6 +13400,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -13326,6 +13590,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -13390,6 +13655,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -13485,6 +13751,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -13528,6 +13795,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -13560,6 +13828,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -13676,6 +13945,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -13865,6 +14135,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -13935,6 +14206,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_STREAM_CONTENT_WITH_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -13989,6 +14261,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -14073,6 +14346,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -14116,6 +14390,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -14148,6 +14423,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -14264,6 +14540,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -14453,6 +14730,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -14523,6 +14801,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -14561,6 +14840,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "metadataKey",
                   "description": "",
                   "modelProperties": {
@@ -14611,6 +14891,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "inputParameter",
                   "description": "",
                   "modelProperties": {}
@@ -14695,6 +14976,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -14738,6 +15020,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -14770,6 +15053,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -14886,6 +15170,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -15075,6 +15360,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -15188,6 +15474,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -15244,6 +15531,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failAt",
                   "description": "",
                   "modelProperties": {}
@@ -15272,6 +15560,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
@@ -15360,6 +15649,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -15512,6 +15802,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -15566,6 +15857,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -15598,6 +15890,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -15714,6 +16007,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -15903,6 +16197,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -15979,6 +16274,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SAMPLE_DATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -16074,6 +16370,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -16117,6 +16414,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -16149,6 +16447,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -16265,6 +16564,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -16454,6 +16754,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -16518,6 +16819,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "TOKEN_EXPIRED",
             "namespace": "TEST-OAUTH",
@@ -16613,6 +16915,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -16726,6 +17029,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -16915,6 +17219,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -16976,6 +17281,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "UNAUTHORIZE",
             "namespace": "TEST-OAUTH",
@@ -17014,6 +17320,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "resourceOwnerId",
                   "description": "The id of the resource owner which access should be invalidated",
                   "modelProperties": {}
@@ -17098,6 +17405,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -17211,6 +17519,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -17284,6 +17593,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "VALUES_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -17331,6 +17641,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "parameter",
                   "description": "",
                   "modelProperties": {}
@@ -17415,6 +17726,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -17458,6 +17770,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -17490,6 +17803,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -17606,6 +17920,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -17795,6 +18110,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -17835,6 +18151,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [
+            "connectivity.OAuthClientCredentialsConnection"
+          ],
           "stereotype": {
             "type": "CLIENT-CREDENTIALS",
             "namespace": "TEST-OAUTH",
@@ -17886,6 +18205,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -17913,6 +18233,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -17944,6 +18265,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -17975,6 +18297,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -18002,6 +18325,7 @@
                     "order": 5
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "knownCustomHeader",
                   "description": "",
                   "modelProperties": {}
@@ -18050,6 +18374,7 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "randomHeaders",
                   "description": "",
                   "modelProperties": {}
@@ -18259,6 +18584,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -18312,6 +18638,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "clientId",
                   "description": "The OAuth client id as registered with the service provider",
                   "modelProperties": {}
@@ -18339,6 +18668,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "clientSecret",
                   "description": "The OAuth client secret as registered with the service provider",
                   "modelProperties": {}
@@ -18367,6 +18699,9 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "tokenUrl",
                   "description": "The service provider\u0027s token endpoint URL",
                   "modelProperties": {}
@@ -18395,6 +18730,7 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -18445,6 +18781,7 @@
                       "namespace": "OS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "objectStore",
                   "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
@@ -18545,6 +18882,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -18662,6 +19000,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -18729,6 +19068,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ANOTHER_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -18767,6 +19107,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "metadataKey",
                   "description": "",
                   "modelProperties": {
@@ -18817,6 +19158,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "inputParameter",
                   "description": "",
                   "modelProperties": {}
@@ -18901,6 +19243,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -18944,6 +19287,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -18976,6 +19320,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -19092,6 +19437,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -19281,6 +19627,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -19386,6 +19733,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ENTITIES_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -19424,6 +19772,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "key",
                   "description": "",
                   "modelProperties": {
@@ -19513,6 +19862,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -19556,6 +19906,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -19588,6 +19939,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -19704,6 +20056,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -19893,6 +20246,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -19974,6 +20328,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -20069,6 +20424,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -20112,6 +20468,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -20144,6 +20501,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -20260,6 +20618,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -20449,6 +20808,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -20513,6 +20873,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -20608,6 +20969,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -20651,6 +21013,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -20683,6 +21046,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -20799,6 +21163,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -20988,6 +21353,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -21058,6 +21424,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_STREAM_CONTENT_WITH_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -21112,6 +21479,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -21196,6 +21564,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -21239,6 +21608,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -21271,6 +21641,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -21387,6 +21758,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -21576,6 +21948,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -21646,6 +22019,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -21684,6 +22058,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "metadataKey",
                   "description": "",
                   "modelProperties": {
@@ -21734,6 +22109,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "inputParameter",
                   "description": "",
                   "modelProperties": {}
@@ -21818,6 +22194,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -21861,6 +22238,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -21893,6 +22271,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -22009,6 +22388,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -22198,6 +22578,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -22311,6 +22692,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -22367,6 +22749,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failAt",
                   "description": "",
                   "modelProperties": {}
@@ -22395,6 +22778,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
@@ -22483,6 +22867,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -22635,6 +23020,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -22689,6 +23075,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -22721,6 +23108,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -22837,6 +23225,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -23026,6 +23415,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -23102,6 +23492,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SAMPLE_DATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -23197,6 +23588,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -23240,6 +23632,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -23272,6 +23665,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -23388,6 +23782,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -23577,6 +23972,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -23641,6 +24037,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "TOKEN_EXPIRED",
             "namespace": "TEST-OAUTH",
@@ -23736,6 +24133,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -23849,6 +24247,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -24038,6 +24437,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -24099,6 +24499,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "UNAUTHORIZE",
             "namespace": "TEST-OAUTH",
@@ -24137,6 +24538,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "resourceOwnerId",
                   "description": "The id of the resource owner which access should be invalidated",
                   "modelProperties": {}
@@ -24221,6 +24623,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -24334,6 +24737,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -24407,6 +24811,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "VALUES_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -24454,6 +24859,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "parameter",
                   "description": "",
                   "modelProperties": {}
@@ -24538,6 +24944,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -24581,6 +24988,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -24613,6 +25021,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -24729,6 +25138,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -24918,6 +25328,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -24958,6 +25369,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [
+            "connectivity.OAuthClientCredentialsConnection"
+          ],
           "stereotype": {
             "type": "CLIENT-CREDENTIALS",
             "namespace": "TEST-OAUTH",
@@ -25009,6 +25423,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -25036,6 +25451,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -25067,6 +25483,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -25098,6 +25515,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -25125,6 +25543,7 @@
                     "order": 5
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "knownCustomHeader",
                   "description": "",
                   "modelProperties": {}
@@ -25173,6 +25592,7 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "randomHeaders",
                   "description": "",
                   "modelProperties": {}
@@ -25382,6 +25802,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -25435,6 +25856,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "clientId",
                   "description": "The OAuth client id as registered with the service provider",
                   "modelProperties": {}
@@ -25462,6 +25886,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "clientSecret",
                   "description": "The OAuth client secret as registered with the service provider",
                   "modelProperties": {}
@@ -25490,6 +25917,9 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "tokenUrl",
                   "description": "The service provider\u0027s token endpoint URL",
                   "modelProperties": {}
@@ -25518,6 +25948,7 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -25568,6 +25999,7 @@
                       "namespace": "OS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "objectStore",
                   "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
@@ -25625,6 +26057,9 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -25676,6 +26111,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -25703,6 +26139,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -25734,6 +26171,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -25765,6 +26203,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -25974,6 +26413,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -26027,6 +26467,9 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -26054,6 +26497,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -26082,6 +26528,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -26110,6 +26559,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -26138,6 +26590,7 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -26165,6 +26618,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -26197,6 +26653,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -26229,6 +26686,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -26283,6 +26741,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "listenerConfig",
                   "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
@@ -26310,6 +26769,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -26337,6 +26799,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -26364,6 +26829,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -26414,6 +26882,7 @@
                       "namespace": "OS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "objectStore",
                   "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
@@ -26521,6 +26990,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -26638,6 +27108,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -26705,6 +27176,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ANOTHER_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -26743,6 +27215,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "metadataKey",
                   "description": "",
                   "modelProperties": {
@@ -26793,6 +27266,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "inputParameter",
                   "description": "",
                   "modelProperties": {}
@@ -26877,6 +27351,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -26920,6 +27395,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -26952,6 +27428,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -27068,6 +27545,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -27257,6 +27735,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -27362,6 +27841,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ENTITIES_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -27400,6 +27880,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "key",
                   "description": "",
                   "modelProperties": {
@@ -27489,6 +27970,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -27532,6 +28014,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -27564,6 +28047,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -27680,6 +28164,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -27869,6 +28354,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -27950,6 +28436,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -28045,6 +28532,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -28088,6 +28576,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -28120,6 +28609,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -28236,6 +28726,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -28425,6 +28916,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -28489,6 +28981,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -28584,6 +29077,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -28627,6 +29121,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -28659,6 +29154,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -28775,6 +29271,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -28964,6 +29461,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -29034,6 +29532,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_STREAM_CONTENT_WITH_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -29088,6 +29587,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -29172,6 +29672,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -29215,6 +29716,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -29247,6 +29749,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -29363,6 +29866,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -29552,6 +30056,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -29622,6 +30127,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -29660,6 +30166,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "metadataKey",
                   "description": "",
                   "modelProperties": {
@@ -29710,6 +30217,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "inputParameter",
                   "description": "",
                   "modelProperties": {}
@@ -29794,6 +30302,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -29837,6 +30346,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -29869,6 +30379,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -29985,6 +30496,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -30174,6 +30686,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -30287,6 +30800,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -30343,6 +30857,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failAt",
                   "description": "",
                   "modelProperties": {}
@@ -30371,6 +30886,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
@@ -30459,6 +30975,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -30611,6 +31128,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -30665,6 +31183,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -30697,6 +31216,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -30813,6 +31333,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -31002,6 +31523,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -31078,6 +31600,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SAMPLE_DATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -31173,6 +31696,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -31216,6 +31740,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -31248,6 +31773,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -31364,6 +31890,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -31553,6 +32080,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -31617,6 +32145,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "TOKEN_EXPIRED",
             "namespace": "TEST-OAUTH",
@@ -31712,6 +32241,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -31825,6 +32355,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -32014,6 +32545,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -32075,6 +32607,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "UNAUTHORIZE",
             "namespace": "TEST-OAUTH",
@@ -32113,6 +32646,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "resourceOwnerId",
                   "description": "The id of the resource owner which access should be invalidated",
                   "modelProperties": {}
@@ -32197,6 +32731,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -32310,6 +32845,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -32383,6 +32919,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "VALUES_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -32430,6 +32967,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "parameter",
                   "description": "",
                   "modelProperties": {}
@@ -32514,6 +33052,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -32557,6 +33096,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -32589,6 +33129,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -32705,6 +33246,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -32894,6 +33436,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -32934,6 +33477,9 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "POOLED",
             "namespace": "TEST-OAUTH",
@@ -32985,6 +33531,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -33012,6 +33559,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -33043,6 +33591,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -33074,6 +33623,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -33283,6 +33833,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -33496,6 +34047,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
@@ -33549,6 +34101,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -33576,6 +34131,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -33604,6 +34162,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -33632,6 +34193,9 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -33659,6 +34223,7 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -33686,6 +34251,9 @@
                     "order": 12
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -33718,6 +34286,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -33750,6 +34319,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -33804,6 +34374,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "listenerConfig",
                   "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
@@ -33831,6 +34402,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -33858,6 +34432,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -33885,6 +34462,9 @@
                     "order": 18
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -33935,6 +34515,7 @@
                       "namespace": "OS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "objectStore",
                   "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
@@ -34041,6 +34622,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -34158,6 +34740,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -34225,6 +34808,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ANOTHER_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -34263,6 +34847,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "metadataKey",
                   "description": "",
                   "modelProperties": {
@@ -34313,6 +34898,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "inputParameter",
                   "description": "",
                   "modelProperties": {}
@@ -34397,6 +34983,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -34440,6 +35027,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -34472,6 +35060,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -34588,6 +35177,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -34777,6 +35367,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -34882,6 +35473,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "ENTITIES_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -34920,6 +35512,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "key",
                   "description": "",
                   "modelProperties": {
@@ -35009,6 +35602,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -35052,6 +35646,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -35084,6 +35679,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -35200,6 +35796,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -35389,6 +35986,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -35470,6 +36068,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -35565,6 +36164,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -35608,6 +36208,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -35640,6 +36241,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -35756,6 +36358,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -35945,6 +36548,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -36009,6 +36613,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -36104,6 +36709,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -36147,6 +36753,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -36179,6 +36786,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -36295,6 +36903,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -36484,6 +37093,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -36554,6 +37164,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "GET_STREAM_CONTENT_WITH_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -36608,6 +37219,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -36692,6 +37304,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -36735,6 +37348,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -36767,6 +37381,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -36883,6 +37498,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -37072,6 +37688,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -37142,6 +37759,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -37180,6 +37798,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "metadataKey",
                   "description": "",
                   "modelProperties": {
@@ -37230,6 +37849,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "inputParameter",
                   "description": "",
                   "modelProperties": {}
@@ -37314,6 +37934,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -37357,6 +37978,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -37389,6 +38011,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -37505,6 +38128,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -37694,6 +38318,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -37807,6 +38432,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -37863,6 +38489,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "failAt",
                   "description": "",
                   "modelProperties": {}
@@ -37891,6 +38518,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
@@ -37979,6 +38607,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -38131,6 +38760,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -38185,6 +38815,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -38217,6 +38848,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -38333,6 +38965,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -38522,6 +39155,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -38598,6 +39232,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "SAMPLE_DATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -38693,6 +39328,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -38736,6 +39372,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -38768,6 +39405,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -38884,6 +39522,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -39073,6 +39712,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -39137,6 +39777,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "TOKEN_EXPIRED",
             "namespace": "TEST-OAUTH",
@@ -39232,6 +39873,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -39345,6 +39987,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -39534,6 +40177,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -39595,6 +40239,7 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
+          "semanticTerms": [],
           "stereotype": {
             "type": "UNAUTHORIZE",
             "namespace": "TEST-OAUTH",
@@ -39633,6 +40278,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "resourceOwnerId",
                   "description": "The id of the resource owner which access should be invalidated",
                   "modelProperties": {}
@@ -39717,6 +40363,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -39830,6 +40477,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -39903,6 +40551,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED",
             "TEST-OAUTH:CONNECTIVITY"
           ],
+          "semanticTerms": [],
           "stereotype": {
             "type": "VALUES_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -39950,6 +40599,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "parameter",
                   "description": "",
                   "modelProperties": {}
@@ -40034,6 +40684,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -40077,6 +40728,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -40109,6 +40761,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -40225,6 +40878,7 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
@@ -40414,6 +41068,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -40454,6 +41109,9 @@
           "connectionManagementType": "CACHED",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [
+            "connectivity.OAuthAuthorizationCodeConnection"
+          ],
           "stereotype": {
             "type": "REFRESH-VALIDATION",
             "namespace": "TEST-OAUTH",
@@ -40505,6 +41163,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -40532,6 +41191,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -40563,6 +41223,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -40594,6 +41255,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -40803,6 +41465,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -40856,6 +41519,9 @@
                     "order": 6
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -40883,6 +41549,9 @@
                     "order": 7
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientSecret"
+                  ],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -40911,6 +41580,9 @@
                     "order": 8
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "authorizationUrl"
+                  ],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -40939,6 +41611,9 @@
                     "order": 9
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.tokenUrlTemplate"
+                  ],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -40966,6 +41641,7 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -40993,6 +41669,9 @@
                     "order": 11
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.clientId"
+                  ],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -41025,6 +41704,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -41057,6 +41737,7 @@
                       "namespace": "MULE"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -41111,6 +41792,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "listenerConfig",
                   "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
@@ -41138,6 +41820,9 @@
                     "order": 15
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -41165,6 +41850,9 @@
                     "order": 16
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.path"
+                  ],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -41192,6 +41880,9 @@
                     "order": 17
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -41242,6 +41933,7 @@
                       "namespace": "OS"
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "objectStore",
                   "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
@@ -41364,6 +42056,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
       "stereotype": {
         "type": "GET_STREAM",
         "namespace": "TEST-OAUTH",
@@ -41402,6 +42095,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "content",
               "description": "",
               "modelProperties": {}
@@ -41579,6 +42273,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -41633,6 +42328,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -41665,6 +42361,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -41781,6 +42478,7 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
