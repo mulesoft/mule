@@ -92,14 +92,10 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
   public Optional<ValueProviderCacheId> getIdForResolvedValues(ComponentAst containerComponent, String parameterName,
                                                                String targetPath) {
     return ifContainsParameter(containerComponent, parameterName)
-        .flatMap(ParameterModel::getValueProviderModels)
-        .flatMap(models -> resolveParametersInformation(containerComponent)
-            .flatMap(infoMap -> models.reduce(
-                                              vp -> resolveId(containerComponent, vp, infoMap),
-                                              fp -> fp.stream()
-                                                  .filter(m -> m.getFieldPath().equals(targetPath))
-                                                  .findAny()
-                                                  .flatMap(f -> resolveId(containerComponent, f, infoMap)))));
+        .flatMap(pm -> pm.getFieldValueProviderModels().stream().filter(fm -> Objects.equal(fm.getTargetPath(), targetPath))
+            .findAny())
+        .flatMap(fieldModel -> resolveParametersInformation(containerComponent)
+            .flatMap(infoMap -> resolveId(containerComponent, fieldModel, infoMap)));
   }
 
   private Optional<ParameterModel> ifContainsParameter(ComponentAst containerComponent, String parameterName) {

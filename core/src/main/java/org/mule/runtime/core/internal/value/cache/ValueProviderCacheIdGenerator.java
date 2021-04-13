@@ -34,6 +34,9 @@ public interface ValueProviderCacheIdGenerator<T> {
    * {@link org.mule.runtime.extension.api.values.ValueProvider} associated with the field contained by the parameter in the given
    * container.
    *
+   * Keep in mind that if there is no {@link org.mule.runtime.api.meta.model.parameter.FieldValueProviderModel} associated with
+   * the given targetPath in the parameter, this method should return {@link Optional#empty()}
+   *
    * @param containerComponent the component that holds the parameter
    * @param parameterName      the name of the parameter containing the field for which {@link org.mule.runtime.api.value.Value}s
    *                           are provided.

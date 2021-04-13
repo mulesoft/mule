@@ -9,6 +9,7 @@ package org.mule.runtime.config.api.dsl.model.metadata;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkArgument;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getSourceElementName;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveConfigName;
@@ -22,10 +23,12 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
@@ -83,14 +86,10 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
                                                                String parameterName,
                                                                String targetPath) {
     return ifContainsParameter(containerComponent, parameterName)
-        .flatMap(ParameterModel::getValueProviderModels)
-        .flatMap(models -> resolveParametersInformation(containerComponent)
-            .flatMap(infoMap -> models.reduce(
-                                              vp -> resolveId(containerComponent, vp, infoMap),
-                                              fp -> fp.stream()
-                                                  .filter(m -> m.getFieldPath().equals(targetPath))
-                                                  .findAny()
-                                                  .flatMap(f -> resolveId(containerComponent, f, infoMap)))));
+        .flatMap(pm -> pm.getFieldValueProviderModels().stream().filter(fm -> Objects.equal(fm.getTargetPath(), targetPath))
+            .findAny())
+        .flatMap(fieldModel -> resolveParametersInformation(containerComponent)
+            .flatMap(infoMap -> resolveId(containerComponent, fieldModel, infoMap)));
   }
 
   private Optional<ParameterModel> ifContainsParameter(DslElementModel<?> containerComponent, String parameterName) {
@@ -219,16 +218,41 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
                                                                Map<String, ParameterModelInformation> parameterModelsInformation) {
     List<ValueProviderCacheId> parts = new LinkedList<>();
 
-    valueProviderModel.getActingParameters().forEach(
-                                                     ap -> {
-                                                       if (parameterModelsInformation.containsKey(ap)) {
-                                                         resolveParameterId(parameterModelsInformation.get(ap)
-                                                             .getParameterDslElementModel()).ifPresent(parts::add);
-                                                       }
-                                                     });
-
+    valueProviderModel
+        .getParameters()
+        .stream()
+        .map(ActingParameterModel::getPath)
+        .forEach(p -> {
+          if (parameterModelsInformation.containsKey(p)) {
+            resolveParameterId(parameterModelsInformation.get(p).getParameterDslElementModel()).ifPresent(parts::add);
+          } else {
+            // Either the acting parameter is not present or the path references an acting field
+            getModelForPath(parameterModelsInformation, p).flatMap(this::resolveParameterId).ifPresent(parts::add);
+          }
+        });
     return parts;
+  }
 
+  private Optional<DslElementModel<?>> getModelForPath(Map<String, ParameterModelInformation> parameterModelsInformation,
+                                                       String targetPath) {
+    String[] path = targetPath.split("\\.");
+    Optional<DslElementModel<?>> rootDslModel =
+        ofNullable(parameterModelsInformation.get(path[0])).map(ParameterModelInformation::getParameterDslElementModel);
+    for (int i = 1; i < path.length; i++) {
+      final String pathPart = path[i];
+      final Optional<DslElementModel<?>> pathDslModel = rootDslModel.flatMap(r -> extractFieldDslModel(r, pathPart));
+      if(pathDslModel.isPresent()) {
+        rootDslModel = pathDslModel;
+      }
+    }
+    return rootDslModel;
+  }
+
+  private Optional<DslElementModel<?>> extractFieldDslModel(DslElementModel rootModel, String field) {
+    if (field.startsWith("@")) {
+      field = field.substring(1);
+    }
+    return rootModel.findElement(field);
   }
 
   private Optional<String> resolveDslTag(DslElementModel<?> elementModel) {
@@ -258,7 +282,7 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     }
   }
 
-  private class ParameterModelInformation {
+  private static class ParameterModelInformation {
 
     private final ParameterModel parameterModel;
     private final DslElementModel<?> parameterDslElementModel;

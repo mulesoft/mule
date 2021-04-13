@@ -19,6 +19,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -30,6 +32,8 @@ import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
+import static org.mule.runtime.config.dsl.model.ComplexActingParameterUtils.DEFAULT_COMPLEX_ACTING_PARAMETER;
+import static org.mule.runtime.config.dsl.model.ComplexActingParameterUtils.declareComplexActingParameter;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
@@ -44,7 +48,6 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
@@ -53,6 +56,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.FieldValueProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -68,10 +72,7 @@ import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
-import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
-import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
-import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
@@ -106,7 +107,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.slf4j.Logger;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 public abstract class AbstractMockedValueProviderExtensionTestCase extends AbstractMuleTestCase {
@@ -128,7 +128,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected static final String PROVIDED_FROM_COMPLEX_PARAMETER_NAME = "fromComplexActingParameter";
   protected static final String COMPLEX_ACTING_PARAMETER_NAME = "complexActingParameter";
   protected static final String PROVIDED_PARAMETER_DEFAULT_VALUE = "providedParameter";
-  protected static final String PROVIDED_FIELD_PATH = "some.target.path";
   protected static final String EXTENSION_NAME = "extension";
   protected static final String OPERATION_NAME = "mockOperation";
   protected static final String OTHER_OPERATION_NAME = "mockOtherOperation";
@@ -205,9 +204,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   @Mock(lenient = true)
   protected ValueProviderModel complexValueProviderModel;
 
-  @Mock(lenient = true)
-  protected FieldValueProviderModel fieldValueProviderModel;
-
   protected ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   private Set<ExtensionModel> extensions;
@@ -230,40 +226,30 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     when(valueProviderModel.getProviderId()).thenReturn(VALUE_PROVIDER_ID);
     when(valueProviderModel.getActingParameters()).thenReturn(asList(ACTING_PARAMETER_NAME, PARAMETER_IN_GROUP_NAME));
 
-    ActingParameterModel actingParameterActingModel = new ImmutableActingParameterModel(ACTING_PARAMETER_NAME, true);
-    ActingParameterModel parameterInGroupActingModel = new ImmutableActingParameterModel(PARAMETER_IN_GROUP_NAME, true);
+    ActingParameterModel actingParameterModel = createActingParameterModel(ACTING_PARAMETER_NAME);
+    ActingParameterModel groupActingParameterModel = createActingParameterModel(PARAMETER_IN_GROUP_NAME);
+    when(valueProviderModel.getParameters()).thenReturn(asList(actingParameterModel, groupActingParameterModel));
 
-    when(valueProviderModel.getParameters()).thenReturn(asList(actingParameterActingModel, parameterInGroupActingModel));
     when(valueProviderModel.requiresConfiguration()).thenReturn(false);
     when(valueProviderModel.requiresConnection()).thenReturn(false);
 
     when(complexValueProviderModel.getPartOrder()).thenReturn(0);
     when(complexValueProviderModel.getProviderName()).thenReturn(COMPLEX_VALUE_PROVIDER_NAME);
     when(complexValueProviderModel.getProviderId()).thenReturn(COMPLEX_VALUE_PROVIDER_ID);
-
-    ActingParameterModel complexActingParameterActingModel =
-        new ImmutableActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME, true);
-    when(complexValueProviderModel.getParameters()).thenReturn(singletonList(complexActingParameterActingModel));
-
     when(complexValueProviderModel.getActingParameters()).thenReturn(singletonList(COMPLEX_ACTING_PARAMETER_NAME));
+
+    ActingParameterModel complexActingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME);
+    when(complexValueProviderModel.getParameters()).thenReturn(singletonList(complexActingParameterModel));
+
     when(complexValueProviderModel.requiresConfiguration()).thenReturn(false);
     when(complexValueProviderModel.requiresConnection()).thenReturn(false);
-
-    when(fieldValueProviderModel.getPartOrder()).thenReturn(0);
-    when(fieldValueProviderModel.getProviderName()).thenReturn(FIELD_VALUE_PROVIDER_NAME);
-    when(fieldValueProviderModel.getProviderId()).thenReturn(FIELD_VALUE_PROVIDER_ID);
-    when(fieldValueProviderModel.getActingParameters()).thenReturn(emptyList());
-    when(fieldValueProviderModel.getParameters()).thenReturn(emptyList());
-    when(fieldValueProviderModel.requiresConfiguration()).thenReturn(false);
-    when(fieldValueProviderModel.requiresConnection()).thenReturn(false);
-    when(fieldValueProviderModel.getFieldPath()).thenReturn(PROVIDED_FIELD_PATH);
 
     parameterInGroup = createParameterModel(PARAMETER_IN_GROUP_NAME, false, stringType, null,
                                             NOT_SUPPORTED, BEHAVIOUR, null, emptyList());
     actingParameter = createParameterModel(ACTING_PARAMETER_NAME, false, stringType,
                                            ACTING_PARAMETER_DEFAULT_VALUE, NOT_SUPPORTED, BEHAVIOUR, null, emptyList());
     providedParameter = createParameterModel(PROVIDED_PARAMETER_NAME, false, stringType, null, NOT_SUPPORTED,
-                                             BEHAVIOUR, null, emptyList(), singletonList(fieldValueProviderModel));
+                                             BEHAVIOUR, valueProviderModel, emptyList());
 
     otherProvidedParameter =
         createParameterModel(OTHER_PROVIDED_PARAMETER_NAME, false, stringType, null,
@@ -360,18 +346,11 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
                                                        Object defaultValue, ExpressionSupport expressionSupport,
                                                        ParameterRole parameterRole, ValueProviderModel valueProviderModel,
                                                        List<StereotypeModel> allowedStereotypes) {
-    return createParameterModel(paramName, isComponentId, type, defaultValue, expressionSupport, parameterRole, valueProviderModel, allowedStereotypes, emptyList());
-  }
-
-  private ImmutableParameterModel createParameterModel(String paramName, boolean isComponentId, MetadataType type,
-                                                       Object defaultValue, ExpressionSupport expressionSupport,
-                                                       ParameterRole parameterRole, ValueProviderModel valueProviderModel,
-                                                       List<StereotypeModel> allowedStereotypes, List<FieldValueProviderModel> fieldModels) {
-    return new ImmutableParameterModel(paramName, "", type, false, false,
-                                       false, isComponentId, expressionSupport, defaultValue,
-                                       parameterRole, ParameterDslConfiguration.getDefaultInstance(), null, null,
-                                       valueProviderModel,
-                                       allowedStereotypes, emptySet(), null, fieldModels);
+    return spy(new ImmutableParameterModel(paramName, "", type, false, false,
+                                           false, isComponentId, expressionSupport, defaultValue,
+                                           parameterRole, ParameterDslConfiguration.getDefaultInstance(), null, null,
+                                           valueProviderModel,
+                                           allowedStereotypes, emptySet()));
   }
 
   private ImmutableOperationModel createOperationModel(String operationName, List<ParameterGroupModel> paramGroups) {
@@ -411,6 +390,27 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
                                        emptySet(),
                                        emptySet(),
                                        emptySet());
+  }
+
+  protected ActingParameterModel createActingParameterModel(String parameterName) {
+    return createActingParameterModel(parameterName, parameterName);
+  }
+
+  protected ActingParameterModel createActingParameterModel(String parameterName, String targetPath) {
+    ActingParameterModel actingParameterModel = mock(ActingParameterModel.class);
+    when(actingParameterModel.getName()).thenReturn(parameterName);
+    when(actingParameterModel.getPath()).thenReturn(targetPath);
+    return actingParameterModel;
+  }
+
+  protected FieldValueProviderModel createFieldValueProviderModel(String providerName, String providerId, String targetPath) {
+    FieldValueProviderModel fieldValueProviderModel = mock(FieldValueProviderModel.class);
+    when(fieldValueProviderModel.getProviderName()).thenReturn(providerName);
+    when(fieldValueProviderModel.getProviderId()).thenReturn(providerId);
+    when(fieldValueProviderModel.requiresConnection()).thenReturn(false);
+    when(fieldValueProviderModel.requiresConfiguration()).thenReturn(false);
+    when(fieldValueProviderModel.getTargetPath()).thenReturn(targetPath);
+    return fieldValueProviderModel;
   }
 
   protected ConfigurationElementDeclaration declareConfig(ConnectionElementDeclaration connectionDeclaration, String name,
@@ -461,74 +461,29 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
         .getDeclaration();
   }
 
-  protected ParameterValue declareInnerPojo(InnerPojo innerPojo) {
-    ParameterListValue.Builder listBuilder = ParameterListValue.builder();
-    innerPojo.getListParam().forEach(listBuilder::withValue);
-
-    ParameterObjectValue.Builder mapBuilder = ParameterObjectValue.builder();
-    innerPojo.getMapParam().forEach(mapBuilder::withParameter);
-
-    return ParameterObjectValue.builder()
-        .ofType(InnerPojo.class.getName())
-        .withParameter("intParam", Integer.toString(innerPojo.getIntParam()))
-        .withParameter("stringParam", innerPojo.getStringParam())
-        .withParameter("listParam", listBuilder.build())
-        .withParameter("mapParam", mapBuilder.build())
-        .build();
-  }
-
-  protected ParameterValue newComplexActingParameter(int intParam,
-                                                     String stringParam,
-                                                     List<String> listParam,
-                                                     Map<String, String> mapParam,
-                                                     InnerPojo innerPojo,
-                                                     List<InnerPojo> complexList,
-                                                     Map<String, InnerPojo> complexMap) {
-    ParameterListValue.Builder listValueBuilder = ParameterListValue.builder();
-    listParam.forEach(listValueBuilder::withValue);
-
-    ParameterListValue.Builder complexListBuilder = ParameterListValue.builder();
-    complexList.forEach(i -> complexListBuilder.withValue(declareInnerPojo(i)));
-
-    ParameterObjectValue.Builder mapBuilder = ParameterObjectValue.builder();
-    mapParam.forEach(mapBuilder::withParameter);
-
-    ParameterObjectValue.Builder complexMapBuilder = ParameterObjectValue.builder();
-    complexMap.forEach((k, v) -> complexMapBuilder.withParameter(k, declareInnerPojo(v)));
-
-    return ParameterObjectValue.builder()
-        .withParameter("innerPojoParam", declareInnerPojo(innerPojo))
-        .withParameter("intParam", Integer.toString(intParam))
-        .withParameter("stringParam", stringParam)
-        .withParameter("listParam", listValueBuilder.build())
-        .withParameter("mapParam", mapBuilder.build())
-        .withParameter("complexListParam", complexListBuilder.build())
-        .withParameter("complexMapParam", complexMapBuilder.build())
-        .build();
-
-  }
-
   public OperationElementDeclaration declareOperation(String operationName) {
-    final int defaultInt = 0;
-    final String defaultString = "zero";
-    final List<String> defaultList = asList("one", "two", "three");
-    final Map<String, String> defaultMap = ImmutableMap.of("0", "zero", "1", "one");
-    final InnerPojo defaultInnerPojo = new InnerPojo(defaultInt, defaultString, defaultList, defaultMap);
-    final List<InnerPojo> defaultComplexList = asList(defaultInnerPojo);
-    final Map<String, InnerPojo> defaultComplexMap = ImmutableMap.of("0", defaultInnerPojo);
     return declarer.newOperation(operationName)
         .withConfig(MY_CONFIG)
         .withParameterGroup(newParameterGroup()
             .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
             .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
-            .withParameter(COMPLEX_ACTING_PARAMETER_NAME, newComplexActingParameter(
-                                                                                    defaultInt,
-                                                                                    defaultString,
-                                                                                    defaultList,
-                                                                                    defaultMap,
-                                                                                    defaultInnerPojo,
-                                                                                    defaultComplexList,
-                                                                                    defaultComplexMap))
+            .withParameter(COMPLEX_ACTING_PARAMETER_NAME,
+                           declareComplexActingParameter(
+                                                         new ComplexActingParameter(
+                                                                                    DEFAULT_COMPLEX_ACTING_PARAMETER
+                                                                                        .getIntParam(),
+                                                                                    DEFAULT_COMPLEX_ACTING_PARAMETER
+                                                                                        .getStringParam(),
+                                                                                    DEFAULT_COMPLEX_ACTING_PARAMETER
+                                                                                        .getListParam(),
+                                                                                    DEFAULT_COMPLEX_ACTING_PARAMETER
+                                                                                        .getMapParam(),
+                                                                                    DEFAULT_COMPLEX_ACTING_PARAMETER
+                                                                                        .getInnerPojoParam(),
+                                                                                    DEFAULT_COMPLEX_ACTING_PARAMETER
+                                                                                        .getComplexListParam(),
+                                                                                    DEFAULT_COMPLEX_ACTING_PARAMETER
+                                                                                        .getComplexMapParam())))
             .withParameter(PROVIDED_FROM_COMPLEX_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
             .getDeclaration())
 
@@ -607,7 +562,6 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     }
     return logId.toString();
   }
-
 
   protected void checkIdsAreEqual(Optional<ValueProviderCacheId> id1, Optional<ValueProviderCacheId> id2) {
     LOGGER.debug("ID1: " + id1.map(i -> collectLog(i, 0)).orElse("empty"));
