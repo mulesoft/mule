@@ -10,8 +10,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -263,6 +266,36 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         spy.doStop();
         verify(connection, times(1)).stop();
     }
+
+    @Test
+    public void closeConnectionFactoryOnStop() throws Exception
+    {
+        try
+        {
+            System.setProperty(MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP, "true");
+            Connection connection = mock(Connection.class);
+            JmsConnector connector = new JmsConnector(muleContext);
+            JmsConnector spy = spy(connector);
+            spy.doConnect();
+            spy.doStop();
+            assertNull(connector.getConnectionFactory());
+        }finally
+        {
+            System.setProperty(MULE_JMS_CLOSE_CONNECTION_FACTORY_ON_STOP, "false");
+        }
+    }
+
+    @Test
+    public void doNotCloseConnectionFactoryOnStop() throws Exception
+    {
+            Connection connection = mock(Connection.class);
+            JmsConnector connector = new JmsConnector(muleContext);
+            JmsConnector spy = spy(connector);
+            spy.doConnect();
+            spy.doStop();
+            assertNotNull(connector.getConnectionFactory());
+    }
+
 
     @Test
     public void doNotChangeConnectionFactoryWhenNotUsingXAConnectionFactory() throws Exception
