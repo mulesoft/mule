@@ -25,8 +25,10 @@ import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+import io.qameta.allure.Flaky;
 import io.qameta.allure.Feature;
 
 @Feature(DOMAIN_DEPLOYMENT)
@@ -231,6 +233,8 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
   }
 
   @Test
+  @Flaky
+  @Ignore("MULE-19333")
   public void stoppedApplicationsAreNotStartedWhenDomainIsRedeployed() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
