@@ -54,8 +54,8 @@ public class SemanticTermsEnricher extends AbstractAnnotatedDeclarationEnricher 
       @Override
       protected void onOperation(OperationDeclaration declaration) {
         extractImplementingMethod(declaration)
-                .map(method -> new MethodWrapper(method, typeLoader))
-                .ifPresent(method -> addSemanticTerms(declaration, method));
+            .map(method -> new MethodWrapper(method, typeLoader))
+            .ifPresent(method -> addSemanticTerms(declaration, method));
       }
 
       @Override

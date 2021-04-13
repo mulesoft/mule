@@ -142,7 +142,7 @@ public final class MuleExtensionAnnotationParser {
 
   private static void doParseLayoutAnnotations(AnnotatedElement annotatedElement, LayoutModelBuilder builder) {
     if (annotatedElement.getAnnotation(Password.class) != null
-            || annotatedElement.getAnnotation(org.mule.sdk.api.annotation.semantics.security.Password.class) != null) {
+        || annotatedElement.getAnnotation(org.mule.sdk.api.annotation.semantics.security.Password.class) != null) {
       builder.asPassword();
 
     }
