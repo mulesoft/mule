@@ -9,13 +9,14 @@ package org.mule.runtime.config.internal.dsl.spring;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
-import java.util.stream.Collectors;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+
+import static java.util.stream.Collectors.toList;
 
 public class ParameterUtils {
 
@@ -110,7 +111,7 @@ public class ParameterUtils {
   private List<Pair<DslElementSyntax, String>> makeChildrenElementsToNamePairList(DslElementSyntax dslElementSyntax) {
     return dslElementSyntax.getContainedElementsByName().entrySet().stream()
         .map(entry -> new Pair<>(entry.getValue(), entry.getKey()))
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
 }
