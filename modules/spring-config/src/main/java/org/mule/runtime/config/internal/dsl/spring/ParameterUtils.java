@@ -56,6 +56,13 @@ public class ParameterUtils {
     return paramInOwner;
   }
 
+  /**
+   * Obtains the param name from a given dsl element name
+   * 
+   * @param componentAst: Parent or root AST component
+   * @param name:         The dsl name
+   * @return
+   */
   protected String getParamName(ComponentAst componentAst, String name) {
     return componentAst.getGenerationInformation().getSyntax()
         .map(dslElementSyntax -> searchParameterNameByElementNameBreadthFirst(name, dslElementSyntax))
@@ -63,31 +70,44 @@ public class ParameterUtils {
   }
 
   /**
-   * A parameter corresponding to a dsl syntax element maybe nested inside parameter groups that will not show in the dsl. Because
-   * of this, in order to find the entry corresponding to a dsl parameter name in the generation information, a tree-like
-   * structure must be traversed. A breadth search is used because the most common case is that parameters are in the first level.
+   * A parameter corresponding to a dsl syntax element may be nested inside parameter groups that will not show in the dsl.
+   * Because of this, in order to find the entry corresponding to a dsl parameter name in the generation information, a tree-like
+   * structure must be traversed. The nodes represent the one-to-one relationship between a parameter name and a dsl syntax
+   * element (with it's element name). A breadth search is used because the most common case is that parameters are in the first
+   * level.
    *
    * @param name:             The dsl name
    * @param dslElementSyntax: The root syntax with the generation information
    * @return The corresponding parameter name to a dsl name
    */
   private String searchParameterNameByElementNameBreadthFirst(String name, DslElementSyntax dslElementSyntax) {
-    Queue<Pair<DslElementSyntax, String>> queue = new ArrayDeque<>(makeElementsToNamePairList(dslElementSyntax));
+    // Add first level children to the queue
+    Queue<Pair<DslElementSyntax, String>> queue = new ArrayDeque<>(makeChildrenElementsToNamePairList(dslElementSyntax));
 
     while (!queue.isEmpty()) {
+      // Get the oldest node
       Pair<DslElementSyntax, String> currentNode = queue.remove();
 
+      // If it is the one we are looking for, return it
       if (currentNode.getFirst().getElementName().equals(name)) {
         return currentNode.getSecond();
       }
 
-      queue.addAll(makeElementsToNamePairList(currentNode.getFirst()));
+      // Add current node's children to the back of the queue
+      queue.addAll(makeChildrenElementsToNamePairList(currentNode.getFirst()));
     }
 
     return null;
   }
 
-  private List<Pair<DslElementSyntax, String>> makeElementsToNamePairList(DslElementSyntax dslElementSyntax) {
+  /**
+   * Given dsl element, generates a list of tuples (Pair) that bundle the parameter name with the dsl syntax information of this
+   * element's children
+   * 
+   * @param dslElementSyntax A root syntax
+   * @return
+   */
+  private List<Pair<DslElementSyntax, String>> makeChildrenElementsToNamePairList(DslElementSyntax dslElementSyntax) {
     return dslElementSyntax.getContainedElementsByName().entrySet().stream()
         .map(entry -> new Pair<>(entry.getValue(), entry.getKey()))
         .collect(Collectors.toList());
