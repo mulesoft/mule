@@ -14,7 +14,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
-import static org.mule.runtime.config.dsl.model.ComplexActingParameterUtils.DEFAULT_COMPLEX_ACTING_PARAMETER;
 import static org.mule.runtime.config.dsl.model.ComplexActingParameterUtils.forAllComplexActingParameterChanges;
 import static org.mule.runtime.config.dsl.model.DeclarationUtils.modifyParameter;
 import static org.mule.runtime.config.dsl.model.DeclarationUtils.removeParameter;
@@ -23,7 +22,6 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.FieldValueProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
@@ -60,7 +58,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   private Optional<ValueProviderCacheId> computeIdFor(ArtifactDeclaration appDeclaration,
                                                       String location,
                                                       String parameterName)
-          throws Exception {
+      throws Exception {
     return this.computeIdFor(appDeclaration, location, parameterName, null);
   }
 
@@ -68,30 +66,30 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
                                                       String location,
                                                       String parameterName,
                                                       String targetPath)
-          throws Exception {
+      throws Exception {
     ArtifactAst app = loadApplicationModel(appDeclaration);
     Locator locator = new Locator(app);
     ComponentLocator<DslElementModel<?>> dslLocator =
-            l -> getDeclaration(appDeclaration, l.toString()).map(d -> dslElementModelFactory.create(d).orElse(null));
+        l -> getDeclaration(appDeclaration, l.toString()).map(d -> dslElementModelFactory.create(d).orElse(null));
 
     ComponentLocator<ElementDeclaration> declarationLocator =
-            l -> appDeclaration.findElement(builderFromStringRepresentation(l.toString()).build());
+        l -> appDeclaration.findElement(builderFromStringRepresentation(l.toString()).build());
 
     ValueProviderCacheIdGenerator<ComponentAst> componentAstBasedValueProviderCacheIdGenerator =
-            new ComponentAstBasedValueProviderCacheIdGenerator(locator);
+        new ComponentAstBasedValueProviderCacheIdGenerator(locator);
     ValueProviderCacheIdGenerator<ComponentAst> componentBasedValueProviderCacheIdGenerator =
-            new ComponentBasedValueProviderCacheIdGenerator(dslContext, locator);
+        new ComponentBasedValueProviderCacheIdGenerator(dslContext, locator);
     ValueProviderCacheIdGenerator<DslElementModel<?>> dslElementModelValueProviderCacheIdGenerator =
-            new DslElementBasedValueProviderCacheIdGenerator(dslLocator);
+        new DslElementBasedValueProviderCacheIdGenerator(dslLocator);
     ValueProviderCacheIdGenerator<ElementDeclaration> elementDeclarationValueProviderCacheIdGenerator =
-            new DeclarationBasedValueProviderCacheIdGenerator(dslContext, declarationLocator);
+        new DeclarationBasedValueProviderCacheIdGenerator(dslContext, declarationLocator);
 
     ComponentAst component = getComponentAst(app, location);
     DslElementModel<?> dslElementModel = dslLocator.get(Location.builderFromStringRepresentation(location).build())
-            .orElseThrow(() -> new AssertionError("Could not create dslElementModel"));
+        .orElseThrow(() -> new AssertionError("Could not create dslElementModel"));
 
     Optional<ParameterizedElementDeclaration> elementDeclaration =
-            appDeclaration.findElement(builderFromStringRepresentation(location).build());
+        appDeclaration.findElement(builderFromStringRepresentation(location).build());
     Optional<ParameterizedModel> elementModel = component.getModel(ParameterizedModel.class);
 
     if (!elementDeclaration.isPresent() || !elementModel.isPresent()) {
@@ -113,11 +111,10 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
       dslElementId = dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName);
       componentBasedId = componentBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
       declarationBasedId =
-              elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(), parameterName);
-    }
-    else {
+          elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(), parameterName);
+    } else {
       dslElementId =
-              dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName, targetPath);
+          dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName, targetPath);
       componentBasedId = componentBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName, targetPath);
       declarationBasedId = elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(),
                                                                                                   parameterName, targetPath);
@@ -205,7 +202,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
 
   @Test
   public void idForConfiglessAndConnectionlessOperationDefaultValueHashIdShouldBeSameWithExplicitValueOnActingParameter()
-          throws Exception {
+      throws Exception {
     ArtifactDeclaration app = getBaseApp();
     Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(opId.isPresent(), is(true));
@@ -439,7 +436,7 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
                                         OPERATION_LOCATION,
                                         COMPLEX_ACTING_PARAMETER_NAME,
                                         v -> allIds
-                                                .add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME)));
+                                            .add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME)));
 
     for (Optional<ValueProviderCacheId> idA : allIds) {
       for (Optional<ValueProviderCacheId> idB : allIds) {
@@ -466,14 +463,16 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   }
 
   @Test
-  public void nonActingFieldReturnsSameHash() throws Exception {
+  //Ideally we would want only the acting fields to modify the hash, but since there is still no way
+  //to correctly identify them without evaluating the path expression, we are using the whole parameter for caching
+  public void changesInParameterWithActingFieldReturnsDifferentHash() throws Exception {
     final String targetPath = "some.target.path";
     FieldValueProviderModel fieldValueProviderModel =
-            createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetPath);
+        createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetPath);
 
     ActingParameterModel actingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME,
                                                                            COMPLEX_ACTING_PARAMETER_NAME
-                                                                           + ".innerPojoParam.stringParam");
+                                                                               + ".innerPojoParam.stringParam");
 
     when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
     when(providedParameterFromComplex.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
@@ -481,56 +480,65 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
     ArtifactDeclaration app = getBaseApp();
 
     List<Optional<ValueProviderCacheId>> allIds = new LinkedList<>();
-    Reference<Optional<ValueProviderCacheId>> modifiedActingFieldIdReference = new Reference<>();
-
-    // We only care that the ValueProviderCacheId changes when the defined acting field changes (innerPojoParam.stringParam)
-    // Then, every other computed id should be the same
     forAllComplexActingParameterChanges(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME,
-                                        v -> {
-                                          Optional<ValueProviderCacheId> id =
-                                                  computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME,
-                                                               targetPath);
-                                          if (v.getInnerPojoParam().getStringParam()
-                                                  .equals(DEFAULT_COMPLEX_ACTING_PARAMETER.getInnerPojoParam().getStringParam())) {
-                                            allIds.add(id);
-                                          }
-                                          else {
-                                            modifiedActingFieldIdReference.set(id);
-                                          }
-                                        });
-    Optional<ValueProviderCacheId> modifiedActingFieldId = modifiedActingFieldIdReference.get();
-    assertThat(modifiedActingFieldId.isPresent(), is(true));
+                                        v -> allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME, targetPath)));
 
-    Optional<ValueProviderCacheId> listId = allIds.get(0);
-
-    // Every id in the list should be equal to each other and all should be different to the modified acting field id
-    allIds.forEach(
-            id -> {
-              checkIdsAreEqual(id, listId);
-              checkIdsAreDifferent(id, modifiedActingFieldId);
-            });
+    // Every id in the list should be different to each other
+    for (Optional<ValueProviderCacheId> idA : allIds) {
+      for (Optional<ValueProviderCacheId> idB : allIds) {
+        if (idA != idB) {
+          checkIdsAreDifferent(idA, idB);
+        }
+      }
+    }
   }
 
   @Test
-  public void actingFieldAsExpressionUsesWholeParameter() throws Exception {
+  public void actingFieldFromNotExistentParameterIsNotConsideredForId() throws Exception {
     final String targetPath = "some.target.path";
     FieldValueProviderModel fieldValueProviderModel =
             createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetPath);
 
     ActingParameterModel actingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME,
-                                                                           COMPLEX_ACTING_PARAMETER_NAME
-                                                                           + ".innerPojoParam.stringParam");
+                                                                           "notExistentParam.innerPojoParam.stringParam");
 
     when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
     when(providedParameterFromComplex.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
 
     ArtifactDeclaration app = getBaseApp();
 
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("#['complexActingParameter']")));
-    Optional<ValueProviderCacheId> originalExpressionId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME, targetPath);
+    List<Optional<ValueProviderCacheId>> allIds = new LinkedList<>();
+    forAllComplexActingParameterChanges(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME,
+                                        v -> allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME, targetPath)));
 
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("#['otherComplexActingParameter']")));
-    Optional<ValueProviderCacheId> otherExpressionId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME, targetPath);
+    // Every id in the list should be the same
+    allIds.forEach(i -> checkIdsAreEqual(allIds.get(0), i));
+  }
+
+  @Test
+  public void actingFieldAsExpressionUsesWholeParameter() throws Exception {
+    final String targetPath = "some.target.path";
+    FieldValueProviderModel fieldValueProviderModel =
+        createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetPath);
+
+    ActingParameterModel actingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME,
+                                                                           COMPLEX_ACTING_PARAMETER_NAME
+                                                                               + ".innerPojoParam.stringParam");
+
+    when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
+    when(providedParameterFromComplex.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
+
+    ArtifactDeclaration app = getBaseApp();
+
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME,
+                    p -> p.setValue(ParameterSimpleValue.of("#['complexActingParameter']")));
+    Optional<ValueProviderCacheId> originalExpressionId =
+        computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME, targetPath);
+
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME,
+                    p -> p.setValue(ParameterSimpleValue.of("#['otherComplexActingParameter']")));
+    Optional<ValueProviderCacheId> otherExpressionId =
+        computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME, targetPath);
 
     checkIdsAreDifferent(originalExpressionId, otherExpressionId);
   }
@@ -540,91 +548,17 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
     final String targetPath = "some.target.path";
 
     FieldValueProviderModel fieldValueProviderModel =
-            createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetPath);
+        createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetPath);
 
     ActingParameterModel actingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME,
                                                                            COMPLEX_ACTING_PARAMETER_NAME
-                                                                           + ".innerPojoParam.stringParam");
+                                                                               + ".innerPojoParam.stringParam");
 
     when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
     when(providedParameterFromComplex.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
 
     ArtifactDeclaration app = getBaseApp();
-    assertThat(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME, "this-is-not&a$$$val*d@path").isPresent(), is(false));
+    assertThat(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME, "this-is-not&a$$$val*d@path")
+        .isPresent(), is(false));
   }
-
-  @Test
-  public void attributeInPathNotConsideredIfElement() throws Exception {
-    final String targetPath = "some.target.path";
-    FieldValueProviderModel fieldValueProviderModel =
-            createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetPath);
-
-    ActingParameterModel actingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME,
-                                                                           COMPLEX_ACTING_PARAMETER_NAME
-                                                                           + ".@innerPojoParam");
-
-    when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
-    when(providedParameterFromComplex.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
-
-    ArtifactDeclaration app = getBaseApp();
-
-    List<Optional<ValueProviderCacheId>> allIds = new LinkedList<>();
-    forAllComplexActingParameterChanges(app,
-                                        OPERATION_LOCATION,
-                                        COMPLEX_ACTING_PARAMETER_NAME,
-                                        c -> allIds.add(computeIdFor(app,
-                                                                     OPERATION_LOCATION,
-                                                                     PROVIDED_FROM_COMPLEX_PARAMETER_NAME,
-                                                                     targetPath)));
-
-    Optional<ValueProviderCacheId> listId = allIds.get(0);
-
-    // Every id in the list should be equal because complexActingParameter.@innerPojoParam does not exist since innerPojoParam is not an attribute
-    allIds.forEach(id -> checkIdsAreEqual(id, listId));
-  }
-
-  @Test
-  public void attributeInConsideredIfAttribute() throws Exception {
-    final String targetPath = "some.target.path";
-    FieldValueProviderModel fieldValueProviderModel =
-            createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetPath);
-
-    ActingParameterModel actingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME,
-                                                                           COMPLEX_ACTING_PARAMETER_NAME
-                                                                           + ".innerPojoParam.@stringParam");
-
-    when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
-    when(providedParameterFromComplex.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
-
-    ArtifactDeclaration app = getBaseApp();
-
-    List<Optional<ValueProviderCacheId>> allIds = new LinkedList<>();
-    Reference<Optional<ValueProviderCacheId>> changedStringParamReference = new Reference<>();
-    forAllComplexActingParameterChanges(app,
-                                        OPERATION_LOCATION,
-                                        COMPLEX_ACTING_PARAMETER_NAME,
-                                        c -> {
-                                          Optional<ValueProviderCacheId> id = computeIdFor(app,
-                                                                                           OPERATION_LOCATION,
-                                                                                           PROVIDED_FROM_COMPLEX_PARAMETER_NAME,
-                                                                                           targetPath);
-                                          if (c.getInnerPojoParam().getStringParam().equals(DEFAULT_COMPLEX_ACTING_PARAMETER.getInnerPojoParam().getStringParam())) {
-                                            allIds.add(id);
-                                          }
-                                          else {
-                                            changedStringParamReference.set(id);
-                                          }
-                                        });
-
-    Optional<ValueProviderCacheId> listId = allIds.get(0);
-
-    // Every id in the list should be equal to each other and all should be different to the modified acting field id
-    allIds.forEach(
-            id -> {
-              checkIdsAreEqual(id, listId);
-              checkIdsAreDifferent(id, changedStringParamReference.get());
-            });
-  }
-
-
 }

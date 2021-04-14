@@ -43,7 +43,7 @@ public class DeclarationUtils {
     }
   }
 
-  static void  modifyParameter(ArtifactDeclaration artifactDeclaration,
+  static void modifyParameter(ArtifactDeclaration artifactDeclaration,
                               String ownerLocation,
                               String parameterName,
                               Consumer<ParameterElementDeclaration> parameterConsumer) {

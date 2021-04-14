@@ -223,36 +223,12 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
         .stream()
         .map(ActingParameterModel::getPath)
         .forEach(p -> {
-          if (parameterModelsInformation.containsKey(p)) {
-            resolveParameterId(parameterModelsInformation.get(p).getParameterDslElementModel()).ifPresent(parts::add);
-          } else {
-            // Either the acting parameter is not present or the path references an acting field
-            getModelForPath(parameterModelsInformation, p).flatMap(this::resolveParameterId).ifPresent(parts::add);
+          final String actingParameter = p.split("\\.")[0];
+          if (parameterModelsInformation.containsKey(actingParameter)) {
+            resolveParameterId(parameterModelsInformation.get(actingParameter).getParameterDslElementModel()).ifPresent(parts::add);
           }
         });
     return parts;
-  }
-
-  private Optional<DslElementModel<?>> getModelForPath(Map<String, ParameterModelInformation> parameterModelsInformation,
-                                                       String targetPath) {
-    String[] path = targetPath.split("\\.");
-    Optional<DslElementModel<?>> rootDslModel =
-        ofNullable(parameterModelsInformation.get(path[0])).map(ParameterModelInformation::getParameterDslElementModel);
-    for (int i = 1; i < path.length; i++) {
-      final String pathPart = path[i];
-      final Optional<DslElementModel<?>> pathDslModel = rootDslModel.flatMap(r -> extractFieldDslModel(r, pathPart));
-      if(pathDslModel.isPresent()) {
-        rootDslModel = pathDslModel;
-      }
-    }
-    return rootDslModel;
-  }
-
-  private Optional<DslElementModel<?>> extractFieldDslModel(DslElementModel rootModel, String field) {
-    if (field.startsWith("@")) {
-      field = field.substring(1);
-    }
-    return rootModel.findElement(field);
   }
 
   private Optional<String> resolveDslTag(DslElementModel<?> elementModel) {
