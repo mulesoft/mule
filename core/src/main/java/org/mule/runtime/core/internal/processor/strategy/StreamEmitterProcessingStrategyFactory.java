@@ -147,6 +147,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       if (allSchedulersStopped()) {
         stopSchedulersIfNeeded();
       }
+      super.stop();
     }
 
     @Override

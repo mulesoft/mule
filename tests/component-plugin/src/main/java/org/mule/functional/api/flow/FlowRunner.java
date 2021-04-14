@@ -371,6 +371,14 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
     }
   }
 
+  /**
+   * Stops the flow and starts it again.
+   */
+  public void restartFlow() throws MuleException {
+    flow.stop();
+    flow.start();
+  }
+
   @Override
   public String getFlowConstructName() {
     return flowName;
