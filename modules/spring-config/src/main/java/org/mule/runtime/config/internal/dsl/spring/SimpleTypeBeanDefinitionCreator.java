@@ -7,13 +7,9 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.NameUtils.toCamelCase;
-import static org.mule.runtime.config.internal.dsl.spring.ParameterGroupUtils.getSourceCallbackAwareParameter;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -32,70 +28,53 @@ import java.util.Optional;
  */
 class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
+  private final ParameterUtils parameterUtils;
+
+  public SimpleTypeBeanDefinitionCreator(ParameterUtils parameterUtils) {
+    super();
+    this.parameterUtils = parameterUtils;
+  }
+
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateBeanDefinitionRequest createBeanDefinitionRequest) {
     Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
-    if (isSimpleType(type)) {
-      ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
-      createBeanDefinitionRequest.getSpringComponentModel().setType(type);
 
-      final ComponentParameterAst paramInOwner = getParamInOwnerComponent(createBeanDefinitionRequest, componentModel);
-      final ComponentParameterAst valueParame = componentModel.getParameter("value");
+    if (!isSimpleType(type)) {
+      return false;
+    }
 
-      String value = null;
+    createBeanDefinitionRequest.getSpringComponentModel().setType(type);
 
-      if (paramInOwner != null) {
-        value = paramInOwner.getResolvedRawValue();
-      } else if (valueParame != null) {
-        value = valueParame.getResolvedRawValue();
-      }
+    ComponentParameterAst paramInOwnerComponent = parameterUtils.getParamInOwnerComponent(createBeanDefinitionRequest);
 
-      if (value == null) {
-        throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
-                                                           componentModel.getMetadata().getFileName()
-                                                               .orElse("unknown"),
-                                                           componentModel.getMetadata().getStartLine().orElse(-1)));
-      }
-      Optional<TypeConverter> typeConverterOptional =
-          createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeConverter();
-      createBeanDefinitionRequest.getSpringComponentModel()
-          .setBeanDefinition(getConvertibleBeanDefinition(type, value, typeConverterOptional));
+    if (paramInOwnerComponent != null) {
+      this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, paramInOwnerComponent.getResolvedRawValue());
       return true;
     }
-    return false;
+
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+    final ComponentParameterAst valueParam = componentModel.getParameter("value");
+
+    if (valueParam == null || valueParam.getResolvedRawValue() == null) {
+      throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
+                                                         componentModel.getMetadata().getFileName().orElse("unknown"),
+                                                         componentModel.getMetadata().getStartLine().orElse(-1)));
+    }
+
+    this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type, valueParam.getResolvedRawValue());
+
+    return true;
   }
 
-  private ComponentParameterAst getParamInOwnerComponent(CreateBeanDefinitionRequest createBeanDefinitionRequest,
-                                                         ComponentAst componentModel) {
-    ComponentAst ownerComponent = resolveOwnerComponent(createBeanDefinitionRequest);
+  private void setConvertibleBeanDefinition(CreateBeanDefinitionRequest createBeanDefinitionRequest, Class<?> type,
+                                            String value) {
+    Optional<TypeConverter> typeConverterOptional =
+        createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeConverter();
 
-    if (ownerComponent != null) {
-      final String paramName = toCamelCase(componentModel.getIdentifier().getName(), "-");
+    SpringComponentModel springComponentModel = createBeanDefinitionRequest.getSpringComponentModel();
 
-      ParameterizedModel ownerComponentModel = ownerComponent.getModel(ParameterizedModel.class).get();
-      if (ownerComponent != componentModel && ownerComponentModel instanceof SourceModel) {
-        // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
-        // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in
-        // previous implementations.
-        int ownerIndex = createBeanDefinitionRequest.getComponentModelHierarchy().indexOf(ownerComponent);
-        final ComponentAst possibleGroup = createBeanDefinitionRequest.getComponentModelHierarchy().get(ownerIndex + 1);
-
-        return getSourceCallbackAwareParameter(ownerComponent, paramName, possibleGroup, (SourceModel) ownerComponentModel);
-      } else {
-        ComponentParameterAst paramInOwner =
-            ownerComponent.getParameter(paramName);
-
-        if (paramInOwner == null) {
-          // XML SDK 1 allows for hyphenized names in parameters, so need to account for those.
-          paramInOwner = ownerComponent.getParameter(componentModel.getIdentifier().getName());
-        }
-
-        return paramInOwner;
-      }
-    } else {
-      return null;
-    }
+    springComponentModel.setBeanDefinition(getConvertibleBeanDefinition(type, value, typeConverterOptional));
   }
 
 }
