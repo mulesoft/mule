@@ -30,7 +30,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy implements Startable, Stoppable, Disposable {
+abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy
+    implements Startable, Stoppable, Disposable {
 
   private final Supplier<Scheduler> cpuLightSchedulerSupplier;
   private final int parallelism;
