@@ -27,6 +27,8 @@ import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.tck.probe.PollingProber.probe;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.FLOW_DISPATCH;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.CORE_POOL_SIZE_ERROR_MESSAGE;
@@ -62,8 +64,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
+@Feature(SOURCES)
+@Story(FLOW_DISPATCH)
 public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   public static final int TIMEOUT_MILLIS = 30000;
@@ -83,7 +89,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Override
   protected String getConfigFile() {
-    return "heisenberg-source-config.xml";
+    return "source/heisenberg-source-config.xml";
   }
 
   @Override

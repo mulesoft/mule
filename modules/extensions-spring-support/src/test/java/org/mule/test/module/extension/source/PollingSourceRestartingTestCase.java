@@ -14,6 +14,9 @@ import static org.hamcrest.number.OrderingComparison.lessThanOrEqualTo;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
+import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.ComponentLifeCycle.COMPONENT_LIFE_CYCLE;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
 import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.beginLatch;
 import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.resetSource;
 
@@ -32,6 +35,12 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
+
+@Feature(SOURCES)
+@Stories({@Story(POLLING), @Story(COMPONENT_LIFE_CYCLE)})
 public class PollingSourceRestartingTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static int PROBER_TIMEOUT = 30000;
@@ -72,7 +81,7 @@ public class PollingSourceRestartingTestCase extends AbstractExtensionFunctional
 
   @Override
   protected String getConfigFile() {
-    return "polling-source-restarting-config.xml";
+    return "source/polling-source-restarting-config.xml";
   }
 
   @Override

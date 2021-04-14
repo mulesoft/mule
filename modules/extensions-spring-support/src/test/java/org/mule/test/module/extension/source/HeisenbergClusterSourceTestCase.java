@@ -9,6 +9,8 @@ package org.mule.test.module.extension.source;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
+import static org.mule.test.allure.AllureConstants.ClusteringFeature.CLUSTERING;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
 
 import org.mule.runtime.api.cluster.ClusterService;
@@ -23,13 +25,17 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+
+@Features({@Feature(CLUSTERING), @Feature(SOURCES)})
 public class HeisenbergClusterSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   private Flow flow;
 
   @Override
   protected String getConfigFile() {
-    return "heisenberg-cluster-source-config.xml";
+    return "source/heisenberg-cluster-source-config.xml";
   }
 
   @Before

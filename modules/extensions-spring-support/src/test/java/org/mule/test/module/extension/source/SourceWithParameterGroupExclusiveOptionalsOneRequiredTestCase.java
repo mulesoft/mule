@@ -9,6 +9,7 @@ package org.mule.test.module.extension.source;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.tck.probe.PollingProber.check;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -22,6 +23,9 @@ import java.util.List;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+
+@Feature(SOURCES)
 public class SourceWithParameterGroupExclusiveOptionalsOneRequiredTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final int TIMEOUT = 5000;
