@@ -49,10 +49,25 @@ import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.c
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.configureHonourRetryPolicyTemplateOverrideFeature;
+import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.configureResolveExuectionModeBasedOnEnabledReconnectionStrategy;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -111,21 +126,6 @@ import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
@@ -157,6 +157,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     configureBatchFixedAggregatorTransactionRecordBuffer();
     configureComputeConnectionErrorsInStats();
     configureToStringTransformerTransformIteratorElements();
+    configureResolveExuectionModeBasedOnEnabledReconnectionStrategy();
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactContext.class);
