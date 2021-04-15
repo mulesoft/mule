@@ -44,6 +44,7 @@ import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor.processXmlConfiguration;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.configureHonourRetryPolicyTemplateOverrideFeature;
+import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.configureResolveExecutionModeBasedOnAsyncReconnectionStrategy;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -151,6 +152,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     configureHonourRetryPolicyTemplateOverrideFeature();
     configureBatchFixedAggregatorTransactionRecordBuffer();
     configureComputeConnectionErrorsInStats();
+    configureResolveExecutionModeBasedOnAsyncReconnectionStrategy();
   }
 
   public static final String INNER_BEAN_PREFIX = "(inner bean)";

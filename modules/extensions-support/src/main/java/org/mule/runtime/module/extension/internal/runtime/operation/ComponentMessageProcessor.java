@@ -14,6 +14,8 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -62,6 +64,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -253,8 +256,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    * rest of the policy we need to transform the {@link Result} returned by the operation into a {@link CoreEvent}, we use {@link
    * #valueReturnDelegate} as a helper class to do this transformation. It's used only when there is an operation that defines a
    * target, and at the same time, there are operation policies applied to it. Finally, when the policy finishes, the proper
-   * {@link #returnDelegate} is executed. It'd be ideal to improve this by extracting from {@link ReturnDelegate} the logic
-   * that transforms an {@link Object} into a {@link CoreEvent}.
+   * {@link #returnDelegate} is executed. It'd be ideal to improve this by extracting from {@link ReturnDelegate} the logic that
+   * transforms an {@link Object} into a {@link CoreEvent}.
    */
   private ReturnDelegate valueReturnDelegate;
   protected PolicyManager policyManager;
@@ -1082,12 +1085,24 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     } else {
       Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
       if (staticConfig.isPresent()) {
-        RetryPolicyTemplate resolvedRetryPolicyTemplate = getRetryPolicyTemplate(staticConfig);
-        return resolvedRetryPolicyTemplate.isEnabled() && resolvedRetryPolicyTemplate.isAsync();
+        return isAsyncExecutableBasedOn(staticConfig);
       }
     }
 
     return true;
+  }
+
+  protected boolean isAsyncExecutableBasedOn(Optional<ConfigurationInstance> staticConfig) {
+    RetryPolicyTemplate resolvedRetryPolicyTemplate = getRetryPolicyTemplate(staticConfig);
+
+    if (resolveExecutionModeBasedOnAsyncReconnectionPolicy()) {
+      return resolvedRetryPolicyTemplate.isEnabled() && resolvedRetryPolicyTemplate.isAsync();
+    }
+
+    // By default the operation will be executed in async mode if it has a reconnection
+    // strategy regardless it is async or sync (this may result in some performance bottlenecks
+    // and has to be reviewed see MULE-19346 MULE-19342)
+    return resolvedRetryPolicyTemplate.isEnabled();
   }
 
   @Override
@@ -1321,6 +1336,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                ctx -> ctx.getConfiguration().getMinMuleVersion().isPresent()
                                    && ctx.getConfiguration().getMinMuleVersion().get().atLeast("4.4.0"));
 
+  }
+
+  public static void configureResolveExecutionModeBasedOnAsyncReconnectionStrategy() {
+    FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
+
+    ffRegistry.registerFeature(RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY,
+                               ctx -> false);
+  }
+
+  public boolean resolveExecutionModeBasedOnAsyncReconnectionPolicy() {
+    return featureFlaggingService.isEnabled(RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY);
   }
 
   protected boolean honourOperationRetryPolicyOverride() {
