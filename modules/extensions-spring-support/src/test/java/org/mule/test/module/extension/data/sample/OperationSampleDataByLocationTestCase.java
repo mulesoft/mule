@@ -80,9 +80,4 @@ public class OperationSampleDataByLocationTestCase extends AbstractSampleDataTes
   public void complexActingParameter() throws Exception {
     assertMessage(getOperationSampleByLocation("complexActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
-
-  @Test
-  public void complexActingParameterAsd() throws Exception {
-    assertMessage(getOperationSampleByLocation("complexActingParameterNew"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
-  }
 }

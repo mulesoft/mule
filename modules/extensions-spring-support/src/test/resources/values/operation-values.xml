@@ -104,6 +104,11 @@
             actingParameter='#[output application/json --- { "field" : "Acting parameter value" }]'/>
     </flow>
 
+    <flow name="withBoundActingParameterFieldWithDot">
+        <values:with-bound-acting-parameter-field-with-dot
+            actingParameter='#[output application/json --- { "field.with.dot" : "Acting parameter value" }]'/>
+    </flow>
+
     <flow name="withTwoActingParameters">
         <values:with-two-acting-parameters scalarActingParameter="Scalar value"
                                            actingParameter='#[output application/json --- { "field" : "Acting parameter value" }]'/>
@@ -160,6 +165,38 @@
         <values:with-pojo-field-bound-acting-parameter-field>
             <values:acting-parameter pojoId="This is the pojo ID" pojoName="This is the pojo name"/>
         </values:with-pojo-field-bound-acting-parameter-field>
+    </flow>
+
+    <flow name="withBoundActingParameterEnum">
+        <values:with-bound-acting-parameter-enum
+            actingParameter='#[output application/json --- { "enumField" : "ENUM_VALUE" }]'/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameterPresent">
+        <values:with-bound-optional-acting-parameter actingParameter="Acting parameter value"/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameter">
+        <values:with-bound-optional-acting-parameter/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameterFieldPresent">
+        <values:with-bound-optional-acting-parameter-field
+            actingParameter='#[output application/json --- { "nested": { "field": "Acting parameter value"}}]'/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameterFieldMissingParameter">
+        <values:with-bound-optional-acting-parameter-field/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameterFieldMissingField">
+        <values:with-bound-optional-acting-parameter-field
+            actingParameter='#[output application/json --- { "nested": { "otherField": "another value"}}]'/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameterFieldMissingPath">
+        <values:with-bound-optional-acting-parameter-field
+            actingParameter='#[output application/json --- { "otherField": "another value"}]'/>
     </flow>
 
 </mule>

@@ -80,4 +80,14 @@ public class MyPojo {
     result = 31 * result + (pojoBoolean ? 1 : 0);
     return result;
   }
+
+  @Override
+  public String toString() {
+    return "MyPojo{" +
+        "pojoId='" + pojoId + '\'' +
+        ", pojoName='" + pojoName + '\'' +
+        ", pojoNumber=" + pojoNumber +
+        ", pojoBoolean=" + pojoBoolean +
+        '}';
+  }
 }

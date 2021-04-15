@@ -51,9 +51,6 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
 
   @Override
   public void validate(ExtensionModel model, ProblemsReporter problemsReporter) {
-    if (1 == 1) {
-      return;
-    }
     final ReflectionCache reflectionCache = new ReflectionCache();
     final ValueProvidersIdValidator valueProvidersIdValidator = new ValueProvidersIdValidator(problemsReporter);
     new IdempotentExtensionWalker() {
@@ -123,25 +120,30 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
     }
 
     for (InjectableParameterInfo parameterInfo : modelProperty.getInjectableParameters()) {
+      int parameterNameDelimiter = parameterInfo.getPath().indexOf(".");
 
-      if (!allParameters.containsKey(parameterInfo.getParameterName())) {
+      String parameterName = parameterNameDelimiter < 0 ? parameterInfo.getPath()
+          : parameterInfo.getPath().substring(0, parameterNameDelimiter);
+      if (!allParameters.containsKey(parameterName)) {
         problemsReporter.addError(new Problem(model,
-                                              format("The Value Provider [%s] declares a parameter '%s' which doesn't exist in the %s '%s'",
-                                                     providerName, parameterInfo.getParameterName(), modelTypeName, modelName)));
+                                              format("The Value Provider [%s] declares to use a parameter '%s' which doesn't exist in the %s '%s'",
+                                                     providerName, parameterName, modelTypeName, modelName)));
       } else {
-        MetadataType metadataType = allParameters.get(parameterInfo.getParameterName());
-        Class<?> expectedType = getType(metadataType)
-            .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
-                                                                parameterInfo.getParameterName())));
-        Class<?> gotType = getType(parameterInfo.getType())
-            .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
-                                                                parameterInfo.getParameterName())));
+        if (parameterInfo.getPath().equals(parameterInfo.getParameterName())) {
+          MetadataType metadataType = allParameters.get(parameterInfo.getParameterName());
+          Class<?> expectedType = getType(metadataType)
+              .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
+                                                                  parameterInfo.getParameterName())));
+          Class<?> gotType = getType(parameterInfo.getType())
+              .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
+                                                                  parameterInfo.getParameterName())));
 
-        if (!expectedType.equals(gotType)) {
-          problemsReporter.addError(new Problem(model,
-                                                format("The Value Provider [%s] defines a parameter '%s' of type '%s' but in the %s '%s' is of type '%s'",
-                                                       providerName, parameterInfo.getParameterName(), gotType, modelTypeName,
-                                                       modelName, expectedType)));
+          if (!expectedType.equals(gotType)) {
+            problemsReporter.addError(new Problem(model,
+                                                  format("The Value Provider [%s] defines a parameter '%s' of type '%s' but in the %s '%s' is of type '%s'",
+                                                         providerName, parameterInfo.getParameterName(), gotType, modelTypeName,
+                                                         modelName, expectedType)));
+          }
         }
       }
     }

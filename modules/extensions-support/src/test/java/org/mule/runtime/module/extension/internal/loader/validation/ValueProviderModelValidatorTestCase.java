@@ -126,7 +126,7 @@ public class ValueProviderModelValidatorTestCase {
         .thenReturn(Optional.of(operationParameterBuilder.build()));
 
     validate();
-    assertProblems("The Value Provider [SomeValueProvider] declares a parameter 'someParam' which doesn't exist in the operation 'superOperation'");
+    assertProblems("The Value Provider [SomeValueProvider] declares to use a parameter 'someParam' which doesn't exist in the operation 'superOperation'");
   }
 
   @Test
@@ -187,6 +187,46 @@ public class ValueProviderModelValidatorTestCase {
 
     validate();
     assertProblems("The following ValueProvider implementations [org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeValueProvider, org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeOtherValueProvider] use the same id [valueProviderId]. ValueProvider ids must be unique.");
+  }
+
+  @Test
+  public void boundParameterExists() {
+    operationParameterBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "someName");
+    when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void boundParameterShouldExist() {
+    operationParameterBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "anotherName");
+    when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+
+    validate();
+    assertProblems("The Value Provider [SomeValueProvider] declares to use a parameter 'anotherName' which doesn't exist in the operation 'superOperation'");
+  }
+
+  @Test
+  public void boundParameterFromPathExists() {
+    operationParameterBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "someName.someTag.@attribute");
+    when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void boundParameterFromPathShouldExist() {
+    operationParameterBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "anotherName.nested.fields");
+    when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+
+    validate();
+    assertProblems("The Value Provider [SomeValueProvider] declares to use a parameter 'anotherName' which doesn't exist in the operation 'superOperation'");
   }
 
   @Test

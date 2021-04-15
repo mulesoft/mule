@@ -164,6 +164,15 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
+  public void withBoundActingParameterFieldWithDot() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterFieldWithDot", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
   public void withTwoActingParameters() throws Exception {
     ValueResult result = getValueResult("withTwoActingParameters", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
@@ -222,7 +231,10 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   public void withPojoBoundActingParameter() throws Exception {
     ValueResult result = getValueResult("withPojoBoundActingParameter", "parameterWithValues");
     assertThat(result.getFailure().isPresent(), is(false));
-    // Add assertion
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values,
+               hasValues("MyPojo{pojoId='This is the pojo ID', pojoName='This is the pojo name', pojoNumber=23, pojoBoolean=true}"));
   }
 
   @Test
@@ -262,12 +274,76 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(values, hasValues("This is the pojo ID"));
   }
 
-  //
-  // public void withBoundActingParameterEnum(@OfValues(
-  // value = WithEnumParameterValueProvider.class,
-  // bindings = {@Binding(actingParameter = "requiredValue", path = "actingParameter.enumField")}) String parameterWithValues,
-  // InputStream actingParameter) {}
+  @Test
+  public void withBoundActingParameterEnum() throws Exception {
+    ValueResult result = getValueResult("withBoundActingParameterEnum", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("ENUM_VALUE"));
+  }
 
   // ADD optional parameter cases cases
+
+  // Binded scalar parameter that is binded to optional acting is missing
+
+  // Complex parameter binded to options parameter is present but field is missing
+
+  // Complex parameter binded to optional acting para is present but path is missing for example , path is a.b.c.d and b.c.d is
+  // missing
+
+  @Test
+  public void withBoundOptionalActingParameterPresent() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameterPresent", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void withBoundOptionalActingParameter() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Optional value ommited"));
+  }
+
+  @Test
+  public void withBoundOptionalActingParameterFieldPresent() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameterFieldPresent", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Acting parameter value"));
+  }
+
+  @Test
+  public void withBoundOptionalActingParameterFieldMissingParameter() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameterFieldMissingParameter", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Optional value ommited"));
+  }
+
+  @Test
+  public void withBoundOptionalActingParameterFieldMissingField() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameterFieldMissingField", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Optional value ommited"));
+  }
+
+  @Test
+  public void withBoundOptionalActingParameterFieldMissingPath() throws Exception {
+    ValueResult result = getValueResult("withBoundOptionalActingParameterFieldMissingPath", "parameterWithValues");
+    assertThat(result.getFailure().isPresent(), is(false));
+    Set<Value> values = result.getValues();
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("Optional value ommited"));
+  }
 
 }

@@ -159,7 +159,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
     public ValueProviderFactoryModelPropertyBuilder withInjectableParameter(String name, MetadataType metadataType,
                                                                             boolean isRequired) {
-      return withInjectableParameter(name, metadataType, isRequired, null);
+      return withInjectableParameter(name, metadataType, isRequired, name);
     }
 
     public ValueProviderFactoryModelPropertyBuilder withInjectableParameter(String name, MetadataType metadataType,

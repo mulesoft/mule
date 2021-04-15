@@ -241,7 +241,6 @@ public class ValueProviderFactory {
   }
 
   private void injectValueProviderFields(Object resolver, Map<String, Object> resolvedParameters) throws ValueResolvingException {
-    TransformationService transformationService = muleContext.getTransformationService();
     List<String> missingParameters = new ArrayList<>();
     for (InjectableParameterInfo injectableParam : factoryModelProperty.getInjectableParameters()) {
       Object parameterValue = null;
@@ -250,6 +249,19 @@ public class ValueProviderFactory {
       parameterValue = resolvedParameters.get(parameterName);
 
       if (parameterValue != null) {
+        try {
+          parameterValue = expressionManager
+              .evaluate("#[payload]",
+                        DataType.fromType(Thread.currentThread().getContextClassLoader()
+                            .loadClass(injectableParam.getType().getAnnotation(ClassInformationAnnotation.class)
+                                .map(classInformationAnnotation -> classInformationAnnotation.getClassname())
+                                .orElse(Object.class.getName()))),
+                        BindingContext.builder()
+                            .addBinding("payload", new TypedValue(parameterValue, DataType.fromObject(parameterValue))).build())
+              .getValue();
+        } catch (ClassNotFoundException e) {
+          // Failed to transform value.
+        }
         setValueIntoField(resolver, parameterValue, parameterName, reflectionCache);
       } else if (injectableParam.isRequired()) {
         missingParameters.add(parameterName);
