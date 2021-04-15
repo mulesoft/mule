@@ -16,6 +16,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
 import static org.mule.test.petstore.extension.NumberPetAdoptionSource.ALL_NUMBERS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.FAILED_ADOPTION_COUNT;
@@ -40,10 +42,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.qameta.allure.Description;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SOURCES)
+@Story(POLLING)
 public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final int TIMEOUT = 5000;
@@ -68,7 +75,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "polling-source-config.xml";
+    return "source/polling-source-config.xml";
   }
 
   @Before

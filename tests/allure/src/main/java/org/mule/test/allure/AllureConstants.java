@@ -527,6 +527,19 @@ public interface AllureConstants {
 
   }
 
+  interface SourcesFeature {
+
+    String SOURCES = "Sources";
+
+    interface SourcesStories {
+
+      String FLOW_DISPATCH = "Dispatch to flow";
+      String POLLING = "Polling";
+      String WATERMARK = "Watermark";
+    }
+
+  }
+
   interface ScopeFeature {
 
     String SCOPE = "Scope";
@@ -771,4 +784,9 @@ public interface AllureConstants {
     String NOTIFICATIONS = "Notifications";
   }
 
+  interface ClusteringFeature {
+
+    String CLUSTERING = "Clustering";
+
+  }
 }
