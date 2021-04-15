@@ -14,7 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.RESOLVE_EXECUTION_MODE_BASED_ON_ENABLED_RECONNECTION_STRATEGY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -1357,12 +1357,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public static void configureResolveExuectionModeBasedOnEnabledReconnectionStrategy() {
     FeatureFlaggingRegistry ffRegistry = FeatureFlaggingRegistry.getInstance();
 
-    ffRegistry.registerFeature(RESOLVE_EXECUTION_MODE_BASED_ON_ENABLED_RECONNECTION_STRATEGY,
-                               ctx -> ctx.getConfiguration().getMinMuleVersion().map(v -> v.atLeast("4.4.0")).orElse(false));
+    ffRegistry.registerFeature(RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY,
+                               ctx -> false);
   }
 
   public boolean resolveExecutionModeBasedOnAsyncReconnectionPolicy() {
-    return featureFlaggingService.isEnabled(RESOLVE_EXECUTION_MODE_BASED_ON_ENABLED_RECONNECTION_STRATEGY);
+    return featureFlaggingService.isEnabled(RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY);
   }
 
   protected boolean honourOperationRetryPolicyOverride() {
