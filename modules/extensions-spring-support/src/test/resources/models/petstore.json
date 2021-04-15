@@ -22,6 +22,10 @@
       "type": "Object",
       "annotations": {
         "typeId": "org.mule.runtime.api.scheduler.SchedulingStrategy",
+        "extensibleType": {},
+        "typeAlias": {
+          "value": "SchedulingStrategy"
+        },
         "classInformation": {
           "classname": "org.mule.runtime.api.scheduler.SchedulingStrategy",
           "hasDefaultConstructor": false,
@@ -33,9 +37,6 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeAlias": {
-          "value": "SchedulingStrategy"
         }
       },
       "fields": []
