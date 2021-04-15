@@ -15,7 +15,6 @@ import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_OPERATION_RETRY_POLICY_TEMPLATE_OVERRIDE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.RESOLVE_EXECUTION_MODE_BASED_ON_ASYNC_RECONNECTION_STRATEGY;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
