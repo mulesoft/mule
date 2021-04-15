@@ -126,7 +126,7 @@ public class TransactionBindingDelegate {
     } finally {
       if (!bound) {
         try {
-          connectionHandler.release();
+          connectionHandler.invalidate();
         } catch (Exception e) {
           final String msg = "Ignored '" + e.getClass().getName() + ": " + e.getMessage() + "' during connection release";
           if (LOGGER.isDebugEnabled()) {
