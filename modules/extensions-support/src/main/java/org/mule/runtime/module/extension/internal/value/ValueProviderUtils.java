@@ -51,7 +51,7 @@ public class ValueProviderUtils {
   public static org.mule.runtime.extension.api.values.ValueBuilder cloneAndEnrichValue(org.mule.runtime.api.value.Value value,
                                                                                        List<ParameterModel> parameters) {
     Value sdkValue = new SdkValueAdapter(value);
-    return cloneAndEnrichMuleValue(sdkValue, orderParts(parameters), 1);
+    return cloneAndEnrichMuleValue(sdkValue, orderParts(parameters, null), 1);
   }
 
   /**
@@ -67,7 +67,11 @@ public class ValueProviderUtils {
   }
 
   public static ValueBuilder cloneAndEnrichValue(Value value, List<ParameterModel> parameters) {
-    return cloneAndEnrichValue(value, orderParts(parameters), 1);
+    return cloneAndEnrichValue(value, orderParts(parameters, null), 1);
+  }
+
+  public static ValueBuilder cloneAndEnrichValue(Value value, List<ParameterModel> parameters, String providerId) {
+    return cloneAndEnrichValue(value, orderParts(parameters, providerId), 1);
   }
 
   /**
@@ -96,7 +100,14 @@ public class ValueProviderUtils {
     return keyBuilder;
   }
 
-  private static Map<Integer, String> orderParts(List<ParameterModel> parameters) {
+  private static Map<Integer, String> orderParts(List<ParameterModel> parameters, String providerId) {
+    if (parameters.size() == 1 && !parameters.get(0).getFieldValueProviderModels().isEmpty()) {
+      return parameters.get(0).getFieldValueProviderModels().stream()
+          .filter(fieldValueProviderModel -> fieldValueProviderModel.getProviderId().equals(providerId))
+          .collect(toMap(ValueProviderModel::getPartOrder,
+                         fieldModel -> parameters.get(0).getName() + "." + fieldModel.getTargetPath()));
+    }
+
     return parameters.stream()
         .collect(toMap(param -> param.getValueProviderModel().get().getPartOrder(), NamedObject::getName));
   }

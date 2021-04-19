@@ -72,6 +72,18 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
         .getValues();
   }
 
+  Set<Value> getValuesFromSource(String flowName, String parameterName, String targetPath) throws Exception {
+    ValueResult valueResult =
+        valueProviderService.getFieldValues(Location.builder().globalName(flowName).addSourcePart().build(), parameterName,
+                                            targetPath);
+    if (valueResult.getFailure().isPresent()) {
+      ResolvingFailure resolvingFailure = valueResult.getFailure().get();
+      throw new ValueResolvingException(resolvingFailure.getMessage(), resolvingFailure.getFailureCode());
+    }
+    return valueResult
+        .getValues();
+  }
+
   Set<Value> getValues(String flowName, String parameterName) throws Exception {
     return checkResultAndRetrieveValues(getValueResult(flowName, parameterName));
   }
@@ -90,6 +102,15 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
                                           parameterName);
   }
 
+  Set<Value> getFieldValuesFromConfig(String configName, String parameterName, String targetPath) throws Exception {
+    return checkResultAndRetrieveValues(getFieldValuesResultFromConfig(configName, parameterName, targetPath));
+  }
+
+  public ValueResult getFieldValuesResultFromConfig(String configName, String parameterName, String targetPath) {
+    return valueProviderService.getFieldValues(Location.builder().globalName(configName).build(),
+                                               parameterName, targetPath);
+  }
+
   Set<Value> getValuesFromConnection(String configName, String parameterName) throws Exception {
     return checkResultAndRetrieveValues(getValueResultFromConnection(configName, parameterName));
   }
@@ -99,6 +120,15 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
         .getValues(Location.builder().globalName(configName).addConnectionPart().build(), parameterName);
   }
 
+  Set<Value> getFieldValuesFromConnection(String configName, String parameterName, String targetPath) throws Exception {
+    return checkResultAndRetrieveValues(getFieldValueResultFromConnection(configName, parameterName, targetPath));
+  }
+
+  public ValueResult getFieldValueResultFromConnection(String configName, String parameterName, String targetPath) {
+    return valueProviderService
+        .getFieldValues(Location.builder().globalName(configName).addConnectionPart().build(), parameterName, targetPath);
+  }
+
   private Set<Value> checkResultAndRetrieveValues(ValueResult values) throws ValueResolvingException {
     if (!values.isSuccess()) {
       ResolvingFailure resolvingFailure = values.getFailure().get();
@@ -106,4 +136,10 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
     }
     return values.getValues();
   }
+
+  ValueResult getValueResult(String flowName, String parameterName, String targetPath) throws Exception {
+    Location location = Location.builder().globalName(flowName).addProcessorsPart().addIndexPart(0).build();
+    return valueProviderService.getFieldValues(location, parameterName, targetPath);
+  }
+
 }

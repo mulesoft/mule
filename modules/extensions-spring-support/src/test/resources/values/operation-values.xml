@@ -91,10 +91,12 @@
             <values:values-group channels="#[payload ++ payload]" anyParameter="someValue"/>
         </values:values-inside-show-in-dsl-group>
     </flow>
+
     <flow name="withErrorValueProvider">
         <values:with-error-value-provider errorCode="CUSTOM_ERROR"/>
     </flow>
 
+<<<<<<< HEAD
     <flow name="withBoundActingParameter">
         <values:with-bound-acting-parameter actingParameter="Acting parameter value"/>
     </flow>
@@ -201,6 +203,14 @@
     <flow name="withBoundOptionalActingParameterFieldMissingPath">
         <values:with-bound-optional-acting-parameter-field
             actingParameter='#[output application/json --- { "otherField": "another value"}]'/>
+=======
+    <flow name="singleValuesEnabledParameterWithOneFieldValues">
+        <values:single-values-enabled-parameter-with-one-field-values channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithMoreThanOneFieldValues">
+        <values:single-values-enabled-parameter-with-more-than-one-field-values channels="dummyValue"/>
+>>>>>>> MULE-19041: Support value providers at body level
     </flow>
 
     <flow name="withBoundActingParameterFromContentField">

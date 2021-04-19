@@ -29,6 +29,10 @@
 
     <values:failure-config errorCode="#['CUSTOM_ERROR']" name="dynamic-failure-config"/>
 
+<<<<<<< HEAD
     <values:with-bound-value-parameter-config name="with-bound-acting-parameter"
                                               actingParameter="Acting parameter value"/>
+=======
+    <values:config-with-parameter-with-field-values-config name="config-with-parameter-with-field-values"/>
+>>>>>>> MULE-19041: Support value providers at body level
 </mule>

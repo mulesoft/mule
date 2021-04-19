@@ -138,4 +138,29 @@ public class SourcesValuesTestCase extends AbstractValuesTestCase {
     assertThat(values, hasValues("oneParameterValue", "someParameterValue"));
   }
 
+  @Test
+  public void sourceWithParameterWithFieldValues() throws Exception {
+    Set<Value> channels = getValuesFromSource("simple-source-with-parameter-with-field-values", "channel", "simple.path");
+    assertThat(channels, hasSize(3));
+    assertThat(channels, hasValues("channel1", "channel2", "channel3"));
+  }
+
+  @Test
+  public void multiLevelFieldValues() throws Exception {
+    Set<Value> values = getValuesFromSource("source-with-multi-level-field-values", "body",
+                                            "location.continent");
+
+    ValueMatcher americaValue = valueWithId(AMERICA)
+        .withDisplayName(AMERICA)
+        .withPartName("body.location.continent")
+        .withChilds(valueWithId(ARGENTINA)
+            .withDisplayName(ARGENTINA)
+            .withPartName("body.location.country")
+            .withChilds(valueWithId(BUENOS_AIRES)
+                .withDisplayName(BUENOS_AIRES)
+                .withPartName("body.location.city")));
+
+    assertThat(values, hasValues(americaValue));
+  }
+
 }

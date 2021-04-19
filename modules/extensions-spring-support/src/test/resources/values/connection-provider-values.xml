@@ -48,9 +48,14 @@
         <values:failure-connection errorCode="#['CUSTOM_ERROR']" />
     </values:config>
 
+<<<<<<< HEAD
     <values:config name="with-value-four-bound-acting-parameters">
         <values:with-value-four-bound-acting-parameters-connection parameterOne="some value"
                                                                    parameterTwo="another value"
                                                                    parameterThree="a value" parameterFour="last value"/>
+=======
+    <values:config name="with-parameter-with-field-values-connection">
+        <values:with-parameter-with-field-values-connection channel="dummyValue"/>
+>>>>>>> MULE-19041: Support value providers at body level
     </values:config>
 </mule>

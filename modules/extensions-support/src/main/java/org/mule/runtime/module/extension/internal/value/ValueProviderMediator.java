@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.value;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.withRefreshToken;
@@ -22,12 +21,14 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.runtime.module.extension.internal.loader.java.property.FieldsValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.values.ValueBuilder;
 import org.mule.sdk.api.values.ValueProvider;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -74,6 +75,23 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
   }
 
   /**
+   * Given the name of a parameter or parameter group and the target path of a field of the parameter, if the parameter supports
+   * it, this will try to resolve the {@link Value values} for the parameter's field.
+   *
+   * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
+   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires the value of
+   *                               parameters from the same parameter container.
+   * @param targetPath             the target path of the field of the parameter.
+   * 
+   * @return a {@link Set} of {@link Value} correspondent to the given parameter
+   * @throws ValueResolvingException if an error occurs resolving {@link Value values}
+   */
+  public Set<Value> getValues(String parameterName, String targetPath, ParameterValueResolver parameterValueResolver)
+      throws ValueResolvingException {
+    return getValues(parameterName, parameterValueResolver, targetPath, nullSupplier, nullSupplier);
+  }
+
+  /**
    * Given the name of a parameter or parameter group, and if the parameter supports it, this will try to resolve the {@link Value
    * values} for the parameter.
    *
@@ -91,6 +109,28 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
                               Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier)
       throws ValueResolvingException {
     return getValues(parameterName, parameterValueResolver, connectionSupplier, configurationSupplier, null);
+  }
+
+  /**
+   * Given the name of a parameter or parameter group and the target path of a field of the parameter, if the parameter supports
+   * it, this will try to resolve the {@link Value values} for the parameter's field.
+   *
+   * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
+   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires the value of
+   *                               parameters from the same parameter container.
+   * @param targetPath             the target path of the field of the parameter.
+   * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
+   *                               {@link ValueProvider}
+   * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
+   *                               {@link ValueProvider}
+   * 
+   * @return a {@link Set} of {@link Value} correspondent to the given parameter
+   * @throws ValueResolvingException if an error occurs resolving {@link Value values}
+   */
+  public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver, String targetPath,
+                              Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier)
+      throws ValueResolvingException {
+    return getValues(parameterName, parameterValueResolver, targetPath, connectionSupplier, configurationSupplier, null);
   }
 
   /**
@@ -112,6 +152,30 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
                               Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier,
                               ConnectionProvider connectionProvider)
       throws ValueResolvingException {
+    return getValues(parameterName, parameterValueResolver, null, connectionSupplier, configurationSupplier, connectionProvider);
+  }
+
+  /**
+   * Given the name of a parameter or parameter group and the target path of a field of the parameter, if the parameter supports
+   * it, this will try to resolve the {@link Value values} for the parameter's field.
+   *
+   * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
+   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires the value of
+   *                               parameters from the same parameter container.
+   * @param targetPath             the target path of the field of the parameter.
+   * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
+   *                               {@link ValueProvider}
+   * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
+   *                               {@link ValueProvider}
+   * @param connectionProvider     the connection provider in charge of providing the connection given by the connection supplier.
+   * @return a {@link Set} of {@link Value} correspondent to the given parameter
+   * @throws ValueResolvingException if an error occurs resolving {@link Value values}
+   */
+  public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver, String targetPath,
+                              Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier,
+                              ConnectionProvider connectionProvider)
+      throws ValueResolvingException {
+
     List<ParameterModel> parameters = getParameters(parameterName);
 
     if (parameters.isEmpty()) {
@@ -122,11 +186,21 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
 
     ParameterModel parameterModel = parameters.get(0);
 
-    ValueProviderFactoryModelProperty factoryModelProperty =
-        parameterModel.getModelProperty(ValueProviderFactoryModelProperty.class)
-            .orElseThrow(() -> new ValueResolvingException(format("The parameter with name '%s' is not an Values Provider",
-                                                                  parameterName),
-                                                           INVALID_VALUE_RESOLVER_NAME));
+    ValueProviderFactoryModelProperty factoryModelProperty;
+    if (targetPath != null) {
+      factoryModelProperty =
+          parameterModel.getModelProperty(FieldsValueProviderFactoryModelProperty.class)
+              .map(fieldsValueProvider -> fieldsValueProvider.getFieldsValueProviderFactories().get(targetPath))
+              .orElseThrow(() -> new ValueResolvingException(format("The parameter with name '%s' is not an Values Provider",
+                                                                    parameterName),
+                                                             INVALID_VALUE_RESOLVER_NAME));
+    } else {
+      factoryModelProperty =
+          parameterModel.getModelProperty(ValueProviderFactoryModelProperty.class)
+              .orElseThrow(() -> new ValueResolvingException(format("The parameter with name '%s' is not an Values Provider",
+                                                                    parameterName),
+                                                             INVALID_VALUE_RESOLVER_NAME));
+    }
 
     try {
       return withRefreshToken(connectionProvider,
@@ -139,6 +213,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
                                                parameterName, containerModel.getName(), e.getMessage()),
                                         UNKNOWN, e);
     }
+
   }
 
   private Set<Value> resolveValues(List<ParameterModel> parameters, ValueProviderFactoryModelProperty factoryModelProperty,
@@ -155,7 +230,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
       Set<org.mule.sdk.api.values.Value> valueSet = valueProvider.resolve();
 
       return valueSet.stream()
-          .map(option -> cloneAndEnrichValue(option, parameters))
+          .map(option -> cloneAndEnrichValue(option, parameters, valueProvider.getId()))
           .map(ValueBuilder::build)
           .map(MuleValueAdapter::new)
           .collect(toCollection(LinkedHashSet::new));
@@ -172,12 +247,18 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    * @return the correspondent parameter
    */
   private List<ParameterModel> getParameters(String valueName) {
-    return containerModel.getAllParameterModels()
-        .stream()
-        .filter(parameterModel -> parameterModel.getValueProviderModel()
-            .map(provider -> provider.getProviderName().equals(valueName))
-            .orElse(false))
-        .collect(toList());
-  }
+    List<ParameterModel> parameterModels = new ArrayList<>();
+    for (ParameterModel parameterModel : containerModel.getAllParameterModels()) {
+      if (parameterModel.getValueProviderModel().isPresent() &&
+          parameterModel.getValueProviderModel().get().getProviderName().equals(valueName)) {
+        parameterModels.add(parameterModel);
+      } else if (parameterModel.getFieldValueProviderModels()
+          .stream()
+          .anyMatch(fieldValueProviderModel -> fieldValueProviderModel.getProviderName().equals(valueName))) {
+        parameterModels.add(parameterModel);
+      }
+    }
 
+    return parameterModels;
+  }
 }

@@ -59,8 +59,17 @@
         <values:source-must-not-start/>
     </flow>
 
+<<<<<<< HEAD
     <flow name="source-with-two-bound-acting-parameters">
         <values:source-with-two-bound-acting-parameters oneParameter="oneParameterValue" someParameter="someParameterValue"/>
+=======
+    <flow name="simple-source-with-parameter-with-field-values" >
+        <values:simple-source-with-parameter-with-field-values channel="dummyValue"/>
+    </flow>
+
+    <flow name="source-with-multi-level-field-values">
+        <values:source-with-multi-level-field-values/>
+>>>>>>> MULE-19041: Support value providers at body level
     </flow>
 
 </mule>

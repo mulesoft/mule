@@ -380,4 +380,22 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(values, hasSize(1));
     assertThat(values, hasValues("Acting parameter value"));
   }
+
+  public void singleValuesEnabledParameterWithMoreThanOneFieldValues() throws Exception {
+    ValueResult result1 = getValueResult("singleValuesEnabledParameterWithMoreThanOneFieldValues", "body", "simple.path");
+    assertThat(result1.getValues(), hasSize(3));
+    assertThat(result1.getValues(), hasValues("channel1", "channel2", "channel3"));
+
+    ValueResult result2 = getValueResult("singleValuesEnabledParameterWithMoreThanOneFieldValues", "body", "another.simple.path");
+    assertThat(result2.getValues(), hasSize(1));
+    assertThat(result2.getValues(), hasValues("FALSE"));
+  }
+
+  @Test
+  public void singleValuesEnabledParameterWithOneFieldValues() throws Exception {
+    ValueResult result = getValueResult("singleValuesEnabledParameterWithOneFieldValues", "body", "simple.path");
+    assertThat(result.getValues(), hasSize(3));
+    assertThat(result.getValues(), hasValues("channel1", "channel2", "channel3"));
+  }
+
 }
